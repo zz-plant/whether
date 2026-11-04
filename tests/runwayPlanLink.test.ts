@@ -7,7 +7,7 @@ import {
   readSharedRunwayPlan,
   resolveSharedRunwayProfile,
 } from "../app/operate/components/runwayPlanLink";
-import { EMPTY_OPERATOR_PROFILE, OPERATOR_PROFILE_LIMITS } from "../lib/operatorProfile";
+import { EMPTY_OPERATOR_PROFILE, OPERATOR_PROFILE_LIMITS, resolveProfileRunway } from "../lib/operatorProfile";
 
 /**
  * A runway plan you can send someone.
@@ -108,6 +108,19 @@ describe("shared runway plan link", () => {
    * figures alone. Merging in this direction is what makes that true, and it is
    * also what lets a link carry one figure without blanking the rest.
    */
+  it("names a filing only for the figures it filled", () => {
+    const filing = { ticker: "BYND", name: "Fixture Foods", periodEnd: "2026-06-30", debtUsd: 500 };
+    const stored = { ...EMPTY_OPERATOR_PROFILE, cashUsd: 100, monthlyBurnUsd: 20, monthlyRevenueUsd: 10, filing };
+    // The reader's own link says what the filing said; a sector says nothing about it.
+    assert.deepEqual(resolveSharedRunwayProfile(stored, { cashUsd: 100, monthlyBurnUsd: 20, monthlyRevenueUsd: 10 }).filing, filing);
+    assert.deepEqual(resolveSharedRunwayProfile(stored, { sector: "consumer" }).filing, filing);
+    // Someone else's figures are not that company's, and carry none of its debt.
+    for (const shared of [{ cashUsd: 900 }, { runwayMonths: 9 }, { monthlyBurnUsd: 5 }, { monthlyGrowthPct: 3 }]) {
+      assert.equal(resolveSharedRunwayProfile(stored, shared).filing, undefined);
+    }
+    assert.equal(resolveProfileRunway(resolveSharedRunwayProfile(stored, { cashUsd: 90 }))?.debtExceedsCash, undefined);
+  });
+
   it("lets the link win where it speaks and the stored profile fill the rest", () => {
     const stored = { ...EMPTY_OPERATOR_PROFILE, runwayMonths: 30, monthlyBurnUsd: 10000 };
     const merged = resolveSharedRunwayProfile(stored, { runwayMonths: 6 });

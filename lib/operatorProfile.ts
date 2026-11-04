@@ -204,7 +204,7 @@ export const parseOperatorProfile = (value: unknown): OperatorProfile => {
 };
 
 /** Editing one of these makes the figures the reader's own, so the filing stops being named. */
-const FILED_FIGURES: ReadonlySet<keyof OperatorProfile> = new Set<keyof OperatorProfile>([
+export const FILED_FIGURES: ReadonlySet<keyof OperatorProfile> = new Set<keyof OperatorProfile>([
   "cashUsd",
   "runwayMonths",
   "monthlyBurnUsd",
@@ -284,7 +284,7 @@ export type ProfileRunway =
   /** Worked out: cash divided by net burn. */
   | { basis: "cash"; months: number; cashUsd: number; netBurnUsd: number; debtExceedsCash?: true }
   /** Typed in as a number of months. */
-  | { basis: "entered"; months: number }
+  | { basis: "entered"; months: number; debtExceedsCash?: never }
   /**
    * Revenue covers spending, so cash is not running down and there is no runway
    * to count. `cashUsd` is absent when the runway was typed rather than worked out.

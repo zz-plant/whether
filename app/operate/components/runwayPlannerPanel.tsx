@@ -393,9 +393,9 @@ export function RunwayPlannerPanel({
         </div>
 
         <CompanyFilingLookup onFiling={applyFiling} />
-        {storedProfile.filing ? (
+        {profile.filing ? (
           <p data-testid="company-filing-source" className="text-xs text-slate-300">
-            {describeProfileFiling(storedProfile.filing, storedProfile.cashUsd)}
+            {describeProfileFiling(profile.filing, profile.cashUsd)}
           </p>
         ) : null}
 

@@ -38,7 +38,13 @@ const useRunwayNotes = (regime: RegimeKey) => {
   const notes = useMemo(
     () =>
       runway && !thinlyCovered
-        ? buildRunwayConditionedNotes({ regime, ...runway, netMonthlyBurnUsd: netMonthlyBurnUsd(profile), selfFunded: stage === "bootstrapped" })
+        ? buildRunwayConditionedNotes({
+            regime,
+            ...runway,
+            netMonthlyBurnUsd: netMonthlyBurnUsd(profile),
+            selfFunded: stage === "bootstrapped",
+            debtExceedsCash: Boolean(resolveProfileRunway(profile)?.debtExceedsCash),
+          })
         : [],
     [regime, runway, profile, stage, thinlyCovered],
   );
