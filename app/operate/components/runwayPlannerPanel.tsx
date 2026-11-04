@@ -509,7 +509,7 @@ export function RunwayPlannerPanel({
             </span>
           </div>
 
-          <p className="mt-3 text-fluid-xs text-slate-400">
+          <p className="mt-3 text-fluid-sm text-slate-400">
             Your figures stay in this browser and are shared with the plan stress test.
           </p>
         </div>
@@ -537,7 +537,7 @@ export function RunwayPlannerPanel({
                 tone={output.runwayRisk.score >= 60 ? "rose" : output.runwayRisk.score >= 35 ? "amber" : "emerald"}
                 label="Runway risk now and if conditions worsen"
               />
-              <p className="mt-2 text-fluid-xs text-slate-400">{output.runwayRisk.summary}</p>
+              <p className="mt-2 text-fluid-sm text-slate-400">{output.runwayRisk.summary}</p>
             </article>
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold text-slate-400">Safe runway band</p>
@@ -557,9 +557,9 @@ export function RunwayPlannerPanel({
                 tone="emerald"
                 label="Safe runway band against your runway"
               />
-              <p className="mt-2 text-fluid-xs text-slate-400">{output.safeRunwayBand.summary}</p>
+              <p className="mt-2 text-fluid-sm text-slate-400">{output.safeRunwayBand.summary}</p>
               {inYourNumbers?.floorGap ? (
-                <p data-testid="planner-floor-gap" className="mt-2 text-fluid-xs text-semantic-caution-fg">{inYourNumbers.floorGap}</p>
+                <p data-testid="planner-floor-gap" className="mt-2 text-fluid-sm text-semantic-caution-fg">{inYourNumbers.floorGap}</p>
               ) : null}
             </article>
             <article className="weather-surface p-4">
@@ -588,7 +588,7 @@ export function RunwayPlannerPanel({
                   {inYourNumbers.runsOut ? ` ${inYourNumbers.runsOut}` : null}
                 </p>
               ) : null}
-              <p className="mt-2 text-fluid-xs text-slate-400">{output.raiseTimingWindow.summary}</p>
+              <p className="mt-2 text-fluid-sm text-slate-400">{output.raiseTimingWindow.summary}</p>
             </article>
             <article className="weather-surface p-4">
               <p className="text-xs font-semibold text-slate-400">Burn adjustment range</p>
@@ -614,7 +614,7 @@ export function RunwayPlannerPanel({
               {inYourNumbers?.burnChange ? (
                 <p data-testid="planner-burn-dollars" className="mt-2 text-sm text-slate-100">{inYourNumbers.burnChange}</p>
               ) : null}
-              <p className="mt-2 text-fluid-xs text-slate-400">{output.burnAdjustmentRange.summary}</p>
+              <p className="mt-2 text-fluid-sm text-slate-400">{output.burnAdjustmentRange.summary}</p>
               <p className={`mt-3 inline-flex rounded-sm border px-2 py-1 text-xs font-semibold ${paybackStrictnessState.tone}`}>
                 Payback bar: {paybackStrictnessState.label.toLowerCase()}
               </p>
@@ -629,7 +629,7 @@ export function RunwayPlannerPanel({
           <section id="ops-runway-lines" aria-labelledby="ops-runway-lines-heading" className="weather-surface space-y-3 p-4">
             <div>
               <p id="ops-runway-lines-heading" className="text-xs font-semibold text-slate-400">Your own runway lines</p>
-              <p className="mt-1 text-fluid-xs text-slate-400">
+              <p className="mt-1 text-fluid-sm text-slate-400">
                 Agree them now, while nothing is urgent. Each one shows the month you&apos;d hit it at
                 today&apos;s net burn, and goes out with the link and the memo.
               </p>
@@ -683,7 +683,7 @@ export function RunwayPlannerPanel({
               <li>• {output.boundedRules.burnDiscipline}</li>
             </ul>
             {resolution.growthAssumedFlat ? (
-              <p className="mt-3 text-fluid-xs text-slate-400">Growth was left blank, so revenue is held flat for the next six months.</p>
+              <p className="mt-3 text-fluid-sm text-slate-400">Growth was left blank, so revenue is held flat for the next six months.</p>
             ) : null}
           </div>
 
@@ -693,7 +693,7 @@ export function RunwayPlannerPanel({
             </summary>
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                <p className="text-fluid-xs text-slate-400">Built from the figures above. Check them before you send it.</p>
+                <p className="text-fluid-sm text-slate-400">Built from the figures above. Check them before you send it.</p>
                 <ClipboardActionRow
                   label="Copy memo"
                   state={memoClipboardState}
@@ -703,7 +703,7 @@ export function RunwayPlannerPanel({
                   compact
                 />
               </div>
-              <pre className="max-h-72 overflow-y-auto overscroll-contain whitespace-pre-wrap break-words rounded bg-slate-950/90 p-3 font-mono text-fluid-xs leading-relaxed text-slate-300 border border-slate-900">
+              <pre className="max-h-72 overflow-y-auto overscroll-contain whitespace-pre-wrap break-words rounded bg-slate-950/90 p-3 font-mono text-fluid-sm leading-relaxed text-slate-300 border border-slate-900">
                 {memoMarkdown}
               </pre>
             </div>

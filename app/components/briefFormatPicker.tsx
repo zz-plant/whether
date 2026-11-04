@@ -18,7 +18,7 @@ export const BriefPreview = ({ label, text }: { label: string; text: string }) =
     </div>
     <pre
       aria-label={`Preview of ${label}`}
-      className="whitespace-pre-wrap break-words p-3 text-fluid-xs leading-5 text-slate-300"
+      className="whitespace-pre-wrap break-words p-3 text-fluid-sm leading-5 text-slate-300"
     >
       {text}
     </pre>

@@ -14,7 +14,7 @@ export default function AcceptableUsePolicyPage() {
   return (
     <LegalPageShell title="Acceptable Use Policy">
 
-        <section className="space-y-4 text-sm leading-7 text-slate-200 sm:text-base">
+        <section className="space-y-4 text-base leading-7 text-slate-200">
           <p>
             This Acceptable Use Policy (&quot;Policy&quot;) governs use of the Whether software platform, APIs,
             data outputs, and related services (collectively, the &quot;Service&quot;). By accessing or using
@@ -24,7 +24,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">1. Nature of the Service</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             Whether provides analytical summaries and interpretive outputs derived from publicly
             available macroeconomic and market data. The Service is informational in nature, does not
             provide investment, legal, tax, accounting, or employment advice, does not predict future
@@ -35,7 +35,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">2. Permitted Use</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             You may use the Service for lawful internal business purposes, including strategic planning,
             capital allocation discussions, hiring and budgeting analysis, fundraising preparation, and
             board and investor communications. Subject to your agreement with Whether, outputs may be
@@ -45,7 +45,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">3. Prohibited Use</h2>
-          <div className="space-y-6 text-sm leading-7 text-slate-200 sm:text-base">
+          <div className="space-y-6 text-base leading-7 text-slate-200">
             <div>
               <h3 className="text-base font-semibold text-slate-100 sm:text-lg">
                 3.1 As Regulated Professional Advice
@@ -104,7 +104,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">4. Third-Party Data Sources</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             The Service relies on third-party data providers and publicly available datasets. Whether
             does not control third-party data sources and does not warrant availability, continuity,
             accuracy, timeliness, or completeness. Changes in third-party data may affect outputs
@@ -114,7 +114,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">5. No Warranty; Limitation of Reliance</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             The Service is provided &quot;as is&quot; and &quot;as available.&quot; To the maximum extent permitted by law,
             Whether disclaims all warranties, express or implied, and does not guarantee accuracy,
             fitness for a particular purpose, or uninterrupted availability. Users remain responsible
@@ -124,7 +124,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">6. Regulatory and Fiduciary Disclaimer</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             Nothing in the Service creates a fiduciary relationship, a duty of care beyond contractual
             obligations, an advisory or broker-dealer relationship, or a professional services
             relationship. The Service does not replace independent financial, legal, or accounting
@@ -134,7 +134,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">7. Suspension and Enforcement</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             Whether may suspend or terminate access to the Service if this Policy is violated, the
             Service is used in a manner that creates material legal or reputational risk, or fraudulent
             or unlawful activity is detected. Remedies are cumulative and do not limit other rights
@@ -144,7 +144,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">8. Modifications</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             Whether may modify this Policy upon reasonable notice. Continued use of the Service
             constitutes acceptance of any updates.
           </p>
@@ -152,7 +152,7 @@ export default function AcceptableUsePolicyPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">9. Governing Agreement</h2>
-          <p className="text-sm leading-7 text-slate-200 sm:text-base">
+          <p className="text-base leading-7 text-slate-200">
             This Policy supplements and does not replace any applicable Terms of Service, Master
             Services Agreement, or other binding contract between the parties. In the event of conflict,
             the governing agreement controls.

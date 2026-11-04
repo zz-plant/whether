@@ -183,7 +183,7 @@ export function NumberDraftField({
         </p>
       ) : null}
       {error ? (
-        <p id={`${id}-error`} role="alert" className="mt-1 text-fluid-xs text-amber-300">
+        <p id={`${id}-error`} role="alert" className="mt-1 text-fluid-sm text-amber-300">
           {error}
         </p>
       ) : null}

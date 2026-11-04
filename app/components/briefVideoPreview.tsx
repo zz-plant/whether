@@ -20,7 +20,7 @@ export function BriefVideoPreview({ asset, label }: { asset: BriefVideoAsset; la
         <track kind="captions" srcLang="en" src={asset.captions} label="What the clip shows" />
         <a href={asset.video}>Download the brief video</a>.
       </video>
-      <p className="text-fluid-xs leading-relaxed text-slate-400">
+      <p className="text-fluid-sm leading-relaxed text-slate-400">
         A {asset.duration}-second clip of the published brief. All guidance and source notes stay visible throughout.
       </p>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1">

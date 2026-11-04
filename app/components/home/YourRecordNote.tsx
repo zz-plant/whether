@@ -34,7 +34,7 @@ export function RecordNote({ view, recordDate }: { view: DecisionRecordView; rec
     <div
       data-testid="your-record-note"
       data-needs-attention={needsAttention ? "true" : "false"}
-      className={`mt-3 flex flex-wrap items-center justify-between gap-2.5 rounded-lg border px-3.5 py-2 text-fluid-xs leading-5 ${
+      className={`mt-3 flex flex-wrap items-center justify-between gap-2.5 rounded-lg border px-3.5 py-2 text-fluid-sm leading-5 ${
         needsAttention
           ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
           : "border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] text-slate-300"

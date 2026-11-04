@@ -332,7 +332,8 @@ details[open] > summary[data-chevron]::after,
   background: var(--bg-nested);
   color: var(--color-app-text-secondary);
   font-family: inherit;
-  font-size: 0.75em;
+  /* A keycap in a 12px line would otherwise draw at 9px. */
+  font-size: max(0.75rem, 0.75em);
   font-weight: 600;
   line-height: 1.4;
   justify-content: center;

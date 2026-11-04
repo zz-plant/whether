@@ -158,7 +158,7 @@ export async function ComparePanel({
             <p className="text-xs text-slate-400">{bbbDetail}</p>
           </div>
         </div>
-        <p className="mt-2 text-fluid-xs text-slate-400">
+        <p className="mt-2 text-fluid-sm text-slate-400">
           Period A is the filled dot, period B the hollow one; the lines are the ones in force in period A.
         </p>
       </section>
@@ -169,7 +169,7 @@ export async function ComparePanel({
       </div>
 
       {isFallback ? (
-        <p className="text-fluid-xs text-slate-400">Saved copy — not a live reading.</p>
+        <p className="text-fluid-sm text-slate-400">Saved copy — not a live reading.</p>
       ) : null}
     </div>
   );

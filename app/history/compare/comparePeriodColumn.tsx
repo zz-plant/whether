@@ -44,7 +44,7 @@ const SignalRow = ({ label, value, meaning, missing = false }: { label: string; 
   <tr className="border-b border-slate-800/50 last:border-0">
     <td className="py-2.5 font-medium text-slate-400">
       {label}
-      {meaning ? <span className="mt-0.5 block text-fluid-xs font-normal text-slate-500">{meaning}</span> : null}
+      {meaning ? <span className="mt-0.5 block text-fluid-sm font-normal text-slate-500">{meaning}</span> : null}
     </td>
     <td className={`py-2.5 text-right tabular-nums ${missing ? "text-slate-500" : "font-semibold text-slate-200"}`}>{value}</td>
   </tr>
@@ -142,20 +142,20 @@ export function ComparePeriodColumn({
 
         <dl className="space-y-3 border-t border-slate-800/80 pt-4">
           <div>
-            <dt className={`text-fluid-xs font-semibold ${DECISION_SLOT_TONE.action}`}>
+            <dt className={`text-fluid-sm font-semibold ${DECISION_SLOT_TONE.action}`}>
               {DECISION_CONTRACT_LABELS.action.actionNow}
             </dt>
             <dd className="mt-1 text-sm text-slate-200">{snapshot.weeklyCall.actionNow}</dd>
           </div>
           <div>
-            <dt className={`text-fluid-xs font-semibold ${DECISION_SLOT_TONE.threshold}`}>
+            <dt className={`text-fluid-sm font-semibold ${DECISION_SLOT_TONE.threshold}`}>
               {DECISION_CONTRACT_LABELS.threshold.pauseIf}
             </dt>
             <dd className="mt-1 text-sm text-slate-200">{snapshot.weeklyCall.pauseIf}</dd>
           </div>
           {weeklyCallChangeLines(snapshot.weeklyCall).map(({ label, value }) => (
             <div key={label}>
-              <dt className={`text-fluid-xs font-semibold ${DECISION_SLOT_TONE.reversal}`}>{label}</dt>
+              <dt className={`text-fluid-sm font-semibold ${DECISION_SLOT_TONE.reversal}`}>{label}</dt>
               <dd className="mt-1 text-sm text-slate-200">{value}</dd>
             </div>
           ))}

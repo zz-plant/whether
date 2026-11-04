@@ -230,8 +230,8 @@ export function ProjectPaybackSection({
           Engineering work against the payback bar
         </p>
         <p className="mt-1 text-sm text-slate-100">{describePaybackBar(bar, regime)}</p>
-        {whatMovesBar ? <p className="mt-1 text-fluid-xs text-slate-300">{whatMovesBar}</p> : null}
-        <p className="mt-1 text-fluid-xs text-slate-400">
+        {whatMovesBar ? <p className="mt-1 text-fluid-sm text-slate-300">{whatMovesBar}</p> : null}
+        <p className="mt-1 text-fluid-sm text-slate-400">
           Price each piece of work by what it saves: the payback bar measures how fast savings recoup build costs post-launch (hours someone no longer spends, and bills it cuts).
         </p>
       </div>
@@ -281,7 +281,7 @@ export function ProjectPaybackSection({
           </li>
         ))}
       </ul>
-      <p className="text-fluid-xs text-slate-400">
+      <p className="text-fluid-sm text-slate-400">
         The payback counts engineer time at what a week costs; the runway does not, because the engineers are paid either
         way. The saving starts in full the week the work ships, and the runway it adds assumes revenue stays flat. Paying a
         contractor for the work is new spend, so it falls under the Spending rule&apos;s{" "}

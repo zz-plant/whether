@@ -25,7 +25,7 @@ export function ScreenshotCaption({ detail, className = "" }: { detail?: string;
     <p
       aria-hidden="true"
       data-screenshot-caption
-      className={`flex items-center gap-1.5 text-[0.75rem] leading-none text-slate-400 ${className}`.trim()}
+      className={`flex items-center gap-1.5 text-xs leading-none text-slate-400 ${className}`.trim()}
     >
       <span className="font-semibold text-slate-300">Whether</span>
       <span aria-hidden="true">·</span>

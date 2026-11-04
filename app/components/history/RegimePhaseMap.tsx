@@ -459,7 +459,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                   unit={current.monthLabel}
                 />
               </FactList>
-              <dl className="space-y-1 text-fluid-xs">
+              <dl className="space-y-1 text-fluid-sm">
                 {[gaps.tightness, gaps.riskAppetite].map((gap) => (
                   <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
                     <dt className="text-slate-400">{gap.label}</dt>

@@ -99,7 +99,7 @@ function HearingThread({ guide }: { guide: (typeof stakeholderGuides)[number] })
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] text-[10px] font-semibold uppercase text-slate-300"
+          className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] text-xs font-semibold uppercase text-slate-300"
         >
           {guide.avatar}
         </span>

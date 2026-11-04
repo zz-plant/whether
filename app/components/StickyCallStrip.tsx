@@ -167,7 +167,7 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
             <a
               href={imageBriefHref}
               download="whether-brief.png"
-              className="weather-button weather-focus-ring weather-press-scale inline-flex flex-shrink-0 items-center justify-center text-fluid-xs"
+              className="weather-button weather-focus-ring weather-press-scale inline-flex flex-shrink-0 items-center justify-center text-fluid-sm"
               aria-label="Download decision card image"
             >
               <ImageIcon className="h-4 w-4" aria-hidden="true" />
@@ -175,7 +175,7 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
             <button
               type="button"
               onClick={handleCopy}
-              className="weather-button weather-focus-ring weather-press-scale inline-flex flex-shrink-0 items-center justify-center gap-1.5 text-fluid-xs"
+              className="weather-button weather-focus-ring weather-press-scale inline-flex flex-shrink-0 items-center justify-center gap-1.5 text-fluid-sm"
               aria-label={isCopied ? "Copied weekly guidance" : "Copy weekly guidance"}
             >
               {isCopied ? (

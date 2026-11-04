@@ -47,7 +47,7 @@ export function Breadcrumbs({
           return (
             <li key={`${item.href ?? item.label}-${index}`} className="inline-flex items-center gap-1.5">
               {index > 0 ? (
-                <span className="text-slate-600 select-none text-fluid-xs" aria-hidden="true">
+                <span className="text-slate-600 select-none text-fluid-sm" aria-hidden="true">
                   /
                 </span>
               ) : null}

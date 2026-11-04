@@ -217,7 +217,7 @@ export const SignalsWhatChangedSection = ({
           </tbody>
         </table>
       </div>
-      <p className="text-fluid-xs text-slate-400">
+      <p className="text-fluid-sm text-slate-400">
         <ActionLink href="/#what-would-change" variant="inline">
           {DECISION_CONTRACT_LABELS.watch.flipWatch}
         </ActionLink>

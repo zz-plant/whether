@@ -44,7 +44,7 @@ export function SharedArrivalNote({ orientation }: { orientation: string }) {
     <section
       aria-label="Shared with you"
       data-shared-arrival
-      className="border-l-2 border-[color:var(--border-default)] pl-3 text-fluid-xs leading-relaxed text-slate-300"
+      className="border-l-2 border-[color:var(--border-default)] pl-3 text-fluid-sm leading-relaxed text-slate-300"
     >
       <p>
         <span className="font-semibold text-slate-100">Shared with you.</span> {orientation}

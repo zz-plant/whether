@@ -70,7 +70,7 @@ function MonthEndHistory({ points, label, showLabel = false }: { points?: readon
   if (!points || points.length < 3) return null;
   return (
     <figure className="weather-signal-history mt-4 whitespace-normal text-slate-400">
-      {showLabel ? <p className="mb-2 text-fluid-xs text-slate-300">{label}</p> : null}
+      {showLabel ? <p className="mb-2 text-fluid-sm text-slate-300">{label}</p> : null}
       <Sparkline
         points={points}
         label={`${label}, month-end history`}
@@ -89,7 +89,7 @@ function InputHistoryGrid({ series }: { series: readonly { key: string; label: s
   if (usable.length === 0) return null;
   return (
     <div className="weather-input-history mt-4" data-testid="input-history-grid">
-      <p className="mb-2 text-fluid-xs font-medium text-slate-300">Inputs over the last ~90 days</p>
+      <p className="mb-2 text-fluid-sm font-medium text-slate-300">Inputs over the last ~90 days</p>
       <ul className="weather-grid gap-x-4 gap-y-3 [--col-min:10rem]">
         {usable.map((entry) => (
           <li key={entry.key} className="min-w-0">
@@ -236,7 +236,7 @@ export function WhatChangedSection({
                         moved 27 points, when part of a score's move can be an
                         input the earlier score never had. */}
                     {row.movement ? (
-                      <p className="text-fluid-xs font-normal leading-relaxed text-slate-300" data-movement={row.key}>
+                      <p className="text-fluid-sm font-normal leading-relaxed text-slate-300" data-movement={row.key}>
                         <span className="text-slate-400">What moved it: </span>
                         {row.movement}
                       </p>
@@ -285,7 +285,7 @@ export function WhatChangedSection({
                     <div className="space-y-1 text-xs text-slate-500">
                       <span className="block tabular-nums text-slate-200">{row.valueLabel}</span>
                       {!comparisonUnavailable && row.delta !== null && row.delta !== 0 && row.previousLabel ? (
-                        <span className="block text-[12px] tabular-nums text-slate-400">{`${basis.label}: ${row.previousLabel}`}</span>
+                        <span className="block text-xs tabular-nums text-slate-400">{`${basis.label}: ${row.previousLabel}`}</span>
                       ) : null}
                       {compact ? null : (
                         <span className="block">
@@ -305,18 +305,18 @@ export function WhatChangedSection({
       </div>
       {compact && hasHistory ? (
         <UrlDetails queryKey="inputs" initialOpen={historyOpen}
-          summary="Score history and market inputs" summaryClassName="weather-hit text-fluid-xs text-slate-300">
+          summary="Score history and market inputs" summaryClassName="weather-hit text-fluid-sm text-slate-300">
           <div className="space-y-4 pt-3">
             <div className="flex flex-wrap gap-8">
               {rows.map((row) => <MonthEndHistory showLabel key={row.key} points={history?.[row.key]} label={row.label} />)}
             </div>
-            {historyCaveat ? <p className="max-w-3xl text-fluid-xs text-slate-400">{historyCaveat}</p> : null}
+            {historyCaveat ? <p className="text-fluid-sm text-slate-400">{historyCaveat}</p> : null}
             {inputHistory ? <InputHistoryGrid series={inputHistory} /> : null}
           </div>
         </UrlDetails>
       ) : <>
         {historyCaveat && Object.values(history ?? {}).some((points) => points.length >= 3) ? (
-          <p className="max-w-3xl text-fluid-xs text-slate-400">{historyCaveat}</p>
+          <p className="text-fluid-sm text-slate-400">{historyCaveat}</p>
         ) : null}
         {inputHistory ? <InputHistoryGrid series={inputHistory} /> : null}
       </>}

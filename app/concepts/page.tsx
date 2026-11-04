@@ -199,7 +199,7 @@ function PairSide({ essay }: { essay: TimelineEssay }) {
     <div className="weather-sidebar-start gap-x-4 gap-y-1 [--aside:6rem] [--main-min:20rem]">
       <p className="type-eyebrow">{ADVICE_STANCE_DEFINITIONS[essay.stance].label}</p>
       <div className="min-w-0 space-y-1">
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           <a href={`#${essay.slug}`} className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">
             {essay.title}
           </a>{" "}
@@ -319,7 +319,7 @@ export default function ProductCanonPage() {
 
             <div className="space-y-2">
               <h3 className="text-base font-semibold text-slate-100">How soon after the record moved</h3>
-              <ul className="space-y-1.5 text-sm text-slate-300">
+              <ul className="space-y-1.5 text-base text-slate-300">
                 {describeCapitalAdviceLag(lag).map((sentence) => (
                   <li key={sentence}>{sentence}</li>
                 ))}
@@ -328,7 +328,7 @@ export default function ProductCanonPage() {
 
             <div className="space-y-2">
               <h3 className="text-base font-semibold text-slate-100">Funding pressure or risk appetite</h3>
-              <ul className="space-y-1.5 text-sm text-slate-300">
+              <ul className="space-y-1.5 text-base text-slate-300">
                 {describeScoreAlignment(alignment).map((sentence) => (
                   <li key={sentence}>{sentence}</li>
                 ))}
@@ -368,7 +368,7 @@ export default function ProductCanonPage() {
           }
         >
           {thisWeek.essays.length > 0 ? (
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-base text-slate-300">
               {thisWeek.essays.map((essay) => (
                 <li key={essay.slug}>
                   <a href={`#${essay.slug}`} className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">
@@ -379,7 +379,7 @@ export default function ProductCanonPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-300">
+            <p className="text-base text-slate-300">
               None of these was published in a {thisWeek.conditions} month, across the{" "}
               {monthsLabel(thisWeek.monthsInConditions)} of {thisWeek.conditions} on record.
             </p>
@@ -450,7 +450,7 @@ export default function ProductCanonPage() {
                     {formatCanonAuthors(essay)}
                     {essay.kind === "investorMemo" ? " · investor memo" : null}
                   </p>
-                  <p className="mt-2 text-sm text-slate-300">{essay.argument}</p>
+                  <p className="mt-2 text-base text-slate-300">{essay.argument}</p>
                   <p className="mt-1 text-xs text-slate-400" data-advice={essay.stance}>
                     <span className="font-semibold text-slate-200">{ADVICE_STANCE_DEFINITIONS[essay.stance].label}.</span>{" "}
                     {essay.stanceBasis}
@@ -467,7 +467,7 @@ export default function ProductCanonPage() {
         title="What this does not show"
         description="Every number above carries its limit. None of them is a forecast."
       >
-        <ul className="space-y-2 text-sm text-slate-300">
+        <ul className="space-y-2 text-base text-slate-300">
           <li>
             <span className="text-slate-100">A small, chosen sample.</span> These texts were picked because they
             were widely read; counting every post in the archives above checks that choice.
@@ -523,7 +523,7 @@ export default function ProductCanonPage() {
       </SecondaryPageSection>
 
       <SecondaryPageSection title="Sources">
-        <ul className="space-y-2 text-sm text-slate-300">
+        <ul className="space-y-2 text-base text-slate-300">
           <li>
             Conditions and scores each month: the month-end record on{" "}
             <ActionLink href="/history" variant="inline">

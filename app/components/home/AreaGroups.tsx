@@ -78,12 +78,12 @@ export function AreaGroups({
               </span>
             </h3>
             {group.condition || group.distance ? (
-              <p className="max-w-[64ch] text-fluid-sm text-slate-300" data-group-condition>
+              <p className="max-w-[60ch] text-fluid-sm text-slate-300" data-group-condition>
                 {[group.condition, group.distance].filter(Boolean).join(" ")}
               </p>
             ) : null}
             {group.history ? (
-              <p className="max-w-[64ch] text-fluid-xs text-slate-400" data-group-history>
+              <p className="max-w-[60ch] text-fluid-sm text-slate-400" data-group-history>
                 {group.history}
               </p>
             ) : null}
@@ -124,7 +124,7 @@ export function AreaGroups({
                         {sentence(entry.rule)}
                       </p>
                     </div>
-                    {entry.changed ? <p className="col-start-2 text-fluid-xs text-slate-400">{entry.changed}</p> : null}
+                    {entry.changed ? <p className="col-start-2 text-fluid-sm text-slate-400">{entry.changed}</p> : null}
                     {note ? <div className="col-start-2 empty:hidden">{note(entry.area)}</div> : null}
                     {open && detail ? (
                       <div id={`area-${entry.area}-detail`} aria-live="polite" className="col-start-2">

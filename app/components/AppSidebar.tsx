@@ -18,7 +18,7 @@ function OutlineItem({
   isActive: boolean;
 }) {
   const isHash = href.startsWith("#");
-  const linkClass = `rounded-lg px-2.5 py-2 text-fluid-xs no-underline transition-colors min-h-11 flex items-center justify-between group weather-focus-ring ${
+  const linkClass = `rounded-lg px-2.5 py-2 text-fluid-sm no-underline transition-colors min-h-11 flex items-center justify-between group weather-focus-ring ${
     isActive
       ? "bg-sky-500/15 text-white font-semibold border-l-2 border-sky-400 pl-2"
       : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 border-l-2 border-transparent pl-2"

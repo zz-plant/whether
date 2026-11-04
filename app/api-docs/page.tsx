@@ -32,13 +32,13 @@ type EndpointProps = {
 function Endpoint({ signature, children, tryHref, tryLabel, tryAriaLabel }: EndpointProps) {
   return (
     <div className="weather-surface px-4 py-3 space-y-1">
-      <code className="block text-fluid-xs font-semibold text-slate-100">{signature}</code>
+      <code className="block text-fluid-sm font-semibold text-slate-100">{signature}</code>
       <p className="text-xs text-slate-300">{children}</p>
       {tryHref ? (
         <a
           href={tryHref}
           aria-label={tryAriaLabel}
-          className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600"
+          className="inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600"
         >
           {tryLabel} →
         </a>
@@ -78,7 +78,7 @@ export default function ApiDocsPage() {
   return (
     <PageShell backdropVariant="default" structuredData={buildApiDocsStructuredData()}>
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
-        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">API and agent tools</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
           Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
           scores behind it, and the pause and restart lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.
@@ -87,42 +87,42 @@ export default function ApiDocsPage() {
         <section className="space-y-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="type-eyebrow">Connect Claude, Cursor & AI Agents (MCP)</h2>
-            <span className="text-fluid-micro font-mono text-emerald-400">Streamable HTTP • No auth required</span>
+            <span className="text-fluid-nano font-mono text-emerald-400">Streamable HTTP • No auth required</span>
           </div>
           <p className="text-xs text-slate-300">
             <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
             streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, each score's distance from its line, and a scenario's result while it reasons.
           </p>
           <div className="flex flex-wrap items-center gap-2" aria-label="Install the MCP server">
-            <a href={cursorInstallHref} className="weather-button inline-flex items-center text-fluid-xs">
+            <a href={cursorInstallHref} className="weather-button inline-flex items-center text-fluid-sm">
               Add to Cursor
             </a>
-            <a href={vscodeInstallHref} className="weather-button inline-flex items-center text-fluid-xs">
+            <a href={vscodeInstallHref} className="weather-button inline-flex items-center text-fluid-sm">
               Add to VS Code
             </a>
           </div>
           <div className="space-y-1.5">
-            <p className="text-fluid-micro text-slate-400">Claude Code:</p>
-            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <p className="text-fluid-nano text-slate-400">Claude Code:</p>
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               {claudeCodeCommand}
             </pre>
-            <p className="text-fluid-micro text-slate-400">
+            <p className="text-fluid-nano text-slate-400">
               Claude or ChatGPT on the web: add a custom connector with the address above.
             </p>
           </div>
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-fluid-micro text-slate-400">
+            <div className="flex items-center justify-between text-fluid-nano text-slate-400">
               <span>Claude Code, one line from any directory:</span>
             </div>
-            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               claude mcp add --transport http whether {siteUrl}/api/mcp
             </pre>
           </div>
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-fluid-micro text-slate-400">
+            <div className="flex items-center justify-between text-fluid-nano text-slate-400">
               <span>Claude Desktop (<code className="font-mono text-slate-300">claude_desktop_config.json</code>) or Cursor Settings → MCP:</span>
             </div>
-            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               {mcpClientConfig}
             </pre>
           </div>
@@ -437,18 +437,18 @@ export default function ApiDocsPage() {
             </Endpoint>
           </div>
           <div className="weather-surface px-4 py-3 space-y-2">
-            <p className="text-fluid-xs font-semibold text-slate-100">Embeddable widget</p>
+            <p className="text-fluid-sm font-semibold text-slate-100">Embeddable widget</p>
             <p className="text-xs text-slate-300">
               Drop the current guidance into an internal dashboard or wiki. It updates itself each week.
               Add <span className="font-mono text-slate-100">data-whether-ticker</span> or{" "}
               <span className="font-mono text-slate-100">data-whether-stage</span> to tailor it to one company.
             </p>
-            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               {embedSnippet}
             </pre>
             <Link
               href="/share#embed"
-              className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600"
+              className="inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600"
             >
               Configure it with a live preview →
             </Link>
@@ -460,7 +460,7 @@ export default function ApiDocsPage() {
           <p className="text-xs text-slate-300">
             The CLI&apos;s commands read public endpoints, so a script can make the same requests without it:
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+          <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
             curl {siteUrl}/api/cli/status
           </pre>
           <div className="space-y-3">
@@ -534,7 +534,7 @@ export default function ApiDocsPage() {
           </p>
         </section>
 
-        <p className="text-fluid-micro text-slate-400">
+        <p className="text-fluid-nano text-slate-400">
           All endpoints listed here are free and need no key or account. Data is provided for
           informational purposes.
         </p>

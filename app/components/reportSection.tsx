@@ -86,7 +86,7 @@ export function ReportSection({
             <SectionAnchor id={id} title={title} />
           </div>
           {description ? (
-            <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-300 sm:text-sm">
+            <p className="mt-1 text-xs leading-5 text-slate-300 sm:text-sm">
               {description}
             </p>
           ) : null}
@@ -132,7 +132,7 @@ export function ReportSection({
             <SectionAnchor id={id} title={title} />
           </div>
           {description ? (
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
+            <p className="mt-2 text-sm leading-7 text-slate-300">
               {description}
             </p>
           ) : null}

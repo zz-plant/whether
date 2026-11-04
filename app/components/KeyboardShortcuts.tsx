@@ -174,7 +174,7 @@ export function KeyboardShortcuts() {
   return (
     <>
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
-      <p className="flex items-center justify-center py-2 text-center text-fluid-micro text-[var(--app-text-muted)] [@media(hover:none)]:hidden">
+      <p className="flex items-center justify-center py-2 text-center text-fluid-nano text-[var(--app-text-muted)] [@media(hover:none)]:hidden">
         <button
           type="button"
           onClick={openHelp}

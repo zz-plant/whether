@@ -69,7 +69,7 @@ export function CommitmentTest({
 
   return (
     <div data-testid="commitment-test" className="space-y-2 border-t border-[color:var(--border-faint)] pt-3">
-      {showTitle ? <p className="text-fluid-xs font-medium text-slate-200">Test it against your runway</p> : null}
+      {showTitle ? <p className="text-fluid-sm font-medium text-slate-200">Test it against your runway</p> : null}
       <div className="weather-grid gap-2 [--col-min:13rem] [--grid-max:2]">
         <OperatorProfileNumberField
           field="cashUsd"
@@ -130,12 +130,12 @@ export function CommitmentTest({
       {/* The profile is browser-only, so this never renders on the server and
           today's date cannot disagree with a server-rendered one. */}
       {runway ? (
-        <p data-testid="commitment-runway" className="text-fluid-xs text-slate-300">
+        <p data-testid="commitment-runway" className="text-fluid-sm text-slate-300">
           {describeProfileRunway(runway, new Date())}
         </p>
       ) : null}
       {impact ? (
-        <div aria-live="polite" className="space-y-2 text-fluid-xs">
+        <div aria-live="polite" className="space-y-2 text-fluid-sm">
           {typeof impact.runwayBefore === "number" && typeof impact.runwayAfter === "number" ? (
             <div className="space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5">
               <div className="flex items-center justify-between text-fluid-nano text-slate-300">
@@ -215,7 +215,7 @@ export function CommitmentTestDisclosure({ regime }: { regime: RegimeKey }) {
   const [area, setArea] = useState<DecisionArea>("hiring");
   return (
     <details data-testid="commitment-test-disclosure" className="weather-auto-chevron">
-      <summary className="text-fluid-xs font-semibold text-slate-200">Test a decision against your runway</summary>
+      <summary className="text-fluid-sm font-semibold text-slate-200">Test a decision against your runway</summary>
       <div className="mt-2 space-y-2">
         <div className="sm:max-w-xs">
           <label htmlFor={areaId} className="block text-fluid-nano text-slate-400">

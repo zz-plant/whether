@@ -91,7 +91,7 @@ export const RegimeTimelinePanel = ({
             /* "Showing", not "Current": the strip ends at the last month-end,
                so on an October reading "Current: Aug 2026" named a month the
                brief above had already moved past. */
-            <dl className="flex items-baseline gap-1.5 text-fluid-xs">
+            <dl className="flex items-baseline gap-1.5 text-fluid-sm">
               <dt className="text-slate-400">Showing:</dt>
               <dd className="font-semibold tabular-nums text-slate-100">{currentLabel}</dd>
             </dl>
@@ -119,7 +119,7 @@ export const RegimeTimelinePanel = ({
                       <p className="truncate type-eyebrow text-slate-100 sm:text-xs">
                         {runLabel}
                       </p>
-                      <p className="hidden text-fluid-micro text-slate-200/90 sm:block">{spanLabel}</p>
+                      <p className="hidden text-fluid-nano text-slate-200/90 sm:block">{spanLabel}</p>
                     </div>
                   </div>
                 );

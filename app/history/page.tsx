@@ -273,10 +273,10 @@ export default async function HistoryPage({
                       {/* The conditions stamp every page draws: glyph, word and hue. */}
                       <Tag regime={newest.regime}>{getRegimePublicLabel(newest.regime)}</Tag>
                     </p>
-                    <p className="text-fluid-xs text-slate-400 line-clamp-2">{newest.summary}</p>
+                    <p className="text-fluid-sm text-slate-400 line-clamp-2">{newest.summary}</p>
                   </Link>
                   {run.length > 1 ? (
-                    <p className="flex flex-wrap gap-x-3 px-1 text-fluid-xs text-slate-400" data-brief-run-weeks>
+                    <p className="flex flex-wrap gap-x-3 px-1 text-fluid-sm text-slate-400" data-brief-run-weeks>
                       <span>Each week:</span>
                       {run.map((brief) => (
                         <Link key={brief.slug} href={buildPublishedBriefPath(brief.slug)} className="weather-hit tabular-nums underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
@@ -307,7 +307,7 @@ export default async function HistoryPage({
             <div className="space-y-3">
               <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
               <ConfidenceRecordSummary />
-              <p className="text-fluid-xs text-slate-400">
+              <p className="text-fluid-sm text-slate-400">
                 <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
                 </Link>
@@ -343,7 +343,7 @@ export default async function HistoryPage({
         queryKey="compare"
         initialOpen={Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1")}
         className="weather-auto-chevron weather-panel px-5 py-4"
-        summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
+        summaryClassName="cursor-pointer select-none text-fluid-sm font-medium text-white/70"
         summary={<span>Compare two periods side by side</span>}
       >
         <div className="mt-4">
@@ -355,7 +355,7 @@ export default async function HistoryPage({
         queryKey="explore"
         initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
         className="weather-auto-chevron weather-panel px-5 py-4"
-        summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
+        summaryClassName="cursor-pointer select-none text-fluid-sm font-medium text-white/70"
         summary={<span>Explore past months and signal trends</span>}
       >
         <div className="mt-4 space-y-5">

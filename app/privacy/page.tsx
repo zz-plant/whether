@@ -32,9 +32,9 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether privacy policy",
 });
 
-const paragraph = "text-sm leading-7 text-slate-200 sm:text-base";
+const paragraph = "text-base leading-7 text-slate-200";
 const heading = "text-xl font-semibold text-slate-50";
-const subheading = "text-base font-semibold text-slate-100 sm:text-lg";
+const subheading = "text-lg font-semibold text-slate-100";
 
 export default function PrivacyPage() {
   return (

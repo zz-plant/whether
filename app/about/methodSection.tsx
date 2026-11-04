@@ -26,7 +26,7 @@ export const DECISION_SLOT_TONE = {
 } as const;
 
 const slotLabelClass = (slot: keyof typeof DECISION_SLOT_TONE) =>
-  `text-fluid-xs font-semibold ${DECISION_SLOT_TONE[slot]}`;
+  `text-fluid-sm font-semibold ${DECISION_SLOT_TONE[slot]}`;
 
 /*
  * The method: an action, a pause line and a restart line, written down before the
@@ -48,13 +48,13 @@ export function MethodSection() {
       </h2>
 
       <section className="space-y-3">
-        <h3 className="type-eyebrow">In practice</h3>
+        <h3 className="text-fluid-lg font-semibold text-slate-100">In practice</h3>
         {/* Ruled at the left like a quoted answer, not boxed: in the same surface as
             the definitions it read as a fourth definition rather than the three filled in. */}
         <div className="space-y-2 border-l-2 border-slate-600 pl-4">
           <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
-          <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
-          <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Restart hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
+          <p className="text-base text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
+          <p className="text-base text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Restart hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
         </div>
         {/* The example's three lines, drawn on the axis they share: the pause
             line past the change line, the restart line inside it, and the hold
@@ -79,26 +79,26 @@ export function MethodSection() {
             <div className="grid gap-4">
               <div className="weather-surface px-4 py-4 space-y-2">
                 <p className={slotLabelClass("action")}>{DECISION_CONTRACT_LABELS.slot.action}</p>
-                <p className="text-sm text-slate-200">The commitment you will make this week.</p>
+                <p className="text-base text-slate-200">The commitment you will make this week.</p>
               </div>
               <div className="weather-surface px-4 py-4 space-y-2">
                 <p className={slotLabelClass("threshold")}>{DECISION_CONTRACT_LABELS.slot.threshold}</p>
-                <p className="text-sm text-slate-200">The measurable condition for pausing that commitment.</p>
+                <p className="text-base text-slate-200">The measurable condition for pausing that commitment.</p>
               </div>
               <div className="weather-surface px-4 py-4 space-y-2">
                 <p className={slotLabelClass("reversal")}>{DECISION_CONTRACT_LABELS.slot.reversal}</p>
-                <p className="text-sm text-slate-200">The condition that must be met before you restart.</p>
+                <p className="text-base text-slate-200">The condition that must be met before you restart.</p>
               </div>
             </div>
           </section>
 
           <section className="space-y-4">
-            <h3 className="type-eyebrow">Agree on them in advance</h3>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <h3 className="text-fluid-lg font-semibold text-slate-100">Agree on them in advance</h3>
+            <p className="text-base text-slate-300 leading-relaxed">
               Write down when you would pause and when you would restart before committing cash. When either
               happens, review the decision against the condition you agreed on.
             </p>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <p className="text-base text-slate-300 leading-relaxed">
               They give you a reason to review a decision. They cannot establish that it is right or safe;
               check your cash position and the costs of stopping or restarting.
             </p>
@@ -114,7 +114,7 @@ export function MethodSection() {
           Decision template to print or copy
         </summary>
         <div className="mt-4 space-y-4">
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-base text-slate-300 leading-relaxed">
             Complete this before committing cash.
           </p>
 
@@ -154,7 +154,7 @@ export function MethodSection() {
 
           <TemplateActions />
 
-          <p className="text-fluid-micro text-slate-400">
+          <p className="text-fluid-nano text-slate-400">
             Free to copy and share. No signup or data collection.
           </p>
         </div>

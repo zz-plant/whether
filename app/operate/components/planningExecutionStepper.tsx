@@ -152,13 +152,13 @@ function StepPanel({
               step.title
             )}
           </h2>
-          <p className="max-w-2xl text-sm leading-6 text-slate-300">
+          <p className="text-sm leading-6 text-slate-300">
             {step.description}
           </p>
           {/* Facts about the step, not controls: a pill is a button
               shape, and three of them in a row look like three actions. */}
           {step.owner || step.approvalStatus || step.changeSignal ? (
-            <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-fluid-xs text-slate-300">
+            <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-fluid-sm text-slate-300">
               {step.owner ? (
                 <div>
                   <dt className="inline text-slate-400">Owner: </dt>

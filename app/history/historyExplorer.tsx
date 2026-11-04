@@ -113,7 +113,7 @@ export function HistoryExplorer({
             <button
               type="button"
               onClick={clearSelection}
-              className="inline-flex min-h-[44px] items-center text-fluid-micro text-sky-200 hover:text-sky-100 underline decoration-sky-600"
+              className="inline-flex min-h-[44px] items-center text-fluid-nano text-sky-200 hover:text-sky-100 underline decoration-sky-600"
             >
               Clear filter
             </button>

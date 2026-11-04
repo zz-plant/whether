@@ -131,7 +131,7 @@ export const DecisionShieldPresetsSection = ({
                   key={starter.name}
                   type="button"
                   onClick={() => onApplyPreset(starter)}
-                  className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-3 text-fluid-xs font-medium"
+                  className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-3 text-fluid-sm font-medium"
                 >
                   {starter.name}
                 </button>

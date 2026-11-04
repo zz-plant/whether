@@ -69,7 +69,7 @@ export function RunwayMacroFanChart({
       </figcaption>
 
       {outlastVerdict ? (
-        <p className="text-fluid-xs text-slate-300 leading-snug border-l-2 border-amber-400/80 pl-2.5 py-0.5" data-outlast-verdict>
+        <p className="text-fluid-sm text-slate-300 leading-snug border-l-2 border-amber-400/80 pl-2.5 py-0.5" data-outlast-verdict>
           {outlastVerdict}
         </p>
       ) : null}

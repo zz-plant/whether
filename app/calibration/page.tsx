@@ -80,7 +80,7 @@ export default function CalibrationPage() {
         title="How it was measured"
         description="Which readings we counted, how we scored the outcome, and how the distance bands work."
       >
-        <ul className="space-y-2 text-sm text-slate-300">
+        <ul className="space-y-2 text-base text-slate-300">
           <li>
             <span className="text-slate-100">Sample.</span> Every monthly reading in the archive
             that has a following month to compare against — {totals.months} of them.
@@ -108,7 +108,7 @@ export default function CalibrationPage() {
         title="What it does not show"
         description="These limits are why we didn't just re-fit the number."
       >
-        <ul className="space-y-2 text-sm text-slate-300">
+        <ul className="space-y-2 text-base text-slate-300">
           <li>
             {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is not enough to estimate a probability per band. A
             curve fitted to that base rate would report about 97% every week and discriminate nothing. That is worse than a number that at least measures something real.
@@ -122,14 +122,14 @@ export default function CalibrationPage() {
             about this number, not about forecasting scores generally.
           </li>
         </ul>
-        <p className="mt-4 text-sm text-slate-300">
+        <p className="mt-4 text-base text-slate-300">
           So the room before a change still measures distance, which it can do honestly, and this record
           sits next to it instead of being folded in.
         </p>
       </SecondaryPageSection>
 
       <SecondaryPageSection title="Sources">
-        <ul className="space-y-2 text-sm text-slate-300">
+        <ul className="space-y-2 text-base text-slate-300">
           <li>
             Rates:{" "}
             <a

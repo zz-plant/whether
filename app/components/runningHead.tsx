@@ -164,7 +164,7 @@ export function RunningHead() {
         /* The brief's own line on a phone: the call, which is what a screenshot of the
            brief is for, and the jump to what it changes. The desktop brief keeps its
            floating strip for both. */
-        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-4 pb-1 text-fluid-xs sm:px-7 md:hidden">
+        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-4 pb-1 text-fluid-sm sm:px-7 md:hidden">
           <span aria-hidden="true" className="min-w-0 flex-1 truncate font-medium text-slate-50">
             {facts.call}
           </span>

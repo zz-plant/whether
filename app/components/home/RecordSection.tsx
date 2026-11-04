@@ -47,7 +47,7 @@ export function RecordSection({
               reading, the record behind this band is month-end readings. Said
               once, under the band, because a reader comparing the two would
               otherwise read the difference as a data gap (2026-10-22). */}
-          <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400" data-record-sampling>
+          <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-400" data-record-sampling>
             This band shows end-of-month readings; the guidance above is this week&rsquo;s. A week that changed
             the guidance shows up at the end of its month.
           </p>
@@ -57,9 +57,9 @@ export function RecordSection({
           two at 20rem: two short answers that stacked under a full-width band left
           half a laptop screen empty. */}
       <div className="weather-switch items-start gap-x-8 gap-y-4 [--col-min:20rem]">
-        {spellLengths?.rest ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{spellLengths.rest}</p> : null}
+        {spellLengths?.rest ? <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300">{spellLengths.rest}</p> : null}
         {turningPoints.length > 0 ? (
-          <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">
+          <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300">
             What the guidance said the last few times conditions changed:{" "}
             {turningPoints.map((point, index) => (
               <span key={point.href}>

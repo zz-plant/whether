@@ -62,19 +62,19 @@ export default function AboutPage() {
       <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
-        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">How Whether works</h1>
-        <p className="text-sm text-slate-300">
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">How Whether works</h1>
+        <p className="text-base text-slate-300">
           Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
         </p>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">How it works</h2>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a
           score at which to restart. The two are set apart, so a small move back won&rsquo;t restart anything.
         </p>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           Each published brief stays on record. The{" "}
           <Link href="/history#track-record" className={inlineLinkClass}>
             track record
@@ -92,15 +92,15 @@ export default function AboutPage() {
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">Where it fits and where it does not</h2>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
           Set when each area pauses and restarts for your own plan, and get an email the day one does.
         </p>
         {/* Two blocks, one per list: together they ran 862px, taller than a phone
             screen, so no screenshot held the answer to "does this fit us" whole. */}
         <div data-frame-block="" className="space-y-1.5">
-          <p className="text-sm font-semibold text-slate-100">It fits</p>
-          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+          <p className="text-base font-semibold text-slate-100">It fits</p>
+          <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
             <li>
               Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
               contract, the runway to hold before the next raise.
@@ -124,8 +124,8 @@ export default function AboutPage() {
           </ul>
         </div>
         <div data-frame-block="" className="space-y-1.5">
-          <p className="text-sm font-semibold text-slate-100">It does not fit</p>
-          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+          <p className="text-base font-semibold text-slate-100">It does not fit</p>
+          <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
             <li>
               A single hire or purchase. The rules are a policy for a kind of decision, not a verdict on one.
             </li>
@@ -148,11 +148,11 @@ export default function AboutPage() {
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">Who writes it</h2>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           <span className="font-semibold text-slate-100">{publisherAuthor.name}</span> — {publisherAuthor.role}
         </p>
-        <p className="text-sm text-slate-300">{publisherAuthor.bio}</p>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">{publisherAuthor.bio}</p>
+        <p className="text-base text-slate-300">
           The pause-and-resume structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products.
           That work is listed at{" "}
           <a href={publisherAuthor.sameAs[0]} className={inlineLinkClass}>
@@ -164,7 +164,7 @@ export default function AboutPage() {
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">What it is built from</h2>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
           pressure comes from the one-month bill rate, the speed of its rise, and long rates falling below short ones.
           Risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings then adjust
@@ -172,11 +172,11 @@ export default function AboutPage() {
           conditions, and the VIX index of expected stock-market turbulence. Where the pair lands sets the conditions:
           Sunny, Cloudy, Stormy or Freezing.
         </p>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           Two startup-market inputs lower risk appetite when they weaken: the pace of venture funding and tech layoffs.
           They come from a curated snapshot rather than a live feed, and every surface that uses them says so.
         </p>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           Inflation and unemployment appear on the signals page but enter neither score. Everything that does is
           published with its formula, source and refresh schedule.
         </p>
@@ -192,7 +192,7 @@ export default function AboutPage() {
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">Corrections and questions</h2>
-        <p className="text-sm text-slate-300">
+        <p className="text-base text-slate-300">
           Whether publishes dated records that will not change after the fact. If a published brief is wrong, say so
           and it gets a correction note rather than a silent edit.
         </p>

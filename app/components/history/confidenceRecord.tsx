@@ -108,7 +108,7 @@ function MarginReliabilityChart({ rows }: { rows: readonly BandRow[] }) {
         <text x={pad.l} y={H - 6} fontSize="11" fill="currentColor" opacity="0.7">Published % →</text>
         <text textAnchor="middle" transform={`translate(10 ${(pad.t + H - pad.b) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Held % →</text>
       </svg>
-      <figcaption className="max-w-[36rem] text-fluid-xs text-slate-400">
+      <figcaption className="max-w-[36rem] text-fluid-sm text-slate-400">
         Each dot is a band of the table below, sized by its months. Above the dashed line, the band held more
         often than its published percent; below it, less often.
       </figcaption>
@@ -192,12 +192,12 @@ function ConfidenceRecordBody() {
 
       <RecentYearParagraph />
 
-      <p className="text-fluid-xs text-slate-400">
+      <p className="text-fluid-sm text-slate-400">
         A held month means conditions did not change.
         {" "}
         {CALL_CHANGE_RULE}
       </p>
-      <p className="text-fluid-xs text-slate-400" data-record-rescore>
+      <p className="text-fluid-sm text-slate-400" data-record-rescore>
         {describeCalibrationRescore({ held: totals.held, comparisons: totals.months })}
       </p>
     </div>

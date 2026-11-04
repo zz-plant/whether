@@ -170,7 +170,7 @@ export function WhatWouldChangeSection({
                 </dl>
               ) : null}
               {marketMoves.length > 0 ? (
-                <details className="weather-auto-chevron text-fluid-xs">
+                <details className="weather-auto-chevron text-fluid-sm">
                   <summary className="cursor-pointer select-none font-medium text-slate-300">In interest-rate terms</summary>
                   <ul className="space-y-1.5 text-slate-300">
                     {/* The everyday size leads; the instrument and the record's count are the
@@ -210,7 +210,7 @@ export function WhatWouldChangeSection({
                 ) : null}
               </dl>
               {resumeLine ? (
-                <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
+                <p className="max-w-[52ch] text-fluid-sm leading-relaxed text-slate-400">
                   Better conditions alone won&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
                 </p>
               ) : null}
@@ -218,7 +218,7 @@ export function WhatWouldChangeSection({
           ) : null}
 
           {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
-            <div className="space-y-0.5 text-fluid-xs">
+            <div className="space-y-0.5 text-fluid-sm">
               <p className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
               <p className="text-slate-300">{flipConditions.join(" · ")}</p>
             </div>

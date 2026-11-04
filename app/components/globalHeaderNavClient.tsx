@@ -99,7 +99,7 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
                     className={`${SHEET_LINK_CLASS} ${sheetLinkTone(isActive)}`}
                   >
                     <span>{page.label}</span>
-                    <span className="text-fluid-micro font-normal text-slate-400">{page.description}</span>
+                    <span className="text-fluid-nano font-normal text-slate-400">{page.description}</span>
                   </Link>
                 );
               })}
@@ -122,7 +122,7 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
                     className={`${SHEET_LINK_CLASS} ${sheetLinkTone(isActive)}`}
                   >
                     <span>{link.label}</span>
-                    <span className="text-fluid-micro font-normal text-slate-400">{link.description}</span>
+                    <span className="text-fluid-nano font-normal text-slate-400">{link.description}</span>
                   </Link>
                 );
               })}
@@ -166,7 +166,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
             href={link.href}
             aria-current={link.isActive ? "page" : undefined}
             title={`${link.description} Press ${link.shortcut}.`}
-            className={`group relative flex min-h-11 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
+            className={`group relative flex min-h-11 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-fluid-sm tracking-[0.02em] no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
               link.isActive
                 ? "text-white font-semibold"
                 : "text-slate-400 font-medium hover:text-slate-100"
@@ -204,7 +204,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
               href={link.href}
               aria-current={isActive ? "page" : undefined}
               title={link.description}
-              className={`${link.header === "lg" ? "hidden lg:flex" : "flex"} min-h-11 items-center rounded-md px-2 py-1.5 text-fluid-xs no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
+              className={`${link.header === "lg" ? "hidden lg:flex" : "flex"} min-h-11 items-center rounded-md px-2 py-1.5 text-fluid-sm no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
                 isActive ? "text-slate-100 font-semibold" : "text-slate-500 font-medium hover:text-slate-200"
               }`}
             >

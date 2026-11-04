@@ -12,12 +12,12 @@
    values, and — through `.type-section`'s old 1.5–1.875rem — a panel title
    larger than the page section it sat in. Adjacent to a card heading
    (`text-fluid-lg`, 17–20px) the 22px version was a 1.1x step, which is not a
-   step. One primitive now, sized so the ladder reads: h1 28–52, h2 22–26,
-   h3 17–20, body 15–17.
+   step. One primitive now, sized so the ladder reads: the call 28–52, page
+   title 26–34, h2 22–26, h3 18–20, body 16–17.
    Ink is set here and may be overridden by a caller that has a reason. */
 .type-section {
   @apply font-semibold leading-tight text-slate-100;
-  font-size: clamp(1.375rem, 1rem + 1.1vw, 1.625rem);
+  font-size: var(--text-fluid-xl);
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
   letter-spacing: -0.015em;
@@ -28,7 +28,7 @@
 
 .type-label {
   @apply font-medium text-slate-400;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   letter-spacing: 0.04em;
   text-transform: none;
 }
@@ -41,7 +41,7 @@
    Distinct from .type-label, which is the sentence-case metadata label the
    surface system was migrating toward. Keeping them separate means the case
    change can happen here, once, rather than being decided per call site.
-   Values are the dominant ones: fluid-xs at 0.12em (125 of the 282).
+   Values were the dominant ones at the time: 0.12em (125 of the 282).
 
    Sentence case since 2026-09-23 (DD-028, ui-ux-standards §XVIII). The case
    change happened here, once, as the paragraph above intended: capitals are
@@ -52,7 +52,7 @@
 
 .type-eyebrow {
   @apply font-semibold text-slate-400;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   letter-spacing: 0.01em;
   /* An eyebrow is a label, whatever element carries it. Without this, the
      `:where(h1, h2)` display-face rule below set every h2 eyebrow in the serif
@@ -90,7 +90,7 @@ svg :where(.type-eyebrow, .type-badge) {
 
 .type-badge {
   @apply font-semibold uppercase;
-  font-size: var(--fs-micro);
+  font-size: var(--fs-nano);
   letter-spacing: 0.08em;
   /* Case-sensitive forms: Archivo lifts the hyphen to sit between capitals
      rather than at x-height. */

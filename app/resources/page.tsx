@@ -228,7 +228,7 @@ export default async function ResourcesHubPage({
               <li key={entry.href}>
                 <Link href={entry.href} className="weather-surface block space-y-1 px-4 py-4 text-sm text-slate-100 hover:border-sky-500/50">
                   <span className="block font-semibold">{entry.title}</span>
-                  <span className="block text-fluid-xs text-slate-400">{entry.description}</span>
+                  <span className="block text-fluid-sm text-slate-400">{entry.description}</span>
                 </Link>
               </li>
             ))}

@@ -85,7 +85,7 @@ export function PlanStressTestMode({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <label htmlFor="decision-shield-plan-input" className="block text-fluid-xs text-slate-300">
+        <label htmlFor="decision-shield-plan-input" className="block text-fluid-sm text-slate-300">
           Plan description <span className="text-slate-400">· name the commitment and its size</span>
         </label>
         <textarea
@@ -115,7 +115,7 @@ export function PlanStressTestMode({
 
       {engaged ? (
         <div className="space-y-2">
-          <p className="text-fluid-xs text-slate-400">
+          <p className="text-fluid-sm text-slate-400">
             Runway and monthly spend are optional; with both, the verdict is sized against the cash they imply, at
             spend less any revenue you entered on the runway planner.
           </p>
@@ -178,7 +178,7 @@ export function PlanStressTestMode({
             {stressTestResult.verdict === null ? (
               <>
                 <p className="type-data text-slate-200 break-words font-medium">{stressTestResult.headline}</p>
-                <p className="text-fluid-xs text-slate-300">{stressTestResult.nextStep}</p>
+                <p className="text-fluid-sm text-slate-300">{stressTestResult.nextStep}</p>
               </>
             ) : (
               <>
@@ -195,7 +195,7 @@ export function PlanStressTestMode({
                   }`}>
                     {stressTestResult.verdict}
                   </span>
-                  <span className="text-fluid-xs text-slate-300 font-semibold">
+                  <span className="text-fluid-sm text-slate-300 font-semibold">
                     Category: {stressTestResult.detectedCategory}
                   </span>
                 </div>
@@ -214,7 +214,7 @@ export function PlanStressTestMode({
             {stressTestResult.sizingNote ? (
               <div className="rounded border border-slate-800/80 bg-slate-900/60 p-2.5">
                 <p className="type-eyebrow">Sizing</p>
-                <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.sizingNote}</p>
+                <p className="text-fluid-sm text-slate-300 mt-0.5">{stressTestResult.sizingNote}</p>
               </div>
             ) : null}
 
@@ -222,7 +222,7 @@ export function PlanStressTestMode({
               <p className="type-eyebrow">What this plan assumes</p>
               <ul className="space-y-1">
                 {stressTestResult.fragileAssumptions.map((assumption, idx) => (
-                  <li key={idx} className="text-fluid-xs text-amber-200/90 flex items-start gap-1.5">
+                  <li key={idx} className="text-fluid-sm text-amber-200/90 flex items-start gap-1.5">
                     <span className="text-amber-400 font-bold">•</span>
                     <span>{assumption}</span>
                   </li>
@@ -233,15 +233,15 @@ export function PlanStressTestMode({
             <div className="border-t border-slate-800 pt-2.5 weather-switch gap-3 [--col-min:12rem]">
               <div>
                 <p className="type-eyebrow">{publicDecisionLabels.threshold}</p>
-                <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
+                <p className="text-fluid-sm text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
               </div>
               <div>
                 <p className="type-eyebrow">A more reversible version</p>
-                <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
+                <p className="text-fluid-sm text-slate-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
               </div>
               <div>
                 <p className="type-eyebrow">{publicDecisionLabels.reversal}</p>
-                <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.reversalTrigger}</p>
+                <p className="text-fluid-sm text-slate-300 mt-0.5">{stressTestResult.reversalTrigger}</p>
               </div>
             </div>
               </>
@@ -293,7 +293,7 @@ function ComparedPlanVerdict({ plan }: { plan: PlanStressTestResult }) {
   return (
     <>
       <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${tone}`}>Verdict: {plan.verdict ?? "Not graded"}</span>
-      <p className="text-fluid-xs text-slate-300 mt-1.5">{plan.verdict === null ? plan.headline : plan.reversibleAlternative}</p>
+      <p className="text-fluid-sm text-slate-300 mt-1.5">{plan.verdict === null ? plan.headline : plan.reversibleAlternative}</p>
     </>
   );
 }
@@ -312,7 +312,7 @@ export function ComparePlansMode({
           <div className="space-y-4">
             {/* No heading: the mode switch directly above already reads "Compare two plans". */}
             <div>
-              <p className="text-fluid-xs text-slate-400">
+              <p className="text-fluid-sm text-slate-400">
                 Describe two plans. The one that holds up better in this week&apos;s conditions is named below.
               </p>
               <div className="flex flex-wrap items-center gap-2 pt-2">
@@ -374,7 +374,7 @@ export function ComparePlansMode({
             <div aria-live="polite">
               {anyPlan ? (
                 <div className="p-3.5 bg-slate-900/40 border border-slate-700/70 rounded-lg flex items-center justify-between">
-                  <span className="text-fluid-xs text-slate-100 font-semibold">
+                  <span className="text-fluid-sm text-slate-100 font-semibold">
                     {comparisonReady
                       ? `Recommendation: ${comparisonResult.comparativeRecommendation}`
                       : "Describe both plans to compare them."}

@@ -74,7 +74,7 @@ export function ChatPreview({ label, text }: { label: string; text: string }) {
           <summary className="px-3 text-xs text-slate-400 hover:text-slate-200">Show the text that copies</summary>
           <pre
             aria-label={`Text of ${label}`}
-            className="whitespace-pre-wrap break-words px-3 pb-3 text-fluid-xs leading-5 text-slate-300"
+            className="whitespace-pre-wrap break-words px-3 pb-3 text-fluid-sm leading-5 text-slate-300"
           >
             {text}
           </pre>

@@ -53,7 +53,7 @@ export function HomeSection({
         </h2>
         {action}
       </div>
-      {lead ? <p className="max-w-3xl text-fluid-lg font-medium leading-snug text-slate-50" data-section-lead>{lead}</p> : null}
+      {lead ? <p className="text-fluid-lg font-medium leading-snug text-slate-50" data-section-lead>{lead}</p> : null}
       {children}
     </section>
   );
