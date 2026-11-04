@@ -509,8 +509,16 @@ describe("stress test — detection confidence", () => {
   it("sends venture debt and a secondary sale to the answers that cover them", () => {
     const debt = runStressTest(buildExpansionAssessment(), { planText: "Raise $2M of venture debt" });
     assert.ok(debt.verdict === null && debt.answerTopic === "should-startups-take-venture-debt-now");
-    const secondary = runStressTest(buildExpansionAssessment(), { planText: "Run a tender offer for employees" });
-    assert.ok(secondary.verdict === null && secondary.answerTopic === "should-startups-change-compensation-now");
+    for (const planText of ["Run a tender offer for employees", "Offer engineers a secondary sale", "Tender offer so early employees can sell shares"]) {
+      const secondary = runStressTest(buildExpansionAssessment(), { planText });
+      assert.ok(secondary.verdict === null && secondary.answerTopic === "should-startups-change-compensation-now", planText);
+    }
+  });
+
+  it("grades a tender offer for a company as the acquisition it is", () => {
+    for (const planText of ["Acquire a competitor through a tender offer", "Make a tender offer for a competitor", "Launch a tender offer for our rival", "Buy a smaller competitor via tender offer", "Merger structured as a tender offer"]) {
+      assert.equal(stressTestDecisionPlan(buildExpansionAssessment(), { planText }).detectedCategory, "M_AND_A", planText);
+    }
   });
 
   it("still grades the discount side of pricing, in the plural too", () => {

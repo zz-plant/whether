@@ -338,6 +338,12 @@ const BUYING_A_COMPANY =
 
 const VENTURE_DEBT = /\bventure\s+(?:debt|loan)\b/;
 
+/* A tender offer is also how a buyer acquires a company, which spends cash the test has a row for. */
+const TENDER_OFFER_FOR_A_COMPANY = /\btender\s+offer\b.*\b(?:competitor|rival|startup)\b|\b(?:competitor|rival|startup)\b.*\btender\s+offer\b/;
+
+const readsAsAcquisition = (lower: string) =>
+  /\b(acquire|acquiring|acquisition|merger|m&a)\b/.test(lower) || BUYING_A_COMPANY.test(lower) || TENDER_OFFER_FOR_A_COMPANY.test(lower);
+
 /* Shares changing hands between holders, not money the company spends or raises. */
 const SECONDARY_SALE = /\b(?:secondary\s+(?:sale|sales|offering|transaction)|tender\s+offer)\b/;
 
@@ -363,7 +369,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
       },
     };
   }
-  if (SECONDARY_SALE.test(lower)) {
+  if (SECONDARY_SALE.test(lower) && !readsAsAcquisition(lower)) {
     return {
       ungraded: {
         headline: "Not graded: this sells existing shares, and the stress test grades commitments that spend the company's cash.",
@@ -413,7 +419,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   if (/\b(discount|discounts|pricing|price|prices|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contracts?)\b/.test(lower)) {
     return { category: "PRICING", action: "DISCOUNT" };
   }
-  if (/\b(acquire|acquiring|acquisition|merger|m&a)\b/.test(lower) || BUYING_A_COMPANY.test(lower)) {
+  if (readsAsAcquisition(lower)) {
     return { category: "M_AND_A", action: "ACQUIRE" };
   }
   if (/\b(rewrite|refactor|architecture|rebuild|v2 migration|tech debt)\b/.test(lower)) {
