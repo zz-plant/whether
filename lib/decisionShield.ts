@@ -338,8 +338,10 @@ const BUYING_A_COMPANY =
 
 const VENTURE_DEBT = /\bventure\s+(?:debt|loan)\b/;
 
-/* A tender offer is also how a buyer acquires a company, which spends cash the test has a row for. */
-const TENDER_OFFER_FOR_A_COMPANY = /\btender\s+offer\b.*\b(?:competitor|rival|startup)\b|\b(?:competitor|rival|startup)\b.*\btender\s+offer\b/;
+/* A tender offer is also how a buyer acquires a company, which spends cash the test has a row for.
+   The company has to be what the offer is for: "for employees at our startup" only mentions one. */
+const TENDER_OFFER_FOR_A_COMPANY =
+  /\btender\s+offer\s+(?:for|on)\s+(?:(?:a|an|the|our|one|another)\s+)?(?:\S+\s+)?(?:competitor|rival|startup)\b/;
 
 const readsAsAcquisition = (lower: string) =>
   /\b(acquire|acquiring|acquisition|merger|m&a)\b/.test(lower) || BUYING_A_COMPANY.test(lower) || TENDER_OFFER_FOR_A_COMPANY.test(lower);

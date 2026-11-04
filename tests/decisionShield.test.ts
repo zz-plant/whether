@@ -509,14 +509,21 @@ describe("stress test — detection confidence", () => {
   it("sends venture debt and a secondary sale to the answers that cover them", () => {
     const debt = runStressTest(buildExpansionAssessment(), { planText: "Raise $2M of venture debt" });
     assert.ok(debt.verdict === null && debt.answerTopic === "should-startups-take-venture-debt-now");
-    for (const planText of ["Run a tender offer for employees", "Offer engineers a secondary sale", "Tender offer so early employees can sell shares"]) {
+    for (const planText of [
+      "Run a tender offer for employees",
+      "Offer engineers a secondary sale",
+      "Tender offer so early employees can sell shares",
+      "Run a tender offer for employees at our startup",
+      "Our startup will run a tender offer for employees",
+      "Run a tender offer for employees before a competitor poaches them",
+    ]) {
       const secondary = runStressTest(buildExpansionAssessment(), { planText });
       assert.ok(secondary.verdict === null && secondary.answerTopic === "should-startups-change-compensation-now", planText);
     }
   });
 
   it("grades a tender offer for a company as the acquisition it is", () => {
-    for (const planText of ["Acquire a competitor through a tender offer", "Make a tender offer for a competitor", "Launch a tender offer for our rival", "Buy a smaller competitor via tender offer", "Merger structured as a tender offer"]) {
+    for (const planText of ["Acquire a competitor through a tender offer", "Make a tender offer for a competitor", "Make a tender offer for a smaller competitor", "Launch a tender offer for our rival", "Launch a tender offer to buy a startup", "Buy a smaller competitor via tender offer", "Merger structured as a tender offer"]) {
       assert.equal(stressTestDecisionPlan(buildExpansionAssessment(), { planText }).detectedCategory, "M_AND_A", planText);
     }
   });
