@@ -159,12 +159,14 @@ const BURN_MULTIPLE_DEFAULT = 4;
  */
 const MIN_PLANNER_RUNWAY_MONTHS = 0.1;
 const MAX_PLANNER_RUNWAY_MONTHS = 60;
+/* The profile's own ceiling. It was $100M, which capped a public company's filed spend. */
+const MAX_PLANNER_MONTHLY_USD = 1e11;
 
 const sanitize = (input: RunwayPlannerInput): RunwayPlannerInput => ({
   ...input,
   runway: clamp(Number.isFinite(input.runway) ? input.runway : 0, MIN_PLANNER_RUNWAY_MONTHS, MAX_PLANNER_RUNWAY_MONTHS),
-  burn: clamp(Number.isFinite(input.burn) ? input.burn : 0, 0, 100_000_000),
-  revenue: clamp(Number.isFinite(input.revenue) ? input.revenue : 0, 0, 100_000_000),
+  burn: clamp(Number.isFinite(input.burn) ? input.burn : 0, 0, MAX_PLANNER_MONTHLY_USD),
+  revenue: clamp(Number.isFinite(input.revenue) ? input.revenue : 0, 0, MAX_PLANNER_MONTHLY_USD),
   growthRate: clamp(Number.isFinite(input.growthRate) ? input.growthRate : 0, -40, 80),
 });
 

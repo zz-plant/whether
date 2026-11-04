@@ -312,7 +312,8 @@ const embedChangeLines = ({ flipTrigger, resumeWhen }: Pick<BriefEmbedData, "fli
 /** `format=text`: the embed as plain lines a newsletter build step inserts. */
 export const buildBriefEmbedText = (data: BriefEmbedData): string =>
   [
-    `Whether — Weekly brief${data.tickerLabel ? ` for ${data.tickerLabel}` : ""}`,
+    /* "for GOOGL" read as a brief written for that company. The ticker changes no word of it. */
+    `Whether — Weekly brief${data.tickerLabel ? ` · Tagged ${data.tickerLabel}` : ""}`,
     /* This line read "Regime: Freezing • Confidence: MED": the engine's noun
        and the confidence code, where every other surface prints the weather
        word under "Conditions" and the band as a word. */
@@ -338,7 +339,7 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   // `stageLabel` is only ever a stage the brief was actually calibrated for —
   // the route derives it from the parsed stage, not the raw parameter — so the
   // meta line can carry it without claiming a calibration that did not happen.
-  const metaParts = [postureLabel, confidenceLabel, `Data as of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
+  const metaParts = [postureLabel, confidenceLabel, `Data as of ${recordDate}`, tickerLabel ? `Tagged ${tickerLabel}` : null, stageLabel].filter(Boolean);
   const doNowHtml = doNowItems
     .map((item) => `<p style="font-size:13px;color:${OG_TEXT_SECONDARY};margin:2px 0;padding:4px 0;border-bottom:1px solid ${OG_BORDER};">${escapeHtml(item)}</p>`)
     .join("");

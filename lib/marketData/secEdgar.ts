@@ -55,6 +55,7 @@ const conceptSchema = z.object({ units: z.record(z.string(), z.array(z.unknown()
 const companyFactsSchema = z.object({
   facts: z.object({
     "us-gaap": z.record(z.string(), z.unknown()).optional(),
+    "ifrs-full": z.record(z.string(), z.unknown()).optional(),
     dei: z.record(z.string(), z.unknown()).optional(),
   }),
 });
@@ -217,6 +218,21 @@ const sharesOutstanding = (gaap: Taxonomy, dei: Taxonomy): number | null => {
   return weighted.val > 0 ? weighted.val : null;
 };
 
+/** The sum of the latest four quarters, or null unless they run consecutively. */
+const trailingFourQuarters = (quarters: Quarter[]): number | null => {
+  const trailing = quarters.slice(0, 4);
+  const consecutive = trailing.length === 4
+    && trailing.every((quarter, index) => index === 0 || isQuarterSpan(daysApart(quarter.end, trailing[index - 1].end)));
+  return consecutive ? trailing.reduce((sum, quarter) => sum + quarter.value, 0) : null;
+};
+
+const growthOnYearAgo = (quarters: Quarter[]): number | null => {
+  const latest = quarters[0];
+  if (!latest) return null;
+  const yearAgo = quarters.find((quarter) => isYearSpan(daysApart(quarter.end, latest.end)));
+  return yearAgo && yearAgo.value > 0 ? latest.value / yearAgo.value - 1 : null;
+};
+
 /** A company whose latest quarter ended longer ago than this has stopped filing (acquired, delisted). */
 const STALE_PERIOD_DAYS = 200;
 
@@ -237,15 +253,11 @@ export function deriveSecFundamentals(companyFacts: unknown, now: Date): Upstrea
     return { status: "missing", reason: `latest revenue is for the quarter ended ${latest.end}` };
   }
 
-  const trailing = quarters.slice(0, 4);
-  const consecutive = trailing.length === 4
-    && trailing.every((quarter, index) => index === 0 || isQuarterSpan(daysApart(quarter.end, trailing[index - 1].end)));
-  if (!consecutive) return { status: "missing", reason: "four consecutive quarters of revenue are not on file" };
-  const revenueTtm = trailing.reduce((sum, quarter) => sum + quarter.value, 0);
+  const revenueTtm = trailingFourQuarters(quarters);
+  if (revenueTtm === null) return { status: "missing", reason: "four consecutive quarters of revenue are not on file" };
   if (!(revenueTtm > 0)) return { status: "missing", reason: "trailing revenue is not positive" };
 
-  const yearAgo = quarters.find((quarter) => isYearSpan(daysApart(quarter.end, latest.end)));
-  const revenueGrowth = yearAgo && yearAgo.value > 0 ? latest.value / yearAgo.value - 1 : null;
+  const revenueGrowth = growthOnYearAgo(quarters);
 
   const balanceSheetDate = latestInstantDate(gaap, CASH_CONCEPTS);
   const shares = sharesOutstanding(gaap, dei);
@@ -309,7 +321,7 @@ const writeCached = async (cache: FundamentalsCache, cik: number, result: Upstre
   }
 };
 
-const fetchFromEdgar = async (cik: number, now: Date): Promise<UpstreamRead<SecFundamentals>> => {
+const fetchCompanyFacts = async (cik: number): Promise<UpstreamRead<unknown>> => {
   let res: Response;
   try {
     res = await fetch(companyFactsUrl(cik), {
@@ -335,7 +347,12 @@ const fetchFromEdgar = async (cik: number, now: Date): Promise<UpstreamRead<SecF
   } catch {
     return { status: "unavailable", reason: "SEC EDGAR returned an unreadable body" };
   }
-  return deriveSecFundamentals(body, now);
+  return { status: "ok", value: body };
+};
+
+const fetchFromEdgar = async (cik: number, now: Date): Promise<UpstreamRead<SecFundamentals>> => {
+  const facts = await fetchCompanyFacts(cik);
+  return facts.status === "ok" ? deriveSecFundamentals(facts.value, now) : facts;
 };
 
 /** One company's fundamentals, from the cache when a fresh copy exists. */
@@ -376,4 +393,223 @@ export async function fetchSecFundamentalsBatch(
   };
   await Promise.all(Array.from({ length: Math.min(FETCH_CONCURRENCY, ciks.length) }, lane));
   return results;
+}
+
+/* ---------- One company's filing, by ticker ---------- */
+
+/**
+ * Why a filing cannot stand in for a company's own figures. Each is a fact about the filer, so
+ * each is cached: asking again before it files again gets the same answer.
+ */
+type SecFilingRefusal =
+  | "unknown-ticker"
+  | "international-filer"
+  | "financial-company"
+  | "no-recent-filing"
+  | "incomplete-filing";
+
+type SecCompanyFigures = {
+  cashUsd: number;
+  debtUsd: number;
+  /** Zero for a company with no revenue on file. */
+  revenueTtmUsd: number;
+  /** Negative when operations consumed cash. */
+  operatingCashFlowTtmUsd: number;
+  revenueGrowth: number | null;
+  /** The balance sheet's date, YYYY-MM-DD. */
+  periodEnd: string;
+};
+
+type SecCompanyFiling = SecCompanyFigures & { ticker: string; name: string };
+
+type SecFilingRead<T> =
+  | { status: "ok"; value: T }
+  | { status: "refused"; refusal: SecFilingRefusal }
+  | { status: "unavailable"; reason: string };
+
+const OPERATING_CASH_FLOW_CONCEPTS = [
+  "NetCashProvidedByUsedInOperatingActivities",
+  "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations",
+];
+
+/** Liabilities only a bank or an insurer carries. Its cash is held against them, so it is no runway. */
+const FINANCIAL_COMPANY_CONCEPTS = ["Deposits", "PremiumsEarnedNet", "LiabilityForFuturePolicyBenefits"];
+
+/**
+ * Operating cash flow over the trailing year, and the date it runs to.
+ *
+ * Filings report cash flow year to date (88, 180, 272 days), not by quarter, so `quarterlySeries`
+ * would find only the first quarter of any year. A year is the last full year plus this year to
+ * date, less the same stretch of last year. A shorter window is not a substitute: a company that
+ * burned $145M last year and $23M in the first half reads as 14 months of runway or 45, depending
+ * on which it is divided by.
+ */
+const trailingOperatingCashFlow = (gaap: Taxonomy): { value: number; end: string } | null => {
+  let periods: Array<FactRow & { start: string }> = [];
+  for (const concept of OPERATING_CASH_FLOW_CONCEPTS) {
+    periods = latestFiledByPeriod(readRows(gaap, concept, "USD"))
+      .filter((row): row is FactRow & { start: string } => row.start !== undefined);
+    if (periods.length > 0) break;
+  }
+  const span = (row: { start: string; end: string }) => daysSpanned(row.start, row.end);
+  const latestEnd = periods.reduce((latest, row) => (row.end > latest ? row.end : latest), "");
+  const toDate = periods
+    .filter((row) => row.end === latestEnd && span(row) <= 380)
+    .sort((a, b) => span(b) - span(a))[0];
+  if (!toDate) return null;
+  if (isYearSpan(span(toDate))) return { value: toDate.val, end: toDate.end };
+
+  const lastYear = periods.find((row) => isYearSpan(span(row)) && Math.abs(daysApart(row.end, toDate.start)) <= 10);
+  const sameStretch = periods.find(
+    (row) => isYearSpan(daysApart(row.end, toDate.end)) && Math.abs(span(row) - span(toDate)) <= 10,
+  );
+  if (!lastYear || !sameStretch) return null;
+  return { value: lastYear.val + toDate.val - sameStretch.val, end: toDate.end };
+};
+
+/** The figures a company's own runway is worked out from, or why its filing cannot supply them. Pure. */
+export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFilingRead<SecCompanyFigures> {
+  const parsed = companyFactsSchema.safeParse(companyFacts);
+  if (!parsed.success) return { status: "refused", refusal: "incomplete-filing" };
+  const gaap = parsed.data.facts["us-gaap"];
+  if (!gaap && parsed.data.facts["ifrs-full"]) return { status: "refused", refusal: "international-filer" };
+  if (FINANCIAL_COMPANY_CONCEPTS.some((concept) => concept in (gaap ?? {}))) {
+    return { status: "refused", refusal: "financial-company" };
+  }
+
+  const cashFlow = trailingOperatingCashFlow(gaap);
+  if (!cashFlow) return { status: "refused", refusal: "incomplete-filing" };
+  if (daysApart(cashFlow.end, now.toISOString().slice(0, 10)) > STALE_PERIOD_DAYS) {
+    return { status: "refused", refusal: "no-recent-filing" };
+  }
+
+  const cashOnFile = CASH_CONCEPTS.some((concept) => instantOn(gaap, concept, cashFlow.end) !== null);
+  const cashUsd = cashOnFile ? cashOn(gaap, cashFlow.end) : 0;
+  if (!(cashUsd > 0)) return { status: "refused", refusal: "incomplete-filing" };
+
+  const quarters = latestRevenueQuarters(gaap);
+  const revenueTtmUsd = quarters.length === 0 ? 0 : trailingFourQuarters(quarters);
+  // Revenue under a concept this does not read looks like none, which only a company consuming cash can claim.
+  if (revenueTtmUsd === null || (revenueTtmUsd === 0 && cashFlow.value >= 0)) {
+    return { status: "refused", refusal: "incomplete-filing" };
+  }
+
+  return {
+    status: "ok",
+    value: {
+      cashUsd,
+      debtUsd: debtOn(gaap, cashFlow.end),
+      revenueTtmUsd,
+      operatingCashFlowTtmUsd: cashFlow.value,
+      revenueGrowth: growthOnYearAgo(quarters),
+      periodEnd: cashFlow.end,
+    },
+  };
+}
+
+const TICKER_INDEX_URL = "https://www.sec.gov/files/company_tickers.json";
+const TICKER_CACHE_PREFIX = "company:sec:ticker:v1:";
+const FIGURES_CACHE_PREFIX = "company:sec:figures:v1:";
+/** A listing rarely changes, and an unknown ticker costs an 800KB read each time it is asked. */
+const TICKER_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+const tickerIndexSchema = z.record(z.string(), z.object({ cik_str: z.number(), ticker: z.string(), title: z.string() }));
+const listingSchema = z.object({ cik: z.number(), name: z.string() });
+const cachedListingSchema = z.union([listingSchema, z.object({ unlisted: z.literal(true) })]);
+const refusalSchema = z.enum(["unknown-ticker", "international-filer", "financial-company", "no-recent-filing", "incomplete-filing"]);
+const cachedFiguresSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("ok"),
+    value: z.object({
+      cashUsd: z.number(),
+      debtUsd: z.number(),
+      revenueTtmUsd: z.number(),
+      operatingCashFlowTtmUsd: z.number(),
+      revenueGrowth: z.number().nullable(),
+      periodEnd: z.string(),
+    }),
+  }),
+  z.object({ status: z.literal("refused"), refusal: refusalSchema }),
+]);
+
+const putQuietly = async (cache: FundamentalsCache | null, key: string, value: unknown, expirationTtl: number) => {
+  try {
+    await cache?.put(key, JSON.stringify(value), { expirationTtl });
+  } catch {
+    /* A cache write failure costs one more upstream read, nothing else. */
+  }
+};
+
+const getQuietly = async <T>(cache: FundamentalsCache | null, key: string, schema: z.ZodType<T>): Promise<T | null> => {
+  if (!cache) return null;
+  try {
+    return await getJson(cache, key, schema);
+  } catch {
+    return null;
+  }
+};
+
+/** The company behind a ticker. A ticker the SEC does not list is remembered too, since finding out costs the whole list. */
+const readListing = async (ticker: string, cache: FundamentalsCache | null): Promise<SecFilingRead<{ cik: number; name: string }>> => {
+  const cached = await getQuietly(cache, TICKER_CACHE_PREFIX + ticker, cachedListingSchema);
+  if (cached) return "cik" in cached ? { status: "ok", value: cached } : { status: "refused", refusal: "unknown-ticker" };
+
+  let body: unknown;
+  try {
+    const res = await fetch(TICKER_INDEX_URL, {
+      headers: { "user-agent": SEC_USER_AGENT, accept: "application/json" },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) {
+      await releaseBody(res);
+      return { status: "unavailable", reason: `SEC EDGAR returned ${res.status}` };
+    }
+    body = await res.json();
+  } catch (error) {
+    return { status: "unavailable", reason: `SEC EDGAR: ${describeFetchError(error, "ticker list fetch failed")}` };
+  }
+  const index = tickerIndexSchema.safeParse(body);
+  if (!index.success) return { status: "unavailable", reason: "SEC EDGAR returned an unreadable ticker list" };
+
+  const entry = Object.values(index.data).find((row) => row.ticker === ticker);
+  if (!entry) {
+    await putQuietly(cache, TICKER_CACHE_PREFIX + ticker, { unlisted: true }, TICKER_TTL_SECONDS);
+    return { status: "refused", refusal: "unknown-ticker" };
+  }
+  const listing = { cik: entry.cik_str, name: entry.title };
+  await putQuietly(cache, TICKER_CACHE_PREFIX + ticker, listing, TICKER_TTL_SECONDS);
+  return { status: "ok", value: listing };
+};
+
+/** What a reader types, as the SEC lists it: `brk.b` is `BRK-B`. Null when it cannot be a ticker. */
+const normalizeSecTicker = (raw: string): string | null => {
+  const ticker = raw.trim().toUpperCase().replace(/\./g, "-");
+  return /^[A-Z0-9-]{1,10}$/.test(ticker) ? ticker : null;
+};
+
+/**
+ * One company's latest filed figures, by ticker. Facts only, with no reading of them: what they
+ * mean is worked out in the browser of whoever asked, and never printed against the company's name.
+ */
+export async function fetchSecCompanyFiling(
+  rawTicker: string,
+  options: { cache: FundamentalsCache | null; now?: Date },
+): Promise<SecFilingRead<SecCompanyFiling>> {
+  const ticker = normalizeSecTicker(rawTicker);
+  if (!ticker) return { status: "refused", refusal: "unknown-ticker" };
+  const listing = await readListing(ticker, options.cache);
+  if (listing.status !== "ok") return listing;
+  const { cik, name } = listing.value;
+
+  const key = FIGURES_CACHE_PREFIX + cik;
+  let figures: SecFilingRead<SecCompanyFigures> | null = await getQuietly(options.cache, key, cachedFiguresSchema);
+  if (!figures) {
+    const facts = await fetchCompanyFacts(cik);
+    if (facts.status === "unavailable") return facts;
+    figures = facts.status === "missing"
+      ? { status: "refused", refusal: "incomplete-filing" }
+      : deriveSecCompanyFigures(facts.value, options.now ?? new Date());
+    await putQuietly(options.cache, key, figures, figures.status === "ok" ? CACHE_TTL_SECONDS : MISSING_TTL_SECONDS);
+  }
+  return figures.status === "ok" ? { status: "ok", value: { ...figures.value, ticker, name } } : figures;
 }

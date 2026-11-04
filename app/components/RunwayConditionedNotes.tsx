@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
 import { netMonthlyBurnUsd, resolveProfileRunway, resolveProfileRunwayMonths } from "../../lib/operatorProfile";
+import { describeProfileFiling } from "../../lib/report/companyFiling";
 import { HOME_SECTIONS } from "../../lib/report/home/homeSectionModel";
 import { DEFAULT_RUNWAY_BAND, describeRunwayBandAge, isThinlyCoveredRunway, runwayBandLabel } from "../../lib/report/operatorRunway";
 import { THINLY_COVERED_NOTE, buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
@@ -44,7 +45,7 @@ const useRunwayNotes = (regime: RegimeKey) => {
   // A company whose revenue covers its spending reads as the open-ended band, not as an exact figure,
   // but its figures are entered all the same.
   const figuresGiven = useMemo(() => resolveProfileRunway(profile) !== null, [profile]);
-  return { runway, notes, figuresGiven, thinlyCovered, bandAge };
+  return { runway, notes, figuresGiven, thinlyCovered, bandAge, profile };
 };
 
 /** Back to no runway given: the band cookie, the `?runway` param and an entered figure all go. */
@@ -82,7 +83,12 @@ function ClearRunwayButton() {
  * (`RunwayAreaNote`); this is the heading and the invitation.
  */
 export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
-  const { runway, figuresGiven, thinlyCovered, bandAge } = useRunwayNotes(regime);
+  const { runway, figuresGiven, thinlyCovered, bandAge, profile } = useRunwayNotes(regime);
+  const filingSource = profile.filing ? (
+    <p data-testid="company-filing-source" className="text-fluid-nano text-slate-400">
+      {describeProfileFiling(profile.filing, profile.cashUsd)}
+    </p>
+  ) : null;
 
   if (thinlyCovered) {
     return (
@@ -95,6 +101,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
           </Link>
           .
         </p>
+        {filingSource}
       </div>
     );
   }
@@ -126,6 +133,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         <p className="type-eyebrow text-slate-300">What this guidance means at {runway.runwayPhrase} of runway</p>
         <ClearRunwayButton />
       </div>
+      {filingSource}
       {bandAge ? (
         <p data-testid="runway-band-age" className="text-fluid-nano text-slate-400">
           {describeRunwayBandAge(bandAge)}{" "}

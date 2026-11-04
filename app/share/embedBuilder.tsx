@@ -22,11 +22,6 @@ const STAGE_OPTIONS = [
   ...OPERATOR_STAGE_OPTIONS.map((option) => ({ value: option.key, label: option.label })),
 ] as const;
 
-const TICKER_PRESETS = [
-  { key: "", label: "None" },
-  ...["GOOGL", "MSFT", "DOCU", "COIN", "UBER", "AAPL"].map((ticker) => ({ key: ticker, label: ticker })),
-] as const;
-
 const EMBED_FORMAT_OPTIONS = [
   { key: "brief", label: "Full brief" },
   { key: "call-strip", label: "One-line strip" },
@@ -115,7 +110,7 @@ export function EmbedBuilder() {
               {/* Client-side only: the server HTML is what a crawler indexes, and a
                   "Loading…" sentence there is not part of the page. */}
               <div className="px-3 py-3 text-fluid-nano text-slate-400">
-                {hydrated ? `Loading the live ${embedMode === "call-strip" ? "call strip" : "brief"}${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…` : null}
+                {hydrated ? `Loading the live ${embedMode === "call-strip" ? "call strip" : "brief"}${stage ? ` (${stage})` : ""}…` : null}
               </div>
             </div>
           </div>
@@ -184,12 +179,12 @@ export function EmbedBuilder() {
 
       <details className="weather-auto-chevron">
         <summary className="text-fluid-sm font-semibold text-slate-200">
-          <span>Customize: ticker and company stage</span>
+          <span>Customize: company stage and a ticker tag</span>
         </summary>
         <div className="mt-3 max-w-sm space-y-3">
           <div>
             <label htmlFor="embed-ticker" className="block text-fluid-sm font-medium text-slate-300">
-              Ticker
+              Ticker tag
             </label>
             <input
               id="embed-ticker"
@@ -202,14 +197,8 @@ export function EmbedBuilder() {
               autoComplete="off"
               spellCheck={false}
             />
+            <p className="mt-1 text-fluid-nano text-slate-400">Adds a label. The guidance stays the same for any ticker.</p>
           </div>
-
-          <SegmentedControl
-            options={TICKER_PRESETS}
-            value={ticker}
-            onSelect={setTicker}
-            ariaLabel="Ticker presets"
-          />
 
           <div>
             <label htmlFor="embed-stage" className="block text-fluid-sm font-medium text-slate-300">

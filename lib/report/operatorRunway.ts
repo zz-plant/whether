@@ -95,11 +95,13 @@ const ABUNDANT_FLOOR_MONTHS = RUNWAY_BAND_OPTIONS.find((opt) => opt.maxMonths ==
 export const runwayBandForProfileRunway = (runway: ProfileRunway | null): RunwayBand | null => {
   if (!runway) return null;
   if (runway.basis === "cash-flow-positive") return coveredRunwayIsCushioned(runway) ? "abundant" : "balanced";
-  return runwayBandForMonths(runway.months);
+  const band = runwayBandForMonths(runway.months);
+  return band === "abundant" && runway.basis === "cash" && runway.debtExceedsCash ? "balanced" : band;
 };
 
-const coveredRunwayIsCushioned = ({ cushionMonths, coveredForMonths }: Extract<ProfileRunway, { basis: "cash-flow-positive" }>): boolean =>
-  cushionMonths !== undefined
+const coveredRunwayIsCushioned = ({ cushionMonths, coveredForMonths, debtExceedsCash }: Extract<ProfileRunway, { basis: "cash-flow-positive" }>): boolean =>
+  !debtExceedsCash
+  && cushionMonths !== undefined
   && cushionMonths >= COVERED_CUSHION_FLOOR_MONTHS
   && (coveredForMonths === undefined || coveredForMonths >= ABUNDANT_FLOOR_MONTHS);
 

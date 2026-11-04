@@ -104,6 +104,14 @@ describe("embed route helpers", () => {
     assert.match(script, /&mode=/);
   });
 
+  /* The ticker changes no word of the brief, so nothing may read as written for that company. */
+  it("tags a ticker rather than addressing the brief to it", () => {
+    const tagged = { ...briefData, tickerLabel: "GOOGL" };
+    assert.match(buildBriefEmbedText(tagged), /^Whether — Weekly brief · Tagged GOOGL/);
+    assert.match(buildBriefEmbedHtml(tagged), /Tagged GOOGL/);
+    assert.doesNotMatch(`${buildBriefEmbedText(tagged)} ${buildBriefEmbedHtml(tagged)}`, /for GOOGL/);
+  });
+
   it("escapes embed HTML text and href interpolations", () => {
     const html = buildBriefEmbedHtml(briefData);
 

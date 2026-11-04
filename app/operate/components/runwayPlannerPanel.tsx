@@ -7,7 +7,7 @@ import { getClipboardUiState, useClipboardCopy } from "../../components/useClipb
 import { useOperatorProfile } from "../../components/useOperatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
 import { useHydrated } from "../../components/browserSource";
-import { isPlannerSector, resolveProfileRunway, setOperatorProfileField } from "../../../lib/operatorProfile";
+import { applyCompanyFiling, isPlannerSector, resolveProfileRunway, setOperatorProfileField } from "../../../lib/operatorProfile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   buildSharedRunwayPlanQuery,
@@ -33,6 +33,8 @@ import {
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { ReportData } from "../../../lib/report/reportData";
 import { ScoreCell } from "../../components/ui/scoreCell";
+import { describeProfileFiling } from "../../../lib/report/companyFiling";
+import { CompanyFilingLookup } from "./companyFilingLookup";
 import { buildEngineeringPaybackLines, buildProjectPaybacks, resolvePaybackBar } from "../../../lib/report/projectPayback";
 import { runwayBandForMonths } from "../../../lib/report/operatorRunway";
 import { ProjectPaybackSection } from "./projectPaybackSection";
@@ -162,7 +164,7 @@ export function RunwayPlannerPanel({
   macroSeries?: ReportData["macroSeries"];
   recordDateLabel?: string;
 }) {
-  const { profile: storedProfile, setProfileField } = useOperatorProfile();
+  const { profile: storedProfile, setProfileField, setProfileFromFiling } = useOperatorProfile();
   const { stage: storedStage, setStage } = useOperatorStage();
   const router = useRouter();
   const pathname = usePathname();
@@ -235,6 +237,16 @@ export function RunwayPlannerPanel({
       syncPlanLink(next, preset.stage);
     },
     [profile, setProfileField, setStage, syncPlanLink],
+  );
+
+  /* Series B+ is the nearest of the four stages to a listed company (`operatorStage.ts`). */
+  const applyFiling = useCallback(
+    (filing: Parameters<typeof setProfileFromFiling>[0]) => {
+      setProfileFromFiling(filing);
+      setStage("series-b");
+      syncPlanLink(applyCompanyFiling(profile, filing), "series-b");
+    },
+    [profile, setProfileFromFiling, setStage, syncPlanLink],
   );
 
   const resolution = useMemo(() => resolveRunwayPlannerRequest(profile, stage), [profile, stage]);
@@ -379,6 +391,13 @@ export function RunwayPlannerPanel({
             ))}
           </div>
         </div>
+
+        <CompanyFilingLookup onFiling={applyFiling} />
+        {storedProfile.filing ? (
+          <p data-testid="company-filing-source" className="text-xs text-slate-300">
+            {describeProfileFiling(storedProfile.filing, storedProfile.cashUsd)}
+          </p>
+        ) : null}
 
         <div className="weather-grid gap-3 [--col-min:13rem] [--grid-max:4]">
           <OperatorProfileNumberField

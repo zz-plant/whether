@@ -142,7 +142,8 @@ Canonical modules — extend these before creating new ones:
 - **Company calibration (stage, runway)** — `lib/report/operatorStage.ts`,
   `lib/report/operatorRunway.ts`, `buildScopedVariantDecisionAdjustment` and
   `scaleAdjustmentToRunway` in `lib/report/boundedDecisionRules.ts`; one cookie each, read by
-  `lib/report/operatorContext.ts`
+  `lib/report/operatorContext.ts`. A public company fills its figures from a ticker:
+  `lib/report/companyFiling.ts`, `fetchSecCompanyFiling` in `lib/marketData/secEdgar.ts`
 - **Share artifacts** — `/share` owns every copy, file and image format; builders in
   `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `portfolioNote`, `meetingSlideExport`,
   `boardSlideDeck`). The page reads `lib/report/weeklyBriefSnapshot.ts`; the slide and image
