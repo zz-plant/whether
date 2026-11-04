@@ -13,6 +13,7 @@ import { z } from "zod";
 import timeMachineCache from "../../data/time_machine_cache.json";
 import summaryArchive from "../../data/summary_archive.json";
 import { parseSeries, type TreasuryDatasets } from "../../lib/summary/regimeArchiveContext";
+import { resolveHistoricalDate } from "../../lib/timeMachine/timeMachine";
 
 const YieldsSchema = z.object({
   oneMonth: z.number().nullable().optional(),
@@ -34,6 +35,7 @@ export const CacheEntrySchema = z.object({
   chicagoFciHistory: z.array(HistoryPointSchema).nullable().optional(),
   source: z.string(),
   record_date: z.string(),
+  fetched_at: z.string(),
   isLive: z.boolean().optional(),
   yields: YieldsSchema,
 });
@@ -57,6 +59,12 @@ const ArchiveEntrySchema = z.object({
 
 export const bundledCache = z.array(CacheEntrySchema).parse(timeMachineCache);
 export const bundledArchive = z.array(ArchiveEntrySchema).parse(summaryArchive);
+
+/**
+ * When the bundled archive was last generated, read from the data. Replays run at this moment
+ * rather than at a date written in a test, so a refresh that adds a month moves the clock with it.
+ */
+export const bundledGeneratedAt = new Date(bundledCache.map((entry) => entry.fetched_at).sort().at(-1) ?? 0);
 
 export type BundledSeriesId = "DGS1MO" | "DGS3MO" | "DGS2" | "DGS10" | "VIXCLS" | "NFCI";
 
@@ -103,6 +111,27 @@ export const buildBundledSeries = () => {
       } else if (input.id === "ten-year") {
         put(series.DGS10, input.recordDate, input.value);
       }
+    }
+  }
+
+  /*
+   * A month ending on a weekend replays only once a print after its last day exists: Oct 31, 2026,
+   * a Saturday, reads Oct 30's yields and needs Nov 2 on FRED to count as ended. The archive stores
+   * no such print until a later week lands, so right after a month-end lands the bundle would drop
+   * that month. Add it at the next weekday, carrying the month's yields, when nothing later is bundled.
+   */
+  const newest = bundledCache.at(-1);
+  if (newest) {
+    const monthEnd = resolveHistoricalDate(newest.year, newest.month);
+    if (newest.record_date < monthEnd && [...series.DGS2.keys()].every((date) => date <= monthEnd)) {
+      const after = new Date(`${monthEnd}T00:00:00Z`);
+      do after.setUTCDate(after.getUTCDate() + 1);
+      while (after.getUTCDay() === 0 || after.getUTCDay() === 6);
+      const nextPrint = after.toISOString().slice(0, 10);
+      put(series.DGS1MO, nextPrint, newest.yields.oneMonth ?? null);
+      put(series.DGS3MO, nextPrint, newest.yields.threeMonth ?? null);
+      put(series.DGS2, nextPrint, newest.yields.twoYear ?? null);
+      put(series.DGS10, nextPrint, newest.yields.tenYear ?? null);
     }
   }
 

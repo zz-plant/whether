@@ -4,7 +4,13 @@ import { z } from "zod";
 
 import { ENGINE_VERSION } from "../lib/regimeEngineCore";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
-import { bundledArchive as archive, bundledCache as cache, buildBundledSeries, CacheEntrySchema } from "./fixtures/bundledArchiveSeries";
+import {
+  bundledArchive as archive,
+  bundledCache as cache,
+  bundledGeneratedAt as NOW,
+  buildBundledSeries,
+  CacheEntrySchema,
+} from "./fixtures/bundledArchiveSeries";
 import {
   buildMonthlyArchive,
   buildQuarterlyYearlyArchive,
@@ -28,9 +34,6 @@ import {
  * walk and three generators); this is what pins the one copy left to the data
  * all four produced.
  */
-
-// The archives on record were regenerated on Oct 9, 2026 (engine-2026-10-09b); the weekly range ends at the Friday it covers.
-const NOW = new Date("2026-10-09T18:29:43.682Z");
 
 const bundled = buildBundledSeries();
 
@@ -152,9 +155,13 @@ describe("archive replay from bundled series", () => {
   it("carries the Chicago Fed index into every cached month, as a reader had it", () => {
     const { timeMachineEntries } = buildMonthlyArchive({ ...bundled, now: NOW });
     assert.deepEqual(timeMachineEntries.filter((entry) => typeof entry.chicagoFci !== "number").map((entry) => entry.record_date), []);
-    /* Mar 31, 2020: the Mar 27 week was published Apr 1, so the month reads Mar 20's 0.175. */
+    /* Mar 31, 2020: the Mar 27 week was published Apr 1, so the month reads Mar 20's value. The
+       value itself is not pinned: the Chicago Fed re-estimates the whole series weekly, so every
+       rebuild moves it (Mar 20 read 0.175 on Oct 9, 2026 and 0.183 on Nov 3). */
     const march2020 = timeMachineEntries.find((entry) => entry.record_date === "2020-03-31");
-    assert.equal(march2020?.chicagoFci, 0.175);
+    const lastRead = march2020?.chicagoFciHistory?.at(-1);
+    assert.equal(lastRead?.date, "2020-03-20");
+    assert.equal(march2020?.chicagoFci, lastRead?.value);
     assert.equal(march2020?.chicagoFciHistory?.some((point) => point.date > "2020-03-26"), false);
   });
 

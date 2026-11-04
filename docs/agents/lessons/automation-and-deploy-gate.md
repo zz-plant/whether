@@ -84,7 +84,7 @@ everything the account did that week. The Slack brief refresh fired seven Monday
 six were rejected by the cap before the model took a turn, one correctly refused fallback data while
 FRED was still blocked, and the one refresh that reached `main` came from a person typing "Try again"
 the next evening. The regime history refresh was rejected the same way on 2026-09-21, 09-28 and
-10-05. The Thursday freeze has never hit the cap. A rejected run never reaches the prompt's `FAILED`
+10-05. The Thursday freeze was clear of it until 2026-10-15, then was rejected on Oct 15, 22 and 29, so a later day is no protection. A rejected run never reaches the prompt's `FAILED`
 instruction: it ends on "You've hit your weekly limit", and the `USAGE_LIMIT_REACHED` status lives
 only in the routine's run log (`RemoteTrigger` `list_runs` / `get_run_log`, or the routines page),
 so the repo saw what looked like quiet weeks. The regime history refresh moved from Monday to
@@ -198,6 +198,19 @@ golden did: every paste's "Full brief" link cited the newest frozen week even fo
 before it (`selectCitablePermalinkBrief` let a negative age through), so appending w41 would have moved
 twenty-odd pinned strings. It now cites the newest week frozen at or before the reading. Before changing
 anything the freeze touches, append a week in a scratch copy (`bun run brief:freeze`) and run the suite.
+
+**Neither may a refresh, and on 2026-11-04 both did.** Rehearsed in scratch worktrees, freezing w45
+failed `tests/readerVocabulary.test.tsx`: it counted the newest frozen week's stored text, and w45's
+evidence line said "discipline". A full archive refresh failed five tests in three files. Each one
+was held to something a refresh moves: the Chicago Fed value for March 2020, which is re-estimated
+weekly; the count of months on record; the clock of the last regeneration, written as a date; and a
+bundle with no print after a month ending on a weekend, so a month dropped out right after it landed.
+The rebuild Workflow can merge only a pull request that changes data files and whose branch build is
+green, so these tests could never have passed its gate, with or without `GITHUB_TOKEN`. They now read
+the clock and the newest month from the data, the vocabulary test counts one named week, and the
+fixture supplies the missing print. The cost: a newer week's stored text is no longer counted, so a
+retired word in `lib/report/reportEvidence.ts` reaches the archive unnoticed. Rehearse both after
+changing anything they touch; a conditions change was not rehearsed.
 
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.

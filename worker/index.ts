@@ -212,8 +212,7 @@ export default {
 
     /* Monday only, where the trial is on: freeze this week's brief into the citable archive
        behind a pull request. The Workflow retries the live read hourly when the data is not
-       publishable yet, which the sandboxed routine it replaces never got far enough to need —
-       every one of its runs failed at the egress proxy before reaching FRED. */
+       publishable yet. */
     if (!isDailyIngestion && env.WHETHER_BRIEF_FREEZE_WORKFLOW === "1" && env.BRIEF_FREEZE_WORKFLOW) {
       const workflow = env.BRIEF_FREEZE_WORKFLOW;
       /* Named for what it measures: handing the workflow to Cloudflare. Whether the

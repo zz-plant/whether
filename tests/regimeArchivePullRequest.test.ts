@@ -9,7 +9,7 @@ import { buildPostureArchivePeriods } from "../lib/summary/postureArchiveIndex";
 import { REGIME_ARCHIVE_PATHS, weeklySummariesPath } from "../lib/summary/regimeArchiveFiles";
 import { commitRegimeArchiveRebuild, openRegimeArchivePullRequest } from "../lib/summary/regimeArchivePullRequest";
 import { parseSummaryArchive } from "../lib/summary/summaryArchive";
-import { buildBundledSeries, type BundledSeriesId } from "./fixtures/bundledArchiveSeries";
+import { bundledCache, bundledGeneratedAt, buildBundledSeries, type BundledSeriesId } from "./fixtures/bundledArchiveSeries";
 
 /*
  * The Worker's archive rebuild end to end, offline: FRED is the bundled series served as its
@@ -20,9 +20,23 @@ const MAIN_SHA = "sha-main-000";
 const ARCHIVE_PATHS = [...Object.values(REGIME_ARCHIVE_PATHS), weeklySummariesPath(2026)];
 const readCheckout = () => new Map(ARCHIVE_PATHS.map((path) => [path, readFileSync(path, "utf8")]));
 
-// The archives on record were regenerated on Friday Oct 9, 2026; the bundled series end there.
-const FRIDAY = new Date("2026-10-09T18:29:43.682Z");
-const TUESDAY = new Date("2026-10-13T02:00:00.000Z");
+const DAY_MS = 24 * 60 * 60 * 1000;
+const TUESDAY_UTC = 2;
+
+/**
+ * The day nearest the archive's last generation that satisfies `isWanted`, in the same month,
+ * since the bundled series end there and a later month would turn the last one into a new month-end.
+ */
+const nearestDayInMonth = (isWanted: (weekday: number) => boolean) => {
+  const offsets = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6];
+  const day = offsets
+    .map((offset) => new Date(bundledGeneratedAt.getTime() + offset * DAY_MS))
+    .find((candidate) => candidate.getUTCMonth() === bundledGeneratedAt.getUTCMonth() && isWanted(candidate.getUTCDay()));
+  assert.ok(day, "every month has every weekday within six days of any date in it");
+  return day;
+};
+const OFF_DAY = nearestDayInMonth((weekday) => weekday !== TUESDAY_UTC);
+const TUESDAY = nearestDayInMonth((weekday) => weekday === TUESDAY_UTC);
 
 const bundled = buildBundledSeries();
 const isBundledSeriesId = (id: string | null): id is BundledSeriesId => id !== null && id in bundled.csv;
@@ -155,7 +169,7 @@ const readJson = (files: Map<string, string>, path: string): unknown => JSON.par
 
 describe("commitRegimeArchiveRebuild", () => {
   const github = new FakeGitHub(readCheckout());
-  const first = rebuild(github, FRIDAY, true);
+  const first = rebuild(github, OFF_DAY, true);
 
   it("rebuilds against main and commits every changed file in one commit on the rebuild branch", async () => {
     const result = await first;
@@ -218,21 +232,23 @@ describe("commitRegimeArchiveRebuild", () => {
     assert.equal(result.committed, true);
     if (!result.committed) return;
     const again = new FakeGitHub(github.filesOn(result.branch));
-    const second = await rebuild(again, FRIDAY, true);
+    const second = await rebuild(again, OFF_DAY, true);
     assert.deepEqual(second, { committed: false, reason: "main already carries the archive FRED rebuilds to" });
   });
 
   it("on a day other than Tuesday, lands only a month-end the base lacks", async () => {
-    const quiet = await rebuild(new FakeGitHub(readCheckout()), FRIDAY);
+    const quiet = await rebuild(new FakeGitHub(readCheckout()), OFF_DAY);
     assert.equal(quiet.committed, false);
     assert.match(quiet.committed ? "" : quiet.reason, /no month-end is new; Tuesday's rebuild lands them/);
 
     const behind = readCheckout();
     const rail = z.array(z.unknown()).parse(JSON.parse(behind.get(REGIME_ARCHIVE_PATHS.monthlyRegimeHistory) ?? "[]"));
     behind.set(REGIME_ARCHIVE_PATHS.monthlyRegimeHistory, `${JSON.stringify(rail.slice(0, -1), null, 2)}\n`);
-    const monthEnd = await rebuild(new FakeGitHub(behind), FRIDAY);
+    const monthEnd = await rebuild(new FakeGitHub(behind), OFF_DAY);
     assert.equal(monthEnd.committed, true);
-    assert.deepEqual(monthEnd.committed ? monthEnd.newMonthEnds : [], ["2026-09"]);
+    const newest = bundledCache.at(-1);
+    assert.ok(newest);
+    assert.deepEqual(monthEnd.committed ? monthEnd.newMonthEnds : [], [`${newest.year}-${String(newest.month).padStart(2, "0")}`]);
   });
 
   it("on Tuesday, lands whatever changed", async () => {
@@ -244,12 +260,12 @@ describe("commitRegimeArchiveRebuild", () => {
   it("refuses a missing base branch and a FRED failure before writing anything", async () => {
     const noMain = new FakeGitHub(readCheckout());
     noMain.branches.delete("main");
-    await assert.rejects(rebuild(noMain, FRIDAY, true), /base branch main not found/);
+    await assert.rejects(rebuild(noMain, OFF_DAY, true), /base branch main not found/);
 
     const github = new FakeGitHub(readCheckout());
     const down: typeof fetch = async () => new Response("unavailable", { status: 503 });
     await assert.rejects(
-      commitRegimeArchiveRebuild({ client: github.client(), now: FRIDAY, fetcher: down, landAnyChange: true }),
+      commitRegimeArchiveRebuild({ client: github.client(), now: OFF_DAY, fetcher: down, landAnyChange: true }),
       /FRED series fetch failed for DGS1MO: 503/,
     );
     assert.deepEqual(github.calls.filter((call) => call.method !== "GET"), []);
@@ -259,18 +275,18 @@ describe("commitRegimeArchiveRebuild", () => {
 describe("openRegimeArchivePullRequest", () => {
   it("opens one pull request for the branch, naming the files, and reuses it on the next run", async () => {
     const github = new FakeGitHub(readCheckout());
-    const commit = await rebuild(github, FRIDAY, true);
+    const commit = await rebuild(github, OFF_DAY, true);
     assert.equal(commit.committed, true);
     if (!commit.committed) return;
 
-    const opened = await openRegimeArchivePullRequest({ client: github.client(), commit, now: FRIDAY });
+    const opened = await openRegimeArchivePullRequest({ client: github.client(), commit, now: OFF_DAY });
     assert.equal(opened.alreadyOpen, false);
     const pull = github.openPulls[0];
     assert.equal(pull?.head, "automation/regime-archive-rebuild");
     assert.match(pull?.title ?? "", /^chore: rebuild the regime archive from FRED \(weeks through \d{4}-\d{2}-\d{2}\)$/);
     for (const path of commit.paths) assert.ok(pull?.body.includes(`\`${path}\``), path);
 
-    const again = await openRegimeArchivePullRequest({ client: github.client(), commit, now: FRIDAY });
+    const again = await openRegimeArchivePullRequest({ client: github.client(), commit, now: OFF_DAY });
     assert.deepEqual(again, { pullRequest: { number: 1, html_url: pull?.html_url }, alreadyOpen: true });
     assert.equal(github.openPulls.length, 1);
   });
