@@ -18,6 +18,8 @@ rules; Whether does not predict when a recession will happen.
 1. With the Whether connector, call `get_state`. For one named decision ("should we freeze
    hiring", "how much runway before we raise"), call `get_answer` with the question as the user
    asked it: it returns the answer, this week's standing, the rules in force and a line to cite.
+   If it refuses, the refusal says where to go next, usually `stress_test_plan`: follow it. If it
+   names no tool, say Whether has no answer for that question and give the general reading.
 2. Without the connector, fetch `https://whether.work/api/agent?view=state` (JSON, about 3KB, no
    key). For one decision, fetch
    `https://whether.work/api/mcp?tool=get_answer&question=<the question, URL-encoded>`.

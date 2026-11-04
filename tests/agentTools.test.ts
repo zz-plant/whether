@@ -111,6 +111,37 @@ describe("the agent tool registry", () => {
     assert.ok(unknown.problems.some((problem) => problem.allowed?.includes("should-startups-raise-capital-now")));
   });
 
+  it("sends a question no page answers to the tool that grades it, and that tool grades it", async () => {
+    /* Each was refused with the list of pages until 2026-11-04, though the stress test has rules for it. */
+    const plans: Record<string, string> = {
+      "should we sign a three year office lease?": "INFRASTRUCTURE",
+      "how much should we budget for AI and GPU spend?": "INFRASTRUCTURE",
+      "should we buy a smaller competitor?": "M_AND_A",
+      "should we push customers to annual contracts?": "PRICING",
+    };
+    for (const [question, category] of Object.entries(plans)) {
+      const refused = await refusal(runAgentTool("get_answer", { question }, "http"));
+      assert.match(refused.message, /stress_test_plan grades this kind of decision/, question);
+      assert.doesNotMatch(refused.message, /Available decision topics/, question);
+      const graded = await runAgentTool("stress_test_plan", { planText: question }, "http");
+      assert.equal(graded.detectedCategory, category, question);
+    }
+  });
+
+  it("names the nearest answer as the nearest when the stress test already points to one", async () => {
+    const refused = await refusal(runAgentTool("get_answer", { question: "should I take venture debt?" }, "http"));
+    assert.match(refused.message, /The nearest is Should startups raise capital now\? \(should-startups-raise-capital-now\)/);
+    assert.match(refused.message, /not one about this question/);
+  });
+
+  it("still refuses what nothing covers, with the list of what does", async () => {
+    for (const question of ["should I quit my job to start a company?", "should we offer a secondary sale to employees?"]) {
+      const refused = await refusal(runAgentTool("get_answer", { question }, "http"));
+      assert.match(refused.message, /Available decision topics/, question);
+      assert.doesNotMatch(refused.message, /stress_test_plan/, question);
+    }
+  });
+
   it("returns each curated question's own answer before fuzzy topic ranking", () => {
     for (const page of answerPages) {
       for (const question of [page.slug, page.title, page.keyword, ...page.askedAs]) {
@@ -138,6 +169,12 @@ describe("the agent tool registry", () => {
       "market context for our board update": "how-to-brief-executives-on-market-conditions",
       "do we have enough runway": "how-much-runway-should-we-have-before-we-raise",
       "freeze-or-selectively": "should-we-freeze-or-selectively-hire",
+      "how much cash do we need": "how-much-runway-should-we-have-before-we-raise",
+      // Sent to cutting burn until 2026-11-04: "cut" and the "rate" in "burn rate".
+      "do rate cuts help my startup": "startup-funding-climate-this-week",
+      "will rate cuts help us": "startup-funding-climate-this-week",
+      "should we spend more on ads": "how-fast-should-we-scale-go-to-market",
+      "is it time to increase our ad budget": "how-fast-should-we-scale-go-to-market",
       // What a model passed in a headless run on 2026-11-02, the company's details and all.
       "should I hire two more engineers this quarter with 14 months of runway": "should-startups-hire-engineers-right-now",
     };
@@ -145,7 +182,7 @@ describe("the agent tool registry", () => {
       assert.equal(matchDecisionPage(question)?.slug, slug, question);
     }
     // One incidental word a page's phrasing happens to use is not a match.
-    for (const offTopic of ["pizza recipes", "cryptocurrency", "", "   ", "should I start a company now", "should our support agent offer a 20% discount to save this customer"]) {
+    for (const offTopic of ["pizza recipes", "cryptocurrency", "", "   ", "should I start a company now", "how much should we budget for AI and GPU spend", "should our support agent offer a 20% discount to save this customer"]) {
       assert.equal(matchDecisionPage(offTopic), undefined, JSON.stringify(offTopic));
     }
   });
@@ -198,7 +235,10 @@ describe("what an agent may pass, and what it is told when it passes something e
     assert.match(JSON.stringify(angel.answer), /"slug":"should-startups-raise-capital-now"/);
     const ads = await runAgentTool("lint_sprint_goal", { goalText: "Spend $300 a month on ads for six weeks" }, "http");
     assert.equal(ads.verdict, "not_graded");
-    assert.equal(ads.answer, null);
+    assert.match(JSON.stringify(ads.answer), /"slug":"how-fast-should-we-scale-go-to-market"/);
+    const secondary = await runAgentTool("stress_test_plan", { planText: "Offer employees a secondary sale" }, "http");
+    assert.equal(secondary.verdict, null);
+    assert.equal(secondary.answer, null);
     const retro = await runAgentTool("audit_sprint_retro", { planText: "Quit my contract work" }, "http");
     assert.equal(retro.verdict, null);
     assert.equal(retro.violationCount, 0);

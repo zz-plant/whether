@@ -3,7 +3,7 @@ import { buildAgentInterfaceResponse, loadAgentInterfaceContext, pullRecentSiteI
 import { agentSkills } from "../agentSkills";
 import { agentStateSchema, buildAgentState } from "../agentState";
 import { getHistoricalAnalogPlaybook } from "../analogPlaybook";
-import { companyFinancialProfileFor, stressTestDecisionPlan, type PlanStressTestResult } from "../decisionShield";
+import { companyFinancialProfileFor, routePlanText, stressTestDecisionPlan, type PlanStressTestResult } from "../decisionShield";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules, formatStandingRuleTriplet } from "../report/boundedDecisionRules";
@@ -145,6 +145,34 @@ const withAnswerForUngraded = (plan: PlanStressTestResult, planText: string) => 
   return { ...plan, answer: page ? { slug: page.slug, title: page.title, permalink: buildCanonicalUrl(`/answers/${page.slug}`) } : null };
 };
 
+/* A question no page answers can still be one the stress test grades ("should we sign a three-year
+   lease") or one it already sends to an answer ("should I take venture debt"). Both were refused
+   with the list of pages until 2026-11-04, and a model reading that list has no reason to try
+   another tool. The nearest answer is named as the nearest, because it is not about this question. */
+const refusalForUnmatchedQuestion = (question: string) => {
+  const asked = JSON.stringify(question);
+  const route = routePlanText(question);
+  if (route.gradable) {
+    return (
+      `No answer page matches ${asked}, but stress_test_plan grades this kind of decision. ` +
+      "Call it with planText set to the plan, adding cashUsd and monthlySpendUsd if the user gave them."
+    );
+  }
+  const nearest = route.answerTopic ? matchDecisionPage(route.answerTopic) : undefined;
+  if (nearest) {
+    return (
+      `No answer page is about ${asked}. The nearest is ${nearest.title} (${nearest.slug}): ` +
+      "call get_answer with that slug, and tell the user it is the nearest answer, not one about this question."
+    );
+  }
+  /* Titles, not slugs: a caller picking the nearest answer reads the question it answers. */
+  return (
+    `No answer found matching ${asked}. Available decision topics: ` +
+    `${answerPages.map((candidate) => `${candidate.title} (${candidate.slug})`).join("; ")}. ` +
+    "For what this week's conditions mean in general, get_state answers it."
+  );
+};
+
 const AGENT_TOOLS = [
   defineTool({
     name: "get_state",
@@ -221,7 +249,7 @@ const AGENT_TOOLS = [
     name: "get_answer",
     title: "Get decision answer",
     description:
-      "Whether's answer to one startup operating question, with this week's standing, the rules in force and a line to cite: hiring or a hiring freeze, engineers, sales headcount or a first salesperson, layoffs, compensation, raising capital or a bridge round, runway before a raise, cutting burn, vendors, pricing, retention versus acquisition, the roadmap, new product lines, go-to-market pace, international expansion, preparing for a downturn, a board or executive briefing, the funding climate, or risk-on versus risk-off. Pass the question as the user asked it.",
+      "Whether's answer to one startup operating question, with this week's standing, the rules in force and a line to cite: hiring or a hiring freeze, engineers, sales headcount or a first salesperson, layoffs, compensation, raising capital or a bridge round, runway before a raise, cutting burn, vendors, pricing, retention versus acquisition, the roadmap, new product lines, go-to-market pace, international expansion, preparing for a downturn, a board or executive briefing, the funding climate, or risk-on versus risk-off. Pass the question as the user asked it. A refusal says where to go next, often stress_test_plan.",
     input: {
       question: textInput.describe("The question in the user's words, a topic, or an answer slug (e.g. 'should I hire a second engineer', 'cut burn', 'should-we-freeze-or-selectively-hire')."),
     },
@@ -231,12 +259,7 @@ const AGENT_TOOLS = [
       const page = matchDecisionPage(question);
       if (!page) {
         const availableTopics = answerPages.map((candidate) => candidate.slug);
-        /* Titles, not slugs: a caller picking the nearest answer reads the question it answers. */
-        const message =
-          `No answer found matching ${JSON.stringify(question)}. Available decision topics: ` +
-          `${answerPages.map((candidate) => `${candidate.title} (${candidate.slug})`).join("; ")}. ` +
-          `For what this week's conditions mean in general, get_state answers it.`;
-        throw new AgentInputError(message, "invalid_arguments", [
+        throw new AgentInputError(refusalForUnmatchedQuestion(question), "invalid_arguments", [
           { argument: "question", message: `Unknown decision topic ${JSON.stringify(question)}.`, allowed: availableTopics },
         ]);
       }
