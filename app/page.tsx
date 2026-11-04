@@ -55,12 +55,14 @@ import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
 import { HearingSection } from "./components/home/HearingSection";
 import { selectHearingForAreas } from "./guides/stakeholderGuides";
-import { ActionLink } from "./components/ui/actionLink";
+import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { ShareLinks } from "./components/home/ShareLinks";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   HOME_DECISION_PARAM,
+  HOME_MONDAY_EMAIL_HASH,
+  ROLE_FORMAT_LINKS,
   parseHomeDecision,
   buildAreaGroups,
   buildHomeAreaRows,
@@ -640,7 +642,7 @@ async function PageContent({
     ? undefined
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   const heroAreas = heldAreasLine
-    ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
+    ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do by area" }
     : undefined;
   /* One sentence the reader can say in a meeting, from the same playbook /operate
      prints in full. A score has to be interpreted; a sentence can be repeated.
@@ -892,9 +894,7 @@ async function PageContent({
                   <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} showLabel />
                   {/* The core loop, beside the artifact rather than 4,000px below
                       it: the alert is what a quiet week is for. */}
-                  <ActionLink href={`#${HOME_SECTIONS.alert.id}`} variant="inline">
-                    Get the alert →
-                  </ActionLink>
+                  <PlainActionLink href={`#${HOME_MONDAY_EMAIL_HASH}`}>Email me Mondays →</PlainActionLink>
                 </div>
                 {/* No plan-horizon control here (2026-11-03): it is set once, so it
                     folds with stage and runway under the calibration line below. */}
@@ -925,11 +925,31 @@ async function PageContent({
               })}
             >
               <AreaDistancesFold regime={regime} isHistorical={Boolean(historicalSelection)} corridorModel={corridorModel} />
-              <div>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <ActionLink href={operateHref} variant="primary">
                   {cadenceCall?.planLabel ?? "Build this week’s plan →"}
                 </ActionLink>
+                {/* Live weeks only, as both of these read today's guidance. */}
+                {!historicalSelection ? (
+                  <PlainActionLink href="/operate#ops-decision-shield" data-test-decision-link>
+                    Test a decision →
+                  </PlainActionLink>
+                ) : null}
               </div>
+              {/* The formats a reader with one of these roles came for, named. They sat
+                  behind "Share or embed this" at the foot of the page. After the areas
+                  rather than beside Copy Brief: the decision, then the artifact, and the
+                  words-before-the-areas budget stands. */}
+              {!historicalSelection ? (
+                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-xs text-slate-400">
+                  Share as:
+                  {ROLE_FORMAT_LINKS.map((format) => (
+                    <ActionLink key={format.href} href={format.href} variant="inline">
+                      {format.label}
+                    </ActionLink>
+                  ))}
+                </p>
+              ) : null}
             </DecisionPicker>
 
             {/* 3. Whose rules these are, and the settings behind them. Live briefs

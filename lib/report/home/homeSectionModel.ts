@@ -36,6 +36,15 @@ import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
  */
 export const HOME_DECISION_PARAM = "decision";
 
+/*
+ * "Email me Mondays" under the call (2026-11-04). The form starts on alerts only, on
+ * purpose (`AlertSection`), and a link that promises Monday has to land on Monday: #1661
+ * found the greeting's "Get it every Monday" signing readers up for no Monday email. This
+ * anchor sits on the form, and the form starts on Monday delivery when the hash names it.
+ * A hash and not a query, so the press does not reload the page or lose the week shown.
+ */
+export const HOME_MONDAY_EMAIL_HASH = "email-monday";
+
 /** The decision a `?decision=` value names, or undefined for anything that is not an area. */
 export const parseHomeDecision = (value: string | undefined): DecisionArea | undefined =>
   value !== undefined && isDecisionArea(value) ? value : undefined;
@@ -86,6 +95,27 @@ export const HOME_SECTIONS = {
   record: { id: "has-this-happened-before", heading: "How unusual is this?" },
   alert: { id: "subscribe", heading: "Get notified when something changes" },
 } as const;
+
+/** `/share` opens on the format its hash names; the slide is in the files section under it. */
+export const ROLE_FORMAT_LINKS = [
+  { href: "/share#investor-update", label: "Investor update" },
+  { href: "/share#image-artifacts", label: "Board slide" },
+  { href: "/share#portfolio-note", label: "Portfolio note" },
+] as const;
+
+/**
+ * One move to test per area, for the link under its rule: a reader who has not worded a
+ * plan still gets a verdict in one click. Each must be one the stress test grades;
+ * `tests/homeDiscoverability.test.tsx` runs them through it. Fundraising has none: the
+ * test has no rules for raising money and says "Not graded", so a link would open on a
+ * refusal (#1740). Its area links to the answer that covers it.
+ */
+export const AREA_TEST_PLANS: Partial<Record<DecisionArea, string>> = {
+  hiring: "Hire one engineer",
+  "product-tempo": "Spend a sprint on tech debt",
+  "burn-discipline": "Sign a 2-year cloud commitment",
+  "expansion-bets": "Expand into a new region",
+};
 
 /** The three lines a score is drawn against, as the ladder primitive takes them. */
 export type HomeLadderLine = { kind: "pause" | "resume" | "callChange"; value: number };

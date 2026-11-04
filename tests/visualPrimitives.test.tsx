@@ -657,8 +657,8 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.doesNotMatch(html, /<h2/, "no section heading over two links");
     assert.doesNotMatch(html, /href="\/operate"/, "the plan link is the areas section's");
     assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant|Subscribe/);
-    const layout = require("node:fs").readFileSync("app/layout.tsx", "utf8");
-    assert.match(layout, /href="\/decisions"[^>]*>Your decisions</, "the decision record stays one click away, in the footer");
+    const { pagesInGroup } = require("../lib/navigation/informationArchitecture");
+    assert.ok(pagesInGroup("decide").some((page: { href: string }) => page.href === "/decisions"), "the decision record stays in the Plan group's row and the footer");
   });
 
   it("deep-links AreaTable consequence rows to #ops-monthly-action-summary on /operate", () => {

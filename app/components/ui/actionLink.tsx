@@ -34,3 +34,25 @@ export function ActionLink({ children, className, variant = "pill", ...linkProps
 }
 
 
+
+/* A plain anchor, for a link whose hash has to do its work. `Link` moves the hash with
+   `pushState`, which fires no `hashchange`, so a control reading the hash never hears; and
+   after a client-side move to another route the scroll to its target lands in the wrong
+   place on `/operate`, whose steps are still settling. A full load lands on the anchor. */
+export function PlainActionLink({
+  children,
+  variant = "inline",
+  className,
+  ...anchorProps
+}: Omit<ComponentProps<"a">, "className"> & {
+  children: ReactNode;
+  href: string;
+  variant?: ActionLinkVariant;
+  className?: string;
+}) {
+  return (
+    <a {...anchorProps} className={joinClasses(actionLinkVariantClasses[variant], className)}>
+      {children}
+    </a>
+  );
+}

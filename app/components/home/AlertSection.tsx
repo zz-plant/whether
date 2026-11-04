@@ -1,7 +1,7 @@
 import { HomeSection } from "./HomeSection";
 import { SubscribeForm } from "../SubscribeForm";
 import { RegimeAlertToggle } from "../regimeAlertToggle";
-import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
+import { HOME_MONDAY_EMAIL_HASH, HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
 
 /**
  * The alert, fifth on the page and right after the lines it watches (2026-10-09).
@@ -13,12 +13,15 @@ import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
  * away; the section above states the lines, so the form does not repeat them. The
  * push toggle is the same alert by another route, and renders nothing where push
  * is unconfigured. A reader who arrived from a shared link was offered "Get it
- * every Monday" in the greeting, so for them the form starts on Monday delivery.
+ * every Monday" in the greeting, so for them the form starts on Monday delivery, as it
+ * does for one who pressed "Email me Mondays" under the call (`HOME_MONDAY_EMAIL_HASH`).
  */
 export function AlertSection({ defaultFrequency = "alerts" }: { defaultFrequency?: "alerts" | "weekly" }) {
   return (
     <HomeSection id={HOME_SECTIONS.alert.id} heading={HOME_SECTIONS.alert.heading}>
-      <SubscribeForm compact defaultFrequency={defaultFrequency} showTitle={false} />
+      <div id={HOME_MONDAY_EMAIL_HASH}>
+        <SubscribeForm compact defaultFrequency={defaultFrequency} showTitle={false} />
+      </div>
       <RegimeAlertToggle />
     </HomeSection>
   );

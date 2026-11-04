@@ -157,7 +157,8 @@ export default function PrivacyPage() {
               report the shape of a search, described above. A visit
               to the brief also reports where it arrived from, as a coarse bucket: a search engine, a link
               or typed directly, never the referring URL. It reports whether this browser had opened the
-              brief before, and whether the visit used any control on the page, though not which one.
+              brief before, and whether the visit used any control on the page, with the section of the page the first
+              one was in, though not which control.
               A click that did nothing, on something that looked as if it would (a chart, a stamp, a
               glyph), reports the page, the section it was in and that kind of element: not the words
               clicked or where on the screen. These go to Cloudflare Analytics Engine, and section 5

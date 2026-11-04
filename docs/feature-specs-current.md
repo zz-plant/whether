@@ -333,6 +333,17 @@ until the report resolves.
   bordered disclosure button with a chevron, the week picker's shape. It was a dotted underline,
   the card's defined-term mark, so the names read as definitions and the runway test and "Set
   your own rules" behind them went unopened.
+- **The Monday email is named near the top.** "Email me Mondays →" beside Copy Brief replaces "Get
+  the alert →" and lands on the form with Monday delivery chosen (`#email-monday`). A reader who
+  scrolls to the form still finds it on alerts only, the default `AlertSection` explains.
+- **The stress test and the role formats are named under the areas.** "Test a decision →" sits
+  beside the plan link, and an open area offers one graded example with nothing to type (`Test
+  "Hire one engineer" →`, through `/operate?plan=`). Fundraising has none, because the test has no
+  rules for a raise. "Share as: Investor update, Board slide, Portfolio note" links their places on
+  `/share`. All are live weeks only. The "Rules for Series A · 12–24 months" link over the areas came
+  out to pay for the words; the calibration line and the card's pill say the same.
+- **Your decisions is in the Plan group** as a secondary page: its row, footer column and the
+  phone's sheet. It was a footer link beside Privacy. It stays out of the sitemap and `/llms.txt`.
 - **The card names the score holding the areas** when one score holds them all: "On hold while
   funding pressure is above 76: Hiring, Fundraising, Spending and New bets." With two scores
   holding different areas it lists the areas alone.
@@ -1972,7 +1983,8 @@ leaving was the measurement and the owner's own checks:
   `ActivationTracker`: any control pressed, section opened or link followed, on any visit. It came
   only from the first-visit picker and the explainer's Dismiss, both hidden from a returning browser,
   so a returning reader could only ever count as leaving. `visited` minus `oriented` is the visits
-  that touched nothing. The picker and the explainer no longer send it themselves.
+  that touched nothing. The picker and the explainer no longer send it themselves. Since 2026-11-04
+  it carries the page section of that first act, read by `bun run telemetry:first-acts`.
 - **`/` mounts `OperatorWorkflowRouteTracker`.** `/` was always an accepted route and the tracker was
   never on it, so a move from the brief to `/signals`, `/operate` or `/resolve` went unrecorded.
 - **A browser can turn measurement off** from `/privacy` section 5. Every browser emitter goes through

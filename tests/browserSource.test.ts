@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { createBrowserSource } from "../app/components/browserSource";
+import { createBrowserSource, locationHashSource } from "../app/components/browserSource";
 
 /**
  * The properties a `useSyncExternalStore` source has to hold, pinned without a DOM.
@@ -160,5 +160,29 @@ describe("browser source snapshots", () => {
     const third = source.subscribe(() => {});
     assert.equal(watching, 1);
     third();
+  });
+});
+
+describe("the location hash", () => {
+  it("is read again by the next page's first consumer, since pushState fires no event", () => {
+    const hadWindow = "window" in globalThis;
+    const original: unknown = Reflect.get(globalThis, "window");
+    const location = { hash: "#email-monday" };
+    Reflect.set(globalThis, "window", { location, addEventListener: () => {}, removeEventListener: () => {} });
+    try {
+      const leaveHomepage = locationHashSource.subscribe(() => {});
+      locationHashSource.refresh();
+      assert.equal(locationHashSource.getSnapshot(), "email-monday");
+      leaveHomepage();
+
+      // A client-side move to /share: the hash changed and nothing announced it.
+      location.hash = "#investor-update";
+      const openShare = locationHashSource.subscribe(() => {});
+      assert.equal(locationHashSource.getSnapshot(), "investor-update");
+      openShare();
+    } finally {
+      if (hadWindow) Reflect.set(globalThis, "window", original);
+      else Reflect.deleteProperty(globalThis, "window");
+    }
   });
 });

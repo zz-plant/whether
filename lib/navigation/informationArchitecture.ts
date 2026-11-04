@@ -27,6 +27,7 @@ type NavigationPageKey =
   | "runway"
   | "scenarios"
   | "comps"
+  | "decisions"
   | "history"
   | "compare"
   | "calibration"
@@ -200,6 +201,17 @@ export const navigationPages: readonly NavigationPage[] = [
     description: "Median EV/Revenue multiple across a basket of public SaaS companies",
     placement: "tab",
   },
+  /* Secondary in Plan since 2026-11-04: what the test on the hub records goes here, and
+     a footer link beside Privacy was the one fixed way to it, so a reader who recorded a
+     decision had no path back the next week. */
+  {
+    key: "decisions",
+    group: "decide",
+    href: "/decisions",
+    label: "Your decisions",
+    description: "The decisions you recorded from this browser, checked against each week's reading.",
+    placement: "secondary",
+  },
   {
     key: "history",
     group: "record",
@@ -322,7 +334,6 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
-  { prefix: "/decisions", label: "Your decisions" },
   { prefix: "/resolve", label: "More tools" },
   { prefix: "/toolkits", label: "Toolkit" },
   { prefix: "/privacy", label: "Privacy" },

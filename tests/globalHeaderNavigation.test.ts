@@ -74,7 +74,7 @@ describe("global header navigation helpers", () => {
     assert.equal(groupOf("/answers/should-startups-raise-capital-now"), "guides");
     assert.equal(groupOf("/resolve/ceo"), "guides");
     assert.equal(groupOf("/toolkits/focus"), "guides");
-    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy", "/decisions"]) {
+    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy"]) {
       assert.equal(groupOf(ungrouped), null, `${ungrouped} belongs to no group`);
     }
   });
@@ -123,6 +123,7 @@ describe("sub-tabs", () => {
         ["Runway planner", false],
         ["Scenarios", false],
         ["SaaS multiples", true],
+        ["Your decisions", false],
       ],
     );
   });
