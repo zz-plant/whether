@@ -17,7 +17,7 @@ import {
 import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
 import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildPortfolioNote } from "../lib/export/portfolioNote";
-import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, findPublishedBrief } from "../lib/report/publishedBriefs";
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "../lib/alert/alertTemplates";
 import { publishedScoreLines } from "../lib/alert/alertEvaluator";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
@@ -48,6 +48,9 @@ import { decisionAreaOrder, buildCanonicalBoundedDecisionRules } from "../lib/re
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
 serveUnreachableUpstreams();
+
+const COUNTED_WEEK = findPublishedBrief("2026-w44");
+assert.ok(COUNTED_WEEK, "2026-w44 is still in the archive");
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -449,8 +452,11 @@ const artifactSurfaces: Surface[] = [
         { area: "burn-discipline", rule: "Payback on every line", pause: { line: "Funding pressure > 76", state: "crossed" }, resume: { line: "Funding pressure < 66" } },
       ]),
   },
-  { name: "published brief (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },
-  { name: "published brief (email)", text: () => (latestPublishedBrief ? buildPublishedBriefEmailUpdate(latestPublishedBrief) : "") },
+  /* One named week, not the newest: a freeze appends stored text no pull request can reword,
+     and counting it let w45's evidence line fail the freeze's own push (2026-11-04). This holds
+     the words the two pastes add to a record. A newer week's stored text is not counted here. */
+  { name: "published brief (Slack)", text: () => buildPublishedBriefSlackUpdate(COUNTED_WEEK) },
+  { name: "published brief (email)", text: () => buildPublishedBriefEmailUpdate(COUNTED_WEEK) },
   {
     name: "alert emails",
     text: () =>
