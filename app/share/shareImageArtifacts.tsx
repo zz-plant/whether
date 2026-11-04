@@ -253,7 +253,7 @@ export function ShareImageArtifacts() {
                   <ActionLink
                     href={file.href}
                     variant="ghost"
-                    className={file.use ? "w-[8.5rem] shrink-0" : "shrink-0"}
+                    className={file.use ? "w-[9.5rem] shrink-0 whitespace-nowrap" : "shrink-0"}
                     {...(file.download ? { download: file.filename ?? "" } : { target: "_blank", rel: "noreferrer" })}
                   >
                     {file.label}

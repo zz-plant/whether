@@ -38,8 +38,12 @@
     color: #525c60 !important;
   }
 
-  [class*="text-slate-200"] {
+  [class*="text-slate-200"], [class*="text-semantic-easing-fg"] {
     color: #384145 !important;
+  }
+
+  [class*="text-slate-500"] {
+    color: #525c60 !important;
   }
 
   [class*="bg-slate-950"], [class*="bg-slate-900"], [class*="bg-slate-800"] {
@@ -65,8 +69,6 @@
   [data-page-section] {
     border-color: #cfd1d1 !important;
     background: white !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
     margin-bottom: 1rem;
   }
 
@@ -75,11 +77,6 @@
     border-bottom: 1px solid #dcdfde;
     padding-bottom: 0.25rem;
     margin-bottom: 0.5rem;
-  }
-
-  article, section, [class*="weather-panel"] {
-    break-inside: avoid;
-    page-break-inside: avoid;
   }
 
   @page {

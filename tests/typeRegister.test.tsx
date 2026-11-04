@@ -15,6 +15,16 @@ const ruleBody = (selector: string) => {
 };
 
 describe("type register", () => {
+  it("lets a printed section break across pages, and keeps a page's own title", () => {
+    /* Told to stay whole, a section taller than the sheet left the published brief's
+       first page blank, and a blanket `header` rule took the name off the legal pages. */
+    const surfaces = readFileSync("app/styles/surfaces.css", "utf8");
+    const effects = readFileSync("app/styles/layout-effects.css", "utf8");
+    assert.doesNotMatch(effects, /article, section[^{]*\{[^}]*break-inside/);
+    assert.doesNotMatch(surfaces, /\.weather-panel \{[^}]*break-inside/);
+    assert.match(surfaces, /header:not\(\.weather-hub-section\)/);
+  });
+
   it("sets labels in sentence case, without caps tracking", () => {
     const eyebrow = ruleBody(".type-eyebrow");
     assert.doesNotMatch(eyebrow, /uppercase/, ".type-eyebrow went back to capitals");
