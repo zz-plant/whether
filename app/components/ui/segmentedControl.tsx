@@ -116,7 +116,7 @@ const CONTAINER = {
    Hover, checked and pressed are `.peer:*` rules in controls.css: the radio is
    stretched over the option, so the pointer is always over the input. */
 const OPTION_BASE =
-  "weather-segment-option flex min-h-[44px] min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 px-3 py-1.5 text-fluid-micro font-semibold peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
+  "weather-segment-option flex min-h-[44px] min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 px-3 py-1.5 text-fluid-nano font-semibold peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
 
 const OPTION = {
   segmented: OPTION_BASE,

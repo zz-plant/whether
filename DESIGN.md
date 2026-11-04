@@ -28,7 +28,7 @@ typography:
     letterSpacing: "-0.015em"
   body:
     fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
-    fontSize: "clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem)"
+    fontSize: "clamp(1rem, 0.85rem + 0.5vw, 1.0625rem)"
     fontWeight: 400
     lineHeight: 1.6
   label:
@@ -118,14 +118,19 @@ why the steps are these:
 | --- | --- | --- |
 | The week's call (h1) | 28 → 52px | `.text-display` |
 | A page section or panel title (h2/h3) | 22 → 26px | `.type-section` |
-| A card's own heading | 17 → 20px | `text-fluid-lg` |
-| Body and prose | 15 → 17px | `text-fluid-base` |
-| Secondary prose | 13 → 15px | `text-fluid-sm` |
-| Label, eyebrow, metadata | 12 → 14px | `.type-eyebrow`, `.type-label` |
-| Stamp, badge | 12 → 13px | `.type-stamp`, `.type-badge` |
+| A page's title (h1) | 26 → 34px | `text-fluid-2xl`, `.weather-secondary-title` |
+| A card's own heading | 18 → 20px | `text-fluid-lg` |
+| Body and prose | 16 → 17px | `text-fluid-base` |
+| Secondary prose, label, eyebrow | 14 → 15px | `text-fluid-sm`, `.type-eyebrow`, `.type-label` |
+| Metadata, stamp, badge | 12 → 13px | `text-fluid-nano`, `.type-stamp`, `.type-badge` |
 
-Every step is at least 1.15x the one below it at both ends of the range; two sizes closer than
-that read as one job set twice. A role with no class above is a role that will be hand-rolled:
+Every step is at least 1.125x the one below it at both ends of the range
+(`tests/typeSteps.test.tsx`); two sizes closer than that read as one job set twice. Tailwind's
+`text-xs` through `text-xl` resolve to these steps (`app/styles/tokens.css`), so there is no second
+scale to reach for. `text-2xl` and up stay fixed, for figures.
+
+Prose stops at `60ch`, about 75 characters in Archivo, from a base-layer rule on `p` and on list
+items that hold text; a utility on the element overrides it, and a table or a flex row is exempt. A role with no class above is a role that will be hand-rolled:
 the section heading was, at 32 call sites in five spellings, until `.type-section` became the one
 primitive.
 

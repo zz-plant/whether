@@ -88,7 +88,7 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
       }
     >
       <div className="space-y-4">
-        <p className="text-fluid-xs text-slate-400">
+        <p className="text-fluid-sm text-slate-400">
           Closest of {analog.referenceCycleCount} reference cycles on the four readings below.
           A resemblance in the inputs, not a forecast of the outcome.
         </p>
@@ -96,7 +96,7 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
             of slack, so on a wide panel the two numeric columns end up jammed
             against the right edge. 50/25/25 keeps the pairs readable across
             the row. */}
-        <table className="w-full max-w-2xl table-fixed border-collapse text-left text-fluid-xs">
+        <table className="w-full max-w-2xl table-fixed border-collapse text-left text-fluid-sm">
           <caption className="sr-only">Match coordinates, reference cycle against this week</caption>
           <colgroup>
             <col className="w-1/2" />
@@ -128,7 +128,7 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
           ].map((cell) => (
             <div key={cell.label}>
               <dt className="type-eyebrow">{cell.label}</dt>
-              <dd className="mt-1 text-fluid-xs leading-relaxed text-slate-200">{cell.value}</dd>
+              <dd className="mt-1 text-fluid-sm leading-relaxed text-slate-200">{cell.value}</dd>
             </div>
           ))}
         </dl>
@@ -240,7 +240,7 @@ export const SignalsInstrumentsSection = ({
               the month-end archive, so the two disagree by design — for the same
               two named signals. Each cell stamps its own period; this line says
               what the block is, once. */}
-          <p className="text-fluid-xs text-slate-400">
+          <p className="text-fluid-sm text-slate-400">
             Month-end readings from the archive, so the latest figure here is the last
             completed month rather than this week&rsquo;s score above.
           </p>

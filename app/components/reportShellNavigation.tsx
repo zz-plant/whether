@@ -42,13 +42,13 @@ export const ReportSectionNavigation = ({
               className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-left text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               <span>{resolveCompactSectionLabel(section)}</span>
-              <span className="text-fluid-micro text-slate-400">{index + 1}</span>
+              <span className="text-fluid-nano text-slate-400">{index + 1}</span>
             </a>
           </li>
         ))}
         </ol>
         {hiddenSectionCount > 0 ? (
-          <p className="px-1 text-fluid-xs text-slate-400">
+          <p className="px-1 text-fluid-sm text-slate-400">
             {hiddenSectionCount} more section{hiddenSectionCount === 1 ? "" : "s"} below.
           </p>
         ) : null}

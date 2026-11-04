@@ -91,7 +91,7 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
           className="fixed inset-0 z-[var(--z-presentation)] flex flex-col justify-between p-6 sm:p-12"
           aria-label="Brief presentation"
         >
-          <div className="flex items-center justify-between gap-4 text-fluid-xs text-white/50">
+          <div className="flex items-center justify-between gap-4 text-fluid-sm text-white/50">
             <span className="type-eyebrow">{artifact.title} · {artifact.recordDateLabel}</span>
             <span className="flex items-center gap-2">
               <span className="tabular-nums" aria-hidden="true">
@@ -204,7 +204,7 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                   leadingIcon={<CopyIcon />}
                   stateIcons={{ copied: <CheckIcon /> }}
                   buttonLabels={{ copied: "Summary copied" }}
-                  buttonClassName="text-fluid-xs"
+                  buttonClassName="text-fluid-sm"
                   buttonProps={{ "data-testid": "presentation-copy-summary" }}
                 />
               ) : null}
@@ -212,14 +212,14 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                 type="button"
                 onClick={goPrev}
                 disabled={frame === 0}
-                className="weather-button inline-flex min-h-11 min-w-11 items-center justify-center px-4 py-2 text-fluid-xs font-semibold disabled:opacity-30"
+                className="weather-button inline-flex min-h-11 min-w-11 items-center justify-center px-4 py-2 text-fluid-sm font-semibold disabled:opacity-30"
               >
                 Back
               </button>
               <button
                 type="button"
                 onClick={isLast ? onExit : goNext}
-                className="weather-button inline-flex min-h-11 items-center justify-center px-4 py-2 text-fluid-xs font-semibold"
+                className="weather-button inline-flex min-h-11 items-center justify-center px-4 py-2 text-fluid-sm font-semibold"
               >
                 {isLast ? "Done" : "Next"}
               </button>

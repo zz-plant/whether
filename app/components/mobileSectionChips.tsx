@@ -86,7 +86,7 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
                   ref={isActive ? activeChipRef : undefined}
                   href={section.href}
                   aria-current={isActive ? "location" : undefined}
-                  className={`-mb-px inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-2.5 text-fluid-xs font-medium no-underline transition-colors weather-focus-ring ${
+                  className={`-mb-px inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-2.5 text-fluid-sm font-medium no-underline transition-colors weather-focus-ring ${
                     isActive
                       ? "border-[color:var(--regime-accent)] text-slate-100 font-semibold"
                       : "border-transparent text-slate-400 hover:text-slate-200"

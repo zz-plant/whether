@@ -159,7 +159,7 @@ const ribbonTone = (value: number | null) => {
 const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) => (
   <header className="space-y-1">
     <p className="type-eyebrow text-slate-300">{title}</p>
-    <p className="text-fluid-xs text-slate-400">{subtitle}</p>
+    <p className="text-fluid-sm text-slate-400">{subtitle}</p>
   </header>
 );
 
@@ -361,8 +361,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               ))}
             </div>
             {/* Autoscaled to the visible window, so the extent has to be stated. */}
-            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(rateMin, rateMax, "%")}</p>
-            {hasRateGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing readings.</p> : null}
+            <p className="text-fluid-sm tabular-nums text-slate-400">Vertical scale {formatRange(rateMin, rateMax, "%")}</p>
+            {hasRateGaps ? <p className="text-fluid-sm text-slate-400">Breaks indicate missing readings.</p> : null}
           </FlatPanel>
 
           <FlatPanel source={panelSource} className="@4xl:col-span-4">
@@ -442,11 +442,11 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               ) : null}
             </svg>
             {monthlyScatter.length ? (
-              <p className="text-fluid-xs tabular-nums text-slate-400">
+              <p className="text-fluid-sm tabular-nums text-slate-400">
                 X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, "pp")}
               </p>
             ) : null}
-            <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction as well as position.</p>
+            <p className="text-fluid-sm text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction as well as position.</p>
           </FlatPanel>
 
           <FlatPanel source={panelSource} className="@4xl:col-span-8">
@@ -474,8 +474,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             <p className="text-xs tabular-nums text-slate-300">
               {CURVE_SPREAD_LABELS.spread10Y2Y} {formatSpread(latest?.spread10Y2Y ?? null)} · {CURVE_SPREAD_LABELS.spread2Y3M} {formatSpread(latest?.spread2Y3M ?? null)}
             </p>
-            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, "pp")}</p>
-            {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
+            <p className="text-fluid-sm tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, "pp")}</p>
+            {hasSpreadGaps ? <p className="text-fluid-sm text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 
           <FlatPanel source={panelSource} className="@4xl:col-span-4">

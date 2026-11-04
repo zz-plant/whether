@@ -46,7 +46,7 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
       <button
         type="button"
         onClick={() => document.dispatchEvent(new CustomEvent("whether-open-command-palette"))}
-        className={`${CELL} max-md:hidden xl:min-w-[13rem] xl:justify-start xl:gap-2 xl:px-3 xl:text-fluid-xs`}
+        className={`${CELL} max-md:hidden xl:min-w-[13rem] xl:justify-start xl:gap-2 xl:px-3 xl:text-fluid-sm`}
         aria-label="Search"
         title="Search or jump to… ⌘K"
       >

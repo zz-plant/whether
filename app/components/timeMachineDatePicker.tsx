@@ -67,13 +67,13 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
                 <div className="mt-2 flex items-center gap-2">
                   {adjacentPrev ? (
                     <button type="button" onClick={() => navigateTo(adjacentPrev.year, adjacentPrev.month)}
-                      className="flex items-center gap-1 rounded border border-slate-700/60 px-2 py-1 text-fluid-micro hover:bg-slate-800/50">
+                      className="flex items-center gap-1 rounded border border-slate-700/60 px-2 py-1 text-fluid-nano hover:bg-slate-800/50">
                       <ChevronLeftIcon className="h-3 w-3" /> {adjacentPrev.month}/{adjacentPrev.year}
                     </button>
                   ) : null}
                   {adjacentNext ? (
                     <button type="button" onClick={() => navigateTo(adjacentNext.year, adjacentNext.month)}
-                      className="flex items-center gap-1 rounded border border-slate-700/60 px-2 py-1 text-fluid-micro hover:bg-slate-800/50">
+                      className="flex items-center gap-1 rounded border border-slate-700/60 px-2 py-1 text-fluid-nano hover:bg-slate-800/50">
                       {adjacentNext.month}/{adjacentNext.year} <ChevronRightIcon className="h-3 w-3" />
                     </button>
                   ) : null}

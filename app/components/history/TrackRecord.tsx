@@ -48,7 +48,7 @@ const renderDelta = (delta: number | null) => {
  * never drift into two different tables of the same thing.
  */
 const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: string }) => (
-  <table className="w-full max-w-3xl table-fixed border-collapse text-left text-fluid-xs">
+  <table className="w-full max-w-3xl table-fixed border-collapse text-left text-fluid-sm">
     <colgroup>
       <col className="w-[26%]" />
       <col className="w-[32%]" />
@@ -94,7 +94,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
                 {row.regimeLabel}
               </span>
               {row.changed ? (
-                <span className="type-badge text-fluid-micro rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
+                <span className="type-badge text-fluid-nano rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
                   changed
                 </span>
               ) : null}
@@ -173,7 +173,7 @@ export function TrackRecordTiles({
             <Fact label="Changes in conditions" value={record.regimeChanges.toLocaleString("en-US")} unit={changeRate} />
           </FactList>
 
-          <p className="text-fluid-xs text-slate-400">
+          <p className="text-fluid-sm text-slate-400">
             {CALL_CHANGE_RULE} One noisy month can&rsquo;t change them, so most months nothing changes, and a
             change is worth your attention.
           </p>
@@ -233,7 +233,7 @@ export function TrackRecordTable({
         queryKey="months"
         initialOpen={allMonthsOpen}
         className="weather-auto-chevron"
-        summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-medium text-slate-300"
+        summaryClassName="cursor-pointer select-none rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-sm font-medium text-slate-300"
         summary={
           <span>
             Monthly readings ({record.allRows.length.toLocaleString("en-US")}) ·{" "}

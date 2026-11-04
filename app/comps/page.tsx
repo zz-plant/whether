@@ -140,7 +140,7 @@ export default async function CompsPage() {
                 </>
               )}
             </p>
-            <p className="max-w-2xl text-sm text-slate-300">
+            <p className="text-sm text-slate-300">
               Median revenue growth {formatPercent(comps.data.medianRevenueGrowth)}, across{" "}
               {comps.data.growthCompanyCount === SAAS_BASKET.length
                 ? `all ${SAAS_BASKET.length} companies in the basket`

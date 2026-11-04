@@ -277,7 +277,7 @@ export default function RootLayout({
                       Whether
                     </Link>
                   </p>
-                  <p className="max-w-[32ch] text-fluid-micro leading-relaxed text-[var(--footer-legal)]">
+                  <p className="max-w-[32ch] text-fluid-nano leading-relaxed text-[var(--footer-legal)]">
                     {canonicalPositioningLine}
                   </p>
                 </div>
@@ -294,7 +294,7 @@ export default function RootLayout({
                       <li key={link.href}>
                         <Link
                           href={link.href}
-                          className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
+                          className="weather-list-link text-fluid-sm text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                         >
                           {link.label}
                         </Link>
@@ -304,7 +304,7 @@ export default function RootLayout({
                       {/* A file, not a page — stays an <a> and outside the link set. */}
                       <a
                         href="/feed.xml"
-                        className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
+                        className="weather-list-link text-fluid-sm text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                       >
                         RSS
                       </a>
@@ -315,7 +315,7 @@ export default function RootLayout({
                           /share also offers Google's add-by-URL page. */}
                       <a
                         href={CALENDAR_WEBCAL_URL}
-                        className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
+                        className="weather-list-link text-fluid-sm text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                       >
                         Calendar
                       </a>
@@ -355,7 +355,7 @@ export default function RootLayout({
                             <li key={link.href}>
                               <Link
                                 href={link.href}
-                                className="weather-list-link text-fluid-xs text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                                className="weather-list-link text-fluid-sm text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
                               >
                                 {link.label}
                               </Link>
@@ -378,7 +378,7 @@ export default function RootLayout({
             <div className="mt-8 flex flex-col gap-3 border-t border-slate-800/40 pt-5 sm:flex-row sm:items-center sm:justify-between">
               <nav
                 aria-label="Legal and credits"
-                className="flex flex-wrap items-center gap-x-6 gap-y-2 text-fluid-micro text-[var(--footer-legal)]"
+                className="flex flex-wrap items-center gap-x-6 gap-y-2 text-fluid-nano text-[var(--footer-legal)]"
               >
                 <Link href="/privacy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
                 <Link href="/acceptable-use-policy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>

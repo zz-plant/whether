@@ -58,8 +58,8 @@
 - MUST: Overscroll containment. Any element with its own scrollbar (modals, sidebars) MUST have `overscroll-behavior: contain` to prevent the body from scrolling when the element hits the edge.
 - Compact shared controls (36px) require both a fine pointer and hover support; a wide touch screen keeps the 44px floor. Native text fields keep at least 16px text on coarse pointers, including tablets and landscape phones.
 - The desktop header keeps all six loop tabs from `md`; Search stays an icon until `xl` to leave room for the wordmark and navigation. Below `md`, the bottom bar owns Search.
-- Section names remain readable: the desktop outline wraps long names; the mobile index uses the shared `text-fluid-xs` size and contains horizontal overscroll.
-- User-facing metadata uses `text-fluid-nano`, which bottoms at 11px on phones; explanatory text and copy previews use `text-fluid-xs` or larger. All-caps labels inside an aria-hidden graphic may go to 10px (`RegimeRadar` quadrants); text inside a viewBox-scaled SVG is judged at rendered size, not `font-size`.
+- Section names remain readable: the desktop outline wraps long names; the mobile index uses the shared `text-fluid-sm` size and contains horizontal overscroll.
+- User-facing metadata uses `text-fluid-nano`, which bottoms at 12px on phones; explanatory text and copy previews use `text-fluid-sm` or larger; reading prose uses `text-fluid-base`. All-caps labels inside an aria-hidden graphic may go to 10px (`RegimeRadar` quadrants); text inside a viewBox-scaled SVG is judged at rendered size, not `font-size`.
 
 ## VII. Zero-tolerance metrics
 - CLS (Cumulative Layout Shift) MUST be 0. Content does not jump. Ever.

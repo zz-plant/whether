@@ -110,7 +110,7 @@ export function SubscribeForm({
         <p className="text-fluid-sm font-semibold text-slate-50">
           {channel === "slack" ? "Slack channel connected" : "Check your inbox"}
         </p>
-        <p className="text-fluid-micro text-slate-300">
+        <p className="text-fluid-nano text-slate-300">
           {message}
           {alertsOnly ? " After that, you hear from us only when something moves." : null}
         </p>
@@ -168,7 +168,7 @@ export function SubscribeForm({
             }}
           />
         </div>
-        <p className="max-w-[72ch] text-fluid-xs text-slate-400">
+        <p className="max-w-[60ch] text-fluid-sm text-slate-400">
           {channel === "slack"
             ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
             : alertsOnly
@@ -223,7 +223,7 @@ export function SubscribeForm({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-sm font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Subscribing…" : alertsOnly ? "Email me when it changes" : "Subscribe"}
             </button>
@@ -262,7 +262,7 @@ export function SubscribeForm({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-sm font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Connecting…" : "Connect Slack"}
             </button>
@@ -271,7 +271,7 @@ export function SubscribeForm({
       </form>
 
       {message && (
-        <p id="subscribe-message" aria-live="polite" className="text-fluid-micro text-rose-400">
+        <p id="subscribe-message" aria-live="polite" className="text-fluid-nano text-rose-400">
           {message}
         </p>
       )}

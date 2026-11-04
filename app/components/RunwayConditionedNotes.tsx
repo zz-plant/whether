@@ -58,7 +58,7 @@ function ClearRunwayButton() {
         const query = params.toString();
         router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
       }}
-      className="inline-flex min-h-[44px] sm:min-h-9 items-center rounded-sm px-2 text-fluid-micro text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+      className="inline-flex min-h-[44px] sm:min-h-9 items-center rounded-sm px-2 text-fluid-nano text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
     >
       Clear
     </button>

@@ -506,7 +506,7 @@ export function TimelineBar({
           {/* Current Period Badge. This answers "where am I", so it tracks the
               selection and any commit in flight — never the hover, which is a
               question about where you *would* land and belongs in the tooltip. */}
-          <div className="flex flex-wrap items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-fluid-micro">
+          <div className="flex flex-wrap items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-fluid-nano">
             <span
               className={`size-2 rounded-full ${
                 selected.entry ? REGIME_COLORS[selected.entry.regime] : "bg-slate-400"
@@ -540,7 +540,7 @@ export function TimelineBar({
             <button
               type="button"
               onClick={goToLatest}
-              className="weather-timeline-control rounded-md border border-sky-500/30 bg-sky-500/10 px-2 py-1 text-fluid-micro font-medium text-sky-300 transition-colors hover:bg-sky-500/20 weather-focus-ring"
+              className="weather-timeline-control rounded-md border border-sky-500/30 bg-sky-500/10 px-2 py-1 text-fluid-nano font-medium text-sky-300 transition-colors hover:bg-sky-500/20 weather-focus-ring"
             >
               Jump to latest
             </button>
@@ -554,7 +554,7 @@ export function TimelineBar({
             on the group, where a reader already hovers when looking for zoom. */}
         {showZoomControls ? (
           <div
-            className="flex items-center gap-1 bg-slate-950/70 border border-[color:var(--border-subtle)] p-0.5 rounded-lg text-fluid-micro"
+            className="flex items-center gap-1 bg-slate-950/70 border border-[color:var(--border-subtle)] p-0.5 rounded-lg text-fluid-nano"
             title="Pinch, or hold ⌘/Ctrl and scroll, to zoom. Scroll sideways to pan."
           >
             <span className="px-1.5 text-slate-500 flex items-center gap-0.5">
@@ -665,7 +665,7 @@ export function TimelineBar({
         {/* Tooltip on Drag / Hover — the "where would I land" readout. */}
         {preview?.entry ? (
           <div
-            className="absolute -top-14 pointer-events-none z-30 transform -translate-x-1/2 whitespace-nowrap rounded-md border border-slate-700 bg-slate-900/95 px-2 py-1 shadow-xl text-fluid-micro backdrop-blur-sm"
+            className="absolute -top-14 pointer-events-none z-30 transform -translate-x-1/2 whitespace-nowrap rounded-md border border-slate-700 bg-slate-900/95 px-2 py-1 shadow-xl text-fluid-nano backdrop-blur-sm"
             style={{
               left: `${previewPercent}%`,
             }}
@@ -782,7 +782,7 @@ export function TimelineBar({
 
       {/* Detailed Variant Info (Optional) */}
       {variant === "detailed" && selected.entry ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-fluid-micro text-slate-400">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-fluid-nano text-slate-400">
           <SignalReading signalKey="tightness" score={selected.entry.tightness} />
           <SignalReading signalKey="riskAppetite" score={selected.entry.riskAppetite} />
           <span className="text-slate-500 font-mono">

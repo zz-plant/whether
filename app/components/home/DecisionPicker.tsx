@@ -143,7 +143,7 @@ export function DecisionPicker({
           </p>
         ) : null}
         {activeTransmission ? (
-          <div data-transmission-note className="max-w-[64ch] space-y-1.5 text-fluid-xs">
+          <div data-transmission-note className="max-w-[60ch] space-y-1.5 text-fluid-sm">
             <p className="leading-relaxed text-slate-300">
               <span className="font-semibold text-slate-100">Why this matters for {decisionAreaLabel(area).toLowerCase()}:</span>{" "}
               {activeTransmission.transmission} {activeTransmission.whyLineMatters}
@@ -159,7 +159,7 @@ export function DecisionPicker({
           </div>
         ) : null}
         <details className="weather-auto-chevron" data-commitment-disclosure>
-          <summary className="cursor-pointer select-none text-fluid-xs font-medium text-slate-300 hover:text-slate-100">
+          <summary className="cursor-pointer select-none text-fluid-sm font-medium text-slate-300 hover:text-slate-100">
             Test against your cash and runway (optional)
           </summary>
           <div className="pt-2">
@@ -183,7 +183,7 @@ export function DecisionPicker({
             type="button"
             onClick={handleCopySlackTakeaway}
             data-testid="copy-slack-takeaway"
-            className="weather-hit inline-flex items-center gap-1.5 text-fluid-xs font-medium text-slate-300 hover:text-slate-100 transition-colors"
+            className="weather-hit inline-flex items-center gap-1.5 text-fluid-sm font-medium text-slate-300 hover:text-slate-100 transition-colors"
             title="Copy a summary of this decision to paste into Slack or a meeting note"
           >
             {copyStatus === "copied" ? (

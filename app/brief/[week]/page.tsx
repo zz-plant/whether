@@ -208,7 +208,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         {superseded ? (
           <p
             data-newer-guidance
-            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-raised)] px-4 py-2 text-fluid-xs text-slate-200"
+            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-raised)] px-4 py-2 text-fluid-sm text-slate-200"
           >
             {/* It names no newer week's conditions: the archive can trail the
                 live brief by a week or two, and the link is where the current
@@ -291,7 +291,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             both lines are on the card now, so this section carries only the
             delta. */}
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
+          <h2 className="type-section">What changed this week</h2>
           <p className="text-sm text-slate-300">{display.whatChanged}</p>
         </section>
 
@@ -319,7 +319,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
         {readings.length > 0 ? (
           <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="published-readings">
-            <h2 id="published-readings" className="text-lg font-semibold text-slate-100">The numbers behind the guidance</h2>
+            <h2 id="published-readings" className="type-section">The numbers behind the guidance</h2>
             <dl className="weather-switch gap-4 [--col-min:16rem]">
               {readings.map((reading) => {
                 const rail = rails.find((candidate) => candidate.metric === reading.key);
@@ -390,7 +390,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
         {brief.decisions.length ? (
           <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-            <h2 className="text-lg font-semibold text-slate-100">Guidance by area</h2>
+            <h2 className="type-section">Guidance by area</h2>
             {tabulateDecisions && frozenScores ? (
               /* Every area's rule is a pair of the same four lines, drawn once
                  above. A row per area says which lines apply and how far off
@@ -465,7 +465,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
         {brief.evidence.length ? (
           <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-            <h2 className="text-lg font-semibold text-slate-100">Evidence behind the guidance</h2>
+            <h2 className="type-section">Evidence behind the guidance</h2>
             <ul className="space-y-3 text-sm text-slate-300">
               {brief.evidence.map((item) => (
                 <li key={item.title}>
@@ -477,7 +477,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         ) : null}
 
         <footer className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Provenance</h2>
+          <h2 className="type-section">Provenance</h2>
           <p className="text-sm text-slate-300">
             Data as of {brief.recordDateLabel} · {display.source} · captured {brief.freshnessLabel}
           </p>

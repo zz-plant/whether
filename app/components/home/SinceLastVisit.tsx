@@ -197,7 +197,7 @@ export function SinceLastVisit({
   const compact = (
     <div
       data-testid="since-last-visit"
-      className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
+      className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-2.5 text-fluid-sm leading-5 text-slate-200"
     >
       <div>
         <span className="font-semibold text-slate-50">Monday check &mdash; since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
@@ -219,7 +219,7 @@ export function SinceLastVisit({
   return (
     <div data-testid="lapsed-return" className="rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
-        <p className="text-fluid-xs leading-5 text-slate-200">
+        <p className="text-fluid-sm leading-5 text-slate-200">
           <span className="font-semibold text-slate-50">Monday check &mdash; since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
           {regimeChanged
             ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
@@ -228,21 +228,21 @@ export function SinceLastVisit({
         {dismissButton}
       </div>
       {/* The call the reader last saw; the call now is the card's heading. */}
-      {callChanged ? <p className="text-fluid-xs leading-5 text-slate-400">Then: “{previous.call}”</p> : null}
+      {callChanged ? <p className="text-fluid-sm leading-5 text-slate-400">Then: “{previous.call}”</p> : null}
       <div className="flex flex-wrap items-center gap-2">
         {boardDeckHref ? (
           <a
             href={boardDeckHref}
             target="_blank"
             rel="noreferrer"
-            className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
+            className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-nano font-semibold no-underline"
           >
             Download this week&apos;s guidance as a slide
           </a>
         ) : null}
         <Link
           href={compareHrefForRecordDate(previous.recordDate)}
-          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline text-sky-200 hover:text-slate-50"
+          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-nano font-semibold no-underline text-sky-200 hover:text-slate-50"
         >
           Compare against your last visit &rarr;
         </Link>

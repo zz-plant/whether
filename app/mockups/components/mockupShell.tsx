@@ -75,7 +75,7 @@ export function MockupShell({
               <h1 className="text-2xl font-semibold text-white sm:text-3xl">
                 {title}
               </h1>
-              <p className="max-w-3xl text-sm leading-6 text-slate-300">{description}</p>
+              <p className="text-sm leading-6 text-slate-300">{description}</p>
             </div>
           </div>
 

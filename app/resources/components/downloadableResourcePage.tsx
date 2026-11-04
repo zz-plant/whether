@@ -93,7 +93,7 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
       <section
         className={`weather-panel space-y-3 px-6 py-6 ${printModeClassNames.heroPanel}`.trim()}
       >
-        <h1 className={`text-2xl font-semibold text-slate-100 sm:text-3xl ${printModeClassNames.title}`.trim()}>
+        <h1 className={`text-fluid-2xl font-semibold text-slate-100 ${printModeClassNames.title}`.trim()}>
           {config.metadata.title}
         </h1>
         <p className={`text-sm text-slate-200 ${printModeClassNames.description}`.trim()}>

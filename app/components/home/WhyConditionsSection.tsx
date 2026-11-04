@@ -109,7 +109,7 @@ export function WhyConditionsSection({
       <div className="min-w-0">
         {notCounted.length > 0 ? (
           <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
-            <p className="weather-caveat-mark text-fluid-xs font-semibold">What the headline reading leaves out</p>
+            <p className="weather-caveat-mark text-fluid-sm font-semibold">What the headline reading leaves out</p>
             <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
               {warning
                 ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
@@ -122,7 +122,7 @@ export function WhyConditionsSection({
         ) : null}
 
         {cappedDistance ? (
-          <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
+          <p className="mt-4 text-fluid-sm leading-relaxed text-slate-400" data-capped-reading>
             Funding pressure shows {tightness} because that&rsquo;s as high as the score goes; uncapped it would be{" "}
             {saturatedPressure}. Conditions are judged on the capped {tightness}, {cappedDistance} points above{" "}
             {changeLines.tightness}.
@@ -130,7 +130,7 @@ export function WhyConditionsSection({
         ) : null}
       </div>
 
-      <p className="mt-4 text-fluid-xs text-slate-400">
+      <p className="mt-4 text-fluid-sm text-slate-400">
         <Link href="/trust#formula-reference" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
           How scores are set
         </Link>

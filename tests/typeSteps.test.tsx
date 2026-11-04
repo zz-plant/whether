@@ -35,13 +35,37 @@ describe("type steps", () => {
 
   it("sets a reading page's section title in the section step", () => {
     const shells = css("app/styles/layout-shells.css");
-    assert.match(ruleBody(shells, ".weather-secondary-section-title"), /font-size: 1\.375rem/);
-    assert.match(shells, /@media \(min-width: 640px\) \{\s*\.weather-secondary-section-title \{\s*font-size: 1\.5rem;/);
+    assert.match(ruleBody(shells, ".weather-secondary-section-title"), /font-size: var\(--text-fluid-xl\)/);
+    assert.match(ruleBody(css("app/styles/typography.css"), ".type-section"), /font-size: var\(--text-fluid-xl\)/);
+    assert.doesNotMatch(shells, /\.weather-home-section[^{]*h2 \{[^}]*font-size/, "the home page drew two section sizes");
   });
 
   it("draws nothing on a phone under 12px from the smallest step", () => {
     const tokens = css("app/styles/tokens.css");
     assert.match(tokens, /--text-fluid-nano: clamp\(0\.75rem,/);
-    assert.match(tokens, /--fs-nano: clamp\(0\.75rem,/, "the plain-CSS mirror keeps step");
+    assert.match(tokens, /--fs-nano: var\(--text-fluid-nano\)/, "the plain-CSS name keeps step");
+  });
+
+  it("keeps every step of the ladder at least 1.125x the one below, at both ends", () => {
+    const tokens = css("app/styles/tokens.css");
+    const steps = ["nano", "sm", "base", "lg", "xl", "2xl"].map((step) => {
+      const match = new RegExp(`--text-fluid-${step}: clamp\\(([\\d.]+)rem,[^,]+, ([\\d.]+)rem\\)`).exec(tokens);
+      assert.ok(match, `--text-fluid-${step} is a clamp`);
+      return { step, phone: Number(match[1]), desktop: Number(match[2]) };
+    });
+    for (const [index, upper] of steps.entries()) {
+      const lower = steps[index - 1];
+      if (!lower) continue;
+      for (const end of ["phone", "desktop"] as const) {
+        assert.ok(upper[end] / lower[end] >= 1.125, `${lower.step} to ${upper.step} at the ${end} end is not a step`);
+      }
+    }
+  });
+
+  it("puts Tailwind's small sizes on the ladder, so a typed text-sm is not a second scale", () => {
+    const tokens = css("app/styles/tokens.css");
+    for (const [name, step] of [["xs", "nano"], ["sm", "sm"], ["base", "base"], ["lg", "lg"], ["xl", "xl"]]) {
+      assert.ok(tokens.includes(`--text-${name}: var(--text-fluid-${step});`), `text-${name} left the ladder`);
+    }
   });
 });

@@ -9,15 +9,34 @@
   /* The text-fluid-* utilities. --fs-* in :root carries the same values for
      plain CSS rules (.type-label, .type-badge); keep the two in step. */
   /* 12px at the floor (2026-10-27): at 11px the captions, hints and "Governs:" lines
-     were the smallest text a phone drew, in the dimmest ink, under the controls they explain. */
+     were the smallest text a phone drew, in the dimmest ink, under the controls they explain.
+
+     Six steps (2026-11-04), each at least 1.125x the one below at both ends, phone to
+     desktop: label 12-13, secondary 14-15, body 16-17, card heading 18-20, section 22-26,
+     page title 26-34. There were eight, with nano, micro, xs and sm one pixel apart, and
+     Tailwind's fixed text-xs and text-sm running beside them at 683 call sites, so a
+     desktop page drew 12, 12.7, 13, 14, 15, 16 and 17px and the eye could separate none of
+     them. tests/typeSteps.test.tsx holds the ratio. */
   --text-fluid-nano: clamp(0.75rem, 0.66rem + 0.15vw, 0.8125rem);
-  --text-fluid-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
-  --text-fluid-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
   --text-fluid-sm: clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem);
-  --text-fluid-base: clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem);
-  --text-fluid-lg: clamp(1.0625rem, 0.9rem + 0.7vw, 1.25rem);
-  --text-fluid-xl: clamp(1.25rem, 1rem + 1.1vw, 1.625rem);
-  --text-fluid-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
+  --text-fluid-base: clamp(1rem, 0.85rem + 0.5vw, 1.0625rem);
+  --text-fluid-lg: clamp(1.125rem, 0.95rem + 0.7vw, 1.25rem);
+  --text-fluid-xl: clamp(1.375rem, 1rem + 1.1vw, 1.625rem);
+  --text-fluid-xl--line-height: 1.25;
+  --text-fluid-xl--letter-spacing: -0.015em;
+  --text-fluid-2xl: clamp(1.625rem, 1.15rem + 1.8vw, 2.125rem);
+  --text-fluid-2xl--line-height: 1.15;
+  --text-fluid-2xl--letter-spacing: -0.015em;
+  /* Tailwind's own names land on the ladder, so a text-sm typed tomorrow is a step of it
+     rather than a seventh size. text-2xl and up stay fixed: those are figures. */
+  --text-xs: var(--text-fluid-nano);
+  --text-sm: var(--text-fluid-sm);
+  --text-base: var(--text-fluid-base);
+  --text-lg: var(--text-fluid-lg);
+  --text-lg--line-height: 1.35;
+  --text-xl: var(--text-fluid-xl);
+  --text-xl--line-height: 1.25;
+  --text-xl--letter-spacing: -0.015em;
   /* Colour carries two things on this site and nothing else (Synoptic,
      docs/design/palette-directions.md): the four conditions, and where a line
      stands. Everything else is ink.
@@ -99,6 +118,15 @@
   html {
     @apply font-sans;
   }
+  /* The reading measure, in the base layer so a utility on the element wins. A paragraph
+     in a wide panel ran 100 to 180 characters a line on a laptop. 60ch is about 75
+     characters here, not 60: `ch` measures Archivo's "0", which is wider than its average
+     letter (fonts.css). A flex or grid element, or a list item holding blocks, is a row of
+     parts rather than a line of prose. */
+  :where(p:not(.flex, .grid, .inline-flex)),
+  :where(li:not(.flex, .grid, .inline-flex, :has(> :is(div, p, ul, ol, table, section, article, h2, h3, h4)))) {
+    max-width: 60ch;
+  }
 }
 
 :root {
@@ -146,20 +174,13 @@
   --footer-legal-hover: var(--app-text);
 
   /* Type scale */
-  /* nano/micro are the dense operator end (badges, metadata) and are unchanged.
-     xs gets its own step: typography.css aliased .text-fluid-xs to --fs-micro,
-     so the two most-used tokens in the app (401 usages) rendered identically
-     and the page had no small-text hierarchy at all. The top of the scale is
-     widened because lg/xl/2xl previously spanned only 16-20px, which left
-     headings reading as body copy. */
-  --fs-nano: clamp(0.75rem, 0.66rem + 0.15vw, 0.8125rem);
-  --fs-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
-  --fs-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
-  --fs-sm: clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem);
-  --fs-base: clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem);
-  --fs-lg: clamp(1.0625rem, 0.9rem + 0.7vw, 1.25rem);
-  --fs-xl: clamp(1.25rem, 1rem + 1.1vw, 1.625rem);
-  --fs-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
+  /* The ladder's plain-CSS names; the steps and their reasons are in @theme above. */
+  --fs-nano: var(--text-fluid-nano);
+  --fs-sm: var(--text-fluid-sm);
+  --fs-base: var(--text-fluid-base);
+  --fs-lg: var(--text-fluid-lg);
+  --fs-xl: var(--text-fluid-xl);
+  --fs-2xl: var(--text-fluid-2xl);
 
   /* Spacing */
   --space-lg: 24px;

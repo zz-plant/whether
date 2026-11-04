@@ -35,7 +35,7 @@ export function LastTimeCallChangedCard({
       className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4"
     >
       <p className="type-eyebrow">The last time conditions {lastTimeVerb(record)}</p>
-      <p className="text-fluid-xs leading-5 text-slate-200">
+      <p className="text-fluid-sm leading-5 text-slate-200">
         <span className="font-semibold text-slate-50">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.
       </p>
@@ -58,7 +58,7 @@ export function LastTimeCallChangedCard({
           previousLabel={changedAt}
         />
       </div>
-      <p data-testid="last-time-versus-today" className="max-w-[64ch] text-fluid-xs leading-5 text-slate-300">
+      <p data-testid="last-time-versus-today" className="max-w-[60ch] text-fluid-sm leading-5 text-slate-300">
         <span className="font-semibold text-slate-100">Against this week:</span> {versus.text}
       </p>
       <ActionLink href={buildLastTimeCompareHref(record)} variant="inline">

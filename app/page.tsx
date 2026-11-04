@@ -700,7 +700,7 @@ async function PageContent({
       {/* A caveat, drawn like the archived-week banner below: the amber it
           used is the crossed-line red, so late data read as a crossed line. */}
       {isDegraded ? (
-        <p className="weather-caveat-band weather-caveat-mark mb-4 px-4 py-2.5 text-fluid-micro">
+        <p className="weather-caveat-band weather-caveat-mark mb-4 px-4 py-2.5 text-fluid-nano">
           {savedCopy
             ? describeSavedCopyBanner({
                 recordDate: reportData.treasury.record_date,
@@ -941,7 +941,7 @@ async function PageContent({
                   rather than beside Copy Brief: the decision, then the artifact, and the
                   words-before-the-areas budget stands. */}
               {!historicalSelection ? (
-                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-xs text-slate-400">
+                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-slate-400">
                   Share as:
                   {ROLE_FORMAT_LINKS.map((format) => (
                     <ActionLink key={format.href} href={format.href} variant="inline">

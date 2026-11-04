@@ -315,7 +315,7 @@ a.weather-hub-link-card:hover {
   border: 1px solid var(--border-strong);
   background: var(--bg-surface-muted);
   padding: 0.45rem 0.85rem;
-  font-size: 0.72rem;
+  font-size: var(--fs-nano);
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -365,19 +365,19 @@ a.weather-hub-link-card:hover {
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
   font-weight: 600;
-  /* The page-title step every shell uses (2026-10-27): 24px on a phone, 34px at the
+  /* The page-title step every shell uses (2026-10-27): 26px on a phone, 34px at the
      widest. It ran 31px to 48px here, while a report page's title was 15px. */
   font-size: var(--text-fluid-2xl);
-  line-height: 1.1;
-  letter-spacing: 0;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: var(--app-text);
   text-wrap: balance;
 }
 
 .weather-secondary-description {
-  max-width: 54rem;
-  font-size: 1rem;
-  line-height: 1.75;
+  max-width: 60ch;
+  font-size: var(--text-fluid-base);
+  line-height: 1.65;
   color: var(--app-text-secondary);
 }
 
@@ -416,18 +416,18 @@ a.weather-hub-link-card:hover {
 .weather-secondary-section-title {
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
-  /* The section-heading step: 22px on a phone, 24px from sm, as every report section. */
-  font-size: 1.375rem;
-  line-height: 1.2;
+  /* The section-heading step, as every report section (.type-section). */
+  font-size: var(--text-fluid-xl);
+  line-height: 1.25;
   font-weight: 600;
-  letter-spacing: 0;
+  letter-spacing: -0.015em;
   color: var(--app-text);
 }
 
 .weather-secondary-section-description {
-  max-width: 48rem;
-  font-size: 0.95rem;
-  line-height: 1.75;
+  max-width: 60ch;
+  font-size: var(--text-fluid-base);
+  line-height: 1.65;
   color: var(--app-text-secondary);
 }
 
@@ -567,12 +567,6 @@ a.weather-hub-link-card:hover {
   }
 }
 
-@media (min-width: 640px) {
-  .weather-secondary-section-title {
-    font-size: 1.5rem;
-  }
-}
-
 /* The brief reads as an editorial page: the call owns display size; section
    questions are the next register. Keep the phone fold compact. */
 .weather-editorial-hero {
@@ -601,11 +595,10 @@ a.weather-hub-link-card:hover {
     padding-inline-start: 1.25rem;
   }
 
+  /* Measure only. This rule also set 24-32px, so the first section on the home page
+     drew at 26px and the next three at 32px. */
   .weather-home-section > div:first-child > h2 {
-    font-size: clamp(1.5rem, 2.3vw, 2rem);
     max-width: 28ch;
-    line-height: 1.1;
-    letter-spacing: -0.025em;
   }
 
   .weather-signal-table tbody th,
@@ -635,8 +628,9 @@ a.weather-hub-link-card:hover {
 }
 
 @media (max-width: 767px) {
+  /* The display floor, 28px. At 24px the call sat 1.09x above a 22px section heading,
+     on the phone layout that is the primary one. */
   .weather-editorial-hero .text-display {
-    font-size: 1.5rem;
     line-height: 1.06;
   }
 }

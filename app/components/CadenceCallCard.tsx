@@ -82,7 +82,7 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
   return (
     <section className="weather-card space-y-4 p-4 sm:p-6 lg:p-7" aria-labelledby={headingId}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-fluid-xs font-medium text-slate-400">
+        <p className="text-fluid-sm font-medium text-slate-400">
           {model.cadenceLabel}
           {model.periodLabel ? <> · {model.periodLabel}</> : null}
         </p>
@@ -115,7 +115,7 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
             <span className="weather-caveat-mark font-semibold">Guidance held:</span> {model.overrideReason}
           </p>
         ) : null}
-        <p className="max-w-2xl text-fluid-sm leading-relaxed text-slate-300">{model.description}</p>
+        <p className="text-fluid-sm leading-relaxed text-slate-300">{model.description}</p>
       </div>
 
       {/* Suppressed under a refusal. The hold's threshold and reversal are horizon-neutral

@@ -140,7 +140,7 @@ export default async function OperatorBriefMockupPage({
               <h1 className="mt-3 text-3xl font-semibold text-white sm:text-[2.5rem]">
                 {weeklyCall.currentCall}
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
+              <p className="mt-3 text-sm leading-6 text-slate-200 sm:text-base">
                 {weeklyCall.whatChanged}
               </p>
             </div>

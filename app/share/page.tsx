@@ -419,7 +419,7 @@ export default async function SharePage() {
             <li>
               {/* A file, not a page: the absolute address the feed autodiscovery
                   link in the layout's <head> names. */}
-              <a href={`${siteUrl}/feed.xml`} className="inline-flex min-h-[44px] items-center text-fluid-xs font-semibold text-sky-300 hover:text-sky-200">RSS</a>
+              <a href={`${siteUrl}/feed.xml`} className="inline-flex min-h-[44px] items-center text-fluid-sm font-semibold text-sky-300 hover:text-sky-200">RSS</a>
             </li>
             <li className="flex items-center">
               <CalendarSubscribeLinks feedUrl={`${siteUrl}${CALENDAR_FEED_PATH}`} lead="Each Monday's guidance in your calendar" />

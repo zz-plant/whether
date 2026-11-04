@@ -79,7 +79,7 @@ export function HistoricalTrendChart({
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between gap-2">
         <span className="type-eyebrow">{label}</span>
-        <span className="text-fluid-xs font-semibold tabular-nums text-slate-300">
+        <span className="text-fluid-sm font-semibold tabular-nums text-slate-300">
           {currentVal}
           <span
             className={`ml-1 inline-flex items-center gap-0.5 align-baseline ${trendToneClass(direction, increaseIsPositive)}`}

@@ -126,7 +126,7 @@ const storedAuditSource = createBrowserSource<ThresholdAuditEntry[]>({
    come from `weather-auto-chevron`. */
 const DISCLOSURE_CLASS = "weather-auto-chevron";
 const DISCLOSURE_SUMMARY_CLASS =
-  "rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-xs font-semibold text-slate-300";
+  "rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2 text-fluid-sm font-semibold text-slate-300";
 
 const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
   const { baseRate, tightness, risk } = parseDraft(draft);
@@ -320,7 +320,7 @@ export const ThresholdsPanel = ({
           aside={
             /* A labelled value, not a control: it was set in `weather-pill`,
                which is the class the page's pill-shaped links press. */
-            <dl className="flex items-baseline gap-1.5 text-fluid-xs">
+            <dl className="flex items-baseline gap-1.5 text-fluid-sm">
               <dt className="text-slate-400">Defaults:</dt>
               {/* Each number named: "3.5% · 70/50" asked the reader to know
                   which score each figure belonged to. */}
@@ -346,7 +346,7 @@ export const ThresholdsPanel = ({
                   className="weather-button inline-flex min-h-[44px] w-full flex-col items-start justify-center gap-1 px-4 py-3 text-left text-xs font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
                 >
                   <span className="text-slate-100">{preset.label}</span>
-                  <span className="text-fluid-xs font-medium text-slate-400">
+                  <span className="text-fluid-sm font-medium text-slate-400">
                     {preset.detail}
                   </span>
                 </button>

@@ -193,7 +193,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
           ) : null}
 
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-            <h1 className="text-2xl font-semibold text-slate-100 print:text-slate-900 sm:text-3xl">{article.title}</h1>
+            <h1 className="text-fluid-2xl font-semibold text-slate-100 print:text-slate-900">{article.title}</h1>
             <p className="text-xs text-slate-400">
               Updated <time dateTime={article.updatedAt}>{formatDateUTC(article.updatedAt)}</time>
             </p>

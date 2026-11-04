@@ -161,7 +161,7 @@ export const SearchResults = ({
       </search>
 
       {activeJob ? (
-        <p className="text-fluid-xs text-slate-400">
+        <p className="text-fluid-sm text-slate-400">
           Filtered to “{searchJobLabels[activeJob]}”.{" "}
           <Link href={`/search?q=${encodeURIComponent(trimmed)}`} className="text-sky-200 underline decoration-sky-600">
             Show everything
@@ -195,7 +195,7 @@ export const SearchResults = ({
                       className="weather-surface block space-y-1 px-4 py-4 text-sm text-slate-100 hover:border-sky-500/50"
                     >
                       <span className="block font-semibold">{entity.title}</span>
-                      <span className="block text-fluid-xs text-slate-400">{entity.summary}</span>
+                      <span className="block text-fluid-sm text-slate-400">{entity.summary}</span>
                     </Link>
                   </li>
                 ))}

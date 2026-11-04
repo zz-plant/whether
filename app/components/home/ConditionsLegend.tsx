@@ -129,7 +129,7 @@ export function ConditionsLegend({
       aria-label="The four conditions"
       data-testid="conditions-legend"
       suppressHydrationWarning
-      className={`${compact ? "" : "mb-3 border-b border-[color:var(--border-subtle)] pb-3"} flex items-start justify-between gap-4 text-fluid-xs text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
+      className={`${compact ? "" : "mb-3 border-b border-[color:var(--border-subtle)] pb-3"} flex items-start justify-between gap-4 text-fluid-sm text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
     >
       <div className="min-w-0 flex-1">
         <p className="min-w-0 leading-relaxed">

@@ -113,7 +113,7 @@ export function TrackRecordSection({
           </table>
         </div>
       ) : currentSpell ? (
-        <p className="text-fluid-xs text-slate-300">
+        <p className="text-fluid-sm text-slate-300">
           No changes in conditions in this window — {label(currentSpell.regime)} has held all{" "}
           {currentSpell.months} months.
         </p>

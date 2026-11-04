@@ -63,7 +63,7 @@ export function SignalSparklineStrip({ series }: { series: SignalSparklineSeries
                 <p className="tabular-nums">
                   <span className="text-2xl font-semibold text-slate-100">{Math.round(last)}</span>
                   <span className="text-sm text-slate-500">/100</span>
-                  <span className={`ml-2 inline-flex items-center gap-1 text-fluid-xs ${trendToneClass(direction, item.increaseIsPositive)}`}>
+                  <span className={`ml-2 inline-flex items-center gap-1 text-fluid-sm ${trendToneClass(direction, item.increaseIsPositive)}`}>
                     <TrendGlyph direction={direction} className="h-3 w-3" />
                     {delta > 0 ? "+" : ""}
                     {delta.toFixed(0)} over {months} mo

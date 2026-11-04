@@ -131,21 +131,21 @@ export function CommandCenterNavBlock({
             {statusLabel ? (
               <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
                 {statusPrefix ? (
-                  <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
+                  <span className="text-fluid-sm font-medium text-slate-400">{statusPrefix}</span>
                 ) : null}
                 {/* The week's word in the stamp's shape, the same placard the
                     hero's tag and the sticky strip print. */}
-                <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-xs font-semibold">{statusLabel}</span>
+                <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-sm font-semibold">{statusLabel}</span>
                 {introMetaRest ? (
-                  <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
+                  <span className="text-fluid-sm font-medium text-slate-400">{introMetaRest}</span>
                 ) : null}
               </p>
             ) : introMetaRest ? (
-              <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
+              <p className="text-fluid-sm font-medium leading-4 text-slate-400">{introMetaRest}</p>
             ) : null}
             <h1
               style={{ viewTransitionName: "page-title" }}
-              className="max-w-3xl font-semibold leading-tight text-slate-100 text-fluid-2xl"
+              className="max-w-3xl font-semibold text-slate-100 text-fluid-2xl"
             >
               {pageTitle}
             </h1>
@@ -172,7 +172,7 @@ export function CommandCenterNavBlock({
                   (2026-10-09; it read "Signals refreshed", which did not say
                   which of the two mattered). */}
               {showStamp ? (
-                <p className="text-fluid-xs text-slate-400 max-sm:hidden @3xl:text-right">Checked {fetchedAtLabel}</p>
+                <p className="text-fluid-sm text-slate-400 max-sm:hidden @3xl:text-right">Checked {fetchedAtLabel}</p>
               ) : null}
 
               {showActions ? (

@@ -137,7 +137,7 @@ export function PlanLinesForm({
     <form onSubmit={handleSubmit} aria-label={"Set your own rules"} data-testid="plan-lines-form" className="space-y-4">
       {/* The step's own line already says these start at the published lines and
           that a crossing sends one email; this says how to use them. */}
-      <p className="max-w-[68ch] text-sm text-slate-300">
+      <p className="max-w-[60ch] text-sm text-slate-300">
         For example, release the second half of a hiring plan only once funding pressure falls below 60. Untick
         any area you are not planning.
       </p>
@@ -237,7 +237,7 @@ export function PlanLinesForm({
           {status === "error" ? (
             <p id="plan-lines-message" role="alert" className="text-xs text-rose-300">{message}</p>
           ) : null}
-          <p className="max-w-[68ch] text-xs text-slate-400">
+          <p className="max-w-[60ch] text-xs text-slate-400">
             Stored with your email address and nothing else: the numbers above, for the areas you tick, and your
             runway band if the box above is ticked (the band, never a figure). Sending the form again replaces them
             once you confirm. See{" "}

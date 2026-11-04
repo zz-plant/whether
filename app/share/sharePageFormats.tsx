@@ -117,7 +117,7 @@ const CalendarLink = ({ title, details }: { title: string; details: string }) =>
       href={`https://calendar.google.com/calendar/render?${params.toString()}`}
       target="_blank"
       rel="noreferrer"
-      className="weather-hit text-fluid-xs text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
+      className="weather-hit text-fluid-sm text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
     >
       Add a Monday review to your calendar
     </a>
@@ -140,9 +140,9 @@ export const CalendarSubscribeLinks = ({
 }) => {
   const webcal = feedUrl.replace(/^https?:/, "webcal:");
   const linkClass =
-    "weather-hit text-fluid-xs text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200";
+    "weather-hit text-fluid-sm text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200";
   return (
-    <span className="text-fluid-xs text-slate-400">
+    <span className="text-fluid-sm text-slate-400">
       {lead}:{" "}
       <a href={webcal} className={linkClass}>
         Apple or Outlook
@@ -210,13 +210,13 @@ export function SharePageFormats({
       <h2 id="copy-call-heading" className="type-section">Copy this week&apos;s guidance</h2>
       {/* Labelled and ruled at the left, so the lines read as the readings
           behind every format rather than the opening of the text below. At the
-          explanatory floor (§VI, text-fluid-xs) and a reading measure: at 12px
+          explanatory floor (§VI, text-fluid-sm) and a reading measure: at 12px
           across the full 72rem column each line ran to ~150 characters, the
           densest text on the page, above the preview it explains. */}
       {scoreReferences.length > 0 ? (
         <div className="max-w-3xl space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p id="copy-call-scores-label" className="type-eyebrow">This week&apos;s readings</p>
-          <ul className="space-y-1.5 text-fluid-xs leading-5 tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
+          <ul className="space-y-1.5 text-fluid-sm leading-5 tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
             {scoreReferences.map((line) => (
               <li key={line}>{line}</li>
             ))}
