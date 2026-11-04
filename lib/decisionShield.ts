@@ -375,7 +375,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
-  if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
+  if (/\b(cloud|aws|gpus?|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
   if (RAISING_PRICE.test(lower)) {

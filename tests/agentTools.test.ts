@@ -116,6 +116,11 @@ describe("the agent tool registry", () => {
     const plans: Record<string, string> = {
       "should we sign a three year office lease?": "INFRASTRUCTURE",
       "how much should we budget for AI and GPU spend?": "INFRASTRUCTURE",
+      /* "spend" and "more" are not a topic: these reached the go-to-market answer through its ad phrasing. */
+      "should we spend more on AWS": "INFRASTRUCTURE",
+      "should we spend more on GPUs": "INFRASTRUCTURE",
+      "should we spend more on office rent": "INFRASTRUCTURE",
+      "should we increase spend on AWS": "INFRASTRUCTURE",
       "should we buy a smaller competitor?": "M_AND_A",
       "should we push customers to annual contracts?": "PRICING",
     };
@@ -174,7 +179,8 @@ describe("the agent tool registry", () => {
       "do rate cuts help my startup": "startup-funding-climate-this-week",
       "will rate cuts help us": "startup-funding-climate-this-week",
       "should we spend more on ads": "how-fast-should-we-scale-go-to-market",
-      "is it time to increase our ad budget": "how-fast-should-we-scale-go-to-market",
+      "should we spend more on advertising": "how-fast-should-we-scale-go-to-market",
+      "should we increase our ad spend": "how-fast-should-we-scale-go-to-market",
       // What a model passed in a headless run on 2026-11-02, the company's details and all.
       "should I hire two more engineers this quarter with 14 months of runway": "should-startups-hire-engineers-right-now",
     };

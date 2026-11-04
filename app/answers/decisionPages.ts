@@ -96,7 +96,7 @@ const answerPageByQuestion = new Map(answerPages.flatMap((page) =>
    page whose title starts with "Should". */
 const QUERY_STOPWORDS = new Set([
   "a", "about", "am", "an", "and", "any", "are", "as", "at", "be", "can", "company", "could", "do", "does",
-  "for", "from", "get", "given", "good", "how", "i", "if", "in", "is", "it", "its", "me", "mean", "much", "my",
+  "for", "from", "get", "given", "good", "how", "i", "if", "in", "is", "it", "its", "me", "mean", "more", "much", "my",
   "now", "of", "on", "or", "our", "right", "should", "so", "startup", "startups", "still", "that", "the",
   "this", "time", "to", "us", "wait", "we", "week", "what", "when", "will", "with", "would", "yet", "you",
 ]);
