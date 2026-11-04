@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { Check, Calendar } from "lucide-react";
 import { requestSubscription, requestSlackSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
+import { HOME_MONDAY_EMAIL_HASH } from "../../lib/report/home/homeSectionModel";
+import { locationHashSource, useBrowserSource } from "./browserSource";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 import { useOperatorStage } from "./useOperatorStage";
@@ -60,7 +62,11 @@ export function SubscribeForm({
      prints the same one, so the signup carries it rather than asking again. */
   const { runwayBand } = useOperatorRunway();
   const [channel, setChannel] = useState<SubscribeChannel>("email");
-  const [frequency, setFrequency] = useState<EmailFrequency>(defaultFrequency);
+  /* The reader's own choice wins; until they make one, a link to Monday delivery
+     (`HOME_MONDAY_EMAIL_HASH`) starts the form there. The hash reads "" through hydration. */
+  const hash = useBrowserSource(locationHashSource);
+  const [chosenFrequency, setFrequency] = useState<EmailFrequency | null>(null);
+  const frequency = chosenFrequency ?? (hash === HOME_MONDAY_EMAIL_HASH ? "weekly" : defaultFrequency);
   const alertsOnly = channel === "email" && frequency === "alerts";
   const [email, setEmail] = useState("");
   const [slackWebhookUrl, setSlackWebhookUrl] = useState("");

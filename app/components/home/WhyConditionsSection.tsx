@@ -132,11 +132,11 @@ export function WhyConditionsSection({
 
       <p className="mt-4 text-fluid-xs text-slate-400">
         <Link href="/trust#formula-reference" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-          How the scores are set
+          How scores are set
         </Link>
         {" · "}
         <Link href="/history" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-          How these conditions compare with past months
+          Compare with past months
         </Link>
       </p>
     </HomeSection>

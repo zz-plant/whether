@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { trackDeadClick, type DeadClickKind } from "../../lib/deadClickTelemetry";
+import { pageSectionOf } from "../../lib/telemetry/pageSection";
 
 /*
  * Reports a click that did nothing on something that looked as if it would
@@ -52,10 +53,6 @@ const classify = (element: Element): DeadClickKind | null => {
   return null;
 };
 
-const sectionOf = (element: Element) => {
-  const section = element.closest("[data-page-section]")?.getAttribute("data-page-section") ?? element.closest("section[id]")?.id ?? "";
-  return /^[a-z0-9-]{0,64}$/.test(section) ? section : "";
-};
 
 const pointerOf = (event: MouseEvent) => {
   const type = event instanceof PointerEvent ? event.pointerType : "mouse";
@@ -98,7 +95,7 @@ export function DeadClickBeacon() {
       while (recent.length > 0 && now - (recent.at(0)?.at ?? now) > RAGE_WINDOW_MS) recent.shift();
       recent.push({ x: event.clientX, y: event.clientY, at: now });
       const rage = recent.filter((click) => Math.hypot(click.x - event.clientX, click.y - event.clientY) <= RAGE_RADIUS_PX).length >= RAGE_CLICKS;
-      const section = sectionOf(target);
+      const section = pageSectionOf(target);
       const send = (kind: DeadClickKind) => {
         sent += 1;
         trackDeadClick({ type: "dead_click", path, section, kind, rage, pointer: pointerOf(event) });

@@ -12,6 +12,10 @@ const PLAN_LINES_WATCH_PARAM = "watch";
 export const buildPlanLinesWatchHref = (areas: readonly DecisionArea[]) =>
   `/operate?${PLAN_LINES_WATCH_PARAM}=${areas.join(",")}#ops-plan-lines`;
 
+/* A plan in the URL is graded as the page loads (`useDecisionShieldState`), so a link
+   can hand a reader a verdict with nothing to type. */
+export const buildPlanTestHref = (plan: string) => `/operate?plan=${encodeURIComponent(plan)}#ops-decision-shield`;
+
 /** The areas a `?watch=` names, in its order; empty when it names none. */
 export const parsePlanLinesWatch = (params: Record<string, string | undefined> | undefined): DecisionArea[] =>
   [...new Set((params?.[PLAN_LINES_WATCH_PARAM] ?? "").split(","))].filter(isDecisionArea);

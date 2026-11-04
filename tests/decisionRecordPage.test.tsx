@@ -63,8 +63,11 @@ describe("decision record page", () => {
   });
 
   it("is reachable without already knowing the URL", async () => {
-    const layout = await readFile("app/layout.tsx", "utf8");
-    assert.match(layout, /href="\/decisions"/, "the footer is the only standing way in");
+    const { pagesInGroup } = await import("../lib/navigation/informationArchitecture");
+    assert.ok(
+      pagesInGroup("decide").some((page) => page.href === "/decisions"),
+      "the Plan group's row, its footer column and the phone's sheet all read this list",
+    );
 
     const palette = await readFile("app/components/commandPalette.tsx", "utf8");
     assert.match(palette, /\/decisions/, "and the palette is the way a returning reader finds it");

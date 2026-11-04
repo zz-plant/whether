@@ -8,6 +8,7 @@ import {
   resolveReturnVisit,
   trackActivationEvent,
 } from "../../lib/activationFunnel";
+import { pageSectionOf } from "../../lib/telemetry/pageSection";
 
 /* Anything a reader presses, opens or follows. A click on plain text or the
    page background is not a deliberate act; Enter or Space on a button, link or
@@ -49,9 +50,11 @@ export function ActivationTracker({ path }: { path: string }) {
   useEffect(() => {
     // Capture phase, so a control that stops propagation still counts.
     const onClick = (event: MouseEvent) => {
-      if (!(event.target instanceof Element) || !event.target.closest(DELIBERATE_TARGETS)) return;
+      if (!(event.target instanceof Element)) return;
+      const control = event.target.closest(DELIBERATE_TARGETS);
+      if (!control) return;
       document.removeEventListener("click", onClick, true);
-      trackActivationEvent({ step: "oriented", path });
+      trackActivationEvent({ step: "oriented", path, section: pageSectionOf(control) });
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);

@@ -1,3 +1,4 @@
+import { PAGE_SECTION_PATTERN } from "./telemetry/pageSection";
 import { sendTelemetry } from "./telemetry/sendTelemetry";
 
 /**
@@ -49,7 +50,7 @@ export const isDeadClickEvent = (input: unknown): input is DeadClickEvent => {
     typeof payload.path === "string" &&
     /^\/[\w\-/.]{0,200}$/.test(payload.path) &&
     typeof payload.section === "string" &&
-    /^[a-z0-9-]{0,64}$/.test(payload.section) &&
+    PAGE_SECTION_PATTERN.test(payload.section) &&
     isDeadClickKind(payload.kind) &&
     typeof payload.rage === "boolean" &&
     (payload.pointer === "mouse" || payload.pointer === "touch" || payload.pointer === "pen")

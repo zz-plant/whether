@@ -38,7 +38,8 @@ export const buildLlmsTxt = (baseUrl: string) => {
     ...navigationGroups.flatMap((group) => [
       `- ${group.label}: ${baseUrl}${group.href} — ${group.description}`,
       ...pagesInGroup(group.key)
-        .filter((page) => page.href !== group.href)
+        /* /decisions is one browser's own record: an agent reading this has none. */
+        .filter((page) => page.href !== group.href && page.href !== "/decisions")
         .map((page) => `  - ${page.label}: ${baseUrl}${page.href}`),
     ]),
     ...utilityLinks

@@ -46,7 +46,7 @@ describe("navigation groups", () => {
       Object.fromEntries(navigationGroups.map((group) => [group.key, pagesInGroup(group.key).map((page) => page.href)])),
       {
         "this-week": ["/", "/signals", "/trust"],
-        decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps"],
+        decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps", "/decisions"],
         record: ["/history", "/calibration", "/history/compare", "/concepts"],
         guides: ["/resources"],
       },
@@ -170,11 +170,12 @@ describe("footer mirrors the groups and the utility links", () => {
 
   it("keeps every indexable linked page in the sitemap", () => {
     const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
-    // /search is deliberately noindex, so it is deliberately not in the sitemap. The two
-    // workstreams are submitted from WORKSTREAMS, not as string literals.
+    // /search is deliberately noindex, so it is deliberately not in the sitemap, and
+    // /decisions is one browser's own record with nothing to submit. The two workstreams
+    // are submitted from WORKSTREAMS, not as string literals.
     const indexable = [...utilityLinks, ...navigationPages]
       .map((entry) => entry.href)
-      .filter((href) => href !== "/search" && href !== "/" && !href.startsWith("/operate/"));
+      .filter((href) => href !== "/search" && href !== "/decisions" && href !== "/" && !href.startsWith("/operate/"));
 
     for (const href of indexable) {
       assert.ok(sitemap.includes(`"${href}"`), `${href} is linked in the navigation but missing from the sitemap`);

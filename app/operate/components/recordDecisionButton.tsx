@@ -56,13 +56,13 @@ export const RecordDecisionButton = ({ buildPayload }: { buildPayload: () => Dec
         <p className="type-label text-slate-400">
           In{" "}
           <Link href="/decisions" className="text-sky-300 underline-offset-2 hover:underline">
-            your decision record
+            Your decisions
           </Link>
         </p>
       ) : null}
       {state === "failed" && error ? <p className="type-label text-amber-200">{error}</p> : null}
       <output className="sr-only" aria-live="polite">
-        {state === "saved" ? "Decision recorded to your decision record." : state === "failed" ? error : ""}
+        {state === "saved" ? "Decision recorded in Your decisions." : state === "failed" ? error : ""}
       </output>
     </div>
   );

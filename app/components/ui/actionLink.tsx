@@ -34,3 +34,21 @@ export function ActionLink({ children, className, variant = "pill", ...linkProps
 }
 
 
+
+/* A plain anchor for a jump within the page. `Link` moves the hash with `pushState`, which
+   fires no `hashchange`, so a control that reads the hash would never hear about it. */
+export function InPageActionLink({
+  children,
+  href,
+  variant = "inline",
+}: {
+  children: ReactNode;
+  href: `#${string}`;
+  variant?: ActionLinkVariant;
+}) {
+  return (
+    <a href={href} className={actionLinkVariantClasses[variant]}>
+      {children}
+    </a>
+  );
+}

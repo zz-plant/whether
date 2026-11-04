@@ -28,6 +28,7 @@
  * than to be maximally informative.
  */
 import { formatIsoWeekSlug, getIsoWeekInfo, isoWeekMonday, isoWeeksInYear, parseIsoWeekSlug } from "./isoWeek";
+import { PAGE_SECTION_PATTERN } from "./telemetry/pageSection";
 import { sendTelemetry } from "./telemetry/sendTelemetry";
 
 const ACTIVATION_TELEMETRY_ENDPOINT = "/api/telemetry/activation";
@@ -60,7 +61,8 @@ type ActivationArrival = "direct" | "search" | "social" | "chat" | "shared-link"
 
 type ActivationEvent =
   | { step: "visited"; path: string; arrival?: ActivationArrival; firstVisit?: boolean }
-  | { step: "oriented"; path: string }
+  /** `section`: the page section the first deliberate act was in, so a fold or a link nobody opens can be seen. */
+  | { step: "oriented"; path: string; section?: string }
   | { step: "committed"; path: string; commitment: ActivationCommitment }
   | { step: "returned"; path: string; gap: ActivationReturnGap };
 
@@ -123,7 +125,7 @@ export const classifyArrival = ({
    validator used to accept any extra key a caller sent. */
 const ALLOWED_KEYS: Record<ActivationEvent["step"], readonly string[]> = {
   visited: ["step", "path", "arrival", "firstVisit"],
-  oriented: ["step", "path"],
+  oriented: ["step", "path", "section"],
   committed: ["step", "path", "commitment"],
   returned: ["step", "path", "gap"],
 };
@@ -152,6 +154,11 @@ export const isActivationEvent = (input: unknown): input is ActivationEvent => {
     const firstVisit: unknown = Reflect.get(input, "firstVisit");
     return (arrival === undefined || ARRIVALS.some((bucket) => bucket === arrival))
       && (firstVisit === undefined || typeof firstVisit === "boolean");
+  }
+
+  if (step === "oriented") {
+    const section: unknown = Reflect.get(input, "section");
+    return section === undefined || (typeof section === "string" && PAGE_SECTION_PATTERN.test(section));
   }
 
   if (step === "committed") {

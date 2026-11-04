@@ -8,6 +8,7 @@ import {
   type DecisionAreaCorporateTransmission,
 } from "../../../lib/report/boundedDecisionRules";
 import {
+  AREA_TEST_PLANS,
   HOME_DECISION_PARAM,
   HOME_SECTIONS,
   buildHomeDecisionCookie,
@@ -16,11 +17,10 @@ import {
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
 import {
-  DEFAULT_RUNWAY_BAND,
   runwayBandLabel,
-  runwayBandPhrase,
   type RunwayBand,
 } from "../../../lib/report/operatorRunway";
+import { buildPlanTestHref } from "../../../lib/navigation/planningNavigation";
 import { ActionLink } from "../ui/actionLink";
 import { CommitmentTest } from "./CommitmentTest";
 import { AreaGroups } from "./AreaGroups";
@@ -131,8 +131,9 @@ export function DecisionPicker({
 
   /* Under the area's own rule: what the rule and its condition, said in the group, do
      not — why it matters, the test against the reader's cash, and the links. */
-  const renderDetail = (area: DecisionArea) =>
-    active && active.area === area ? (
+  const renderDetail = (area: DecisionArea) => {
+    const testPlan = isHistorical ? undefined : AREA_TEST_PLANS[area];
+    return active && active.area === area ? (
       <div className="mt-2 space-y-3 border-t border-[color:var(--border-faint)] pt-3 text-fluid-sm animate-in fade-in-50 duration-200 motion-reduce:animate-none">
         {/* The question in the reader's words: the answer page's own heading, so the
             short answer here and the long one there cannot diverge. */}
@@ -169,6 +170,12 @@ export function DecisionPicker({
             a hiring plan released at 60 rather than 66 — sets them once on the
             planning page and hears the day one is crossed. */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          {/* Not on an archived month: the stress test grades against today's reading. */}
+          {testPlan ? (
+            <ActionLink href={buildPlanTestHref(testPlan)} variant="inline" data-area-test-link>
+              {`Test “${testPlan}” →`}
+            </ActionLink>
+          ) : null}
           <ActionLink href="/operate#ops-plan-lines" variant="inline">
             Set your own rules →
           </ActionLink>
@@ -200,6 +207,7 @@ export function DecisionPicker({
         </div>
       </div>
     ) : null;
+  };
 
   return (
     <section
@@ -216,15 +224,6 @@ export function DecisionPicker({
             <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="type-section">
               {HOME_SECTIONS.areas.heading}
             </h2>
-            {stageLabel ? (
-              <a
-                href={`#${HOME_SECTIONS.calibration.id}`}
-                className="weather-hit text-fluid-xs text-slate-400 hover:text-slate-200 underline decoration-slate-600 underline-offset-2"
-                title="Click to calibrate your stage and runway"
-              >
-                Rules for {stageLabel} · {runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}
-              </a>
-            ) : null}
           </div>
           {/* A saved copy only (2026-11-03): on a live week the card's "On hold …" line
               and the groups below say the same count. */}

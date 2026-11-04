@@ -309,9 +309,8 @@ const EmptyState = ({ snapshot }: { snapshot?: SnapshotContext }) => (
   <div className="space-y-2 rounded-xl border border-dashed border-slate-700 bg-slate-950/40 p-6 text-sm leading-6 text-slate-300">
     <p className="font-semibold text-slate-100">Nothing recorded from this browser yet.</p>
     <p>
-      Run a decision through the{" "}
-      <Link href="/operate" className="text-sky-300 underline-offset-2 hover:underline">
-        Decision Shield
+      <Link href="/operate#ops-decision-shield" className="text-sky-300 underline-offset-2 hover:underline">
+        Test a decision
       </Link>{" "}
       and record it. Each one is stored with the reading it was made against, so a later week can tell you
       whether the conditions it relied on still hold.
