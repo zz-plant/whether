@@ -20,15 +20,53 @@
 <p align="center">
   <a href="https://whether.work"><strong>This week's brief</strong></a> ·
   <a href="https://whether.work/share#subscribe-email">Monday email</a> ·
-  <a href="#try-it-without-installing">Try it in one command</a> ·
+  <a href="#try-it">Try it in one command</a> ·
   <a href="#connect-an-agent">MCP &amp; agent API</a> ·
   <a href="docs/README.md">Documentation</a>
 </p>
 
+---
+
+## Try it
+
+This week's reading, with no key or account:
+
+```bash
+curl https://whether.work/brief.md
+```
+
+Shortened, for the week of Nov 2, 2026:
+
+```markdown
+# Whether Weekly Brief — 2026-11-02
+
+> **Conditions:** Cloudy (money is available but pricey)
+
+## This Week's Guidance
+
+Conditions are tightening. Protect the revenue you already have, and hold off on new bets until money gets cheaper.
+
+**Pause if:** Funding pressure is above 76 or risk appetite falls below 44. Funding pressure is 90 now.
+
+**Restart when:** Funding pressure falls below 66 and risk appetite is above 54
+```
+
+To ask from an agent instead, add the MCP server. In Claude Code:
+
+```bash
+claude mcp add --transport http whether https://whether.work/api/mcp
+```
+
+[Cursor, VS Code, claude.ai and other clients](#connect-an-agent) use the same URL. For scripts, the same reading comes as about 3KB of JSON, with each score against its lines:
+
+```bash
+curl "https://whether.work/api/agent?view=state"
+```
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/screens/weekly-brief-light.png" />
-    <img src="docs/assets/screens/weekly-brief-dark.png" alt="The weekly brief at whether.work for the week of Oct 19, 2026: Cloudy conditions, the week's call, and the conditions chart plotting funding pressure against risk appetite" width="820" />
+    <img src="docs/assets/screens/weekly-brief-dark.png" alt="The weekly brief at whether.work for the week of Oct 19, 2026: Cloudy conditions, the week's guidance, and the conditions chart plotting funding pressure against risk appetite" width="820" />
   </picture>
 </p>
 
@@ -43,15 +81,30 @@ Whether scores two things from public U.S. market data every Monday:
 
 Together the two scores place the week in one of four conditions: `Sunny`, `Cloudy`, `Stormy` or `Freezing`. Interest rates, the yield curve, the pace of rate rises, stock-market volatility and the Chicago Fed financial conditions index move the scores, because the record holds each of them at every month-end since 2012. Inflation, labor, the high-yield credit spread and startup-market inputs are shown beside them and move nothing.
 
-Each decision area gets an action for this week, a **pause line** that holds it back and a **resume line**, set apart from the pause line so one noisy week cannot flip it. Three rows from the brief for the week of Oct 19, 2026, in Cloudy conditions:
+Each decision area gets an action for this week, a **pause line** that holds it back and a **restart line**, set apart from the pause line so one noisy week cannot undo the decision. Three rows from the brief for the week of Oct 19, 2026, in Cloudy conditions:
 
-| Area | This week | Pause line | Resume line |
+| Area | This week | Pause line | Restart line |
 | :--- | :--- | :--- | :--- |
 | **Hiring** | Limit hiring to backfills and mission-critical roles tied to delivery risk | Funding pressure &gt; 76 or risk appetite &lt; 44 | Funding pressure &lt; 66 and risk appetite &gt; 54 |
 | **Spending** | Put a payback figure on every discretionary line before approving it | Funding pressure &gt; 76 | Funding pressure &lt; 66 and the payback figures still hold |
 | **Fundraising** | If you plan to raise, prepare the materials now so the timing stays yours | Risk appetite &lt; 44 or funding pressure &gt; 76 | Risk appetite &gt; 54 and funding pressure &lt; 66 |
 
 The live brief at `/` fits the actions to a company's stage and cash runway. Every number traces to its formula and source on `/trust`.
+
+---
+
+## How the record holds up
+
+The engine behind the live brief has scored every month-end since 2012. Weekly briefs began in 2026, so the earlier months are a reconstruction, not guidance anyone read at the time. Through Sep 2026:
+
+| Measure | Result |
+| :--- | :--- |
+| Conditions the same a month later | 169 of 176 comparisons (96%) |
+| Changes in conditions, last 60 months | 5 |
+| Of those, warned a month ahead | 2 of 5 |
+| Of those, changed back within a month | 0 |
+
+Predicting "no change" every month would also score 96%, so that figure shows how rarely conditions move, not foresight. The record grades conditions, not companies: it cannot show that following the lines improved any company's results. [`/history`](https://whether.work/history) lists each change, and [`/calibration`](https://whether.work/calibration) has the study behind the 96%.
 
 ---
 
@@ -62,7 +115,7 @@ The live brief at `/` fits the actions to a company's stage and cash runway. Eve
 | <img src="docs/assets/screens/decide.png" alt="The Decide page: this week's rule for each area, with its pause and resume lines" /> | <img src="docs/assets/screens/why-it-changed.png" alt="Why it changed: each signal since the last reading, against its lines" /> |
 | **Decide** (`/operate`): this week's rule for each area, the work to stop and start, and a runway planner. | **Why it changed** (`/signals`): each reading since the last brief, measured against the lines it governs. |
 | <img src="docs/assets/screens/trust.png" alt="How much to trust this week: the scores built step by step from public data" /> | <img src="docs/assets/screens/record.png" alt="The Record: conditions by month since 2012 and every published weekly brief" /> |
-| **Trust** (`/trust`): how each score is built, where each feed comes from and when it last updated. | **Record** (`/history`): conditions by month since 2012, every published brief, and how past calls held up. |
+| **Trust** (`/trust`): how each score is built, where each feed comes from and when it last updated. | **Record** (`/history`): conditions by month since 2012, every published brief, and how past readings held up. |
 | <img src="docs/assets/screens/share.png" alt="Share: this week's guidance as a Slack post, email, slide, ticket or investor update" /> | <picture><source media="(prefers-color-scheme: light)" srcset="docs/assets/screens/weekly-brief-mobile-light.png" /><img src="docs/assets/screens/weekly-brief-mobile-dark.png" alt="The weekly brief on a phone" width="260" /></picture> |
 | **Share** (`/share`): the week's guidance as a Slack post, email, meeting slide, ticket or investor update. | **On a phone:** the same brief at 430px. |
 
@@ -70,46 +123,11 @@ Captured from whether.work on Oct 21, 2026. [docs/assets/README.md](docs/assets/
 
 ---
 
-## Quick start
-
-### Try it without installing
-
-Every endpoint is public and needs no key or account:
-
-```bash
-curl https://whether.work/brief.md
-```
-
-That prints this week's brief as Markdown: the conditions, the guidance, and each decision with its pause and resume lines. For the same reading as about 3KB of JSON, with each score against its lines:
-
-```bash
-curl "https://whether.work/api/agent?view=state"
-```
-
-### Run locally
-
-```bash
-git clone https://github.com/zz-plant/whether.git
-cd whether
-bun install
-bun run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000). Without network access the brief falls back to the snapshots in `data/` and says so.
-
-### Use the CLI
-
-```bash
-bun run cli:whether -- status
-bun run cli:whether -- brief slack
-bun run cli:whether -- watch --changes-only
-```
-
-`status` prints this week's conditions and call, `brief slack` prints the Slack post, and `watch` refreshes until a score moves. Pass `--api-base-url https://whether.work` to read production. [docs/cli-command-reference.md](docs/cli-command-reference.md) lists every command.
+## Other ways to use it
 
 ### Connect an agent
 
-In Claude Code, the plugin adds the connector and a skill that tells Claude when this week's call
+In Claude Code, the plugin adds the connector and a skill that tells Claude when this week's guidance
 applies (hiring, raising, burn, runway, a board update):
 
 ```bash
@@ -142,6 +160,18 @@ Or run the server locally over stdio with `bun run mcp:whether`. Agents should c
 
 The REST endpoints, their parameters and the ones that need a header are in [docs/developer/api-reference.md](docs/developer/api-reference.md); [whether.work/api-docs](https://whether.work/api-docs) is the public version.
 
+### Use the CLI
+
+From a clone, after `bun install`:
+
+```bash
+bun run cli:whether -- status --api-base-url https://whether.work
+bun run cli:whether -- brief slack --api-base-url https://whether.work
+bun run cli:whether -- watch --changes-only --api-base-url https://whether.work
+```
+
+`status` prints this week's conditions and guidance, `brief slack` prints the Slack post, and `watch` refreshes until a score moves. Leave out `--api-base-url` to read a local dev server. [docs/cli-command-reference.md](docs/cli-command-reference.md) lists every command.
+
 ### Embed this week's call
 
 Paste two lines into any page, such as a team wiki, an investor portal or an internal dashboard:
@@ -153,6 +183,17 @@ Paste two lines into any page, such as a team wiki, an investor portal or an int
 
 `brief` draws the guidance and each area's action; `call-strip` draws a single line. The block updates when the brief does and links back to the full reading. The builder at [whether.work/share](https://whether.work/share) adds a company stage and previews the result.
 
+### Run locally
+
+```bash
+git clone https://github.com/zz-plant/whether.git
+cd whether
+bun install
+bun run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). Without network access the brief falls back to the snapshots in `data/` and says so.
+
 ---
 
 ## Under the hood
@@ -160,8 +201,8 @@ Paste two lines into any page, such as a team wiki, an investor portal or an int
 - **One registry, every agent surface.** Each tool is defined once in `lib/agent/tools.ts`. The HTTP and stdio MCP servers, the plain-GET shim, the manifest and `/llms.txt` all read from it, and `tests/agentDiscoveryParity.test.ts` fails if any of them drifts.
 - **An engine that reads no data and writes no words.** `lib/regimeEngineScoring.ts` turns inputs into codes. Every sentence a reader sees comes from `lib/report/`, and an architecture test rejects any engine import of copy, React or data files. A change to scoring bumps `ENGINE_VERSION`.
 - **Fallback that says so.** If a feed fails or goes stale, the brief draws from the snapshots in `data/` and labels the reading with its date and the reason.
-- **A record you can audit.** Conditions are scored at every month-end since 2012 by the same engine the live brief runs, so a past call can be checked against what followed.
-- **Fast, strict gates.** The 2,500+ tests run in about 14 seconds on Bun. The pre-push gate rejects new `as` casts, new lint suppressions and exports with no caller.
+- **A record you can audit.** Conditions are scored at every month-end since 2012 by the same engine the live brief runs, so a past reading can be checked against what followed.
+- **Fast, strict gates.** The 3,400+ tests run in about 20 seconds on Bun. The pre-push gate rejects new `as` casts, new lint suppressions and exports with no caller.
 
 ---
 
@@ -171,7 +212,7 @@ Paste two lines into any page, such as a team wiki, an investor portal or an int
 | :--- | :--- | :--- |
 | `bun run dev` | Dev server with hot reload (Vinext on Cloudflare Workers) | — |
 | `bun run test <path>` | One test file | ~0.2s |
-| `bun run test` | The full suite, 2,500+ tests | ~14s |
+| `bun run test` | The full suite, 3,400+ tests | ~20s |
 | `bun run typecheck` | TypeScript 7 (native) | ~5s |
 | `bun run lint` | oxlint, warnings denied | ~1s |
 | `bun run build` | The production Worker bundle | — |
@@ -207,16 +248,6 @@ whether/
 
 ---
 
-## Place in the revisable delegation loop
-
-Whether holds the **act** step in the [STD-07 Revisable Delegation Record](https://ethotechnics.org/standards/std-07-revisable-delegation-record) loop. It turns changed conditions into weekly operating guidance, and the operator acts. It authorizes nothing and takes no action itself.
-
-- **Export:** a reader's saved decisions in STD-07 shape at `GET /api/decision-memory?format=records`, as newline-delimited JSON, SHA-256 chained, oldest first. The endpoint returns only the requesting owner's records.
-- **Conformance:** Level 2 (append-only, hashed, chained), declared in [`/.well-known/whether-agent.json`](https://whether.work/.well-known/whether-agent.json).
-- **Siblings:** [Ambit](https://github.com/zz-plant/ambit) (capability and authorization), [Refract](https://github.com/refract-org/refract) (discrepancy), [NextConsensus](https://nextconsensus.com) (belief), [Ethotechnics](https://ethotechnics.org) (record shape and vocabulary).
-
----
-
 ## Documentation
 
 - [docs/README.md](docs/README.md): the documentation hub, routed by task
@@ -224,5 +255,6 @@ Whether holds the **act** step in the [STD-07 Revisable Delegation Record](https
 - [docs/editorial-guardrails.md](docs/editorial-guardrails.md): vocabulary, decision contracts and tone
 - [docs/one-screen-weekly-brief-spec.md](docs/one-screen-weekly-brief-spec.md): the weekly brief's specification
 - [docs/developer/quickstart.md](docs/developer/quickstart.md): integrating with the API
+- [docs/agents/agent-interface.md](docs/agents/agent-interface.md): the MCP and HTTP interface, and how saved decisions export as records
 - [ROADMAP.md](ROADMAP.md): what has shipped and what is next
 - [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md): how changes are made here

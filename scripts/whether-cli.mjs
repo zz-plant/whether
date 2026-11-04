@@ -284,11 +284,10 @@ const buildMarkdownExport = ({ status, changes, brief }) => {
   const lines = [
     "# Whether Export",
     "",
-    "## Current Call",
-    `- Regime: ${status.regime}`,
-    `- Cycle phase: ${status.cyclePhase}`,
-    `- Margin: ${status.confidence.label} (${status.confidence.score})`,
+    "## This Week's Guidance",
+    `- Conditions: ${status.regime}`,
     `- Trend: ${status.trend}`,
+    `- Freshness: ${freshnessText(status)}`,
     `- Summary: ${status.call.summary}`,
     "",
     "## Do Now",
@@ -297,7 +296,7 @@ const buildMarkdownExport = ({ status, changes, brief }) => {
     "## Avoid",
     ...status.call.avoid.map((item) => `- ${item}`),
     "",
-    "## Flip Conditions",
+    "## Conditions Change If",
     ...status.call.flipConditions.map((item) => `- ${item}`),
     "",
     "## What Changed",
@@ -316,13 +315,11 @@ const buildTextBriefing = ({ status, changes, brief }) => {
   const lines = [
     "Whether briefing",
     "",
-    `Regime: ${status.regime}`,
-    `Cycle phase: ${status.cyclePhase}`,
-    `Margin: ${status.confidence.label} (${status.confidence.score})`,
+    `Conditions: ${status.regime}`,
     `Trend: ${status.trend}`,
     `Freshness: ${freshnessText(status)}`,
     "",
-    `Call: ${status.call.summary}`,
+    `Guidance: ${status.call.summary}`,
     "",
     "Do now:",
     ...status.call.do.map((item) => `- ${item}`),
@@ -330,7 +327,7 @@ const buildTextBriefing = ({ status, changes, brief }) => {
     "Avoid:",
     ...status.call.avoid.map((item) => `- ${item}`),
     "",
-    "Flip conditions:",
+    "Conditions change if:",
     ...status.call.flipConditions.map((item) => `- ${item}`),
     "",
     "What changed:",
@@ -869,15 +866,15 @@ const compactStatusPayload = (body) => ({
 });
 
 const compactStatusText = (body) => `Status snapshot
-${body.regime} · ${body.trend} · ${body.confidence.label} (${body.confidence.score})
-Call: ${body.call.summary}
+${body.regime} · ${body.trend}
+Guidance: ${body.call.summary}
 Top do now: ${(body.call.do ?? []).slice(0, 2).join(" | ") || "n/a"}
-Flip: ${body.call.flipConditions?.[0] ?? "n/a"}
+Conditions change if: ${body.call.flipConditions?.[0] ?? "n/a"}
 Freshness: ${freshnessText(body)}`;
 
-const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nMargin:             ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nFreshness:          ${freshnessText(body)}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+const statusText = (body) => `Whether — Current Status\n\nConditions: ${body.regime}\nTrend:      ${body.trend}\nFreshness:  ${freshnessText(body)}\n\nThis Week's Guidance:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nConditions Change If:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
 
-const callText = (body) => `Call: ${body.call}
+const callText = (body) => `Guidance: ${body.call}
 Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
 /* "-2 from the yield curve, -11 from startup-market inputs": what a score's move is made of. */
 const movedText = (moved) =>
@@ -895,7 +892,7 @@ const changesText = (body) => {
     return `- ${item.label ?? item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})${split ? `\n    made of: ${split}` : ""}`;
   });
   return `What changed ${basis}
-Freshness: ${freshnessText(body)}${body.decision ? `\n\nDECISIONS\n${body.decision}` : ""}\n\nCHANGED\n${changed.join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${distanceText(item.distance)}`).join("\n")}`;
+Freshness: ${freshnessText(body)}${body.decision ? `\n\nDECISIONS\n${body.decision}` : ""}\n\nCHANGED\n${changed.join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nCONDITIONS CHANGE IF\n${body.flip.map((item) => `- ${item.condition}${distanceText(item.distance)}`).join("\n")}`;
 };
 const signed = (value) => (value > 0 ? `+${value}` : String(value));
 
@@ -921,13 +918,13 @@ ${body.headline}
 ${stateScoreText(body.scores.tightness, body.change.comparedWith)}
 ${stateScoreText(body.scores.riskAppetite, body.change.comparedWith)}${body.change.note ? `\n${body.change.note}` : ""}${body.change.summary ? `\n\n${body.change.summary}` : ""}
 
-Call: ${body.guidance.call}
+Guidance: ${body.guidance.call}
 
 Do:\n${body.guidance.doNow.map((item) => `- ${item}`).join("\n")}
 
 Avoid:\n${body.guidance.avoidNow.map((item) => `- ${item}`).join("\n")}
 
-Flips when:\n${body.guidance.flipConditions.map((item) => `- ${item}`).join("\n")}
+Conditions change if:\n${body.guidance.flipConditions.map((item) => `- ${item}`).join("\n")}
 
 ${body.use.summary}`;
 
@@ -960,7 +957,7 @@ Record date: ${body.recordDateLabel ?? "Unavailable"}
 Generated at: ${body.generatedAt}
 Summary hash: ${body.summaryHash ?? "n/a"}
 Decision delta: ${body.agentHandoff?.payload?.decision_delta?.summary ?? body.decision_delta?.summary ?? "n/a"}
-Flip watch: ${body.agentHandoff?.payload?.flip_watch?.flip_trigger ?? body.flip_watch?.flip_trigger ?? "n/a"}
+Conditions change if: ${body.agentHandoff?.payload?.flip_watch?.flip_trigger ?? body.flip_watch?.flip_trigger ?? "n/a"}
 Links:
 - Self: ${body.links?.self ?? "n/a"}
 - llms.txt: ${body.links?.llms ?? "n/a"}
@@ -1001,7 +998,7 @@ Cadence: ${compact.cadence}
 Record date: ${compact.recordDateLabel ?? "Unavailable"}
 Summary hash: ${compact.summaryHash ?? "n/a"}
 Decision delta: ${compact.decisionDelta ?? "n/a"}
-Flip watch: ${compact.flipWatch ?? "n/a"}
+Conditions change if: ${compact.flipWatch ?? "n/a"}
 Skills:
 ${compact.skills.map((skill) => `- ${skill.id}: ${skill.purpose}`).join("\n") || "- none"}`;
 };
@@ -1090,11 +1087,9 @@ const cmdStatus = async (settings, flags) => {
   const expandedTail = body.view === "expanded"
     ? `
 
-Bounded Decision:
-Guardrail: ${body.boundedDecision.guardrailThreshold}
-Reversal: ${body.boundedDecision.reversalTrigger}
-Flip (compact):
-${body.boundedDecision.flipConditionsCompact.map((item) => `- ${item}`).join("\n")}
+Decision detail:
+Stop: ${body.boundedDecision.guardrailThreshold}
+What would change this guidance: ${body.boundedDecision.reversalTrigger}
 Top deltas:
 ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.direction} (${item.delta})`).join("\n")}`
     : "";
@@ -1127,7 +1122,7 @@ const cmdCall = async (settings, subcommand, flags) => {
   if (subcommand === "diff") {
     const from = flags.from ?? "previous";
     const to = flags.to ?? "current";
-    return writeOutput(`Call diff (${from} -> ${to})\n\nCurrent call:\n${body.call}`, settings);
+    return writeOutput(`Guidance diff (${from} -> ${to})\n\nCurrent guidance:\n${body.call}`, settings);
   }
 
   const context = resolveCompanyContext(settings, flags);
@@ -1146,9 +1141,9 @@ const cmdRegime = async (settings, flags) => {
   if (flags.plot) {
     const history = await getJson(settings, "/api/cli/history");
     const plot = history.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.trend}`).join("\n");
-    return writeOutput(attachCompanyContextText(`Regime history\n${plot}`, context), settings);
+    return writeOutput(attachCompanyContextText(`Conditions history\n${plot}`, context), settings);
   }
-  const text = attachCompanyContextText(`Regime: ${body.regime}\nPhase: ${body.phase}\nMargin: ${body.confidence}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`, context);
+  const text = attachCompanyContextText(`Conditions: ${body.regime}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`, context);
   await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
   writeOutput(isTextOutput(settings) ? text : body, settings);
 };
@@ -1169,7 +1164,7 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
     const status = await getJson(settings, cliRoutes.status(flags));
     const payload = { updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded };
     const text = attachCompanyContextText(
-      `Updated at: ${status.updatedAt ?? "n/a"}\nMargin: ${status.confidence?.label ?? "n/a"}\nDegraded: ${status.degraded ? "yes" : "no"}`,
+      `Updated at: ${status.updatedAt ?? "n/a"}\nData: ${status.degraded ? "saved copy" : "live"}`,
       context,
     );
     return writeOutput(isTextOutput(settings) ? text : payload, settings);
@@ -1317,9 +1312,9 @@ const cmdExplain = async (settings, subcommand, flags) => {
     return writeOutput(`Metric explanation (${flags.metric ?? "unknown"}): signals changed and should be interpreted through current posture constraints.`, settings);
   }
   const text = subcommand === "flip"
-    ? `Flip conditions:\n${changes.flip.map((item) => `- ${item.condition}`).join("\n")}`
+    ? `Conditions change if:\n${changes.flip.map((item) => `- ${item.condition}`).join("\n")}`
     : subcommand === "call"
-      ? `Why this call? ${regime.interpretation}`
+      ? `Why this guidance? ${regime.interpretation}`
       : `Why "${regime.regime}"?\n${regime.interpretation}`;
   writeOutput(text, settings);
 };

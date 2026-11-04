@@ -311,6 +311,14 @@ WHETHER_LEDGER_SECRET=<the deployment's secret> bun scripts/issue-ledger-token.t
 - The client id must be 3–128 characters, the range the API accepts.
 - No endpoint mints tokens. One would let anyone sign any id, which is what the token exists to prevent.
 
+## Place in the revisable delegation loop
+
+Whether holds the **act** step in the [STD-07 Revisable Delegation Record](https://ethotechnics.org/standards/std-07-revisable-delegation-record) loop. It turns changed conditions into weekly operating guidance, and the operator acts. It authorizes nothing and takes no action itself.
+
+- **Export:** a reader's saved decisions in STD-07 shape at `GET /api/decision-memory?format=records`, as newline-delimited JSON, SHA-256 chained, oldest first. The endpoint returns only the requesting owner's records.
+- **Conformance:** Level 2 (append-only, hashed, chained), declared in [`/.well-known/whether-agent.json`](https://whether.work/.well-known/whether-agent.json).
+- **Siblings:** [Ambit](https://github.com/zz-plant/ambit) (capability and authorization), [Refract](https://github.com/refract-org/refract) (discrepancy), [NextConsensus](https://nextconsensus.com) (belief), [Ethotechnics](https://ethotechnics.org) (record shape and vocabulary).
+
 ## Production monitoring endpoints
 
 - `GET /api/health` exposes monitor-friendly service status for synthetic probes.

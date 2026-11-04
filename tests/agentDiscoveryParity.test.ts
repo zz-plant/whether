@@ -92,6 +92,7 @@ describe("every place an agent learns what to call", () => {
     assert.deepEqual(pluginMcp.mcpServers, { [MCP_SERVER_INFO.name]: { type: "http", url: manifest.mcp.endpoint } });
     assert.deepEqual(registryEntry.remotes, [{ type: "streamable-http", url: manifest.mcp.endpoint }]);
     assert.equal(registryEntry.version, MCP_SERVER_INFO.version, "the registry entry names the version initialize reports");
+    assert.equal(JSON.parse(repoFile("package.json")).version, MCP_SERVER_INFO.version, "`whether --version` prints the version initialize reports");
     assert.ok(registryEntry.description.length <= 100, "the registry refuses a longer description");
     assert.deepEqual(
       marketplace.plugins.map((entry: { name: string; source: string }) => [entry.name, entry.source]),
