@@ -32,16 +32,18 @@ export const useOperatorProfile = () => {
     <K extends keyof OperatorProfile>(key: K, value: OperatorProfile[K] | undefined) => {
       // The setter runs the updater synchronously, so the runway on either side
       // of this edit is known here without reading storage again.
-      const sync: { band: RunwayBand | null } = { band: null };
+      const sync: { band: RunwayBand | null; ages: boolean } = { band: null, ages: true };
       setStored((previous) => {
         const next = setOperatorProfileField(previous, key, value);
-        sync.band = runwayBandForProfileEdit(resolveProfileRunway(parseOperatorProfile(previous)), resolveProfileRunway(next));
+        const after = resolveProfileRunway(next);
+        sync.band = runwayBandForProfileEdit(resolveProfileRunway(parseOperatorProfile(previous)), after);
+        sync.ages = after?.basis !== "cash-flow-positive";
         return next;
       });
       // One runway setting: an exact figure moves the band with it, and so does
       // one worked out from cash, which a change to spend or revenue moves too —
       // including revenue that comes to cover spending.
-      syncRunwayBandToFigures(sync.band);
+      syncRunwayBandToFigures(sync.band, { ages: sync.ages });
     },
     [setStored],
   );

@@ -67,7 +67,7 @@ export const resolveRunwayPlannerRequest = (
       revenue,
       growthRate: profile.monthlyGrowthPct ?? 0,
       sector: profile.sector ?? "b2b-saas",
-      stage: plannerStageForOperatorStage[stage ?? "series-a"],
+      stage: plannerStageForOperatorStage(stage ?? "series-a", revenue),
     },
   };
 };

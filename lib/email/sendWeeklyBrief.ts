@@ -1,3 +1,4 @@
+import { ageRunwayBand, describeRunwayBandAge } from "../report/operatorRunway";
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
 import { emailTextFooter, escapeHtml, renderEmailShell, unsubscribeHeaders } from "./emailShell";
 import { resolveEmailBaseUrl } from "./publicBaseUrl";
@@ -221,11 +222,21 @@ export const sendWeeklyBrief = async (options?: {
       /* A subscriber who told the site their stage gets the rules scaled to it,
          the same ones the homepage prints for them. Everyone else gets the
          published call unchanged. */
+      const statedRunway = recipient.runwayBand
+        ? { band: recipient.runwayBand, setOn: recipient.runwayBandSetOn }
+        : recipient.planRunway;
+      const agedBand = statedRunway && ageRunwayBand(statedRunway.band, statedRunway.setOn);
+      /* The rules follow the aged band, so the email says it assumed one. Printed only
+         where a stage scales the rules to it, and only once it has moved. */
+      const runwayAgeLine =
+        recipient.stage && statedRunway?.setOn && agedBand && agedBand !== statedRunway.band
+          ? describeRunwayBandAge({ chosen: statedRunway.band, setOn: statedRunway.setOn, band: agedBand })
+          : null;
       const call = recipient.stage
         ? applyStageToWeeklyCall(weeklyCall, {
             assessment: snapshot.assessment,
             startupVariantMode: recipient.stage,
-            runwayBand: recipient.runwayBand ?? recipient.planRunway?.band,
+            runwayBand: agedBand,
           })
         : weeklyCall;
 
@@ -281,6 +292,7 @@ export const sendWeeklyBrief = async (options?: {
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
         ...(ownLines ? [`Your rules: ${ownLines}.`] : []),
+        ...(runwayAgeLine ? [runwayAgeLine] : []),
         ...(quiet ? [] : [...readingsText(readings), basisLine]),
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
         `${publicDecisionLabels.call}: ${headline.composed}`,
@@ -297,6 +309,9 @@ export const sendWeeklyBrief = async (options?: {
 
       /* Regime-adaptive email */
       const sections = [];
+      if (runwayAgeLine) {
+        sections.push(`<p style="font-size:0.85rem;margin:0 0 12px;color:${OG_TEXT_SECONDARY};">${escapeHtml(runwayAgeLine)}</p>`);
+      }
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
         `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,

@@ -229,8 +229,22 @@ export type ProfileRunway =
   /**
    * Revenue covers spending, so cash is not running down and there is no runway
    * to count. `cashUsd` is absent when the runway was typed rather than worked out.
+   *
+   * Covered is not the same as safe, and the two figures below say how far it
+   * goes (`runwayBandForProfileRunway` reads them). `cushionMonths` is how long
+   * the balance would carry today's spending, absent when spending is zero.
+   * `coveredForMonths` is when falling revenue meets spending, at the reader's
+   * own rate, and is absent unless revenue is falling.
    */
-  | { basis: "cash-flow-positive"; cashUsd?: number; surplusUsd: number };
+  | { basis: "cash-flow-positive"; cashUsd?: number; surplusUsd: number; cushionMonths?: number; coveredForMonths?: number };
+
+/** Months until revenue falling at `growthPct` a month meets spending. Undefined unless it is falling toward it. */
+const monthsUntilSpendOvertakesRevenue = ({ monthlyBurnUsd, monthlyRevenueUsd, monthlyGrowthPct }: OperatorProfile): number | undefined => {
+  if (monthlyGrowthPct === undefined || monthlyGrowthPct >= 0) return undefined;
+  if (!monthlyBurnUsd || !monthlyRevenueUsd) return undefined;
+  if (monthlyGrowthPct <= -100) return 0;
+  return Math.log(monthlyBurnUsd / monthlyRevenueUsd) / Math.log(1 + monthlyGrowthPct / 100);
+};
 
 /**
  * The runway every surface reads: worked out from cash and net burn when cash
@@ -249,7 +263,15 @@ export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | 
   const typedMonths = profile.runwayMonths !== undefined && profile.runwayMonths > 0 ? profile.runwayMonths : undefined;
   if (netBurn !== undefined && netBurn <= 0 && (cash !== undefined || typedMonths !== undefined)) {
     const surplusUsd = Math.max(0, -netBurn);
-    return cash !== undefined ? { basis: "cash-flow-positive", cashUsd: cash, surplusUsd } : { basis: "cash-flow-positive", surplusUsd };
+    const cushionMonths = cash === undefined ? typedMonths : profile.monthlyBurnUsd ? cash / profile.monthlyBurnUsd : undefined;
+    const coveredForMonths = monthsUntilSpendOvertakesRevenue(profile);
+    return {
+      basis: "cash-flow-positive",
+      ...(cash !== undefined ? { cashUsd: cash } : {}),
+      surplusUsd,
+      ...(cushionMonths !== undefined ? { cushionMonths } : {}),
+      ...(coveredForMonths !== undefined ? { coveredForMonths } : {}),
+    };
   }
   if (cash !== undefined && netBurn !== undefined) {
     // Tenths of a month, and never zero: a balance under one tenth of a month is still a runway.

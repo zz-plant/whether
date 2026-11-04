@@ -7,9 +7,10 @@ import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
 import { netMonthlyBurnUsd, resolveProfileRunway, resolveProfileRunwayMonths } from "../../lib/operatorProfile";
 import { HOME_SECTIONS } from "../../lib/report/home/homeSectionModel";
-import { DEFAULT_RUNWAY_BAND, runwayBandLabel } from "../../lib/report/operatorRunway";
-import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
+import { DEFAULT_RUNWAY_BAND, describeRunwayBandAge, isThinlyCoveredRunway, runwayBandLabel } from "../../lib/report/operatorRunway";
+import { THINLY_COVERED_NOTE, buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
+import { useOperatorStage } from "./useOperatorStage";
 import { persistOperatorRunway, useOperatorRunway } from "./useOperatorRunway";
 
 /*
@@ -25,19 +26,25 @@ import { persistOperatorRunway, useOperatorRunway } from "./useOperatorRunway";
  */
 const useRunwayNotes = (regime: RegimeKey) => {
   const { profile } = useOperatorProfile();
-  const { runwayBand } = useOperatorRunway();
+  const { runwayBand, bandAge } = useOperatorRunway();
+  const { stage } = useOperatorStage();
+  const thinlyCovered = useMemo(() => isThinlyCoveredRunway(resolveProfileRunway(profile)), [profile]);
+  /* A figure the band has aged past is as old as the band, so the aged band speaks and the figure does not. */
   const runway = useMemo(
-    () => resolveRunwayForNotes({ exactMonths: resolveProfileRunwayMonths(profile), band: runwayBand }),
-    [profile, runwayBand],
+    () => resolveRunwayForNotes({ exactMonths: bandAge ? undefined : resolveProfileRunwayMonths(profile), band: runwayBand }),
+    [bandAge, profile, runwayBand],
   );
   const notes = useMemo(
-    () => (runway ? buildRunwayConditionedNotes({ regime, ...runway, netMonthlyBurnUsd: netMonthlyBurnUsd(profile) }) : []),
-    [regime, runway, profile],
+    () =>
+      runway && !thinlyCovered
+        ? buildRunwayConditionedNotes({ regime, ...runway, netMonthlyBurnUsd: netMonthlyBurnUsd(profile), selfFunded: stage === "bootstrapped" })
+        : [],
+    [regime, runway, profile, stage, thinlyCovered],
   );
   // A company whose revenue covers its spending reads as the open-ended band, not as an exact figure,
   // but its figures are entered all the same.
   const figuresGiven = useMemo(() => resolveProfileRunway(profile) !== null, [profile]);
-  return { runway, notes, figuresGiven };
+  return { runway, notes, figuresGiven, thinlyCovered, bandAge };
 };
 
 /** Back to no runway given: the band cookie, the `?runway` param and an entered figure all go. */
@@ -75,7 +82,22 @@ function ClearRunwayButton() {
  * (`RunwayAreaNote`); this is the heading and the invitation.
  */
 export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
-  const { runway, figuresGiven } = useRunwayNotes(regime);
+  const { runway, figuresGiven, thinlyCovered, bandAge } = useRunwayNotes(regime);
+
+  if (thinlyCovered) {
+    return (
+      <div id="runway-notes" className="space-y-1.5">
+        <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
+        <p className="text-fluid-nano text-slate-400">
+          {THINLY_COVERED_NOTE}{" "}
+          <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+            Change your cash, spend and revenue
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
 
   if (!runway) {
     return (
@@ -104,6 +126,23 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
         <p className="type-eyebrow text-slate-300">What this guidance means at {runway.runwayPhrase} of runway</p>
         <ClearRunwayButton />
       </div>
+      {bandAge ? (
+        <p data-testid="runway-band-age" className="text-fluid-nano text-slate-400">
+          {describeRunwayBandAge(bandAge)}{" "}
+          <button
+            type="button"
+            onClick={() => persistOperatorRunway(bandAge.band)}
+            className="weather-hit text-[var(--accent-action)] underline underline-offset-4"
+          >
+            That&rsquo;s right
+          </button>
+          {" or "}
+          <a href={`#${HOME_SECTIONS.calibration.id}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+            pick again
+          </a>
+          .
+        </p>
+      ) : null}
       <p className="text-fluid-nano text-slate-500">
         Your figures stay in this browser. These notes translate the guidance; the thresholds above are
         unchanged.{" "}

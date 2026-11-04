@@ -5,7 +5,7 @@ import {
   lifecycleStageForOperatorStage,
   OPERATOR_STAGE_COOKIE,
   OPERATOR_STAGE_OPTIONS,
-  operatorStageForLifecycleStage,
+  operatorStageForLifecycleChoice,
   operatorStageForVariantMode,
   plannerStageForOperatorStage,
   readOperatorStageCookie,
@@ -53,13 +53,32 @@ describe("operator stage: one vocabulary for every stage control", () => {
     assert.equal(operatorStageForVariantMode(undefined), "series-a");
   });
 
-  it("maps into both engine stage types and back without loss", () => {
-    for (const option of OPERATOR_STAGE_OPTIONS) {
-      const lifecycle = lifecycleStageForOperatorStage[option.key];
-      assert.equal(operatorStageForLifecycleStage[lifecycle], option.key);
-      assert.ok(plannerStageForOperatorStage[option.key]);
+  it("maps the funded stages into both engine stage types and back", () => {
+    for (const stage of ["seed", "series-a", "series-b"] as const) {
+      assert.equal(operatorStageForLifecycleChoice(lifecycleStageForOperatorStage(stage), null), stage);
+      assert.ok(plannerStageForOperatorStage(stage));
     }
-    assert.equal(lifecycleStageForOperatorStage.bootstrapped, "MATURE");
-    assert.equal(plannerStageForOperatorStage["series-b"], "growth");
+    assert.equal(plannerStageForOperatorStage("series-b"), "growth");
+  });
+
+  /* Bootstrapped says how a company is funded, not how far along it is. It read as
+     MATURE, so a founder alone with no revenue was graded as a mature company. */
+  it("does not read bootstrapped as a stage of maturity", () => {
+    assert.equal(lifecycleStageForOperatorStage("bootstrapped"), "GROWTH");
+    assert.equal(lifecycleStageForOperatorStage("bootstrapped", 40_000), "GROWTH");
+    assert.equal(lifecycleStageForOperatorStage("bootstrapped", 0), "DISCOVERY");
+    assert.equal(plannerStageForOperatorStage("bootstrapped"), "growth");
+    assert.equal(plannerStageForOperatorStage("bootstrapped", 0), "seed");
+    // Revenue of zero says nothing about a funded company's stage.
+    assert.equal(lifecycleStageForOperatorStage("series-b", 0), "SCALE");
+  });
+
+  it("keeps a company's funding when a lifecycle is chosen", () => {
+    for (const lifecycle of ["DISCOVERY", "GROWTH", "SCALE", "MATURE"] as const) {
+      assert.equal(operatorStageForLifecycleChoice(lifecycle, "bootstrapped"), "bootstrapped");
+    }
+    // Mature wrote "bootstrapped" over a funded company's stage.
+    assert.equal(operatorStageForLifecycleChoice("MATURE", "series-a"), "series-b");
+    assert.equal(operatorStageForLifecycleChoice("MATURE", null), "series-b");
   });
 });

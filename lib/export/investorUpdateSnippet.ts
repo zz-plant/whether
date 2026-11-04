@@ -44,7 +44,7 @@ export type InvestorUpdateSnippetParts = {
  */
 const RUNWAY_IMPLICATIONS: Record<RunwayBand, string> = {
   critical:
-    "With under six months of runway, cash comes before the macro read: [our rule for new commitments until runway passes nine months].",
+    "With under six months of runway, cash comes before the macro read: [our rule for new commitments until runway passes six months].",
   tight:
     "With six to twelve months of runway, every new commitment has to pay back inside [n] months, and [where we are on raise planning].",
   balanced:

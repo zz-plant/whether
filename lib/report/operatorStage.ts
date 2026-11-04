@@ -63,26 +63,42 @@ export const operatorStageForVariantMode = (mode: StartupVariantMode | null | un
   return DEFAULT_OPERATOR_STAGE;
 };
 
+/**
+ * Bootstrapped says how a company is funded, not how far along it is. It mapped
+ * to `MATURE` until 2026-11-04, so a founder alone with no revenue was graded as
+ * a mature company, and choosing Mature on the stress test wrote "bootstrapped"
+ * over a funded company's stage. It now reads as a company with revenue unless
+ * the reader's own figures say there is none, and the blank stays not given.
+ */
+const isPreRevenueBootstrapped = (stage: OperatorStage, monthlyRevenueUsd: number | undefined) =>
+  stage === "bootstrapped" && monthlyRevenueUsd === 0;
+
 /** The runway planner's engine keeps its own four stages; Series B+ and bootstrapped teams share the growth band. */
-export const plannerStageForOperatorStage: Record<OperatorStage, PlannerStage> = {
-  seed: "seed",
-  "series-a": "series-a",
-  "series-b": "growth",
-  bootstrapped: "growth",
+export const plannerStageForOperatorStage = (stage: OperatorStage, monthlyRevenueUsd?: number): PlannerStage => {
+  if (isPreRevenueBootstrapped(stage, monthlyRevenueUsd)) return "seed";
+  if (stage === "seed" || stage === "series-a") return stage;
+  return "growth";
 };
 
-export const lifecycleStageForOperatorStage: Record<OperatorStage, LifecycleStage> = {
+const LIFECYCLE_FOR_FUNDED_STAGE: Record<Exclude<OperatorStage, "bootstrapped">, LifecycleStage> = {
   seed: "DISCOVERY",
   "series-a": "GROWTH",
   "series-b": "SCALE",
-  bootstrapped: "MATURE",
 };
 
-export const operatorStageForLifecycleStage: Record<LifecycleStage, OperatorStage> = {
-  DISCOVERY: "seed",
-  GROWTH: "series-a",
-  SCALE: "series-b",
-  MATURE: "bootstrapped",
+export const lifecycleStageForOperatorStage = (stage: OperatorStage, monthlyRevenueUsd?: number): LifecycleStage => {
+  if (stage !== "bootstrapped") return LIFECYCLE_FOR_FUNDED_STAGE[stage];
+  return isPreRevenueBootstrapped(stage, monthlyRevenueUsd) ? "DISCOVERY" : "GROWTH";
+};
+
+/**
+ * The stage a lifecycle choice writes. A lifecycle says nothing about funding,
+ * so a bootstrapped company stays bootstrapped whichever it picks.
+ */
+export const operatorStageForLifecycleChoice = (lifecycle: LifecycleStage, current: OperatorStage | null): OperatorStage => {
+  if (current === "bootstrapped") return current;
+  if (lifecycle === "DISCOVERY") return "seed";
+  return lifecycle === "GROWTH" ? "series-a" : "series-b";
 };
 
 const readCookieValue = (cookieHeader: string, name: string): string | null => {

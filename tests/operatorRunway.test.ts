@@ -11,6 +11,10 @@ import {
   runwayBandLabel,
   runwayBandSublabel,
   runwayBandPhrase,
+  ageRunwayBand,
+  describeRunwayBandAge,
+  isThinlyCoveredRunway,
+  readRunwayBandAge,
   runwayBandForProfileEdit,
   runwayBandForProfileRunway,
   RUNWAY_BAND_OPTIONS,
@@ -111,11 +115,71 @@ describe("one runway setting", () => {
     assert.equal(runwayBandForMonths(undefined), null);
   });
 
-  it("puts a company whose revenue covers its spending in the open-ended band, not in no band", () => {
-    const covered = resolveProfileRunway({ version: 1, cashUsd: 600_000, monthlyBurnUsd: 200_000, monthlyRevenueUsd: 250_000 });
+  it("puts a company whose revenue covers its spending in the open-ended band when cash stands behind it", () => {
+    const covered = resolveProfileRunway({ version: 1, cashUsd: 1_500_000, monthlyBurnUsd: 200_000, monthlyRevenueUsd: 250_000 });
     assert.equal(runwayBandForProfileRunway(covered), "abundant");
+    assert.equal(isThinlyCoveredRunway(covered), false);
+    // A typed runway stands in for the balance.
+    const typed = resolveProfileRunway({ version: 1, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 });
+    assert.equal(runwayBandForProfileRunway(typed), "abundant");
     assert.equal(runwayBandForProfileRunway(null), null);
     assert.equal(runwayBandForProfileRunway({ basis: "entered", months: 9 }), "tight");
+  });
+
+  it("does not tell a company with thin cash or falling revenue to use the cushion", () => {
+    const covered = { version: 1, cashUsd: 20_000, monthlyBurnUsd: 80_000, monthlyRevenueUsd: 80_500 } as const;
+    const thin = resolveProfileRunway(covered);
+    assert.equal(runwayBandForProfileRunway(thin), "balanced");
+    assert.equal(isThinlyCoveredRunway(thin), true);
+    // Plenty of cash, but revenue falls through spending inside the band's 24 months.
+    const falling = resolveProfileRunway({ ...covered, cashUsd: 2_000_000, monthlyRevenueUsd: 100_000, monthlyGrowthPct: -5 });
+    assert.equal(runwayBandForProfileRunway(falling), "balanced");
+    // The same fall against a wide margin holds past 24 months.
+    const slow = resolveProfileRunway({ ...covered, cashUsd: 2_000_000, monthlyRevenueUsd: 200_000, monthlyGrowthPct: -1 });
+    assert.equal(runwayBandForProfileRunway(slow), "abundant");
+    // Revenue wiped out in a month, and growth left blank, are both readable.
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway({ ...covered, cashUsd: 2_000_000, monthlyGrowthPct: -100 })), "balanced");
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway({ ...covered, cashUsd: 2_000_000 })), "abundant");
+    // No spending means no cushion to measure, not an endless one.
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway({ version: 1, cashUsd: 5_000, monthlyBurnUsd: 0 })), "balanced");
+  });
+
+  it("ages a band from the day it was set, downward only", () => {
+    const on = (date: string) => new Date(`${date}T12:00:00.000Z`);
+    assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2026-01-02")), "balanced");
+    assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2026-08-01")), "tight");
+    assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2027-02-01")), "critical");
+    assert.equal(ageRunwayBand("abundant", "2026-01-01", on("2026-08-01")), "balanced");
+    assert.equal(ageRunwayBand("tight", "2026-01-01", on("2026-05-01")), "critical");
+    // The lowest band has nowhere to go, and past its months stays there.
+    assert.equal(ageRunwayBand("critical", "2026-01-01", on("2027-01-01")), "critical");
+    // No date, a bad date and a future date all leave it as set.
+    assert.equal(ageRunwayBand("abundant", null, on("2030-01-01")), "abundant");
+    assert.equal(ageRunwayBand("abundant", "soon", on("2030-01-01")), "abundant");
+    assert.equal(ageRunwayBand("abundant", "2031-01-01", on("2030-01-01")), "abundant");
+  });
+
+  it("keeps the day in the cookie and reads the aged band out of it", () => {
+    const setOn = new Date("2026-01-01T12:00:00.000Z");
+    const later = new Date("2026-08-01T12:00:00.000Z");
+    const cookie = buildOperatorRunwayCookie("balanced", setOn);
+    assert.ok(cookie.startsWith(`${OPERATOR_RUNWAY_COOKIE}=balanced:2026-01-01;`));
+    const header = cookie.split(";")[0];
+    assert.equal(readOperatorRunwayCookie(header, setOn), "balanced");
+    assert.equal(readOperatorRunwayCookie(header, later), "tight");
+    assert.equal(readRunwayBandAge(header, setOn), null);
+    const age = readRunwayBandAge(header, later);
+    assert.deepEqual(age, { chosen: "balanced", setOn: "2026-01-01", band: "tight" });
+    assert.ok(age);
+    assert.equal(describeRunwayBandAge(age), "You set 12–24 months of runway on Jan 1, 2026, so this now assumes 6–12 months.");
+    // A band earned by covering spending, and a cookie from before the day was kept, do not age.
+    const bare = buildOperatorRunwayCookie("abundant", null).split(";")[0];
+    assert.equal(bare, `${OPERATOR_RUNWAY_COOKIE}=abundant`);
+    assert.equal(readOperatorRunwayCookie(bare, new Date("2030-01-01")), "abundant");
+    assert.equal(readRunwayBandAge(bare, new Date("2030-01-01")), null);
+    // A garbled day is no day, and a garbled band is no band.
+    assert.equal(readOperatorRunwayCookie(`${OPERATOR_RUNWAY_COOKIE}=tight:someday`, later), "tight");
+    assert.equal(readOperatorRunwayCookie(`${OPERATOR_RUNWAY_COOKIE}=nope:2026-01-01`, later), null);
   });
 
   it("moves the band with each figure, including revenue that comes to cover spending", () => {
@@ -135,9 +199,9 @@ describe("one runway setting", () => {
       written.push(runwayBandForProfileEdit(resolveProfileRunway(profile), resolveProfileRunway(next)));
       profile = next;
     }
-    // Cash alone is no runway; 3 months is critical; covered is open-ended; revenue cleared is 3 months again;
-    // spend cleared leaves no runway, which leaves the band alone.
-    assert.deepEqual(written, [null, "critical", "abundant", "critical", null]);
+    // Cash alone is no runway; 3 months is critical; covered with three months of spend banked follows the
+    // guidance; revenue cleared is 3 months again; spend cleared leaves no runway, which leaves the band alone.
+    assert.deepEqual(written, [null, "critical", "balanced", "critical", null]);
     // An edit that does not move the runway does not rewrite the band.
     assert.equal(runwayBandForProfileEdit({ basis: "entered", months: 9 }, { basis: "entered", months: 9 }), null);
   });

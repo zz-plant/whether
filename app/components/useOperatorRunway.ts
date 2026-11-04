@@ -3,8 +3,10 @@
 import {
   buildOperatorRunwayCookie,
   readOperatorRunwayCookie,
+  readRunwayBandAge,
   runwayBandForProfileRunway,
   type RunwayBand,
+  type RunwayBandAge,
 } from "../../lib/report/operatorRunway";
 import {
   OPERATOR_PROFILE_STORAGE_KEY,
@@ -56,12 +58,28 @@ const runwaySource = createBrowserSource<RunwayBand | null>({
   refreshOnSubscribe: true,
 });
 
+const sameAge = (left: RunwayBandAge | null, right: RunwayBandAge | null) =>
+  left?.chosen === right?.chosen && left?.setOn === right?.setOn && left?.band === right?.band;
+
+const runwayAgeSource = createBrowserSource<RunwayBandAge | null>({
+  read: () => readRunwayBandAge(document.cookie),
+  serverValue: null,
+  watch: (onChange) => {
+    window.addEventListener(RUNWAY_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(RUNWAY_CHANGED_EVENT, onChange);
+  },
+  refreshOnSubscribe: true,
+  isEqual: sameAge,
+});
+
 export const useOperatorRunway = () => {
   const runwayBand = useBrowserSource(runwaySource);
+  const bandAge = useBrowserSource(runwayAgeSource);
   const hydrated = useHydrated();
 
   return {
     runwayBand,
+    bandAge,
     setRunwayBand: persistOperatorRunway,
     hydrated,
   };
@@ -106,12 +124,12 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
  * A figure was entered: move the band to the one the figures fall in, so the
  * header, the homepage selector and the server-calibrated rules agree with
  * them (`runwayBandForProfileEdit` decides which). Revenue that covers spending
- * moves it too, to the open-ended band. A null band leaves the cookie alone —
- * clearing a number is not choosing a runway.
+ * moves it too, and that band does not age, since nothing is counting down. A
+ * null band leaves the cookie alone — clearing a number is not choosing a runway.
  */
-export const syncRunwayBandToFigures = (band: RunwayBand | null) => {
+export const syncRunwayBandToFigures = (band: RunwayBand | null, { ages }: { ages: boolean }) => {
   if (!band) return;
   const previousBand = readOperatorRunwayCookie(document.cookie);
-  document.cookie = buildOperatorRunwayCookie(band);
+  document.cookie = buildOperatorRunwayCookie(band, ages ? new Date() : null);
   announceRunwayChange(previousBand, band, "figure");
 };
