@@ -7,6 +7,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - Local: `bun run cli:whether -- <command> [flags]`
 - Binary: `whether`
 - Production: add `--api-base-url https://whether.work`. Without it the CLI reads a local server.
+- Text output uses the site's words: conditions, guidance, "Conditions change if". Command names (`call`, `regime`) and `--json` fields (`regime`, `confidence`, `call.flipConditions`) keep theirs, because scripts depend on them. `cyclePhase`, `decisionStability` and the `confidence` score print only with `--json`.
 - The parity commands read public routes (`/api/cli/*`, `/api/agent`, `/api/brief/slack`; parameters in `docs/developer/api-reference.md` and on `/api-docs`), so `curl https://whether.work/api/cli/status` answers what `whether status --json` prints.
 
 ## Top-level commands
@@ -218,7 +219,7 @@ Use these four commands as the minimal smoke surface for operators and agents:
 
 - `whether --version`
   - Exit: `0`
-  - Stdout (text): semantic version only (example `0.1.0`)
+  - Stdout (text): semantic version only (example `1.1.0`)
 - `whether ping --json`
   - Exit: `0` on healthy API
   - Stdout (json): `{ "ok": true, "apiBaseUrl": "...", "status": "ok", "autodiscovered": false }`

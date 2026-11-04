@@ -379,7 +379,7 @@ describe("whether cli", () => {
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Cadence: weekly/);
     assert.match(result.stdout, /Decision delta: Nested decision delta/);
-    assert.match(result.stdout, /Flip watch: Nested flip trigger/);
+    assert.match(result.stdout, /Conditions change if: Nested flip trigger/);
     assert.match(result.stdout, /Copy:/);
     assert.match(result.stdout, /Agent prompt:/);
     assert.match(result.stdout, /Give me the weekly operator summary\./);
@@ -490,6 +490,56 @@ describe("whether cli", () => {
 
     assert.equal(stdout.updatedAt, "live");
     assert.equal(written.updatedAt, "live");
+  });
+
+  it("reads by default from the address `bun run dev` serves, the one the README gives", () => {
+    /* Configuration: nothing renders it, and starting the real server here would take a port. */
+    const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "utf8");
+    const launch = JSON.parse(read(".claude/launch.json"));
+    assert.match(read("vite.config.ts"), /server: \{ host: "127\.0\.0\.1", port: 3000 \}/);
+    assert.match(read("scripts/whether-cli.mjs"), /const DEFAULT_API_BASE_URL = "http:\/\/localhost:3000"/);
+    assert.ok(read("README.md").includes("http://localhost:3000"));
+    assert.equal(launch.configurations.find((entry: { name: string }) => entry.name === "whether-dev")?.port, 3000);
+  });
+
+  it("prints status in the site's words and keeps the API's fields for --json", async () => {
+    const server = http.createServer((req, res) => {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({
+        version: "v1",
+        regime: "Cloudy",
+        cyclePhase: "Mid (Fragile)",
+        confidence: { label: "LOW", score: 60 },
+        trend: "Deteriorating",
+        decisionStability: "unstable",
+        updatedAt: "2026-11-02T02:00:00.000Z",
+        freshness: { line: "Updated 2026-11-02T02:00:00.000Z · live · room before a change: little" },
+        call: { summary: "Protect revenue.", do: ["Keep customers"], avoid: ["New markets"], flipConditions: ["Funding pressure at or below 70"] },
+        degraded: false,
+      }));
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const baseUrl = `http://127.0.0.1:${resolveServerPort(server)}`;
+    const text = await runCli(["status", "--api-base-url", baseUrl]);
+    const compact = await runCli(["status", "--compact", "--api-base-url", baseUrl]);
+    const json = await runCli(["status", "--json", "--api-base-url", baseUrl]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(text.status, 0);
+    assert.match(text.stdout, /Conditions: Cloudy/);
+    assert.match(text.stdout, /This Week's Guidance:\nProtect revenue\./);
+    assert.match(text.stdout, /Conditions Change If:\n- Funding pressure at or below 70/);
+    assert.match(compact.stdout, /Conditions change if: Funding pressure at or below 70/);
+    for (const output of [text.stdout, compact.stdout]) {
+      assert.doesNotMatch(output, /Regime|Cycle Phase|Margin|Decision Stability|Flip|Call:|LOW/);
+    }
+
+    const parsed = JSON.parse(json.stdout);
+    assert.equal(parsed.regime, "Cloudy");
+    assert.equal(parsed.cyclePhase, "Mid (Fragile)");
+    assert.equal(parsed.decisionStability, "unstable");
+    assert.deepEqual(parsed.confidence, { label: "LOW", score: 60 });
   });
 
   it("auto-discovers a healthy local API when the default localhost port is unavailable", async () => {
@@ -1254,7 +1304,7 @@ describe("whether cli", () => {
 
     assert.equal(result.status, 0);
     assert.ok(requests.some((url) => url.includes("/api/cli/status?view=expanded")));
-    assert.match(result.stdout, /Bounded Decision:/);
+    assert.match(result.stdout, /Decision detail:/);
   });
 
   it("forwards only route-supported params for each CLI command endpoint", async () => {

@@ -17,6 +17,11 @@ export default defineConfig({
   logLevel: parseLogLevel(process.env.WHETHER_BUILD_LOG_LEVEL),
   /* The commit /api/health reports (lib/runtime/versionMetadata.ts); "" from a dirty checkout. */
   define: { __WHETHER_BUILD_COMMIT__: JSON.stringify(buildCommit()) },
+  /* Vinext 1.0 hands `dev` to Vite, whose default is localhost:5173 (::1 on a Mac). The README,
+     the CLI's default, launch.json and the capture scripts all read this address, so a clean
+     clone's `bun run dev` answered none of them from 2026-10-11 until this was set. An explicit
+     `--host` or `--port`, as scripts/dev-server.lib.mjs passes, still wins. */
+  server: { host: "127.0.0.1", port: 3000 },
   environments: {
     /* Server source maps only. `cf deploy` uploads every map in the Build Output, so Workers
        Logs stack traces name real files and lines instead of a bundle offset.
