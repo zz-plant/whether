@@ -115,7 +115,7 @@ describe("a project's payback", () => {
     const payback = sized(buildProjectPayback(project, 0, context({ runwayMonths: 10, netMonthlyBurnUsd: 100_000 })));
     assert.equal(payback.verdict, "misses");
     assert.match(payback.sentence, /^Project 1: /, "an unnamed row is named by its place");
-    assert.match(payback.sentence, /past the 6-month bar your runway sets, which lifts once runway clears 12 months or a round is signed\./);
+    assert.match(payback.sentence, /past the 6-month bar your runway sets, which lifts once runway clears 12 months or new money is in the bank\./);
   });
 
   it("says when shipping the work moves runway into a band with a different bar", () => {

@@ -328,7 +328,7 @@ export const deliverAlerts = async (
         skipped++;
         continue;
       }
-      const described = describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway });
+      const described = describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway, selfFunded: sub.stage === "bootstrapped" });
       const ok = await sendPlanLineEmail(sub, described, adapter, options.baseUrl);
       if (ok) {
         sent++;

@@ -9,6 +9,7 @@ import { parseMoneyInput } from "../../../lib/planCommitment";
 import { netMonthlyBurnUsd, resolveProfileRunway } from "../../../lib/operatorProfile";
 import { OperatorProfileNumberField } from "../operatorProfileFields";
 import { useOperatorProfile } from "../useOperatorProfile";
+import { useOperatorStage } from "../useOperatorStage";
 
 /**
  * "Test it against your runway": the step from this week's guidance to the
@@ -49,6 +50,7 @@ export function CommitmentTest({
   showTitle?: boolean;
 }) {
   const { profile, setProfileField } = useOperatorProfile();
+  const { stage } = useOperatorStage();
   const costId = useId();
   const [costDraft, setCostDraft] = useState("");
   const cost = parseMoneyInput(costDraft) ?? undefined;
@@ -63,8 +65,9 @@ export function CommitmentTest({
         netMonthlyBurnUsd: netMonthlyBurnUsd(profile),
         cashUsd: profile.cashUsd,
         newMonthlyCostUsd: cost,
+        selfFunded: stage === "bootstrapped",
       }),
-    [regime, area, runway, profile, cost],
+    [regime, area, runway, profile, cost, stage],
   );
 
   return (

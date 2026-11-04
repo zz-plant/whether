@@ -23,6 +23,8 @@ type EmailRecipient = {
   planLines?: PlanLines[];
   /** The runway band they chose on the site, which picks the note their brief prints. */
   runwayBand?: RunwayBand;
+  /** The day that band was set: they chose it when they subscribed, and it ages from there. Absent for one that does not age. */
+  runwayBandSetOn?: string;
   /** The subscriber's unsubscribe token, so outgoing mail can carry a one-click link. */
   token?: string;
 };
@@ -119,6 +121,6 @@ export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
     ...(sub.stage ? { stage: sub.stage } : {}),
     ...(sub.planRunway ? { planRunway: sub.planRunway } : {}),
     ...(sub.planLines.length > 0 ? { planLines: sub.planLines } : {}),
-    ...(sub.runwayBand ? { runwayBand: sub.runwayBand } : {}),
+    ...(sub.runwayBand ? { runwayBand: sub.runwayBand, ...(sub.runwayBandFixed ? {} : { runwayBandSetOn: sub.subscribedAt }) } : {}),
   }));
 };

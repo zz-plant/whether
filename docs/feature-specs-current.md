@@ -1341,8 +1341,8 @@ set for cash runway — `critical` (<6 months), `tight` (6–12), `balanced` (12
 count), the `whether-company-runway` cookie, and `whether.operatorProfile.runwayMonths` in the
 browser, kept in step by `app/components/useOperatorRunway.ts`. `scaleAdjustmentToRunway` in
 `boundedDecisionRules.ts` reshapes every stage rule: below twelve months a cash gate leads the
-do-now and pause lines and the reversal becomes a cash milestone (past nine months, or bridge
-financing banked) rather than a macro read; above twenty-four the corridor still binds but a
+do-now and pause lines and the reversal becomes a cash milestone (past six months, the band's own
+boundary, or bridge financing banked; a bootstrapped company's names only the cash) rather than a macro read; above twenty-four the corridor still binds but a
 counter-cyclical move is offered at the same payback bar. The balanced band is the corridor the
 stage rules already assume, so it leaves them untouched — an operator who picks the default sees
 the same brief as one who never picked. The hero carries a second tablist from `sm` up and the
@@ -1350,7 +1350,7 @@ header a second pill on phones (`RunwayPersonaSelector`, `RunwayDropdownPill`; t
 reads the cookie itself, since the header has no page model in reach), and when a band has
 reshaped the rule the hero prints the binding constraint under the calibration row ("Runway is
 the binding constraint this week, not the regime line; the corridor sets tempo again once cash
-clears nine months"). `WeeklyCallContract` carries `runwayBand` and `runwayLabel`, both absent
+clears six months"). `WeeklyCallContract` carries `runwayBand` and `runwayLabel`, both absent
 rather than `undefined` so a stored snapshot round-trips unchanged. `/privacy` §2.5 counts two
 cookies now. `tests/runwayScaledDecisionRules.test.ts` pins the band semantics; the balanced
 no-op is asserted for every stage.
@@ -1592,6 +1592,32 @@ not the guidance (an article anchor, the blank template, the preview-only mockup
 `CopyMeetingSlideButton` showed "Copied the slide" after a failed rich copy whether or not its
 plain-text fallback worked, the 1.1.10 defect in the one control that did not use the shared hook. It
 now claims and reports a copy only after a write resolves.
+
+### 1.1.22a A company's situation, read against what the rules say (2026-11-04)
+
+Six places where the stage and runway settings said something false, each found by running the rules
+on an edge profile.
+
+- **Covering spending is not a cushion.** See the open-ended band above; `/` prints
+  `THINLY_COVERED_NOTE` in place of the runway notes for a company that falls short of it.
+- **A runway band ages.** The `whether-company-runway` cookie holds `band:YYYY-MM-DD`, and
+  `readOperatorRunwayCookie` ages the band: its representative months less the months since, moving
+  only down. The panel says what it assumed (`describeRunwayBandAge`), with one click to confirm or
+  pick again; the crossing and Monday emails print the same sentence. A band earned by covering
+  spending and a cookie from before this date carry no day and do not age, and a subscription carries
+  that (`runwayBandFixed`, `PlanRunway.fixed`) so the emails do not count one down from the day it was
+  sent. A copied stress-test link names its business model either way, so it opens as it was sent. Figures in the browser
+  profile stay as typed, and once the band has aged past them the notes read the band instead.
+- **Bootstrapped has no round to sign.** `scaleAdjustmentToRunway` and
+  `buildRunwayConditionedNotes` (`selfFunded`) say what customers can pay early, and the stress test's
+  business model follows the stage until the reader sets it.
+- **Weeks of cash cannot wait for a raise.** Under three months, on an exact figure, the Fundraising
+  note says a new process is unlikely to close and names what can land. A band reader gets the limit
+  in the sentence, because a band is a range.
+- **The under-six gate lifts at six months**, not nine, because no band held a reader between the two.
+- **Bootstrapped is not a lifecycle stage.** It read as `MATURE`. It reads as `GROWTH`, or as
+  `DISCOVERY` and the planner's seed band when the reader entered revenue of zero, and a lifecycle
+  choice no longer overwrites it. Mature now writes Series B+.
 
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
@@ -4778,7 +4804,10 @@ Slack, Notion, and Linear targets.
     whichever way the runway was given: a typed runway beside revenue that covers spend used to size
     a full plan and date a cash-out month while the same company with its cash entered was told there
     was no runway to plan against. A cash-flow-positive company sits in the open-ended band (24+ mo,
-    `runwayBandForProfileRunway`), and revenue coming to cover spend moves the band cookie there. It
+    `runwayBandForProfileRunway`) when its balance would carry six months of spending and revenue
+    still covers spending 24 months on at the reader's own growth rate, and in the 12–24 band
+    otherwise, which leaves the guidance as written (2026-11-04). Revenue coming to cover spend moves
+    the band cookie to whichever it earns. It
     used to leave the cookie wherever the last burning figure had put it, so cash $600k, then spend
     $200k, then revenue $250k kept `/` saying "With less than 6 months of runway, cash is what limits
     you" and the server scaling the rules to that band, beside "cash is not running down".

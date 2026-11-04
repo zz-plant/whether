@@ -66,6 +66,8 @@ export type Subscriber = {
    * without this it got the generic brief until it happened to set lines.
    */
   runwayBand?: RunwayBand;
+  /** The band does not age from `subscribedAt`: revenue covered spending, so nothing was counting down. */
+  runwayBandFixed?: true;
   /**
    * A hard bounce, a complaint, or an address the owner retired. Suppressed
    * addresses stay on record but are dropped from every send list, so a dead
@@ -119,6 +121,8 @@ type SubscribeOptions = {
   planLines?: PlanLines[];
   /** The reader's runway band, sent with `planLines`; kept only beside a non-empty set of lines. */
   runwayBand?: RunwayBand;
+  /** The band does not age: revenue covers the reader's spending, so nothing counts down. */
+  runwayBandFixed?: boolean;
   /**
    * The company stage the reader set on the site. Kept on the record so the
    * Monday brief can print the rules scaled to it. Set only when the record is
@@ -142,7 +146,7 @@ const planLinesRequestChanges = (existing: Subscriber, planLines: PlanLines[], r
 /** The band to hold beside a request's lines, dated today, or nothing. */
 const pendingRunwayFor = (options: SubscribeOptions | undefined, now: Date): Pick<Subscriber, "pendingPlanRunway"> =>
   options?.planLines && options.planLines.length > 0 && options.runwayBand
-    ? { pendingPlanRunway: { band: options.runwayBand, setOn: now.toISOString() } }
+    ? { pendingPlanRunway: { band: options.runwayBand, setOn: now.toISOString(), ...(options.runwayBandFixed ? { fixed: true } : {}) } }
     : {};
 
 export interface SubscriberStore {
@@ -370,6 +374,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
     ...(isOperatorStage(Reflect.get(raw, "stage")) ? { stage: Reflect.get(raw, "stage") as OperatorStage } : {}),
     ...(isRunwayBand(Reflect.get(raw, "runwayBand")) ? { runwayBand: Reflect.get(raw, "runwayBand") as RunwayBand } : {}),
+    ...(Reflect.get(raw, "runwayBandFixed") === true ? { runwayBandFixed: true } : {}),
     ...(Reflect.get(raw, "suppressed") === true ? { suppressed: true } : {}),
     ...readPlanRunway(raw),
     ...readPendingPlanLines(raw),
@@ -391,6 +396,7 @@ const newSubscriber = (email: string, options: SubscribeOptions | undefined, now
   planLines: [],
   ...(options?.stage ? { stage: options.stage } : {}),
   ...(options?.runwayBand ? { runwayBand: options.runwayBand } : {}),
+  ...(options?.runwayBand && options.runwayBandFixed ? { runwayBandFixed: true } : {}),
   ...(options?.planLines ? { pendingPlanLines: options.planLines, ...pendingRunwayFor(options, now) } : {}),
   ...issueConfirmation(now),
 });

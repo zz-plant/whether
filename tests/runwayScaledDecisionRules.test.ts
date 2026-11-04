@@ -93,12 +93,30 @@ describe("runway-scaled decision rules", () => {
       assert.match(critical.avoidAdjustments[0] ?? "", /follow-on financing/i);
       assert.match(critical.watchAdjustments[0] ?? "", /under six months of runway/i);
       // The reversal is a cash milestone, not a macro read.
-      assert.match(critical.reversalTriggerDiscipline, /past nine months|bridge financing/i);
+      assert.match(critical.reversalTriggerDiscipline, /past six months/i);
       assert.doesNotMatch(critical.reversalTriggerDiscipline, /risk appetite|funding pressure/i);
       // The binding constraint is named, and not with the pause sentence again.
       assert.match(critical.thresholdEmphasis, /what limits you this week/i);
       assert.notEqual(critical.thresholdEmphasis, critical.watchAdjustments[0]);
     }
+  });
+
+  /* It promised the lines back at nine months, but at 6.5 the reader is in the tight band with the hold gone. */
+  it("lifts the under-six gate at the band's own boundary", () => {
+    const critical = adjustmentFor("seed", { runwayBand: "critical" });
+    assert.match(critical.thresholdEmphasis, /once cash clears six months/);
+    assert.doesNotMatch(`${critical.thresholdEmphasis} ${critical.reversalTriggerDiscipline}`, /nine/);
+  });
+
+  it("never asks a bootstrapped company to close a round", () => {
+    for (const runwayBand of ["critical", "tight"] as const) {
+      const adjustment = adjustmentFor("bootstrapped", { runwayBand });
+      const copy = [adjustment.reversalTriggerDiscipline, ...adjustment.doNowAdjustments, adjustment.thresholdEmphasis].join(" ");
+      assert.doesNotMatch(copy, /round is signed|bridge financing|plan to raise/i);
+    }
+    // A funded company keeps them.
+    assert.match(adjustmentFor("seed", { runwayBand: "critical" }).reversalTriggerDiscipline, /bridge financing/);
+    assert.match(adjustmentFor("seed", { runwayBand: "tight" }).reversalTriggerDiscipline, /round is signed/);
   });
 
   it("bands a month figure the same way as an explicit band", () => {

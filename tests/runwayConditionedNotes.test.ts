@@ -24,6 +24,37 @@ describe("runway-conditioned notes", () => {
     assert.match(notes[0].note, /With 5 months of runway/);
   });
 
+  const raiseNote = (input: Parameters<typeof buildRunwayConditionedNotes>[0]) =>
+    buildRunwayConditionedNotes(input).find((note) => note.area === "capital-raising")?.note ?? "";
+
+  it("does not tell a company with weeks of cash that a raise will land in time", () => {
+    const note = raiseNote({ regime: "SCARCITY", runwayMonths: 0.5 });
+    assert.match(note, /a new raise process is unlikely to close in time/);
+    assert.match(note, /a sale or closing in good order/);
+    assert.doesNotMatch(note, /started this quarter/);
+    // From three months a process can still land, and the note says when it can't.
+    assert.match(raiseNote({ regime: "SCARCITY", runwayMonths: 3 }), /started this quarter/);
+    // A band is a range, so it can't say the reader is under three months. It names the limit.
+    const band = raiseNote({ regime: "SCARCITY", runwayMonths: 4, runwayPhrase: "less than 6 months", runwayIsExact: false });
+    assert.match(band, /under about three months one is unlikely to close in time/);
+    // Under three months is about the figure, and a band's representative figure isn't one.
+    const lowBand = raiseNote({ regime: "SCARCITY", runwayMonths: 2, runwayPhrase: "less than 6 months", runwayIsExact: false });
+    assert.match(lowBand, /started this quarter/);
+  });
+
+  it("does not talk to a bootstrapped company about raising", () => {
+    for (const runwayMonths of [0.5, 5, 9, 18, 30]) {
+      const notes = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths, selfFunded: true });
+      for (const { note } of notes) {
+        assert.doesNotMatch(note, /raise process|raise planning|when to raise/i, `${runwayMonths} months: ${note}`);
+      }
+    }
+    assert.match(raiseNote({ regime: "SCARCITY", runwayMonths: 5, selfFunded: true }), /what customers owe or would pay early/);
+    assert.match(raiseNote({ regime: "SCARCITY", runwayMonths: 0.5, selfFunded: true }), /a sale or closing in good order/);
+    assert.match(raiseNote({ regime: "SCARCITY", runwayMonths: 9, selfFunded: true }), /how early customers pay/);
+    assert.equal(raiseNote({ regime: "SCARCITY", runwayMonths: 30, selfFunded: true }), "");
+  });
+
   it("computes the burn-cut extension from the operator's own months, and names the dollars", () => {
     const notes = buildRunwayConditionedNotes({
       regime: "SCARCITY",
@@ -144,6 +175,18 @@ describe("runway-conditioned notes", () => {
 });
 
 describe("buildCommitmentImpact", () => {
+  it("reads a bootstrapped company's note at the runway a commitment leaves it", () => {
+    const impact = buildCommitmentImpact({
+      regime: "SCARCITY",
+      area: "capital-raising",
+      runwayMonths: 13,
+      netMonthlyBurnUsd: 100_000,
+      newMonthlyCostUsd: 150_000,
+      selfFunded: true,
+    });
+    assert.match(impact?.noteAfter ?? "", /revenue as your funding/);
+  });
+
   it("holds cash constant: runway after is runway times net burn over net burn plus cost", () => {
     const impact = buildCommitmentImpact({
       regime: "SCARCITY", area: "hiring", runwayMonths: 13, netMonthlyBurnUsd: 250_000, newMonthlyCostUsd: 40_000,

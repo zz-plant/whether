@@ -142,7 +142,8 @@ export default function PrivacyPage() {
             <p className={paragraph}>
               Picking a company stage writes a cookie so the panels on a page agree with each other
               and the guidance is calibrated the same way everywhere. Picking a cash runway band writes a
-              second one for the same reason. Each holds only the band you picked, never a cash figure.
+              second one for the same reason, with the day you picked it, so the guidance can allow for the
+              months since. Each holds only the choice you made, never a cash figure.
               Picking a decision under &ldquo;What are you deciding?&rdquo; writes a third, holding only
               that area&rsquo;s name, so your next visit opens on the same answer. Each is read only by
               this site and set by no other action.

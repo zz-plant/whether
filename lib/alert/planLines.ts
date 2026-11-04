@@ -8,7 +8,7 @@ import {
   type DecisionArea,
   type RuleCondition,
 } from "../report/boundedDecisionRules";
-import { isRunwayBand, runwayBandPhrase, runwayBandSublabel, type RunwayBand } from "../report/operatorRunway";
+import { ageRunwayBand, describeRunwayBandAge, isRunwayBand, runwayBandPhrase, runwayBandSublabel, type RunwayBand } from "../report/operatorRunway";
 import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../report/runwayConditionedNotes";
 import { isRegimeKey } from "../regimePresentation";
 import { formatDateUTC } from "../formatters";
@@ -161,7 +161,15 @@ export const describePlanLines = (lines: readonly PlanLines[]) =>
  * The runway band a reader had set when they confirmed their lines, and the day.
  * The band only, never a figure: the figures stay in the browser that typed them.
  */
-export type PlanRunway = { band: RunwayBand; setOn: string };
+export type PlanRunway = {
+  band: RunwayBand;
+  setOn: string;
+  /** The band does not age: revenue covered spending when it was set, so nothing was counting down. */
+  fixed?: true;
+};
+
+/** The day a plan's band ages from, or nothing for one that does not. */
+export const planRunwayAgesFrom = (runway: PlanRunway): string | undefined => (runway.fixed ? undefined : runway.setOn);
 
 /** A stored band, read field by field: an unknown band or an unreadable date is no band. */
 export const parsePlanRunway = (value: unknown): PlanRunway | null => {
@@ -169,7 +177,7 @@ export const parsePlanRunway = (value: unknown): PlanRunway | null => {
   const band: unknown = Reflect.get(value, "band");
   const setOn: unknown = Reflect.get(value, "setOn");
   if (!isRunwayBand(band) || typeof setOn !== "string" || !Number.isFinite(Date.parse(setOn))) return null;
-  return { band, setOn };
+  return { band, setOn, ...(Reflect.get(value, "fixed") === true ? { fixed: true } : {}) };
 };
 
 /**
@@ -182,17 +190,24 @@ export const parsePlanRunway = (value: unknown): PlanRunway | null => {
  * about a crossing is not. So the email adds the note this guidance already
  * carries for that area at the reader's runway band (`buildRunwayConditionedNotes`),
  * or the band's own one-line stance where the band has no note for the area,
- * and dates the band, because runway falls every month after it was set.
+ * and dates the band, because runway falls every month after it was set. It ages
+ * the band too (`ageRunwayBand`): the date alone left a reader who set 12–24
+ * months a year ago told what a crossing means at 12–24 months.
  */
-const describeCrossingAtRunway = (area: DecisionArea, regime: string, runway: PlanRunway): string => {
+const describeCrossingAtRunway = (area: DecisionArea, regime: string, runway: PlanRunway, now: Date, selfFunded: boolean): string => {
   const setOn = formatDateUTC(runway.setOn);
-  const forNotes = resolveRunwayForNotes({ band: runway.band });
+  const band = ageRunwayBand(runway.band, planRunwayAgesFrom(runway), now);
+  const forNotes = resolveRunwayForNotes({ band });
   const note = forNotes && isRegimeKey(regime)
-    ? buildRunwayConditionedNotes({ regime, ...forNotes }).find((entry) => entry.area === area)?.note
+    ? buildRunwayConditionedNotes({ regime, ...forNotes, selfFunded }).find((entry) => entry.area === area)?.note
     : undefined;
+  if (band !== runway.band) {
+    const age = describeRunwayBandAge({ chosen: runway.band, setOn: runway.setOn, band });
+    return note ? `${note} (${age})` : `${age} ${runwayBandSublabel(band)}.`;
+  }
   return note
     ? `${note} (Your runway band, set on ${setOn}.)`
-    : `With ${runwayBandPhrase(runway.band)} of runway, the band you set on ${setOn}: ${runwayBandSublabel(runway.band).toLowerCase()}.`;
+    : `With ${runwayBandPhrase(band)} of runway, the band you set on ${setOn}: ${runwayBandSublabel(band).toLowerCase()}.`;
 };
 
 /**
@@ -202,12 +217,12 @@ const describeCrossingAtRunway = (area: DecisionArea, regime: string, runway: Pl
 export const describePlanLineCrossing = (
   crossing: PlanLineCrossing,
   scores: Scores,
-  context?: { regime: string; runway?: PlanRunway },
+  context?: { regime: string; runway?: PlanRunway; now?: Date; selfFunded?: boolean },
 ) => {
   const area = decisionAreaLabel(crossing.area);
   const clause = formatPlanLineClause(crossing.line, crossing.side);
   const today = `Funding pressure is ${Math.round(scores.tightness)} and risk appetite ${Math.round(scores.riskAppetite)} today.`;
-  const atRunway = context?.runway ? ` ${describeCrossingAtRunway(crossing.area, context.regime, context.runway)}` : "";
+  const atRunway = context?.runway ? ` ${describeCrossingAtRunway(crossing.area, context.regime, context.runway, context.now ?? new Date(), context.selfFunded ?? false)}` : "";
   return crossing.side === "pause"
     ? {
       headline: `${area}: pause now, by your rule`,

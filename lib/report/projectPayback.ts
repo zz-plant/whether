@@ -192,7 +192,7 @@ const verdictClause = (verdict: SizedProjectPayback["verdict"], bar: PaybackBar,
   if (bar.kind !== "months") return "";
   if (verdict === "clears") return `inside the ${bar.months}-month bar`;
   if (bar.basis === "tight-runway") {
-    return `past the ${bar.months}-month bar your runway sets, which lifts once runway clears 12 months or a round is signed`;
+    return `past the ${bar.months}-month bar your runway sets, which lifts once runway clears 12 months or new money is in the bank`;
   }
   return `past the ${bar.months}-month bar, so the roadmap rule slows it until conditions turn ${getRegimePublicLabel("EXPANSION")}`;
 };

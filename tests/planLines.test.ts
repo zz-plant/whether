@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import {
   describePlanLineCrossing,
+  parsePlanRunway,
   evaluatePlanLineCrossings,
   parsePlanLines,
   type PlanLines,
@@ -86,6 +87,7 @@ describe("a crossing at the reader's own runway", () => {
     const { body } = describePlanLineCrossing(crossing, today, {
       regime: "DEFENSIVE",
       runway: { band: "critical", setOn: "2026-10-01T12:00:00.000Z" },
+      now: new Date("2026-10-15T12:00:00.000Z"),
     });
     assert.match(body, /With less than 6 months of runway, the hiring pause is what protects the runway/);
     assert.match(body, /\(Your runway band, set on Oct 1, 2026\.\)$/);
@@ -95,8 +97,31 @@ describe("a crossing at the reader's own runway", () => {
     const { body } = describePlanLineCrossing(crossing, today, {
       regime: "DEFENSIVE",
       runway: { band: "balanced", setOn: "2026-10-01T12:00:00.000Z" },
+      now: new Date("2026-10-15T12:00:00.000Z"),
     });
     assert.match(body, /With 12–24 months of runway, the band you set on Oct 1, 2026: follow the guidance\.$/);
+  });
+
+  it("does not age a band that revenue covering spending earned", () => {
+    const runway = parsePlanRunway({ band: "balanced", setOn: "2026-01-01T12:00:00.000Z", fixed: true });
+    assert.ok(runway);
+    const { body } = describePlanLineCrossing(crossing, today, {
+      regime: "DEFENSIVE",
+      runway,
+      now: new Date("2026-12-01T12:00:00.000Z"),
+    });
+    assert.doesNotMatch(body, /now assumes/);
+    assert.match(body, /With 12–24 months of runway/);
+  });
+
+  it("ages the band, and says so", () => {
+    const { body } = describePlanLineCrossing(crossing, today, {
+      regime: "DEFENSIVE",
+      runway: { band: "balanced", setOn: "2026-01-01T12:00:00.000Z" },
+      now: new Date("2026-09-01T12:00:00.000Z"),
+    });
+    assert.match(body, /With 6–12 months of runway, each net-new role/);
+    assert.match(body, /\(You set 12–24 months of runway on Jan 1, 2026, so this now assumes 6–12 months\.\)$/);
   });
 
   it("says nothing about runway to a reader who set none", () => {

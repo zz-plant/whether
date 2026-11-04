@@ -23,6 +23,8 @@ type SubscribeOptions = {
   planLines?: PlanLines[];
   /** The reader's runway band, sent with `planLines` so a crossing email can say what it means at it. */
   runwayBand?: RunwayBand;
+  /** The band does not age: nothing is counting down, so the emails read it as sent. */
+  runwayBandFixed?: boolean;
   /** The company stage they set on the site, so their Monday brief prints the scaled rules. */
   stage?: OperatorStage;
 };

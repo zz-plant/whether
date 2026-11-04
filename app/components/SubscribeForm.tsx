@@ -60,7 +60,7 @@ export function SubscribeForm({
   const { stage } = useOperatorStage();
   /* The runway band the reader already chose for the on-site notes; their brief
      prints the same one, so the signup carries it rather than asking again. */
-  const { runwayBand } = useOperatorRunway();
+  const { runwayBand, runwayBandFixed } = useOperatorRunway();
   const [channel, setChannel] = useState<SubscribeChannel>("email");
   /* The reader's own choice wins; until they make one, a link to Monday delivery
      (`HOME_MONDAY_EMAIL_HASH`) starts the form there. The hash reads "" through hydration. */
@@ -88,7 +88,7 @@ export function SubscribeForm({
         trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
       }
     } else {
-      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly", ...(stage ? { stage } : {}), ...(runwayBand ? { runwayBand } : {}) });
+      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly", ...(stage ? { stage } : {}), ...(runwayBand ? { runwayBand, runwayBandFixed } : {}) });
       setStatus(result.ok ? "success" : "error");
       setMessage(result.message);
       if (result.ok) {

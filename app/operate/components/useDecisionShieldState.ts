@@ -7,6 +7,7 @@ import {
   companyFinancialProfileFor,
   compareDecisionPlans,
   evaluateDecision,
+  isBusinessModel,
   stressTestDecisionPlan,
   type DecisionAction,
   type DecisionCategory,
@@ -16,7 +17,7 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { DecisionMemoryPayload } from "../../../lib/decisionMemory";
 import {
   lifecycleStageForOperatorStage,
-  operatorStageForLifecycleStage,
+  operatorStageForLifecycleChoice,
 } from "../../../lib/report/operatorStage";
 import { useOperatorProfile } from "../../components/useOperatorProfile";
 import { useOperatorStage } from "../../components/useOperatorStage";
@@ -103,29 +104,42 @@ export const useDecisionShieldState = ({
   );
   const [planText, setPlanText] = useState(() => searchParams.get("plan") ?? "");
   const [planBText, setPlanBText] = useState(() => searchParams.get("planB") ?? "");
-  const [businessModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED">(() =>
-    searchParams.get("model") === "BOOTSTRAPPED" ? "BOOTSTRAPPED" : "VC_BACKED",
-  );
+  const [chosenModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED" | null>(() => {
+    const model = searchParams.get("model");
+    return model && isBusinessModel(model) ? model : null;
+  });
   const { profile, setProfileField } = useOperatorProfile();
   const { stage, setStage } = useOperatorStage();
+  /* A bootstrapped company's plan is graded on revenue, not on a raise, until the
+     reader says otherwise. This defaulted to VC-backed whatever the stage, and
+     warned a bootstrapped company about investors, until 2026-11-04. */
+  const businessModel = chosenModel ?? (stage === "bootstrapped" ? "BOOTSTRAPPED" : "VC_BACKED");
   const initialUrlLifecycle = useRef(searchParams.get("lifecycle"));
+
+  /* A chosen lifecycle writes a stage, and the stage must not write a different
+     lifecycle back: Scale and Mature both write Series B+, and Mature would flip
+     to Scale in the reader's hand. */
+  const chosenLifecycle = useRef<LifecycleStage | null>(null);
 
   useEffect(() => {
     if (!stage || initialUrlLifecycle.current !== null) return;
-    setField("lifecycle", lifecycleStageForOperatorStage[stage]);
-  }, [setField, stage]);
+    if (chosenLifecycle.current && operatorStageForLifecycleChoice(chosenLifecycle.current, stage) === stage) return;
+    setField("lifecycle", lifecycleStageForOperatorStage(stage, profile.monthlyRevenueUsd));
+  }, [profile.monthlyRevenueUsd, setField, stage]);
 
   const selectLifecycle = useCallback((value: LifecycleStage) => {
+    chosenLifecycle.current = value;
     setField("lifecycle", value);
-    setStage(operatorStageForLifecycleStage[value]);
-  }, [setField, setStage]);
+    setStage(operatorStageForLifecycleChoice(value, stage));
+  }, [setField, setStage, stage]);
 
   const applyPresetSelection = useCallback((preset: CurrentSelection) => {
+    chosenLifecycle.current = preset.lifecycle;
     setField("lifecycle", preset.lifecycle);
     setField("category", preset.category);
     setField("action", preset.action);
-    setStage(operatorStageForLifecycleStage[preset.lifecycle]);
-  }, [setField, setStage]);
+    setStage(operatorStageForLifecycleChoice(preset.lifecycle, stage));
+  }, [setField, setStage, stage]);
 
   /* The stress test sizes a plan against cash: the balance itself when one was
      entered, else net burn × runway (`companyFinancialProfileFor`). */
@@ -298,7 +312,9 @@ export const useDecisionShieldState = ({
     };
     setOrDelete("plan", planMode === "dropdown" ? null : planText.trim() || null);
     setOrDelete("planB", planMode === "compare" ? planBText.trim() || null : null);
-    setOrDelete("model", businessModel === "BOOTSTRAPPED" ? "BOOTSTRAPPED" : null);
+    /* Both values travel: left out, a VC-backed plan would open as bootstrapped
+       for a reader whose own stage is, and grade differently from what was sent. */
+    params.set("model", businessModel);
 
     const link = `${window.location.origin}${pathname}?${params.toString()}#ops-decision-shield`;
     setLastAttemptedTarget("link");

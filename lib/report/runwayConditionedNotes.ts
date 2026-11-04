@@ -40,6 +40,8 @@ type RunwayConditionedNoteInput = {
   runwayIsExact?: boolean;
   /** Spend less revenue (`netMonthlyBurnUsd`): what the runway is counted against. */
   netMonthlyBurnUsd?: number;
+  /** A bootstrapped company: revenue is its funding, so a note about raising says nothing to it. */
+  selfFunded?: boolean;
 };
 
 type RunwayConditionedNote = {
@@ -59,6 +61,13 @@ const bandCeiling = (band: RunwayBand) => RUNWAY_BAND_OPTIONS.find((option) => o
 const CRITICAL_RUNWAY_MONTHS = bandCeiling("critical");
 const TIGHT_RUNWAY_MONTHS = bandCeiling("tight");
 const LONG_RUNWAY_MONTHS = bandCeiling("balanced");
+/**
+ * Under this a new raise is unlikely to close in time. Diligence alone runs 12
+ * weeks or more in Cloudy or Freezing conditions (`decisionAreaCorporateTransmission`),
+ * and the note told someone with two weeks of cash that "a raise process started
+ * this quarter is what lands cash before runway ends" until 2026-11-04.
+ */
+const RAISE_PROCESS_MONTHS = 3;
 
 /*
  * Past ten years a runway is no planning horizon, and a month count there reads
@@ -101,12 +110,39 @@ export const resolveRunwayForNotes = ({
 const monthsBoughtByTenPercentCut = (runwayMonths: number) =>
   (runwayMonths / 9).toFixed(1);
 
+const criticalCashNote = ({
+  runway,
+  isExpansion,
+  selfFunded,
+  tooLateToRaise,
+}: {
+  runway: string;
+  isExpansion: boolean;
+  selfFunded: boolean;
+  tooLateToRaise: boolean;
+}): string => {
+  if (selfFunded) {
+    return tooLateToRaise
+      ? `With ${runway} of runway and revenue as your funding, what can land in time is what customers owe or would pay early. If that falls short, the decision is a sale or closing in good order.`
+      : `With ${runway} of runway and revenue as your funding, the cash that can land first is what customers owe or would pay early.`;
+  }
+  if (tooLateToRaise) {
+    return `With ${runway} of runway, a new raise process is unlikely to close in time. What can land in time is money from those who already know the company. If that falls short, the decision is a sale or closing in good order.`;
+  }
+  return `With ${runway} of runway, a raise process started this quarter is what lands cash before runway ends, and under about three months one is unlikely to close in time. Waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`;
+};
+
+/** What the panel says for a company revenue covers but the figures do not cushion: it has no runway to translate. */
+export const THINLY_COVERED_NOTE =
+  "Revenue covers your spending, but cash in the bank is thin or revenue is falling, so the guidance applies as written.";
+
 export const buildRunwayConditionedNotes = ({
   regime,
   runwayMonths,
   runwayPhrase,
   runwayIsExact = true,
   netMonthlyBurnUsd,
+  selfFunded = false,
 }: RunwayConditionedNoteInput): RunwayConditionedNote[] => {
   if (typeof runwayMonths !== "number" || !Number.isFinite(runwayMonths) || runwayMonths <= 0) {
     return [];
@@ -129,7 +165,7 @@ export const buildRunwayConditionedNotes = ({
       },
       {
         area: "capital-raising",
-        note: `With ${runway} of runway, a raise process started this quarter is what lands cash before runway ends. Waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
+        note: criticalCashNote({ runway, isExpansion, selfFunded, tooLateToRaise: runwayIsExact && runwayMonths < RAISE_PROCESS_MONTHS }),
       },
       {
         area: "hiring",
@@ -143,7 +179,9 @@ export const buildRunwayConditionedNotes = ({
     const notes: RunwayConditionedNote[] = [
       {
         area: "capital-raising",
-        note: `With ${runway} of runway, raise planning has the least slack: if you plan to raise, the process has to finish inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
+        note: selfFunded
+          ? `With ${runway} of runway and revenue as your funding, the slack comes from how early customers pay, not from a raise.`
+          : `With ${runway} of runway, raise planning has the least slack: if you plan to raise, the process has to finish inside the runway you have${isExpansion ? ", and a favorable window widens it" : ""}.`,
       },
       {
         area: "hiring",
@@ -181,7 +219,7 @@ export const buildRunwayConditionedNotes = ({
       note: `With ${runway} of runway, runway is not what limits you this week. The pauses are.`,
     },
   ];
-  if (isTightening) {
+  if (isTightening && !selfFunded) {
     notes.push({
       area: "capital-raising",
       note: "The exception: with money this expensive, the question is when to raise, not whether. Long runway lets you choose.",
@@ -233,6 +271,7 @@ export const buildCommitmentImpact = ({
   netMonthlyBurnUsd,
   cashUsd,
   newMonthlyCostUsd,
+  selfFunded,
 }: {
   regime: RegimeKey;
   area: DecisionArea;
@@ -241,6 +280,7 @@ export const buildCommitmentImpact = ({
   /** Read only when revenue covers spending, where runway cannot carry the balance. */
   cashUsd?: number;
   newMonthlyCostUsd?: number;
+  selfFunded?: boolean;
 }): CommitmentImpact | null => {
   if (!valid(newMonthlyCostUsd)) return null;
   const cost = formatCommitmentUsd(newMonthlyCostUsd);
@@ -269,7 +309,7 @@ export const buildCommitmentImpact = ({
         `Revenue covers spending today. At ${cost} more a month you would burn ${formatCommitmentUsd(netBurnAfter)} a month, ` +
         `and ${formatCommitmentUsd(cashUsd)} of cash lasts ${runwayAfter > DECADE_MONTHS ? BEYOND_A_DECADE : `about ${runwayAfter} months`}.`,
       noteAfter:
-        buildRunwayConditionedNotes({ regime, runwayMonths: runwayAfter, runwayPhrase: runwayInWords(runwayAfter), netMonthlyBurnUsd: netBurnAfter })
+        buildRunwayConditionedNotes({ selfFunded, regime, runwayMonths: runwayAfter, runwayPhrase: runwayInWords(runwayAfter), netMonthlyBurnUsd: netBurnAfter })
           .find((note) => note.area === area)?.note ?? null,
     };
   }
@@ -296,6 +336,7 @@ export const buildCommitmentImpact = ({
 
   const noteAfter =
     buildRunwayConditionedNotes({
+    selfFunded,
       regime,
       runwayMonths: runwayAfter,
       runwayPhrase: runwayInWords(runwayAfter),

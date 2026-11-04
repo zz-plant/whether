@@ -814,6 +814,15 @@ export const buildScopedVariantDecisionAdjustment = ({
  * the condition that pauses it, and the reversal names the milestone that
  * lifts it — a cash figure, not a macro read, because cash is what put the
  * gate there.
+ *
+ * The under-six gate lifts at six months, the band's own boundary, where the
+ * tight band's payback gate takes over. It said nine until 2026-11-04, but no
+ * band holds a reader to that: at 6.5 months they were already in the tight band
+ * with the hold gone, whatever this sentence had promised.
+ *
+ * A bootstrapped company has no round to sign. It was told the gate lifts when
+ * "the round is signed" or "bridge financing is banked", in the same list as
+ * "Don't start anything that needs outside money to finish", until 2026-11-04.
  */
 const scaleAdjustmentToRunway = (
   base: ScopedVariantDecisionAdjustment,
@@ -823,6 +832,7 @@ const scaleAdjustmentToRunway = (
     return base;
   }
   const runwayLabel = `${runwayBandLabel(band)} runway`;
+  const selfFunded = base.mode === "bootstrapped";
 
   if (band === "critical") {
     return {
@@ -843,8 +853,10 @@ const scaleAdjustmentToRunway = (
         "Cash gate: under six months of runway, hold every new commitment whatever this week's guidance says.",
         ...base.watchAdjustments,
       ],
-      thresholdEmphasis: "Runway is what limits you this week, not the guidance. The pause and restart lines apply again once cash clears nine months.",
-      reversalTriggerDiscipline: "Reverse the freeze only after runway extends past nine months or bridge financing is banked.",
+      thresholdEmphasis: "Runway is what limits you this week, not the guidance. The pause and restart lines apply again once cash clears six months.",
+      reversalTriggerDiscipline: selfFunded
+        ? "Reverse the freeze only after runway extends past six months on cash the business has collected."
+        : "Reverse the freeze only after runway extends past six months or bridge financing is banked.",
     };
   }
 
@@ -855,7 +867,9 @@ const scaleAdjustmentToRunway = (
       runwayLabel,
       doNowAdjustments: [
         `Require a cash payback case inside ${TIGHT_RUNWAY_PAYBACK_BAR_MONTHS} months on every new hire and growth campaign.`,
-        "If you plan to raise, start planning now; a year of cash leaves room for one process, not two.",
+        selfFunded
+          ? "Line up what customers can pay early, through annual-upfront terms and earlier invoicing, before you need it."
+          : "If you plan to raise, start planning now; a year of cash leaves room for one process, not two.",
         ...base.doNowAdjustments,
       ],
       watchAdjustments: [
@@ -863,7 +877,9 @@ const scaleAdjustmentToRunway = (
         ...base.watchAdjustments,
       ],
       thresholdEmphasis: `Tight runway: every stage rule below now needs a payback inside ${TIGHT_RUNWAY_PAYBACK_BAR_MONTHS} months first. ${base.thresholdEmphasis}`,
-      reversalTriggerDiscipline: "Lift the payback gate once runway clears twelve months or the round is signed; until then the stage rule's own resume condition still applies.",
+      reversalTriggerDiscipline: selfFunded
+        ? "Lift the payback gate once runway clears twelve months; until then the stage rule's own resume condition still applies."
+        : "Lift the payback gate once runway clears twelve months or the round is signed; until then the stage rule's own resume condition still applies.",
     };
   }
 

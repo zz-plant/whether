@@ -37,11 +37,12 @@ export async function POST(request: Request) {
     // gets the cash-first note) and, with plan lines, says what a crossing means
     // at it. One of four bands or nothing: never a figure.
     const runwayBand = isRunwayBand(body.runwayBand) ? body.runwayBand : undefined;
+    const runwayBandFixed = runwayBand !== undefined && body.runwayBandFixed === true;
     // The company stage the reader set on the site, so the Monday brief prints the
     // rules scaled to it. A band, never a figure.
     const stage = isOperatorStage(body.stage) ? body.stage : undefined;
 
-    await subscribeAndSendVerification({ email, alerts, weekly, planLines, runwayBand, stage, request });
+    await subscribeAndSendVerification({ email, alerts, weekly, planLines, runwayBand, runwayBandFixed, stage, request });
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {

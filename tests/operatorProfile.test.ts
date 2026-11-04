@@ -104,7 +104,7 @@ describe("operator profile: runway from cash, burn net of revenue", () => {
 
   it("counts no runway when revenue covers spending", () => {
     const profile = { version: 1 as const, cashUsd: 300_000, monthlyBurnUsd: 80_000, monthlyRevenueUsd: 80_000 };
-    assert.deepEqual(resolveProfileRunway(profile), { basis: "cash-flow-positive", cashUsd: 300_000, surplusUsd: 0 });
+    assert.deepEqual(resolveProfileRunway(profile), { basis: "cash-flow-positive", cashUsd: 300_000, surplusUsd: 0, cushionMonths: 3.75 });
     assert.equal(resolveProfileRunwayMonths(profile), undefined);
   });
 
@@ -112,7 +112,7 @@ describe("operator profile: runway from cash, burn net of revenue", () => {
     // Typed 14 months used to size a full plan here, while the same company with its cash entered was told
     // there was no runway to plan against.
     const typed = { version: 1 as const, runwayMonths: 14, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 };
-    assert.deepEqual(resolveProfileRunway(typed), { basis: "cash-flow-positive", surplusUsd: 20_000 });
+    assert.deepEqual(resolveProfileRunway(typed), { basis: "cash-flow-positive", surplusUsd: 20_000, cushionMonths: 14 });
     assert.equal(resolveProfileRunwayMonths(typed), undefined);
     // Spend and revenue alone say nothing about cash yet, and are no runway either way.
     assert.equal(resolveProfileRunway({ version: 1, monthlyBurnUsd: 100_000, monthlyRevenueUsd: 120_000 }), null);
