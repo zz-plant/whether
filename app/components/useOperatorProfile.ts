@@ -3,6 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { useLocalStorageState } from "../../lib/hooks/useLocalStorageState";
 import {
+  applyCompanyFiling,
   EMPTY_OPERATOR_PROFILE,
   OPERATOR_PROFILE_STORAGE_KEY,
   parseOperatorProfile,
@@ -10,7 +11,7 @@ import {
   setOperatorProfileField,
   type OperatorProfile,
 } from "../../lib/operatorProfile";
-import { runwayBandForProfileEdit, type RunwayBand } from "../../lib/report/operatorRunway";
+import { runwayBandForProfileEdit, runwayBandForProfileRunway, type RunwayBand } from "../../lib/report/operatorRunway";
 import { syncRunwayBandToFigures } from "./useOperatorRunway";
 
 /**
@@ -48,5 +49,21 @@ export const useOperatorProfile = () => {
     [setStored],
   );
 
-  return { profile, setProfileField };
+  /** Every filed figure at once: set one at a time, the band would pass through each half-filled state. */
+  const setProfileFromFiling = useCallback(
+    (filing: Parameters<typeof applyCompanyFiling>[1]) => {
+      const sync: { band: RunwayBand | null; ages: boolean } = { band: null, ages: true };
+      setStored((previous) => {
+        const next = applyCompanyFiling(previous, filing);
+        const runway = resolveProfileRunway(next);
+        sync.band = runwayBandForProfileRunway(runway);
+        sync.ages = runway?.basis !== "cash-flow-positive";
+        return next;
+      });
+      syncRunwayBandToFigures(sync.band, { ages: sync.ages });
+    },
+    [setStored],
+  );
+
+  return { profile, setProfileField, setProfileFromFiling };
 };

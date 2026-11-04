@@ -281,6 +281,10 @@ export default function ApiDocsPage() {
               Weekly and monthly summaries side by side, with an alignment status naming any
               constraints where the two cadences disagree.
             </Endpoint>
+            <Endpoint signature="GET /api/company-filing?ticker=DOCU">
+              One US-listed company&apos;s latest figures as filed with the SEC: cash, debt, trailing revenue and
+              operating cash flow, and the period they cover. Filed numbers only, with no reading of them.
+            </Endpoint>
             <Endpoint
               signature="GET /api/comps"
               tryHref="/api/comps"
@@ -391,7 +395,7 @@ export default function ApiDocsPage() {
               <code className="font-mono">critical</code>, <code className="font-mono">tight</code>,{" "}
               <code className="font-mono">balanced</code> or <code className="font-mono">abundant</code>; or a
               number of months) calibrate the guidance to one company, and{" "}
-              <code className="font-mono">ticker</code> names it.
+              <code className="font-mono">ticker</code> adds a label and changes nothing else.
             </Endpoint>
             <Endpoint
               signature="GET /brief.md"
@@ -440,8 +444,8 @@ export default function ApiDocsPage() {
             <p className="text-fluid-sm font-semibold text-slate-100">Embeddable widget</p>
             <p className="text-xs text-slate-300">
               Drop the current guidance into an internal dashboard or wiki. It updates itself each week.
-              Add <span className="font-mono text-slate-100">data-whether-ticker</span> or{" "}
-              <span className="font-mono text-slate-100">data-whether-stage</span> to tailor it to one company.
+              Add <span className="font-mono text-slate-100">data-whether-stage</span> to tailor it to a company stage, or{" "}
+              <span className="font-mono text-slate-100">data-whether-ticker</span> to tag it with a label.
             </p>
             <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               {embedSnippet}

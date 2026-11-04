@@ -1619,6 +1619,25 @@ on an edge profile.
   `DISCOVERY` and the planner's seed band when the reader entered revenue of zero, and a lifecycle
   choice no longer overwrites it. Mature now writes Series B+.
 
+### 1.1.22b A ticker fills a public company's figures (2026-11-04)
+
+`?ticker=` on the embed and image routes is a tag and changes no word of the guidance, and the embed
+says "Tagged GOOGL" rather than "for GOOGL". The presets naming large companies are gone.
+
+The runway planner's "Fill from filing" asks `GET /api/company-filing?ticker=` (rate limited, not on
+the read path), which answers with filed numbers and no reading of them (`fetchSecCompanyFiling`).
+`applyCompanyFiling` writes them over cash, spend, revenue and growth, so every surface reads them as
+typed figures, and the stage becomes Series B+. Operating cash flow is a trailing year built from
+year-to-date filings; spend is revenue less that, so net burn is the filing's own.
+
+- The filing is named beside the figures (`describeProfileFiling`) until the reader edits one.
+- Debt is not subtracted from cash. A company owing more than it holds cannot reach the 24+ band.
+- It refuses, saying why: an unlisted ticker, an international filer, a bank or insurer, no filing in
+  200 days, or no full year of cash flow and revenue.
+- The company's name and anything worked out from its figures reach neither the embed, the image nor
+  the share formats, where anyone could print a runway beside a company they do not run. There is no
+  agent tool for it, for the same reason.
+
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
 The runway unification itself landed on `main` separately (7f264a26, recorded in docs/agents/lessons/dead-features-and-honesty.md, "One

@@ -20,6 +20,7 @@
 import {
   isPlannerSector,
   MAX_PAYBACK_PROJECTS,
+  FILED_FIGURES,
   OPERATOR_PROFILE_LIMITS,
   PAYBACK_PROJECT_NUMBER_KEYS,
   parsePaybackProjects,
@@ -198,7 +199,14 @@ export const resolveSharedRunwayProfile = (
 ): OperatorProfile => {
   const linkSetsRunway = shared.cashUsd !== undefined || shared.runwayMonths !== undefined;
   const base: OperatorProfile = linkSetsRunway ? { ...stored, cashUsd: undefined, runwayMonths: undefined } : stored;
-  return { ...base, ...shared };
+  const merged: OperatorProfile = { ...base, ...shared };
+  /* A filing vouches for the figures it filled and no others: a link's figures would otherwise
+     read as that company's, with its debt warning beside them. The reader's own link, written
+     when the filing filled the plan, carries the same figures and keeps the name. */
+  const stillFiled = [...FILED_FIGURES].every((figure) => merged[figure] === stored[figure]);
+  if (stillFiled) return merged;
+  const { filing: _filing, ...withoutFiling } = merged;
+  return withoutFiling;
 };
 
 /**

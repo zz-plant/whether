@@ -1,0 +1,242 @@
+import assert from "node:assert/strict";
+import { afterEach, beforeEach, describe, it } from "bun:test";
+import { GET } from "../app/api/company-filing/route";
+import { deriveSecCompanyFigures, fetchSecCompanyFiling } from "../lib/marketData/secEdgar";
+import { applyCompanyFiling, parseOperatorProfile, resolveProfileRunway, setOperatorProfileField } from "../lib/operatorProfile";
+import { companyFilingLookupSchema, describeProfileFiling } from "../lib/report/companyFiling";
+import { runwayBandForProfileRunway } from "../lib/report/operatorRunway";
+import { companyFactsFixture } from "./fixtures/marketData";
+
+const NOW = new Date("2026-10-09T12:00:00.000Z");
+const PERIOD_END = "2026-06-30";
+
+type Row = { start: string; end: string; val: number; filed: string };
+
+/* Year to date, as filings report it: last year's full year, then this year's first half and last year's. */
+const CASH_FLOW_ROWS: Row[] = [
+  { start: "2025-01-01", end: "2025-12-31", val: -120e6, filed: "2026-02-20" },
+  { start: "2026-01-01", end: "2026-03-31", val: -20e6, filed: "2026-05-01" },
+  { start: "2026-01-01", end: PERIOD_END, val: -48e6, filed: "2026-08-01" },
+  { start: "2025-01-01", end: "2025-06-30", val: -60e6, filed: "2026-08-01" },
+];
+
+const facts = ({
+  cashFlow = CASH_FLOW_ROWS,
+  extra = {},
+  ...options
+}: { cashFlow?: Row[]; extra?: Record<string, unknown> } & Partial<Parameters<typeof companyFactsFixture>[0]> = {}) => {
+  const fixture = companyFactsFixture({ latestQuarterEnd: PERIOD_END, ...options });
+  return {
+    ...fixture,
+    facts: {
+      ...fixture.facts,
+      "us-gaap": {
+        ...fixture.facts["us-gaap"],
+        NetCashProvidedByUsedInOperatingActivities: { units: { USD: cashFlow } },
+        ...extra,
+      },
+    },
+  };
+};
+
+const refusalOf = (input: unknown, now = NOW) => {
+  const result = deriveSecCompanyFigures(input, now);
+  return result.status === "refused" ? result.refusal : result.status;
+};
+
+describe("a company's figures from its filings", () => {
+  it("builds a trailing year out of year-to-date cash flow", () => {
+    const result = deriveSecCompanyFigures(facts(), NOW);
+    assert.equal(result.status, "ok");
+    if (result.status !== "ok") return;
+    // -120 for last year, -48 this half, less last year's -60 half.
+    assert.equal(result.value.operatingCashFlowTtmUsd, -108e6);
+    assert.equal(result.value.periodEnd, PERIOD_END);
+    assert.equal(result.value.cashUsd, 150e6);
+    assert.equal(result.value.debtUsd, 50e6);
+    assert.equal(result.value.revenueTtmUsd, 410e6);
+  });
+
+  it("reads a full year as it stands", () => {
+    const cashFlow = [{ start: "2025-07-01", end: PERIOD_END, val: -90e6, filed: "2026-08-20" }];
+    const result = deriveSecCompanyFigures(facts({ cashFlow }), NOW);
+    assert.equal(result.status === "ok" && result.value.operatingCashFlowTtmUsd, -90e6);
+  });
+
+  it("works out a company with no revenue on file from its burn", () => {
+    const withoutRevenue = (input: ReturnType<typeof facts>) => ({
+      ...input,
+      facts: {
+        ...input.facts,
+        "us-gaap": Object.fromEntries(Object.entries(input.facts["us-gaap"]).filter(([concept]) => !concept.startsWith("Revenue"))),
+      },
+    });
+    const result = deriveSecCompanyFigures(withoutRevenue(facts()), NOW);
+    assert.equal(result.status === "ok" && result.value.revenueTtmUsd, 0);
+    // Cash coming in with no revenue on file means revenue under a concept this does not read.
+    const positive = CASH_FLOW_ROWS.map((row) => ({ ...row, val: Math.abs(row.val) }));
+    assert.equal(refusalOf(withoutRevenue(facts({ cashFlow: positive }))), "incomplete-filing");
+  });
+
+  it("says why a filing cannot stand in for a company's figures", () => {
+    assert.equal(refusalOf({ facts: { "ifrs-full": { Revenue: {} }, dei: {} } }), "international-filer");
+    assert.equal(refusalOf(facts({ extra: { Deposits: { units: { USD: [] } } } })), "financial-company");
+    assert.equal(refusalOf(facts(), new Date("2027-06-01T00:00:00.000Z")), "no-recent-filing");
+    assert.equal(refusalOf(facts({ cashFlow: [] })), "incomplete-filing");
+    // A half with no comparable half a year earlier is not a year.
+    assert.equal(refusalOf(facts({ cashFlow: CASH_FLOW_ROWS.slice(0, 3) })), "incomplete-filing");
+    assert.equal(refusalOf(facts({ cash: 0, shortTermInvestments: 0 })), "incomplete-filing");
+    assert.equal(refusalOf("not a filing"), "incomplete-filing");
+  });
+});
+
+describe("looking a company up by ticker", () => {
+  const originalFetch = globalThis.fetch;
+  let requests: string[] = [];
+  let upstream: (url: string) => Response;
+
+  const healthy = (url: string) =>
+    url.includes("company_tickers")
+      ? Response.json({ "0": { cik_str: 7, ticker: "BRK-B", title: "Fixture Holdings" }, "1": { cik_str: 8, ticker: "DOCU", title: "Fixture Sign" } })
+      : Response.json(facts());
+
+  const kv = () => {
+    const entries = new Map<string, string>();
+    return {
+      entries,
+      get: async (key: string) => entries.get(key) ?? null,
+      put: async (key: string, value: string) => void entries.set(key, value),
+    };
+  };
+
+  beforeEach(() => {
+    requests = [];
+    upstream = healthy;
+    globalThis.fetch = async (input) => {
+      const url = input instanceof Request ? input.url : input.toString();
+      requests.push(url);
+      return upstream(url);
+    };
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it("reads a ticker as the SEC lists it, and names the company", async () => {
+    const result = await fetchSecCompanyFiling(" brk.b ", { cache: null, now: NOW });
+    assert.equal(result.status, "ok");
+    assert.equal(result.status === "ok" && result.value.ticker, "BRK-B");
+    assert.equal(result.status === "ok" && result.value.name, "Fixture Holdings");
+    assert.ok(requests[1]?.includes("CIK0000000007"));
+  });
+
+  it("refuses what cannot be a ticker without asking anyone", async () => {
+    const result = await fetchSecCompanyFiling("not a ticker!", { cache: null, now: NOW });
+    assert.deepEqual(result, { status: "refused", refusal: "unknown-ticker" });
+    assert.deepEqual(requests, []);
+  });
+
+  it("asks the SEC once per company, unknown tickers included", async () => {
+    const cache = kv();
+    await fetchSecCompanyFiling("DOCU", { cache, now: NOW });
+    await fetchSecCompanyFiling("DOCU", { cache, now: NOW });
+    assert.equal(requests.length, 2, "one list read and one filing read");
+
+    requests = [];
+    assert.deepEqual(await fetchSecCompanyFiling("ZZZZ", { cache, now: NOW }), { status: "refused", refusal: "unknown-ticker" });
+    assert.deepEqual(await fetchSecCompanyFiling("ZZZZ", { cache, now: NOW }), { status: "refused", refusal: "unknown-ticker" });
+    assert.equal(requests.length, 1);
+  });
+
+  it("does not remember an outage as a fact about the company", async () => {
+    const cache = kv();
+    upstream = (url) => (url.includes("company_tickers") ? healthy(url) : new Response("busy", { status: 503 }));
+    assert.equal((await fetchSecCompanyFiling("DOCU", { cache, now: NOW })).status, "unavailable");
+    upstream = healthy;
+    assert.equal((await fetchSecCompanyFiling("DOCU", { cache, now: NOW })).status, "ok");
+  });
+
+  it("answers with filed numbers and no reading of them", async () => {
+    const response = await GET(new Request("https://whether.test/api/company-filing?ticker=DOCU"));
+    assert.equal(response.status, 200);
+    const body = await response.text();
+    const lookup = companyFilingLookupSchema.parse(JSON.parse(body));
+    assert.equal(lookup.ok && lookup.filing.ticker, "DOCU");
+    assert.doesNotMatch(body, /runway|band|cash first|cushion/i);
+  });
+
+  it("answers a failure in the shape the form reads", async () => {
+    const unknown = await GET(new Request("https://whether.test/api/company-filing?ticker=ZZZZ"));
+    assert.equal(unknown.status, 404);
+    assert.deepEqual(companyFilingLookupSchema.parse(await unknown.json()), { ok: false, failure: "unknown-ticker" });
+
+    upstream = () => new Response("busy", { status: 503 });
+    const down = await GET(new Request("https://whether.test/api/company-filing?ticker=DOCU"));
+    assert.equal(down.status, 503);
+    assert.deepEqual(companyFilingLookupSchema.parse(await down.json()), { ok: false, failure: "unavailable" });
+  });
+});
+
+describe("a filing as the operator's figures", () => {
+  const filing = {
+    ticker: "RIVN",
+    name: "Fixture Motors",
+    cashUsd: 3_600e6,
+    debtUsd: 100e6,
+    revenueTtmUsd: 1_200e6,
+    operatingCashFlowTtmUsd: -2_400e6,
+    revenueGrowth: 0.2,
+    periodEnd: PERIOD_END,
+  };
+
+  it("fills the fields a reader would type, so net burn is the filing's own", () => {
+    const profile = applyCompanyFiling({ version: 1, runwayMonths: 9, sector: "consumer" }, filing, NOW);
+    assert.equal(profile.cashUsd, 3_600e6);
+    assert.equal(profile.monthlyRevenueUsd, 100e6);
+    assert.equal(profile.monthlyBurnUsd, 300e6);
+    assert.equal(profile.runwayMonths, undefined);
+    assert.equal(profile.sector, "consumer");
+    // 20% a year compounds from about 1.5% a month.
+    assert.equal(profile.monthlyGrowthPct, 1.5);
+    const runway = resolveProfileRunway(profile);
+    assert.equal(runway?.basis === "cash" && runway.months, 18);
+    assert.equal(runwayBandForProfileRunway(runway), "balanced");
+  });
+
+  it("survives being stored, large figures included", () => {
+    const huge = applyCompanyFiling({ version: 1 }, { ...filing, revenueTtmUsd: 400e9, operatingCashFlowTtmUsd: 110e9, cashUsd: 60e9 }, NOW);
+    const stored = parseOperatorProfile(JSON.parse(JSON.stringify(huge)));
+    assert.equal(stored.monthlyRevenueUsd, huge.monthlyRevenueUsd);
+    assert.equal(stored.monthlyBurnUsd, huge.monthlyBurnUsd);
+    assert.deepEqual(stored.filing, huge.filing);
+    assert.equal(parseOperatorProfile({ version: 1, filing: { ticker: "X" } }).filing, undefined);
+  });
+
+  it("gives no cushion to a company owing more than it holds", () => {
+    const long = { ...filing, operatingCashFlowTtmUsd: -600e6 };
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, long, NOW))), "abundant");
+    const owing = applyCompanyFiling({ version: 1 }, { ...long, debtUsd: 5_000e6 }, NOW);
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway(owing)), "balanced");
+    const covered = { ...filing, operatingCashFlowTtmUsd: 300e6, revenueGrowth: 0 };
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, covered, NOW))), "abundant");
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, { ...covered, debtUsd: 5_000e6 }, NOW))), "balanced");
+  });
+
+  it("stops naming the filing once a figure is the reader's own", () => {
+    const profile = applyCompanyFiling({ version: 1 }, filing, NOW);
+    assert.ok(profile.filing);
+    assert.equal(setOperatorProfileField(profile, "cashUsd", 5).filing, undefined);
+    assert.equal(setOperatorProfileField(profile, "monthlyRevenueUsd", 5).filing, undefined);
+    assert.ok(setOperatorProfileField(profile, "raiseAtRunwayMonths", 9).filing);
+  });
+
+  it("names the filing and what it owes", () => {
+    const source = { ticker: "RIVN", name: "Fixture Motors", periodEnd: PERIOD_END, debtUsd: 5_000e6 };
+    assert.equal(
+      describeProfileFiling({ ...source, debtUsd: 1 }, 100),
+      "From Fixture Motors (RIVN), as filed for the period ended Jun 30, 2026. Change any figure to use your own.",
+    );
+    assert.match(describeProfileFiling(source, 100), /It owes \$5B, more than its cash, so the guidance stops short of the 24\+ month band\.$/);
+  });
+});

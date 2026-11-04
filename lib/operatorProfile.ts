@@ -41,6 +41,9 @@ export type PaybackProjectNumberKey =
  */
 export type PaybackProjectEntry = { name?: string } & Partial<Record<PaybackProjectNumberKey, number>>;
 
+/** The public filing the figures were read from, until the reader changes one of them. */
+export type ProfileFiling = { ticker: string; name: string; periodEnd: string; debtUsd: number };
+
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
   /**
@@ -71,6 +74,7 @@ export type OperatorProfile = {
   /** The engineering work the planner checks against the payback bar, at most `MAX_PAYBACK_PROJECTS`. */
   paybackProjects?: readonly PaybackProjectEntry[];
   sector?: PlannerSector;
+  filing?: ProfileFiling;
   updatedAt?: string;
 };
 
@@ -80,8 +84,9 @@ export const EMPTY_OPERATOR_PROFILE: OperatorProfile = Object.freeze({ version: 
 export const OPERATOR_PROFILE_LIMITS: Record<OperatorProfileNumberKey, { min: number; max: number }> = {
   cashUsd: { min: 0, max: 1e12 },
   runwayMonths: { min: 0, max: 240 },
-  monthlyBurnUsd: { min: 0, max: 1e10 },
-  monthlyRevenueUsd: { min: 0, max: 1e10 },
+  /* Up to the largest public companies, whose filed figures fill these. */
+  monthlyBurnUsd: { min: 0, max: 1e11 },
+  monthlyRevenueUsd: { min: 0, max: 1e11 },
   monthlyGrowthPct: { min: -100, max: 300 },
   grossMarginPct: { min: 0, max: 100 },
   raiseAtRunwayMonths: { min: 1, max: 60 },
@@ -166,6 +171,14 @@ export const parsePaybackProjects = (value: unknown): PaybackProjectEntry[] => {
   return projects;
 };
 
+const parseProfileFiling = (value: unknown): ProfileFiling | null => {
+  if (!isRecord(value)) return null;
+  const { ticker, name, periodEnd, debtUsd } = value;
+  if (typeof ticker !== "string" || typeof name !== "string" || typeof periodEnd !== "string") return null;
+  if (typeof debtUsd !== "number" || !Number.isFinite(debtUsd) || debtUsd < 0) return null;
+  return { ticker, name, periodEnd, debtUsd };
+};
+
 /**
  * Reads a stored profile of any shape. Fields that are missing, the wrong
  * type, or outside their limits are dropped one at a time, so a corrupted
@@ -181,12 +194,23 @@ export const parseOperatorProfile = (value: unknown): OperatorProfile => {
     if (withinLimits(key, candidate)) profile[key] = candidate;
   }
   if (isPlannerSector(record.sector)) profile.sector = record.sector;
+  const filing = parseProfileFiling(record.filing);
+  if (filing) profile.filing = filing;
   const paybackProjects = parsePaybackProjects(record.paybackProjects);
   if (paybackProjects.length > 0) profile.paybackProjects = paybackProjects;
   if (typeof record.updatedAt === "string") profile.updatedAt = record.updatedAt;
 
   return profile;
 };
+
+/** Editing one of these makes the figures the reader's own, so the filing stops being named. */
+export const FILED_FIGURES: ReadonlySet<keyof OperatorProfile> = new Set<keyof OperatorProfile>([
+  "cashUsd",
+  "runwayMonths",
+  "monthlyBurnUsd",
+  "monthlyRevenueUsd",
+  "monthlyGrowthPct",
+]);
 
 export const setOperatorProfileField = <K extends keyof OperatorProfile>(
   current: unknown,
@@ -195,6 +219,7 @@ export const setOperatorProfileField = <K extends keyof OperatorProfile>(
   now: Date = new Date(),
 ): OperatorProfile => {
   const next: OperatorProfile = { ...parseOperatorProfile(current), updatedAt: now.toISOString() };
+  if (FILED_FIGURES.has(key)) delete next.filing;
   if (value === undefined) {
     delete next[key];
   } else {
@@ -204,6 +229,40 @@ export const setOperatorProfileField = <K extends keyof OperatorProfile>(
     if (key === "runwayMonths") delete next.cashUsd;
   }
   return next;
+};
+
+/**
+ * A company's filed figures as the ones a reader would type. Spend is what makes spend less revenue
+ * come to the cash its operations consumed, so net burn is the filing's own however revenue is
+ * tagged. Annual growth reads as the monthly rate that compounds to it.
+ */
+export const applyCompanyFiling = (
+  current: unknown,
+  filing: {
+    ticker: string;
+    name: string;
+    cashUsd: number;
+    debtUsd: number;
+    revenueTtmUsd: number;
+    operatingCashFlowTtmUsd: number;
+    revenueGrowth: number | null;
+    periodEnd: string;
+  },
+  now: Date = new Date(),
+): OperatorProfile => {
+  const { runwayMonths: _typed, monthlyGrowthPct: _growth, ...rest } = parseOperatorProfile(current);
+  const monthlyGrowthPct = filing.revenueGrowth !== null && filing.revenueGrowth > -1
+    ? Math.round((Math.pow(1 + filing.revenueGrowth, 1 / 12) - 1) * 1000) / 10
+    : undefined;
+  return {
+    ...rest,
+    cashUsd: filing.cashUsd,
+    monthlyBurnUsd: Math.max(0, Math.round((filing.revenueTtmUsd - filing.operatingCashFlowTtmUsd) / 12)),
+    monthlyRevenueUsd: Math.round(filing.revenueTtmUsd / 12),
+    ...(monthlyGrowthPct !== undefined ? { monthlyGrowthPct } : {}),
+    filing: { ticker: filing.ticker, name: filing.name, periodEnd: filing.periodEnd, debtUsd: filing.debtUsd },
+    updatedAt: now.toISOString(),
+  };
 };
 
 /**
@@ -223,9 +282,9 @@ export const netMonthlyBurnUsd = (profile: OperatorProfile): number | undefined 
 
 export type ProfileRunway =
   /** Worked out: cash divided by net burn. */
-  | { basis: "cash"; months: number; cashUsd: number; netBurnUsd: number }
+  | { basis: "cash"; months: number; cashUsd: number; netBurnUsd: number; debtExceedsCash?: true }
   /** Typed in as a number of months. */
-  | { basis: "entered"; months: number }
+  | { basis: "entered"; months: number; debtExceedsCash?: never }
   /**
    * Revenue covers spending, so cash is not running down and there is no runway
    * to count. `cashUsd` is absent when the runway was typed rather than worked out.
@@ -236,7 +295,7 @@ export type ProfileRunway =
    * `coveredForMonths` is when falling revenue meets spending, at the reader's
    * own rate, and is absent unless revenue is falling.
    */
-  | { basis: "cash-flow-positive"; cashUsd?: number; surplusUsd: number; cushionMonths?: number; coveredForMonths?: number };
+  | { basis: "cash-flow-positive"; cashUsd?: number; surplusUsd: number; cushionMonths?: number; coveredForMonths?: number; debtExceedsCash?: true };
 
 /** Months until revenue falling at `growthPct` a month meets spending. Undefined unless it is falling toward it. */
 const monthsUntilSpendOvertakesRevenue = ({ monthlyBurnUsd, monthlyRevenueUsd, monthlyGrowthPct }: OperatorProfile): number | undefined => {
@@ -261,6 +320,10 @@ export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | 
   const netBurn = netMonthlyBurnUsd(profile);
   const cash = profile.cashUsd !== undefined && profile.cashUsd > 0 ? profile.cashUsd : undefined;
   const typedMonths = profile.runwayMonths !== undefined && profile.runwayMonths > 0 ? profile.runwayMonths : undefined;
+  /* Filings say what is owed, which a cash balance does not: a company owing more than it holds
+     has no cushion to use, however long the cash would last against operations alone. */
+  const debtExceedsCash = cash !== undefined && profile.filing !== undefined && profile.filing.debtUsd > cash;
+  const debtFlag: { debtExceedsCash?: true } = debtExceedsCash ? { debtExceedsCash: true } : {};
   if (netBurn !== undefined && netBurn <= 0 && (cash !== undefined || typedMonths !== undefined)) {
     const surplusUsd = Math.max(0, -netBurn);
     const cushionMonths = cash === undefined ? typedMonths : profile.monthlyBurnUsd ? cash / profile.monthlyBurnUsd : undefined;
@@ -271,12 +334,13 @@ export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | 
       surplusUsd,
       ...(cushionMonths !== undefined ? { cushionMonths } : {}),
       ...(coveredForMonths !== undefined ? { coveredForMonths } : {}),
+      ...debtFlag,
     };
   }
   if (cash !== undefined && netBurn !== undefined) {
     // Tenths of a month, and never zero: a balance under one tenth of a month is still a runway.
     const months = Math.max(0.1, Math.round((cash / netBurn) * 10) / 10);
-    return { basis: "cash", months, cashUsd: cash, netBurnUsd: netBurn };
+    return { basis: "cash", months, cashUsd: cash, netBurnUsd: netBurn, ...debtFlag };
   }
   if (typedMonths !== undefined) {
     return { basis: "entered", months: typedMonths };

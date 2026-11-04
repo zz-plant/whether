@@ -21,6 +21,7 @@ const DOCUMENTED_API_PATHS = [
   "/api/posture/current",
   "/api/scores",
   "/api/comps",
+  "/api/company-filing",
   "/api/regime-alerts",
   "/api/decision",
   "/api/integrations/weekly-mandate",

@@ -148,6 +148,10 @@ export default function PrivacyPage() {
               that area&rsquo;s name, so your next visit opens on the same answer. Each is read only by
               this site and set by no other action.
             </p>
+            <p className={paragraph}>
+              Looking up a ticker on the runway planner sends that ticker to this site, which reads the SEC&apos;s
+              public data for it. The figures it returns stay in your browser with the rest of your figures.
+            </p>
           </div>
 
           <div className="space-y-2">
