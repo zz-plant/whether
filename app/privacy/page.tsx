@@ -165,6 +165,11 @@ export default function PrivacyPage() {
               turns them off for one browser.
             </p>
             <p className={paragraph}>
+              A request to the MCP server records which tool ran, how it ended and a label from a fixed
+              list, such as the answer page returned. It does not record the question, plan or figures
+              sent. Section 5 cannot turn this off, because the request does not come from a browser.
+            </p>
+            <p className={paragraph}>
               What is written is the event and nothing around it: no IP address, no user-agent
               string, and none of the identifiers above. The intake refuses any record carrying a
               field it does not expect, so a stream cannot quietly start carrying more than it says.

@@ -84,6 +84,11 @@ export const TELEMETRY_STREAMS = [
    * (`lib/deadClickTelemetry.ts`; `isDeadClickEvent` refuses any other key).
    */
   "dead-click",
+  /**
+   * Worker-authored: a call to an agent tool over HTTP, as the tool's name, how it ended and a
+   * label from a closed set (`describeAgentToolCall`). Never the arguments.
+   */
+  "agent-tool",
 ] as const;
 
 export type TelemetryStream = (typeof TELEMETRY_STREAMS)[number];

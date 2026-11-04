@@ -126,6 +126,7 @@ recapture correctly.
 | `bun run audit:near-duplicates` | Advisory, needs a local Ollama with `embeddinggemma-2:740m`: embeds every top-level function under `app/`, `lib/`, `worker/` and lists cross-file pairs at cosine ≥0.93, the helper rewritten under a new name that `rg` and the dead-export census miss. Cached by content hash in `artifacts/near-duplicates/`. A pair is a prompt to read both, not a finding. `-- --copy` (needs a running server too) does the same for reader-route sentences at ≥0.95: the same point said twice in different words, on one page or two. |
 | `bun run telemetry:streams` | Rows per Analytics Engine stream over a window, with each stream's consumer. A stream at zero is dead code or a broken emitter. |
 | `bun run telemetry:first-acts` | Which section of the brief each visit first used, from `oriented`. One event per visit, so it ranks first acts, not every press. |
+| `bun run telemetry:agent-tools` | Calls to each agent tool over HTTP by how they ended, from `agent-tool`: answered, not graded, refused and where the refusal pointed. Counts only; the questions are not recorded. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |
 | `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |

@@ -42,6 +42,7 @@ Or add the connector alone in any MCP client: `https://whether.work/api/mcp`.
   asked or the plan text you want checked, are sent there to compute the answer.
 - Without the connector, the skill fetches `https://whether.work/api/agent?view=state` and
   `https://whether.work/api/mcp?tool=...` instead.
+- The server counts each call by tool and outcome. It does not keep the arguments.
 - The plugin bundles no hooks or local scripts. See the [privacy policy](https://whether.work/privacy).
 
 ## Limits

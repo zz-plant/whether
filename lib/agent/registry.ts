@@ -55,6 +55,8 @@ type AgentInputProblem = {
   message: string;
   /** What would have been accepted, when the argument takes a fixed set. */
   allowed?: readonly string[];
+  /** The tool to call instead, when the refusal knows one. */
+  next?: string;
 };
 
 type AgentInputErrorCode = "invalid_arguments" | "unknown_tool";
@@ -227,8 +229,25 @@ type AgentToolCallResult = {
   isError?: true;
 };
 
+/** What ran and how it ended, for an observer. It never carries the arguments. */
+export type AgentToolCall = { tool: string; transport: AgentToolTransport } & (
+  | { result: Record<string, unknown> }
+  | { error: unknown }
+);
+
 /** The list and call paths over one set of definitions, which every transport and catalogue reads. */
-export const createAgentToolRegistry = (tools: readonly AgentTool[]) => {
+export const createAgentToolRegistry = (tools: readonly AgentTool[], onCall?: (call: AgentToolCall) => void) => {
+  const execute = async (tool: AgentTool, args: unknown, transport: AgentToolTransport) => {
+    try {
+      const result = await tool.execute(args);
+      onCall?.({ tool: tool.name, transport, result });
+      return result;
+    } catch (error) {
+      onCall?.({ tool: tool.name, transport, error });
+      throw error;
+    }
+  };
+
   const availableOn = (transport: AgentToolTransport) => tools.filter((tool) => tool.transports.includes(transport));
 
   const requireTool = (name: string, transport: AgentToolTransport): AgentTool => {
@@ -266,7 +285,7 @@ export const createAgentToolRegistry = (tools: readonly AgentTool[]) => {
       })),
 
     /** Runs a tool and returns its object; throws `AgentInputError` for a caller's mistake, anything else for a fault. */
-    runAgentTool: async (name: string, args: unknown, transport: AgentToolTransport) => requireTool(name, transport).execute(args),
+    runAgentTool: async (name: string, args: unknown, transport: AgentToolTransport) => execute(requireTool(name, transport), args, transport),
 
     /** Refuses arguments the tool would refuse, without running it, for a caller that builds its own answer. */
     checkAgentToolArguments: (name: string, args: unknown, transport: AgentToolTransport): void => {
@@ -285,7 +304,7 @@ export const createAgentToolRegistry = (tools: readonly AgentTool[]) => {
     callAgentTool: async (name: string, args: unknown, transport: AgentToolTransport): Promise<AgentToolCallResult> => {
       const tool = requireTool(name, transport);
       try {
-        const structured = await tool.execute(args);
+        const structured = await execute(tool, args, transport);
         return { content: [{ type: "text", text: JSON.stringify(structured) }], structuredContent: structured };
       } catch (error) {
         return { content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }], isError: true };

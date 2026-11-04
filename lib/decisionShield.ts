@@ -336,6 +336,11 @@ const RAISING_PRICE =
 const BUYING_A_COMPANY =
   /\b(?:buy|buying)\s+(?:(?:a|an|the|our|one|another)\s+)?(?:\S+\s+){0,2}?(?:competitor|rival|startup|(?:company|business)(?!\s+(?:car|cars|card|cards|class|laptop|laptops|phone|phones|insurance)\b))\b/;
 
+const VENTURE_DEBT = /\bventure\s+(?:debt|loan)\b/;
+
+/* Shares changing hands between holders, not money the company spends or raises. */
+const SECONDARY_SALE = /\b(?:secondary\s+(?:sale|sales|offering|transaction)|tender\s+offer)\b/;
+
 const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCategory): Detection => {
   if (categoryOverride) {
     /* The caller said which kind of decision this is, so there is nothing to infer. */
@@ -349,6 +354,24 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   }
 
   const lower = text.toLowerCase();
+  if (VENTURE_DEBT.test(lower)) {
+    return {
+      ungraded: {
+        headline: "Not graded: this brings money in, and the stress test grades commitments that spend it.",
+        nextStep: `${GRADABLE_DECISIONS} The answer on venture debt covers this one.`,
+        answerTopic: "should-startups-take-venture-debt-now",
+      },
+    };
+  }
+  if (SECONDARY_SALE.test(lower)) {
+    return {
+      ungraded: {
+        headline: "Not graded: this sells existing shares, and the stress test grades commitments that spend the company's cash.",
+        nextStep: `${GRADABLE_DECISIONS} The answer on compensation is the nearest to this one.`,
+        answerTopic: "should-startups-change-compensation-now",
+      },
+    };
+  }
   if (RAISING_MONEY.test(lower)) {
     return {
       ungraded: {
@@ -421,6 +444,15 @@ export const routePlanText = (
   return "ungraded" in detection
     ? { gradable: false, answerTopic: detection.ungraded.answerTopic }
     : { gradable: true, category: detection.category };
+};
+
+/* The pricing row is keyed DISCOUNT, and it also grades vendor deals and annual contracts. A headline
+   calling those a discount answered a plan that never offered one. */
+const headlineActionLabel = (action: DecisionAction, text: string) => {
+  const lower = text.toLowerCase();
+  if (action !== "DISCOUNT" || /\bdiscounts?\b/.test(lower)) return formatDecisionAction(action);
+  if (/\bannual\s+contracts?\b/.test(lower)) return "Annual contract";
+  return /\bpric(?:e|es|ing)\b/.test(lower) ? "This pricing change" : "This deal";
 };
 
 /** Names the rule that decided, not the week, unless the week is what decided. */
@@ -605,7 +637,7 @@ export const stressTestDecisionPlan = (
   return {
     verdict,
     headline: buildStressHeadline({
-      actionLabel: formatDecisionAction(action),
+      actionLabel: headlineActionLabel(action, request.planText),
       verdict,
       verdictDriver,
       regimeLabel,
