@@ -161,7 +161,15 @@ export const describePlanLines = (lines: readonly PlanLines[]) =>
  * The runway band a reader had set when they confirmed their lines, and the day.
  * The band only, never a figure: the figures stay in the browser that typed them.
  */
-export type PlanRunway = { band: RunwayBand; setOn: string };
+export type PlanRunway = {
+  band: RunwayBand;
+  setOn: string;
+  /** The band does not age: revenue covered spending when it was set, so nothing was counting down. */
+  fixed?: true;
+};
+
+/** The day a plan's band ages from, or nothing for one that does not. */
+export const planRunwayAgesFrom = (runway: PlanRunway): string | undefined => (runway.fixed ? undefined : runway.setOn);
 
 /** A stored band, read field by field: an unknown band or an unreadable date is no band. */
 export const parsePlanRunway = (value: unknown): PlanRunway | null => {
@@ -169,7 +177,7 @@ export const parsePlanRunway = (value: unknown): PlanRunway | null => {
   const band: unknown = Reflect.get(value, "band");
   const setOn: unknown = Reflect.get(value, "setOn");
   if (!isRunwayBand(band) || typeof setOn !== "string" || !Number.isFinite(Date.parse(setOn))) return null;
-  return { band, setOn };
+  return { band, setOn, ...(Reflect.get(value, "fixed") === true ? { fixed: true } : {}) };
 };
 
 /**
@@ -188,7 +196,7 @@ export const parsePlanRunway = (value: unknown): PlanRunway | null => {
  */
 const describeCrossingAtRunway = (area: DecisionArea, regime: string, runway: PlanRunway, now: Date, selfFunded: boolean): string => {
   const setOn = formatDateUTC(runway.setOn);
-  const band = ageRunwayBand(runway.band, runway.setOn, now);
+  const band = ageRunwayBand(runway.band, planRunwayAgesFrom(runway), now);
   const forNotes = resolveRunwayForNotes({ band });
   const note = forNotes && isRegimeKey(regime)
     ? buildRunwayConditionedNotes({ regime, ...forNotes, selfFunded }).find((entry) => entry.area === area)?.note

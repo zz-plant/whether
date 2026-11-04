@@ -16,7 +16,7 @@ import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import type { BriefDocument } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
 import { applyStageToWeeklyCall } from "../report/weeklyCallContract";
-import { describePlanLineStates } from "../alert/planLines";
+import { describePlanLineStates, planRunwayAgesFrom } from "../alert/planLines";
 import { briefIsQuietWeek, briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { decisionAreaOrder } from "../report/boundedDecisionRules";
@@ -224,8 +224,8 @@ export const sendWeeklyBrief = async (options?: {
          published call unchanged. */
       const statedRunway = recipient.runwayBand
         ? { band: recipient.runwayBand, setOn: recipient.runwayBandSetOn }
-        : recipient.planRunway;
-      const agedBand = statedRunway && ageRunwayBand(statedRunway.band, statedRunway.setOn);
+        : recipient.planRunway && { band: recipient.planRunway.band, setOn: planRunwayAgesFrom(recipient.planRunway) };
+      const agedBand = statedRunway && ageRunwayBand(statedRunway.band, statedRunway.setOn, now);
       /* The rules follow the aged band, so the email says it assumed one. Printed only
          where a stage scales the rules to it, and only once it has moved. */
       const runwayAgeLine =

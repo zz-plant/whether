@@ -1604,7 +1604,9 @@ on an edge profile.
   `readOperatorRunwayCookie` ages the band: its representative months less the months since, moving
   only down. The panel says what it assumed (`describeRunwayBandAge`), with one click to confirm or
   pick again; the crossing and Monday emails print the same sentence. A band earned by covering
-  spending and a cookie from before this date carry no day and do not age. Figures in the browser
+  spending and a cookie from before this date carry no day and do not age, and a subscription carries
+  that (`runwayBandFixed`, `PlanRunway.fixed`) so the emails do not count one down from the day it was
+  sent. A copied stress-test link names its business model either way, so it opens as it was sent. Figures in the browser
   profile stay as typed, and once the band has aged past them the notes read the band instead.
 - **Bootstrapped has no round to sign.** `scaleAdjustmentToRunway` and
   `buildRunwayConditionedNotes` (`selfFunded`) say what customers can pay early, and the stress test's

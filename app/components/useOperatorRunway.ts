@@ -2,6 +2,7 @@
 
 import {
   buildOperatorRunwayCookie,
+  isUndatedRunwayCookie,
   readOperatorRunwayCookie,
   readRunwayBandAge,
   runwayBandForProfileRunway,
@@ -72,14 +73,26 @@ const runwayAgeSource = createBrowserSource<RunwayBandAge | null>({
   isEqual: sameAge,
 });
 
+const runwayFixedSource = createBrowserSource<boolean>({
+  read: () => isUndatedRunwayCookie(document.cookie),
+  serverValue: false,
+  watch: (onChange) => {
+    window.addEventListener(RUNWAY_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(RUNWAY_CHANGED_EVENT, onChange);
+  },
+  refreshOnSubscribe: true,
+});
+
 export const useOperatorRunway = () => {
   const runwayBand = useBrowserSource(runwaySource);
   const bandAge = useBrowserSource(runwayAgeSource);
+  const runwayBandFixed = useBrowserSource(runwayFixedSource);
   const hydrated = useHydrated();
 
   return {
     runwayBand,
     bandAge,
+    runwayBandFixed,
     setRunwayBand: persistOperatorRunway,
     hydrated,
   };

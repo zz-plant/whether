@@ -123,6 +123,7 @@ export const subscribeAndSendVerification = async ({
   weekly,
   planLines,
   runwayBand,
+  runwayBandFixed,
   stage,
   request,
   adapter = createCloudflareEmailAdapter(),
@@ -136,6 +137,8 @@ export const subscribeAndSendVerification = async ({
   planLines?: PlanLines[];
   /** The reader's runway band, held beside `planLines` and confirmed with them. */
   runwayBand?: RunwayBand;
+  /** The band does not age: revenue covers the reader's spending, so nothing counts down. */
+  runwayBandFixed?: boolean;
   /** The company stage the reader had set on the site; scales their Monday brief. */
   stage?: OperatorStage;
   request?: Request;
@@ -160,7 +163,7 @@ export const subscribeAndSendVerification = async ({
     return { subscriber: existing, verifyUrl: null };
   }
 
-  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand, stage });
+  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand, runwayBandFixed, stage });
   /* The request's own link, never the permanent token: that one is in the footer
      of every email this address has been sent. The caller's response is the same
      whichever email goes out, so it says nothing about whether the address is

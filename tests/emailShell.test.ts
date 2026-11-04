@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it } from "bun:test";
+import { afterEach, describe, it, setSystemTime } from "bun:test";
 import { readFileSync } from "node:fs";
 
 import { planLineEmail } from "../lib/alert/alertTemplates";
@@ -320,6 +320,35 @@ describe("the brief a reader actually gets", () => {
     assert.ok(message);
     assert.match(message.text, /\nYour rules: hiring (on hold|running|between pause and restart)\./);
     assert.ok(message.text.indexOf("Your rules:") < message.text.indexOf("Guidance:"), "their rules lead the published ones");
+  });
+
+  it("ages a chosen band and says so, and leaves one that does not age alone", async () => {
+    const sendTo = async (email: string, runwayBandFixed: boolean) => {
+      resetSubscriberStore();
+      const store = getSubscriberStore();
+      // Subscribed nine months before the send.
+      setSystemTime(new Date("2025-12-01T12:00:00.000Z"));
+      const subscriber = await store.subscribe(email, { stage: "seed", runwayBand: "balanced", runwayBandFixed });
+      await store.verifyEmail(subscriber.confirmToken ?? "");
+      setSystemTime();
+      const snapshot = snapshotFor();
+      const mail = captureMail();
+      try {
+        await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: new Date("2026-08-31T12:00:00.000Z") });
+      } finally {
+        mail.restore();
+      }
+      return mail.sent[0];
+    };
+
+    const aged = await sendTo("aged-band@example.com", false);
+    assert.match(aged?.text ?? "", /You set 12–24 months of runway on .+, so this now assumes 6–12 months\./);
+    assert.match(aged?.html ?? "", /so this now assumes 6–12 months\./);
+
+    const fixed = await sendTo("covered-band@example.com", true);
+    assert.ok(fixed);
+    assert.doesNotMatch(fixed.text, /so this now assumes/);
+    assert.doesNotMatch(fixed.html, /so this now assumes/);
   });
 
   it("prints the cash-first note for a reader under six months, without plan lines", async () => {

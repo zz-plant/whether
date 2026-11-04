@@ -92,7 +92,7 @@ export function PlanLinesForm({
     const asked = defaults.map((line) => line.area).filter((area) => watch.includes(area));
     return new Set(asked.length > 0 ? asked : defaults.map((line) => line.area));
   });
-  const { runwayBand } = useOperatorRunway();
+  const { runwayBand, runwayBandFixed } = useOperatorRunway();
   const [sendBand, setSendBand] = useState(true);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -124,7 +124,7 @@ export function PlanLinesForm({
     const result = await requestSubscription(email, {
       alerts: true,
       planLines,
-      ...(runwayBand && sendBand ? { runwayBand } : {}),
+      ...(runwayBand && sendBand ? { runwayBand, runwayBandFixed } : {}),
     });
     setStatus(result.ok ? "success" : "error");
     setMessage(result.ok ? "Check your email to confirm. Your rules count from the moment you do." : result.message);

@@ -179,6 +179,16 @@ export const readOperatorRunwayCookie = (cookieHeader: string | null | undefined
   return stored ? ageRunwayBand(stored.band, stored.setOn, now) : null;
 };
 
+/**
+ * True for a stored band with no day: one earned by revenue covering spending, or
+ * one from before the day was kept. A subscription carries this, or the email
+ * would count down from the day they subscribed a band the site leaves alone.
+ */
+export const isUndatedRunwayCookie = (cookieHeader: string | null | undefined): boolean => {
+  const stored = readStoredRunway(cookieHeader);
+  return stored !== null && stored.setOn === null;
+};
+
 export const readRunwayBandAge = (cookieHeader: string | null | undefined, now: Date = new Date()): RunwayBandAge | null => {
   const stored = readStoredRunway(cookieHeader);
   if (!stored?.setOn) return null;

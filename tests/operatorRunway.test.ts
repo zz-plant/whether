@@ -14,6 +14,7 @@ import {
   ageRunwayBand,
   describeRunwayBandAge,
   isThinlyCoveredRunway,
+  isUndatedRunwayCookie,
   readRunwayBandAge,
   runwayBandForProfileEdit,
   runwayBandForProfileRunway,
@@ -177,6 +178,10 @@ describe("one runway setting", () => {
     assert.equal(bare, `${OPERATOR_RUNWAY_COOKIE}=abundant`);
     assert.equal(readOperatorRunwayCookie(bare, new Date("2030-01-01")), "abundant");
     assert.equal(readRunwayBandAge(bare, new Date("2030-01-01")), null);
+    // A subscription carries that difference, or the email would count down what the site does not.
+    assert.equal(isUndatedRunwayCookie(bare), true);
+    assert.equal(isUndatedRunwayCookie(header), false);
+    assert.equal(isUndatedRunwayCookie(null), false);
     // A garbled day is no day, and a garbled band is no band.
     assert.equal(readOperatorRunwayCookie(`${OPERATOR_RUNWAY_COOKIE}=tight:someday`, later), "tight");
     assert.equal(readOperatorRunwayCookie(`${OPERATOR_RUNWAY_COOKIE}=nope:2026-01-01`, later), null);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import {
   describePlanLineCrossing,
+  parsePlanRunway,
   evaluatePlanLineCrossings,
   parsePlanLines,
   type PlanLines,
@@ -99,6 +100,18 @@ describe("a crossing at the reader's own runway", () => {
       now: new Date("2026-10-15T12:00:00.000Z"),
     });
     assert.match(body, /With 12–24 months of runway, the band you set on Oct 1, 2026: follow the guidance\.$/);
+  });
+
+  it("does not age a band that revenue covering spending earned", () => {
+    const runway = parsePlanRunway({ band: "balanced", setOn: "2026-01-01T12:00:00.000Z", fixed: true });
+    assert.ok(runway);
+    const { body } = describePlanLineCrossing(crossing, today, {
+      regime: "DEFENSIVE",
+      runway,
+      now: new Date("2026-12-01T12:00:00.000Z"),
+    });
+    assert.doesNotMatch(body, /now assumes/);
+    assert.match(body, /With 12–24 months of runway/);
   });
 
   it("ages the band, and says so", () => {

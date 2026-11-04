@@ -7,6 +7,7 @@ import {
   companyFinancialProfileFor,
   compareDecisionPlans,
   evaluateDecision,
+  isBusinessModel,
   stressTestDecisionPlan,
   type DecisionAction,
   type DecisionCategory,
@@ -103,9 +104,10 @@ export const useDecisionShieldState = ({
   );
   const [planText, setPlanText] = useState(() => searchParams.get("plan") ?? "");
   const [planBText, setPlanBText] = useState(() => searchParams.get("planB") ?? "");
-  const [chosenModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED" | null>(() =>
-    searchParams.get("model") === "BOOTSTRAPPED" ? "BOOTSTRAPPED" : null,
-  );
+  const [chosenModel, setBusinessModel] = useState<"VC_BACKED" | "BOOTSTRAPPED" | null>(() => {
+    const model = searchParams.get("model");
+    return model && isBusinessModel(model) ? model : null;
+  });
   const { profile, setProfileField } = useOperatorProfile();
   const { stage, setStage } = useOperatorStage();
   /* A bootstrapped company's plan is graded on revenue, not on a raise, until the
@@ -310,7 +312,9 @@ export const useDecisionShieldState = ({
     };
     setOrDelete("plan", planMode === "dropdown" ? null : planText.trim() || null);
     setOrDelete("planB", planMode === "compare" ? planBText.trim() || null : null);
-    setOrDelete("model", businessModel === "BOOTSTRAPPED" ? "BOOTSTRAPPED" : null);
+    /* Both values travel: left out, a VC-backed plan would open as bootstrapped
+       for a reader whose own stage is, and grade differently from what was sent. */
+    params.set("model", businessModel);
 
     const link = `${window.location.origin}${pathname}?${params.toString()}#ops-decision-shield`;
     setLastAttemptedTarget("link");
