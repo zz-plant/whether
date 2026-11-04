@@ -496,10 +496,21 @@ describe("stress test — detection confidence", () => {
     }
   });
 
-  it("reads annual contracts in the plural as it does in the singular", () => {
+  it("reads annual contracts in the plural as it does in the singular, and does not call them a discount", () => {
     for (const planText of ["Move customers to an annual contract", "Move customers to annual contracts"]) {
-      assert.equal(stressTestDecisionPlan(buildExpansionAssessment(), { planText }).detectedCategory, "PRICING", planText);
+      const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText });
+      assert.equal(result.detectedCategory, "PRICING", planText);
+      assert.match(result.headline, /^Annual contract is /, planText);
     }
+    assert.match(stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Sign a vendor deal" }).headline, /^This deal is /);
+    assert.match(stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Offer a 20% discount on annual contracts" }).headline, /^Discount is /);
+  });
+
+  it("sends venture debt and a secondary sale to the answers that cover them", () => {
+    const debt = runStressTest(buildExpansionAssessment(), { planText: "Raise $2M of venture debt" });
+    assert.ok(debt.verdict === null && debt.answerTopic === "should-startups-take-venture-debt-now");
+    const secondary = runStressTest(buildExpansionAssessment(), { planText: "Run a tender offer for employees" });
+    assert.ok(secondary.verdict === null && secondary.answerTopic === "should-startups-change-compensation-now");
   });
 
   it("still grades the discount side of pricing, in the plural too", () => {

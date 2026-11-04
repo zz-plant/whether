@@ -31,7 +31,8 @@ import { answerPages, matchDecisionPage } from "../../app/answers/decisionPages"
 import { buildAnswerObject } from "../answers/answerObject";
 import { buildCanonicalUrl } from "../seo";
 import { REGIME_KEYS, SIGNAL_KEYS, businessModelInput, decisionCategoryInput, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
-import { AgentInputError, createAgentToolRegistry, defineTool } from "./registry";
+import { writeAnalytics } from "../telemetry/analyticsEngine";
+import { AgentInputError, createAgentToolRegistry, defineTool, type AgentToolCall } from "./registry";
 
 /**
  * Every tool an agent can call, defined once.
@@ -149,28 +150,51 @@ const withAnswerForUngraded = (plan: PlanStressTestResult, planText: string) => 
    lease") or one it already sends to an answer ("should I take venture debt"). Both were refused
    with the list of pages until 2026-11-04, and a model reading that list has no reason to try
    another tool. The nearest answer is named as the nearest, because it is not about this question. */
-const refusalForUnmatchedQuestion = (question: string) => {
+const refusalForUnmatchedQuestion = (question: string): { message: string; next?: string } => {
   const asked = JSON.stringify(question);
   const route = routePlanText(question);
   if (route.gradable) {
-    return (
-      `No answer page matches ${asked}, but stress_test_plan grades this kind of decision. ` +
-      "Call it with planText set to the plan, adding cashUsd and monthlySpendUsd if the user gave them."
-    );
+    return {
+      next: "stress_test_plan",
+      message:
+        `No answer page matches ${asked}, but stress_test_plan grades this kind of decision. ` +
+        "Call it with planText set to the plan, adding cashUsd and monthlySpendUsd if the user gave them.",
+    };
   }
   const nearest = route.answerTopic ? matchDecisionPage(route.answerTopic) : undefined;
   if (nearest) {
-    return (
-      `No answer page is about ${asked}. The nearest is ${nearest.title} (${nearest.slug}): ` +
-      "call get_answer with that slug, and tell the user it is the nearest answer, not one about this question."
-    );
+    return {
+      next: "get_answer",
+      message:
+        `No answer page is about ${asked}. The nearest is ${nearest.title} (${nearest.slug}): ` +
+        "call get_answer with that slug, and tell the user it is the nearest answer, not one about this question.",
+    };
   }
   /* Titles, not slugs: a caller picking the nearest answer reads the question it answers. */
-  return (
-    `No answer found matching ${asked}. Available decision topics: ` +
-    `${answerPages.map((candidate) => `${candidate.title} (${candidate.slug})`).join("; ")}. ` +
-    "For what this week's conditions mean in general, get_state answers it."
-  );
+  return {
+    message:
+      `No answer found matching ${asked}. Whether answers operating decisions for a running company, so tell the user it has no answer for this rather than stretching one of these. ` +
+      `Available decision topics: ${answerPages.map((candidate) => `${candidate.title} (${candidate.slug})`).join("; ")}. ` +
+      "For what this week's conditions mean in general, get_state answers it.",
+  };
+};
+
+/* How a call ended, in words from closed sets: a tool's name, an answer's slug, a decision category.
+   Never the question, the plan or the figures, which /privacy promises this does not keep. */
+export const describeAgentToolCall = (call: AgentToolCall) => {
+  if ("error" in call) {
+    if (!(call.error instanceof AgentInputError)) return { tool: call.tool, outcome: "failed", detail: null };
+    return { tool: call.tool, outcome: "refused", detail: call.error.problems.find((problem) => problem.next)?.next ?? null };
+  }
+  const { verdict, slug, detectedCategory } = call.result;
+  if (verdict === null || verdict === "not_graded") return { tool: call.tool, outcome: "not_graded", detail: null };
+  if (call.tool === "get_answer" && typeof slug === "string") return { tool: call.tool, outcome: "answered", detail: slug };
+  return { tool: call.tool, outcome: "answered", detail: typeof detectedCategory === "string" ? detectedCategory : null };
+};
+
+/* The site's own calls only. Over stdio the telemetry fallback logs to stdout, which is the protocol. */
+const recordAgentToolCall = (call: AgentToolCall) => {
+  if (call.transport === "http") writeAnalytics("agent-tool", describeAgentToolCall(call));
 };
 
 const AGENT_TOOLS = [
@@ -259,8 +283,9 @@ const AGENT_TOOLS = [
       const page = matchDecisionPage(question);
       if (!page) {
         const availableTopics = answerPages.map((candidate) => candidate.slug);
-        throw new AgentInputError(refusalForUnmatchedQuestion(question), "invalid_arguments", [
-          { argument: "question", message: `Unknown decision topic ${JSON.stringify(question)}.`, allowed: availableTopics },
+        const refusal = refusalForUnmatchedQuestion(question);
+        throw new AgentInputError(refusal.message, "invalid_arguments", [
+          { argument: "question", message: `Unknown decision topic ${JSON.stringify(question)}.`, allowed: availableTopics, next: refusal.next },
         ]);
       }
       const { reportData, snapshot } = await loadWeeklyBriefSnapshot();
@@ -604,7 +629,7 @@ const AGENT_TOOLS = [
   }),
 ];
 
-const registry = createAgentToolRegistry(AGENT_TOOLS);
+const registry = createAgentToolRegistry(AGENT_TOOLS, recordAgentToolCall);
 
 export const listAgentTools = registry.listAgentTools;
 export const describeAgentTools = registry.describeAgentTools;

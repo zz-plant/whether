@@ -134,17 +134,64 @@ describe("the agent tool registry", () => {
   });
 
   it("names the nearest answer as the nearest when the stress test already points to one", async () => {
-    const refused = await refusal(runAgentTool("get_answer", { question: "should I take venture debt?" }, "http"));
-    assert.match(refused.message, /The nearest is Should startups raise capital now\? \(should-startups-raise-capital-now\)/);
-    assert.match(refused.message, /not one about this question/);
+    const nearest: Record<string, RegExp> = {
+      "should we take an angel check?": /The nearest is Should startups raise capital now\? \(should-startups-raise-capital-now\)/,
+      "should we offer a secondary sale to employees?": /The nearest is Should startups change compensation now\? \(should-startups-change-compensation-now\)/,
+    };
+    for (const [question, named] of Object.entries(nearest)) {
+      const refused = await refusal(runAgentTool("get_answer", { question }, "http"));
+      assert.match(refused.message, named, question);
+      assert.match(refused.message, /not one about this question/, question);
+      assert.equal(refused.problems[0]?.next, "get_answer", question);
+    }
   });
 
-  it("still refuses what nothing covers, with the list of what does", async () => {
-    for (const question of ["should I quit my job to start a company?", "should we offer a secondary sale to employees?"]) {
-      const refused = await refusal(runAgentTool("get_answer", { question }, "http"));
-      assert.match(refused.message, /Available decision topics/, question);
-      assert.doesNotMatch(refused.message, /stress_test_plan/, question);
+  it("answers venture debt from its own page", async () => {
+    for (const question of ["should I take venture debt?", "is venture debt a good idea", "should we borrow instead of selling equity"]) {
+      assert.equal(matchDecisionPage(question)?.slug, "should-startups-take-venture-debt-now", question);
     }
+    /* "take" names the page and is no topic. */
+    assert.equal(matchDecisionPage("should we take a break"), undefined);
+  });
+
+  it("says plainly when nothing covers a question, and lists what does", async () => {
+    const refused = await refusal(runAgentTool("get_answer", { question: "should I quit my job to start a company?" }, "http"));
+    assert.match(refused.message, /tell the user it has no answer for this/);
+    assert.match(refused.message, /Available decision topics/);
+    assert.doesNotMatch(refused.message, /stress_test_plan/);
+    assert.equal(refused.problems[0]?.next, undefined);
+  });
+
+  it("counts a call by tool and outcome, and never keeps what was sent", async () => {
+    const rows: unknown[] = [];
+    const written: string[] = [];
+    Reflect.set(globalThis, "ANALYTICS", {
+      writeDataPoint: (point: { blobs?: string[] }) => {
+        const blob = point.blobs?.[1] ?? "";
+        written.push(blob);
+        rows.push(JSON.parse(blob));
+      },
+    });
+    try {
+      await runAgentTool("get_answer", { question: "Should I hire a second engineer for Project Falcon?" }, "http");
+      await refusal(runAgentTool("get_answer", { question: "should we sign the Falcon office lease?" }, "http"));
+      await refusal(runAgentTool("get_answer", { question: "Falcon pizza recipes" }, "http"));
+      await runAgentTool("stress_test_plan", { planText: "Hire one Falcon engineer", cashUsd: 1_234_567 }, "http");
+      await runAgentTool("stress_test_plan", { planText: "Falcon pizza party" }, "http");
+      await refusal(runAgentTool("get_answer", {}, "http"));
+      await callAgentTool("get_answer", { question: "Falcon pizza recipes" }, "stdio");
+    } finally {
+      Reflect.deleteProperty(globalThis, "ANALYTICS");
+    }
+    assert.deepEqual(rows, [
+      { tool: "get_answer", outcome: "answered", detail: "should-startups-hire-engineers-right-now" },
+      { tool: "get_answer", outcome: "refused", detail: "stress_test_plan" },
+      { tool: "get_answer", outcome: "refused", detail: null },
+      { tool: "stress_test_plan", outcome: "answered", detail: "HIRING" },
+      { tool: "stress_test_plan", outcome: "not_graded", detail: null },
+      { tool: "get_answer", outcome: "refused", detail: null },
+    ]);
+    assert.doesNotMatch(written.join(" "), /Falcon|pizza|1234567/);
   });
 
   it("returns each curated question's own answer before fuzzy topic ranking", () => {
@@ -244,7 +291,12 @@ describe("what an agent may pass, and what it is told when it passes something e
     assert.match(JSON.stringify(ads.answer), /"slug":"how-fast-should-we-scale-go-to-market"/);
     const secondary = await runAgentTool("stress_test_plan", { planText: "Offer employees a secondary sale" }, "http");
     assert.equal(secondary.verdict, null);
-    assert.equal(secondary.answer, null);
+    assert.match(JSON.stringify(secondary.answer), /"slug":"should-startups-change-compensation-now"/);
+    const ungraded = await runAgentTool("stress_test_plan", { planText: "Quit my contract work" }, "http");
+    assert.equal(ungraded.answer, null);
+    const debt = await runAgentTool("stress_test_plan", { planText: "Take $2M of venture debt" }, "http");
+    assert.equal(debt.verdict, null);
+    assert.match(JSON.stringify(debt.answer), /"slug":"should-startups-take-venture-debt-now"/);
     const retro = await runAgentTool("audit_sprint_retro", { planText: "Quit my contract work" }, "http");
     assert.equal(retro.verdict, null);
     assert.equal(retro.violationCount, 0);
