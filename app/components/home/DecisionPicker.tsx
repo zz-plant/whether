@@ -21,7 +21,7 @@ import {
   type RunwayBand,
 } from "../../../lib/report/operatorRunway";
 import { buildPlanTestHref } from "../../../lib/navigation/planningNavigation";
-import { ActionLink } from "../ui/actionLink";
+import { ActionLink, PlainActionLink } from "../ui/actionLink";
 import { CommitmentTest } from "./CommitmentTest";
 import { AreaGroups } from "./AreaGroups";
 import { RunwayAreaNote } from "../RunwayConditionedNotes";
@@ -172,9 +172,9 @@ export function DecisionPicker({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           {/* Not on an archived month: the stress test grades against today's reading. */}
           {testPlan ? (
-            <ActionLink href={buildPlanTestHref(testPlan)} variant="inline" data-area-test-link>
+            <PlainActionLink href={buildPlanTestHref(testPlan)} data-area-test-link>
               {`Test “${testPlan}” →`}
-            </ActionLink>
+            </PlainActionLink>
           ) : null}
           <ActionLink href="/operate#ops-plan-lines" variant="inline">
             Set your own rules →

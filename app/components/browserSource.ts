@@ -115,6 +115,9 @@ export const useBrowserSource = <TValue>(source: BrowserSource<TValue>): TValue 
 export const locationHashSource = createBrowserSource({
   read: () => window.location.hash.replace(/^#/, ""),
   serverValue: "",
+  /* The page owns the hash. A client-side move changes it with `pushState`, with no event,
+     so `/share` would otherwise open on the format the homepage's hash last named. */
+  refreshOnSubscribe: true,
   watch: (onChange) => {
     window.addEventListener("hashchange", onChange);
     return () => window.removeEventListener("hashchange", onChange);
