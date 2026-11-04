@@ -332,6 +332,10 @@ const RAISING_MONEY =
 const RAISING_PRICE =
   /\b(?:raise|raising|increase|increasing|hike|hiking|double|doubling)\s+(?:\S+\s+){0,3}?(?:price|prices|pricing)\b|\bpric(?:e|ing)\s+(?:increase|rise|hike)\b|\bcharge\s+more\b/;
 
+/* "buy company" was the only spelling, so "buy a smaller competitor" was not an acquisition. */
+const BUYING_A_COMPANY =
+  /\b(?:buy|buying)\s+(?:(?:a|an|the|our|one|another)\s+)?(?:\S+\s+){0,2}?(?:competitor|rival|startup|(?:company|business)(?!\s+(?:car|cars|card|cards|class|laptop|laptops|phone|phones|insurance)\b))\b/;
+
 const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCategory): Detection => {
   if (categoryOverride) {
     /* The caller said which kind of decision this is, so there is nothing to infer. */
@@ -371,7 +375,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
-  if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
+  if (/\b(cloud|aws|gpus?|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
   if (RAISING_PRICE.test(lower)) {
@@ -383,10 +387,10 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
       },
     };
   }
-  if (/\b(discount|discounts|pricing|price|prices|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contract)\b/.test(lower)) {
+  if (/\b(discount|discounts|pricing|price|prices|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contracts?)\b/.test(lower)) {
     return { category: "PRICING", action: "DISCOUNT" };
   }
-  if (/\b(acquire|acquisition|merger|m&a|buy company)\b/.test(lower)) {
+  if (/\b(acquire|acquiring|acquisition|merger|m&a)\b/.test(lower) || BUYING_A_COMPANY.test(lower)) {
     return { category: "M_AND_A", action: "ACQUIRE" };
   }
   if (/\b(rewrite|refactor|architecture|rebuild|v2 migration|tech debt)\b/.test(lower)) {
@@ -403,6 +407,20 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
       answerTopic: null,
     },
   };
+};
+
+/**
+ * Where a piece of text would go without grading it: a decision the test has rules for, or the
+ * answer that covers it, or neither. For a caller holding a question no answer page matched, which
+ * has no reading loaded and should not need one to say where to look next.
+ */
+export const routePlanText = (
+  text: string,
+): { gradable: true; category: DecisionCategory } | { gradable: false; answerTopic: string | null } => {
+  const detection = detectCategoryAndAction(text);
+  return "ungraded" in detection
+    ? { gradable: false, answerTopic: detection.ungraded.answerTopic }
+    : { gradable: true, category: detection.category };
 };
 
 /** Names the rule that decided, not the week, unless the week is what decided. */

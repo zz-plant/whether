@@ -487,6 +487,21 @@ describe("stress test — detection confidence", () => {
     }
   });
 
+  it("reads buying a company as an acquisition, and not every purchase with the word in it", () => {
+    for (const planText of ["Buy a smaller competitor", "Buying our rival", "buy company", "Acquiring a startup in Berlin"]) {
+      assert.equal(stressTestDecisionPlan(buildExpansionAssessment(), { planText }).detectedCategory, "M_AND_A", planText);
+    }
+    for (const planText of ["Buy a company car", "Buy more laptops", "Buy business insurance"]) {
+      assert.equal(runStressTest(buildExpansionAssessment(), { planText }).verdict, null, planText);
+    }
+  });
+
+  it("reads annual contracts in the plural as it does in the singular", () => {
+    for (const planText of ["Move customers to an annual contract", "Move customers to annual contracts"]) {
+      assert.equal(stressTestDecisionPlan(buildExpansionAssessment(), { planText }).detectedCategory, "PRICING", planText);
+    }
+  });
+
   it("still grades the discount side of pricing, in the plural too", () => {
     const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Cut prices 20% with discounts for annual prepay" });
     assert.equal(result.detectedAction, "DISCOUNT");
