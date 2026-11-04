@@ -492,6 +492,16 @@ describe("whether cli", () => {
     assert.equal(written.updatedAt, "live");
   });
 
+  it("reads by default from the address `bun run dev` serves, the one the README gives", () => {
+    /* Configuration: nothing renders it, and starting the real server here would take a port. */
+    const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "utf8");
+    const launch = JSON.parse(read(".claude/launch.json"));
+    assert.match(read("vite.config.ts"), /server: \{ host: "127\.0\.0\.1", port: 3000 \}/);
+    assert.match(read("scripts/whether-cli.mjs"), /const DEFAULT_API_BASE_URL = "http:\/\/localhost:3000"/);
+    assert.ok(read("README.md").includes("http://localhost:3000"));
+    assert.equal(launch.configurations.find((entry: { name: string }) => entry.name === "whether-dev")?.port, 3000);
+  });
+
   it("prints status in the site's words and keeps the API's fields for --json", async () => {
     const server = http.createServer((req, res) => {
       res.writeHead(200, { "content-type": "application/json" });
