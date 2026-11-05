@@ -15,6 +15,10 @@ type Workstream = {
   imageAlt: string;
   pageTitle: string;
   pageSummary: string;
+  /** schema.org's name for the kind of tool this is. */
+  applicationCategory: "FinanceApplication" | "BusinessApplication";
+  /** The term people search, where the heading keeps the tool's own name. */
+  alternateName?: string;
 };
 
 export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
@@ -27,6 +31,8 @@ export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
     imageAlt: "Whether startup runway calculator",
     pageTitle: "Runway planner",
     pageSummary: "A startup runway calculator: burn, raise timing and a memo, sized to this week's guidance.",
+    applicationCategory: "FinanceApplication",
+    alternateName: "Startup runway calculator",
   },
   scenarios: {
     slug: "scenarios",
@@ -35,6 +41,7 @@ export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
     imageAlt: "Whether scenario studio view",
     pageTitle: "Scenarios",
     pageSummary: "Move two sliders to see what the guidance would be in a different week.",
+    applicationCategory: "BusinessApplication",
   },
 };
 

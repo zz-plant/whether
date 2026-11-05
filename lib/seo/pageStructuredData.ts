@@ -6,6 +6,7 @@ import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
 import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
+import type { DecisionArea } from "../report/boundedDecisionRules";
 
 /**
  * Per-page JSON-LD, for the pages whose content already supports a schema.org
@@ -49,6 +50,183 @@ const isoDate = (value: string | null | undefined) => {
   if (!value) return null;
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? null : date.toISOString().slice(0, 10);
+};
+
+/**
+ * The public concept a page is about, named the way a knowledge graph already knows it.
+ *
+ * "Whether" is an ordinary English word and "funding pressure" is this site's own term, so nothing
+ * in the text ties a page to the concepts a retrieval system indexes. `sameAs` does. Each article
+ * was opened to confirm it is about the concept, not a redirect to something broader: "New bets" has
+ * no entry because `Market_expansion` redirects to `Economic_growth`, and a wrong link is worse than
+ * none.
+ */
+const wikipediaTopic = (name: string, article: string) => ({
+  "@type": "Thing",
+  name,
+  sameAs: `https://en.wikipedia.org/wiki/${article}`,
+});
+
+const DECISION_AREA_TOPIC: Record<DecisionArea, ReturnType<typeof wikipediaTopic> | null> = {
+  hiring: wikipediaTopic("Recruitment", "Recruitment"),
+  "product-tempo": wikipediaTopic("Product management", "Product_management"),
+  "capital-raising": wikipediaTopic("Venture capital", "Venture_capital"),
+  "burn-discipline": wikipediaTopic("Burn rate", "Burn_rate"),
+  "expansion-bets": null,
+};
+
+/** What each signal watch reads, from its `evidence` line in `app/signals/clusterRoutes.ts`. */
+const SIGNAL_WATCH_TOPICS: Record<string, ReadonlyArray<ReturnType<typeof wikipediaTopic>>> = {
+  "capital-tightness-watch": [
+    wikipediaTopic("Interest rate", "Interest_rate"),
+    wikipediaTopic("United States Treasury security", "United_States_Treasury_security"),
+  ],
+  "risk-appetite-watch": [wikipediaTopic("Risk aversion", "Risk_aversion")],
+  "yield-curve-flip-watch": [wikipediaTopic("Yield curve", "Yield_curve")],
+};
+
+const areaTopics = (areas: readonly DecisionArea[]) =>
+  areas.flatMap((area) => DECISION_AREA_TOPIC[area] ?? []);
+
+/**
+ * A hub: a `CollectionPage` listing what it links.
+ *
+ * `/companies`, `/resources` and the three signal watches drew a trail and declared nothing else, so
+ * their only structured statement was where they sat, not what they were. `items` must be pages the
+ * hub renders a link to; a list naming URLs the page does not show is markup that misdescribes it.
+ */
+export const buildHubStructuredData = ({
+  path,
+  name,
+  description,
+  items,
+  about = [],
+  dateModifiedIso,
+}: {
+  path: `/${string}`;
+  name: string;
+  description: string;
+  items: ReadonlyArray<{ path: string; name: string }>;
+  about?: ReadonlyArray<Record<string, unknown>>;
+  dateModifiedIso?: string;
+}): JsonLdGraph => {
+  const url = buildCanonicalUrl(path);
+  return graph([
+    {
+      "@type": "CollectionPage",
+      "@id": `${url}#webpage`,
+      url,
+      name,
+      description,
+      inLanguage: "en",
+      isPartOf: isPartOfSite,
+      publisher: buildPublisherSchema(organizationName),
+      ...(about.length > 0 ? { about: [...about] } : {}),
+      ...(dateModifiedIso ? { dateModified: dateModifiedIso } : {}),
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: items.length,
+        itemListElement: items.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: buildCanonicalUrl(item.path),
+          name: item.name,
+        })),
+      },
+    },
+  ]);
+};
+
+/** `/signals/[cluster]`: a hub over its five decision scenarios, about what the watch reads. */
+export const buildSignalWatchStructuredData = ({
+  slug,
+  name,
+  description,
+  scenarios,
+  dateModifiedIso,
+}: {
+  slug: string;
+  name: string;
+  description: string;
+  scenarios: ReadonlyArray<{ path: string; name: string }>;
+  dateModifiedIso: string;
+}): JsonLdGraph =>
+  buildHubStructuredData({
+    path: `/signals/${slug}`,
+    name,
+    description,
+    items: scenarios,
+    about: SIGNAL_WATCH_TOPICS[slug] ?? [],
+    dateModifiedIso,
+  });
+
+/** `/signals/[cluster]/[decision-scenario]`: one signal read for one decision, so it is about both. */
+export const buildSignalScenarioStructuredData = ({
+  slug,
+  signalTitle,
+  area,
+  name,
+  description,
+  dateModifiedIso,
+}: {
+  slug: string;
+  signalTitle: string;
+  area: DecisionArea;
+  name: string;
+  description: string;
+  dateModifiedIso: string;
+}): JsonLdGraph => {
+  const url = buildCanonicalUrl(`/signals/${slug}/${area}`);
+  return graph([
+    {
+      "@type": "WebPage",
+      "@id": `${url}#webpage`,
+      url,
+      name,
+      description,
+      inLanguage: "en",
+      isPartOf: [isPartOfSite, { "@type": "CollectionPage", url: buildCanonicalUrl(`/signals/${slug}`), name: signalTitle }],
+      publisher: buildPublisherSchema(organizationName),
+      about: [...(SIGNAL_WATCH_TOPICS[slug] ?? []), ...areaTopics([area])],
+      dateModified: dateModifiedIso,
+    },
+  ]);
+};
+
+/**
+ * `/operate/financial` and `/operate/scenarios`: tools, declared as tools.
+ *
+ * Their title says calculator and their markup said only where they sit. No `offers` or rating: no
+ * price is charged and no one has rated them, and the rich result those would chase needs both.
+ */
+export const buildWorkstreamStructuredData = ({
+  path,
+  name,
+  alternateName,
+  description,
+  applicationCategory,
+}: {
+  path: `/${string}`;
+  name: string;
+  alternateName?: string;
+  description: string;
+  applicationCategory: string;
+}): Record<string, unknown> => {
+  const url = buildCanonicalUrl(path);
+  return {
+    "@type": "WebApplication",
+    "@id": `${url}#app`,
+    url,
+    name,
+    ...(alternateName ? { alternateName } : {}),
+    description,
+    applicationCategory,
+    operatingSystem: "Any",
+    inLanguage: "en",
+    isAccessibleForFree: true,
+    isPartOf: isPartOfSite,
+    publisher: buildPublisherSchema(organizationName),
+  };
 };
 
 /**
@@ -274,10 +452,16 @@ export const buildAnswerFaqStructuredData = ({
   datePublishedIso,
   dateModifiedIso,
   additionalQuestions = [],
+  areas = [],
+  audience,
 }: {
   slug: string;
   question: string;
   answer: string;
+  /** The decisions the answer maps to, the one it argues first leading. */
+  areas?: readonly DecisionArea[];
+  /** Who the page says it is for, as it prints it. */
+  audience?: string;
   payload: Pick<SeoDecisionPayload, "triggerThreshold" | "reversalCondition">;
   /**
    * The rest of what the page answers.
@@ -309,6 +493,8 @@ export const buildAnswerFaqStructuredData = ({
       dateModified: dateModifiedIso,
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),
+      ...(areaTopics(areas).length > 0 ? { about: areaTopics(areas) } : {}),
+      ...(audience ? { audience: { "@type": "Audience", audienceType: audience } } : {}),
       mainEntity: [
         {
           "@type": "Question",
@@ -498,24 +684,41 @@ export const buildPublishedBriefStructuredData = ({
       ],
       about: [
         { "@type": "Thing", name: "Startup Operating Guidance" },
-        { "@type": "Thing", name: "Venture Capital Macro Climate" },
+        wikipediaTopic("Venture capital", "Venture_capital"),
+        wikipediaTopic("Yield curve", "Yield_curve"),
       ],
     },
   ]);
 
-/** A company page says what it is about and where it sits, and claims no reviewer or rating. */
+/**
+ * A company page says what it is about and where it sits, and claims no reviewer or rating.
+ *
+ * The company is identified by its SEC registrant number, the same one its figures are read by.
+ * A name and a ticker leave "Block", "Target" and "Snap" ambiguous, and a page's name ("Google") can
+ * differ from the filer's (Alphabet); the CIK and the EDGAR page do not.
+ */
 export const buildCompanyPageStructuredData = ({
   path,
   title,
+  description,
   company,
   ticker,
+  cik,
   trail,
+  audience,
+  dateModifiedIso,
 }: {
   path: `/${string}`;
   title: string;
+  description: string;
   company: string;
   ticker: string;
+  cik: number;
   trail: ReadonlyArray<{ name: string; path: `/${string}` }>;
+  /** The role a role page speaks to; a company overview speaks to no one role. */
+  audience?: string;
+  /** The reading the page's conditions come from. */
+  dateModifiedIso: string;
 }): JsonLdGraph =>
   graph([
     {
@@ -523,9 +726,21 @@ export const buildCompanyPageStructuredData = ({
       "@id": `${buildCanonicalUrl(path)}#webpage`,
       url: buildCanonicalUrl(path),
       name: title,
-      about: { "@type": "Corporation", name: company, tickerSymbol: ticker },
+      description,
+      inLanguage: "en",
+      dateModified: dateModifiedIso,
+      about: {
+        "@type": "Corporation",
+        name: company,
+        tickerSymbol: ticker,
+        identifier: { "@type": "PropertyValue", propertyID: "SEC CIK", value: String(cik) },
+        sameAs: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${String(cik).padStart(10, "0")}`,
+      },
+      ...(audience ? { audience: { "@type": "Audience", audienceType: audience } } : {}),
       isPartOf: { "@id": websiteId },
-      publisher: { "@id": organizationId },
+      /* A full node, not `{ "@id": organizationId }`: an id resolves only against a node on the same
+         page, and these 350 pages carried none, so their publisher resolved to nothing. */
+      publisher: buildPublisherSchema(organizationName),
     },
     buildBreadcrumbList(trail.map((item) => ({ name: item.name, path: item.path }))),
   ]);
@@ -536,10 +751,13 @@ export const buildRolePageStructuredData = ({
   title,
   role,
   trail,
+  dateModifiedIso,
 }: {
   path: `/${string}`;
   title: string;
   role: string;
+  /** The reading the page's conditions come from. */
+  dateModifiedIso: string;
   /** Everything after Roles, the page itself last. */
   trail: ReadonlyArray<{ name: string; path: `/${string}` }>;
 }): JsonLdGraph =>
@@ -550,8 +768,9 @@ export const buildRolePageStructuredData = ({
       url: buildCanonicalUrl(path),
       name: title,
       about: { "@type": "Occupation", name: role },
+      dateModified: dateModifiedIso,
       isPartOf: { "@id": websiteId },
-      publisher: { "@id": organizationId },
+      publisher: buildPublisherSchema(organizationName),
     },
     buildBreadcrumbList([{ name: "Roles", path: "/roles" }, ...trail]),
   ]);

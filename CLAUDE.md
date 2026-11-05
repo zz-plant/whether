@@ -18,7 +18,7 @@ This file only covers mechanics: commands, costs, and where things live.
 | `bun run check <task…>` | varies | Only the named tasks, e.g. `bun run check lint typecheck`. Task names are in `scripts/check-tasks.mjs`. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
-| `bun run check:unchecked-access` | ~6s | Indexing `noUncheckedIndexedAccess` would reject, against a baseline that only falls (888). `tests/checkUncheckedAccess.test.ts` holds it in every gate; when that fails, this lists the worst files. |
+| `bun run check:unchecked-access` | ~6s | Indexing `noUncheckedIndexedAccess` would reject, against a baseline that only falls (855). `tests/checkUncheckedAccess.test.ts` holds it in every gate; when that fails, this lists the worst files. |
 | `bun run check:home-load` | ~1s | The homepage's words, numbers, folds, buttons, fields, score-name mentions, jargon terms, sentences above grade 12 and longest sentence, against a budget that only falls. `tests/homeLoadBudget.test.tsx` holds it in every gate; when that fails, this prints the table and the value to lower the budget to after a cut. |
 | `bun run check:production-edge` | ~3s | Production `/` and `/api/health`: names a Cloudflare challenge, a 403 or a DNS failure. `check:production-assets` probes every static asset and OG route. |
 | `bun run skills:sync` | <1s | After editing `.claude/skills/` or `.codex/skills-overlay/`: regenerates the `.codex/skills/` mirror. |

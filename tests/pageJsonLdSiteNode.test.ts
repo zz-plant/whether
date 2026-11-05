@@ -66,7 +66,8 @@ describe("every hand-built page graph carries the site node", () => {
       const nodes = assertCarriesTheSite(page, [JSON.parse(JSON.stringify(document))]);
       const webPage = nodes.find((node) => node["@type"] === "WebPage");
       assert.deepEqual(webPage?.isPartOf, { "@id": websiteId }, `${page}: the page names the site by id`);
-      assert.deepEqual(webPage?.publisher, { "@id": organizationId }, page);
+      /* The entity by id, in full here or by a reference to a node on the same page. */
+      assert.partialDeepStrictEqual(webPage?.publisher, { "@id": organizationId }, page);
     }
   });
 

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { buildBreadcrumbList, buildPageMetadata } from "../../../lib/seo";
-import { graph } from "../../../lib/seo/pageStructuredData";
+import { buildWorkstreamStructuredData, graph } from "../../../lib/seo/pageStructuredData";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
@@ -74,7 +74,18 @@ export default async function OperateWorkstreamPage({
         /* The trail as structured data only. A visible "Decide / Runway planner"
            sat under the sub-tab row that names the same two pages and marks the
            same one current (2026-10-09). */
-        payloads: { structuredData: graph([buildBreadcrumbList(buildGroupBreadcrumbs(currentPath))]) },
+        payloads: {
+          structuredData: graph([
+            buildWorkstreamStructuredData({
+              path: currentPath,
+              name: entry.pageTitle,
+              alternateName: entry.alternateName,
+              description: entry.description,
+              applicationCategory: entry.applicationCategory,
+            }),
+            buildBreadcrumbList(buildGroupBreadcrumbs(currentPath)),
+          ]),
+        },
       }}
     >
       <div className="space-y-6">

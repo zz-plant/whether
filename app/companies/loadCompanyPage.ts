@@ -24,6 +24,7 @@ export const loadWeekConditions = async () => {
     rationale: getRegimeWeatherRationale(regime),
     guidance: weeklyCall.currentCall,
     recordDateLabel: reportData.recordDateLabel,
+    recordDateIso: reportData.treasury.record_date,
     /* A robots tag protects search results, not a reader who follows a link. */
     ...(stale
       ? { savedCopyNotice: describeSavedCopyBanner({ recordDate: reportData.treasury.record_date, now: new Date(), guidanceHeld: false }) }

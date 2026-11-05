@@ -2,13 +2,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { buildBreadcrumbList, organizationId, websiteId } from "../../lib/seo";
+import { buildBreadcrumbList, buildCanonicalUrl, organizationName, websiteId } from "../../lib/seo";
+import { buildPublisherSchema } from "../../lib/publisher";
 import { graph } from "../../lib/seo/pageStructuredData";
 import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks, parsePlanLinesWatch } from "../../lib/navigation/planningNavigation";
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
-import { siteUrl } from "../../lib/siteUrl";
 import { HistoricalBanner } from "../components/historicalBanner";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
@@ -68,13 +68,13 @@ export async function buildPlanningPageModel(
   const structuredData = graph([
     {
       "@type": "WebPage",
-      name: "Whether Weekly Brief — Planning",
-      url: `${siteUrl}/planning`,
+      name: "This Week's Plan: Hiring, Spending and Runway Rules",
+      url: buildCanonicalUrl("/operate"),
       description:
         "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
       inLanguage: "en",
       isPartOf: { "@id": websiteId },
-      publisher: { "@id": organizationId },
+      publisher: buildPublisherSchema(organizationName),
     },
     buildBreadcrumbList(buildGroupBreadcrumbs("/operate")),
     {

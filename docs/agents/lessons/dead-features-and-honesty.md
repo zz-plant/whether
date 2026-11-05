@@ -290,6 +290,28 @@ rather than what the metadata code intends, found gaps none of the SEO suites co
   instead (`/api/health` left the manifest), and an open path opens every path it is a prefix of,
   so a closed neighbour (`/api/weekly-digest` beside `/api/weekly`) needs a Disallow line of its own.
 
+## What the markup said a page was about (2026-11-05)
+
+A second crawl of every sitemap URL, reading each page's JSON-LD and link graph rather than its tags:
+
+- **A reference to a node that is not there.** 351 pages (every company page, `/operate`; the `/roles` pages arrived with it mid-change) published
+  `publisher: { "@id": organizationId }` with no Organization node on the page. An id resolves only
+  on its own page, so a consumer read no publisher. `tests/pageStructuredData.test.ts` walks each
+  builder for this.
+- **A page that declared only its trail.** Signal watches, scenario pages, `/companies` and
+  `/resources` emitted a BreadcrumbList and nothing else. `/operate` called itself `/planning`, a
+  retired URL. The guide outside the content lists had no Article node at all.
+- **Nothing tied a page to a known concept.** Everything said "funding pressure" and named no entity a
+  knowledge graph holds. `about` now carries `sameAs` for the decision and the signal, and a company
+  carries its SEC CIK. Open each Wikipedia article before adding it: `Market_expansion` redirects to
+  `Economic_growth`, so "New bets" has no topic.
+- **Ranking is not linking.** `selectRelatedAnswers` looked fair and left three answers on no other
+  answer's list, because a page's strongest neighbour need not rank it back. Measure inbound links
+  across the corpus; a link now runs both ways.
+
+Left alone on purpose, each with a comment saying why: the short headings on tool pages (`Guides`,
+`Runway planner`), which keep the name every link uses, and history periods with no `datePublished`.
+
 ## A warning that is always on (2026-09-23)
 
 Every page showed **"Sources: Partly cached"** in warning amber on every visit, production
