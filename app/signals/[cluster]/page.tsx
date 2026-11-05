@@ -6,6 +6,8 @@ import { buildTrustStripProps } from "../../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../../lib/report/sourceHealth";
 import { resolvePublishedConfidence } from "../../../lib/report/confidence";
 import { buildPageMetadata } from "../../../lib/seo";
+import { buildSignalWatchStructuredData } from "../../../lib/seo/pageStructuredData";
+import { JsonLdScript } from "../../components/jsonLdScript";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { isCallStaleForIndexing, isStaleForIndexing } from "../../../lib/seo/freshnessIndexation";
 import { findSignalsCluster, isSignalsClusterSlug, signalsClusterStaticParams } from "../clusterRoutes";
@@ -111,6 +113,18 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
 
   return (
     <ContentPageShell>
+      <JsonLdScript
+        data={buildSignalWatchStructuredData({
+          slug: cluster,
+          name: clusterDefinition.title,
+          description: clusterDefinition.summary,
+          scenarios: decisionScenarioDefinitions.map((scenario) => ({
+            path: `/signals/${cluster}/${scenario.slug}`,
+            name: `${clusterDefinition.title}: ${scenario.title}`,
+          })),
+          dateModifiedIso: reportData.treasury.fetched_at,
+        })}
+      />
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(`/signals/${cluster}`, [{ name: clusterDefinition.title, path: `/signals/${cluster}` }]),

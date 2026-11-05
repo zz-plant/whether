@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fragment } from "react";
 import { buildPageMetadata } from "../../lib/seo";
+import { buildHubStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildResourceHubEntries } from "../../lib/resourceHub";
 import { resourceSupportingPages } from "../../lib/resourcesContent";
 import { PageShell } from "../components/pageShell";
@@ -29,10 +30,13 @@ import {
 import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
+const title = "Startup Decision Guides: Hiring, Fundraising, Runway and Spending";
+const description =
+  "Guides to the decisions startup leaders ask about most: when to hire, when to raise, how much runway to keep, and what to cut when money gets expensive.";
+
 export const metadata: Metadata = buildPageMetadata({
-  title: "Startup Decision Guides: Hiring, Fundraising, Runway and Spending",
-  description:
-    "Guides to the decisions startup leaders ask about most: when to hire, when to raise, how much runway to keep, and what to cut when money gets expensive.",
+  title,
+  description,
   path: "/resources",
   imageAlt: "Whether guides",
 });
@@ -108,7 +112,22 @@ export default async function ResourcesHubPage({
   );
 
   return (
-    <PageShell backdropVariant="hub">
+    <PageShell
+      backdropVariant="hub"
+      structuredData={buildHubStructuredData({
+        path: "/resources",
+        name: title,
+        description,
+        /* What this page renders, in its order: the answers and guides by area, then the frameworks. */
+        items: [
+          ...areaGroups.flatMap((group) => [
+            ...group.answers.map((page) => ({ path: answerPageHref(page.slug), name: page.title })),
+            ...group.guides.map((entry) => ({ path: entry.href, name: entry.title })),
+          ]),
+          ...frameworks.map((entry) => ({ path: entry.href, name: entry.title })),
+        ],
+      })}
+    >
       <OperatorWorkflowRouteTracker />
       <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs("/resources"))} />
       <article className="weather-panel space-y-8 px-5 max-sm:px-0 py-5">

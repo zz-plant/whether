@@ -1,4 +1,6 @@
 import { ActionLink } from "../components/ui/actionLink";
+import { findLeadAnswerForArea } from "../answers/decisionPages";
+import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { COMPANIES, type CompanyEntry } from "../../lib/companies/companyRegistry";
 import { COMPANY_ROLES, type CompanyRole } from "../../lib/report/companyRoles";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
@@ -18,6 +20,8 @@ export type WeekConditions = {
   rationale: string;
   guidance: string;
   recordDateLabel: string;
+  /** The same date, ISO, for `<time>` and the page's `dateModified`. */
+  recordDateIso: string;
   /** Present when live data is late, so these rules are from a saved reading. */
   savedCopyNotice?: string;
 };
@@ -38,7 +42,7 @@ export function ConditionsSection({ conditions }: { conditions: WeekConditions }
         <span className="font-semibold text-slate-100">{publicDecisionLabels.call}, written for companies that depend on outside funding:</span>{" "}
         {conditions.guidance}
       </p>
-      <p className="text-xs text-slate-400">Data as of {conditions.recordDateLabel}. Every company reads the same conditions.</p>
+      <p className="text-xs text-slate-400">Data as of <time dateTime={conditions.recordDateIso}>{conditions.recordDateLabel}</time>. Every company reads the same conditions.</p>
     </section>
   );
 }
@@ -116,14 +120,22 @@ export function RoleDecisionsSection({
         <p className="text-sm text-slate-200">{askFor}</p>
         <p className="text-sm text-slate-300">{paybackBar}</p>
       </div>
-      {rules.map((rule) => (
-        <div key={rule.area} className="space-y-1 border-t border-[color:var(--border-faint)] pt-3 text-sm text-slate-200">
-          <h3 className="font-semibold text-slate-100">The general {decisionAreaLabel(rule.area).toLowerCase()} rule this week</h3>
-          <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.action.actionNow}:</span> {formatBoundedDecisionAction(rule)}</p>
-          <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {formatBoundedDecisionThreshold(rule)}</p>
-          <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatBoundedDecisionReverse(rule)}</p>
-        </div>
-      ))}
+      {rules.map((rule) => {
+        /* The question this rule answers, under its own words: the 300 role pages printed each
+           general rule and linked to none of the answer pages that argue it. */
+        const answer = findLeadAnswerForArea(rule.area);
+        return (
+          <div key={rule.area} className="space-y-1 border-t border-[color:var(--border-faint)] pt-3 text-sm text-slate-200">
+            <h3 className="font-semibold text-slate-100">The general {decisionAreaLabel(rule.area).toLowerCase()} rule this week</h3>
+            <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.action.actionNow}:</span> {formatBoundedDecisionAction(rule)}</p>
+            <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {formatBoundedDecisionThreshold(rule)}</p>
+            <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatBoundedDecisionReverse(rule)}</p>
+            {answer && isIndexableAnswerSlug(answer.slug) ? (
+              <p>Full answer: <ActionLink href={`/answers/${answer.slug}`} variant="inline">{answer.title}</ActionLink></p>
+            ) : null}
+          </div>
+        );
+      })}
     </section>
   );
 }

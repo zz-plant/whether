@@ -10,6 +10,9 @@ import {
 import { pilotPeerGrowth, readCompanyRecord, refreshCompanyFilings } from "../lib/companies/companyFilingStore";
 import { COMPANIES, findCompany, type CompanyEntry } from "../lib/companies/companyRegistry";
 import { askForThisWeek, COMPANY_ROLES, findCompanyRole, paybackBarLine } from "../lib/report/companyRoles";
+import { findLeadAnswerForArea } from "../app/answers/decisionPages";
+import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import type { SecCompanyFigures } from "../lib/marketData/secEdgar";
 import { buildCompanySituation } from "../lib/report/companySituation";
 import { companyFactsFixture } from "./fixtures/marketData";
@@ -178,8 +181,32 @@ describe("the page sections", () => {
     assert.match(html, /Which project to attach yourself to/);
   });
 
+  it("links each general rule to the answer that argues it", () => {
+    const role = findCompanyRole("software-engineers");
+    assert.ok(role);
+    const lead = findLeadAnswerForArea("hiring");
+    assert.ok(lead);
+    const hiringRules = buildCanonicalBoundedDecisionRules({
+      regime: "DEFENSIVE",
+      thresholds: DEFAULT_THRESHOLDS,
+      scores: { tightness: 72, riskAppetite: 42 },
+    }).filter((rule) => rule.area === "hiring");
+    assert.equal(hiringRules.length, 1);
+    const html = renderToStaticMarkup(
+      <RoleDecisionsSection role={role} askFor="a" paybackBar="b" rules={hiringRules} />,
+    );
+    assert.ok(html.includes(`href="/answers/${lead.slug}"`), "the hiring rule links its answer");
+  });
+
+  it("marks the reading's date up as a date", () => {
+    const html = renderToStaticMarkup(
+      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
+    );
+    assert.match(html, /<time dateTime="2026-11-03">Nov 3, 2026<\/time>/);
+  });
+
   it("warns on the page when the reading is a saved one, and only then", () => {
-    const week = { label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026" };
+    const week = { label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" };
     assert.doesNotMatch(renderToStaticMarkup(<ConditionsSection conditions={week} />), /company-saved-copy/);
     const saved = renderToStaticMarkup(<ConditionsSection conditions={{ ...week, savedCopyNotice: "Live data is late." }} />);
     assert.match(saved, /company-saved-copy/);
@@ -188,14 +215,14 @@ describe("the page sections", () => {
 
   it("says who the guidance is written for, and calls the rules general", () => {
     const html = renderToStaticMarkup(
-      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026" }} />,
+      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
     );
     assert.match(html, /written for companies that depend on outside funding/);
   });
 
   it("prints the shared conditions as shared", () => {
     const html = renderToStaticMarkup(
-      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026" }} />,
+      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
     );
     assert.match(html, /Cloudy/);
     assert.match(html, /Every company reads the same conditions/);

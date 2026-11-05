@@ -24,9 +24,16 @@ export type RelatedAnswerCandidate = {
   mappedDecisionAreas: readonly DecisionArea[];
 };
 
-const overlapCount = (a: readonly DecisionArea[], b: readonly DecisionArea[]) => {
+/*
+ * The share of the two pages' areas they have in common, not the count. A count favours whichever
+ * pages list the most areas, which outrank a page on one narrow lever for every reader of that lever:
+ * three answers came last on every other answer's list and were linked from none of them.
+ */
+const areaOverlap = (a: readonly DecisionArea[], b: readonly DecisionArea[]) => {
   const set = new Set<string>(a);
-  return b.filter((area) => set.has(area)).length;
+  const shared = b.filter((area) => set.has(area)).length;
+  const union = set.size + b.length - shared;
+  return union === 0 ? 0 : shared / union;
 };
 
 /**
@@ -41,7 +48,10 @@ const overlapCount = (a: readonly DecisionArea[], b: readonly DecisionArea[]) =>
  * — not because they are sorting anything now.
  *
  * Ties fall back to slug order rather than input order, so the block does not
- * silently reshuffle when someone appends a page to the JSON.
+ * silently reshuffle when someone appends a page to the JSON. The order starts
+ * after this page's own slug and wraps: ties are common here, and plain slug
+ * order hands every tie to the same early-alphabet pages, which left answers
+ * late in the alphabet with no inbound link from any other answer.
  */
 export const selectRelatedAnswers = <T extends RelatedAnswerCandidate>(
   page: T,
@@ -50,22 +60,37 @@ export const selectRelatedAnswers = <T extends RelatedAnswerCandidate>(
     limit = 3,
     isEligible = () => true,
   }: { limit?: number; isEligible?: (slug: string) => boolean } = {},
-): T[] =>
-  candidates
-    .filter((candidate) => candidate.slug !== page.slug && isEligible(candidate.slug))
-    .map((candidate) => ({
-      candidate,
-      areas: overlapCount(page.mappedDecisionAreas, candidate.mappedDecisionAreas),
-      threshold: candidate.thresholdFocus === page.thresholdFocus ? 1 : 0,
-      audience: candidate.audience === page.audience ? 1 : 0,
-    }))
-    .sort((left, right) =>
-      right.areas - left.areas
-      || right.threshold - left.threshold
-      || right.audience - left.audience
-      || left.candidate.slug.localeCompare(right.candidate.slug))
-    .slice(0, limit)
-    .map((entry) => entry.candidate);
+): T[] => {
+  const strongest = (from: T): T[] =>
+    candidates
+      .filter((candidate) => candidate.slug !== from.slug && isEligible(candidate.slug))
+      .map((candidate) => ({
+        candidate,
+        areas: areaOverlap(from.mappedDecisionAreas, candidate.mappedDecisionAreas),
+        threshold: candidate.thresholdFocus === from.thresholdFocus ? 1 : 0,
+        audience: candidate.audience === from.audience ? 1 : 0,
+      }))
+      .sort((left, right) =>
+        right.areas - left.areas
+        || right.threshold - left.threshold
+        || right.audience - left.audience
+        || Number(left.candidate.slug < from.slug) - Number(right.candidate.slug < from.slug)
+        || left.candidate.slug.localeCompare(right.candidate.slug))
+      .slice(0, limit)
+      .map((entry) => entry.candidate);
+
+  const own = strongest(page);
+  /* Then the answers that name this one, so a link runs both ways. Ranking alone left some answers
+     on no one's list: being a page's strongest neighbour does not make it yours. */
+  const namedBy = candidates.filter(
+    (candidate) =>
+      candidate.slug !== page.slug
+      && isEligible(candidate.slug)
+      && !own.includes(candidate)
+      && strongest(candidate).includes(page),
+  );
+  return [...own, ...namedBy];
+};
 
 /**
  * The answers that cite a page among their supporting links, for that page to

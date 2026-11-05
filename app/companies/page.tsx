@@ -4,12 +4,17 @@ import { COMPANIES } from "../../lib/companies/companyRegistry";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../lib/seo";
+import { buildHubStructuredData } from "../../lib/seo/pageStructuredData";
+import { JsonLdScript } from "../components/jsonLdScript";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
+const title = "This week's conditions by company and role";
+const description = "This week's conditions, the decisions each role makes, and each company's latest filed figures, for 50 public companies.";
+
 export const metadata: Metadata = buildPageMetadata({
-  title: "This week's conditions by company and role",
-  description: "This week's conditions, the decisions each role makes, and each company's latest filed figures, for 50 public companies.",
+  title,
+  description,
   path: "/companies",
   imageAlt: "This week's conditions by company and role",
 });
@@ -17,6 +22,14 @@ export const metadata: Metadata = buildPageMetadata({
 export default function CompaniesPage() {
   return (
     <ContentPageShell>
+      <JsonLdScript
+        data={buildHubStructuredData({
+          path: "/companies",
+          name: title,
+          description,
+          items: COMPANIES.map((company) => ({ path: `/companies/${company.slug}`, name: company.name })),
+        })}
+      />
       <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(toRoute("/companies"), [{ name: "Companies", path: toRoute("/companies") }]))} />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions by company and role</h1>

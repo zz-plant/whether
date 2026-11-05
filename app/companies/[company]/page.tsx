@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { findCompany } from "../../../lib/companies/companyRegistry";
+import { findCompany, type CompanyEntry } from "../../../lib/companies/companyRegistry";
 import { COMPANY_ROLES } from "../../../lib/report/companyRoles";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../lib/navigation/routeType";
@@ -19,13 +19,16 @@ type Params = { company: string };
 export const dynamicParams = true;
 export const revalidate = 3600;
 
+const companyDescription = (company: CompanyEntry) =>
+  `This week's conditions, ${company.name}'s latest filed revenue, cash flow and debt, and what they mean by role.`;
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const company = findCompany((await params).company);
   if (!company) return {};
   const { indexable } = await loadCompanyPage(company);
   const metadata = buildPageMetadata({
     title: `${company.name}: this week's operating conditions and filed figures`,
-    description: `This week's conditions, ${company.name}'s latest filed revenue, cash flow and debt, and what they mean by role.`,
+    description: companyDescription(company),
     path: `/companies/${company.slug}`,
     imageAlt: `${company.name}: this week's operating conditions`,
   });
@@ -46,8 +49,11 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
         data={buildCompanyPageStructuredData({
           path: `/companies/${company.slug}`,
           title: `${company.name}: this week's conditions and filed figures`,
+          description: companyDescription(company),
           company: company.name,
           ticker: company.ticker,
+          cik: company.cik,
+          dateModifiedIso: conditions.recordDateIso,
           trail: [
             { name: "Companies", path: "/companies" },
             { name: company.name, path: `/companies/${company.slug}` },

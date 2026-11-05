@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
+import { buildSignalScenarioStructuredData } from "../../../../lib/seo/pageStructuredData";
+import { JsonLdScript } from "../../../components/jsonLdScript";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import { shouldNoindexPayload } from "../../../../lib/seo/freshnessIndexation";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
@@ -164,6 +166,16 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       data-content-measurement-root={pagePath}
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="authority" intent={contentIntent} />
+      <JsonLdScript
+        data={buildSignalScenarioStructuredData({
+          slug: cluster,
+          signalTitle: signal.title,
+          area: scenario.slug,
+          name: `${signal.title}: ${scenario.title}`,
+          description: signal.summary,
+          dateModifiedIso: payloadRecord.snapshot.fetchedAtIso,
+        })}
+      />
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(`/signals/${cluster}/${scenario.slug}`), [

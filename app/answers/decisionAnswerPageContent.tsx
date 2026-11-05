@@ -8,6 +8,7 @@ import {
 import { findPublishedDecisionPage } from "../../lib/answers/answerContentStore";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { selectRelatedAnswers } from "../../lib/seo/relatedAnswers";
+import { indexableSignalsClusters } from "../signals/clusterRoutes";
 import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
@@ -153,6 +154,8 @@ export async function DecisionAnswerPageContent({
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
+    areas: page.mappedDecisionAreas,
+    audience: page.audience,
     /* The rest of what this page answers, from what it already renders. Each is
        a passage an answer engine can quote and attribute; none of them were in
        the payload a machine reads. */
@@ -371,6 +374,22 @@ export async function DecisionAnswerPageContent({
               </div>
             ))}
           </div>
+          {/* Each signal read for this decision. The scenario pages hung off their hub alone, so the
+              page that says what would change an answer linked to none of the pages that track it. */}
+          {leadArea ? (
+            <div className="mt-3 space-y-1 text-xs">
+              <p className="text-slate-400">The signals behind these lines, for {decisionAreaLabel(leadArea).toLowerCase()}:</p>
+              <ul className="flex flex-wrap gap-x-4 gap-y-1">
+                {indexableSignalsClusters.map((signal) => (
+                  <li key={signal.slug}>
+                    <ActionLink href={`/signals/${signal.slug}/${leadArea}`} variant="inline">
+                      {signal.title}: {decisionAreaLabel(leadArea)}
+                    </ActionLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.copy}>
@@ -398,7 +417,7 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
-          <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
+          <p className="text-xs text-slate-400">Data date: <time dateTime={reportData.treasury.record_date}>{recordDateLabel}</time> · freshness: {fetchedAtLabel}.</p>
           {reviewedAt ? (
             <p className="text-xs text-slate-400">Answer last reviewed: {reviewedAt}.</p>
           ) : null}
