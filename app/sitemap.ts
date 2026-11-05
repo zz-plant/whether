@@ -9,6 +9,7 @@ import { signalScenarioRoutes } from "./seoRouteClusters";
 import { readCompanyRecord } from "../lib/companies/companyFilingStore";
 import { COMPANIES } from "../lib/companies/companyRegistry";
 import { COMPANY_ROLES, ROLES } from "../lib/report/companyRoles";
+import { ROLE_STAGES } from "../lib/report/roleStages";
 import { buildCompanySituation } from "../lib/report/companySituation";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
@@ -372,12 +373,15 @@ export default async function sitemap(options?: {
   const roleEntries: SitemapEntryDescriptor[] = programmaticEligible
     ? [
         { path: "/roles", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
-        ...ROLES.map((role): SitemapEntryDescriptor => ({
-          path: `/roles/${role.slug}`,
-          lastModified: reportLastModified,
-          changeFrequency: "weekly",
-          priority: 0.55,
-        })),
+        ...ROLES.flatMap((role): SitemapEntryDescriptor[] => [
+          { path: `/roles/${role.slug}`, lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.55 },
+          ...ROLE_STAGES.map((stage): SitemapEntryDescriptor => ({
+            path: `/roles/${role.slug}/${stage}`,
+            lastModified: reportLastModified,
+            changeFrequency: "weekly",
+            priority: 0.5,
+          })),
+        ]),
       ]
     : [];
 

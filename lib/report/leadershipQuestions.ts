@@ -7,6 +7,8 @@
  */
 import { TIGHT_RUNWAY_PAYBACK_BAR_MONTHS } from "./boundedDecisionRules";
 import type { CompanyRole } from "./companyRoles";
+import type { OperatorStage } from "./operatorStage";
+import { stageForWorkers } from "./roleStages";
 import { RUNWAY_BAND_OPTIONS, runwayBandPhrase, type RunwayBand } from "./operatorRunway";
 
 const BAND_MEANINGS: Record<RunwayBand, string> = {
@@ -33,8 +35,13 @@ const SHARED_QUESTIONS = [
 ];
 
 /** The questions in the order a page prints them, the runway question first because others hang on it. */
-export const leadershipQuestions = (role: CompanyRole): string[] => [RUNWAY_QUESTION, ...SHARED_QUESTIONS, role.leadershipQuestion];
+export const leadershipQuestions = (role: CompanyRole, stage?: OperatorStage): string[] => [
+  RUNWAY_QUESTION,
+  ...SHARED_QUESTIONS,
+  ...(stage ? [stageForWorkers(stage).leadershipQuestion] : []),
+  role.leadershipQuestion,
+];
 
 /** The questions as a message someone can paste to a manager or into a meeting doc. */
-export const buildLeadershipQuestionsCopy = (role: CompanyRole): string =>
-  ["Questions for our next all-hands:", ...leadershipQuestions(role).map((question) => `- ${question}`)].join("\n");
+export const buildLeadershipQuestionsCopy = (role: CompanyRole, stage?: OperatorStage): string =>
+  ["Questions for our next all-hands:", ...leadershipQuestions(role, stage).map((question) => `- ${question}`)].join("\n");

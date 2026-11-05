@@ -201,8 +201,9 @@ describe("segmented sitemaps", () => {
 
   it("lists every role while the week can be stood behind, and keeps new families off company pages", async () => {
     const roles = await sitemap({ id: "roles", programmaticEligible: true });
-    assert.equal(roles.length, ROLES.length + 1);
+    assert.equal(roles.length, 1 + ROLES.length * 5);
     assert.ok(roles.some((entry) => entry.url.endsWith("/roles/recruiters")));
+    assert.ok(roles.some((entry) => entry.url.endsWith("/roles/recruiters/series-b")));
     assert.deepEqual(await sitemap({ id: "roles", programmaticEligible: false }), []);
     const companies = await sitemap({ id: "companies", programmaticEligible: true });
     assert.ok(!companies.some((entry) => entry.url.endsWith("/recruiters")));
