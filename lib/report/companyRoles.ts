@@ -59,7 +59,7 @@ export const ROLES: readonly CompanyRole[] = [
       "What to propose, and how to size it",
       "How to make the case for reliability or tech-debt work",
     ],
-    leadershipQuestion: "Which projects would stop first if cash got tighter?",
+    leadershipQuestion: "If money got tight, which projects would get cut first?",
     atStage: {
       seed: "Build what can show customer pull inside one sprint, and flag anything that would take longer before you start.",
       "series-a": "Tie your proposal to a number the company tracks, and avoid starting a second big project before the first shows results.",
@@ -78,7 +78,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Product managers",
     areas: ["product-tempo"],
     decisions: ["What gets on the roadmap", "How much discovery to fund", "When to adjust pricing"],
-    leadershipQuestion: "What has to be true for us to fund discovery next quarter?",
+    leadershipQuestion: "What would it take to get discovery funded next quarter?",
     atStage: {
       seed: "Run experiments that prove or kill an idea inside a sprint, and fund one proof of demand at a time.",
       "series-a": "Put spend behind what is already converting better, and run one expansion program at a time so you can tell what paid back.",
@@ -97,7 +97,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Engineering managers",
     areas: ["product-tempo", "hiring"],
     decisions: ["Where capacity goes", "How much to spend on reliability", "Which architecture commitments to make"],
-    leadershipQuestion: "Is reliability work protected if budgets are cut?",
+    leadershipQuestion: "If budgets get cut, does reliability work still get done?",
     atStage: {
       seed: "Ask for a hire only when a milestone has landed or revenue covers it, and keep architecture choices easy to change.",
       "series-a": "Add capacity where sales proof is repeating, and keep platform work tied to what customers already buy.",
@@ -116,7 +116,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Designers",
     areas: ["product-tempo"],
     decisions: ["Which research to run", "What to redesign and what to leave", "How to show design's effect on revenue"],
-    leadershipQuestion: "Which business number should design work be judged against?",
+    leadershipQuestion: "What number should we use to show design work is paying off?",
     atStage: {
       seed: "Test with real customers in short cycles, and leave polish until demand is proven.",
       "series-a": "Aim design work at the conversion the company already measures, one major change at a time so the results stay readable.",
@@ -139,7 +139,7 @@ export const ROLES: readonly CompanyRole[] = [
       "Which models and pipelines to keep funding",
       "How to show that an analysis changed a decision",
     ],
-    leadershipQuestion: "Which decisions this quarter are waiting on data?",
+    leadershipQuestion: "What are we waiting on data to decide this quarter?",
     atStage: {
       seed: "Answer whether customers want this with the simplest data that can, and put off heavy pipelines.",
       "series-a": "Build the reporting that shows which channels pay back, because spending at this stage follows that proof.",
@@ -158,7 +158,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Growth and sales leaders",
     areas: ["expansion-bets", "burn-discipline"],
     decisions: ["Which channels to fund", "How fast to run campaigns", "Which claims to make in public"],
-    leadershipQuestion: "What cost per customer would make us stop spending on a channel?",
+    leadershipQuestion: "How much can a customer cost us before we stop spending on that channel?",
     atStage: {
       seed: "Test channels cheaply to prove pull, and don't scale one before repeat demand shows up.",
       "series-a": `Fund only channels that convert repeatably and pay back inside ${BAR} months, one expansion program at a time.`,
@@ -177,7 +177,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Customer success and support teams",
     areas: ["burn-discipline", "expansion-bets"],
     decisions: ["Which accounts get the most attention", "What to escalate about renewals and churn", "How to make the case for support capacity"],
-    leadershipQuestion: "How much revenue renews in the next two quarters, and which of it is in doubt?",
+    leadershipQuestion: "How much is up for renewal in the next six months, and which renewals are we worried about?",
     onCompanyPages: false,
     atStage: {
       seed: "Treat every support conversation as evidence of demand, and pass what you hear to whoever decides what's next.",
@@ -197,7 +197,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Recruiters and people teams",
     areas: ["hiring"],
     decisions: ["Which roles to open first", "How to plan if hiring pauses", "What to tell candidates about the company's plans"],
-    leadershipQuestion: "Which open roles would we keep if hiring had to pause?",
+    leadershipQuestion: "If we had to stop hiring, which open roles would we still fill?",
     onCompanyPages: false,
     atStage: {
       seed: "Open a role only after a milestone lands or revenue covers it, and avoid several permanent hires at once.",
@@ -217,7 +217,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "Finance teams",
     areas: ["burn-discipline", "capital-raising"],
     decisions: ["Which commitments to question", "What to put in the forecast", "How early to raise a cash concern"],
-    leadershipQuestion: "What would we stop first if revenue came in below plan?",
+    leadershipQuestion: "If we miss the revenue plan, what goes first?",
     onCompanyPages: false,
     atStage: {
       seed: "Keep the cash view simple and current, and tie each hire to the milestone that justifies it.",
@@ -237,7 +237,7 @@ export const ROLES: readonly CompanyRole[] = [
     title: "IT and security teams",
     areas: ["burn-discipline"],
     decisions: ["Which tools to keep or cut", "How to defend security spending", "What to do with vendor contracts at renewal"],
-    leadershipQuestion: "Which security spending is a customer or legal obligation, and which is a choice?",
+    leadershipQuestion: "Which security spending do customers or the law require, and which is optional?",
     onCompanyPages: false,
     atStage: {
       seed: "Use tools you can drop easily, and cover what customers require before anything else.",

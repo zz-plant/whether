@@ -18,7 +18,7 @@ const BAND_MEANINGS: Record<RunwayBand, string> = {
   abundant: "the rules leave room to move against the cycle, at the same payback bar.",
 };
 
-export const RUNWAY_QUESTION = "How many months of runway do we have, or does revenue cover our spending?";
+export const RUNWAY_QUESTION = "How many months of runway do we have, or are we already covering our costs?";
 
 /** One line per band, from the band table, so a moved boundary moves these too. */
 export const runwayAnswers = (): string[] => [
@@ -30,8 +30,8 @@ export const runwayAnswers = (): string[] => [
 ];
 
 const SHARED_QUESTIONS = [
-  "When is next year's budget set, and when do proposals need to be in?",
-  "What would make us pause hiring or spending, and what would restart it?",
+  "When does next year's budget get decided, and when do we need to pitch for it?",
+  "What would make us stop hiring or cut spending, and what would make us start again?",
 ];
 
 /** The questions in the order a page prints them, the runway question first because others hang on it. */
