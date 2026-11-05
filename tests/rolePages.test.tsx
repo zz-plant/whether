@@ -10,6 +10,13 @@ import { macroSeries } from "../lib/macroSnapshot";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { snapshotData } from "../lib/snapshot";
 import { findRoleStage, ROLE_STAGES, stageForWorkers } from "../lib/report/roleStages";
+import {
+  buildWorkSituationsCopy,
+  conditionQuestionForRole,
+  conditionQuestions,
+  WORK_SITUATIONS,
+  workSituationsForRole,
+} from "../lib/report/workQuestions";
 
 /* The copy button reads the router, which nothing mounts in a static render. */
 const mockAny: any = mock;
@@ -160,3 +167,87 @@ describe("a role at a company stage", () => {
   });
 });
 
+describe("questions that come with the work", () => {
+  const regimes = ["EXPANSION", "DEFENSIVE", "VOLATILE", "SCARCITY"] as const;
+
+  it("gives each set of conditions its own questions, with no question twice", () => {
+    const seen = new Set<string>();
+    for (const regime of regimes) {
+      const questions = conditionQuestions(regime);
+      assert.ok(questions.length >= 5, regime);
+      for (const { question } of questions) {
+        assert.ok(!seen.has(question), `repeats "${question}"`);
+        seen.add(question);
+      }
+    }
+  });
+
+  it("links a seat to a role page only where that page exists", () => {
+    for (const regime of regimes) {
+      for (const { roleHref } of conditionQuestions(regime)) {
+        if (roleHref) assert.ok(findRole(roleHref.replace("/roles/", "")), roleHref);
+      }
+    }
+  });
+
+  it("prints the stage from the stage vocabulary", () => {
+    const whos = conditionQuestions("SCARCITY").map(({ who }) => who);
+    assert.ok(whos.includes("Founder · Seed"));
+    assert.ok(whos.includes("Board member · Series B+"));
+    assert.ok(whos.includes("Technical founder · Bootstrapped"));
+  });
+
+  it("gives a role page its own question, and nothing where the seat has none", () => {
+    assert.match(conditionQuestionForRole("engineering-managers", "VOLATILE")?.question ?? "", /stay monthly/);
+    assert.match(conditionQuestionForRole("finance-teams", "SCARCITY")?.question ?? "", /saves \$200k/);
+    assert.equal(conditionQuestionForRole("finance-teams", "EXPANSION"), undefined);
+    assert.equal(conditionQuestionForRole("designers", "SCARCITY"), undefined);
+  });
+
+  it("says the questions are not quotes, and renders nothing with none to show", async () => {
+    const { ConditionQuestionsSection } = await import("../app/roles/workQuestionsSections");
+    const html = renderToStaticMarkup(
+      <ConditionQuestionsSection regime="SCARCITY" questions={conditionQuestions("SCARCITY")} pagePath="/roles" />,
+    );
+    assert.match(html, /What might come up in Freezing conditions/);
+    assert.match(html, /Money is expensive and hard to raise/);
+    assert.match(html, /not quotes or survey results/);
+    assert.match(html, /href="\/decisions"/);
+    assert.equal(renderToStaticMarkup(<ConditionQuestionsSection regime="SCARCITY" questions={[]} pagePath="/roles" />), "");
+  });
+
+  it("does not link a role page to itself", async () => {
+    const { ConditionQuestionsSection } = await import("../app/roles/workQuestionsSections");
+    const path = "/roles/engineering-managers";
+    const question = conditionQuestionForRole("engineering-managers", "VOLATILE");
+    assert.ok(question);
+    const html = renderToStaticMarkup(<ConditionQuestionsSection regime="VOLATILE" questions={[question]} pagePath={path} />);
+    assert.doesNotMatch(html, new RegExp(`href="${path}"`));
+    assert.match(html, /Engineering lead · Series A/);
+  });
+
+  it("prints the eight situations only for engineering and product leads", async () => {
+    assert.equal(workSituationsForRole("engineering-managers").length, 8);
+    assert.equal(workSituationsForRole("product-managers").length, 8);
+    assert.equal(workSituationsForRole("designers").length, 0);
+
+    const { WorkSituationsSection } = await import("../app/roles/workQuestionsSections");
+    const html = renderToStaticMarkup(<WorkSituationsSection situations={WORK_SITUATIONS} pagePath="/roles/product-managers" />);
+    assert.match(html, /Is this worth the time and money/);
+    assert.match(html, /Copy what you&#x27;ll be asked/);
+    assert.equal(renderToStaticMarkup(<WorkSituationsSection situations={[]} pagePath="/roles/designers" />), "");
+  });
+
+  it("claims no tool for whether finished work paid off, which none measures", () => {
+    const paidOff = WORK_SITUATIONS.find(({ situation }) => situation === "Checking whether the work paid off");
+    assert.ok(paidOff);
+    assert.equal(paidOff.tool, undefined);
+  });
+
+  it("copies what you'll be asked, not what you're asking yourself", () => {
+    const copy = buildWorkSituationsCopy(WORK_SITUATIONS);
+    assert.match(copy, /^Questions to be ready for:\n- What does this buy us/);
+    assert.doesNotMatch(copy, /How do I show/);
+    assert.equal(copy.split("\n").length, WORK_SITUATIONS.length + 1);
+  });
+});

@@ -3,23 +3,35 @@ import Link from "next/link";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../lib/navigation/routeType";
 import { ROLES } from "../../lib/report/companyRoles";
+import { conditionQuestions } from "../../lib/report/workQuestions";
 import { buildPageMetadata } from "../../lib/seo";
 import { buildHubStructuredData } from "../../lib/seo/pageStructuredData";
+import { ConditionsSection } from "../companies/companyPageSections";
+import { loadWeekConditions } from "../companies/loadCompanyPage";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { ConditionQuestionsSection } from "./workQuestionsSections";
+
+export const revalidate = 3600;
 
 const title = "This week's conditions by role";
 const description = "What this week's conditions mean for your job at any tech company: what to ask for, the general rules, and questions to ask leadership.";
 
-export const metadata: Metadata = buildPageMetadata({
-  title,
-  description,
-  path: "/roles",
-  imageAlt: "This week's conditions by role",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { stale } = await loadWeekConditions();
+  const metadata = buildPageMetadata({
+    title,
+    description,
+    path: "/roles",
+    imageAlt: title,
+  });
+  if (stale) metadata.robots = { index: false, follow: true };
+  return metadata;
+}
 
-export default function RolesPage() {
+export default async function RolesPage() {
+  const { conditions, regime } = await loadWeekConditions();
   return (
     <ContentPageShell>
       <JsonLdScript
@@ -50,6 +62,8 @@ export default function RolesPage() {
           ))}
         </ul>
       </section>
+      <ConditionsSection conditions={conditions} />
+      <ConditionQuestionsSection regime={regime} questions={conditionQuestions(regime)} pagePath="/roles" />
     </ContentPageShell>
   );
 }

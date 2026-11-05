@@ -1688,6 +1688,15 @@ known stage. Ten roles (`ROLES`); support, recruiters, finance and IT and securi
 pages (`onCompanyPages: false`), since each role there is 50 more URLs. A page is noindexed while the
 week's call is stale, and the questions copy as one message.
 
+**The questions that come with the work (2026-11-05)** (`lib/report/workQuestions.ts`). `/roles` prints the
+questions written for this week's conditions, one per seat at a typical stage. Engineering, product and
+finance role pages print their own seat's question where it has one. The engineering and product manager
+pages add eight work situations, with what you're asking and what you're being asked, and the second
+half copies as a list. The questions are written examples, and the section says they are not quotes or
+survey results. A question links to a tool only where that tool works on it: the payback section of the
+runway planner, the stress test's more reversible version, or `/decisions`, which compares a recorded
+decision with today's conditions. No tool says whether finished work paid off, so that question prints alone.
+
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
 The runway unification itself landed on `main` separately (7f264a26, recorded in docs/agents/lessons/dead-features-and-honesty.md, "One

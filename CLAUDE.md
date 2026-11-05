@@ -149,7 +149,8 @@ Canonical modules — extend these before creating new ones:
   `lib/report/companyRoles.ts` (each role's decisions and what it can ask for)
 - **Role pages (any company)** — `app/roles/`, `lib/report/companyRoles.ts` (`ROLES`),
   `lib/report/leadershipQuestions.ts` (what to ask, and what the answer means),
-  `lib/report/roleStages.ts` (what a company's stage changes for someone working there)
+  `lib/report/roleStages.ts` (what a company's stage changes for someone working there),
+  `lib/report/workQuestions.ts` (what comes up under each set of conditions, and which tool helps)
 - **Share artifacts** — `/share` owns every copy, file and image format; builders in
   `lib/export/*` (`briefBuilders`, `investorUpdateSnippet`, `portfolioNote`, `meetingSlideExport`,
   `boardSlideDeck`). The page reads `lib/report/weeklyBriefSnapshot.ts`; the slide and image
