@@ -16,6 +16,7 @@ const dynamicRouteSamples = {
   "/companies/[company]": ["/companies/microsoft", "/companies/rivian"],
   "/companies/[company]/[role]": ["/companies/microsoft/product-managers", "/companies/rivian/engineering-managers"],
   "/roles/[role]": ["/roles/software-engineers"],
+  "/roles/[role]/[stage]": ["/roles/software-engineers/series-a", "/roles/recruiters/bootstrapped"],
   "/signals/[cluster]": ["/signals/capital-tightness-watch"],
   "/signals/[cluster]/[decision-scenario]": [
     "/signals/capital-tightness-watch/hiring",
