@@ -22,7 +22,8 @@ type Params = { role: string; stage: string };
 export const dynamicParams = true;
 export const revalidate = 3600;
 
-const titleFor = (label: string, atCompanies: string) => `This week's conditions for ${label} at ${atCompanies}`;
+/* The role first, as on the company pages: a result list cuts a long title from the end. */
+const titleFor = (title: string, atCompanies: string) => `${title} at ${atCompanies}: this week's conditions`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { role: roleSlug, stage: stageSlug } = await params;
@@ -32,10 +33,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { stale } = await loadWeekConditions();
   const { atCompanies } = stageForWorkers(stage);
   const metadata = buildPageMetadata({
-    title: titleFor(role.label, atCompanies),
+    title: titleFor(role.title, atCompanies),
     description: `What this week's conditions mean for ${role.label} at ${atCompanies}: what to ask for, the rule at this stage, and questions to ask leadership.`,
     path: `/roles/${role.slug}/${stage}`,
-    imageAlt: titleFor(role.label, atCompanies),
+    imageAlt: titleFor(role.title, atCompanies),
   });
   if (stale) metadata.robots = { index: false, follow: true };
   return metadata;
@@ -49,7 +50,7 @@ export default async function RoleStagePage({ params }: { params: Promise<Params
 
   const { conditions, regime, thresholds, scores } = await loadWeekConditions();
   const { atCompanies } = stageForWorkers(stage);
-  const title = titleFor(role.label, atCompanies);
+  const title = titleFor(role.title, atCompanies);
   const rolePath = `/roles/${role.slug}` as const;
   const path = `/roles/${role.slug}/${stage}` as const;
   const stageName = `${atCompanies.charAt(0).toUpperCase()}${atCompanies.slice(1)}`;
@@ -65,6 +66,7 @@ export default async function RoleStagePage({ params }: { params: Promise<Params
             { name: role.title, path: rolePath },
             { name: stageName, path },
           ],
+          dateModifiedIso: conditions.recordDateIso,
         })}
       />
       <Breadcrumbs

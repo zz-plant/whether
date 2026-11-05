@@ -294,7 +294,7 @@ rather than what the metadata code intends, found gaps none of the SEO suites co
 
 A second crawl of every sitemap URL, reading each page's JSON-LD and link graph rather than its tags:
 
-- **A reference to a node that is not there.** 351 pages (every company page, `/operate`) published
+- **A reference to a node that is not there.** 351 pages (every company page, `/operate`; the `/roles` pages arrived with it mid-change) published
   `publisher: { "@id": organizationId }` with no Organization node on the page. An id resolves only
   on its own page, so a consumer read no publisher. `tests/pageStructuredData.test.ts` walks each
   builder for this.

@@ -751,10 +751,13 @@ export const buildRolePageStructuredData = ({
   title,
   role,
   trail,
+  dateModifiedIso,
 }: {
   path: `/${string}`;
   title: string;
   role: string;
+  /** The reading the page's conditions come from. */
+  dateModifiedIso: string;
   /** Everything after Roles, the page itself last. */
   trail: ReadonlyArray<{ name: string; path: `/${string}` }>;
 }): JsonLdGraph =>
@@ -765,8 +768,9 @@ export const buildRolePageStructuredData = ({
       url: buildCanonicalUrl(path),
       name: title,
       about: { "@type": "Occupation", name: role },
+      dateModified: dateModifiedIso,
       isPartOf: { "@id": websiteId },
-      publisher: { "@id": organizationId },
+      publisher: buildPublisherSchema(organizationName),
     },
     buildBreadcrumbList([{ name: "Roles", path: "/roles" }, ...trail]),
   ]);

@@ -8,6 +8,7 @@ import {
   buildHistoryStructuredData,
   buildHubStructuredData,
   buildPublishedBriefStructuredData,
+  buildRolePageStructuredData,
   buildSignalScenarioStructuredData,
   buildSignalWatchStructuredData,
   buildToolkitHowTo,
@@ -108,6 +109,7 @@ describe("references", () => {
   it("resolves every id on the page that declares it", () => {
     const documents = {
       company: microsoftPage(),
+      role: buildRolePageStructuredData({ path: "/roles/product-managers", title: "t", role: "Product managers", trail: [], dateModifiedIso: "2026-11-03" }),
       hub: buildHubStructuredData({ path: "/companies", name: "n", description: "d", items: [{ path: "/companies/microsoft", name: "Microsoft" }] }),
       watch: buildSignalWatchStructuredData({ slug: "yield-curve-flip-watch", name: "n", description: "d", scenarios: [], dateModifiedIso: "2026-11-03" }),
       scenario: buildSignalScenarioStructuredData({ slug: "yield-curve-flip-watch", signalTitle: "s", area: "hiring", name: "n", description: "d", dateModifiedIso: "2026-11-03" }),
