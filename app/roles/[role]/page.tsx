@@ -22,17 +22,18 @@ type Params = { role: string };
 export const dynamicParams = true;
 export const revalidate = 3600;
 
-const titleFor = (label: string) => `This week's conditions for ${label}`;
+/* The role first, as on the company pages: a result list cuts a long title from the end. */
+const titleFor = (title: string) => `${title}: this week's conditions`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const role = findRole((await params).role);
   if (!role) return {};
   const { stale } = await loadWeekConditions();
   const metadata = buildPageMetadata({
-    title: titleFor(role.label),
+    title: titleFor(role.title),
     description: `What this week's conditions mean for ${role.label} at any tech company: what to ask for, the general rules, and questions to ask leadership.`,
     path: `/roles/${role.slug}`,
-    imageAlt: titleFor(role.label),
+    imageAlt: titleFor(role.title),
   });
   if (stale) metadata.robots = { index: false, follow: true };
   return metadata;
@@ -48,7 +49,7 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
   return (
     <ContentPageShell data-content-measurement-root={path}>
       <ContentMeasurementTracker pagePath={path} cluster="authority" intent="vp-product" />
-      <JsonLdScript data={buildRolePageStructuredData({ path, title: titleFor(role.label), role: role.title, trail: [{ name: role.title, path }] })} />
+      <JsonLdScript data={buildRolePageStructuredData({ path, title: titleFor(role.title), role: role.title, trail: [{ name: role.title, path }], dateModifiedIso: conditions.recordDateIso })} />
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(path), [

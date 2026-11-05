@@ -1,27 +1,50 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "../../../lib/seo";
+import { buildCanonicalUrl, buildPageImageUrl, buildPageMetadata, organizationName } from "../../../lib/seo";
+import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
+import { graph } from "../../../lib/seo/pageStructuredData";
+import { JsonLdScript } from "../../components/jsonLdScript";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { ActionLink } from "../../components/ui/actionLink";
 import { loadPostureLine } from "../postureLine";
 
+const title = "How VC firms can enforce capital discipline across portfolios";
+const description =
+  "Portfolio-wide governance framework for VC firms: an implementation model, one set of threshold words for every company, and a memo block to forward to a board.";
+const path = "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios";
+const imageParams = { template: "guides", title: "VC portfolio capital discipline" };
+
 export const metadata: Metadata = buildPageMetadata({
-  title: "How VC firms can enforce capital discipline across portfolios",
-  description:
-    "Portfolio-wide governance framework for VC firms: an implementation model, one set of threshold words for every company, and a memo block to forward to a board.",
-  path: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
+  title,
+  description,
+  path,
   imageAlt: "VC portfolio capital discipline authority page",
-  imageParams: {
-    template: "guides",
-    title: "VC portfolio capital discipline",
-  },
+  imageParams,
 });
+
+/* The one guide outside the content lists, so the one with no Article node or dates. These are its
+   first commit and its last copy change; `dateModified` has to move with the copy, as a guide's
+   `updatedAt` does. */
+const articleSchema = graph([
+  {
+    "@type": "Article",
+    headline: title,
+    description,
+    author: buildAuthorSchema(),
+    publisher: buildPublisherSchema(organizationName),
+    url: buildCanonicalUrl(path),
+    mainEntityOfPage: buildCanonicalUrl(path),
+    datePublished: "2026-03-03",
+    dateModified: "2026-10-25",
+    image: [buildPageImageUrl(title, description, imageParams)],
+  },
+]);
 
 export const revalidate = 21600;
 
 export default async function Page() {
-  const pagePath = "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios";
+  const pagePath = path;
   /* The week the reader is in, from the same helper the pillars and articles
      use: an authority page arrived at from search must meet the current
      posture before the essay (AGENTS.md, "Thin SEO page"). */
@@ -34,6 +57,7 @@ export default async function Page() {
       data-page-intent="vc-partner"
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="vc" intent="vc-partner" />
+      <JsonLdScript data={articleSchema} />
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">
           How VC firms can enforce capital discipline across portfolios
@@ -46,7 +70,7 @@ export default async function Page() {
           <p className="type-eyebrow">This week</p>
           <p className="text-sm text-slate-200">{postureSummary}</p>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-            <span>Data as of {reportData.recordDateLabel}</span>
+            <span>Data as of <time dateTime={reportData.treasury.record_date}>{reportData.recordDateLabel}</time></span>
             <ActionLink href="/" variant="inline">Open this week&apos;s brief</ActionLink>
           </p>
         </div>

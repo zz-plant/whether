@@ -3,6 +3,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
+import { indexableSignalsClusters } from "../app/signals/clusterRoutes";
 import { compositeSignalScales } from "../lib/report/signalTranslations";
 import { decisionAnswerOutputSchema, runAgentTool } from "../lib/agent/tools";
 import { buildAnswerObject } from "../lib/answers/answerObject";
@@ -92,9 +93,21 @@ describe("answer page reader copy", () => {
   it("keeps the engine's own vocabulary off every one of them", async () => {
     for (const page of answerPages) {
       const html = await renderAnswer(page.slug);
-      const found = ENGINE_VOCABULARY.exec(html);
+      /* A URL is not a word said to a reader, and `/signals/capital-tightness-watch` is a public one. */
+      const found = ENGINE_VOCABULARY.exec(html.replace(/href="[^"]*"/g, ""));
       assert.equal(found, null, `/answers/${page.slug} said "${found?.[0]}" to a reader`);
     }
+  });
+
+  it("links the page that says what would change an answer to each signal, for that decision", async () => {
+    const reached = new Set<string>();
+    for (const page of answerPages) {
+      const html = await renderAnswer(page.slug);
+      const links = [...html.matchAll(/href="(\/signals\/[a-z-]+\/[a-z-]+)"/g)].flatMap((match) => match[1] ?? []);
+      assert.equal(new Set(links).size, indexableSignalsClusters.length, page.slug);
+      links.forEach((link) => reached.add(link));
+    }
+    assert.ok(reached.size >= indexableSignalsClusters.length * 3, `reached only ${reached.size} scenario pages`);
   });
 
   it("states both numbers in the rich result the way the page states them", async () => {

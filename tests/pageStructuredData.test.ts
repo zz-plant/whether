@@ -3,10 +3,17 @@ import { describe, it } from "bun:test";
 import {
   buildAnswerFaqStructuredData,
   buildApiDocsStructuredData,
+  buildCompanyPageStructuredData,
   buildCompsStructuredData,
   buildHistoryStructuredData,
+  buildHubStructuredData,
   buildPublishedBriefStructuredData,
+  buildRolePageStructuredData,
+  buildSignalScenarioStructuredData,
+  buildSignalWatchStructuredData,
   buildToolkitHowTo,
+  buildWorkstreamStructuredData,
+  graph as pageGraph,
 } from "../lib/seo/pageStructuredData";
 import { buildHomeStructuredData } from "../lib/report/home/structuredData";
 import { buildPublisherSchema } from "../lib/publisher";
@@ -19,9 +26,9 @@ type Node = Record<string, unknown>;
 const nodesOf = (graph: { "@graph": Node[] }, type: string) =>
   graph["@graph"].filter((node) => node["@type"] === type || (Array.isArray(node["@type"]) && node["@type"].includes(type)));
 const one = (graph: { "@graph": Node[] }, type: string) => {
-  const matches = nodesOf(graph, type);
-  assert.equal(matches.length, 1, `exactly one ${type} node`);
-  return matches[0];
+  const [match, ...rest] = nodesOf(graph, type);
+  assert.ok(match && rest.length === 0, `exactly one ${type} node`);
+  return match;
 };
 
 describe("site entities", () => {
@@ -64,6 +71,116 @@ describe("site entities", () => {
       const page = graph["@graph"].find((node) => node["@type"] === "WebPage" || node["@type"] === "CollectionPage");
       assert.deepEqual(page?.isPartOf, { "@id": websiteId });
     }
+  });
+});
+
+/** Every `{ "@id": … }` reference in a graph that no node on the same page declares. */
+const danglingReferences = (document: { "@graph": Node[] }) => {
+  const declared = new Set<unknown>();
+  const referenced = new Set<unknown>();
+  const walk = (value: unknown): void => {
+    if (Array.isArray(value)) return value.forEach(walk);
+    if (!value || typeof value !== "object") return;
+    const entries = Object.entries(value);
+    const id = entries.find(([key]) => key === "@id")?.[1];
+    if (id !== undefined) (entries.length === 1 ? referenced : declared).add(id);
+    entries.forEach(([, child]) => walk(child));
+  };
+  walk(document);
+  return [...referenced].filter((id) => !declared.has(id));
+};
+
+const microsoftPage = (overrides: { audience?: string } = {}) =>
+  buildCompanyPageStructuredData({
+    path: "/companies/microsoft/product-managers",
+    title: "Product managers at Microsoft: this week's conditions",
+    description: "What this week's conditions mean.",
+    company: "Microsoft",
+    ticker: "MSFT",
+    cik: 789019,
+    trail: [{ name: "Companies", path: "/companies" }],
+    dateModifiedIso: "2026-11-03",
+    ...overrides,
+  });
+
+describe("references", () => {
+  /* 351 pages published `publisher: { "@id": organizationId }` with no Organization node on the
+     page, against the rule at the top of pageStructuredData.ts. A crawl found it; no suite could. */
+  it("resolves every id on the page that declares it", () => {
+    const documents = {
+      company: microsoftPage(),
+      role: buildRolePageStructuredData({ path: "/roles/product-managers", title: "t", role: "Product managers", trail: [], dateModifiedIso: "2026-11-03" }),
+      hub: buildHubStructuredData({ path: "/companies", name: "n", description: "d", items: [{ path: "/companies/microsoft", name: "Microsoft" }] }),
+      watch: buildSignalWatchStructuredData({ slug: "yield-curve-flip-watch", name: "n", description: "d", scenarios: [], dateModifiedIso: "2026-11-03" }),
+      scenario: buildSignalScenarioStructuredData({ slug: "yield-curve-flip-watch", signalTitle: "s", area: "hiring", name: "n", description: "d", dateModifiedIso: "2026-11-03" }),
+      workstream: pageGraph([buildWorkstreamStructuredData({ path: "/operate/financial", name: "n", description: "d", applicationCategory: "FinanceApplication" })]),
+    };
+    for (const [name, document] of Object.entries(documents)) {
+      assert.deepEqual(danglingReferences(document), [], name);
+    }
+  });
+});
+
+describe("topics", () => {
+  const sameAsOf = (about: unknown) =>
+    (Array.isArray(about) ? about : []).map((topic: { sameAs?: string }) => topic.sameAs);
+
+  it("ties a signal watch to what it reads", () => {
+    const page = one(buildSignalWatchStructuredData({ slug: "yield-curve-flip-watch", name: "n", description: "d", scenarios: [{ path: "/signals/yield-curve-flip-watch/hiring", name: "h" }], dateModifiedIso: "2026-11-03" }), "CollectionPage");
+    assert.deepEqual(sameAsOf(page.about), ["https://en.wikipedia.org/wiki/Yield_curve"]);
+    assert.equal(page.dateModified, "2026-11-03");
+  });
+
+  it("ties a scenario page to the signal and the decision", () => {
+    const page = one(buildSignalScenarioStructuredData({ slug: "risk-appetite-watch", signalTitle: "s", area: "capital-raising", name: "n", description: "d", dateModifiedIso: "2026-11-03" }), "WebPage");
+    assert.deepEqual(sameAsOf(page.about), ["https://en.wikipedia.org/wiki/Risk_aversion", "https://en.wikipedia.org/wiki/Venture_capital"]);
+  });
+
+  it("names no topic for a decision with no exact article", () => {
+    const page = one(buildSignalScenarioStructuredData({ slug: "unknown", signalTitle: "s", area: "expansion-bets", name: "n", description: "d", dateModifiedIso: "2026-11-03" }), "WebPage");
+    assert.deepEqual(page.about, []);
+  });
+
+  it("ties an answer to the decisions it maps to and says who it is for", () => {
+    const page = one(buildAnswerFaqStructuredData({
+      slug: "s", question: "q", answer: "a",
+      payload: { triggerThreshold: "t", reversalCondition: "r" },
+      datePublishedIso: "2026-11-03", dateModifiedIso: "2026-11-03",
+      areas: ["hiring", "burn-discipline"], audience: "CEO/CFO",
+    }), "FAQPage");
+    assert.deepEqual(sameAsOf(page.about), ["https://en.wikipedia.org/wiki/Recruitment", "https://en.wikipedia.org/wiki/Burn_rate"]);
+    assert.deepEqual(page.audience, { "@type": "Audience", audienceType: "CEO/CFO" });
+  });
+});
+
+describe("company pages", () => {
+  it("identifies the company by its SEC registrant number", () => {
+    const about = one(microsoftPage(), "WebPage").about;
+    assert.deepEqual(about, {
+      "@type": "Corporation",
+      name: "Microsoft",
+      tickerSymbol: "MSFT",
+      identifier: { "@type": "PropertyValue", propertyID: "SEC CIK", value: "789019" },
+      sameAs: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000789019",
+    });
+  });
+
+  it("names the role only on a role page, and dates the page by its reading", () => {
+    assert.equal(one(microsoftPage(), "WebPage").audience, undefined);
+    const page = one(microsoftPage({ audience: "Product managers" }), "WebPage");
+    assert.deepEqual(page.audience, { "@type": "Audience", audienceType: "Product managers" });
+    assert.equal(page.dateModified, "2026-11-03");
+  });
+});
+
+describe("hubs", () => {
+  it("lists what the hub links, numbered, with absolute URLs", () => {
+    const page = one(buildHubStructuredData({ path: "/companies", name: "n", description: "d", items: [{ path: "/companies/microsoft", name: "Microsoft" }] }), "CollectionPage");
+    assert.deepEqual(page.mainEntity, {
+      "@type": "ItemList",
+      numberOfItems: 1,
+      itemListElement: [{ "@type": "ListItem", position: 1, url: "https://whether.work/companies/microsoft", name: "Microsoft" }],
+    });
   });
 });
 

@@ -90,6 +90,22 @@ describe("related answers", () => {
     );
   });
 
+  it("starts a tie after the page's own slug, and wraps", () => {
+    const page = candidate("m");
+    const related = selectRelatedAnswers(page, [page, candidate("a"), candidate("b"), candidate("x"), candidate("z")], { limit: 4 });
+    assert.deepEqual(related.map((entry) => entry.slug), ["x", "z", "a", "b"]);
+  });
+
+  /* Plain slug order gave every tie to the same early-alphabet pages, so an answer late in the
+     alphabet could be linked from no other answer, whatever it was about. */
+  it("links every indexable answer from at least one other answer", () => {
+    const linked = new Set(
+      answerPages.flatMap((page) => selectRelatedAnswers(page, answerPages, { isEligible: isIndexableAnswerSlug }).map((entry) => entry.slug)),
+    );
+    const unlinked = answerPages.filter((page) => isIndexableAnswerSlug(page.slug) && !linked.has(page.slug)).map((page) => page.slug);
+    assert.deepEqual(unlinked, []);
+  });
+
   it("only offers pages that are indexable", () => {
     for (const page of answerPages) {
       const related = selectRelatedAnswers(page, answerPages, { isEligible: isIndexableAnswerSlug });
