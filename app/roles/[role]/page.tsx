@@ -4,6 +4,7 @@ import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/naviga
 import { toRoute } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
 import { askForThisWeek, findRole, paybackBarLine, ROLES } from "../../../lib/report/companyRoles";
+import { conditionQuestionForRole, workSituationsForRole } from "../../../lib/report/workQuestions";
 import { buildRolePageStructuredData } from "../../../lib/seo/pageStructuredData";
 import { ConditionsSection, RoleDecisionsSection } from "../../companies/companyPageSections";
 import { loadWeekConditions } from "../../companies/loadCompanyPage";
@@ -13,6 +14,7 @@ import { ActionLink } from "../../components/ui/actionLink";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { LeadershipQuestionsSection } from "../leadershipQuestionsSection";
+import { ConditionQuestionsSection, WorkSituationsSection } from "../workQuestionsSections";
 
 type Params = { role: string };
 
@@ -41,6 +43,7 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
 
   const { conditions, regime, rules } = await loadWeekConditions();
   const path = `/roles/${role.slug}` as const;
+  const roleQuestion = conditionQuestionForRole(role.slug, regime);
   return (
     <ContentPageShell data-content-measurement-root={path}>
       <ContentMeasurementTracker pagePath={path} cluster="authority" intent="vp-product" />
@@ -66,6 +69,8 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
         paybackBar={paybackBarLine(regime)}
         rules={role.areas.flatMap((area) => rules.filter((rule) => rule.area === area))}
       />
+      <ConditionQuestionsSection regime={regime} questions={roleQuestion ? [roleQuestion] : []} pagePath={path} />
+      <WorkSituationsSection situations={workSituationsForRole(role.slug)} pagePath={path} />
       <LeadershipQuestionsSection role={role} pagePath={path} />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>

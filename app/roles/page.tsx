@@ -3,18 +3,30 @@ import Link from "next/link";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../lib/navigation/routeType";
 import { ROLES } from "../../lib/report/companyRoles";
+import { conditionQuestions } from "../../lib/report/workQuestions";
 import { buildPageMetadata } from "../../lib/seo";
+import { ConditionsSection } from "../companies/companyPageSections";
+import { loadWeekConditions } from "../companies/loadCompanyPage";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { ConditionQuestionsSection } from "./workQuestionsSections";
 
-export const metadata: Metadata = buildPageMetadata({
-  title: "This week's conditions by role",
-  description: "What this week's conditions mean for your job at any tech company: what to ask for, the general rules, and questions to ask leadership.",
-  path: "/roles",
-  imageAlt: "This week's conditions by role",
-});
+export const revalidate = 3600;
 
-export default function RolesPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const { stale } = await loadWeekConditions();
+  const metadata = buildPageMetadata({
+    title: "This week's conditions by role",
+    description: "What this week's conditions mean for your job at any tech company: what to ask for, the general rules, and questions to ask leadership.",
+    path: "/roles",
+    imageAlt: "This week's conditions by role",
+  });
+  if (stale) metadata.robots = { index: false, follow: true };
+  return metadata;
+}
+
+export default async function RolesPage() {
+  const { conditions, regime } = await loadWeekConditions();
   return (
     <ContentPageShell>
       <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(toRoute("/roles"), [{ name: "Roles", path: toRoute("/roles") }]))} />
@@ -37,6 +49,8 @@ export default function RolesPage() {
           ))}
         </ul>
       </section>
+      <ConditionsSection conditions={conditions} />
+      <ConditionQuestionsSection regime={regime} questions={conditionQuestions(regime)} pagePath="/roles" />
     </ContentPageShell>
   );
 }
