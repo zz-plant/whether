@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { findCompany, findCompanyRole } from "../../../../lib/companies/companyRegistry";
-import { findUseCaseRole } from "../../../../lib/decisionDomainCatalog";
+import { findCompany } from "../../../../lib/companies/companyRegistry";
+import { askForThisWeek, findCompanyRole, paybackBarLine } from "../../../../lib/report/companyRoles";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../../lib/seo";
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { indexable } = await loadCompanyPage(company);
   const metadata = buildPageMetadata({
     title: `This week's conditions for ${role.label} at ${company.name}`,
-    description: `What this week's conditions mean for ${role.label} at ${company.name}: the general rules, what would change them, and ${company.name}'s latest filed figures.`,
+    description: `What this week's conditions mean for ${role.label} at ${company.name}: what to ask for, the general rules, and ${company.name}'s latest filed figures.`,
     path: `/companies/${company.slug}/${role.slug}`,
     imageAlt: `This week's conditions for ${role.label} at ${company.name}`,
   });
@@ -38,10 +38,9 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
   const { company: companySlug, role: roleSlug } = await params;
   const company = findCompany(companySlug);
   const role = findCompanyRole(roleSlug);
-  const catalogRole = role ? findUseCaseRole(role.catalogSlug) : undefined;
-  if (!company || !role || !catalogRole) notFound();
+  if (!company || !role) notFound();
 
-  const { conditions, situation, rules } = await loadCompanyPage(company);
+  const { conditions, regime, situation, rules } = await loadCompanyPage(company);
   const path = `/companies/${company.slug}/${role.slug}`;
   return (
     <ContentPageShell data-content-measurement-root={path}>
@@ -72,14 +71,14 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions for {role.label} at {company.name}</h1>
         <p className="text-sm text-slate-300">
-          The same public signals every company reads, the decisions {role.label} make, and what {company.name} has filed.
+          The same public signals every company reads, what {role.label} can ask for this week, and what {company.name} has filed.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />
       <RoleDecisionsSection
         role={role}
-        decisions={catalogRole.decisions}
-        shifts={catalogRole.postureShifts}
+        askFor={askForThisWeek(role, regime)}
+        paybackBar={paybackBarLine(regime)}
         rules={role.areas.flatMap((area) => rules.filter((rule) => rule.area === area))}
       />
       {situation ? <CompanyPositionSection company={company} situation={situation} /> : null}

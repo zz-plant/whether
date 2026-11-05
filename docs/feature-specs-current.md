@@ -1650,7 +1650,7 @@ year-to-date filings; spend is revenue less that, so net burn is the filing's ow
 ### 1.1.22c Guidance by company and role (2026-11-04)
 
 `/companies`, `/companies/<company>` and `/companies/<company>/<role>`: this week's conditions, the
-role's decisions and rules, and what the company has filed. A pilot of 50 companies and 3 roles
+role's decisions and rules, and what the company has filed. A pilot of 50 companies and 6 roles
 (`lib/companies/companyRegistry.ts`), because mass-produced pages that add little can cost a whole
 site its standing. Grow it only after these are indexed and earn clicks.
 
@@ -1669,6 +1669,11 @@ site its standing. Grow it only after these are indexed and earn clicks.
   file: Oracle and Target read as owing nothing until this.
 - **A saved reading says so.** When live data is late the conditions section prints the saved-copy
   banner, since a robots tag protects search results and not a reader following a link.
+- **For the people doing the work (2026-11-05).** Six roles, each with its own decisions and what to
+  ask for this week (`lib/report/companyRoles.ts`), inside the published rules. Pages add R&D, stock
+  pay and a dated budget calendar. A restructuring filing (8-K item 2.05) in the last 12 months prints
+  with its date and a link. A company with none prints nothing, because that says nothing either way,
+  and no page predicts layoffs, scores risk, or speaks to the company's stock.
 - **Measured page by page** (`ContentMeasurementTracker`), so growing the list rests on which pages
   earn visits. Each page declares a `WebPage` about the company, with no review or rating.
 

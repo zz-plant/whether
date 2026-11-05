@@ -6,8 +6,9 @@ import { resourceArticles } from "../lib/resourceArticles";
 import { buildResourceHubEntries } from "../lib/resourceHub";
 import { readAnswerPages } from "../lib/answers/answerContentStore";
 import { signalScenarioRoutes } from "./seoRouteClusters";
-import { readCompanyFigures } from "../lib/companies/companyFilingStore";
-import { COMPANIES, COMPANY_ROLES } from "../lib/companies/companyRegistry";
+import { readCompanyRecord } from "../lib/companies/companyFilingStore";
+import { COMPANIES } from "../lib/companies/companyRegistry";
+import { COMPANY_ROLES } from "../lib/report/companyRoles";
 import { buildCompanySituation } from "../lib/report/companySituation";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
@@ -356,7 +357,7 @@ export default async function sitemap(options?: {
         { path: "/companies", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
         ...(await Promise.all(
           COMPANIES.map(async (company): Promise<SitemapEntryDescriptor[]> => {
-            const figures = await readCompanyFigures(company);
+            const figures = await readCompanyRecord(company);
             if (!figures || !buildCompanySituation(company, figures, null).current) return [];
             const entryFor = (path: `/${string}`): SitemapEntryDescriptor => ({ path, lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 });
             return [

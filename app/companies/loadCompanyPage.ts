@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { pilotPeerGrowth, readCompanyFigures } from "../../lib/companies/companyFilingStore";
+import { pilotPeerGrowth, readCompanyRecord } from "../../lib/companies/companyFilingStore";
 import type { CompanyEntry } from "../../lib/companies/companyRegistry";
 import { buildCompanySituation } from "../../lib/report/companySituation";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../../lib/regimePresentation";
@@ -12,7 +12,7 @@ const loadWeek = cache(() => loadWeeklyBriefSnapshot(undefined, { route: "/compa
 
 /** What every company page reads: the week, once per request, and this company's stored figures. */
 export const loadCompanyPage = async (company: CompanyEntry) => {
-  const [week, figures] = await Promise.all([loadWeek(), readCompanyFigures(company)]);
+  const [week, figures] = await Promise.all([loadWeek(), readCompanyRecord(company)]);
   const { reportData, degraded, homeBriefModel, weeklyCall } = week.snapshot;
   const regime = reportData.assessment.regime;
   const stale = isCallStaleForIndexing({
@@ -32,6 +32,7 @@ export const loadCompanyPage = async (company: CompanyEntry) => {
   const situation = figures ? buildCompanySituation(company, figures, pilotPeerGrowth()) : null;
   return {
     conditions,
+    regime,
     situation,
     rules: homeBriefModel.decisionRules,
     /* A page with no current filing or no current call is one more name on a template. */

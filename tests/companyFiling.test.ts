@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import { GET } from "../app/api/company-filing/route";
-import { deriveSecCompanyFigures, fetchSecCompanyFiling } from "../lib/marketData/secEdgar";
+import { deriveSecCompanyFigures, deriveSecRestructurings, fetchSecCompanyFiling } from "../lib/marketData/secEdgar";
 import { applyCompanyFiling, parseOperatorProfile, resolveProfileRunway, setOperatorProfileField } from "../lib/operatorProfile";
 import { companyFilingLookupSchema, describeProfileFiling } from "../lib/report/companyFiling";
 import { runwayBandForProfileRunway } from "../lib/report/operatorRunway";
@@ -93,6 +93,40 @@ describe("a company's figures from its filings", () => {
     );
     assert.equal(result.status === "ok" && result.value.debtAsOf, "2025-12-31");
     assert.equal(result.status === "ok" && result.value.longTermInvestmentsUsd, 80e6);
+  });
+
+  it("reads the latest fiscal year's R&D against the one before, and stock pay", () => {
+    const year = (start: string, end: string, val: number) => ({ start, end, val, filed: "2026-08-01" });
+    const result = deriveSecCompanyFigures(
+      facts({
+        extra: {
+          ResearchAndDevelopmentExpense: { units: { USD: [year("2024-01-01", "2024-12-31", 80e6), year("2025-01-01", "2025-12-31", 100e6)] } },
+          ShareBasedCompensation: { units: { USD: [year("2025-07-01", PERIOD_END, 12e6)] } },
+        },
+      }),
+      NOW,
+    );
+    assert.equal(result.status === "ok" && result.value.researchFiscalYearUsd, 100e6);
+    assert.equal(result.status === "ok" && result.value.researchPriorFiscalYearUsd, 80e6);
+    assert.equal(result.status === "ok" && result.value.researchFiscalYearEnd, "2025-12-31");
+    assert.equal(result.status === "ok" && result.value.stockCompensationTtmUsd, 12e6);
+    // R&D last tagged years ago answers for nothing.
+    const stale = deriveSecCompanyFigures(facts({ extra: { ResearchAndDevelopmentExpense: { units: { USD: [year("2020-01-01", "2020-12-31", 80e6)] } } } }), NOW);
+    assert.equal(stale.status === "ok" && stale.value.researchFiscalYearUsd, null);
+  });
+
+  it("finds item 2.05 among a company's 8-Ks, within the year, with a link", () => {
+    const recent = {
+      form: ["8-K", "8-K", "10-Q", "8-K"],
+      filingDate: ["2026-09-29", "2026-08-01", "2026-09-29", "2025-01-01"],
+      items: ["2.05,9.01", "2.02,9.01", "2.05", "2.05"],
+      accessionNumber: ["0001-26-000001", "0001-26-000002", "0001-26-000003", "0001-25-000004"],
+      primaryDocument: ["a.htm", "b.htm", "c.htm", "d.htm"],
+    };
+    assert.deepEqual(deriveSecRestructurings({ filings: { recent } }, 7, NOW), [
+      { filedOn: "2026-09-29", url: "https://www.sec.gov/Archives/edgar/data/7/000126000001/a.htm" },
+    ]);
+    assert.equal(deriveSecRestructurings({ nothing: true }, 7, NOW), null);
   });
 
   it("reads a full year as it stands", () => {
@@ -245,6 +279,10 @@ describe("a filing as the operator's figures", () => {
     revenueTtmUsd: 1_200e6,
     operatingCashFlowTtmUsd: -2_000e6,
     capitalSpendingTtmUsd: 400e6,
+    stockCompensationTtmUsd: null,
+    researchFiscalYearUsd: null,
+    researchPriorFiscalYearUsd: null,
+    researchFiscalYearEnd: null,
     revenueGrowth: 0.2,
     periodEnd: PERIOD_END,
   };

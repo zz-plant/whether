@@ -1,5 +1,6 @@
 import { ActionLink } from "../components/ui/actionLink";
-import { COMPANIES, COMPANY_ROLES, type CompanyEntry, type CompanyRole } from "../../lib/companies/companyRegistry";
+import { COMPANIES, type CompanyEntry } from "../../lib/companies/companyRegistry";
+import { COMPANY_ROLES, type CompanyRole } from "../../lib/report/companyRoles";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import {
   decisionAreaLabel,
@@ -63,6 +64,30 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
           ))}
         </div>
       ) : null}
+      {situation.budgetCalendar ? (
+        <div className="space-y-1" data-testid="company-budget-calendar">
+          <h3 className="text-sm font-semibold text-slate-100">Budget calendar</h3>
+          <p className="text-sm text-slate-300">{situation.budgetCalendar}</p>
+        </div>
+      ) : null}
+      {situation.restructurings.length > 0 ? (
+        <div className="space-y-1" data-testid="company-restructurings">
+          <h3 className="text-sm font-semibold text-slate-100">Restructuring filings, last 12 months</h3>
+          <ul className="space-y-1 text-sm text-slate-300">
+            {situation.restructurings.map((filing) => (
+              <li key={filing.url}>
+                Filed {filing.filedOn} (8-K item 2.05).{" "}
+                <a href={filing.url} rel="noreferrer" className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+                  Read the filing
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-slate-400">
+            This item reports a plan to exit or restructure part of a business, with material costs. Read the filing for what it covers: it may not say how many people or which groups are affected.
+          </p>
+        </div>
+      ) : null}
       <p className="text-xs text-slate-400">{situation.disclaimer}</p>
     </section>
   );
@@ -70,24 +95,27 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
 
 export function RoleDecisionsSection({
   role,
-  decisions,
-  shifts,
+  askFor,
+  paybackBar,
   rules,
 }: {
   role: CompanyRole;
-  decisions: readonly string[];
-  shifts: readonly string[];
+  /** What this role can ask for under this week's conditions (`askForThisWeek`). */
+  askFor: string;
+  paybackBar: string;
   rules: readonly BoundedDecisionRule[];
 }) {
   return (
     <section className={panel}>
       <h2 className="text-lg font-semibold text-slate-100">The decisions in front of {role.label}</h2>
       <ul className="list-disc space-y-1 pl-5 text-sm text-slate-200">
-        {decisions.map((decision) => <li key={decision}>{decision}</li>)}
+        {role.decisions.map((decision) => <li key={decision}>{decision}</li>)}
       </ul>
-      <ul className="space-y-1 text-sm text-slate-300">
-        {shifts.map((shift) => <li key={shift}>{shift}.</li>)}
-      </ul>
+      <div className="space-y-1" data-testid="company-role-ask">
+        <h3 className="text-sm font-semibold text-slate-100">What to ask for this week</h3>
+        <p className="text-sm text-slate-200">{askFor}</p>
+        <p className="text-sm text-slate-300">{paybackBar}</p>
+      </div>
       {rules.map((rule) => (
         <div key={rule.area} className="space-y-1 border-t border-[color:var(--border-faint)] pt-3 text-sm text-slate-200">
           <h3 className="font-semibold text-slate-100">The general {decisionAreaLabel(rule.area).toLowerCase()} rule this week</h3>
