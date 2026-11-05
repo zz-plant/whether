@@ -8,32 +8,40 @@
  */
 import { z } from "zod";
 import bundledFilings from "../../data/company_filings.json";
-import { readSecCompanyFigures, secCompanyFiguresSchema, type SecCompanyFigures } from "../marketData/secEdgar";
+import {
+  fetchSecRestructurings,
+  readSecCompanyFigures,
+  secCompanyFiguresSchema,
+  secRestructuringFilingSchema,
+} from "../marketData/secEdgar";
 import { medianOf, type PeerGrowth } from "../report/companySituation";
 import { getJson, getWhetherKv, type KvNamespace } from "../runtime/kv";
 import { COMPANIES, type CompanyEntry } from "./companyRegistry";
 
-const KEY_PREFIX = "companies:filing:v1:";
+const KEY_PREFIX = "companies:filing:v2:";
 const REFRESH_BATCH_SIZE = 8;
 const MS_PER_DAY = 86_400_000;
 
-const bundled = z.record(z.string(), secCompanyFiguresSchema).parse(bundledFilings.filings);
+const companyRecordSchema = secCompanyFiguresSchema.extend({ restructurings: z.array(secRestructuringFilingSchema) });
+type CompanyRecord = z.infer<typeof companyRecordSchema>;
+
+const bundled = z.record(z.string(), companyRecordSchema).parse(bundledFilings.filings);
 
 type FilingStore = Pick<KvNamespace, "get" | "put">;
 
-const readStored = async (store: FilingStore | null, company: CompanyEntry): Promise<SecCompanyFigures | null> => {
+const readStored = async (store: FilingStore | null, company: CompanyEntry): Promise<CompanyRecord | null> => {
   if (!store) return null;
   try {
-    return await getJson(store, KEY_PREFIX + company.ticker, secCompanyFiguresSchema);
+    return await getJson(store, KEY_PREFIX + company.ticker, companyRecordSchema);
   } catch {
     return null;
   }
 };
 
-export const readCompanyFigures = async (
+export const readCompanyRecord = async (
   company: CompanyEntry,
   store: FilingStore | null = getWhetherKv(),
-): Promise<SecCompanyFigures | null> => (await readStored(store, company)) ?? bundled[company.ticker] ?? null;
+): Promise<CompanyRecord | null> => (await readStored(store, company)) ?? bundled[company.ticker] ?? null;
 
 /**
  * The list's median revenue growth, from the bundled copy. A reading is compared with it, and a
@@ -67,11 +75,16 @@ export const refreshCompanyFilings = async ({
   const due = companiesDue(now);
   for (const company of due) {
     const figures = await readSecCompanyFigures(company.cik, { cache: null, now });
-    if (figures.status === "ok") {
-      await store.put(KEY_PREFIX + company.ticker, JSON.stringify(figures.value));
+    const restructurings = figures.status === "ok" ? await fetchSecRestructurings(company.cik, now) : null;
+    /* Both or neither: a record without the restructuring read would say a company had filed none. */
+    if (figures.status === "ok" && restructurings?.status === "ok") {
+      const record: CompanyRecord = { ...figures.value, restructurings: restructurings.value };
+      await store.put(KEY_PREFIX + company.ticker, JSON.stringify(record));
       refreshed += 1;
-    } else {
+    } else if (figures.status !== "ok") {
       lastFailure = `${company.ticker}: ${figures.status === "refused" ? figures.refusal : figures.reason}`;
+    } else {
+      lastFailure = `${company.ticker}: restructuring filings could not be read`;
     }
   }
   /* A single company's refusal is a fact about it. Nothing at all is the source being down. */

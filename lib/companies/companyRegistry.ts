@@ -1,13 +1,11 @@
 /**
- * The companies and roles the company pages cover.
+ * The companies the company pages cover.
  *
  * A pilot, on purpose: mass-produced pages that add little can cost a site its standing with
  * search engines, the pages that work today included, so this grows only after these earn their
  * place. Every company files US accounts and is no bank or insurer, so its filing can be read
  * (`deriveSecCompanyFigures`). `fiscalYearEnd` is the SEC's, MMDD.
  */
-import type { DecisionArea } from "../report/boundedDecisionRules";
-
 export type CompanyEntry = {
   slug: string;
   /** The name a reader searches, not the filed one ("MICROSOFT CORP"). */
@@ -70,23 +68,4 @@ export const COMPANIES: readonly CompanyEntry[] = [
   { slug: "dell", name: "Dell", ticker: "DELL", cik: 1571996, fiscalYearEnd: "0129" },
 ];
 
-export type CompanyRole = {
-  slug: string;
-  /** Mid-sentence: "for product managers at Microsoft". */
-  label: string;
-  /** Leading a link or a breadcrumb. */
-  title: string;
-  /** The role in `decisionDomainCatalog` its decisions come from. */
-  catalogSlug: string;
-  /** The areas whose rules bear on those decisions, the closest first. */
-  areas: readonly DecisionArea[];
-};
-
-export const COMPANY_ROLES: readonly CompanyRole[] = [
-  { slug: "product-managers", label: "product managers", title: "Product managers", catalogSlug: "product", areas: ["product-tempo"] },
-  { slug: "engineering-managers", label: "engineering managers", title: "Engineering managers", catalogSlug: "engineering", areas: ["product-tempo", "hiring"] },
-  { slug: "growth-leaders", label: "growth and sales leaders", title: "Growth and sales leaders", catalogSlug: "growth-gtm", areas: ["expansion-bets", "burn-discipline"] },
-];
-
 export const findCompany = (slug: string) => COMPANIES.find((company) => company.slug === slug);
-export const findCompanyRole = (slug: string) => COMPANY_ROLES.find((role) => role.slug === slug);

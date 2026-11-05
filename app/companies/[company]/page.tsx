@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COMPANY_ROLES, findCompany } from "../../../lib/companies/companyRegistry";
+import { findCompany } from "../../../lib/companies/companyRegistry";
+import { COMPANY_ROLES } from "../../../lib/report/companyRoles";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";

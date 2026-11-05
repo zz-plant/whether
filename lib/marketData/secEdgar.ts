@@ -416,6 +416,10 @@ export const secCompanyFiguresSchema = z.object({
   revenueTtmUsd: z.number(),
   operatingCashFlowTtmUsd: z.number(),
   capitalSpendingTtmUsd: z.number().nullable(),
+  stockCompensationTtmUsd: z.number().nullable(),
+  researchFiscalYearUsd: z.number().nullable(),
+  researchPriorFiscalYearUsd: z.number().nullable(),
+  researchFiscalYearEnd: z.string().nullable(),
   revenueGrowth: z.number().nullable(),
   periodEnd: z.string(),
 });
@@ -434,6 +438,11 @@ export type SecCompanyFigures = {
   operatingCashFlowTtmUsd: number;
   /** Null when none is on file for the same period, which is not the same as none spent. */
   capitalSpendingTtmUsd: number | null;
+  stockCompensationTtmUsd: number | null;
+  /** The latest full fiscal year's R&D, the year before it, and when the year ended. Null when not on file. */
+  researchFiscalYearUsd: number | null;
+  researchPriorFiscalYearUsd: number | null;
+  researchFiscalYearEnd: string | null;
   revenueGrowth: number | null;
   /** The balance sheet's date, YYYY-MM-DD. */
   periodEnd: string;
@@ -494,6 +503,22 @@ const trailingFlow = (gaap: Taxonomy, concepts: readonly string[], end?: string)
       .filter((row): row is FactRow & { start: string } => row.start !== undefined);
     const trailing = trailingYearOf(periods);
     if (trailing && (!end || trailing.end === end)) return trailing;
+  }
+  return null;
+};
+
+const RESEARCH_CONCEPTS = ["ResearchAndDevelopmentExpense", "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost"];
+
+/** The latest full fiscal year within a year of `end`, and the one before it where it is on file. */
+const fiscalYearsOf = (gaap: Taxonomy, concepts: readonly string[], end: string) => {
+  for (const concept of concepts) {
+    const years = latestFiledByPeriod(readRows(gaap, concept, "USD"))
+      .filter((row) => row.start !== undefined && isYearSpan(daysSpanned(row.start, row.end)))
+      .sort((a, b) => b.end.localeCompare(a.end));
+    const latest = years[0];
+    if (!latest || daysApart(latest.end, end) > 370) continue;
+    const prior = years.find((row) => isYearSpan(daysApart(row.end, latest.end)));
+    return { value: latest.val, prior: prior?.val ?? null, end: latest.end };
   }
   return null;
 };
@@ -568,6 +593,8 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
     return { status: "refused", refusal: "incomplete-filing" };
   }
 
+  const research = fiscalYearsOf(gaap, RESEARCH_CONCEPTS, cashFlow.end);
+
   return {
     status: "ok",
     value: {
@@ -577,6 +604,10 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
       revenueTtmUsd,
       operatingCashFlowTtmUsd: cashFlow.value,
       capitalSpendingTtmUsd: trailingFlow(gaap, CAPITAL_SPENDING_CONCEPTS, cashFlow.end)?.value ?? null,
+      stockCompensationTtmUsd: trailingFlow(gaap, ["ShareBasedCompensation"], cashFlow.end)?.value ?? null,
+      researchFiscalYearUsd: research?.value ?? null,
+      researchPriorFiscalYearUsd: research?.prior ?? null,
+      researchFiscalYearEnd: research?.end ?? null,
       revenueGrowth: growthOnYearAgo(quarters),
       periodEnd: cashFlow.end,
     },
@@ -585,7 +616,7 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
 
 const TICKER_INDEX_URL = "https://www.sec.gov/files/company_tickers.json";
 const TICKER_CACHE_PREFIX = "company:sec:ticker:v1:";
-const FIGURES_CACHE_PREFIX = "company:sec:figures:v3:";
+const FIGURES_CACHE_PREFIX = "company:sec:figures:v4:";
 /** A listing rarely changes, and an unknown ticker costs an 800KB read each time it is asked. */
 const TICKER_TTL_SECONDS = 7 * 24 * 60 * 60;
 
@@ -689,4 +720,57 @@ export async function fetchSecCompanyFiling(
 
   const figures = await readSecCompanyFigures(cik, options);
   return figures.status === "ok" ? { status: "ok", value: { ...figures.value, ticker, name } } : figures;
+}
+
+/* ---------- Restructuring filings ---------- */
+
+/** One 8-K reporting item 2.05: a commitment to an exit or restructuring plan with material costs. */
+export const secRestructuringFilingSchema = z.object({ filedOn: z.string(), url: z.string() });
+export type SecRestructuringFiling = z.infer<typeof secRestructuringFilingSchema>;
+
+const submissionsSchema = z.object({
+  filings: z.object({
+    recent: z.object({
+      form: z.array(z.string()),
+      filingDate: z.array(z.string()),
+      items: z.array(z.string()),
+      accessionNumber: z.array(z.string()),
+      primaryDocument: z.array(z.string()),
+    }),
+  }),
+});
+
+/** Item 2.05's filings in a company's recent submissions, newest first. Pure: the caller fetches. */
+export const deriveSecRestructurings = (submissions: unknown, cik: number, now: Date): SecRestructuringFiling[] | null => {
+  const parsed = submissionsSchema.safeParse(submissions);
+  if (!parsed.success) return null;
+  const { form, filingDate, items, accessionNumber, primaryDocument } = parsed.data.filings.recent;
+  const filings: SecRestructuringFiling[] = [];
+  form.forEach((type, index) => {
+    const filedOn = filingDate[index];
+    const accession = accessionNumber[index];
+    const document = primaryDocument[index];
+    if (type !== "8-K" || !filedOn || !accession || !document) return;
+    if (!(items[index] ?? "").split(",").includes("2.05")) return;
+    if (daysApart(filedOn, now.toISOString().slice(0, 10)) > 366) return;
+    filings.push({ filedOn, url: `https://www.sec.gov/Archives/edgar/data/${cik}/${accession.replace(/-/g, "")}/${document}` });
+  });
+  return filings.sort((a, b) => b.filedOn.localeCompare(a.filedOn));
+};
+
+export async function fetchSecRestructurings(cik: number, now: Date): Promise<UpstreamRead<SecRestructuringFiling[]>> {
+  try {
+    const res = await fetch(`https://data.sec.gov/submissions/CIK${String(cik).padStart(10, "0")}.json`, {
+      headers: { "user-agent": SEC_USER_AGENT, accept: "application/json" },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) {
+      await releaseBody(res);
+      return { status: "unavailable", reason: `SEC EDGAR returned ${res.status}` };
+    }
+    const filings = deriveSecRestructurings(await res.json(), cik, now);
+    return filings ? { status: "ok", value: filings } : { status: "unavailable", reason: "SEC EDGAR returned unreadable submissions" };
+  } catch (error) {
+    return { status: "unavailable", reason: `SEC EDGAR: ${describeFetchError(error, "submissions fetch failed")}` };
+  }
 }

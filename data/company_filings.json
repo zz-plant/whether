@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T00:40:06.597Z",
+  "generatedAt": "2026-11-05T16:25:15.302Z",
   "filings": {
     "MSFT": {
       "cashUsd": 64509000000,
@@ -9,8 +9,13 @@
       "revenueTtmUsd": 346445000000,
       "operatingCashFlowTtmUsd": 195878000000,
       "capitalSpendingTtmUsd": 135921000000,
+      "stockCompensationTtmUsd": 12556000000,
+      "researchFiscalYearUsd": 35562000000,
+      "researchPriorFiscalYearUsd": 32488000000,
+      "researchFiscalYearEnd": "2026-06-30",
       "revenueGrowth": 0.18804475171552526,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "GOOGL": {
       "cashUsd": 265098000000,
@@ -20,8 +25,13 @@
       "revenueTtmUsd": 471097000000,
       "operatingCashFlowTtmUsd": 179551000000,
       "capitalSpendingTtmUsd": 159804000000,
+      "stockCompensationTtmUsd": 30409000000,
+      "researchFiscalYearUsd": 61087000000,
+      "researchPriorFiscalYearUsd": 49326000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.246526488577961,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "AMZN": {
       "cashUsd": 114226000000,
@@ -31,8 +41,13 @@
       "revenueTtmUsd": 797455000000,
       "operatingCashFlowTtmUsd": 168300000000,
       "capitalSpendingTtmUsd": 215192000000,
+      "stockCompensationTtmUsd": 19873000000,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": 0.1208587492853932,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "AAPL": {
       "cashUsd": 56722000000,
@@ -42,8 +57,13 @@
       "revenueTtmUsd": 478834000000,
       "operatingCashFlowTtmUsd": 145097000000,
       "capitalSpendingTtmUsd": 9041000000,
+      "stockCompensationTtmUsd": 13789000000,
+      "researchFiscalYearUsd": 45765000000,
+      "researchPriorFiscalYearUsd": 34550000000,
+      "researchFiscalYearEnd": "2026-09-26",
       "revenueGrowth": 0.11721937032771845,
-      "periodEnd": "2026-09-26"
+      "periodEnd": "2026-09-26",
+      "restructurings": []
     },
     "META": {
       "cashUsd": 82449000000,
@@ -53,8 +73,13 @@
       "revenueTtmUsd": 241607000000,
       "operatingCashFlowTtmUsd": 133087000000,
       "capitalSpendingTtmUsd": 104438000000,
+      "stockCompensationTtmUsd": 26943000000,
+      "researchFiscalYearUsd": 57372000000,
+      "researchPriorFiscalYearUsd": 43873000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.2607041099098395,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "NFLX": {
       "cashUsd": 8222953000,
@@ -64,8 +89,13 @@
       "revenueTtmUsd": 49734633000,
       "operatingCashFlowTtmUsd": 12307938000,
       "capitalSpendingTtmUsd": 932875000,
+      "stockCompensationTtmUsd": 540064000,
+      "researchFiscalYearUsd": 3391390000,
+      "researchPriorFiscalYearUsd": 2925295000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.11849110540665864,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "NVDA": {
       "cashUsd": 22443000000,
@@ -75,8 +105,13 @@
       "revenueTtmUsd": 302969000000,
       "operatingCashFlowTtmUsd": 134360000000,
       "capitalSpendingTtmUsd": 7354000000,
+      "stockCompensationTtmUsd": 7241000000,
+      "researchFiscalYearUsd": 18497000000,
+      "researchPriorFiscalYearUsd": 12914000000,
+      "researchFiscalYearEnd": "2026-01-25",
       "revenueGrowth": 1.0585114348672526,
-      "periodEnd": "2026-07-26"
+      "periodEnd": "2026-07-26",
+      "restructurings": []
     },
     "ORCL": {
       "cashUsd": 37077000000,
@@ -86,8 +121,13 @@
       "revenueTtmUsd": 71776000000,
       "operatingCashFlowTtmUsd": 46940000000,
       "capitalSpendingTtmUsd": 75660000000,
+      "stockCompensationTtmUsd": 4814000000,
+      "researchFiscalYearUsd": 10272000000,
+      "researchPriorFiscalYearUsd": 9860000000,
+      "researchFiscalYearEnd": "2026-05-31",
       "revenueGrowth": 0.2960605654562509,
-      "periodEnd": "2026-08-31"
+      "periodEnd": "2026-08-31",
+      "restructurings": []
     },
     "CRM": {
       "cashUsd": 11403000000,
@@ -97,8 +137,13 @@
       "revenueTtmUsd": 43938000000,
       "operatingCashFlowTtmUsd": 15750000000,
       "capitalSpendingTtmUsd": 596000000,
+      "stockCompensationTtmUsd": 3665000000,
+      "researchFiscalYearUsd": 5993000000,
+      "researchPriorFiscalYearUsd": 5493000000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.1083431027745212,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "ADBE": {
       "cashUsd": 5639000000,
@@ -108,8 +153,13 @@
       "revenueTtmUsd": 25970000000,
       "operatingCashFlowTtmUsd": 10806000000,
       "capitalSpendingTtmUsd": 214000000,
+      "stockCompensationTtmUsd": 2071000000,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": 0.12892451569806274,
-      "periodEnd": "2026-08-28"
+      "periodEnd": "2026-08-28",
+      "restructurings": []
     },
     "INTC": {
       "cashUsd": 54005000000,
@@ -119,8 +169,13 @@
       "revenueTtmUsd": 59892000000,
       "operatingCashFlowTtmUsd": 17472000000,
       "capitalSpendingTtmUsd": 13704000000,
+      "stockCompensationTtmUsd": 2432000000,
+      "researchFiscalYearUsd": 13774000000,
+      "researchPriorFiscalYearUsd": 16546000000,
+      "researchFiscalYearEnd": "2025-12-27",
       "revenueGrowth": 0.20947777045338012,
-      "periodEnd": "2026-09-26"
+      "periodEnd": "2026-09-26",
+      "restructurings": []
     },
     "AMD": {
       "cashUsd": 15776000000,
@@ -130,8 +185,13 @@
       "revenueTtmUsd": 45436000000,
       "operatingCashFlowTtmUsd": 9123000000,
       "capitalSpendingTtmUsd": 2067000000,
+      "stockCompensationTtmUsd": 1999000000,
+      "researchFiscalYearUsd": 8091000000,
+      "researchPriorFiscalYearUsd": 6456000000,
+      "researchFiscalYearEnd": "2025-12-27",
       "revenueGrowth": 0.4467878001297858,
-      "periodEnd": "2026-09-26"
+      "periodEnd": "2026-09-26",
+      "restructurings": []
     },
     "CSCO": {
       "cashUsd": 14297000000,
@@ -141,8 +201,18 @@
       "revenueTtmUsd": 63325000000,
       "operatingCashFlowTtmUsd": 14177000000,
       "capitalSpendingTtmUsd": 1410000000,
+      "stockCompensationTtmUsd": 3830000000,
+      "researchFiscalYearUsd": 9563000000,
+      "researchPriorFiscalYearUsd": 9300000000,
+      "researchFiscalYearEnd": "2026-07-25",
       "revenueGrowth": 0.17576501056362015,
-      "periodEnd": "2026-07-25"
+      "periodEnd": "2026-07-25",
+      "restructurings": [
+        {
+          "filedOn": "2026-05-13",
+          "url": "https://www.sec.gov/Archives/edgar/data/858877/000085887726000075/csco-20260513.htm"
+        }
+      ]
     },
     "IBM": {
       "cashUsd": 11058000000,
@@ -152,8 +222,13 @@
       "revenueTtmUsd": 69868000000,
       "operatingCashFlowTtmUsd": 15831000000,
       "capitalSpendingTtmUsd": 1175000000,
+      "stockCompensationTtmUsd": 1969000000,
+      "researchFiscalYearUsd": 8316000000,
+      "researchPriorFiscalYearUsd": 7479000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.04727205927377387,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "UBER": {
       "cashUsd": 10068000000,
@@ -163,8 +238,13 @@
       "revenueTtmUsd": 56526000000,
       "operatingCashFlowTtmUsd": 10735000000,
       "capitalSpendingTtmUsd": 314000000,
+      "stockCompensationTtmUsd": 2065000000,
+      "researchFiscalYearUsd": 3402000000,
+      "researchPriorFiscalYearUsd": 3109000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.09645800846513697,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "LYFT": {
       "cashUsd": 1794515000,
@@ -174,8 +254,13 @@
       "revenueTtmUsd": 6771939000,
       "operatingCashFlowTtmUsd": 1195080000,
       "capitalSpendingTtmUsd": null,
+      "stockCompensationTtmUsd": 310439000,
+      "researchFiscalYearUsd": 451419000,
+      "researchPriorFiscalYearUsd": 397073000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.16078814595043522,
-      "periodEnd": "2026-06-30"
+      "periodEnd": "2026-06-30",
+      "restructurings": []
     },
     "ABNB": {
       "cashUsd": 12069000000,
@@ -185,8 +270,13 @@
       "revenueTtmUsd": 13159000000,
       "operatingCashFlowTtmUsd": 4860000000,
       "capitalSpendingTtmUsd": null,
+      "stockCompensationTtmUsd": 1707000000,
+      "researchFiscalYearUsd": 2354000000,
+      "researchPriorFiscalYearUsd": 2056000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.1653746770025839,
-      "periodEnd": "2026-06-30"
+      "periodEnd": "2026-06-30",
+      "restructurings": []
     },
     "DASH": {
       "cashUsd": 5982000000,
@@ -196,8 +286,13 @@
       "revenueTtmUsd": 17061000000,
       "operatingCashFlowTtmUsd": 2953000000,
       "capitalSpendingTtmUsd": 262000000,
+      "stockCompensationTtmUsd": 1123000000,
+      "researchFiscalYearUsd": 1431000000,
+      "researchPriorFiscalYearUsd": 1168000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.3395240858966919,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "SHOP": {
       "cashUsd": 4727000000,
@@ -207,8 +302,13 @@
       "revenueTtmUsd": 14167000000,
       "operatingCashFlowTtmUsd": 2682000000,
       "capitalSpendingTtmUsd": 21000000,
+      "stockCompensationTtmUsd": null,
+      "researchFiscalYearUsd": 1536000000,
+      "researchPriorFiscalYearUsd": 1367000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.3157524613220817,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "SNOW": {
       "cashUsd": 2344695000,
@@ -218,8 +318,13 @@
       "revenueTtmUsd": 5434647000,
       "operatingCashFlowTtmUsd": 1253253000,
       "capitalSpendingTtmUsd": 57979000,
+      "stockCompensationTtmUsd": 1641922000,
+      "researchFiscalYearUsd": 1969472000,
+      "researchPriorFiscalYearUsd": 1783379000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.3509474929015546,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "DDOG": {
       "cashUsd": 5233587000,
@@ -229,8 +334,13 @@
       "revenueTtmUsd": 4278164000,
       "operatingCashFlowTtmUsd": 1267515000,
       "capitalSpendingTtmUsd": 41011000,
+      "stockCompensationTtmUsd": 859660000,
+      "researchFiscalYearUsd": 1548451000,
+      "researchPriorFiscalYearUsd": 1152703000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.3516498033649824,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "HUBS": {
       "cashUsd": 1296756000,
@@ -240,8 +350,18 @@
       "revenueTtmUsd": 3587045000,
       "operatingCashFlowTtmUsd": 907037000,
       "capitalSpendingTtmUsd": 64545000,
+      "stockCompensationTtmUsd": 503746000,
+      "researchFiscalYearUsd": 905943000,
+      "researchPriorFiscalYearUsd": 778714000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.17052987086142624,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-10-06",
+          "url": "https://www.sec.gov/Archives/edgar/data/1404655/000119312526414965/d183135d8k.htm"
+        }
+      ]
     },
     "MDB": {
       "cashUsd": 2411254000,
@@ -251,8 +371,13 @@
       "revenueTtmUsd": 2782770000,
       "operatingCashFlowTtmUsd": 666623000,
       "capitalSpendingTtmUsd": 7603000,
+      "stockCompensationTtmUsd": 564392000,
+      "researchFiscalYearUsd": 716303000,
+      "researchPriorFiscalYearUsd": 596837000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.30498882316935005,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "TEAM": {
       "cashUsd": 1239512000,
@@ -262,8 +387,18 @@
       "revenueTtmUsd": 6572308000,
       "operatingCashFlowTtmUsd": 1353135000,
       "capitalSpendingTtmUsd": 34060000,
+      "stockCompensationTtmUsd": 1606561000,
+      "researchFiscalYearUsd": 3269257000,
+      "researchPriorFiscalYearUsd": 2669312000,
+      "researchFiscalYearEnd": "2026-06-30",
       "revenueGrowth": 0.27603326918742743,
-      "periodEnd": "2026-06-30"
+      "periodEnd": "2026-06-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-03-11",
+          "url": "https://www.sec.gov/Archives/edgar/data/1650372/000165037226000021/team-20260311.htm"
+        }
+      ]
     },
     "WDAY": {
       "cashUsd": 3403000000,
@@ -273,8 +408,22 @@
       "revenueTtmUsd": 10155000000,
       "operatingCashFlowTtmUsd": 3081000000,
       "capitalSpendingTtmUsd": 237000000,
+      "stockCompensationTtmUsd": 1646000000,
+      "researchFiscalYearUsd": 2679000000,
+      "researchPriorFiscalYearUsd": 2626000000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.12819420783645663,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": [
+        {
+          "filedOn": "2026-09-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/1327811/000132781126000048/wday-20260929.htm"
+        },
+        {
+          "filedOn": "2026-02-04",
+          "url": "https://www.sec.gov/Archives/edgar/data/1327811/000132781126000004/wday-20260130.htm"
+        }
+      ]
     },
     "NOW": {
       "cashUsd": 4607000000,
@@ -284,8 +433,13 @@
       "revenueTtmUsd": 15431000000,
       "operatingCashFlowTtmUsd": 5334000000,
       "capitalSpendingTtmUsd": 584000000,
+      "stockCompensationTtmUsd": 2323000000,
+      "researchFiscalYearUsd": 2960000000,
+      "researchPriorFiscalYearUsd": 2543000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.20516583504549457,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "NET": {
       "cashUsd": 4162798000,
@@ -295,8 +449,13 @@
       "revenueTtmUsd": 2512350000,
       "operatingCashFlowTtmUsd": 633428000,
       "capitalSpendingTtmUsd": 285023000,
+      "stockCompensationTtmUsd": 507655000,
+      "researchFiscalYearUsd": 512489000,
+      "researchPriorFiscalYearUsd": 421374000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.3586555953747297,
-      "periodEnd": "2026-06-30"
+      "periodEnd": "2026-06-30",
+      "restructurings": []
     },
     "TOST": {
       "cashUsd": 1885000000,
@@ -306,8 +465,13 @@
       "revenueTtmUsd": 7152000000,
       "operatingCashFlowTtmUsd": 668000000,
       "capitalSpendingTtmUsd": 64000000,
+      "stockCompensationTtmUsd": 214000000,
+      "researchFiscalYearUsd": 374000000,
+      "researchPriorFiscalYearUsd": 351000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.2131047152480099,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "DOCU": {
       "cashUsd": 777677000,
@@ -317,8 +481,13 @@
       "revenueTtmUsd": 3361191000,
       "operatingCashFlowTtmUsd": 1323729000,
       "capitalSpendingTtmUsd": 125438000,
+      "stockCompensationTtmUsd": null,
+      "researchFiscalYearUsd": 664985000,
+      "researchPriorFiscalYearUsd": 588455000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.09381291872960995,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "ZM": {
       "cashUsd": 7249721000,
@@ -328,8 +497,13 @@
       "revenueTtmUsd": 4993050000,
       "operatingCashFlowTtmUsd": 2000208000,
       "capitalSpendingTtmUsd": 74551000,
+      "stockCompensationTtmUsd": 729245000,
+      "researchFiscalYearUsd": 844875000,
+      "researchPriorFiscalYearUsd": 852415000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.04928415160031774,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "OKTA": {
       "cashUsd": 2299000000,
@@ -339,8 +513,13 @@
       "revenueTtmUsd": 3073000000,
       "operatingCashFlowTtmUsd": 987000000,
       "capitalSpendingTtmUsd": 8000000,
+      "stockCompensationTtmUsd": 503000000,
+      "researchFiscalYearUsd": 639000000,
+      "researchPriorFiscalYearUsd": 642000000,
+      "researchFiscalYearEnd": "2026-01-31",
       "revenueGrowth": 0.10576923076923084,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "PINS": {
       "cashUsd": 1470021000,
@@ -350,19 +529,39 @@
       "revenueTtmUsd": 4680444000,
       "operatingCashFlowTtmUsd": 1327854000,
       "capitalSpendingTtmUsd": 65603000,
+      "stockCompensationTtmUsd": 1078324000,
+      "researchFiscalYearUsd": 1427447000,
+      "researchPriorFiscalYearUsd": 1240564000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.11887476708555522,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-01-27",
+          "url": "https://www.sec.gov/Archives/edgar/data/1506293/000150629326000009/pins-20260122.htm"
+        }
+      ]
     },
     "SNAP": {
-      "cashUsd": 2659758000,
-      "debtUsd": 3687766000,
-      "debtAsOf": "2026-06-30",
+      "cashUsd": 2770647000,
+      "debtUsd": 3592620000,
+      "debtAsOf": "2026-09-30",
       "longTermInvestmentsUsd": 0,
-      "revenueTtmUsd": 6351084000,
-      "operatingCashFlowTtmUsd": 919059000,
-      "capitalSpendingTtmUsd": 213514000,
-      "revenueGrowth": 0.18890425524004972,
-      "periodEnd": "2026-06-30"
+      "revenueTtmUsd": 6566716000,
+      "operatingCashFlowTtmUsd": 983055000,
+      "capitalSpendingTtmUsd": 206501000,
+      "stockCompensationTtmUsd": 1025256000,
+      "researchFiscalYearUsd": 1793601000,
+      "researchPriorFiscalYearUsd": 1691683000,
+      "researchFiscalYearEnd": "2025-12-31",
+      "revenueGrowth": 0.14310221596335104,
+      "periodEnd": "2026-09-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-04-15",
+          "url": "https://www.sec.gov/Archives/edgar/data/1564408/000119312526155861/d36756d8k.htm"
+        }
+      ]
     },
     "RDDT": {
       "cashUsd": 3033432000,
@@ -372,8 +571,13 @@
       "revenueTtmUsd": 3088880000,
       "operatingCashFlowTtmUsd": 1204733000,
       "capitalSpendingTtmUsd": 6617000,
+      "stockCompensationTtmUsd": 385772000,
+      "researchFiscalYearUsd": 783145000,
+      "researchPriorFiscalYearUsd": 935152000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.5300738061004153,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "ROKU": {
       "cashUsd": 2720569000,
@@ -383,8 +587,13 @@
       "revenueTtmUsd": 5500494000,
       "operatingCashFlowTtmUsd": 810866000,
       "capitalSpendingTtmUsd": 9411000,
+      "stockCompensationTtmUsd": 319298000,
+      "researchFiscalYearUsd": 729477000,
+      "researchPriorFiscalYearUsd": 720145000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.2406863158103414,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "EBAY": {
       "cashUsd": 1166000000,
@@ -394,8 +603,18 @@
       "revenueTtmUsd": 12394000000,
       "operatingCashFlowTtmUsd": 3049000000,
       "capitalSpendingTtmUsd": 637000000,
+      "stockCompensationTtmUsd": 670000000,
+      "researchFiscalYearUsd": 1642000000,
+      "researchPriorFiscalYearUsd": 1479000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.1368794326241134,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-10-22",
+          "url": "https://www.sec.gov/Archives/edgar/data/1065088/000106508826000205/ebay-20261020.htm"
+        }
+      ]
     },
     "PYPL": {
       "cashUsd": 10280000000,
@@ -405,8 +624,13 @@
       "revenueTtmUsd": 34295000000,
       "operatingCashFlowTtmUsd": 7093000000,
       "capitalSpendingTtmUsd": 794000000,
+      "stockCompensationTtmUsd": 977000000,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": 0.01984079838422237,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "XYZ": {
       "cashUsd": 8244548000,
@@ -416,8 +640,18 @@
       "revenueTtmUsd": 25646371000,
       "operatingCashFlowTtmUsd": 3622581000,
       "capitalSpendingTtmUsd": 169196000,
+      "stockCompensationTtmUsd": 1164743000,
+      "researchFiscalYearUsd": 2907889000,
+      "researchPriorFiscalYearUsd": 2914415000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.09884084126907289,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-02-26",
+          "url": "https://www.sec.gov/Archives/edgar/data/1512673/000119312526076557/d108590d8k.htm"
+        }
+      ]
     },
     "COIN": {
       "cashUsd": 8820883000,
@@ -427,8 +661,18 @@
       "revenueTtmUsd": 5629761000,
       "operatingCashFlowTtmUsd": 1409211000,
       "capitalSpendingTtmUsd": null,
+      "stockCompensationTtmUsd": 949923000,
+      "researchFiscalYearUsd": 1670605000,
+      "researchPriorFiscalYearUsd": 1468252000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": -0.3495014965004952,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-05-05",
+          "url": "https://www.sec.gov/Archives/edgar/data/1679788/000167978826000049/coin-20260505.htm"
+        }
+      ]
     },
     "INTU": {
       "cashUsd": 7200000000,
@@ -438,8 +682,18 @@
       "revenueTtmUsd": 21448000000,
       "operatingCashFlowTtmUsd": 8838000000,
       "capitalSpendingTtmUsd": 175000000,
+      "stockCompensationTtmUsd": 2056000000,
+      "researchFiscalYearUsd": 3376000000,
+      "researchPriorFiscalYearUsd": 2928000000,
+      "researchFiscalYearEnd": "2026-07-31",
       "revenueGrowth": 0.13651788044896884,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": [
+        {
+          "filedOn": "2026-05-20",
+          "url": "https://www.sec.gov/Archives/edgar/data/896878/000089687826000024/intu-20260520.htm"
+        }
+      ]
     },
     "PLTR": {
       "cashUsd": 10561531000,
@@ -449,8 +703,13 @@
       "revenueTtmUsd": 7288260000,
       "operatingCashFlowTtmUsd": 4097197000,
       "capitalSpendingTtmUsd": 43241000,
+      "stockCompensationTtmUsd": 982095000,
+      "researchFiscalYearUsd": 557677000,
+      "researchPriorFiscalYearUsd": 507878000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.9587051643733087,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "RIVN": {
       "cashUsd": 5502000000,
@@ -460,8 +719,13 @@
       "revenueTtmUsd": 6480000000,
       "operatingCashFlowTtmUsd": -2629000000,
       "capitalSpendingTtmUsd": 1563000000,
+      "stockCompensationTtmUsd": 824000000,
+      "researchFiscalYearUsd": 1668000000,
+      "researchPriorFiscalYearUsd": 1613000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.383183568677792,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "LCID": {
       "cashUsd": 761313000,
@@ -471,8 +735,22 @@
       "revenueTtmUsd": 1547122000,
       "operatingCashFlowTtmUsd": -4080948000,
       "capitalSpendingTtmUsd": 1031248000,
+      "stockCompensationTtmUsd": 295080000,
+      "researchFiscalYearUsd": 1211397000,
+      "researchPriorFiscalYearUsd": 1176453000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": 0.5624402540935582,
-      "periodEnd": "2026-06-30"
+      "periodEnd": "2026-06-30",
+      "restructurings": [
+        {
+          "filedOn": "2026-06-22",
+          "url": "https://www.sec.gov/Archives/edgar/data/1811210/000162828026044501/lcid-20260622.htm"
+        },
+        {
+          "filedOn": "2026-02-24",
+          "url": "https://www.sec.gov/Archives/edgar/data/1811210/000162828026011118/lcid-20260220.htm"
+        }
+      ]
     },
     "TSLA": {
       "cashUsd": 45447000000,
@@ -482,8 +760,13 @@
       "revenueTtmUsd": 103570000000,
       "operatingCashFlowTtmUsd": 18710000000,
       "capitalSpendingTtmUsd": 15407000000,
+      "stockCompensationTtmUsd": 4300000000,
+      "researchFiscalYearUsd": 6411000000,
+      "researchPriorFiscalYearUsd": 4540000000,
+      "researchFiscalYearEnd": "2025-12-31",
       "revenueGrowth": -0.0017440825769710067,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "WMT": {
       "cashUsd": 11529000000,
@@ -493,8 +776,13 @@
       "revenueTtmUsd": 728466000000,
       "operatingCashFlowTtmUsd": 42923000000,
       "capitalSpendingTtmUsd": 29414000000,
+      "stockCompensationTtmUsd": null,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": 0.05889046941678511,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     },
     "TGT": {
       "cashUsd": 5411000000,
@@ -504,8 +792,13 @@
       "revenueTtmUsd": 107705000000,
       "operatingCashFlowTtmUsd": 8723000000,
       "capitalSpendingTtmUsd": 4267000000,
+      "stockCompensationTtmUsd": 302000000,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": 0.05267541945975962,
-      "periodEnd": "2026-08-01"
+      "periodEnd": "2026-08-01",
+      "restructurings": []
     },
     "NKE": {
       "cashUsd": 8368000000,
@@ -515,8 +808,22 @@
       "revenueTtmUsd": 45891000000,
       "operatingCashFlowTtmUsd": 2781000000,
       "capitalSpendingTtmUsd": 676000000,
+      "stockCompensationTtmUsd": 688000000,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": -0.043259385665529004,
-      "periodEnd": "2026-08-31"
+      "periodEnd": "2026-08-31",
+      "restructurings": [
+        {
+          "filedOn": "2026-10-01",
+          "url": "https://www.sec.gov/Archives/edgar/data/320187/000032018726000184/nke-20261001.htm"
+        },
+        {
+          "filedOn": "2026-03-05",
+          "url": "https://www.sec.gov/Archives/edgar/data/320187/000032018726000017/nke-20260227.htm"
+        }
+      ]
     },
     "DIS": {
       "cashUsd": 5185000000,
@@ -526,8 +833,13 @@
       "revenueTtmUsd": 98861000000,
       "operatingCashFlowTtmUsd": 16989000000,
       "capitalSpendingTtmUsd": 8696000000,
+      "stockCompensationTtmUsd": 1519000000,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": 0.06756871035940804,
-      "periodEnd": "2026-06-27"
+      "periodEnd": "2026-06-27",
+      "restructurings": []
     },
     "BKNG": {
       "cashUsd": 15814000000,
@@ -537,8 +849,13 @@
       "revenueTtmUsd": 28126000000,
       "operatingCashFlowTtmUsd": 9561000000,
       "capitalSpendingTtmUsd": 324000000,
+      "stockCompensationTtmUsd": null,
+      "researchFiscalYearUsd": null,
+      "researchPriorFiscalYearUsd": null,
+      "researchFiscalYearEnd": null,
       "revenueGrowth": -0.01276642984014209,
-      "periodEnd": "2026-09-30"
+      "periodEnd": "2026-09-30",
+      "restructurings": []
     },
     "DELL": {
       "cashUsd": 11569000000,
@@ -548,8 +865,13 @@
       "revenueTtmUsd": 151197000000,
       "operatingCashFlowTtmUsd": 12152000000,
       "capitalSpendingTtmUsd": 3592000000,
+      "stockCompensationTtmUsd": 727000000,
+      "researchFiscalYearUsd": 3142000000,
+      "researchPriorFiscalYearUsd": 3061000000,
+      "researchFiscalYearEnd": "2026-01-30",
       "revenueGrowth": 0.5774785061794734,
-      "periodEnd": "2026-07-31"
+      "periodEnd": "2026-07-31",
+      "restructurings": []
     }
   }
 }
