@@ -503,3 +503,29 @@ export const buildPublishedBriefStructuredData = ({
     },
   ]);
 
+/** A company page says what it is about and where it sits, and claims no reviewer or rating. */
+export const buildCompanyPageStructuredData = ({
+  path,
+  title,
+  company,
+  ticker,
+  trail,
+}: {
+  path: `/${string}`;
+  title: string;
+  company: string;
+  ticker: string;
+  trail: ReadonlyArray<{ name: string; path: `/${string}` }>;
+}): JsonLdGraph =>
+  graph([
+    {
+      "@type": "WebPage",
+      "@id": `${buildCanonicalUrl(path)}#webpage`,
+      url: buildCanonicalUrl(path),
+      name: title,
+      about: { "@type": "Corporation", name: company, tickerSymbol: ticker },
+      isPartOf: { "@id": websiteId },
+      publisher: { "@id": organizationId },
+    },
+    buildBreadcrumbList(trail.map((item) => ({ name: item.name, path: item.path }))),
+  ]);

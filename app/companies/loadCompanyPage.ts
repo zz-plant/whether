@@ -4,6 +4,7 @@ import type { CompanyEntry } from "../../lib/companies/companyRegistry";
 import { buildCompanySituation } from "../../lib/report/companySituation";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../../lib/regimePresentation";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { describeSavedCopyBanner } from "../../lib/report/trustStatus";
 import { isCallStaleForIndexing } from "../../lib/seo/freshnessIndexation";
 import type { WeekConditions } from "./companyPageSections";
 
@@ -14,17 +15,21 @@ export const loadCompanyPage = async (company: CompanyEntry) => {
   const [week, figures] = await Promise.all([loadWeek(), readCompanyFigures(company)]);
   const { reportData, degraded, homeBriefModel, weeklyCall } = week.snapshot;
   const regime = reportData.assessment.regime;
+  const stale = isCallStaleForIndexing({
+    recordDateIso: reportData.treasury.record_date,
+    isFallbackSnapshot: degraded || !reportData.treasury.isLive,
+  });
   const conditions: WeekConditions = {
     label: getRegimePublicLabel(regime),
     rationale: getRegimeWeatherRationale(regime),
     guidance: weeklyCall.currentCall,
     recordDateLabel: reportData.recordDateLabel,
+    /* A robots tag protects search results, not a reader who follows a link. */
+    ...(stale
+      ? { savedCopyNotice: describeSavedCopyBanner({ recordDate: reportData.treasury.record_date, now: new Date(), guidanceHeld: false }) }
+      : {}),
   };
   const situation = figures ? buildCompanySituation(company, figures) : null;
-  const stale = isCallStaleForIndexing({
-    recordDateIso: reportData.treasury.record_date,
-    isFallbackSnapshot: degraded || !reportData.treasury.isLive,
-  });
   return {
     conditions,
     situation,

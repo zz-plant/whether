@@ -490,8 +490,11 @@ const WIDER_DEBT_READINGS = [
  * zero printed Oracle and Target as owing nothing.
  */
 const companyDebt = (gaap: Taxonomy, date: string): number | null => {
-  const onDate = debtOn(gaap, date);
-  if (onDate > 0) return onDate;
+  /* A debt line on this date is the answer, zero included: repaid debt must not come back from
+     last year's notes. */
+  const reportedOnDate = [...LONG_TERM_DEBT_READINGS.flat(), ...SHORT_TERM_BORROWING_CONCEPTS]
+    .some((concept) => instantOn(gaap, concept, date) !== null);
+  if (reportedOnDate) return debtOn(gaap, date);
   for (const reading of WIDER_DEBT_READINGS) {
     const latest = latestInstantDate(gaap, reading);
     if (!latest || daysApart(latest, date) > 370) continue;

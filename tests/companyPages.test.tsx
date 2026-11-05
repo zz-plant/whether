@@ -88,6 +88,14 @@ describe("the page sections", () => {
     }
   });
 
+  it("warns on the page when the reading is a saved one, and only then", () => {
+    const week = { label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026" };
+    assert.doesNotMatch(renderToStaticMarkup(<ConditionsSection conditions={week} />), /company-saved-copy/);
+    const saved = renderToStaticMarkup(<ConditionsSection conditions={{ ...week, savedCopyNotice: "Live data is late." }} />);
+    assert.match(saved, /company-saved-copy/);
+    assert.match(saved, /Live data is late\./);
+  });
+
   it("prints the shared conditions as shared", () => {
     const html = renderToStaticMarkup(
       <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026" }} />,

@@ -1621,6 +1621,9 @@ on an edge profile.
 
 ### 1.1.22b A ticker fills a public company's figures (2026-11-04)
 
+Each child sitemap serves its own segment since 2026-11-04. The framework passes `id` as a promise,
+which matched nothing, so every child served the whole list.
+
 `?ticker=` on the embed and image routes is a tag and changes no word of the guidance, and the embed
 says "Tagged GOOGL" rather than "for GOOGL". The presets naming large companies are gone.
 
@@ -1631,7 +1634,9 @@ typed figures, and the stage becomes Series B+. Operating cash flow is a trailin
 year-to-date filings; spend is revenue less that, so net burn is the filing's own.
 
 - The filing is named beside the figures (`describeProfileFiling`) until the reader edits one.
-- Debt is not subtracted from cash. A company owing more than it holds cannot reach the 24+ band.
+- Debt is not subtracted from the months shown. A company owing more than it holds, or whose cash
+  after its debt would not last 24 months, cannot reach the 24+ band, and the notes say "before the
+  debt on file". The band ages from the filing's date, since its cash is as of then.
 - It refuses, saying why: an unlisted ticker, an international filer, a bank or insurer, no filing in
   200 days, or no full year of cash flow and revenue.
 - The company's name and anything worked out from its figures reach neither the embed, the image nor
@@ -1653,8 +1658,13 @@ site its standing. Grow it only after these are indexed and earn clicks.
   with no sentence saying why. No company page speaks of runway.
 - **Indexing:** a page is indexed and in the `companies` sitemap only with a filing inside 200 days,
   and its robots tag also needs a current week's call.
-- **Debt** falls back to the last figure on file in the year before the balance sheet, and prints
-  nothing when none is on file: Oracle and Target read as owing nothing until this.
+- **Debt** is the balance sheet's own where it has a debt line, a reported zero included. Otherwise
+  it falls back to the last figure on file in the year before, and prints nothing when none is on
+  file: Oracle and Target read as owing nothing until this.
+- **A saved reading says so.** When live data is late the conditions section prints the saved-copy
+  banner, since a robots tag protects search results and not a reader following a link.
+- **Measured page by page** (`ContentMeasurementTracker`), so growing the list rests on which pages
+  earn visits. Each page declares a `WebPage` about the company, with no review or rating.
 
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 

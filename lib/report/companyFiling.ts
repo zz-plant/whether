@@ -8,6 +8,7 @@
  * of cash" beside a company they do not run.
  */
 import { z } from "zod";
+import { COMPANIES } from "../companies/companyRegistry";
 import { formatDateUTC } from "../formatters";
 import { formatCommitmentUsd } from "../planCommitment";
 import type { ProfileFiling } from "../operatorProfile";
@@ -52,10 +53,26 @@ export const companyFilingLookupSchema = z.discriminatedUnion("ok", [
 
 export const describeLookupFailure = (failure: CompanyFilingFailure): string => LOOKUP_FAILURE_MESSAGES[failure];
 
+const LOWER_IN_A_NAME = new Set(["INC", "CO", "THE", "AND", "OF", "LLC", "LTD", "NEW", "CORP", "PLC", "LP"]);
+
+/**
+ * The name a reader knows: the pilot's where it has one, else the filed one out of capitals.
+ * Short words stay capitals ("AMC"), and the state suffix goes ("QUALCOMM INC/DE").
+ */
+const readableCompanyName = (ticker: string, filedName: string): string => {
+  const known = COMPANIES.find((company) => company.ticker === ticker);
+  if (known) return known.name;
+  const name = filedName.replace(/\s*\/[A-Z]{2}\/?$/, "");
+  if (/[a-z]/.test(name)) return name;
+  return name.replace(/[A-Z&']+/g, (word) =>
+    word.length <= 3 && !LOWER_IN_A_NAME.has(word) ? word : `${word.charAt(0)}${word.slice(1).toLowerCase()}`,
+  );
+};
+
 /** Where the figures on screen came from, while they still are the filing's. */
-export const describeProfileFiling = (filing: ProfileFiling, cashUsd: number | undefined): string => {
-  const source = `From ${filing.name} (${filing.ticker}), as filed for the period ended ${formatDateUTC(filing.periodEnd)}. Change any figure to use your own.`;
-  return cashUsd !== undefined && filing.debtUsd !== null && filing.debtUsd > cashUsd
-    ? `${source} It owes ${formatCommitmentUsd(filing.debtUsd)}, more than its cash, so the guidance stops short of the 24+ month band.`
+export const describeProfileFiling = (filing: ProfileFiling, debtLimitsRunway: boolean): string => {
+  const source = `From ${readableCompanyName(filing.ticker, filing.name)} (${filing.ticker}), as filed for the period ended ${formatDateUTC(filing.periodEnd)}. Change any figure to use your own.`;
+  return debtLimitsRunway && filing.debtUsd !== null
+    ? `${source} It owes ${formatCommitmentUsd(filing.debtUsd)}, so the guidance stops short of the 24+ month band.`
     : source;
 };

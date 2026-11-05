@@ -215,6 +215,13 @@ describe("segmented sitemaps", () => {
     assert.ok(briefs.every((entry) => entry.url.includes("/brief/")));
   });
 
+  it("reads the id the framework hands over as a promise", async () => {
+    const briefs = await sitemap({ id: Promise.resolve("briefs"), programmaticEligible: true });
+    const all = await sitemap({ programmaticEligible: true });
+    assert.ok(briefs.length > 0 && briefs.length < all.length);
+    assert.ok(briefs.every((entry) => entry.url.includes("/brief/")));
+  });
+
   it("puts each route in exactly one child", async () => {
     const seen = new Map<string, string>();
     for (const segment of ["pages", "answers", "signals", "companies", "history", "briefs"] as const) {

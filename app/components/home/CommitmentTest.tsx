@@ -66,7 +66,7 @@ export function CommitmentTest({
         cashUsd: profile.cashUsd,
         newMonthlyCostUsd: cost,
         selfFunded: stage === "bootstrapped",
-        debtExceedsCash: Boolean(runway?.debtExceedsCash),
+        debtLimitsRunway: Boolean(runway?.debtLimitsRunway),
       }),
     [regime, area, runway, profile, cost, stage],
   );

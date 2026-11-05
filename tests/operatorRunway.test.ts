@@ -179,7 +179,7 @@ describe("one runway setting", () => {
     const age = readRunwayBandAge(header, later);
     assert.deepEqual(age, { chosen: "balanced", setOn: "2026-01-01", band: "tight" });
     assert.ok(age);
-    assert.equal(describeRunwayBandAge(age), "You set 12–24 months of runway on Jan 1, 2026, so this now assumes 6–12 months.");
+    assert.equal(describeRunwayBandAge(age), "Your runway was 12–24 months on Jan 1, 2026, so this now assumes 6–12 months.");
     // A band earned by covering spending, and a cookie from before the day was kept, do not age.
     const bare = buildOperatorRunwayCookie("abundant", null).split(";")[0];
     assert.equal(bare, `${OPERATOR_RUNWAY_COOKIE}=abundant`);

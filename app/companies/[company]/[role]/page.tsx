@@ -5,6 +5,9 @@ import { findUseCaseRole } from "../../../../lib/decisionDomainCatalog";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../../lib/seo";
+import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
+import { JsonLdScript } from "../../../components/jsonLdScript";
+import { buildCompanyPageStructuredData } from "../../../../lib/seo/pageStructuredData";
 import { Breadcrumbs } from "../../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
 import { CompanyNextLinks, CompanyPositionSection, ConditionsSection, RoleDecisionsSection } from "../../companyPageSections";
@@ -41,7 +44,22 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
   const { conditions, situation, rules } = await loadCompanyPage(company);
   const path = `/companies/${company.slug}/${role.slug}`;
   return (
-    <ContentPageShell>
+    <ContentPageShell data-content-measurement-root={path}>
+      {/* Page by page, because whether this pilot grows turns on which of these earn visits. */}
+      <ContentMeasurementTracker pagePath={path} cluster="authority" intent="vp-product" />
+      <JsonLdScript
+        data={buildCompanyPageStructuredData({
+          path: `/companies/${company.slug}/${role.slug}`,
+          title: `Guidance for ${role.label} at ${company.name}`,
+          company: company.name,
+          ticker: company.ticker,
+          trail: [
+            { name: "Companies", path: "/companies" },
+            { name: company.name, path: `/companies/${company.slug}` },
+            { name: role.title, path: `/companies/${company.slug}/${role.slug}` },
+          ],
+        })}
+      />
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(path), [

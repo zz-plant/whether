@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T00:08:55.200Z",
+  "generatedAt": "2026-11-05T00:22:11.641Z",
   "filings": {
     "MSFT": {
       "cashUsd": 64509000000,
@@ -243,7 +243,7 @@
     },
     "OKTA": {
       "cashUsd": 2299000000,
-      "debtUsd": null,
+      "debtUsd": 0,
       "revenueTtmUsd": 3073000000,
       "operatingCashFlowTtmUsd": 987000000,
       "revenueGrowth": 0.10576923076923084,

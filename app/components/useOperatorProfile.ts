@@ -60,7 +60,8 @@ export const useOperatorProfile = () => {
         sync.ages = runway?.basis !== "cash-flow-positive";
         return next;
       });
-      syncRunwayBandToFigures(sync.band, { ages: sync.ages });
+      /* From the filing's date, not today's: its cash is as of then. */
+      syncRunwayBandToFigures(sync.band, { ages: sync.ages, asOf: new Date(`${filing.periodEnd}T00:00:00.000Z`) });
     },
     [setStored],
   );

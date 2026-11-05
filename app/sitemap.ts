@@ -180,7 +180,9 @@ const isSitemapSegment = (value: string): value is SitemapSegment =>
   SITEMAP_SEGMENTS.some((segment) => segment === value);
 
 export default async function sitemap(options?: {
-  id?: string;
+  /* A promise from the framework, a string from a direct call. Read as a string, the promise
+     matched no segment, so every child served the whole list until 2026-11-04. */
+  id?: string | Promise<string>;
   programmaticEligible?: boolean;
 }): Promise<MetadataRoute.Sitemap> {
   /* One read for three questions now; the override skips it, as it always has,
@@ -382,7 +384,7 @@ export default async function sitemap(options?: {
 
   /* A direct call with no `id` (tests, the share-card fixture) asks for the whole
      list; Next always passes the segment it is rendering. */
-  const requestedId = options?.id;
+  const requestedId = await options?.id;
   const selected = requestedId && isSitemapSegment(requestedId)
     ? bySegment[requestedId]
     : SITEMAP_SEGMENTS.flatMap((segment) => bySegment[segment]);

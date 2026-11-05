@@ -118,7 +118,7 @@ describe("shared runway plan link", () => {
     for (const shared of [{ cashUsd: 900 }, { runwayMonths: 9 }, { monthlyBurnUsd: 5 }, { monthlyGrowthPct: 3 }]) {
       assert.equal(resolveSharedRunwayProfile(stored, shared).filing, undefined);
     }
-    assert.equal(resolveProfileRunway(resolveSharedRunwayProfile(stored, { cashUsd: 90 }))?.debtExceedsCash, undefined);
+    assert.equal(resolveProfileRunway(resolveSharedRunwayProfile(stored, { cashUsd: 90 }))?.debtLimitsRunway, undefined);
   });
 
   it("lets the link win where it speaks and the stored profile fill the rest", () => {

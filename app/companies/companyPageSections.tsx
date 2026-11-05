@@ -17,6 +17,8 @@ export type WeekConditions = {
   rationale: string;
   guidance: string;
   recordDateLabel: string;
+  /** Present when live data is late, so these rules are from a saved reading. */
+  savedCopyNotice?: string;
 };
 
 const panel = "weather-panel space-y-3 px-6 max-sm:px-0 py-6";
@@ -25,6 +27,11 @@ export function ConditionsSection({ conditions }: { conditions: WeekConditions }
   return (
     <section className={panel}>
       <h2 className="text-lg font-semibold text-slate-100">This week&apos;s conditions: {conditions.label}</h2>
+      {conditions.savedCopyNotice ? (
+        <p data-testid="company-saved-copy" className="weather-caveat-band weather-caveat-mark px-4 py-3 text-xs">
+          {conditions.savedCopyNotice}
+        </p>
+      ) : null}
       <p className="text-sm text-slate-300">{conditions.rationale}</p>
       <p className="text-sm text-slate-200">
         <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {conditions.guidance}

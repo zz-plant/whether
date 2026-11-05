@@ -96,11 +96,11 @@ export const runwayBandForProfileRunway = (runway: ProfileRunway | null): Runway
   if (!runway) return null;
   if (runway.basis === "cash-flow-positive") return coveredRunwayIsCushioned(runway) ? "abundant" : "balanced";
   const band = runwayBandForMonths(runway.months);
-  return band === "abundant" && runway.basis === "cash" && runway.debtExceedsCash ? "balanced" : band;
+  return band === "abundant" && runway.basis === "cash" && runway.debtLimitsRunway ? "balanced" : band;
 };
 
-const coveredRunwayIsCushioned = ({ cushionMonths, coveredForMonths, debtExceedsCash }: Extract<ProfileRunway, { basis: "cash-flow-positive" }>): boolean =>
-  !debtExceedsCash
+const coveredRunwayIsCushioned = ({ cushionMonths, coveredForMonths, debtLimitsRunway }: Extract<ProfileRunway, { basis: "cash-flow-positive" }>): boolean =>
+  !debtLimitsRunway
   && cushionMonths !== undefined
   && cushionMonths >= COVERED_CUSHION_FLOOR_MONTHS
   && (coveredForMonths === undefined || coveredForMonths >= ABUNDANT_FLOOR_MONTHS);
@@ -150,7 +150,7 @@ export type RunwayBandAge = { chosen: RunwayBand; setOn: string; band: RunwayBan
 
 /** One sentence for the reader, so a band they did not pick never reads as one they did. */
 export const describeRunwayBandAge = ({ chosen, setOn, band }: RunwayBandAge): string =>
-  `You set ${runwayBandPhrase(chosen)} of runway on ${formatDateUTC(setOn)}, so this now assumes ${runwayBandPhrase(band)}.`;
+  `Your runway was ${runwayBandPhrase(chosen)} on ${formatDateUTC(setOn)}, so this now assumes ${runwayBandPhrase(band)}.`;
 
 const readCookieValue = (cookieHeader: string, name: string): string | null => {
   for (const part of cookieHeader.split(";")) {

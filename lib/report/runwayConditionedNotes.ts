@@ -42,8 +42,8 @@ type RunwayConditionedNoteInput = {
   netMonthlyBurnUsd?: number;
   /** A bootstrapped company: revenue is its funding, so a note about raising says nothing to it. */
   selfFunded?: boolean;
-  /** Filed debt is over its cash: no reading of a long runway as room, the same ceiling the band has. */
-  debtExceedsCash?: boolean;
+  /** Filed debt leaves no cushion: no reading of a long runway as room, the same ceiling the band has. */
+  debtLimitsRunway?: boolean;
 };
 
 type RunwayConditionedNote = {
@@ -145,7 +145,7 @@ export const buildRunwayConditionedNotes = ({
   runwayIsExact = true,
   netMonthlyBurnUsd,
   selfFunded = false,
-  debtExceedsCash = false,
+  debtLimitsRunway = false,
 }: RunwayConditionedNoteInput): RunwayConditionedNote[] => {
   if (typeof runwayMonths !== "number" || !Number.isFinite(runwayMonths) || runwayMonths <= 0) {
     return [];
@@ -200,14 +200,16 @@ export const buildRunwayConditionedNotes = ({
     return notes;
   }
 
-  if (runwayMonths < LONG_RUNWAY_MONTHS || debtExceedsCash) {
+  if (runwayMonths < LONG_RUNWAY_MONTHS || debtLimitsRunway) {
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
-        note: `With ${runway} of runway you can act on the printed guidance. No emergency cuts are needed while spending is not paused.`,
+        note: debtLimitsRunway && runwayMonths >= LONG_RUNWAY_MONTHS
+          ? `With ${runway} of runway before the debt on file, you can act on the printed guidance.`
+          : `With ${runway} of runway you can act on the printed guidance. No emergency cuts are needed while spending is not paused.`,
       },
     ];
-    if (isExpansion) {
+    if (isExpansion && !debtLimitsRunway) {
       notes.push({
         area: "expansion-bets",
         note: "With over a year of runway, the spare goes furthest in the reversible bets the guidance allows.",
@@ -275,7 +277,7 @@ export const buildCommitmentImpact = ({
   cashUsd,
   newMonthlyCostUsd,
   selfFunded,
-  debtExceedsCash,
+  debtLimitsRunway,
 }: {
   regime: RegimeKey;
   area: DecisionArea;
@@ -285,7 +287,7 @@ export const buildCommitmentImpact = ({
   cashUsd?: number;
   newMonthlyCostUsd?: number;
   selfFunded?: boolean;
-  debtExceedsCash?: boolean;
+  debtLimitsRunway?: boolean;
 }): CommitmentImpact | null => {
   if (!valid(newMonthlyCostUsd)) return null;
   const cost = formatCommitmentUsd(newMonthlyCostUsd);
@@ -314,7 +316,7 @@ export const buildCommitmentImpact = ({
         `Revenue covers spending today. At ${cost} more a month you would burn ${formatCommitmentUsd(netBurnAfter)} a month, ` +
         `and ${formatCommitmentUsd(cashUsd)} of cash lasts ${runwayAfter > DECADE_MONTHS ? BEYOND_A_DECADE : `about ${runwayAfter} months`}.`,
       noteAfter:
-        buildRunwayConditionedNotes({ selfFunded, debtExceedsCash, regime, runwayMonths: runwayAfter, runwayPhrase: runwayInWords(runwayAfter), netMonthlyBurnUsd: netBurnAfter })
+        buildRunwayConditionedNotes({ selfFunded, debtLimitsRunway, regime, runwayMonths: runwayAfter, runwayPhrase: runwayInWords(runwayAfter), netMonthlyBurnUsd: netBurnAfter })
           .find((note) => note.area === area)?.note ?? null,
     };
   }
@@ -323,7 +325,7 @@ export const buildCommitmentImpact = ({
 
   const runwayBefore = roundMonths(runwayMonths);
   const runwayAfter = roundMonths((runwayMonths * netMonthlyBurnUsd) / (netMonthlyBurnUsd + newMonthlyCostUsd));
-  const ceiling = (band: RunwayBand | null): RunwayBand | null => (band === "abundant" && debtExceedsCash ? "balanced" : band);
+  const ceiling = (band: RunwayBand | null): RunwayBand | null => (band === "abundant" && debtLimitsRunway ? "balanced" : band);
   const bandBefore = ceiling(runwayBandForMonths(runwayBefore));
   const bandAfter = ceiling(runwayBandForMonths(runwayAfter));
   const bandChange = bandBefore && bandAfter && bandBefore !== bandAfter
@@ -343,7 +345,7 @@ export const buildCommitmentImpact = ({
   const noteAfter =
     buildRunwayConditionedNotes({
       selfFunded,
-      debtExceedsCash,
+      debtLimitsRunway,
       regime,
       runwayMonths: runwayAfter,
       runwayPhrase: runwayInWords(runwayAfter),

@@ -395,7 +395,7 @@ export function RunwayPlannerPanel({
         <CompanyFilingLookup onFiling={applyFiling} />
         {profile.filing ? (
           <p data-testid="company-filing-source" className="text-xs text-slate-300">
-            {describeProfileFiling(profile.filing, profile.cashUsd)}
+            {describeProfileFiling(profile.filing, Boolean(runway?.debtLimitsRunway))}
           </p>
         ) : null}
 

@@ -5,6 +5,9 @@ import { COMPANY_ROLES, findCompany } from "../../../lib/companies/companyRegist
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
+import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
+import { JsonLdScript } from "../../components/jsonLdScript";
+import { buildCompanyPageStructuredData } from "../../../lib/seo/pageStructuredData";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { CompanyNextLinks, CompanyPositionSection, ConditionsSection } from "../companyPageSections";
@@ -36,7 +39,20 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
   const { conditions, situation } = await loadCompanyPage(company);
   const path = `/companies/${company.slug}`;
   return (
-    <ContentPageShell>
+    <ContentPageShell data-content-measurement-root={path}>
+      <ContentMeasurementTracker pagePath={path} cluster="authority" intent="vp-product" />
+      <JsonLdScript
+        data={buildCompanyPageStructuredData({
+          path: `/companies/${company.slug}`,
+          title: `${company.name}: this week's conditions and filed figures`,
+          company: company.name,
+          ticker: company.ticker,
+          trail: [
+            { name: "Companies", path: "/companies" },
+            { name: company.name, path: `/companies/${company.slug}` },
+          ],
+        })}
+      />
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(path), [
