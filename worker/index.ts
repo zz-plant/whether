@@ -1,3 +1,4 @@
+import { refreshCompanyFilings } from "../lib/companies/companyFilingStore";
 import { handleImageOptimization } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { refreshOperatingState } from "../lib/operatingState/refreshOperatingState";
@@ -195,6 +196,11 @@ export default {
         const result = await runMonthEndPulse({ snapshot, weeklyCall });
         return { ok: result.ok, error: result.error };
       });
+    }
+
+    /* A few companies each night: filings arrive quarterly, and the pages read only what this stores. */
+    if (isDailyIngestion) {
+      await step("companies/refresh-filings", () => refreshCompanyFilings());
     }
 
     /* The daily run, where the lane is on: start the Workflow that rebuilds the regime archive

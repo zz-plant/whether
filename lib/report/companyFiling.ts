@@ -16,7 +16,7 @@ export const companyFilingSchema = z.object({
   ticker: z.string(),
   name: z.string(),
   cashUsd: z.number(),
-  debtUsd: z.number(),
+  debtUsd: z.number().nullable(),
   revenueTtmUsd: z.number(),
   operatingCashFlowTtmUsd: z.number(),
   revenueGrowth: z.number().nullable(),
@@ -55,7 +55,7 @@ export const describeLookupFailure = (failure: CompanyFilingFailure): string => 
 /** Where the figures on screen came from, while they still are the filing's. */
 export const describeProfileFiling = (filing: ProfileFiling, cashUsd: number | undefined): string => {
   const source = `From ${filing.name} (${filing.ticker}), as filed for the period ended ${formatDateUTC(filing.periodEnd)}. Change any figure to use your own.`;
-  return cashUsd !== undefined && filing.debtUsd > cashUsd
+  return cashUsd !== undefined && filing.debtUsd !== null && filing.debtUsd > cashUsd
     ? `${source} It owes ${formatCommitmentUsd(filing.debtUsd)}, more than its cash, so the guidance stops short of the 24+ month band.`
     : source;
 };

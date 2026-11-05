@@ -1638,6 +1638,24 @@ year-to-date filings; spend is revenue less that, so net burn is the filing's ow
   the share formats, where anyone could print a runway beside a company they do not run. There is no
   agent tool for it, for the same reason.
 
+### 1.1.22c Guidance by company and role (2026-11-04)
+
+`/companies`, `/companies/<company>` and `/companies/<company>/<role>`: this week's conditions, the
+role's decisions and rules, and what the company has filed. A pilot of 50 companies and 3 roles
+(`lib/companies/companyRegistry.ts`), because mass-produced pages that add little can cost a whole
+site its standing. Grow it only after these are indexed and earn clicks.
+
+- **Pages read and never fetch.** The daily cron stores 8 companies' figures a run
+  (`refreshCompanyFilings`), and `data/company_filings.json` is the floor
+  (`bun run companies:snapshot`). A refusal or an outage keeps the last good figures.
+- **A reading only where it cannot be a judgment** (`buildCompanySituation`): operations bringing in
+  more cash than they use, and debt under three years of that cash. Otherwise the figures stand alone
+  with no sentence saying why. No company page speaks of runway.
+- **Indexing:** a page is indexed and in the `companies` sitemap only with a filing inside 200 days,
+  and its robots tag also needs a current week's call.
+- **Debt** falls back to the last figure on file in the year before the balance sheet, and prints
+  nothing when none is on file: Oracle and Target read as owing nothing until this.
+
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
 The runway unification itself landed on `main` separately (7f264a26, recorded in docs/agents/lessons/dead-features-and-honesty.md, "One
@@ -4823,7 +4841,7 @@ Slack, Notion, and Linear targets.
     whichever way the runway was given: a typed runway beside revenue that covers spend used to size
     a full plan and date a cash-out month while the same company with its cash entered was told there
     was no runway to plan against. A cash-flow-positive company sits in the open-ended band (24+ mo,
-    `runwayBandForProfileRunway`) when its balance would carry six months of spending and revenue
+    `runwayBandForProfileRunway`) when its balance and a year of surplus would carry six months of spending and revenue
     still covers spending 24 months on at the reader's own growth rate, and in the 12–24 band
     otherwise, which leaves the guidance as written (2026-11-04). Revenue coming to cover spend moves
     the band cookie to whichever it earns. It

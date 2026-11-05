@@ -211,6 +211,12 @@ export default async function CompsPage() {
             {SAAS_BASKET_COMPANIES.map((company) => company.name).join(", ")}.
           </p>
           <p className="text-sm text-slate-300">
+            <Link href="/companies" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+              Guidance by company and role
+            </Link>{" "}
+            prints what public companies like these have filed.
+          </p>
+          <p className="text-sm text-slate-300">
             These {SAAS_BASKET_COMPANIES.length} companies represent a cross-section of modern public SaaS: cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
           </p>
         </section>

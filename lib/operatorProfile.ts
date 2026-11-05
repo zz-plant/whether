@@ -42,7 +42,7 @@ export type PaybackProjectNumberKey =
 export type PaybackProjectEntry = { name?: string } & Partial<Record<PaybackProjectNumberKey, number>>;
 
 /** The public filing the figures were read from, until the reader changes one of them. */
-export type ProfileFiling = { ticker: string; name: string; periodEnd: string; debtUsd: number };
+export type ProfileFiling = { ticker: string; name: string; periodEnd: string; debtUsd: number | null };
 
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
@@ -175,7 +175,7 @@ const parseProfileFiling = (value: unknown): ProfileFiling | null => {
   if (!isRecord(value)) return null;
   const { ticker, name, periodEnd, debtUsd } = value;
   if (typeof ticker !== "string" || typeof name !== "string" || typeof periodEnd !== "string") return null;
-  if (typeof debtUsd !== "number" || !Number.isFinite(debtUsd) || debtUsd < 0) return null;
+  if (debtUsd !== null && (typeof debtUsd !== "number" || !Number.isFinite(debtUsd) || debtUsd < 0)) return null;
   return { ticker, name, periodEnd, debtUsd };
 };
 
@@ -242,7 +242,7 @@ export const applyCompanyFiling = (
     ticker: string;
     name: string;
     cashUsd: number;
-    debtUsd: number;
+    debtUsd: number | null;
     revenueTtmUsd: number;
     operatingCashFlowTtmUsd: number;
     revenueGrowth: number | null;
@@ -291,7 +291,9 @@ export type ProfileRunway =
    *
    * Covered is not the same as safe, and the two figures below say how far it
    * goes (`runwayBandForProfileRunway` reads them). `cushionMonths` is how long
-   * the balance would carry today's spending, absent when spending is zero.
+   * the balance and a year of surplus would carry today's spending, absent when
+   * spending is zero: counting the balance alone called Microsoft thin, with five
+   * months of spending banked and $16B a month coming in above it.
    * `coveredForMonths` is when falling revenue meets spending, at the reader's
    * own rate, and is absent unless revenue is falling.
    */
@@ -322,11 +324,13 @@ export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | 
   const typedMonths = profile.runwayMonths !== undefined && profile.runwayMonths > 0 ? profile.runwayMonths : undefined;
   /* Filings say what is owed, which a cash balance does not: a company owing more than it holds
      has no cushion to use, however long the cash would last against operations alone. */
-  const debtExceedsCash = cash !== undefined && profile.filing !== undefined && profile.filing.debtUsd > cash;
+  const debtExceedsCash = cash !== undefined && (profile.filing?.debtUsd ?? 0) > cash;
   const debtFlag: { debtExceedsCash?: true } = debtExceedsCash ? { debtExceedsCash: true } : {};
   if (netBurn !== undefined && netBurn <= 0 && (cash !== undefined || typedMonths !== undefined)) {
     const surplusUsd = Math.max(0, -netBurn);
-    const cushionMonths = cash === undefined ? typedMonths : profile.monthlyBurnUsd ? cash / profile.monthlyBurnUsd : undefined;
+    const cushionMonths = cash === undefined
+      ? typedMonths
+      : profile.monthlyBurnUsd ? (cash + surplusUsd * 12) / profile.monthlyBurnUsd : undefined;
     const coveredForMonths = monthsUntilSpendOvertakesRevenue(profile);
     return {
       basis: "cash-flow-positive",
