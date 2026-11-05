@@ -234,7 +234,7 @@ const growthOnYearAgo = (quarters: Quarter[]): number | null => {
 };
 
 /** A company whose latest quarter ended longer ago than this has stopped filing (acquired, delisted). */
-const STALE_PERIOD_DAYS = 200;
+export const STALE_PERIOD_DAYS = 200;
 
 /**
  * The figures the comps need from one company-facts document, or the reason they cannot be
@@ -408,9 +408,19 @@ type SecFilingRefusal =
   | "no-recent-filing"
   | "incomplete-filing";
 
-type SecCompanyFigures = {
+export const secCompanyFiguresSchema = z.object({
+  cashUsd: z.number(),
+  debtUsd: z.number().nullable(),
+  revenueTtmUsd: z.number(),
+  operatingCashFlowTtmUsd: z.number(),
+  revenueGrowth: z.number().nullable(),
+  periodEnd: z.string(),
+});
+
+export type SecCompanyFigures = {
   cashUsd: number;
-  debtUsd: number;
+  /** Null when no borrowings are on file, which is not the same as none: Oracle tags its $130B only at year-end. */
+  debtUsd: number | null;
   /** Zero for a company with no revenue on file. */
   revenueTtmUsd: number;
   /** Negative when operations consumed cash. */
@@ -467,6 +477,34 @@ const trailingOperatingCashFlow = (gaap: Taxonomy): { value: number; end: string
   return { value: lastYear.val + toDate.val - sameStretch.val, end: toDate.end };
 };
 
+/** Readings `debtOn` leaves out because they can include leases, which the comps' enterprise value must not. */
+const WIDER_DEBT_READINGS = [
+  ["DebtLongtermAndShorttermCombinedAmount"],
+  ["LongTermDebtAndCapitalLeaseObligations", "LongTermDebtAndCapitalLeaseObligationsCurrent"],
+  ["LongTermDebt"],
+];
+
+/**
+ * What a company owes, as of the balance sheet or its last mention in the year before it. Many
+ * tag debt only in the 10-K's notes, so nothing is on file for a 10-Q's date, and reading that as
+ * zero printed Oracle and Target as owing nothing.
+ */
+const companyDebt = (gaap: Taxonomy, date: string): number | null => {
+  /* A debt line on this date is the answer, zero included: repaid debt must not come back from
+     last year's notes. */
+  const reportedOnDate = [...LONG_TERM_DEBT_READINGS.flat(), ...SHORT_TERM_BORROWING_CONCEPTS]
+    .some((concept) => instantOn(gaap, concept, date) !== null);
+  if (reportedOnDate) return debtOn(gaap, date);
+  for (const reading of WIDER_DEBT_READINGS) {
+    const latest = latestInstantDate(gaap, reading);
+    if (!latest || daysApart(latest, date) > 370) continue;
+    const values = reading.map((concept) => instantOn(gaap, concept, latest)).filter((value) => value !== null);
+    const total = values.reduce((sum, value) => sum + value, 0);
+    if (total > 0) return total;
+  }
+  return null;
+};
+
 /** The figures a company's own runway is worked out from, or why its filing cannot supply them. Pure. */
 export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFilingRead<SecCompanyFigures> {
   const parsed = companyFactsSchema.safeParse(companyFacts);
@@ -498,7 +536,7 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
     status: "ok",
     value: {
       cashUsd,
-      debtUsd: debtOn(gaap, cashFlow.end),
+      debtUsd: companyDebt(gaap, cashFlow.end),
       revenueTtmUsd,
       operatingCashFlowTtmUsd: cashFlow.value,
       revenueGrowth: growthOnYearAgo(quarters),
@@ -509,7 +547,7 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
 
 const TICKER_INDEX_URL = "https://www.sec.gov/files/company_tickers.json";
 const TICKER_CACHE_PREFIX = "company:sec:ticker:v1:";
-const FIGURES_CACHE_PREFIX = "company:sec:figures:v1:";
+const FIGURES_CACHE_PREFIX = "company:sec:figures:v2:";
 /** A listing rarely changes, and an unknown ticker costs an 800KB read each time it is asked. */
 const TICKER_TTL_SECONDS = 7 * 24 * 60 * 60;
 
@@ -520,14 +558,7 @@ const refusalSchema = z.enum(["unknown-ticker", "international-filer", "financia
 const cachedFiguresSchema = z.discriminatedUnion("status", [
   z.object({
     status: z.literal("ok"),
-    value: z.object({
-      cashUsd: z.number(),
-      debtUsd: z.number(),
-      revenueTtmUsd: z.number(),
-      operatingCashFlowTtmUsd: z.number(),
-      revenueGrowth: z.number().nullable(),
-      periodEnd: z.string(),
-    }),
+    value: secCompanyFiguresSchema,
   }),
   z.object({ status: z.literal("refused"), refusal: refusalSchema }),
 ]);
@@ -587,6 +618,23 @@ const normalizeSecTicker = (raw: string): string | null => {
   return /^[A-Z0-9-]{1,10}$/.test(ticker) ? ticker : null;
 };
 
+/** One company's filed figures by its SEC id, from the cache when a fresh copy exists. */
+export async function readSecCompanyFigures(
+  cik: number,
+  options: { cache: FundamentalsCache | null; now?: Date },
+): Promise<SecFilingRead<SecCompanyFigures>> {
+  const key = FIGURES_CACHE_PREFIX + cik;
+  const cached = await getQuietly(options.cache, key, cachedFiguresSchema);
+  if (cached) return cached;
+  const facts = await fetchCompanyFacts(cik);
+  if (facts.status === "unavailable") return facts;
+  const figures: SecFilingRead<SecCompanyFigures> = facts.status === "missing"
+    ? { status: "refused", refusal: "incomplete-filing" }
+    : deriveSecCompanyFigures(facts.value, options.now ?? new Date());
+  await putQuietly(options.cache, key, figures, figures.status === "ok" ? CACHE_TTL_SECONDS : MISSING_TTL_SECONDS);
+  return figures;
+}
+
 /**
  * One company's latest filed figures, by ticker. Facts only, with no reading of them: what they
  * mean is worked out in the browser of whoever asked, and never printed against the company's name.
@@ -601,15 +649,6 @@ export async function fetchSecCompanyFiling(
   if (listing.status !== "ok") return listing;
   const { cik, name } = listing.value;
 
-  const key = FIGURES_CACHE_PREFIX + cik;
-  let figures: SecFilingRead<SecCompanyFigures> | null = await getQuietly(options.cache, key, cachedFiguresSchema);
-  if (!figures) {
-    const facts = await fetchCompanyFacts(cik);
-    if (facts.status === "unavailable") return facts;
-    figures = facts.status === "missing"
-      ? { status: "refused", refusal: "incomplete-filing" }
-      : deriveSecCompanyFigures(facts.value, options.now ?? new Date());
-    await putQuietly(options.cache, key, figures, figures.status === "ok" ? CACHE_TTL_SECONDS : MISSING_TTL_SECONDS);
-  }
+  const figures = await readSecCompanyFigures(cik, options);
   return figures.status === "ok" ? { status: "ok", value: { ...figures.value, ticker, name } } : figures;
 }

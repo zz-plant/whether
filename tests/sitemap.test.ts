@@ -187,7 +187,15 @@ describe("sitemap", () => {
 describe("segmented sitemaps", () => {
   it("splits the corpus into one child per content type", async () => {
     const segments = await generateSitemaps();
-    assert.deepEqual(segments.map((segment) => segment.id), ["pages", "answers", "signals", "history", "briefs"]);
+    assert.deepEqual(segments.map((segment) => segment.id), ["pages", "answers", "signals", "companies", "history", "briefs"]);
+  });
+
+  it("lists every pilot company and role while they can be stood behind, and none when the week can't be", async () => {
+    const companies = await sitemap({ id: "companies", programmaticEligible: true });
+    assert.ok(companies.every((entry) => entry.url.includes("/companies")));
+    assert.ok(companies.some((entry) => entry.url.endsWith("/companies/microsoft/product-managers")));
+    assert.ok(companies.some((entry) => entry.url.endsWith("/companies/rivian")));
+    assert.deepEqual(await sitemap({ id: "companies", programmaticEligible: false }), []);
   });
 
   it("keeps history and briefs when the live answer segment is withheld", async () => {
@@ -207,9 +215,16 @@ describe("segmented sitemaps", () => {
     assert.ok(briefs.every((entry) => entry.url.includes("/brief/")));
   });
 
+  it("reads the id the framework hands over as a promise", async () => {
+    const briefs = await sitemap({ id: Promise.resolve("briefs"), programmaticEligible: true });
+    const all = await sitemap({ programmaticEligible: true });
+    assert.ok(briefs.length > 0 && briefs.length < all.length);
+    assert.ok(briefs.every((entry) => entry.url.includes("/brief/")));
+  });
+
   it("puts each route in exactly one child", async () => {
     const seen = new Map<string, string>();
-    for (const segment of ["pages", "answers", "signals", "history", "briefs"] as const) {
+    for (const segment of ["pages", "answers", "signals", "companies", "history", "briefs"] as const) {
       for (const entry of await sitemap({ id: segment, programmaticEligible: true })) {
         assert.ok(!seen.has(entry.url), `${entry.url} appears in both ${seen.get(entry.url)} and ${segment}`);
         seen.set(entry.url, segment);

@@ -140,9 +140,9 @@ export const persistOperatorRunway = (band: RunwayBand | null) => {
  * moves it too, and that band does not age, since nothing is counting down. A
  * null band leaves the cookie alone — clearing a number is not choosing a runway.
  */
-export const syncRunwayBandToFigures = (band: RunwayBand | null, { ages }: { ages: boolean }) => {
+export const syncRunwayBandToFigures = (band: RunwayBand | null, { ages, asOf }: { ages: boolean; asOf?: Date }) => {
   if (!band) return;
   const previousBand = readOperatorRunwayCookie(document.cookie);
-  document.cookie = buildOperatorRunwayCookie(band, ages ? new Date() : null);
+  document.cookie = buildOperatorRunwayCookie(band, ages ? (asOf ?? new Date()) : null);
   announceRunwayChange(previousBand, band, "figure");
 };

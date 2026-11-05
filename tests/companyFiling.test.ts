@@ -78,6 +78,25 @@ describe("a company's figures from its filings", () => {
     assert.equal(refusalOf(withoutRevenue(facts({ cashFlow: positive }))), "incomplete-filing");
   });
 
+  it("takes a reported zero over last year's debt, and a mention over nothing", () => {
+    const old = { DebtLongtermAndShorttermCombinedAmount: { units: { USD: [{ end: "2025-12-31", val: 130e6, filed: "2026-02-20" }] } } };
+    const debtOf = (input: unknown) => {
+      const result = deriveSecCompanyFigures(input, NOW);
+      return result.status === "ok" ? result.value.debtUsd : "refused";
+    };
+    const withoutDebt = (input: ReturnType<typeof facts>) => ({
+      ...input,
+      facts: {
+        ...input.facts,
+        "us-gaap": Object.fromEntries(Object.entries(input.facts["us-gaap"]).filter(([concept]) => !concept.startsWith("Convertible"))),
+      },
+    });
+    assert.equal(debtOf(withoutDebt(facts())), null);
+    assert.equal(debtOf(withoutDebt(facts({ extra: old }))), 130e6);
+    const repaid = { LongTermDebt: { units: { USD: [{ end: PERIOD_END, val: 0, filed: "2026-08-01" }] } } };
+    assert.equal(debtOf(withoutDebt(facts({ extra: { ...old, ...repaid } }))), 0);
+  });
+
   it("says why a filing cannot stand in for a company's figures", () => {
     assert.equal(refusalOf({ facts: { "ifrs-full": { Revenue: {} }, dei: {} } }), "international-filer");
     assert.equal(refusalOf(facts({ extra: { Deposits: { units: { USD: [] } } } })), "financial-company");
@@ -218,6 +237,9 @@ describe("a filing as the operator's figures", () => {
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, long, NOW))), "abundant");
     const owing = applyCompanyFiling({ version: 1 }, { ...long, debtUsd: 5_000e6 }, NOW);
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(owing)), "balanced");
+    // Rivian's shape: less debt than cash, but what is left after it would not last 24 months.
+    const close = applyCompanyFiling({ version: 1 }, { ...long, cashUsd: 5_500e6, debtUsd: 4_400e6, operatingCashFlowTtmUsd: -2_600e6 }, NOW);
+    assert.equal(runwayBandForProfileRunway(resolveProfileRunway(close)), "balanced");
     const covered = { ...filing, operatingCashFlowTtmUsd: 300e6, revenueGrowth: 0 };
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, covered, NOW))), "abundant");
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, { ...covered, debtUsd: 5_000e6 }, NOW))), "balanced");
@@ -234,9 +256,21 @@ describe("a filing as the operator's figures", () => {
   it("names the filing and what it owes", () => {
     const source = { ticker: "RIVN", name: "Fixture Motors", periodEnd: PERIOD_END, debtUsd: 5_000e6 };
     assert.equal(
-      describeProfileFiling({ ...source, debtUsd: 1 }, 100),
-      "From Fixture Motors (RIVN), as filed for the period ended Jun 30, 2026. Change any figure to use your own.",
+      describeProfileFiling(source, false),
+      "From Rivian (RIVN), as filed for the period ended Jun 30, 2026. Change any figure to use your own.",
     );
-    assert.match(describeProfileFiling(source, 100), /It owes \$5B, more than its cash, so the guidance stops short of the 24\+ month band\.$/);
+    assert.match(describeProfileFiling(source, true), /It owes \$5B, so the guidance stops short of the 24\+ month band\.$/);
+    // Debt not on file says nothing about debt, whatever the flag.
+    assert.doesNotMatch(describeProfileFiling({ ...source, debtUsd: null }, true), /owes/);
+  });
+
+  it("prints a filed name the way a reader knows it", () => {
+    const named = (ticker: string, name: string) =>
+      describeProfileFiling({ ticker, name, periodEnd: PERIOD_END, debtUsd: null }, false).split(" (")[0];
+    assert.equal(named("ZZZ", "BEYOND MEAT, INC."), "From Beyond Meat, Inc.");
+    assert.equal(named("ZZZ", "QUALCOMM INC/DE"), "From Qualcomm Inc");
+    assert.equal(named("ZZZ", "AMC NETWORKS INC"), "From AMC Networks Inc");
+    assert.equal(named("ZZZ", "Fixture Sign"), "From Fixture Sign");
+    assert.equal(named("MSFT", "MICROSOFT CORP"), "From Microsoft");
   });
 });

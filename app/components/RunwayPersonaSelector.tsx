@@ -6,6 +6,8 @@ import {
   type RunwayBand,
 } from "../../lib/report/operatorRunway";
 import { choiceSublabel } from "../../lib/report/operatorStage";
+import { resolveProfileRunway } from "../../lib/operatorProfile";
+import { useOperatorProfile } from "./useOperatorProfile";
 import { persistOperatorRunway } from "./useOperatorRunway";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 
@@ -32,6 +34,9 @@ export function RunwayPersonaSelector({
   className = "",
 }: RunwayPersonaSelectorProps) {
   const selected = activeRunway ?? DEFAULT_RUNWAY_BAND;
+  /* No band is true of a company with nothing counting down, so the control says which it is using. */
+  const { profile } = useOperatorProfile();
+  const covered = resolveProfileRunway(profile)?.basis === "cash-flow-positive";
 
   const options: readonly SegmentedOption<RunwayBand>[] = RUNWAY_BAND_OPTIONS.map((option) => ({
     key: option.key,
@@ -60,6 +65,11 @@ export function RunwayPersonaSelector({
         ordinal
         stackSublabel
       />
+      {covered ? (
+        <p className="w-full text-fluid-nano text-slate-400">
+          Revenue covers your spending, so no runway is counting down. This is the closest setting.
+        </p>
+      ) : null}
     </div>
   );
 }

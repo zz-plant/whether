@@ -90,7 +90,8 @@
     "reviewed-cases:add": "bun scripts/reviewed-cases.ts add",
     "reviewed-cases:export-eval": "bun scripts/reviewed-cases.ts export-eval",
     "reviewed-cases:list": "bun scripts/reviewed-cases.ts list",
-    "evidence:pool": "bun scripts/pool-builder.ts"
+    "evidence:pool": "bun scripts/pool-builder.ts",
+    "companies:snapshot": "bun run scripts/refresh-company-filings.ts"
   },
   "engines": {
     "bun": ">=1.3.14",

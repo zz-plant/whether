@@ -43,12 +43,13 @@ describe("runway-conditioned notes", () => {
   });
 
   it("reads no long runway as room when filed debt is over the cash", () => {
-    const owing = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 30, debtExceedsCash: true });
+    const owing = buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 30, debtLimitsRunway: true });
     for (const { note } of owing) assert.doesNotMatch(note, /not what limits you|Long runway lets you choose/);
-    assert.match(owing[0].note, /you can act on the printed guidance/);
+    assert.match(owing[0].note, /30 months of runway before the debt on file, you can act on the printed guidance/);
+    assert.ok(!buildRunwayConditionedNotes({ regime: "EXPANSION", runwayMonths: 30, debtLimitsRunway: true }).some((note) => note.area === "expansion-bets"));
     // Debt changes nothing about a short runway's notes.
     assert.deepEqual(
-      buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 5, debtExceedsCash: true }),
+      buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 5, debtLimitsRunway: true }),
       buildRunwayConditionedNotes({ regime: "SCARCITY", runwayMonths: 5 }),
     );
     const impact = buildCommitmentImpact({
@@ -57,7 +58,7 @@ describe("runway-conditioned notes", () => {
       runwayMonths: 40,
       netMonthlyBurnUsd: 100_000,
       newMonthlyCostUsd: 10_000,
-      debtExceedsCash: true,
+      debtLimitsRunway: true,
     });
     assert.doesNotMatch(impact?.noteAfter ?? "", /not what limits you/);
     assert.equal(impact?.bandChange, null);

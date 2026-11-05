@@ -121,7 +121,7 @@ describe("a crossing at the reader's own runway", () => {
       now: new Date("2026-09-01T12:00:00.000Z"),
     });
     assert.match(body, /With 6–12 months of runway, each net-new role/);
-    assert.match(body, /\(You set 12–24 months of runway on Jan 1, 2026, so this now assumes 6–12 months\.\)$/);
+    assert.match(body, /\(Your runway was 12–24 months on Jan 1, 2026, so this now assumes 6–12 months\.\)$/);
   });
 
   it("says nothing about runway to a reader who set none", () => {

@@ -6,6 +6,9 @@ import { resourceArticles } from "../lib/resourceArticles";
 import { buildResourceHubEntries } from "../lib/resourceHub";
 import { readAnswerPages } from "../lib/answers/answerContentStore";
 import { signalScenarioRoutes } from "./seoRouteClusters";
+import { readCompanyFigures } from "../lib/companies/companyFilingStore";
+import { COMPANIES, COMPANY_ROLES } from "../lib/companies/companyRegistry";
+import { buildCompanySituation } from "../lib/report/companySituation";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
@@ -166,7 +169,7 @@ const resolveSitemapReadiness = async (): Promise<{
  * with it, and crawl diagnostics read per segment instead of one undifferentiated
  * list. `pages` holds the hubs and static pages that are not part of a corpus.
  */
-export const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "history", "briefs"] as const;
+export const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "companies", "history", "briefs"] as const;
 type SitemapSegment = (typeof SITEMAP_SEGMENTS)[number];
 
 export async function generateSitemaps(): Promise<Array<{ id: SitemapSegment }>> {
@@ -177,7 +180,9 @@ const isSitemapSegment = (value: string): value is SitemapSegment =>
   SITEMAP_SEGMENTS.some((segment) => segment === value);
 
 export default async function sitemap(options?: {
-  id?: string;
+  /* A promise from the framework, a string from a direct call. Read as a string, the promise
+     matched no segment, so every child served the whole list until 2026-11-04. */
+  id?: string | Promise<string>;
   programmaticEligible?: boolean;
 }): Promise<MetadataRoute.Sitemap> {
   /* One read for three questions now; the override skips it, as it always has,
@@ -344,6 +349,25 @@ export default async function sitemap(options?: {
     (entry): entry is SitemapEntryDescriptor => entry !== null,
   );
 
+  /* Only a company whose filing a page can stand behind, and only while the week's call is
+     current, the same test its page's own robots tag makes. */
+  const companyEntries: SitemapEntryDescriptor[] = programmaticEligible
+    ? [
+        { path: "/companies", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+        ...(await Promise.all(
+          COMPANIES.map(async (company): Promise<SitemapEntryDescriptor[]> => {
+            const figures = await readCompanyFigures(company);
+            if (!figures || !buildCompanySituation(company, figures).current) return [];
+            const entryFor = (path: `/${string}`): SitemapEntryDescriptor => ({ path, lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 });
+            return [
+              entryFor(`/companies/${company.slug}`),
+              ...COMPANY_ROLES.map((role) => entryFor(`/companies/${company.slug}/${role.slug}`)),
+            ];
+          }),
+        )).flat(),
+      ]
+    : [];
+
   const bySegment: Record<SitemapSegment, SitemapEntryDescriptor[]> = {
     pages: coreEntries,
     answers: [
@@ -353,13 +377,14 @@ export default async function sitemap(options?: {
       ...decisionAnswerEntries,
     ],
     signals: [...signalWatchEntries, ...signalsClusterEntries],
+    companies: companyEntries,
     history: archivePeriodEntries,
     briefs: publishedBriefEntries,
   };
 
   /* A direct call with no `id` (tests, the share-card fixture) asks for the whole
      list; Next always passes the segment it is rendering. */
-  const requestedId = options?.id;
+  const requestedId = await options?.id;
   const selected = requestedId && isSitemapSegment(requestedId)
     ? bySegment[requestedId]
     : SITEMAP_SEGMENTS.flatMap((segment) => bySegment[segment]);

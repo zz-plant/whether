@@ -1,0 +1,405 @@
+{
+  "generatedAt": "2026-11-05T00:22:11.641Z",
+  "filings": {
+    "MSFT": {
+      "cashUsd": 64509000000,
+      "debtUsd": 35481000000,
+      "revenueTtmUsd": 346445000000,
+      "operatingCashFlowTtmUsd": 195878000000,
+      "revenueGrowth": 0.18804475171552526,
+      "periodEnd": "2026-09-30"
+    },
+    "GOOGL": {
+      "cashUsd": 265098000000,
+      "debtUsd": 126118000000,
+      "revenueTtmUsd": 471097000000,
+      "operatingCashFlowTtmUsd": 179551000000,
+      "revenueGrowth": 0.246526488577961,
+      "periodEnd": "2026-09-30"
+    },
+    "AMZN": {
+      "cashUsd": 114226000000,
+      "debtUsd": 181267000000,
+      "revenueTtmUsd": 797455000000,
+      "operatingCashFlowTtmUsd": 168300000000,
+      "revenueGrowth": 0.1208587492853932,
+      "periodEnd": "2026-09-30"
+    },
+    "AAPL": {
+      "cashUsd": 56722000000,
+      "debtUsd": 80111000000,
+      "revenueTtmUsd": 478834000000,
+      "operatingCashFlowTtmUsd": 145097000000,
+      "revenueGrowth": 0.11721937032771845,
+      "periodEnd": "2026-09-26"
+    },
+    "META": {
+      "cashUsd": 82449000000,
+      "debtUsd": 83669000000,
+      "revenueTtmUsd": 241607000000,
+      "operatingCashFlowTtmUsd": 133087000000,
+      "revenueGrowth": 0.2607041099098395,
+      "periodEnd": "2026-09-30"
+    },
+    "NFLX": {
+      "cashUsd": 8222953000,
+      "debtUsd": 15132394000,
+      "revenueTtmUsd": 49734633000,
+      "operatingCashFlowTtmUsd": 12307938000,
+      "revenueGrowth": 0.11849110540665864,
+      "periodEnd": "2026-09-30"
+    },
+    "NVDA": {
+      "cashUsd": 22443000000,
+      "debtUsd": 33366000000,
+      "revenueTtmUsd": 302969000000,
+      "operatingCashFlowTtmUsd": 134360000000,
+      "revenueGrowth": 1.0585114348672526,
+      "periodEnd": "2026-07-26"
+    },
+    "ORCL": {
+      "cashUsd": 37077000000,
+      "debtUsd": 129541000000,
+      "revenueTtmUsd": 71776000000,
+      "operatingCashFlowTtmUsd": 46940000000,
+      "revenueGrowth": 0.2960605654562509,
+      "periodEnd": "2026-08-31"
+    },
+    "CRM": {
+      "cashUsd": 11403000000,
+      "debtUsd": 39288000000,
+      "revenueTtmUsd": 43938000000,
+      "operatingCashFlowTtmUsd": 15750000000,
+      "revenueGrowth": 0.1083431027745212,
+      "periodEnd": "2026-07-31"
+    },
+    "ADBE": {
+      "cashUsd": 5639000000,
+      "debtUsd": 4766000000,
+      "revenueTtmUsd": 25970000000,
+      "operatingCashFlowTtmUsd": 10806000000,
+      "revenueGrowth": 0.12892451569806274,
+      "periodEnd": "2026-08-28"
+    },
+    "INTC": {
+      "cashUsd": 54005000000,
+      "debtUsd": 46317000000,
+      "revenueTtmUsd": 59892000000,
+      "operatingCashFlowTtmUsd": 17472000000,
+      "revenueGrowth": 0.20947777045338012,
+      "periodEnd": "2026-09-26"
+    },
+    "AMD": {
+      "cashUsd": 15776000000,
+      "debtUsd": 7079000000,
+      "revenueTtmUsd": 45436000000,
+      "operatingCashFlowTtmUsd": 9123000000,
+      "revenueGrowth": 0.4467878001297858,
+      "periodEnd": "2026-09-26"
+    },
+    "CSCO": {
+      "cashUsd": 14297000000,
+      "debtUsd": 22872000000,
+      "revenueTtmUsd": 63325000000,
+      "operatingCashFlowTtmUsd": 14177000000,
+      "revenueGrowth": 0.17576501056362015,
+      "periodEnd": "2026-07-25"
+    },
+    "IBM": {
+      "cashUsd": 11058000000,
+      "debtUsd": 63817000000,
+      "revenueTtmUsd": 69868000000,
+      "operatingCashFlowTtmUsd": 15831000000,
+      "revenueGrowth": 0.04727205927377387,
+      "periodEnd": "2026-09-30"
+    },
+    "UBER": {
+      "cashUsd": 10068000000,
+      "debtUsd": 15664000000,
+      "revenueTtmUsd": 56526000000,
+      "operatingCashFlowTtmUsd": 10735000000,
+      "revenueGrowth": 0.09645800846513697,
+      "periodEnd": "2026-09-30"
+    },
+    "LYFT": {
+      "cashUsd": 1794515000,
+      "debtUsd": 1043888000,
+      "revenueTtmUsd": 6771939000,
+      "operatingCashFlowTtmUsd": 1195080000,
+      "revenueGrowth": 0.16078814595043522,
+      "periodEnd": "2026-06-30"
+    },
+    "ABNB": {
+      "cashUsd": 12069000000,
+      "debtUsd": 2476000000,
+      "revenueTtmUsd": 13159000000,
+      "operatingCashFlowTtmUsd": 4860000000,
+      "revenueGrowth": 0.1653746770025839,
+      "periodEnd": "2026-06-30"
+    },
+    "DASH": {
+      "cashUsd": 5982000000,
+      "debtUsd": 2728000000,
+      "revenueTtmUsd": 17061000000,
+      "operatingCashFlowTtmUsd": 2953000000,
+      "revenueGrowth": 0.3395240858966919,
+      "periodEnd": "2026-09-30"
+    },
+    "SHOP": {
+      "cashUsd": 4727000000,
+      "debtUsd": null,
+      "revenueTtmUsd": 14167000000,
+      "operatingCashFlowTtmUsd": 2682000000,
+      "revenueGrowth": 0.3157524613220817,
+      "periodEnd": "2026-09-30"
+    },
+    "SNOW": {
+      "cashUsd": 2344695000,
+      "debtUsd": 2283985000,
+      "revenueTtmUsd": 5434647000,
+      "operatingCashFlowTtmUsd": 1253253000,
+      "revenueGrowth": 0.3509474929015546,
+      "periodEnd": "2026-07-31"
+    },
+    "DDOG": {
+      "cashUsd": 5233587000,
+      "debtUsd": 986595000,
+      "revenueTtmUsd": 4278164000,
+      "operatingCashFlowTtmUsd": 1267515000,
+      "revenueGrowth": 0.3516498033649824,
+      "periodEnd": "2026-09-30"
+    },
+    "HUBS": {
+      "cashUsd": 1296756000,
+      "debtUsd": null,
+      "revenueTtmUsd": 3587045000,
+      "operatingCashFlowTtmUsd": 907037000,
+      "revenueGrowth": 0.17052987086142624,
+      "periodEnd": "2026-09-30"
+    },
+    "MDB": {
+      "cashUsd": 2411254000,
+      "debtUsd": null,
+      "revenueTtmUsd": 2782770000,
+      "operatingCashFlowTtmUsd": 666623000,
+      "revenueGrowth": 0.30498882316935005,
+      "periodEnd": "2026-07-31"
+    },
+    "TEAM": {
+      "cashUsd": 1239512000,
+      "debtUsd": 989560000,
+      "revenueTtmUsd": 6572308000,
+      "operatingCashFlowTtmUsd": 1353135000,
+      "revenueGrowth": 0.27603326918742743,
+      "periodEnd": "2026-06-30"
+    },
+    "WDAY": {
+      "cashUsd": 3403000000,
+      "debtUsd": 2989000000,
+      "revenueTtmUsd": 10155000000,
+      "operatingCashFlowTtmUsd": 3081000000,
+      "revenueGrowth": 0.12819420783645663,
+      "periodEnd": "2026-07-31"
+    },
+    "NOW": {
+      "cashUsd": 4607000000,
+      "debtUsd": 7524000000,
+      "revenueTtmUsd": 15431000000,
+      "operatingCashFlowTtmUsd": 5334000000,
+      "revenueGrowth": 0.20516583504549457,
+      "periodEnd": "2026-09-30"
+    },
+    "NET": {
+      "cashUsd": 4162798000,
+      "debtUsd": 3270266000,
+      "revenueTtmUsd": 2512350000,
+      "operatingCashFlowTtmUsd": 633428000,
+      "revenueGrowth": 0.3586555953747297,
+      "periodEnd": "2026-06-30"
+    },
+    "TOST": {
+      "cashUsd": 1885000000,
+      "debtUsd": null,
+      "revenueTtmUsd": 7152000000,
+      "operatingCashFlowTtmUsd": 668000000,
+      "revenueGrowth": 0.2131047152480099,
+      "periodEnd": "2026-09-30"
+    },
+    "DOCU": {
+      "cashUsd": 777677000,
+      "debtUsd": null,
+      "revenueTtmUsd": 3361191000,
+      "operatingCashFlowTtmUsd": 1323729000,
+      "revenueGrowth": 0.09381291872960995,
+      "periodEnd": "2026-07-31"
+    },
+    "ZM": {
+      "cashUsd": 7249721000,
+      "debtUsd": null,
+      "revenueTtmUsd": 4993050000,
+      "operatingCashFlowTtmUsd": 2000208000,
+      "revenueGrowth": 0.04928415160031774,
+      "periodEnd": "2026-07-31"
+    },
+    "OKTA": {
+      "cashUsd": 2299000000,
+      "debtUsd": 0,
+      "revenueTtmUsd": 3073000000,
+      "operatingCashFlowTtmUsd": 987000000,
+      "revenueGrowth": 0.10576923076923084,
+      "periodEnd": "2026-07-31"
+    },
+    "PINS": {
+      "cashUsd": 1470021000,
+      "debtUsd": 982091000,
+      "revenueTtmUsd": 4680444000,
+      "operatingCashFlowTtmUsd": 1327854000,
+      "revenueGrowth": 0.11887476708555522,
+      "periodEnd": "2026-09-30"
+    },
+    "SNAP": {
+      "cashUsd": 2659758000,
+      "debtUsd": 3687766000,
+      "revenueTtmUsd": 6351084000,
+      "operatingCashFlowTtmUsd": 919059000,
+      "revenueGrowth": 0.18890425524004972,
+      "periodEnd": "2026-06-30"
+    },
+    "RDDT": {
+      "cashUsd": 3033432000,
+      "debtUsd": null,
+      "revenueTtmUsd": 3088880000,
+      "operatingCashFlowTtmUsd": 1204733000,
+      "revenueGrowth": 0.5300738061004153,
+      "periodEnd": "2026-09-30"
+    },
+    "ROKU": {
+      "cashUsd": 2720569000,
+      "debtUsd": null,
+      "revenueTtmUsd": 5500494000,
+      "operatingCashFlowTtmUsd": 810866000,
+      "revenueGrowth": 0.2406863158103414,
+      "periodEnd": "2026-09-30"
+    },
+    "EBAY": {
+      "cashUsd": 1166000000,
+      "debtUsd": 850000000,
+      "revenueTtmUsd": 12394000000,
+      "operatingCashFlowTtmUsd": 3049000000,
+      "revenueGrowth": 0.1368794326241134,
+      "periodEnd": "2026-09-30"
+    },
+    "PYPL": {
+      "cashUsd": 10280000000,
+      "debtUsd": 13353000000,
+      "revenueTtmUsd": 34295000000,
+      "operatingCashFlowTtmUsd": 7093000000,
+      "revenueGrowth": 0.01984079838422237,
+      "periodEnd": "2026-09-30"
+    },
+    "XYZ": {
+      "cashUsd": 8244548000,
+      "debtUsd": 5723027000,
+      "revenueTtmUsd": 25646371000,
+      "operatingCashFlowTtmUsd": 3622581000,
+      "revenueGrowth": 0.09884084126907289,
+      "periodEnd": "2026-09-30"
+    },
+    "COIN": {
+      "cashUsd": 8820883000,
+      "debtUsd": 6696622000,
+      "revenueTtmUsd": 5629761000,
+      "operatingCashFlowTtmUsd": 1409211000,
+      "revenueGrowth": -0.3495014965004952,
+      "periodEnd": "2026-09-30"
+    },
+    "INTU": {
+      "cashUsd": 7200000000,
+      "debtUsd": 7669000000,
+      "revenueTtmUsd": 21448000000,
+      "operatingCashFlowTtmUsd": 8838000000,
+      "revenueGrowth": 0.13651788044896884,
+      "periodEnd": "2026-07-31"
+    },
+    "PLTR": {
+      "cashUsd": 10561531000,
+      "debtUsd": null,
+      "revenueTtmUsd": 7288260000,
+      "operatingCashFlowTtmUsd": 4097197000,
+      "revenueGrowth": 0.9587051643733087,
+      "periodEnd": "2026-09-30"
+    },
+    "RIVN": {
+      "cashUsd": 5502000000,
+      "debtUsd": 4446000000,
+      "revenueTtmUsd": 6480000000,
+      "operatingCashFlowTtmUsd": -2629000000,
+      "revenueGrowth": 0.383183568677792,
+      "periodEnd": "2026-09-30"
+    },
+    "LCID": {
+      "cashUsd": 761313000,
+      "debtUsd": 3253698000,
+      "revenueTtmUsd": 1547122000,
+      "operatingCashFlowTtmUsd": -4080948000,
+      "revenueGrowth": 0.5624402540935582,
+      "periodEnd": "2026-06-30"
+    },
+    "TSLA": {
+      "cashUsd": 45447000000,
+      "debtUsd": 7956000000,
+      "revenueTtmUsd": 103570000000,
+      "operatingCashFlowTtmUsd": 18710000000,
+      "revenueGrowth": -0.0017440825769710067,
+      "periodEnd": "2026-09-30"
+    },
+    "WMT": {
+      "cashUsd": 11529000000,
+      "debtUsd": 50411000000,
+      "revenueTtmUsd": 728466000000,
+      "operatingCashFlowTtmUsd": 42923000000,
+      "revenueGrowth": 0.05889046941678511,
+      "periodEnd": "2026-07-31"
+    },
+    "TGT": {
+      "cashUsd": 5411000000,
+      "debtUsd": 15357000000,
+      "revenueTtmUsd": 107705000000,
+      "operatingCashFlowTtmUsd": 8723000000,
+      "revenueGrowth": 0.05267541945975962,
+      "periodEnd": "2026-08-01"
+    },
+    "NKE": {
+      "cashUsd": 8368000000,
+      "debtUsd": 7893000000,
+      "revenueTtmUsd": 45891000000,
+      "operatingCashFlowTtmUsd": 2781000000,
+      "revenueGrowth": -0.043259385665529004,
+      "periodEnd": "2026-08-31"
+    },
+    "DIS": {
+      "cashUsd": 5185000000,
+      "debtUsd": 46041000000,
+      "revenueTtmUsd": 98861000000,
+      "operatingCashFlowTtmUsd": 16989000000,
+      "revenueGrowth": 0.06756871035940804,
+      "periodEnd": "2026-06-27"
+    },
+    "BKNG": {
+      "cashUsd": 15814000000,
+      "debtUsd": 20061000000,
+      "revenueTtmUsd": 28126000000,
+      "operatingCashFlowTtmUsd": 9561000000,
+      "revenueGrowth": -0.01276642984014209,
+      "periodEnd": "2026-09-30"
+    },
+    "DELL": {
+      "cashUsd": 11569000000,
+      "debtUsd": 34466000000,
+      "revenueTtmUsd": 151197000000,
+      "operatingCashFlowTtmUsd": 12152000000,
+      "revenueGrowth": 0.5774785061794734,
+      "periodEnd": "2026-07-31"
+    }
+  }
+}

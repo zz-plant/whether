@@ -342,7 +342,7 @@ describe("the brief a reader actually gets", () => {
     };
 
     const aged = await sendTo("aged-band@example.com", false);
-    assert.match(aged?.text ?? "", /You set 12–24 months of runway on .+, so this now assumes 6–12 months\./);
+    assert.match(aged?.text ?? "", /Your runway was 12–24 months on .+, so this now assumes 6–12 months\./);
     assert.match(aged?.html ?? "", /so this now assumes 6–12 months\./);
 
     const fixed = await sendTo("covered-band@example.com", true);

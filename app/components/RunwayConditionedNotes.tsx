@@ -43,7 +43,7 @@ const useRunwayNotes = (regime: RegimeKey) => {
             ...runway,
             netMonthlyBurnUsd: netMonthlyBurnUsd(profile),
             selfFunded: stage === "bootstrapped",
-            debtExceedsCash: Boolean(resolveProfileRunway(profile)?.debtExceedsCash),
+            debtLimitsRunway: Boolean(resolveProfileRunway(profile)?.debtLimitsRunway),
           })
         : [],
     [regime, runway, profile, stage, thinlyCovered],
@@ -92,7 +92,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
   const { runway, figuresGiven, thinlyCovered, bandAge, profile } = useRunwayNotes(regime);
   const filingSource = profile.filing ? (
     <p data-testid="company-filing-source" className="text-fluid-nano text-slate-400">
-      {describeProfileFiling(profile.filing, profile.cashUsd)}
+      {describeProfileFiling(profile.filing, Boolean(resolveProfileRunway(profile)?.debtLimitsRunway))}
     </p>
   ) : null;
 

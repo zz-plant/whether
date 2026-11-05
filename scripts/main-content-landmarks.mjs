@@ -12,6 +12,9 @@ const dynamicRouteSamples = {
     "/resources/capital-discipline-venture-backed-companies",
     "/resources/should-we-freeze-hiring-high-interest-rate-environment",
   ],
+  /* Both readings: a company with one, and one whose figures stand alone. */
+  "/companies/[company]": ["/companies/microsoft", "/companies/rivian"],
+  "/companies/[company]/[role]": ["/companies/microsoft/product-managers", "/companies/rivian/engineering-managers"],
   "/signals/[cluster]": ["/signals/capital-tightness-watch"],
   "/signals/[cluster]/[decision-scenario]": [
     "/signals/capital-tightness-watch/hiring",
