@@ -16,7 +16,7 @@ import { decisionAreaOrder, type DecisionArea } from "../../lib/report/boundedDe
  * takes the published lines into a room, and what the line says back. The
  * prompt is written in the speaker's own voice — an objection ("This role is
  * too important to wait…"), a market take ("Public markets bounced this
- * month…") or a direct question ("Are we freezing everything, or just
+ * month…") or a direct question ("Are we pausing everything, or just
  * hiring?") — so the reader is ready for what people actually say, not only for
  * polite questions about the rules. The speaker is a function, never "your
  * CFO". Every reply restates a published line and promises no outcome.
@@ -78,7 +78,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       },
       {
         from: "Team",
-        question: "Are we freezing everything, or just hiring?",
+        question: "Are we pausing everything, or just hiring?",
         answer: "Each area pauses and restarts on its own terms, so check that area before changing its plan.",
       },
     ],

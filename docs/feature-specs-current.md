@@ -136,7 +136,7 @@ line is crossed.
   surfaces, so Guides and `/` cannot show the same pair two ways.
 - **Pushback, takes and questions in the speaker's voice.** Entries include objections ("This role
   is too important to wait…"), market takes ("Public markets bounced this month…") and direct
-  questions ("Are we freezing everything, or just hiring?"), so the reader is ahead of what comes up
+  questions ("Are we pausing everything, or just hiring?"), so the reader is ahead of what comes up
   in the room rather than only polite questions about the rules. The speaker is a function ("Hiring
   manager", "Investors", "Budget owners", "Board"), never "your CFO". Every reply restates a
   published line and promises no outcome; `tests/guidedTranslationRouting.test.ts` holds both
