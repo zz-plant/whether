@@ -1,3 +1,4 @@
+import { ROLES } from "../lib/report/companyRoles";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import sitemap, { generateSitemaps } from "../app/sitemap";
@@ -187,7 +188,7 @@ describe("sitemap", () => {
 describe("segmented sitemaps", () => {
   it("splits the corpus into one child per content type", async () => {
     const segments = await generateSitemaps();
-    assert.deepEqual(segments.map((segment) => segment.id), ["pages", "answers", "signals", "companies", "history", "briefs"]);
+    assert.deepEqual(segments.map((segment) => segment.id), ["pages", "answers", "signals", "companies", "roles", "history", "briefs"]);
   });
 
   it("lists every pilot company and role while they can be stood behind, and none when the week can't be", async () => {
@@ -196,6 +197,15 @@ describe("segmented sitemaps", () => {
     assert.ok(companies.some((entry) => entry.url.endsWith("/companies/microsoft/product-managers")));
     assert.ok(companies.some((entry) => entry.url.endsWith("/companies/rivian")));
     assert.deepEqual(await sitemap({ id: "companies", programmaticEligible: false }), []);
+  });
+
+  it("lists every role while the week can be stood behind, and keeps new families off company pages", async () => {
+    const roles = await sitemap({ id: "roles", programmaticEligible: true });
+    assert.equal(roles.length, ROLES.length + 1);
+    assert.ok(roles.some((entry) => entry.url.endsWith("/roles/recruiters")));
+    assert.deepEqual(await sitemap({ id: "roles", programmaticEligible: false }), []);
+    const companies = await sitemap({ id: "companies", programmaticEligible: true });
+    assert.ok(!companies.some((entry) => entry.url.endsWith("/recruiters")));
   });
 
   it("keeps history and briefs when the live answer segment is withheld", async () => {
@@ -224,7 +234,7 @@ describe("segmented sitemaps", () => {
 
   it("puts each route in exactly one child", async () => {
     const seen = new Map<string, string>();
-    for (const segment of ["pages", "answers", "signals", "companies", "history", "briefs"] as const) {
+    for (const segment of ["pages", "answers", "signals", "companies", "roles", "history", "briefs"] as const) {
       for (const entry of await sitemap({ id: segment, programmaticEligible: true })) {
         assert.ok(!seen.has(entry.url), `${entry.url} appears in both ${seen.get(entry.url)} and ${segment}`);
         seen.set(entry.url, segment);
