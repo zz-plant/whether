@@ -80,7 +80,7 @@ describe("questions to ask leadership", () => {
     const html = renderToStaticMarkup(<LeadershipQuestionsSection role={role} pagePath="/roles/finance-teams" />);
     assert.match(html, /Your company may decide differently/);
     assert.match(html, /Copy these questions/);
-    assert.match(html, /What would we stop first if revenue came in below plan/);
+    assert.match(html, /If we miss the revenue plan, what goes first/);
   });
 });
 
@@ -162,7 +162,7 @@ describe("a role at a company stage", () => {
   it("copies the stage's question too, and leaves it out with no stage", () => {
     const role = findRole("designers");
     assert.ok(role);
-    assert.match(buildLeadershipQuestionsCopy(role, "seed"), /Which milestone unlocks the next hire\?/);
+    assert.match(buildLeadershipQuestionsCopy(role, "seed"), /What do we need to hit before we can hire the next person\?/);
     assert.doesNotMatch(buildLeadershipQuestionsCopy(role), /milestone/);
   });
 });

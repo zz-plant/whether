@@ -322,7 +322,7 @@ export const MONDAY_AGENDA_STEPS: readonly {
 }[] = [
   { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
   { id: "thresholds", label: "Check what is paused", minutes: 1, prompt: "Which areas are paused, and how far is each from restarting?" },
-  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment is in an area that is paused?" },
+  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Have we started any hiring, spending or raise in an area that is now paused?" },
 ];
 
 export const MONDAY_AGENDA_TITLE = "Monday guidance review";

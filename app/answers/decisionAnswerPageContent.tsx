@@ -161,7 +161,7 @@ export async function DecisionAnswerPageContent({
        the payload a machine reads. */
     additionalQuestions: [
       {
-        question: "Which company inputs should we check before acting?",
+        question: "What should we check about our own company before acting?",
         answer: answer.companyInputs.join(" "),
       },
       {

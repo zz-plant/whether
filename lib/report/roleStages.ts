@@ -17,19 +17,19 @@ type StageForWorkers = {
 const STAGES_FOR_WORKERS: Record<OperatorStage, StageForWorkers> = {
   seed: {
     atCompanies: "seed-stage companies",
-    leadershipQuestion: "Which milestone unlocks the next hire?",
+    leadershipQuestion: "What do we need to hit before we can hire the next person?",
   },
   "series-a": {
     atCompanies: "Series A companies",
-    leadershipQuestion: "Which numbers have to keep improving before we add spend?",
+    leadershipQuestion: "Which numbers need to keep getting better before we spend more?",
   },
   "series-b": {
     atCompanies: "Series B+ companies",
-    leadershipQuestion: "What margin gain would justify adding headcount?",
+    leadershipQuestion: "How much do margins need to improve before we add people?",
   },
   bootstrapped: {
     atCompanies: "bootstrapped companies",
-    leadershipQuestion: "How much of this quarter's revenue is free to reinvest?",
+    leadershipQuestion: "How much of this quarter's revenue can we put back into the business?",
   },
 };
 
