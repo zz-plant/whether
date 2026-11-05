@@ -282,8 +282,8 @@ export default function ApiDocsPage() {
               constraints where the two cadences disagree.
             </Endpoint>
             <Endpoint signature="GET /api/company-filing?ticker=DOCU">
-              One US-listed company&apos;s latest figures as filed with the SEC: cash, debt, trailing revenue and
-              operating cash flow, and the period they cover. Filed numbers only, with no reading of them.
+              One US-listed company&apos;s latest figures from its SEC filings: cash, long-term investments, debt,
+              trailing revenue, operating cash flow and capital spending, and the period they cover. Numbers only, with no reading of them.
             </Endpoint>
             <Endpoint
               signature="GET /api/comps"

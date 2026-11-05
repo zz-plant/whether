@@ -137,12 +137,17 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
  * its representative months less the months since. It moves only ever down, and
  * a reader told to expect it can correct it in one click (`describeRunwayBandAge`).
  * No date, or one in the future, leaves the band as it was set.
+ *
+ * An estimate stops at the 6–12 band. Under six months the guidance says "hold every
+ * new commitment whatever this week's guidance says", which only a stated figure can
+ * justify: a 6–12 band reached it about three months on, for a reader who may have raised.
  */
 export const ageRunwayBand = (band: RunwayBand, setOn: string | null | undefined, now: Date = new Date()): RunwayBand => {
   if (!setOn) return band;
   const elapsedMonths = (now.getTime() - Date.parse(setOn)) / MS_PER_DAY / DAYS_PER_MONTH;
   if (!Number.isFinite(elapsedMonths) || elapsedMonths <= 0) return band;
-  return runwayBandForMonths(monthsForRunwayBand(band) - elapsedMonths) ?? "critical";
+  const aged = runwayBandForMonths(monthsForRunwayBand(band) - elapsedMonths) ?? "critical";
+  return aged === "critical" && band !== "critical" ? "tight" : aged;
 };
 
 /** The band a reader set, its day, and where it has aged to. Present only once it has moved. */

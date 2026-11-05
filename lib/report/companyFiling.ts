@@ -18,8 +18,10 @@ export const companyFilingSchema = z.object({
   name: z.string(),
   cashUsd: z.number(),
   debtUsd: z.number().nullable(),
+  longTermInvestmentsUsd: z.number(),
   revenueTtmUsd: z.number(),
   operatingCashFlowTtmUsd: z.number(),
+  capitalSpendingTtmUsd: z.number().nullable(),
   revenueGrowth: z.number().nullable(),
   periodEnd: z.string(),
 });
@@ -71,7 +73,7 @@ const readableCompanyName = (ticker: string, filedName: string): string => {
 
 /** Where the figures on screen came from, while they still are the filing's. */
 export const describeProfileFiling = (filing: ProfileFiling, debtLimitsRunway: boolean): string => {
-  const source = `From ${readableCompanyName(filing.ticker, filing.name)} (${filing.ticker}), as filed for the period ended ${formatDateUTC(filing.periodEnd)}. Change any figure to use your own.`;
+  const source = `From ${readableCompanyName(filing.ticker, filing.name)} (${filing.ticker}), worked out from SEC filings for the period ended ${formatDateUTC(filing.periodEnd)}. Change any figure to use your own.`;
   return debtLimitsRunway && filing.debtUsd !== null
     ? `${source} It owes ${formatCommitmentUsd(filing.debtUsd)}, so the guidance stops short of the 24+ month band.`
     : source;

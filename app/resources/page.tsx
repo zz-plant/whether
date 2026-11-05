@@ -256,7 +256,7 @@ export default async function ResourcesHubPage({
           <h2 id="resources-more-tools-heading" className="type-section">More tools</h2>
           <p className="text-sm text-slate-300">
             <Link href="/companies" className="text-[var(--accent-action)] underline underline-offset-4">
-              Guidance by company and role
+              This week&apos;s conditions by company and role
             </Link>
             : this week&apos;s rules for a role, beside what 50 public companies have filed.
           </p>

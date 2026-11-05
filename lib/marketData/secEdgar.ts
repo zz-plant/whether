@@ -411,8 +411,11 @@ type SecFilingRefusal =
 export const secCompanyFiguresSchema = z.object({
   cashUsd: z.number(),
   debtUsd: z.number().nullable(),
+  debtAsOf: z.string().nullable(),
+  longTermInvestmentsUsd: z.number(),
   revenueTtmUsd: z.number(),
   operatingCashFlowTtmUsd: z.number(),
+  capitalSpendingTtmUsd: z.number().nullable(),
   revenueGrowth: z.number().nullable(),
   periodEnd: z.string(),
 });
@@ -421,10 +424,16 @@ export type SecCompanyFigures = {
   cashUsd: number;
   /** Null when no borrowings are on file, which is not the same as none: Oracle tags its $130B only at year-end. */
   debtUsd: number | null;
+  /** The date of that debt figure, which can be up to a year before `periodEnd`. */
+  debtAsOf: string | null;
+  /** Securities held past a year. Against debt they count, as spending money they do not. */
+  longTermInvestmentsUsd: number;
   /** Zero for a company with no revenue on file. */
   revenueTtmUsd: number;
   /** Negative when operations consumed cash. */
   operatingCashFlowTtmUsd: number;
+  /** Null when none is on file for the same period, which is not the same as none spent. */
+  capitalSpendingTtmUsd: number | null;
   revenueGrowth: number | null;
   /** The balance sheet's date, YYYY-MM-DD. */
   periodEnd: string;
@@ -445,8 +454,15 @@ const OPERATING_CASH_FLOW_CONCEPTS = [
 /** Liabilities only a bank or an insurer carries. Its cash is held against them, so it is no runway. */
 const FINANCIAL_COMPANY_CONCEPTS = ["Deposits", "PremiumsEarnedNet", "LiabilityForFuturePolicyBenefits"];
 
+const CAPITAL_SPENDING_CONCEPTS = [
+  "PaymentsToAcquirePropertyPlantAndEquipment",
+  "PaymentsToAcquireProductiveAssets",
+  "PaymentsForCapitalImprovements",
+  "PaymentsToAcquireOtherProductiveAssets",
+];
+
 /**
- * Operating cash flow over the trailing year, and the date it runs to.
+ * A cash-flow line over the trailing year, and the date it runs to.
  *
  * Filings report cash flow year to date (88, 180, 272 days), not by quarter, so `quarterlySeries`
  * would find only the first quarter of any year. A year is the last full year plus this year to
@@ -454,13 +470,7 @@ const FINANCIAL_COMPANY_CONCEPTS = ["Deposits", "PremiumsEarnedNet", "LiabilityF
  * burned $145M last year and $23M in the first half reads as 14 months of runway or 45, depending
  * on which it is divided by.
  */
-const trailingOperatingCashFlow = (gaap: Taxonomy): { value: number; end: string } | null => {
-  let periods: Array<FactRow & { start: string }> = [];
-  for (const concept of OPERATING_CASH_FLOW_CONCEPTS) {
-    periods = latestFiledByPeriod(readRows(gaap, concept, "USD"))
-      .filter((row): row is FactRow & { start: string } => row.start !== undefined);
-    if (periods.length > 0) break;
-  }
+const trailingYearOf = (periods: Array<FactRow & { start: string }>): { value: number; end: string } | null => {
   const span = (row: { start: string; end: string }) => daysSpanned(row.start, row.end);
   const latestEnd = periods.reduce((latest, row) => (row.end > latest ? row.end : latest), "");
   const toDate = periods
@@ -477,6 +487,32 @@ const trailingOperatingCashFlow = (gaap: Taxonomy): { value: number; end: string
   return { value: lastYear.val + toDate.val - sameStretch.val, end: toDate.end };
 };
 
+/** The first concept with a full trailing year, ending on `end` when one is required: a tag a company stopped using must not answer for this year. */
+const trailingFlow = (gaap: Taxonomy, concepts: readonly string[], end?: string): { value: number; end: string } | null => {
+  for (const concept of concepts) {
+    const periods = latestFiledByPeriod(readRows(gaap, concept, "USD"))
+      .filter((row): row is FactRow & { start: string } => row.start !== undefined);
+    const trailing = trailingYearOf(periods);
+    if (trailing && (!end || trailing.end === end)) return trailing;
+  }
+  return null;
+};
+
+/** Securities held past a year, the first way this company tags them on this date. */
+const LONG_TERM_INVESTMENT_CONCEPTS = [
+  "MarketableSecuritiesNoncurrent",
+  "AvailableForSaleSecuritiesDebtSecuritiesNoncurrent",
+  "LongTermInvestments",
+];
+
+const longTermInvestmentsOn = (gaap: Taxonomy, date: string): number => {
+  for (const concept of LONG_TERM_INVESTMENT_CONCEPTS) {
+    const value = instantOn(gaap, concept, date);
+    if (value !== null) return value;
+  }
+  return 0;
+};
+
 /** Readings `debtOn` leaves out because they can include leases, which the comps' enterprise value must not. */
 const WIDER_DEBT_READINGS = [
   ["DebtLongtermAndShorttermCombinedAmount"],
@@ -489,20 +525,20 @@ const WIDER_DEBT_READINGS = [
  * tag debt only in the 10-K's notes, so nothing is on file for a 10-Q's date, and reading that as
  * zero printed Oracle and Target as owing nothing.
  */
-const companyDebt = (gaap: Taxonomy, date: string): number | null => {
+const companyDebt = (gaap: Taxonomy, date: string): { debtUsd: number | null; debtAsOf: string | null } => {
   /* A debt line on this date is the answer, zero included: repaid debt must not come back from
      last year's notes. */
   const reportedOnDate = [...LONG_TERM_DEBT_READINGS.flat(), ...SHORT_TERM_BORROWING_CONCEPTS]
     .some((concept) => instantOn(gaap, concept, date) !== null);
-  if (reportedOnDate) return debtOn(gaap, date);
+  if (reportedOnDate) return { debtUsd: debtOn(gaap, date), debtAsOf: date };
   for (const reading of WIDER_DEBT_READINGS) {
     const latest = latestInstantDate(gaap, reading);
     if (!latest || daysApart(latest, date) > 370) continue;
     const values = reading.map((concept) => instantOn(gaap, concept, latest)).filter((value) => value !== null);
     const total = values.reduce((sum, value) => sum + value, 0);
-    if (total > 0) return total;
+    if (total > 0) return { debtUsd: total, debtAsOf: latest };
   }
-  return null;
+  return { debtUsd: null, debtAsOf: null };
 };
 
 /** The figures a company's own runway is worked out from, or why its filing cannot supply them. Pure. */
@@ -515,7 +551,7 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
     return { status: "refused", refusal: "financial-company" };
   }
 
-  const cashFlow = trailingOperatingCashFlow(gaap);
+  const cashFlow = trailingFlow(gaap, OPERATING_CASH_FLOW_CONCEPTS);
   if (!cashFlow) return { status: "refused", refusal: "incomplete-filing" };
   if (daysApart(cashFlow.end, now.toISOString().slice(0, 10)) > STALE_PERIOD_DAYS) {
     return { status: "refused", refusal: "no-recent-filing" };
@@ -536,9 +572,11 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
     status: "ok",
     value: {
       cashUsd,
-      debtUsd: companyDebt(gaap, cashFlow.end),
+      ...companyDebt(gaap, cashFlow.end),
+      longTermInvestmentsUsd: longTermInvestmentsOn(gaap, cashFlow.end),
       revenueTtmUsd,
       operatingCashFlowTtmUsd: cashFlow.value,
+      capitalSpendingTtmUsd: trailingFlow(gaap, CAPITAL_SPENDING_CONCEPTS, cashFlow.end)?.value ?? null,
       revenueGrowth: growthOnYearAgo(quarters),
       periodEnd: cashFlow.end,
     },
@@ -547,7 +585,7 @@ export function deriveSecCompanyFigures(companyFacts: unknown, now: Date): SecFi
 
 const TICKER_INDEX_URL = "https://www.sec.gov/files/company_tickers.json";
 const TICKER_CACHE_PREFIX = "company:sec:ticker:v1:";
-const FIGURES_CACHE_PREFIX = "company:sec:figures:v2:";
+const FIGURES_CACHE_PREFIX = "company:sec:figures:v3:";
 /** A listing rarely changes, and an unknown ticker costs an 800KB read each time it is asked. */
 const TICKER_TTL_SECONDS = 7 * 24 * 60 * 60;
 

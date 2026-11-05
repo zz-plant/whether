@@ -357,7 +357,7 @@ export default async function sitemap(options?: {
         ...(await Promise.all(
           COMPANIES.map(async (company): Promise<SitemapEntryDescriptor[]> => {
             const figures = await readCompanyFigures(company);
-            if (!figures || !buildCompanySituation(company, figures).current) return [];
+            if (!figures || !buildCompanySituation(company, figures, null).current) return [];
             const entryFor = (path: `/${string}`): SitemapEntryDescriptor => ({ path, lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 });
             return [
               entryFor(`/companies/${company.slug}`),

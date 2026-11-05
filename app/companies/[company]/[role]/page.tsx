@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!company || !role) return {};
   const { indexable } = await loadCompanyPage(company);
   const metadata = buildPageMetadata({
-    title: `Guidance for ${role.label} at ${company.name}`,
-    description: `What this week's conditions mean for ${role.label} at ${company.name}: the rules, what would change them, and ${company.name}'s latest filed figures.`,
+    title: `This week's conditions for ${role.label} at ${company.name}`,
+    description: `What this week's conditions mean for ${role.label} at ${company.name}: the general rules, what would change them, and ${company.name}'s latest filed figures.`,
     path: `/companies/${company.slug}/${role.slug}`,
-    imageAlt: `Guidance for ${role.label} at ${company.name}`,
+    imageAlt: `This week's conditions for ${role.label} at ${company.name}`,
   });
   if (!indexable) metadata.robots = { index: false, follow: true };
   return metadata;
@@ -50,7 +50,7 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
       <JsonLdScript
         data={buildCompanyPageStructuredData({
           path: `/companies/${company.slug}/${role.slug}`,
-          title: `Guidance for ${role.label} at ${company.name}`,
+          title: `This week's conditions for ${role.label} at ${company.name}`,
           company: company.name,
           ticker: company.ticker,
           trail: [
@@ -70,7 +70,7 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
         )}
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">Guidance for {role.label} at {company.name}</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions for {role.label} at {company.name}</h1>
         <p className="text-sm text-slate-300">
           The same public signals every company reads, the decisions {role.label} make, and what {company.name} has filed.
         </p>

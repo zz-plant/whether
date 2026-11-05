@@ -8,10 +8,10 @@ import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Operating guidance by company and role",
+  title: "This week's conditions by company and role",
   description: "This week's conditions, the decisions each role makes, and each company's latest filed figures, for 50 public companies.",
   path: "/companies",
-  imageAlt: "Operating guidance by company and role",
+  imageAlt: "This week's conditions by company and role",
 });
 
 export default function CompaniesPage() {
@@ -19,7 +19,7 @@ export default function CompaniesPage() {
     <ContentPageShell>
       <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(toRoute("/companies"), [{ name: "Companies", path: toRoute("/companies") }]))} />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">Operating guidance by company and role</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions by company and role</h1>
         <p className="text-sm text-slate-300">
           The conditions are the same for everyone. What differs is the decisions each role makes and what each company has filed.
           Whether isn&apos;t affiliated with any of these companies.

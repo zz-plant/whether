@@ -1602,7 +1602,8 @@ on an edge profile.
   `THINLY_COVERED_NOTE` in place of the runway notes for a company that falls short of it.
 - **A runway band ages.** The `whether-company-runway` cookie holds `band:YYYY-MM-DD`, and
   `readOperatorRunwayCookie` ages the band: its representative months less the months since, moving
-  only down. The panel says what it assumed (`describeRunwayBandAge`), with one click to confirm or
+  only down, and only as far as the 6–12 band, because the gate under six months takes a stated figure.
+  The panel says what it assumed (`describeRunwayBandAge`), with one click to confirm or
   pick again; the crossing and Monday emails print the same sentence. A band earned by covering
   spending and a cookie from before this date carry no day and do not age, and a subscription carries
   that (`runwayBandFixed`, `PlanRunway.fixed`) so the emails do not count one down from the day it was
@@ -1634,7 +1635,10 @@ typed figures, and the stage becomes Series B+. Operating cash flow is a trailin
 year-to-date filings; spend is revenue less that, so net burn is the filing's own.
 
 - The filing is named beside the figures (`describeProfileFiling`) until the reader edits one.
-- Debt is not subtracted from the months shown. A company owing more than it holds, or whose cash
+- Burn is free cash flow: operating cash flow less capital spending, where any is on file. Rivian
+  reads 16 months of runway, not 25.
+- Debt is not subtracted from the months shown, and long-term securities count against it but never
+  lengthen a runway. A company owing more than it holds, or whose cash
   after its debt would not last 24 months, cannot reach the 24+ band, and the notes say "before the
   debt on file". The band ages from the filing's date, since its cash is as of then.
 - It refuses, saying why: an unlisted ticker, an international filer, a bank or insurer, no filing in
@@ -1653,9 +1657,11 @@ site its standing. Grow it only after these are indexed and earn clicks.
 - **Pages read and never fetch.** The daily cron stores 8 companies' figures a run
   (`refreshCompanyFilings`), and `data/company_filings.json` is the floor
   (`bun run companies:snapshot`). A refusal or an outage keeps the last good figures.
-- **A reading only where it cannot be a judgment** (`buildCompanySituation`): operations bringing in
-  more cash than they use, and debt under three years of that cash. Otherwise the figures stand alone
-  with no sentence saying why. No company page speaks of runway.
+- **A reading only where it cannot be a judgment** (`buildCompanySituation`): free cash flow positive,
+  and debt net of what the company holds under three years of it. Otherwise the figures stand alone
+  with no sentence saying why. No company page speaks of runway. The reading compares growth with the
+  list's median rather than saying what growth does for new work, and the week's guidance is labelled
+  as written for companies that depend on outside funding.
 - **Indexing:** a page is indexed and in the `companies` sitemap only with a filing inside 200 days,
   and its robots tag also needs a current week's call.
 - **Debt** is the balance sheet's own where it has a debt line, a reported zero included. Otherwise

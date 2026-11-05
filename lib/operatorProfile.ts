@@ -42,7 +42,13 @@ export type PaybackProjectNumberKey =
 export type PaybackProjectEntry = { name?: string } & Partial<Record<PaybackProjectNumberKey, number>>;
 
 /** The public filing the figures were read from, until the reader changes one of them. */
-export type ProfileFiling = { ticker: string; name: string; periodEnd: string; debtUsd: number | null };
+export type ProfileFiling = {
+  ticker: string;
+  name: string;
+  periodEnd: string;
+  debtUsd: number | null;
+  longTermInvestmentsUsd: number;
+};
 
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
@@ -173,10 +179,11 @@ export const parsePaybackProjects = (value: unknown): PaybackProjectEntry[] => {
 
 const parseProfileFiling = (value: unknown): ProfileFiling | null => {
   if (!isRecord(value)) return null;
-  const { ticker, name, periodEnd, debtUsd } = value;
+  const { ticker, name, periodEnd, debtUsd, longTermInvestmentsUsd } = value;
   if (typeof ticker !== "string" || typeof name !== "string" || typeof periodEnd !== "string") return null;
   if (debtUsd !== null && (typeof debtUsd !== "number" || !Number.isFinite(debtUsd) || debtUsd < 0)) return null;
-  return { ticker, name, periodEnd, debtUsd };
+  const investments = typeof longTermInvestmentsUsd === "number" && Number.isFinite(longTermInvestmentsUsd) ? longTermInvestmentsUsd : 0;
+  return { ticker, name, periodEnd, debtUsd, longTermInvestmentsUsd: investments };
 };
 
 /**
@@ -233,8 +240,9 @@ export const setOperatorProfileField = <K extends keyof OperatorProfile>(
 
 /**
  * A company's filed figures as the ones a reader would type. Spend is what makes spend less revenue
- * come to the cash its operations consumed, so net burn is the filing's own however revenue is
- * tagged. Annual growth reads as the monthly rate that compounds to it.
+ * come to the cash it consumed, capital spending included, so net burn is the filing's own however
+ * revenue is tagged. Leaving capital spending out read Rivian as 25 months of runway, not 16.
+ * Annual growth reads as the monthly rate that compounds to it.
  */
 export const applyCompanyFiling = (
   current: unknown,
@@ -243,8 +251,10 @@ export const applyCompanyFiling = (
     name: string;
     cashUsd: number;
     debtUsd: number | null;
+    longTermInvestmentsUsd: number;
     revenueTtmUsd: number;
     operatingCashFlowTtmUsd: number;
+    capitalSpendingTtmUsd: number | null;
     revenueGrowth: number | null;
     periodEnd: string;
   },
@@ -257,10 +267,16 @@ export const applyCompanyFiling = (
   return {
     ...rest,
     cashUsd: filing.cashUsd,
-    monthlyBurnUsd: Math.max(0, Math.round((filing.revenueTtmUsd - filing.operatingCashFlowTtmUsd) / 12)),
+    monthlyBurnUsd: Math.max(0, Math.round((filing.revenueTtmUsd - (filing.operatingCashFlowTtmUsd - (filing.capitalSpendingTtmUsd ?? 0))) / 12)),
     monthlyRevenueUsd: Math.round(filing.revenueTtmUsd / 12),
     ...(monthlyGrowthPct !== undefined ? { monthlyGrowthPct } : {}),
-    filing: { ticker: filing.ticker, name: filing.name, periodEnd: filing.periodEnd, debtUsd: filing.debtUsd },
+    filing: {
+      ticker: filing.ticker,
+      name: filing.name,
+      periodEnd: filing.periodEnd,
+      debtUsd: filing.debtUsd,
+      longTermInvestmentsUsd: filing.longTermInvestmentsUsd,
+    },
     updatedAt: now.toISOString(),
   };
 };
@@ -324,12 +340,14 @@ export const resolveProfileRunway = (profile: OperatorProfile): ProfileRunway | 
   const netBurn = netMonthlyBurnUsd(profile);
   const cash = profile.cashUsd !== undefined && profile.cashUsd > 0 ? profile.cashUsd : undefined;
   const typedMonths = profile.runwayMonths !== undefined && profile.runwayMonths > 0 ? profile.runwayMonths : undefined;
-  /* Filings say what is owed, which a cash balance does not. There is no cushion to use if the
-     debt is over the cash, or if the cash left after it would not last the 24 months the band with
-     no ceiling claims: Rivian read as 25 months, with $4.4B of debt against $5.5B of cash. */
+  /* Filings say what is owed, which a cash balance does not. There is no cushion to use if the debt
+     is over what the company holds, or if the cash left after it would not last the 24 months the
+     band with no ceiling claims: Rivian has $4.4B of debt against $5.5B of cash. Long-term securities
+     count against debt, or Apple reads as owing more than it holds, but they never lengthen a runway. */
   const debtUsd = profile.filing?.debtUsd ?? 0;
+  const held = (cash ?? 0) + (profile.filing?.longTermInvestmentsUsd ?? 0);
   const debtLimitsRunway = cash !== undefined && debtUsd > 0
-    && (debtUsd > cash || (netBurn !== undefined && netBurn > 0 && (cash - debtUsd) / netBurn < MONTHS_THE_OPEN_BAND_CLAIMS));
+    && (debtUsd > held || (netBurn !== undefined && netBurn > 0 && (held - debtUsd) / netBurn < MONTHS_THE_OPEN_BAND_CLAIMS));
   const debtFlag: { debtLimitsRunway?: true } = debtLimitsRunway ? { debtLimitsRunway: true } : {};
   if (netBurn !== undefined && netBurn <= 0 && (cash !== undefined || typedMonths !== undefined)) {
     const surplusUsd = Math.max(0, -netBurn);
