@@ -120,7 +120,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     shortcut: "g",
     /* /resolve/<slug> (help by role and situation) and /toolkits/<slug> are the
        "More tools" at the foot of Guides; /answers/<slug> are its answers. */
-    memberPrefixes: ["/answers", "/companies", "/resources", "/resolve", "/toolkits"],
+    memberPrefixes: ["/answers", "/companies", "/resources", "/resolve", "/roles", "/toolkits"],
     crossLinks: [],
     footerLinks: [
       { href: "/resources#answers", label: "Answers by decision area" },
@@ -335,6 +335,7 @@ export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
   { prefix: "/companies", label: "Company guidance" },
+  { prefix: "/roles", label: "Role guidance" },
   { prefix: "/resolve", label: "More tools" },
   { prefix: "/toolkits", label: "Toolkit" },
   { prefix: "/privacy", label: "Privacy" },

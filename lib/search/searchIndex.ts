@@ -19,6 +19,17 @@ type SearchEntity = {
 
 const keyDocs: SearchEntity[] = [
   {
+    id: "doc-roles",
+    type: "doc",
+    job: "resolve",
+    routePriority: 4,
+    title: "This week's conditions by role",
+    href: "/roles",
+    summary: "What to ask for this week and what to ask leadership, at any tech company.",
+    intentLabel: "Find your role",
+    keywords: ["role", "software engineer", "designer", "recruiter", "finance", "support", "security", "all-hands", "leadership questions"],
+  },
+  {
     id: "doc-companies",
     type: "doc",
     job: "resolve",

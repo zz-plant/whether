@@ -153,6 +153,7 @@ export function CompanyNextLinks({ company, role }: { company: CompanyEntry; rol
             {role ? `${role.title} at ${other.name}` : other.name}
           </ActionLink>
         ))}
+        {role ? <ActionLink href={`/roles/${role.slug}`} variant="pill">{role.title} at any company</ActionLink> : null}
         <ActionLink href="/companies" variant="pill">All companies</ActionLink>
       </div>
     </section>

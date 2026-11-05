@@ -260,6 +260,12 @@ export default async function ResourcesHubPage({
             </Link>
             : this week&apos;s rules for a role, beside what 50 public companies have filed.
           </p>
+          <p className="text-sm text-slate-300">
+            <Link href="/roles" className="text-[var(--accent-action)] underline underline-offset-4">
+              This week&apos;s conditions by role
+            </Link>
+            : what to ask for and what to ask leadership, at any tech company.
+          </p>
           {/* The worksheets by name, outside the fold (2026-10-27). They were
               listed only inside the closed disclosure below, so a reader who
               did not open it never learned the site had them. */}
