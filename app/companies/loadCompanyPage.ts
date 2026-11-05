@@ -29,7 +29,8 @@ export const loadWeekConditions = async () => {
       ? { savedCopyNotice: describeSavedCopyBanner({ recordDate: reportData.treasury.record_date, now: new Date(), guidanceHeld: false }) }
       : {}),
   };
-  return { conditions, regime, rules: homeBriefModel.decisionRules, stale };
+  const { thresholds, scores } = reportData.assessment;
+  return { conditions, regime, rules: homeBriefModel.decisionRules, stale, thresholds, scores };
 };
 
 /** What every company page reads: the week, and this company's stored figures. */

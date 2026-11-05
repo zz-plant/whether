@@ -1,9 +1,22 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
+import * as nextNavigation from "next/navigation";
 import { renderToStaticMarkup } from "react-dom/server";
 import { COMPANY_ROLES, findCompanyRole, findRole, ROLES } from "../lib/report/companyRoles";
 import { buildLeadershipQuestionsCopy, leadershipQuestions, runwayAnswers } from "../lib/report/leadershipQuestions";
 import { RUNWAY_BAND_OPTIONS } from "../lib/report/operatorRunway";
+import { buildScopedVariantDecisionAdjustment } from "../lib/report/boundedDecisionRules";
+import { macroSeries } from "../lib/macroSnapshot";
+import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { snapshotData } from "../lib/snapshot";
+import { findRoleStage, ROLE_STAGES, stageForWorkers } from "../lib/report/roleStages";
+
+/* The copy button reads the router, which nothing mounts in a static render. */
+const mockAny: any = mock;
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  useRouter: () => ({ push: () => undefined, replace: () => undefined, refresh: () => undefined, prefetch: () => undefined }),
+}));
 
 describe("roles at any company", () => {
   it("adds families to the role pages without adding company pages", () => {
@@ -63,3 +76,87 @@ describe("questions to ask leadership", () => {
     assert.match(html, /What would we stop first if revenue came in below plan/);
   });
 });
+
+describe("a role at a company stage", () => {
+  const { thresholds, scores } = buildOperatingSnapshot({ treasury: snapshotData, macroSeries }).assessment;
+
+  it("covers the four stages a reader can choose, and refuses anything else", () => {
+    assert.deepEqual([...ROLE_STAGES], ["seed", "series-a", "series-b", "bootstrapped"]);
+    assert.equal(findRoleStage("series-a"), "series-a");
+    assert.equal(findRoleStage("public"), null);
+    assert.equal(findRoleStage("growth"), null);
+    assert.equal(findRoleStage("nonsense"), null);
+  });
+
+  it("gives every role a line of its own at every stage", () => {
+    const seen = new Set<string>();
+    for (const role of ROLES) {
+      for (const stage of ROLE_STAGES) {
+        const line = role.atStage[stage];
+        assert.ok(line.length > 0, `${role.slug} at ${stage}`);
+        assert.ok(!seen.has(line), `${role.slug} at ${stage} repeats "${line}"`);
+        seen.add(line);
+      }
+    }
+    assert.equal(seen.size, ROLES.length * ROLE_STAGES.length);
+  });
+
+  it("gives every stage its own question and name", () => {
+    const seen = new Set<string>();
+    for (const stage of ROLE_STAGES) {
+      const { leadershipQuestion, atCompanies } = stageForWorkers(stage);
+      for (const line of [leadershipQuestion, atCompanies]) {
+        assert.ok(!seen.has(line), line);
+        seen.add(line);
+      }
+    }
+  });
+
+  it("does not tell a bootstrapped company's workers to count on a raise", () => {
+    for (const role of ROLES) {
+      assert.doesNotMatch(role.atStage.bootstrapped, /\braise\b|\bround\b|investor|valuation/i, role.slug);
+    }
+    assert.doesNotMatch(stageForWorkers("bootstrapped").leadershipQuestion, /\braise\b|\bround\b|investor|valuation/i);
+  });
+
+  it("does not hand one role another's advice", () => {
+    const line = (slug: string, stage: "seed" | "series-a" | "series-b" | "bootstrapped") => findRole(slug)?.atStage[stage] ?? "";
+    assert.doesNotMatch(line("it-security", "seed"), /customer pull|one sprint/);
+    assert.doesNotMatch(line("recruiters", "seed"), /customer pull|one sprint/);
+    assert.match(line("recruiters", "seed"), /Open a role/);
+  });
+
+  it("makes all 40 pages different, and leaves the repeated parts to the role's page", async () => {
+    const { RoleStageSection } = await import("../app/roles/roleStageSection");
+    const { LeadershipQuestionsSection } = await import("../app/roles/leadershipQuestionsSection");
+    const seen = new Set<string>();
+    for (const role of ROLES) {
+      for (const stage of ROLE_STAGES) {
+        const adjustment = buildScopedVariantDecisionAdjustment({ mode: stage, thresholds, scores });
+        const html = renderToStaticMarkup(
+          <RoleStageSection atCompanies={stageForWorkers(stage).atCompanies} askFor={role.atStage[stage]} adjustment={adjustment} />,
+        );
+        assert.ok(!seen.has(html), `${role.slug} at ${stage}`);
+        seen.add(html);
+        assert.doesNotMatch(html, /regime|posture|Pause if:|Restart when:/i);
+      }
+    }
+    const engineers = findRole("software-engineers");
+    assert.ok(engineers);
+    const onStagePage = renderToStaticMarkup(
+      <LeadershipQuestionsSection role={engineers} stage="seed" pagePath="/roles/software-engineers/seed" answersHref="/roles/software-engineers#runway-answers" />,
+    );
+    assert.doesNotMatch(onStagePage, /What the first answer means/);
+    assert.match(onStagePage, /href="\/roles\/software-engineers#runway-answers"/);
+    const onRolePage = renderToStaticMarkup(<LeadershipQuestionsSection role={engineers} pagePath="/roles/software-engineers" />);
+    assert.match(onRolePage, /id="runway-answers"/);
+  });
+
+  it("copies the stage's question too, and leaves it out with no stage", () => {
+    const role = findRole("designers");
+    assert.ok(role);
+    assert.match(buildLeadershipQuestionsCopy(role, "seed"), /Which milestone unlocks the next hire\?/);
+    assert.doesNotMatch(buildLeadershipQuestionsCopy(role), /milestone/);
+  });
+});
+

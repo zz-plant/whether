@@ -4,6 +4,7 @@ import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/naviga
 import { toRoute } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
 import { askForThisWeek, findRole, paybackBarLine, ROLES } from "../../../lib/report/companyRoles";
+import { ROLE_STAGES, stageForWorkers } from "../../../lib/report/roleStages";
 import { buildRolePageStructuredData } from "../../../lib/seo/pageStructuredData";
 import { ConditionsSection, RoleDecisionsSection } from "../../companies/companyPageSections";
 import { loadWeekConditions } from "../../companies/loadCompanyPage";
@@ -44,7 +45,7 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
   return (
     <ContentPageShell data-content-measurement-root={path}>
       <ContentMeasurementTracker pagePath={path} cluster="authority" intent="vp-product" />
-      <JsonLdScript data={buildRolePageStructuredData({ path, title: titleFor(role.label), role: role.title })} />
+      <JsonLdScript data={buildRolePageStructuredData({ path, title: titleFor(role.label), role: role.title, trail: [{ name: role.title, path }] })} />
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(path), [
@@ -71,6 +72,11 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
+          {ROLE_STAGES.map((stage) => (
+            <ActionLink key={stage} href={`/roles/${role.slug}/${stage}`} variant="pill">
+              At {stageForWorkers(stage).atCompanies}
+            </ActionLink>
+          ))}
           <ActionLink href="/companies" variant="pill">Public company figures</ActionLink>
           {ROLES.filter((other) => other.slug !== role.slug).map((other) => (
             <ActionLink key={other.slug} href={`/roles/${other.slug}`} variant="pill">{other.title}</ActionLink>
