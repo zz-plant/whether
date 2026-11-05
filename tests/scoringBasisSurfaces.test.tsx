@@ -81,6 +81,23 @@ describe("the basis on every surface", () => {
     assert.match(line, /<dt[^>]*>Based on<\/dt>\s*<dd[^>]*>Startup-market inputs left out<span[^>]*data-basis-warning[^>]*>\u00A0·\u00A0Counted, conditions would be Stormy\.<\/span>/);
     assert.doesNotMatch(line, /would put risk appetite at 41/);
     assert.match(html, /Startup-market inputs would put risk appetite at 41, below 50\./);
+    assert.equal(reportData.scoringBasis.countedRegime, "VOLATILE");
+
+    /* Where the card says "Feels like", the strip still names the inputs and stops there. */
+    const props = buildTrustStripProps({
+      recordDateLabel: "Oct 6, 2026",
+      isFallback: false,
+      isHistorical: false,
+      degradedSourceCount: 0,
+      confidenceLabel: "MED",
+      assessment,
+      scoringBasis: reportData.scoringBasis,
+    });
+    const onCard = renderToStaticMarkup(
+      <TrustStrip {...props} basis={{ ...props.basis, consequenceOnCard: true }} phoneLayout="line" href="/trust" />,
+    );
+    assert.match(onCard, /Startup-market inputs left out/);
+    assert.doesNotMatch(onCard, /Counted, conditions would be/);
 
     for (const path of [
       "app/page.tsx",

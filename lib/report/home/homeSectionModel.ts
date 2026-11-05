@@ -388,8 +388,6 @@ export type LineStateBandModel = {
   state: Exclude<LineState, "clear">;
   area: DecisionArea;
   text: string;
-  href: string;
-  action: string;
 };
 
 export const describeLineStateBand = (
@@ -402,8 +400,6 @@ export const describeLineStateBand = (
     state,
     area: row.area,
     text,
-    href: `#${HOME_SECTIONS.areas.id}`,
-    action: "What to do",
   });
 
   /* Held: the area whose restart line is nearest, since that is the hold that
@@ -467,18 +463,33 @@ const describeHoldingScore = (slots: readonly HomeAreaLineSlot[]): string | null
   return `${ruleMetricLabel[first.metric].toLowerCase()} is ${first.holdsAbove ? "above" : "below"} ${first.value}`;
 };
 
-export const describeHeldAreasForCard = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
-): string | null => {
-  const ruled = rows.filter((row) => row.pause);
-  if (ruled.length === 0) return null;
-  const heldRows = ruled.filter((row) => row.pause?.met);
-  const held = heldRows.map((row) => decisionAreaLabel(row.area));
-  if (held.length === 0) return "No area is on hold.";
-  const holding = describeHoldingScore(heldRows.flatMap((row) => (row.pause ? [row.pause] : [])));
-  if (held.length === ruled.length) return holding ? `Every area is on hold while ${holding}.` : "Every area is on hold.";
-  const list = held.length === 1 ? held[0] : `${held.slice(0, -1).join(", ")} and ${held.at(-1)}`;
-  return holding ? `On hold while ${holding}: ${list}.` : `On hold: ${list}.`;
+export type AreaStripModel = {
+  cells: { area: DecisionArea; state: LineState; label: string; href: string }[];
+  /** The one score holding every held area, as a sentence. Null when none is held or two scores hold them. */
+  holding: string | null;
+};
+
+const AREA_STRIP_STATE_LABEL: Record<LineState, string> = {
+  crossed: "On hold",
+  near: "Close to pausing",
+  clear: "Clear",
+};
+
+/**
+ * The card's five-area row: where each area stands against its pause line, in the words
+ * the page's groups use. Null when no area states a line. The distance stays out: areas
+ * held by one score would print one distance in every column.
+ */
+export const buildAreaStrip = (rows: readonly Pick<HomeAreaRow, "area" | "pause">[]): AreaStripModel | null => {
+  const cells = rows.flatMap((row) => {
+    const status = describeAreaPauseStatus(row);
+    return status
+      ? [{ area: row.area, state: status.state, label: AREA_STRIP_STATE_LABEL[status.state], href: `#area-${row.area}` }]
+      : [];
+  });
+  if (cells.length === 0) return null;
+  const holding = describeHoldingScore(rows.flatMap((row) => (row.pause?.met ? [row.pause] : [])));
+  return { cells, holding: holding ? `Held while ${holding}.` : null };
 };
 
 /**
@@ -674,7 +685,7 @@ const STATE_ORDER: readonly LineState[] = ["crossed", "near", "clear"];
 const GROUP_STATUS: Record<LineState, string> = {
   crossed: "On hold",
   near: "Close to pausing",
-  clear: "Not on hold",
+  clear: "Clear",
 };
 
 export const buildAreaGroups = (

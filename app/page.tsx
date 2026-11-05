@@ -48,6 +48,7 @@ import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
+import { AreaStrip } from "./components/home/AreaStrip";
 import { AreaDistancesFold } from "./components/home/AreaDistancesFold";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
@@ -69,7 +70,7 @@ import {
   buildSignalChangeRows,
   describeConditionsTrail,
   describeEarlierConditions,
-  describeHeldAreasForCard,
+  buildAreaStrip,
   describeLineStateBand,
   describeWeeklyMovement,
   HOME_SECTIONS,
@@ -621,7 +622,7 @@ async function PageContent({
      own: the banner (or, on a held week, the call) says what waits for live data,
      and the areas below are dated to the reading. "No area is on hold." sat under
      "hold new hires, spend and vendor contracts" (2026-11-02). */
-  const heldAreasLine = historicalSelection || savedCopy ? null : describeHeldAreasForCard(decisionPickerOptions);
+  const areaStripModel = historicalSelection || savedCopy ? null : buildAreaStrip(decisionPickerOptions);
   /* The week's exception, above the call: null on a calm week, so the page's
      silhouette changes with the weather rather than being drawn the same way
      whatever the reading says. */
@@ -641,9 +642,8 @@ async function PageContent({
   const conditionsSince = historicalSelection || !isRegimeKey(regime)
     ? undefined
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
-  const heroAreas = heldAreasLine
-    ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do by area" }
-    : undefined;
+  /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
+  const countedRegime = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedRegime ?? null;
   /* One sentence the reader can say in a meeting, from the same playbook /operate
      prints in full. A score has to be interpreted; a sentence can be repeated.
      A held week prints none: "take share while money is cheap" under "hold
@@ -652,9 +652,14 @@ async function PageContent({
     !historicalSelection && !reportData.assessment.policyAssessment?.refusal?.refused && isRegimeKey(regime)
       ? getPlaybookForRegime(regime)?.leadershipPhrases.more[0]
       : undefined;
-  const heroTrust = publishedNotice
-    ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
-    : trustStripProps;
+  const heroTrust = {
+    ...trustStripProps,
+    basis: {
+      ...trustStripProps.basis,
+      consequenceOnCard: Boolean(countedRegime),
+      ...(publishedNotice ? { note: null, omitReason: true } : {}),
+    },
+  };
 
   /* A quiet week (2026-11-03): no area moved and the conditions held since the
      earlier reading, and nothing is close to changing. The card and the areas are
@@ -844,7 +849,8 @@ async function PageContent({
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
-                areas={heroAreas}
+                areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} /> : undefined}
+                feelsLike={countedRegime ? { regime: countedRegime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
                 phrase={heroPhrase}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { LineStateBandModel } from "../../../lib/report/home/homeSectionModel";
 import { LineStateIcon } from "../ui/conceptIcons";
 
@@ -14,8 +13,8 @@ import { LineStateIcon } from "../ui/conceptIcons";
  *
  * Its glyph is the line state's own (§XXIV: pause for crossed, the dashed ring
  * for close), and the sentence carries the distance to the binding line — the
- * one fact the card does not state. It names no state word, because the card
- * below says "On hold: …" and two statements of the same state forty pixels
+ * one fact the card does not state. It names no state word and carries no link,
+ * because the card's area strip does both, and two statements of the same state forty pixels
  * apart is how a page starts repeating itself.
  */
 export function LineStateBand({ model }: { model: LineStateBandModel }) {
@@ -26,9 +25,6 @@ export function LineStateBand({ model }: { model: LineStateBandModel }) {
     >
       <LineStateIcon state={model.state} className="self-center" />
       <span className="font-medium">{model.text}</span>
-      <Link href={model.href} className="weather-hit underline underline-offset-4">
-        {model.action} →
-      </Link>
     </p>
   );
 }

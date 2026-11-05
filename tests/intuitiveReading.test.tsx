@@ -6,7 +6,8 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { ScoreLadder } from "../app/components/ui/scoreLadder";
-import { describeHeldAreasForCard, type SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import { AreaStrip } from "../app/components/home/AreaStrip";
+import { buildAreaStrip, type SignalChangeRow } from "../lib/report/home/homeSectionModel";
 import { describeLatitudeAgainstConditions } from "../lib/report/trackRecordCopy";
 
 /*
@@ -19,55 +20,61 @@ import { describeLatitudeAgainstConditions } from "../lib/report/trackRecordCopy
 const slot = (met: boolean) => ({ line: "Funding pressure > 76", distance: "", points: 4, met, metric: "tightness" as const });
 
 describe("the card ties the weather word to the areas", () => {
-  it("names the areas on hold under the condition", () => {
-    const rows = [
-      { area: "hiring" as const, pause: slot(true) },
-      { area: "product-tempo" as const, pause: slot(false) },
-      { area: "capital-raising" as const, pause: slot(true) },
-    ];
-    assert.equal(describeHeldAreasForCard(rows), "On hold: Hiring and Fundraising.");
-    assert.equal(describeHeldAreasForCard(rows.map((row) => ({ ...row, pause: slot(false) }))), "No area is on hold.");
-    assert.equal(describeHeldAreasForCard(rows.map((row) => ({ ...row, pause: slot(true) }))), "Every area is on hold.");
-    assert.equal(describeHeldAreasForCard([]), null);
+  const held = (metric: "tightness" | "riskAppetite", value: number, holdsAbove: boolean) => ({
+    ...slot(true),
+    metric,
+    value,
+    holdsAbove,
+  });
+
+  it("gives each area with a line a column saying where it stands", () => {
+    const model = buildAreaStrip([
+      { area: "hiring", pause: slot(true) },
+      { area: "product-tempo", pause: { ...slot(false), points: 40 } },
+      { area: "capital-raising" },
+    ]);
+    assert.deepEqual(model?.cells.map(({ area, label, href }) => ({ area, label, href })), [
+      { area: "hiring", label: "On hold", href: "#area-hiring" },
+      { area: "product-tempo", label: "Clear", href: "#area-product-tempo" },
+    ]);
+    assert.equal(buildAreaStrip([]), null, "no area states a line");
   });
 
   it("names the score holding them when one score holds them all", () => {
-    const held = (metric: "tightness" | "riskAppetite", value: number, holdsAbove: boolean) => ({
-      ...slot(true),
-      metric,
-      value,
-      holdsAbove,
-    });
-    const rows = [
-      { area: "hiring" as const, pause: held("tightness", 76, true) },
-      { area: "product-tempo" as const, pause: slot(false) },
-      { area: "capital-raising" as const, pause: held("tightness", 76, true) },
-    ];
-    assert.equal(describeHeldAreasForCard(rows), "On hold while funding pressure is above 76: Hiring and Fundraising.");
     assert.equal(
-      describeHeldAreasForCard(rows.map((row) => ({ ...row, pause: held("tightness", 76, true) }))),
-      "Every area is on hold while funding pressure is above 76.",
+      buildAreaStrip([
+        { area: "hiring", pause: held("tightness", 76, true) },
+        { area: "product-tempo", pause: slot(false) },
+        { area: "capital-raising", pause: held("tightness", 76, true) },
+      ])?.holding,
+      "Held while funding pressure is above 76.",
     );
     assert.equal(
-      describeHeldAreasForCard([
-        { area: "hiring" as const, pause: held("tightness", 76, true) },
-        { area: "product-tempo" as const, pause: slot(false) },
-        { area: "capital-raising" as const, pause: held("riskAppetite", 44, false) },
-      ]),
-      "On hold: Hiring and Fundraising.",
-      "two scores holding different areas: the list alone, not one score's reason",
+      buildAreaStrip([
+        { area: "hiring", pause: held("tightness", 76, true) },
+        { area: "capital-raising", pause: held("riskAppetite", 44, false) },
+      ])?.holding,
+      null,
+      "two scores holding different areas name neither",
     );
+    assert.equal(buildAreaStrip([{ area: "hiring", pause: slot(false) }])?.holding, null, "nothing held");
   });
 
-  it("puts the line on the card with a link to the areas' answers", () => {
+  it("links each column on the card to its area's rule", () => {
     const html = renderToStaticMarkup(
-      <DecisionHero
-        weeklyCall="Hold approvals steady."
-        regime="DEFENSIVE"
-        areas={{ text: "On hold: Hiring.", href: "#what-it-changes", action: "What to do in each area" }}
-      />,
+      <AreaStrip model={{ cells: [{ area: "hiring", state: "crossed", label: "On hold", href: "#area-hiring" }], holding: null }} />,
     );
-    assert.match(html, /data-held-areas[^>]*>On hold: Hiring\. <a[^>]*href="#what-it-changes"[^>]*>What to do in each area<\/a>/);
+    assert.match(html, /data-line-state="crossed"[^>]*href="#area-hiring"|href="#area-hiring"[^>]*data-line-state="crossed"/);
+    assert.ok(html.includes("On hold"));
+  });
+
+  it("sets the left-out inputs' conditions beside the published ones, only when passed", () => {
+    const withLine = renderToStaticMarkup(
+      <DecisionHero weeklyCall="Hold." regime="DEFENSIVE" feelsLike={{ regime: "SCARCITY", href: "#why-conditions" }} />,
+    );
+    assert.match(withLine, /data-feels-like[^>]*>Feels like/);
+    assert.ok(withLine.includes("Freezing"));
+    assert.doesNotMatch(renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="DEFENSIVE" />), /data-feels-like/);
   });
 });
 

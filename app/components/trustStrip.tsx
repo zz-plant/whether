@@ -54,6 +54,8 @@ export type TrustStripProps = {
     warningShort?: string | null;
     /** What counting the left-out inputs would change (`ScoringBasis.consequence`). */
     consequence?: string | null;
+    /** The card states what counting them would change, so the strip names the inputs and stops there. */
+    consequenceOnCard?: boolean;
     note?: string | null;
     omitReason?: boolean;
   };
@@ -115,10 +117,10 @@ export function TrustStrip({
   /* A strip that links to /trust says what the left-out inputs would change, not how
      (2026-11-03): "Counted, conditions would be Freezing." beside "Startup-market inputs
      left out". The arithmetic and the reason are /trust's, one tap away. */
-  const consequenceFirst = Boolean(href && basis.consequence && basis.warningShort);
+  const consequenceFirst = Boolean(href && (basis.consequence || basis.consequenceOnCard) && basis.warningShort);
   const basisDetail = (
     consequenceFirst
-      ? [basis.consequence, basis.note]
+      ? [basis.consequenceOnCard ? null : basis.consequence, basis.note]
       : [basis.warning, basis.warning && !basis.omitReason ? NOT_COUNTED_REASON : null, basis.note]
   )
     .filter((part): part is string => Boolean(part))
@@ -170,8 +172,8 @@ export function TrustStrip({
       label: SCORING_BASIS_LABEL,
       value: consequenceFirst && basis.warningShort ? upperFirst(basis.warningShort) : basis.value,
       ...(basisDetail ? { detail: basisDetail, detailKind: "basis" as const } : {}),
-      tone: basisDetail || basis.key === "extended" ? "caveat" : undefined,
-      routine: !basisDetail && basis.key === "record",
+      tone: basisDetail || basis.consequenceOnCard || basis.key === "extended" ? "caveat" : undefined,
+      routine: !basisDetail && !basis.consequenceOnCard && basis.key === "record",
     },
   ];
   /* A phone wraps the four pairs, and a label told from a value only by its
