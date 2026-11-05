@@ -8,7 +8,8 @@ import { readAnswerPages } from "../lib/answers/answerContentStore";
 import { signalScenarioRoutes } from "./seoRouteClusters";
 import { readCompanyRecord } from "../lib/companies/companyFilingStore";
 import { COMPANIES } from "../lib/companies/companyRegistry";
-import { COMPANY_ROLES } from "../lib/report/companyRoles";
+import { COMPANY_ROLES, ROLES } from "../lib/report/companyRoles";
+import { ROLE_STAGES } from "../lib/report/roleStages";
 import { buildCompanySituation } from "../lib/report/companySituation";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
@@ -170,7 +171,7 @@ const resolveSitemapReadiness = async (): Promise<{
  * with it, and crawl diagnostics read per segment instead of one undifferentiated
  * list. `pages` holds the hubs and static pages that are not part of a corpus.
  */
-export const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "companies", "history", "briefs"] as const;
+export const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "companies", "roles", "history", "briefs"] as const;
 type SitemapSegment = (typeof SITEMAP_SEGMENTS)[number];
 
 export async function generateSitemaps(): Promise<Array<{ id: SitemapSegment }>> {
@@ -369,6 +370,21 @@ export default async function sitemap(options?: {
       ]
     : [];
 
+  const roleEntries: SitemapEntryDescriptor[] = programmaticEligible
+    ? [
+        { path: "/roles", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+        ...ROLES.flatMap((role): SitemapEntryDescriptor[] => [
+          { path: `/roles/${role.slug}`, lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.55 },
+          ...ROLE_STAGES.map((stage): SitemapEntryDescriptor => ({
+            path: `/roles/${role.slug}/${stage}`,
+            lastModified: reportLastModified,
+            changeFrequency: "weekly",
+            priority: 0.5,
+          })),
+        ]),
+      ]
+    : [];
+
   const bySegment: Record<SitemapSegment, SitemapEntryDescriptor[]> = {
     pages: coreEntries,
     answers: [
@@ -379,6 +395,7 @@ export default async function sitemap(options?: {
     ],
     signals: [...signalWatchEntries, ...signalsClusterEntries],
     companies: companyEntries,
+    roles: roleEntries,
     history: archivePeriodEntries,
     briefs: publishedBriefEntries,
   };

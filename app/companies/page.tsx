@@ -35,7 +35,11 @@ export default function CompaniesPage() {
         <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions by company and role</h1>
         <p className="text-sm text-slate-300">
           The conditions are the same for everyone. What differs is the decisions each role makes and what each company has filed.
-          Whether isn&apos;t affiliated with any of these companies.
+          Whether isn&apos;t affiliated with any of these companies. At a private company?{" "}
+          <Link href="/roles" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+            Start with your role
+          </Link>
+          .
         </p>
         <ul className="weather-grid gap-x-4 gap-y-2 text-sm [--col-min:10rem]">
           {COMPANIES.map((company) => (

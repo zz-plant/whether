@@ -10,9 +10,9 @@ import type { WeekConditions } from "./companyPageSections";
 
 const loadWeek = cache(() => loadWeeklyBriefSnapshot(undefined, { route: "/companies" }));
 
-/** What every company page reads: the week, once per request, and this company's stored figures. */
-export const loadCompanyPage = async (company: CompanyEntry) => {
-  const [week, figures] = await Promise.all([loadWeek(), readCompanyRecord(company)]);
+/** The week as a page without a company reads it, once per request. */
+export const loadWeekConditions = async () => {
+  const week = await loadWeek();
   const { reportData, degraded, homeBriefModel, weeklyCall } = week.snapshot;
   const regime = reportData.assessment.regime;
   const stale = isCallStaleForIndexing({
@@ -30,13 +30,20 @@ export const loadCompanyPage = async (company: CompanyEntry) => {
       ? { savedCopyNotice: describeSavedCopyBanner({ recordDate: reportData.treasury.record_date, now: new Date(), guidanceHeld: false }) }
       : {}),
   };
+  const { thresholds, scores } = reportData.assessment;
+  return { conditions, regime, rules: homeBriefModel.decisionRules, stale, thresholds, scores };
+};
+
+/** What every company page reads: the week, and this company's stored figures. */
+export const loadCompanyPage = async (company: CompanyEntry) => {
+  const [week, figures] = await Promise.all([loadWeekConditions(), readCompanyRecord(company)]);
   const situation = figures ? buildCompanySituation(company, figures, pilotPeerGrowth()) : null;
   return {
-    conditions,
-    regime,
+    conditions: week.conditions,
+    regime: week.regime,
     situation,
-    rules: homeBriefModel.decisionRules,
+    rules: week.rules,
     /* A page with no current filing or no current call is one more name on a template. */
-    indexable: Boolean(situation?.current) && !stale,
+    indexable: Boolean(situation?.current) && !week.stale,
   };
 };

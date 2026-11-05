@@ -1677,6 +1677,17 @@ site its standing. Grow it only after these are indexed and earn clicks.
 - **Measured page by page** (`ContentMeasurementTracker`), so growing the list rests on which pages
   earn visits. Each page declares a `WebPage` about the company, with no review or rating.
 
+### 1.1.22d Guidance by role, with no company (2026-11-05)
+
+`/roles` and `/roles/<role>`: this week's conditions, what the role can ask for, the general rules, and
+questions to ask leadership with what the first answer means (`lib/report/leadershipQuestions.ts`).
+Most tech workers are at private companies with nothing filed, so the question stands in for the
+filing. `/roles/<role>/<stage>` adds the stage's own rule and what it means for a request
+(`lib/report/roleStages.ts`), for 40 more pages, which is what serves workers at a private company of a
+known stage. Ten roles (`ROLES`); support, recruiters, finance and IT and security stay off the company
+pages (`onCompanyPages: false`), since each role there is 50 more URLs. A page is noindexed while the
+week's call is stale, and the questions copy as one message.
+
 ### 1.1.23 The runway band lives in the cookie, not the address (2026-09-23)
 
 The runway unification itself landed on `main` separately (7f264a26, recorded in docs/agents/lessons/dead-features-and-honesty.md, "One

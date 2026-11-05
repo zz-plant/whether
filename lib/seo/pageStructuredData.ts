@@ -744,3 +744,29 @@ export const buildCompanyPageStructuredData = ({
     },
     buildBreadcrumbList(trail.map((item) => ({ name: item.name, path: item.path }))),
   ]);
+
+/** A role page is about an occupation, and claims no reviewer or rating. */
+export const buildRolePageStructuredData = ({
+  path,
+  title,
+  role,
+  trail,
+}: {
+  path: `/${string}`;
+  title: string;
+  role: string;
+  /** Everything after Roles, the page itself last. */
+  trail: ReadonlyArray<{ name: string; path: `/${string}` }>;
+}): JsonLdGraph =>
+  graph([
+    {
+      "@type": "WebPage",
+      "@id": `${buildCanonicalUrl(path)}#webpage`,
+      url: buildCanonicalUrl(path),
+      name: title,
+      about: { "@type": "Occupation", name: role },
+      isPartOf: { "@id": websiteId },
+      publisher: { "@id": organizationId },
+    },
+    buildBreadcrumbList([{ name: "Roles", path: "/roles" }, ...trail]),
+  ]);
