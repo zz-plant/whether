@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { indexable } = await loadCompanyPage(company);
   const metadata = buildPageMetadata({
     title: `${company.name}: this week's operating conditions and filed figures`,
-    description: `This week's conditions, ${company.name}'s latest filed revenue, cash flow and debt, and guidance by role.`,
+    description: `This week's conditions, ${company.name}'s latest filed revenue, cash flow and debt, and what they mean by role.`,
     path: `/companies/${company.slug}`,
     imageAlt: `${company.name}: this week's operating conditions`,
   });
@@ -67,7 +67,7 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
           {COMPANY_ROLES.map((role) => (
             <li key={role.slug}>
               <Link href={`/companies/${company.slug}/${role.slug}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
-                Guidance for {role.label} at {company.name}
+                This week&apos;s conditions for {role.label} at {company.name}
               </Link>
             </li>
           ))}

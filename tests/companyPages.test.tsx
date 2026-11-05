@@ -7,9 +7,10 @@ import {
   ConditionsSection,
   RoleDecisionsSection,
 } from "../app/companies/companyPageSections";
-import { readCompanyFigures, refreshCompanyFilings } from "../lib/companies/companyFilingStore";
+import { pilotPeerGrowth, readCompanyFigures, refreshCompanyFilings } from "../lib/companies/companyFilingStore";
 import { COMPANIES, COMPANY_ROLES, findCompany, findCompanyRole, type CompanyEntry } from "../lib/companies/companyRegistry";
 import { findUseCaseRole } from "../lib/decisionDomainCatalog";
+import type { SecCompanyFigures } from "../lib/marketData/secEdgar";
 import { buildCompanySituation } from "../lib/report/companySituation";
 import { companyFactsFixture } from "./fixtures/marketData";
 
@@ -17,8 +18,11 @@ const NOW = new Date("2026-11-04T12:00:00.000Z");
 const figures = {
   cashUsd: 64.5e9,
   debtUsd: 35.5e9,
+  debtAsOf: "2026-09-30",
+  longTermInvestmentsUsd: 37.8e9,
   revenueTtmUsd: 346e9,
   operatingCashFlowTtmUsd: 196e9,
+  capitalSpendingTtmUsd: 136e9,
   revenueGrowth: 0.19,
   periodEnd: "2026-09-30",
 };
@@ -27,36 +31,68 @@ if (!microsoft) throw new Error("the list lost Microsoft");
 const company: CompanyEntry = microsoft;
 
 describe("what a page says beside a company's name", () => {
-  it("reads a company generating cash", () => {
-    const situation = buildCompanySituation(company, figures, NOW);
-    assert.match(situation.reading?.[0] ?? "", /budgets and priorities/);
-    assert.match(situation.reading?.[1] ?? "", /grew 19%/);
-    assert.match(situation.reading?.[2] ?? "", /ends June 30/);
+  const peers = { median: 0.17, companies: 50 };
+
+  it("reads a company whose cash covers its capital spending, in facts", () => {
+    const situation = buildCompanySituation(company, figures, peers, NOW);
+    assert.match(situation.reading?.[0] ?? "", /covered capital spending with \$60B left over\. Capital spending took 69% of it\./);
+    assert.match(situation.reading?.[1] ?? "", /budgets and priorities/);
+    assert.equal(situation.reading?.[2], "Revenue grew 19% in the latest quarter on a year earlier, above the 17% median of these 50 companies.");
+    assert.match(situation.reading?.[3] ?? "", /ends June 30, and budgets for the next one are usually set/);
     assert.ok(situation.rows.some((row) => row.label === "Debt on file" && row.value === "$35.5B"));
+    assert.ok(situation.rows.some((row) => row.label === "Free cash flow, last 12 months" && row.value === "$60B"));
     assert.equal(situation.current, true);
   });
 
-  it("lets the figures stand alone for a company using cash or carrying heavy debt", () => {
-    assert.equal(buildCompanySituation(company, { ...figures, operatingCashFlowTtmUsd: -2e9 }, NOW).reading, null);
-    assert.equal(buildCompanySituation(company, { ...figures, operatingCashFlowTtmUsd: 0 }, NOW).reading, null);
-    assert.equal(buildCompanySituation(company, { ...figures, debtUsd: 600e9 }, NOW).reading, null);
-    assert.ok(buildCompanySituation(company, { ...figures, debtUsd: null }, NOW).reading);
+  it("states growth against the median, and claims nothing about what it does for new work", () => {
+    const sentence = (revenueGrowth: number) => buildCompanySituation(company, { ...figures, revenueGrowth }, peers, NOW).reading?.[2];
+    assert.match(sentence(0.05) ?? "", /grew 5%.*below the 17% median/);
+    assert.match(sentence(-0.08) ?? "", /fell 8%.*below the 17% median/);
+    assert.match(sentence(0.17) ?? "", /grew 17%.*in line with the 17% median/);
+    for (const growth of [0.5, 0.05, -0.2]) {
+      assert.doesNotMatch(buildCompanySituation(company, { ...figures, revenueGrowth: growth }, peers, NOW).reading?.join(" ") ?? "", /usually gives|higher bar|likely to compete/);
+    }
+    assert.equal(buildCompanySituation(company, figures, null, NOW).reading?.some((line) => line.includes("median")), false);
   });
 
-  it("prints nothing for debt that is not on file, rather than none", () => {
-    const situation = buildCompanySituation(company, { ...figures, debtUsd: null }, NOW);
-    assert.ok(!situation.rows.some((row) => row.label === "Debt on file"));
+  it("lets the figures stand alone without free cash flow, or with heavy debt", () => {
+    const standsAlone = (changes: Partial<SecCompanyFigures>) =>
+      buildCompanySituation(company, { ...figures, ...changes }, peers, NOW).reading;
+    assert.equal(standsAlone({ operatingCashFlowTtmUsd: -2e9 }), null);
+    // Oracle's shape: plenty from operations, more than all of it spent on capital.
+    assert.equal(standsAlone({ operatingCashFlowTtmUsd: 46.9e9, capitalSpendingTtmUsd: 75.7e9 }), null);
+    // No capital spending on file means free cash flow isn't known, not that it is all of it.
+    assert.equal(standsAlone({ capitalSpendingTtmUsd: null }), null);
+    assert.equal(standsAlone({ debtUsd: 600e9 }), null);
+    // Debt is read net of what the company holds: Google owes $126B and holds more.
+    assert.ok(standsAlone({ debtUsd: 126e9, cashUsd: 265e9, operatingCashFlowTtmUsd: 179e9, capitalSpendingTtmUsd: 160e9 }));
+  });
+
+  it("dates a debt figure older than the period, and prints nothing when none is on file", () => {
+    const older = buildCompanySituation(company, { ...figures, debtAsOf: "2026-05-31" }, peers, NOW);
+    assert.ok(older.rows.some((row) => row.label === "Debt on file, as of May 31, 2026"));
+    const none = buildCompanySituation(company, { ...figures, debtUsd: null, debtAsOf: null }, peers, NOW);
+    assert.ok(!none.rows.some((row) => row.label.startsWith("Debt on file")));
   });
 
   it("stops standing behind an old filing", () => {
-    assert.equal(buildCompanySituation(company, { ...figures, periodEnd: "2026-01-01" }, NOW).current, false);
+    assert.equal(buildCompanySituation(company, { ...figures, periodEnd: "2026-01-01" }, peers, NOW).current, false);
+  });
+
+  it("reads no pilot company whose capital spending outruns its cash, and takes the median from the list", async () => {
+    const oracle = findCompany("oracle");
+    assert.ok(oracle);
+    const stored = await readCompanyFigures(oracle, null);
+    assert.ok(stored);
+    assert.equal(buildCompanySituation(oracle, stored, pilotPeerGrowth(), NOW).reading, null);
+    assert.equal(pilotPeerGrowth()?.companies, COMPANIES.length);
   });
 
   it("says no word about runway or the company's health on any pilot page, and names who it isn't", async () => {
     for (const entry of COMPANIES) {
       const stored = await readCompanyFigures(entry, null);
       assert.ok(stored, `${entry.name} has no bundled figures`);
-      const situation = buildCompanySituation(entry, stored, NOW);
+      const situation = buildCompanySituation(entry, stored, pilotPeerGrowth(), NOW);
       const html = renderToStaticMarkup(<CompanyPositionSection company={entry} situation={situation} />);
       assert.doesNotMatch(html, /runway|cushion|cash first|solven|bankrupt|distress|at risk|months of cash/i, entry.name);
       assert.ok(html.includes(`isn&#x27;t affiliated with ${entry.name}`), entry.name);
@@ -68,7 +104,7 @@ describe("what a page says beside a company's name", () => {
     assert.ok(rivian);
     const stored = await readCompanyFigures(rivian, null);
     assert.ok(stored);
-    const html = renderToStaticMarkup(<CompanyPositionSection company={rivian} situation={buildCompanySituation(rivian, stored, NOW)} />);
+    const html = renderToStaticMarkup(<CompanyPositionSection company={rivian} situation={buildCompanySituation(rivian, stored, pilotPeerGrowth(), NOW)} />);
     assert.doesNotMatch(html, /company-reading|What that changes/);
     assert.match(html, /Cash from operations/);
   });
@@ -94,6 +130,13 @@ describe("the page sections", () => {
     const saved = renderToStaticMarkup(<ConditionsSection conditions={{ ...week, savedCopyNotice: "Live data is late." }} />);
     assert.match(saved, /company-saved-copy/);
     assert.match(saved, /Live data is late\./);
+  });
+
+  it("says who the guidance is written for, and calls the rules general", () => {
+    const html = renderToStaticMarkup(
+      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026" }} />,
+    );
+    assert.match(html, /written for companies that depend on outside funding/);
   });
 
   it("prints the shared conditions as shared", () => {

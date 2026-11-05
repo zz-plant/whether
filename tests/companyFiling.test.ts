@@ -55,6 +55,44 @@ describe("a company's figures from its filings", () => {
     assert.equal(result.value.cashUsd, 150e6);
     assert.equal(result.value.debtUsd, 50e6);
     assert.equal(result.value.revenueTtmUsd, 410e6);
+    assert.equal(result.value.capitalSpendingTtmUsd, null);
+  });
+
+  it("reads capital spending the same way, and only for the same period", () => {
+    const capital = (end: string) => ({
+      PaymentsToAcquireProductiveAssets: { units: { USD: [{ start: "2025-07-01", end, val: 30e6, filed: "2026-08-20" }] } },
+    });
+    const stale = { PaymentsToAcquirePropertyPlantAndEquipment: { units: { USD: [{ start: "2018-01-01", end: "2018-12-31", val: 9e6, filed: "2019-02-20" }] } } };
+    const cashFlow = [{ start: "2025-07-01", end: PERIOD_END, val: 90e6, filed: "2026-08-20" }];
+    const read = (extra: Record<string, unknown>) => {
+      const result = deriveSecCompanyFigures(facts({ cashFlow, extra }), NOW);
+      return result.status === "ok" ? result.value.capitalSpendingTtmUsd : "refused";
+    };
+    // A tag the company stopped using must not answer for this year, and the current one must.
+    assert.equal(read({ ...stale, ...capital(PERIOD_END) }), 30e6);
+    assert.equal(read(stale), null);
+    assert.equal(read(capital("2025-12-31")), null);
+  });
+
+  it("keeps the date of a debt figure older than the balance sheet, and long-term securities", () => {
+    const fixture = facts();
+    const gaap = Object.fromEntries(Object.entries(fixture.facts["us-gaap"]).filter(([concept]) => !concept.startsWith("Convertible")));
+    const result = deriveSecCompanyFigures(
+      {
+        ...fixture,
+        facts: {
+          ...fixture.facts,
+          "us-gaap": {
+            ...gaap,
+            DebtLongtermAndShorttermCombinedAmount: { units: { USD: [{ end: "2025-12-31", val: 130e6, filed: "2026-02-20" }] } },
+            MarketableSecuritiesNoncurrent: { units: { USD: [{ end: PERIOD_END, val: 80e6, filed: "2026-08-01" }] } },
+          },
+        },
+      },
+      NOW,
+    );
+    assert.equal(result.status === "ok" && result.value.debtAsOf, "2025-12-31");
+    assert.equal(result.status === "ok" && result.value.longTermInvestmentsUsd, 80e6);
   });
 
   it("reads a full year as it stands", () => {
@@ -203,8 +241,10 @@ describe("a filing as the operator's figures", () => {
     name: "Fixture Motors",
     cashUsd: 3_600e6,
     debtUsd: 100e6,
+    longTermInvestmentsUsd: 0,
     revenueTtmUsd: 1_200e6,
-    operatingCashFlowTtmUsd: -2_400e6,
+    operatingCashFlowTtmUsd: -2_000e6,
+    capitalSpendingTtmUsd: 400e6,
     revenueGrowth: 0.2,
     periodEnd: PERIOD_END,
   };
@@ -223,8 +263,18 @@ describe("a filing as the operator's figures", () => {
     assert.equal(runwayBandForProfileRunway(runway), "balanced");
   });
 
+  it("counts capital spending in burn, and falls back to operating cash where none is on file", () => {
+    const runwayOf = (capitalSpendingTtmUsd: number | null) => {
+      const runway = resolveProfileRunway(applyCompanyFiling({ version: 1 }, { ...filing, capitalSpendingTtmUsd }, NOW));
+      return runway?.basis === "cash" ? runway.months : null;
+    };
+    assert.equal(runwayOf(400e6), 18);
+    assert.equal(runwayOf(0), 21.6);
+    assert.equal(runwayOf(null), 21.6);
+  });
+
   it("survives being stored, large figures included", () => {
-    const huge = applyCompanyFiling({ version: 1 }, { ...filing, revenueTtmUsd: 400e9, operatingCashFlowTtmUsd: 110e9, cashUsd: 60e9 }, NOW);
+    const huge = applyCompanyFiling({ version: 1 }, { ...filing, revenueTtmUsd: 400e9, operatingCashFlowTtmUsd: 110e9, capitalSpendingTtmUsd: 10e9, cashUsd: 60e9 }, NOW);
     const stored = parseOperatorProfile(JSON.parse(JSON.stringify(huge)));
     assert.equal(stored.monthlyRevenueUsd, huge.monthlyRevenueUsd);
     assert.equal(stored.monthlyBurnUsd, huge.monthlyBurnUsd);
@@ -233,14 +283,17 @@ describe("a filing as the operator's figures", () => {
   });
 
   it("gives no cushion to a company owing more than it holds", () => {
-    const long = { ...filing, operatingCashFlowTtmUsd: -600e6 };
+    const long = { ...filing, operatingCashFlowTtmUsd: -500e6, capitalSpendingTtmUsd: 100e6 };
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, long, NOW))), "abundant");
     const owing = applyCompanyFiling({ version: 1 }, { ...long, debtUsd: 5_000e6 }, NOW);
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(owing)), "balanced");
     // Rivian's shape: less debt than cash, but what is left after it would not last 24 months.
-    const close = applyCompanyFiling({ version: 1 }, { ...long, cashUsd: 5_500e6, debtUsd: 4_400e6, operatingCashFlowTtmUsd: -2_600e6 }, NOW);
+    const close = applyCompanyFiling({ version: 1 }, { ...long, cashUsd: 5_500e6, debtUsd: 4_400e6, operatingCashFlowTtmUsd: -2_600e6, capitalSpendingTtmUsd: 1_600e6 }, NOW);
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(close)), "balanced");
-    const covered = { ...filing, operatingCashFlowTtmUsd: 300e6, revenueGrowth: 0 };
+    // Apple's shape: more debt than cash, less than cash and long-term securities together.
+    const apple = { ...filing, cashUsd: 56.7e9, longTermInvestmentsUsd: 80.2e9, debtUsd: 80.1e9, revenueTtmUsd: 400e9, operatingCashFlowTtmUsd: 145e9, capitalSpendingTtmUsd: 9e9, revenueGrowth: 0 };
+    assert.equal(resolveProfileRunway(applyCompanyFiling({ version: 1 }, apple, NOW))?.debtLimitsRunway, undefined);
+    const covered = { ...filing, operatingCashFlowTtmUsd: 500e6, capitalSpendingTtmUsd: 200e6, revenueGrowth: 0 };
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, covered, NOW))), "abundant");
     assert.equal(runwayBandForProfileRunway(resolveProfileRunway(applyCompanyFiling({ version: 1 }, { ...covered, debtUsd: 5_000e6 }, NOW))), "balanced");
   });
@@ -254,10 +307,10 @@ describe("a filing as the operator's figures", () => {
   });
 
   it("names the filing and what it owes", () => {
-    const source = { ticker: "RIVN", name: "Fixture Motors", periodEnd: PERIOD_END, debtUsd: 5_000e6 };
+    const source = { ticker: "RIVN", name: "Fixture Motors", periodEnd: PERIOD_END, debtUsd: 5_000e6, longTermInvestmentsUsd: 0 };
     assert.equal(
       describeProfileFiling(source, false),
-      "From Rivian (RIVN), as filed for the period ended Jun 30, 2026. Change any figure to use your own.",
+      "From Rivian (RIVN), worked out from SEC filings for the period ended Jun 30, 2026. Change any figure to use your own.",
     );
     assert.match(describeProfileFiling(source, true), /It owes \$5B, so the guidance stops short of the 24\+ month band\.$/);
     // Debt not on file says nothing about debt, whatever the flag.
@@ -266,7 +319,7 @@ describe("a filing as the operator's figures", () => {
 
   it("prints a filed name the way a reader knows it", () => {
     const named = (ticker: string, name: string) =>
-      describeProfileFiling({ ticker, name, periodEnd: PERIOD_END, debtUsd: null }, false).split(" (")[0];
+      describeProfileFiling({ ticker, name, periodEnd: PERIOD_END, debtUsd: null, longTermInvestmentsUsd: 0 }, false).split(" (")[0];
     assert.equal(named("ZZZ", "BEYOND MEAT, INC."), "From Beyond Meat, Inc.");
     assert.equal(named("ZZZ", "QUALCOMM INC/DE"), "From Qualcomm Inc");
     assert.equal(named("ZZZ", "AMC NETWORKS INC"), "From AMC Networks Inc");

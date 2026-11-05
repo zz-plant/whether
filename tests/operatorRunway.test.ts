@@ -156,9 +156,10 @@ describe("one runway setting", () => {
     const on = (date: string) => new Date(`${date}T12:00:00.000Z`);
     assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2026-01-02")), "balanced");
     assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2026-08-01")), "tight");
-    assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2027-02-01")), "critical");
+    // An estimate never reaches the band that holds every commitment. Only a stated figure can.
+    assert.equal(ageRunwayBand("balanced", "2026-01-01", on("2027-02-01")), "tight");
     assert.equal(ageRunwayBand("abundant", "2026-01-01", on("2026-08-01")), "balanced");
-    assert.equal(ageRunwayBand("tight", "2026-01-01", on("2026-05-01")), "critical");
+    assert.equal(ageRunwayBand("tight", "2026-01-01", on("2026-12-01")), "tight");
     // The lowest band has nowhere to go, and past its months stays there.
     assert.equal(ageRunwayBand("critical", "2026-01-01", on("2027-01-01")), "critical");
     // No date, a bad date and a future date all leave it as set.

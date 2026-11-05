@@ -34,7 +34,8 @@ export function ConditionsSection({ conditions }: { conditions: WeekConditions }
       ) : null}
       <p className="text-sm text-slate-300">{conditions.rationale}</p>
       <p className="text-sm text-slate-200">
-        <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {conditions.guidance}
+        <span className="font-semibold text-slate-100">{publicDecisionLabels.call}, written for companies that depend on outside funding:</span>{" "}
+        {conditions.guidance}
       </p>
       <p className="text-xs text-slate-400">Data as of {conditions.recordDateLabel}. Every company reads the same conditions.</p>
     </section>
@@ -53,7 +54,7 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
           </div>
         ))}
       </dl>
-      <p className="text-xs text-slate-400">As filed for the period ended {situation.asOf}.</p>
+      <p className="text-xs text-slate-400">Worked out from SEC filings for the period ended {situation.asOf}.</p>
       {situation.reading ? (
         <div className="space-y-2" data-testid="company-reading">
           <h3 className="text-sm font-semibold text-slate-100">What that changes</h3>
@@ -89,7 +90,7 @@ export function RoleDecisionsSection({
       </ul>
       {rules.map((rule) => (
         <div key={rule.area} className="space-y-1 border-t border-[color:var(--border-faint)] pt-3 text-sm text-slate-200">
-          <h3 className="font-semibold text-slate-100">{decisionAreaLabel(rule.area)} this week</h3>
+          <h3 className="font-semibold text-slate-100">The general {decisionAreaLabel(rule.area).toLowerCase()} rule this week</h3>
           <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.action.actionNow}:</span> {formatBoundedDecisionAction(rule)}</p>
           <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {formatBoundedDecisionThreshold(rule)}</p>
           <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatBoundedDecisionReverse(rule)}</p>

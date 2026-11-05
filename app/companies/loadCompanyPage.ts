@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { readCompanyFigures } from "../../lib/companies/companyFilingStore";
+import { pilotPeerGrowth, readCompanyFigures } from "../../lib/companies/companyFilingStore";
 import type { CompanyEntry } from "../../lib/companies/companyRegistry";
 import { buildCompanySituation } from "../../lib/report/companySituation";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../../lib/regimePresentation";
@@ -29,7 +29,7 @@ export const loadCompanyPage = async (company: CompanyEntry) => {
       ? { savedCopyNotice: describeSavedCopyBanner({ recordDate: reportData.treasury.record_date, now: new Date(), guidanceHeld: false }) }
       : {}),
   };
-  const situation = figures ? buildCompanySituation(company, figures) : null;
+  const situation = figures ? buildCompanySituation(company, figures, pilotPeerGrowth()) : null;
   return {
     conditions,
     situation,

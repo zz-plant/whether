@@ -23,7 +23,7 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 4,
-    title: "Guidance by company and role",
+    title: "This week's conditions by company and role",
     href: "/companies",
     summary: "This week's rules for a role, beside what 50 public companies have filed.",
     intentLabel: "Find a company",

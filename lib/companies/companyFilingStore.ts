@@ -9,6 +9,7 @@
 import { z } from "zod";
 import bundledFilings from "../../data/company_filings.json";
 import { readSecCompanyFigures, secCompanyFiguresSchema, type SecCompanyFigures } from "../marketData/secEdgar";
+import { medianOf, type PeerGrowth } from "../report/companySituation";
 import { getJson, getWhetherKv, type KvNamespace } from "../runtime/kv";
 import { COMPANIES, type CompanyEntry } from "./companyRegistry";
 
@@ -33,6 +34,19 @@ export const readCompanyFigures = async (
   company: CompanyEntry,
   store: FilingStore | null = getWhetherKv(),
 ): Promise<SecCompanyFigures | null> => (await readStored(store, company)) ?? bundled[company.ticker] ?? null;
+
+/**
+ * The list's median revenue growth, from the bundled copy. A reading is compared with it, and a
+ * snapshot that moves only when it is regenerated keeps every page comparing with the same number.
+ */
+export const pilotPeerGrowth = (): PeerGrowth | null => {
+  const growth = COMPANIES.flatMap((company) => {
+    const value = bundled[company.ticker]?.revenueGrowth;
+    return typeof value === "number" ? [value] : [];
+  });
+  const median = medianOf(growth);
+  return median === null ? null : { median, companies: COMPANIES.length };
+};
 
 /** Who is due today: a stretch of the list that moves on each day, so every company comes round. */
 const companiesDue = (now: Date): CompanyEntry[] => {
