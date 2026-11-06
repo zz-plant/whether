@@ -23,22 +23,22 @@ const keyDocs: SearchEntity[] = [
     type: "doc",
     job: "resolve",
     routePriority: 4,
-    title: "This week's conditions by role",
+    title: "What each role can ask for this week",
     href: "/roles",
     summary: "What to ask for this week and what to ask leadership, at any tech company.",
     intentLabel: "Find your role",
-    keywords: ["role", "software engineer", "designer", "recruiter", "finance", "support", "security", "all-hands", "leadership questions"],
+    keywords: ["role", "software engineer", "designer", "recruiter", "finance", "support", "security", "all-hands", "leadership questions", "should I ask for a raise", "what should I ask my manager", "is now a good time to ask for headcount"],
   },
   {
     id: "doc-companies",
     type: "doc",
     job: "resolve",
     routePriority: 4,
-    title: "This week's conditions by company and role",
+    title: "What public tech companies have filed, by role",
     href: "/companies",
     summary: "This week's rules for a role, beside what 50 public companies have filed.",
     intentLabel: "Find a company",
-    keywords: ["company", "companies", "role", "product manager", "engineering manager", "filings", "public company"],
+    keywords: ["company", "companies", "role", "product manager", "engineering manager", "filings", "public company", "is my company hiring", "what is my company doing about hiring"],
   },
   {
     id: "doc-signals",
@@ -49,7 +49,7 @@ const keyDocs: SearchEntity[] = [
     href: "/signals",
     summary: "Review the evidence and the pause lines behind this week's guidance.",
     intentLabel: "Check what changed",
-    keywords: ["signals", "evidence", "thresholds", "regime", "macro"],
+    keywords: ["signals", "evidence", "thresholds", "regime", "macro", "why did the guidance change", "what changed this week", "why did the conditions change"],
   },
   {
     id: "doc-method",
@@ -60,7 +60,7 @@ const keyDocs: SearchEntity[] = [
     href: "/trust",
     summary: "See how the scores are built, how often the data refreshes, and where it comes from.",
     intentLabel: "Validate trust",
-    keywords: ["method", "methodology", "sources", "formulas", "confidence"],
+    keywords: ["method", "methodology", "sources", "formulas", "confidence", "how do you calculate this", "where does the data come from", "can I trust this"],
   },
   {
     id: "doc-evidence",
@@ -93,7 +93,7 @@ const keyDocs: SearchEntity[] = [
     href: "/resources#answers",
     summary: "Single-question helper answers designed for shareable follow-through after the weekly brief.",
     intentLabel: "Get one-question answer",
-    keywords: ["answers", "direct answer", "bounded decisions", "weekly posture", "weekly guidance", "weekly call", "shareable"],
+    keywords: ["answers", "direct answer", "bounded decisions", "weekly guidance", "shareable", "should I hire", "should I raise", "how much runway"],
   },
   {
     id: "doc-resources",
@@ -104,7 +104,7 @@ const keyDocs: SearchEntity[] = [
     href: "/share",
     summary: "The share page's formats, for a board-ready copy once the week's plan is set.",
     intentLabel: "Prepare governance artifact",
-    keywords: ["resources", "board", "artifact", "template", "operations"],
+    keywords: ["resources", "board", "artifact", "template", "operations", "board deck", "investor update", "slack update"],
   },
   {
     id: "doc-concepts",
@@ -164,7 +164,10 @@ export const buildSearchIndex = (): SearchEntity[] => {
       href: `/answers/${page.slug}`,
       summary: page.shortAnswer,
       intentLabel: "Apply this answer to your company",
-      keywords: [page.keyword, page.audience, page.contextHeading, page.context, ...page.companyInputs],
+      /* `askedAs` is the page's own list of the ways people put the question,
+         so search matches the words a reader speaks, not only the keyword the
+         page was named for. */
+      keywords: [page.keyword, ...page.askedAs, page.audience, page.contextHeading, page.context, ...page.companyInputs],
     }));
   const toolkitEntities: SearchEntity[] = toolkitDefinitions.map((toolkit) => ({
     id: `toolkit-${toolkit.slug}`,

@@ -228,7 +228,7 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "calibration",
     group: "record",
     href: "/calibration",
-    label: "Calibration",
+    label: "How it held up",
     description: "How often conditions held at each distance from a change, 2012–2026",
     placement: "tab",
   },

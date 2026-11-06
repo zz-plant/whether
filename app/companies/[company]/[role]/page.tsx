@@ -23,9 +23,9 @@ export const revalidate = 3600;
  * Microsoft"). All 300 titles opened "This week's conditions for", which is what a result list shows
  * when it cuts a long title, and which tells these pages from nothing.
  */
-const roleTitle = (role: CompanyRole, company: CompanyEntry) => `${role.title} at ${company.name}: this week's conditions`;
+const roleTitle = (role: CompanyRole, company: CompanyEntry) => `${role.title} at ${company.name}: what to ask for this week`;
 const roleDescription = (role: CompanyRole, company: CompanyEntry) =>
-  `What this week's conditions mean for ${role.label} at ${company.name}: what to ask for, the general rules, and ${company.name}'s latest filed figures.`;
+  `Is now a good time for ${role.label} at ${company.name} to ask for a raise or more headcount? What this week's conditions mean, the general rules, and the company's latest filed figures.`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { company: companySlug, role: roleSlug } = await params;
@@ -81,9 +81,9 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
         )}
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions for {role.label} at {company.name}</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {company.name} can ask for this week</h1>
         <p className="text-sm text-slate-300">
-          The same public signals every company reads, what {role.label} can ask for this week, and what {company.name} has filed.
+          Is now a good time to ask for a raise or more headcount? Here is what this week&apos;s conditions say for {role.label} at {company.name}, and what the company has filed.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />

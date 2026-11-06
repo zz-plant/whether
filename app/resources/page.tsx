@@ -242,7 +242,7 @@ export default async function ResourcesHubPage({
         </section>
 
         <section aria-labelledby="resources-pillars-heading" className="space-y-3">
-          <h2 id="resources-pillars-heading" className="type-section">Governance frameworks</h2>
+          <h2 id="resources-pillars-heading" className="type-section">Planning and decision frameworks</h2>
           <ul className="weather-grid gap-3 [--grid-max:2]">
             {frameworks.map((entry) => (
               <li key={entry.href}>

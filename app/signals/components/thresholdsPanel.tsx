@@ -276,7 +276,7 @@ export const ThresholdsPanel = ({
   };
 
   const handleReset = () => {
-    if (!confirm("Reset all thresholds to defaults? Your custom lines will be replaced.")) {
+    if (!confirm("Reset every pause and restart line to its default? Your custom lines will be replaced.")) {
       return;
     }
     const defaultDraft = buildDraft(appliedDefaults);

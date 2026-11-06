@@ -32,12 +32,18 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
+  const role = findUseCaseRole(slug);
+  const situation = findSituationUseCase(slug);
+  const name = role?.title ?? situation?.title ?? titleCase(slug);
+  const title = role ? `${name}: what to ask for this week` : `${name}: how to decide it`;
   return {
     ...buildPageMetadata({
-      title: `Decision help: ${titleCase(slug)}`,
-      description: "A practical entry point into the right toolkit and supporting context.",
+      title,
+      description: role
+        ? `What ${name} can ask for this week, the toolkit that helps, and the answers behind it.`
+        : `A practical way to decide ${name.toLowerCase()}, with the toolkit and the answers behind it.`,
       path: `/resolve/${slug}`,
-      imageAlt: `Decision help ${titleCase(slug)}`,
+      imageAlt: title,
     }),
     robots: noindexRobots,
   };

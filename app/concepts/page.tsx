@@ -55,7 +55,7 @@ export const runtime = "edge";
    and the whole tag has to fit a result line (~60 characters with the site suffix).
    The H1 asks the page's question; the title stays the phrase people search. */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Product Management Reading List, Dated by Market",
+  title: "Best Product Management Books, Dated by Market",
   description:
     `${canonEssays.length} product management essays, books and investor memos, from Cagan to Sequoia, each dated and placed on the market conditions of the month it came out.`,
   path: "/concepts",

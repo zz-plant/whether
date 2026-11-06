@@ -75,7 +75,7 @@ const scoringBasisSchema = z
     key: z
       .enum(["record", "extended"])
       .describe("record: only the inputs the archive scores every month-end move the scores, so the record and the calibration study test the score that sets the guidance. extended: a reading scored before 2026-10-09, whose scores also counted inputs the record cannot test."),
-    label: z.string().describe("The basis in the words a reader sees beside the call."),
+    label: z.string().describe("The basis in the words a reader sees beside the guidance."),
     warning: z
       .string()
       .nullable()

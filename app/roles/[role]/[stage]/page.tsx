@@ -23,7 +23,7 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 /* The role first, as on the company pages: a result list cuts a long title from the end. */
-const titleFor = (title: string, atCompanies: string) => `${title} at ${atCompanies}: this week's conditions`;
+const titleFor = (title: string, atCompanies: string) => `${title} at ${atCompanies}: what to ask for this week`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { role: roleSlug, stage: stageSlug } = await params;
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { atCompanies } = stageForWorkers(stage);
   const metadata = buildPageMetadata({
     title: titleFor(role.title, atCompanies),
-    description: `What this week's conditions mean for ${role.label} at ${atCompanies}: what to ask for, the rule at this stage, and questions to ask leadership.`,
+    description: `Is now a good time for ${role.label} at ${atCompanies} to ask for a raise or more headcount? What this week's conditions mean, the rule at this stage, and questions to ask leadership.`,
     path: `/roles/${role.slug}/${stage}`,
     imageAlt: titleFor(role.title, atCompanies),
   });
@@ -78,9 +78,9 @@ export default async function RoleStagePage({ params }: { params: Promise<Params
         )}
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions for {role.label} at {atCompanies}</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {atCompanies} can ask for this week</h1>
         <p className="text-sm text-slate-300">
-          What changes for {role.label} at this stage, beside this week&apos;s conditions.
+          Is now a good time to ask for a raise or more headcount at this stage? Here is what changes for {role.label}, beside this week&apos;s conditions.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />

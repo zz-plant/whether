@@ -365,10 +365,10 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
     },
     boundedRules: {
       burnDiscipline: burnRule
-        ? `${burnRule.recommendation} ${burnRule.pauseTrigger} ${burnRule.resumeTrigger} Playbook stop: ${playbook.stopItems[0] ?? "Avoid unbudgeted bets."}`
+        ? `${burnRule.recommendation} ${burnRule.pauseTrigger} ${burnRule.resumeTrigger} What to stop: ${playbook.stopItems[0] ?? "Avoid unbudgeted bets."}`
         : "Gate discretionary burn and resume only after threshold improvement.",
       capitalRaising: capitalRule
-        ? `${capitalRule.recommendation} ${capitalRule.pauseTrigger} ${capitalRule.resumeTrigger} Playbook start: ${playbook.startItems[0] ?? "Invest in margin-positive moves."}`
+        ? `${capitalRule.recommendation} ${capitalRule.pauseTrigger} ${capitalRule.resumeTrigger} What to start: ${playbook.startItems[0] ?? "Invest in margin-positive moves."}`
         : "Stage fundraising with explicit pause and resume conditions.",
     },
   };
