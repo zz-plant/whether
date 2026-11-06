@@ -34,7 +34,6 @@ it differs from what the sync would write, and when a skill directory is missing
 | `agent-skill-architect` | Creating or upgrading first-party repo-local skills | General product or engineering implementation | Skill spec, trigger test, maintenance notes |
 | `subagent-handoff` | Bounded subagent delegation packets with repo anchors and verification | Early ambiguity shaping or broad implementation work | Handoff packet, return contract, open risks |
 | `system-skill-router` | Routing skill-management requests (list/install vs create/update) | General task work unrelated to skill management | Routing decision, next tool call |
-| `vercel-react-best-practices` | React/Next.js performance review or authoring (rendering, bundling, server, async) | Non-React/Next.js code | Rule-referenced findings and fixes |
 | `whether-ui-loop` | Screenshot-driven UI iteration: capture with `bun run ui:iterate`, look, critique, fix, recapture | Logic-only changes, or UI rules without needing to see the page | Before/after captures, critique, recapture |
 | `whether-ui-standards` | UI/UX rules for anything that renders under `app/` — interaction, accessibility, semantics, theming, motion | Non-UI code; seeing the result (pair with `whether-ui-loop`) | Rule-referenced findings and fixes |
 

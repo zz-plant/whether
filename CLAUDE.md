@@ -208,9 +208,8 @@ reading the set. Product specs live in `docs/`.
   `whether-ui-standards`. Use them instead of editing CSS blind.
 - **Other repo-local skills** live under `.claude/skills/` — see
   [.claude/skills/README.md](.claude/skills/README.md) for the full index (research briefs, feature
-  audits, PR hygiene, provenance audits, executive briefs, skill authoring, subagent handoffs, React/
-  Next.js performance rules). `.claude/skills/` is canonical; `bun run skills:sync` regenerates
-  `.codex/skills/` from it plus `.codex/skills-overlay/`. Never edit the mirror;
+  audits, PR hygiene, provenance audits, executive briefs, skill authoring, subagent handoffs).
+  `.claude/skills/` is canonical; `bun run skills:sync` regenerates `.codex/skills/` from it plus `.codex/skills-overlay/`. Never edit the mirror;
   `tests/skillsMirror.test.ts` fails on drift.
 - **FRED marks a missing observation with an empty CSV field, not only `"."`.** `Number("")`
   is `0`, so any parser that guards only against the dot reads a market holiday as a zero print.
