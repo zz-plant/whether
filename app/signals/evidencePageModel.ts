@@ -73,7 +73,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
       tightness: "When money is tight, higher costs are harder to pass on",
     },
     instruments: [
-      { label: "Change lines", why: "Where the lines sit, if inflation is the main worry", href: "#advanced-controls" },
+      { label: "Where conditions change", why: "Where the lines sit, if inflation is the main worry", href: "#advanced-controls" },
     ],
   },
   labor: {
@@ -120,7 +120,7 @@ const buildStructuredData = () =>
       name: "Whether Weekly Brief — Evidence",
       url: `${siteUrl}/signals`,
       description:
-        "Evidence for the weekly brief: drivers, thresholds, timestamps, and past months.",
+        "Evidence for the weekly brief: what changed, the pause lines, dates, and past months.",
       inLanguage: "en",
       isPartOf: { "@id": websiteId },
       publisher: { "@id": organizationId },
@@ -128,7 +128,7 @@ const buildStructuredData = () =>
         "@type": "Dataset",
         name: "Macro signal evidence feed",
         description:
-          "Macro signal dataset for Whether, including thresholds, sensor readings, and the evidence behind the guidance.",
+          "Macro signal dataset for Whether, including the pause lines, the two scores, and the evidence behind the guidance.",
         creator: { "@id": organizationId },
         license: `${siteUrl}/terms-of-service`,
       },
@@ -182,7 +182,7 @@ const deriveSignalsPageModel = (
     historicalAction: "Use a past month to understand trends, not to act on this week.",
     fallbackAction:
       "Hold anything you cannot undo until live data is back.",
-    stableAction: "Evidence is live with current thresholds and timestamps.",
+    stableAction: "Evidence is live, with this week's pause lines and dates.",
   });
   const trustStrip = buildTrustStripProps({
     recordDateLabel,

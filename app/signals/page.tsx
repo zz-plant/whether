@@ -23,7 +23,7 @@ export const metadata: Metadata = buildPageMetadata({
   imageParams: {
     template: "signals",
     title: "Why the Weekly Brief Changed",
-    subtitle: "What moved, why it matters, and what would make the recommendation change.",
+    subtitle: "What moved, why it matters, and what would make the guidance change.",
   },
 });
 

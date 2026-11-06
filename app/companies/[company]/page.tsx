@@ -20,17 +20,17 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 const companyDescription = (company: CompanyEntry) =>
-  `This week's conditions, ${company.name}'s latest filed revenue, cash flow and debt, and what they mean by role.`;
+  `Is ${company.name} hiring, holding or cutting? This week's conditions, its latest filed revenue, cash flow and debt, and what they mean by role.`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const company = findCompany((await params).company);
   if (!company) return {};
   const { indexable } = await loadCompanyPage(company);
   const metadata = buildPageMetadata({
-    title: `${company.name}: this week's operating conditions and filed figures`,
+    title: `${company.name}: what its filings say about hiring and spending`,
     description: companyDescription(company),
     path: `/companies/${company.slug}`,
-    imageAlt: `${company.name}: this week's operating conditions`,
+    imageAlt: `${company.name}: what its filings say about hiring and spending`,
   });
   if (!indexable) metadata.robots = { index: false, follow: true };
   return metadata;
@@ -48,7 +48,7 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
       <JsonLdScript
         data={buildCompanyPageStructuredData({
           path: `/companies/${company.slug}`,
-          title: `${company.name}: this week's conditions and filed figures`,
+          title: `${company.name}: this week's conditions and what it has filed`,
           description: companyDescription(company),
           company: company.name,
           ticker: company.ticker,
@@ -68,12 +68,12 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
         )}
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">{company.name}: this week&apos;s conditions and filed figures</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">{company.name}: this week&apos;s conditions and what it has filed</h1>
         <ul className="space-y-1 text-sm">
           {COMPANY_ROLES.map((role) => (
             <li key={role.slug}>
               <Link href={`/companies/${company.slug}/${role.slug}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
-                This week&apos;s conditions for {role.label} at {company.name}
+                What {role.label} at {company.name} can ask for this week
               </Link>
             </li>
           ))}

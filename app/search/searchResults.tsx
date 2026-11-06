@@ -64,8 +64,8 @@ const NothingMatched = ({ query }: { query: string }) => (
   <section aria-labelledby="search-empty-heading" className="space-y-3">
     <h2 id="search-empty-heading" className="type-eyebrow">Nothing matched “{query}”</h2>
     <p className="text-sm text-slate-300">
-      The index covers toolkits, failure modes, and the site&apos;s main pages. Try a decision word — hiring,
-      runway, rollback, pricing — or start from one of these.
+      The index covers toolkits, failure modes, and the site&apos;s main pages. Try the words you&apos;d use
+      out loud — hiring, runway, layoffs, raising, pricing — or start from one of these.
     </p>
     <div className="flex flex-wrap gap-2">
       {navigationGroups.map((group) => (

@@ -13,8 +13,8 @@ import { ConditionQuestionsSection } from "./workQuestionsSections";
 
 export const revalidate = 3600;
 
-const title = "This week's conditions by role";
-const description = "What this week's conditions mean for your job at any tech company: what to ask for, the general rules, and questions to ask leadership.";
+const title = "What each role can ask for this week";
+const description = "What each role can ask for this week at any tech company: what to ask leadership, the general rules, and the questions that come up.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { stale } = await loadWeekConditions();
@@ -42,7 +42,7 @@ export default async function RolesPage() {
       />
       <SectionTabs currentPath="/roles" />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions by role</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">What each role can ask for this week</h1>
         <p className="text-sm text-slate-300">
           What to ask for this week and what to ask leadership, at any tech company. If yours is public,{" "}
           <Link href="/companies" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">

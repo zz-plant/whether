@@ -66,7 +66,7 @@ export const rawDecisionDomainCatalog = {
       summary: "For when the direction is changing but the readings disagree.",
       trigger: "The readings are moving, but have not held for a second week.",
       defaults: [
-        "Line up options behind written trigger conditions.",
+        "Line up options behind written conditions.",
         "Run upside and downside plans in parallel.",
         "Delay any scaling you can't undo until the reading holds.",
       ],
@@ -162,7 +162,7 @@ export const rawDecisionDomainCatalog = {
       proceedThreshold: "Proceed when retention on the core action clears your agreed bar for two cohorts in a row.",
       stopTrigger: "Stop incremental acquisition spend when repeat usage drops below the agreed floor.",
       reversalTrigger: "Reverse from invest back to hold if two consecutive cohorts lose retention quality.",
-      decisionArtifact: "30-day PMF action memo with gate, threshold, and next review date.",
+      decisionArtifact: "30-day PMF action memo with the gate, the pause line and a next review date.",
       timeToRun: "60-90 minutes with Product + Growth + Finance.",
       recommendedParticipants: "Product lead, Growth lead, Finance partner, and the team owning activation/retention.",
       prepChecklist: [
@@ -173,7 +173,7 @@ export const rawDecisionDomainCatalog = {
       successSignals: [
         "The room leaves with one PMF gate (invest, hold, or narrow) and a date to re-evaluate.",
         "At least one low-quality segment is deprioritized to protect focus.",
-        "Next-cycle budget is tied to an explicit retention threshold rather than top-line growth alone.",
+        "Next-cycle budget is tied to an explicit retention bar rather than top-line growth alone.",
       ],
       instruments: ["PMF evidence checklist", "Cohort quality rubric", "Retention interview template"],
       runSequence: [
@@ -274,28 +274,28 @@ export const rawDecisionDomainCatalog = {
       slug: "rollback",
       title: "Commitment & Rollback Toolkit",
       whenToUse: "For hiring, pricing, or architecture moves that are hard to undo.",
-      byPosture: "When conditions say slow down, set the rollback triggers earlier; when they say speed up, widen what an experiment may try.",
-      operatingOutcome: "A decision note that names the rollback trigger before any money that cannot be recovered is spent.",
+      byPosture: "When conditions say slow down, set the rollback conditions earlier; when they say speed up, widen what an experiment may try.",
+      operatingOutcome: "A decision note that names the rollback condition before any money that cannot be recovered is spent.",
       decisionThisSession: "Approve or reject the commitment, and name who can roll it back, now.",
-      tightenNow: "Shorten the rollback window and set the trigger thresholds earlier.",
+      tightenNow: "Shorten the rollback window and set the rollback conditions earlier.",
       loosenNow: "Widen the experiment's scope; keep one named person able to roll it back.",
-      proceedThreshold: "Proceed only when the unwind cost, the owner, and the trigger thresholds are written down.",
-      stopTrigger: "Stop expanding the commitment when a leading indicator crosses a trigger in the register.",
-      reversalTrigger: "Roll back immediately when the trigger owner calls it.",
-      decisionArtifact: "Signed commitment note with rollback trigger register and comms packet.",
+      proceedThreshold: "Proceed only when the unwind cost, the owner and the rollback conditions are written down.",
+      stopTrigger: "Stop expanding the commitment when a leading indicator crosses a line in the register.",
+      reversalTrigger: "Roll back immediately when the owner calls it.",
+      decisionArtifact: "Signed commitment note with the rollback register and comms packet.",
       timeToRun: "45-60 minutes per major commitment.",
       recommendedParticipants: "Decision owner, finance owner, delivery owner, and communications counterpart.",
       prepChecklist: [
         "Quantify sunk cost exposure at day 7, day 30, and day 90.",
-        "Pre-identify the metric dashboard that will be used to trigger rollback.",
+        "Pre-identify the metric dashboard that will be used to decide a rollback.",
         "Draft customer and internal rollback messaging before the decision is approved.",
       ],
       successSignals: [
-        "Rollback threshold and owner are written into the launch/commitment note.",
+        "The rollback line and owner are written into the launch/commitment note.",
         "A dry-run confirms teams can unwind within the stated window.",
         "A review date is set before resources are committed.",
       ],
-      instruments: ["Reversibility test", "Rollback trigger register", "Pre-mortem checklist"],
+      instruments: ["Reversibility test", "Rollback register", "Pre-mortem checklist"],
       runSequence: [
         {
           phase: "Classify",
@@ -308,12 +308,12 @@ export const rawDecisionDomainCatalog = {
         },
         {
           phase: "Pre-wire",
-          objective: "Define observable signals that trigger rollback.",
+          objective: "Define the observable signals that would start a rollback.",
           prompts: [
             "What two early signs would tell us this isn't working?",
             "Who can call a rollback on the spot?",
           ],
-          deliverable: "Rollback trigger register with thresholds and owners.",
+          deliverable: "Rollback register with the lines and owners.",
         },
         {
           phase: "Rehearse",
@@ -336,7 +336,7 @@ export const rawDecisionDomainCatalog = {
       operatingOutcome: "Named decision owners, escalation paths, and a review slot each week for the critical calls.",
       decisionThisSession: "Assign one owner and one escalation point for each critical call.",
       tightenNow:
-        "Add an approval check and an earlier escalation trigger to every risk-heavy call.",
+        "Add an approval check and an earlier escalation point to every risk-heavy call.",
       loosenNow: "Delegate more authority so calls close faster.",
       proceedThreshold: "Proceed when every critical decision has one owner, a named reviewer, and a response time.",
       stopTrigger:
@@ -355,7 +355,7 @@ export const rawDecisionDomainCatalog = {
       successSignals: [
         "Every critical decision has one owner and a known escalation path.",
         "Decision cycle time reduces within the next two operating reviews.",
-        "Escalations happen against predefined triggers instead of ad hoc urgency.",
+        "Escalations happen against predefined conditions instead of ad hoc urgency.",
       ],
       instruments: ["Decision rights matrix", "Escalation ladder", "Weekly review checklist"],
       runSequence: [
@@ -446,7 +446,7 @@ export const rawDecisionDomainCatalog = {
           deliverable: "Signed go/no-go note and rollback communications packet.",
         },
       ],
-      misuseCases: ["Launching on optimism without threshold evidence"],
+      misuseCases: ["Launching on optimism without evidence against the pause line"],
       canonLinks: [{ label: "Launch trust checks", href: "/trust" }],
     },
     {
@@ -477,7 +477,7 @@ export const rawDecisionDomainCatalog = {
       ],
       successSignals: [
         "At least one overload source is removed or re-sequenced each cycle.",
-        "A breached reliability floor triggers roadmap triage the same week.",
+        "A breached reliability floor starts roadmap triage the same week.",
         "Leadership can see forward-looking capacity risk two sprints out.",
       ],
       instruments: ["Capacity stress test", "Service-level floor checklist", "Escalation dashboard"],
@@ -522,7 +522,7 @@ export const rawDecisionDomainCatalog = {
       decisionThisSession: "Approve, revise, or pull each claim against what the product does today.",
       tightenNow: "Cut claim language back to what is demonstrably reliable now.",
       loosenNow: "Extend positioning only for claims with monitoring already in place.",
-      proceedThreshold: "Proceed when each claim has an evidence source, an owner, and a monitoring trigger.",
+      proceedThreshold: "Proceed when each claim has an evidence source, an owner and a monitoring condition.",
       stopTrigger: "Stop publishing or promoting any claim without verifiable product evidence.",
       reversalTrigger: "Pull published copy when support tickets about unmet expectations cross the agreed level.",
       decisionArtifact: "Claims evidence table with approved language and a takedown response time.",
@@ -607,7 +607,7 @@ export const rawDecisionDomainCatalog = {
         "Teams add process layers to coordinate growth that has not yet stabilized.",
       ],
       firstMoves: [
-        "Gate expansion decisions behind explicit retention or payback thresholds.",
+        "Gate expansion decisions behind explicit retention or payback bars.",
         "Pause non-critical hiring and concentrate resources on proving repeat behavior.",
         "Reframe weekly reporting around quality of demand, not gross volume.",
       ],
@@ -629,7 +629,7 @@ export const rawDecisionDomainCatalog = {
       ],
       firstMoves: [
         "Classify active decisions by reversibility and pause irreversible bets missing proof.",
-        "Add explicit rollback owners and trigger conditions to each major launch.",
+        "Add explicit rollback owners and conditions to each major launch.",
         "Shift near-term work toward reversible experiments that reduce uncertainty quickly.",
       ],
       linkedToolkits: [
@@ -693,7 +693,7 @@ export const rawDecisionDomainCatalog = {
       firstMoves: [
         "Set a work-in-progress limit for strategic initiatives, and finish one before starting the next.",
         "Publish a keep/pause/accelerate decision with ownership and next review date.",
-        "Require clear trigger evidence for introducing net-new priority streams.",
+        "Require clear evidence for introducing net-new priority streams.",
       ],
       linkedToolkits: [
         { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },

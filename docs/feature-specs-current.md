@@ -71,7 +71,7 @@ those names.
 | --- | --- | --- |
 | This week | `/` | Why it changed (`/signals`); Method (`/trust`) |
 | Plan | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`); Your decisions (`/decisions`) |
-| History | `/history` | Calibration (`/calibration`); Compare periods (`/history/compare`), Advice vs. market (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
+| History | `/history` | How it held up (`/calibration`); Compare periods (`/history/compare`), Advice vs. market (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
 | Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix |
 
 - **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Plan"

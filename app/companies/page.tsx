@@ -7,14 +7,14 @@ import { JsonLdScript } from "../components/jsonLdScript";
 import { SectionTabs } from "../components/sectionTabs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
-const title = "This week's conditions by company and role";
-const description = "This week's conditions, the decisions each role makes, and each company's latest filed figures, for 50 public companies.";
+const title = "What public tech companies have filed, by role";
+const description = "What 50 public tech companies have filed, the decisions each role makes, and this week's conditions beside the figures.";
 
 export const metadata: Metadata = buildPageMetadata({
   title,
   description,
   path: "/companies",
-  imageAlt: "This week's conditions by company and role",
+  imageAlt: "What public tech companies have filed, by role",
 });
 
 export default function CompaniesPage() {
@@ -30,7 +30,7 @@ export default function CompaniesPage() {
       />
       <SectionTabs currentPath="/companies" />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions by company and role</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">What public tech companies have filed, by role</h1>
         <p className="text-sm text-slate-300">
           The conditions are the same for everyone. What differs is the decisions each role makes and what each company has filed.
           Whether isn&apos;t affiliated with any of these companies. At a private company?{" "}

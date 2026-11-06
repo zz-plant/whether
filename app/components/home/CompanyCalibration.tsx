@@ -102,7 +102,7 @@ export function CompanyCalibration({
           <RunwayPersonaSelector activeRunway={activeRunway} className="@xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" />
           {horizon ? (
             <div className="flex flex-wrap items-center gap-1.5 @xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" data-plan-horizon>
-              <span className="type-eyebrow mr-1">Plan horizon</span>
+              <span className="type-eyebrow mr-1">Planning for</span>
               {horizon.control}
             </div>
           ) : null}

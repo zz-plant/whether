@@ -64,7 +64,7 @@ export const ReturningVisitorDeltaStrip = ({
   recordDate,
   impactLinks,
   openPanelHref,
-  openPanelLabel = "Open full delta panel",
+  openPanelLabel = "See everything that changed",
 }: {
   assessment: RegimeAssessment;
   recordDate: string;

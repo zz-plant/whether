@@ -11,7 +11,7 @@ export const revalidate = 21600;
 export const metadata: Metadata = buildPageMetadata({
   title: "Decision Shield",
   description:
-    "Decision Shield checks a plan against this week's guidance and returns Safe, Risky or Dangerous — with the guardrail to hold and the reversal that would change the call.",
+    "Decision Shield checks a plan against this week's guidance and returns Safe, Risky or Dangerous — with the pause line to hold and the restart line that would change the guidance.",
   path: "/resources/decision-shield-overview",
   imageAlt: "Decision Shield overview",
 });

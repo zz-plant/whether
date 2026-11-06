@@ -23,7 +23,7 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 /* The role first, as on the company pages: a result list cuts a long title from the end. */
-const titleFor = (title: string) => `${title}: this week's conditions`;
+const titleFor = (title: string) => `${title}: what to ask for this week`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const role = findRole((await params).role);
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { stale } = await loadWeekConditions();
   const metadata = buildPageMetadata({
     title: titleFor(role.title),
-    description: `What this week's conditions mean for ${role.label} at any tech company: what to ask for, the general rules, and questions to ask leadership.`,
+    description: `Is now a good time for ${role.label} to ask for a raise, more headcount or a slower roadmap? What this week's conditions mean at any tech company, the general rules, and questions to ask leadership.`,
     path: `/roles/${role.slug}`,
     imageAlt: titleFor(role.title),
   });
@@ -58,9 +58,9 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
         )}
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions for {role.label}</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} can ask for this week</h1>
         <p className="text-sm text-slate-300">
-          The same public signals every company reads, what {role.label} can ask for this week, and what to ask leadership. It works for any tech company, public or private.
+          Is now a good time to ask for a raise, more headcount, or a slower roadmap? Here is what this week's conditions say for {role.label}, and what to ask leadership. It works for any tech company, public or private.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />

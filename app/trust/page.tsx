@@ -103,7 +103,7 @@ export default async function MethodPage({
         </ActionLink>
       </ReportSection>
 
-      <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
+      <ReportSection id="revisit-call" title="What would make this guidance wrong?">
         <div className="weather-switch gap-x-8 gap-y-6 [--col-min:18rem]">
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-slate-100">Active warnings</h3>

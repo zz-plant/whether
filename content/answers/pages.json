@@ -12,11 +12,14 @@
       "tech funding environment and outlook",
       "do rate cuts help startups",
       "will interest rate cuts make fundraising easier",
-      "how do rate hikes and rate cuts affect a startup"
+      "how do rate hikes and rate cuts affect a startup",
+      "is the economy good for startups",
+      "are VCs investing right now",
+      "what is the startup market like right now"
     ],
     "category": "climate",
     "shortAnswer": "Read startup funding conditions through rates and credit alongside your runway, investor conversations and the milestone a round must fund.",
-    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; a broad funding score cannot tell you whether a particular round will close.",
+    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; the week's reading can't tell you whether a particular round will close.",
     "audience": "Founders, finance leaders and board operators",
     "applyHeading": "What the reading changes in your financing plan",
     "mappedDecisionAreas": [
@@ -93,11 +96,12 @@
       "should we hire more engineers",
       "should I hire a second engineer",
       "add engineering headcount",
-      "grow the engineering team or hire developers"
+      "grow the engineering team or hire developers",
+      "is now a bad time to hire"
     ],
     "category": "decision",
     "shortAnswer": "Hire when a specific delivery, reliability or revenue bottleneck justifies the full cost and the downside cash plan can fund the role.",
-    "directAnswer": "Name the work an additional engineer unlocks and compare hiring with reducing scope or reassigning capacity. Approve the role only with a funded ramp period and a measurable outcome; a market score cannot establish that need.",
+    "directAnswer": "Name the work an additional engineer unlocks and compare hiring with reducing scope or reassigning capacity. Approve the role only with a funded ramp period and a measurable outcome; the week's reading can't establish that need.",
     "audience": "Engineering leaders and founders",
     "applyHeading": "When one more engineer is worth hiring",
     "mappedDecisionAreas": [
@@ -176,7 +180,9 @@
       "should we raise a seed round",
       "should we raise a series A or wait",
       "when should we fundraise",
-      "go out to investors and raise a round"
+      "go out to investors and raise a round",
+      "should I raise now or wait",
+      "is it a good time to raise money"
     ],
     "category": "decision",
     "shortAnswer": "Prepare now if the time to close a round plus a delay would leave less than your minimum cash buffer. Do not wait for better conditions to start.",
@@ -216,10 +222,12 @@
       "should we cut costs",
       "reduce spending or expenses",
       "lower our burn rate",
-      "extend runway by spending less"
+      "extend runway by spending less",
+      "do we need to cut costs",
+      "how do we cut costs fast"
     ],
     "category": "decision",
-    "shortAnswer": "Review burn when your cash plan no longer funds the next milestone with a contingency buffer; tighter funding conditions make that review more urgent.",
+    "shortAnswer": "Review burn when your runway no longer funds the next milestone with a cushion; tighter funding conditions make that review more urgent.",
     "directAnswer": "Model a slower revenue or fundraising case before approving more recurring spend. Reduce commitments that do not protect delivery, retention or the next milestone, and set a cash buffer for restoring them.",
     "audience": "Founders, CFOs, fractional CFOs and operations leaders",
     "applyHeading": "Where to cut first",
@@ -256,7 +264,9 @@
       "should we slow down hiring",
       "pause hiring or keep hiring",
       "is it time for a hiring freeze",
-      "should I hire now or wait"
+      "should I hire now or wait",
+      "should we stop hiring",
+      "should we pause hiring"
     ],
     "category": "decision",
     "shortAnswer": "Freeze hiring when your cash plan can't support new commitments, and decide on backfills and critical roles one by one.",
@@ -379,7 +389,8 @@
       "how fast should we grow",
       "GTM expansion",
       "should we spend more on ads",
-      "ad spend or advertising"
+      "ad spend or advertising",
+      "should we spend more on marketing"
     ],
     "category": "decision",
     "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
@@ -423,7 +434,7 @@
       "brief leadership on the market"
     ],
     "category": "explanation",
-    "shortAnswer": "Brief executives on the dated change, the decision it affects, the company evidence and the trigger for revisiting it.",
+    "shortAnswer": "Brief executives on the dated change, the decision it affects, the company evidence and what would make you revisit it.",
     "directAnswer": "Keep the briefing to one decision note with a source date and an owner. State what changed externally, whether it changes the company plan, and the business evidence required before acting.",
     "audience": "Chiefs of staff, CFOs, executive teams and VC operating partners",
     "applyHeading": "What to put in the executive note",
@@ -460,7 +471,9 @@
     "askedAs": [
       "how many months of runway do we need",
       "how much cash do we need before fundraising",
-      "is 12 months of runway enough"
+      "is 12 months of runway enough",
+      "how much cash should we have",
+      "how long will our money last"
     ],
     "category": "decision",
     "shortAnswer": "Size cash to the safe band for the current conditions — 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing — and open the raise while you are still above the band's floor.",
@@ -502,8 +515,8 @@
       "what if the economy slows down"
     ],
     "category": "decision",
-    "shortAnswer": "Work out now what each pause line would mean for your company. The stop points are already set, so getting ready means knowing your runway, burn and demand, not guessing when things turn.",
-    "directAnswer": "Put cash, burn and demand numbers next to the pause lines for hiring, roadmap and spend, and write down for each what you would cut, defer or stop if it trips — so a change of conditions triggers a decision you already made.",
+    "shortAnswer": "Work out now what each pause line would mean for your company. The pause lines are already set, so getting ready means knowing your runway, burn and demand, not guessing when things turn.",
+    "directAnswer": "Put cash, burn and demand numbers next to the pause lines for hiring, roadmap and spend, and write down for each what you would cut, defer or stop if it trips — so a change in conditions means a decision you already made.",
     "audience": "Founders, COOs and CFOs",
     "applyHeading": "Decide now what a tripped line means",
     "mappedDecisionAreas": [
@@ -579,7 +592,9 @@
     "askedAs": [
       "should we increase our prices",
       "is it a good time for a price increase",
-      "raise pricing on existing customers"
+      "raise pricing on existing customers",
+      "should we raise our prices",
+      "can we increase prices now"
     ],
     "category": "decision",
     "shortAnswer": "Raise prices only where customers already see the value, and only with a clear way back. Hold the base price steady if churn risk is real or if buyers are scrutinizing spend.",
@@ -637,7 +652,10 @@
     "askedAs": [
       "do we need layoffs",
       "should we lay people off",
-      "reduce headcount or do a RIF"
+      "reduce headcount or do a RIF",
+      "should I lay off staff",
+      "do we need to fire people",
+      "should we cut headcount"
     ],
     "category": "decision",
     "shortAnswer": "Cut roles only when the runway math forces it or when the role no longer fits the plan. Protect the people who ship and sell; avoid cuts that save little cash but cost momentum.",
@@ -695,7 +713,8 @@
     "askedAs": [
       "focus on retention or new customers",
       "should we cut acquisition spend",
-      "churn or growth first"
+      "churn or growth first",
+      "should we focus on keeping customers or getting new ones"
     ],
     "category": "decision",
     "shortAnswer": "Protect retention first when buyers are cautious. Spend on acquisition only where payback is short and the channel is proven.",
@@ -753,7 +772,9 @@
     "askedAs": [
       "should we raise a bridge round",
       "extension round or bridge from existing investors",
-      "do we need a bridge before the next round"
+      "do we need a bridge before the next round",
+      "should we raise a bridge",
+      "how do we extend our runway to the next round"
     ],
     "category": "decision",
     "shortAnswer": "Raise a bridge only if it extends runway to a real milestone and the terms are survivable. Otherwise cut to default alive first.",
@@ -811,7 +832,9 @@
     "askedAs": [
       "should we give raises this year",
       "adjust salaries or equity",
-      "cut pay or offer more equity"
+      "cut pay or offer more equity",
+      "should we cut salaries",
+      "should we reduce pay"
     ],
     "category": "decision",
     "shortAnswer": "Hold base pay steady and shift toward variable or equity-heavy pay when cash is tight. Cut fixed payroll before cutting people.",
@@ -985,7 +1008,8 @@
       "should we take venture debt",
       "is venture debt a good idea",
       "venture debt or equity",
-      "borrow instead of selling equity"
+      "borrow instead of selling equity",
+      "should we borrow money instead of raising"
     ],
     "category": "decision",
     "shortAnswer": "Take venture debt only if you can make every payment even when the next round comes late. Do not use it to replace a round you cannot raise.",

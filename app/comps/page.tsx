@@ -204,7 +204,7 @@ export default async function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-slate-100">Basket composition</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Which companies are in the median</h2>
           {/* Derived, not retyped: the names and the count came from two places
               and could disagree the moment a ticker was added. */}
           <p className="text-sm text-slate-300">
@@ -212,7 +212,7 @@ export default async function CompsPage() {
           </p>
           <p className="text-sm text-slate-300">
             <Link href="/companies" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-              This week&apos;s conditions by company and role
+              What public companies have filed, by role
             </Link>{" "}
             prints what public companies like these have filed.
           </p>
