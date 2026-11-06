@@ -8,6 +8,7 @@ import {
   useClipboardCopy,
 } from "../../components/useClipboardCopy";
 import { CopyIcon } from "../../components/uiIcons";
+import { PlainActionLink } from "../../components/ui/actionLink";
 
 type PublishedBriefCopyControlsProps = {
   /** The week as every surface names it, by its Monday. */
@@ -145,13 +146,11 @@ export function PublishedBriefCopyControls({
           buttonVariant="pill"
         />
         {slidePptxUrl ? (
-          <a
-            href={slidePptxUrl}
-            className="weather-button-pill inline-flex min-h-11 items-center gap-1.5 rounded px-3 text-xs font-semibold text-slate-300 hover:text-slate-100"
-            download
-          >
+          /* The pill beside the copy buttons it sits with. It carried `weather-button-pill`,
+             a class no stylesheet defines, so the download drew as bare text (2026-11-06). */
+          <PlainActionLink href={slidePptxUrl} variant="pill" download>
             Download board slide (.pptx)
-          </a>
+          </PlainActionLink>
         ) : null}
       </div>
 

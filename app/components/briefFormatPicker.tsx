@@ -1,6 +1,7 @@
 "use client";
 
 import { BRIEF_FORMATS, type BriefFormatId } from "../../lib/report/briefArtifact";
+import { SegmentedControl } from "./ui/segmentedControl";
 
 /**
  * The paste payload itself, with the channel context around it: the one
@@ -51,26 +52,16 @@ export const BriefFormatPicker = ({
   /* The drawer and share page use the same reading width. Container queries
      keep four equal tabs beside the wide preview and two per row in a drawer. */
   <div className="@container w-full max-w-3xl">
-    <fieldset className="mt-2">
-      <legend className="sr-only">Format</legend>
-      <div className="grid grid-cols-2 gap-1.5 @xl:grid-cols-4">
-        {BRIEF_FORMATS.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => onSelect(option.id)}
-            aria-pressed={format === option.id}
-            className={`min-h-[44px] rounded-md px-2 py-2 text-xs font-semibold transition-colors weather-focus-ring ${
-              format === option.id
-                ? "border border-sky-500/30 bg-sky-500/12 text-sky-100"
-                : "border border-transparent text-slate-300 hover:bg-slate-800/50"
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-    </fieldset>
+    {/* The site's segmented control (2026-11-06), as the presets above it in the share
+        panel: these were hand-drawn sky-tinted buttons on the data radius. */}
+    <SegmentedControl
+      className="mt-2"
+      layout="choices"
+      ariaLabel="Format"
+      options={BRIEF_FORMATS.map((option) => ({ key: option.id, label: option.label }))}
+      value={format}
+      onSelect={onSelect}
+    />
     <p className="mt-1.5 text-xs text-slate-400">{activeFormat.hint}</p>
     <div className="mt-2">
       <BriefPreview label={`${activeFormat.label} format`} text={briefText} />
@@ -81,7 +72,7 @@ export const BriefFormatPicker = ({
       data-testid="share-rail-copy-brief"
       className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold @xl:w-auto @xl:px-5"
     >
-      {copiedTarget === "brief" ? "Copied!" : `Copy ${activeFormat.label} format`}
+      {copiedTarget === "brief" ? "Copied" : `Copy ${activeFormat.label} format`}
     </button>
   </div>
 );

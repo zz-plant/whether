@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { TERM_DEFINITIONS } from "../../../lib/report/reportCopy";
 import { CloseIcon } from "../uiIcons";
+import { CLOSE_CONTROL_CLASS } from "./closeControl";
 
 /*
  * Tap-to-define for the site's coined terms (2026-11-03). A reader without the macro
@@ -53,9 +54,9 @@ export function TermDefinitionLayer() {
               popoverTarget={popoverId(value)}
               popoverTargetAction="hide"
               aria-label={`Close ${entry.term}`}
-              className="absolute right-1 top-1 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-slate-400 hover:bg-[color:var(--bg-raised)] hover:text-slate-100"
+              className={`${CLOSE_CONTROL_CLASS} absolute right-1 top-1`}
             >
-              <CloseIcon className="size-4" />
+              <CloseIcon />
             </button>
             <p className="font-semibold text-slate-100">{entry.term}</p>
             <p className="mt-1">{entry.summary}</p>

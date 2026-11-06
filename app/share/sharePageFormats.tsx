@@ -260,7 +260,7 @@ export function SharePageFormats({
                           type="button"
                           onClick={() => select(option.id)}
                           aria-pressed={active}
-                          className={`weather-focus-ring flex min-h-8 w-full items-center rounded-md border px-2.5 text-left text-sm transition-colors ${
+                          className={`weather-focus-ring flex min-h-11 w-full items-center rounded-lg border px-2.5 text-left text-sm transition-colors [@media(hover:hover)_and_(pointer:fine)]:min-h-8 ${
                             active
                               ? "border-sky-500/30 bg-sky-500/12 font-semibold text-sky-100"
                               : "border-transparent text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"

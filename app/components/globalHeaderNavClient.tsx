@@ -18,6 +18,7 @@ import {
   pagesInGroup,
   utilityLinks,
 } from "../../lib/navigation/informationArchitecture";
+import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
 
 type MobileNavContentProps = {
   navigationLinks?: GlobalHeaderNavigationLink[];
@@ -49,9 +50,9 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
           type="button"
           onClick={onClose}
           aria-label="Close menu"
-          className="absolute -right-2 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
+          className={`${CLOSE_CONTROL_CLASS} absolute -right-2 top-1/2 -translate-y-1/2`}
         >
-          <CloseIcon className="size-4" />
+          <CloseIcon />
         </button>
       </div>
       <div className="space-y-4">

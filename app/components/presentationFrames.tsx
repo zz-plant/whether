@@ -10,6 +10,7 @@ import { useClipboardCopy } from "./useClipboardCopy";
 import { briefConditionEntries, formatBriefArtifact } from "../../lib/report/briefArtifact";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { SignalReading } from "./ui/plainLanguage";
+import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
 
 /**
  * The brief as three frames, for the meeting it gets read in.
@@ -101,9 +102,9 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                   frame's Done, and a phone or a tablet has no Esc. */}
               <Dialog.Close
                 aria-label="Exit presentation"
-                className="-my-2 -mr-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                className={`${CLOSE_CONTROL_CLASS} -my-2 -mr-2`}
               >
-                <CloseIcon className="size-4" />
+                <CloseIcon />
               </Dialog.Close>
             </span>
           </div>

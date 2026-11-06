@@ -182,12 +182,12 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                   href={spanHref(span.key)}
                   scroll={false}
                   variant="pill"
-                  aria-current={active ? "true" : undefined}
+                  /* "page", which `.weather-pill[aria-current="page"]` draws as selected. It
+                     was "true" with sky border and fill utilities, which the pill's unlayered
+                     paint beats, so the window on show looked like the others (2026-11-06). */
+                  aria-current={active ? "page" : undefined}
                   aria-label={`Show ${span.description}`}
-                  /* Padding and weight only. The pill's 44px floor is the touch
-                     target the standards set, and a segmented row is exactly the
-                     place the temptation to shrink it turns up. */
-                  className={active ? "border-sky-400/60 bg-sky-500/15 text-sky-100" : "text-slate-300"}
+                  className={active ? undefined : "text-slate-300"}
                 >
                   {span.label}
                 </ActionLink>

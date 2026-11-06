@@ -4671,6 +4671,34 @@ in both themes, found the frame around the page working against it:
   the tab bar stays on one line at 320px; on a tablet held upright the tab bar's tabs sit within
   36rem rather than 140px apart.
 
+### 1.1.104 Controls, one of each (2026-11-06)
+
+An inventory of the controls under `app/` found the same job built several ways. The ones with a
+defect a reader meets, or a shared part to reach for, changed:
+
+- **The .pptx download on a published brief drew as bare text.** It carried `weather-button-pill`,
+  a class no stylesheet defines. It is the pill beside the copy buttons (`PlainActionLink`).
+- **History's phase-map window showed no selection.** The chosen span set `aria-current="true"`,
+  which `.weather-pill[aria-current="page"]` never matches, and its sky utilities lost to the pill's
+  unlayered paint. It sets `"page"` now.
+- **One close key.** Ten × buttons share `CLOSE_CONTROL_CLASS`: 44px, the control radius, one hover
+  fill, one icon size. The help modal's (shadcn's) was 28px.
+- **One segmented control.** The share panel's presets and formats and the time machine's years use
+  `SegmentedControl`; the presets and years had no pressed state for a screen reader.
+- **Links that go somewhere are links.** The time machine's "Back to this week" (it said "Return to
+  current") and its month steps, and the calendar picker's "Back to this week" (drawn as a stamp),
+  were buttons calling `router.push`. The time machine's link to History said "History Dashboard".
+- **44px targets.** The share panel's switch rows, the time machine's steps and years, `/share`'s
+  format list on a touch screen, and the browser-alert toggle.
+- **One text size for buttons.** Copy buttons were `text-xs` unless compact, beside link-buttons at
+  `text-fluid-sm`; both are `text-fluid-sm`. Copy buttons say "Copied".
+- **Pill links use `ActionLink`.** Thirteen `Link`s that wrote the pill's classes out by hand, at a
+  smaller size, on Guides, the answer and toolkit pages, `/comps` and the scenario pages.
+
+Left as found, for a decision rather than a fix: how many filled primaries the brief shows at once,
+the four wordings of "go to this week's brief", the retry buttons' four looks, and the disclosures'
+seven chevrons.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

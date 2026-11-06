@@ -5,6 +5,7 @@ import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
+import { ActionLink } from "../../components/ui/actionLink";
 
 type DownloadableResourceMetadataConfig = {
   title: string;
@@ -113,13 +114,13 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
           >
             {config.downloadCta.label}
           </a>
-          <Link
+          <ActionLink
             href={config.secondaryCta.href}
-            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100"
+            variant="pill"
             data-conversion-event={config.secondaryCta.conversionEvent}
           >
             {config.secondaryCta.label}
-          </Link>
+          </ActionLink>
         </div>
       </section>
 

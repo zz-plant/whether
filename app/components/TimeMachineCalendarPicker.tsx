@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Popover } from "@base-ui/react/popover";
 import { ChevronDownIcon } from "./uiIcons";
+import { ActionLink } from "./ui/actionLink";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
 /**
@@ -75,11 +76,6 @@ export function TimeMachineCalendarPicker({
     router.push(`/?month=${m}&year=${y}`);
   };
 
-  const handleReturnLive = () => {
-    setOpen(false);
-    router.push("/");
-  };
-
   return (
     <Popover.Root open={open} onOpenChange={(next) => setOpen(next)}>
       {/* A label, not a heading (2026-10-09): it printed as an h2 above the page's
@@ -106,13 +102,12 @@ export function TimeMachineCalendarPicker({
             <div className="mb-2 flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-2">
               <span className="text-xs font-semibold text-slate-50">Past weeks</span>
               {isHistorical && (
-                <button
-                  type="button"
-                  onClick={handleReturnLive}
-                  className="weather-chip inline-flex min-h-[44px] items-center text-sky-300 hover:text-sky-200"
-                >
+                /* A link, not a button that pushes the router, and in the inline-link
+                   register rather than `weather-chip`, which is a stamp (§XXVII): it
+                   goes to an address (2026-11-06). */
+                <ActionLink href="/" variant="inline" onClick={() => setOpen(false)}>
                   Back to this week
-                </button>
+                </ActionLink>
               )}
             </div>
 

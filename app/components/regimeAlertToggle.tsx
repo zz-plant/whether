@@ -164,7 +164,9 @@ export const RegimeAlertToggle = () => {
         type="button"
         disabled={busy}
         onClick={() => void (state.subscribed ? unsubscribe(state.publicKey) : subscribe(state.publicKey))}
-        className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-sky-500/60 hover:text-sky-200 disabled:cursor-not-allowed disabled:opacity-50"
+        /* The site's secondary button (2026-11-06): it was a hand-drawn box about 36px
+           tall, under the 44px a touch target needs, with the every-property transition. */
+        className="weather-button inline-flex min-h-11 items-center px-4 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
       >
         {busy ? "Working…" : state.subscribed ? "Stop notifying this browser" : "Notify this browser when conditions change"}
       </button>
