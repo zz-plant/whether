@@ -93,7 +93,7 @@ export const HOME_SECTIONS = {
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
   hearing: { id: "what-you-may-hear", heading: "What you may be hearing" },
   record: { id: "has-this-happened-before", heading: "How unusual is this?" },
-  alert: { id: "subscribe", heading: "Get notified when something changes" },
+  alert: { id: "subscribe", heading: "Get an alert the day conditions turn" },
 } as const;
 
 /** `/share` opens on the format its hash names; the slide is in the files section under it. */

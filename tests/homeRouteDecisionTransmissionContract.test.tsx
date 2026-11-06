@@ -104,7 +104,7 @@ describe("home route render contract", () => {
         "What would change this guidance",
         "What changed this week",
         "How unusual is this?",
-        "Get notified when something changes",
+        "Get an alert the day conditions turn",
       ],
     );
   });

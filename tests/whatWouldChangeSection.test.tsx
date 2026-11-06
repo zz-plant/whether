@@ -111,7 +111,7 @@ describe("what would change this guidance: the pause and restart lines", () => {
     assert.match(lined, /Conditions change if/);
     assert.match(lined, /Restart when/);
     assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
-    assert.match(lined.replace(/<[^>]+>/g, ""), /One good week can(?:’|')t lift a pause: the restart line sits further out\./);
+    assert.match(lined.replace(/<[^>]+>/g, ""), /One warm week isn(?:’|')t spring: the restart line sits further out\./);
   });
 
   it("prefers a chosen stage's restart line to the lead area's", () => {

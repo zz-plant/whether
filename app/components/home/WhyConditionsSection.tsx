@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { HomeSection } from "./HomeSection";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
-import { signalReadingMeaning } from "../../../lib/report/signalTranslations";
+import { getRegimePublicLabel, isRegimeKey, REGIME_WEATHER_LINES } from "../../../lib/regimePresentation";
 import { NOT_COUNTED_REASON } from "../../../lib/report/scoringBasis";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
@@ -21,9 +20,9 @@ type NotCountedReading = {
  * What the week's conditions are made of, and what the reading leaves out.
  *
  * It answers "how reliable is this?" where the reader asks it — after the
- * decisions, not inside a methodology page. The two scores print with their
- * meaning (`signalReadingMeaning`, the same phrase the brief card uses), so a
- * reader does not have to learn the 0–100 scale to know what 90 and 55 say.
+ * decisions, not inside a methodology page. The two scores print against their lines,
+ * and `REGIME_WEATHER_LINES` says what they add up to, so a reader does not have to
+ * learn the 0–100 scale to know what 90 and 55 say.
  *
  * Two qualifications live here because they change the classification rather
  * than decorate it:
@@ -75,27 +74,23 @@ export function WhyConditionsSection({
          own, what each reading means, is a clause here. */
       lead={(
         <>
-          {/* One template for two lines with opposite polarity (2026-11-01). "Risk
-              appetite is above its 50 change line: investors are selective about
-              risk" read as a penalty, because the funding-pressure sentence before
-              it uses the colon to mean "this is what being above the line costs
-              you". Above the risk-appetite line is the safe side. The semicolon
-              states the position and then the reading, and the score is named so a
-              reader can hold it against the line on the map. */}
-          {/* The cut as a number, not "its 70 change line" (2026-11-03): the
-              heading already says these are the lines conditions turn on. */}
+          {/* The numbers against their lines, then what they add up to in the weather's
+              terms (2026-11-05). Each score carried its meaning in brackets; the closing
+              line says it once, for both. */}
           Funding pressure is {Math.round(tightness)}, {tightness > changeLines.tightness ? "above" : "below"}{" "}
-          {changeLines.tightness} ({signalReadingMeaning("tightness", tightness)}). Risk appetite is{" "}
-          {Math.round(riskAppetite)}, {riskAppetite > changeLines.riskAppetite ? "above" : "below"} {changeLines.riskAppetite}{" "}
-          ({signalReadingMeaning("riskAppetite", riskAppetite)}). Together they put conditions in{" "}
-          <span className="font-semibold">{regimeLabel}</span>.
+          {changeLines.tightness}. Risk appetite is {Math.round(riskAppetite)},{" "}
+          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} {changeLines.riskAppetite}.{" "}
+          {isRegimeKey(regime) ? `${REGIME_WEATHER_LINES[regime]} ` : null}
+          <span className="font-semibold">That&rsquo;s {regimeLabel}.</span>
         </>
       )}
     >
       <div className="min-w-0">
         {notCounted.length > 0 ? (
           <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
-            <p className="weather-caveat-mark text-fluid-sm font-semibold">What the headline reading leaves out</p>
+            <p className="weather-caveat-mark text-fluid-sm font-semibold">
+              {countedRegimeLabel !== regimeLabel ? `Why it feels like ${countedRegimeLabel}` : "What the headline reading leaves out"}
+            </p>
             <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
               {warning
                 ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`

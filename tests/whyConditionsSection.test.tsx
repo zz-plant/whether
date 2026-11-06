@@ -28,15 +28,15 @@ describe("why conditions", () => {
     assert.match(html, /Why conditions are Cloudy/);
     assert.match(html, /Funding pressure/);
     assert.match(html, /Risk appetite/);
-    // The meaning comes from signalReadingMeaning, not a local phrase.
-    assert.match(html, /money is hard to raise/i);
+    assert.match(html, /they(?:&#x27;|')ll charge you for it/);
   });
 
   it("states which side of each change line the readings sit on", () => {
     const html = render();
-    assert.match(html, /Funding pressure is 90, above 70 \(money is hard to raise\)/);
-    assert.match(html, /Risk appetite is 55, above 50 \(/);
-    assert.match(html, /Together they put conditions in/);
+    assert.match(html, /Funding pressure is 90, above\s*(?:<!-- -->)?\s*70\./);
+    assert.match(html, /Risk appetite is 55,\s*(?:<!-- -->)?\s*above\s*(?:<!-- -->)?\s*50\./);
+    assert.match(html, /Investors will still go out in this, and they(?:&#x27;|')ll charge you for it\./);
+    assert.match(html, /That(?:&rsquo;|’|&#x27;|')s Cloudy\./);
   });
 
   it("shows what the excluded inputs would change, when they would change the classification", () => {
@@ -44,7 +44,7 @@ describe("why conditions", () => {
       notCounted: [{ metric: "riskAppetite", label: "startup-market inputs", score: 44, published: 55, line: "50" }],
       warning: "Startup-market inputs would put risk appetite at 44, below 50.",
     });
-    assert.match(html, /What the headline reading leaves out/);
+    assert.match(html, /Why it feels like Freezing/);
     assert.match(html, /would put risk appetite at 44/);
     // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
     assert.match(html, /conditions would be Freezing, not Cloudy/);

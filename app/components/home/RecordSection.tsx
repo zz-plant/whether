@@ -48,7 +48,7 @@ export function RecordSection({
               once, under the band, because a reader comparing the two would
               otherwise read the difference as a data gap (2026-10-22). */}
           <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-400" data-record-sampling>
-            This band shows end-of-month readings; the guidance above is this week&rsquo;s.
+            The band is the climate, read at each month-end. The guidance above is this week&rsquo;s weather.
           </p>
         </>
       ) : null}

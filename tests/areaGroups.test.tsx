@@ -92,7 +92,7 @@ describe("buildAreaGroups", () => {
 
   it("gives a held group its record, and none to a group that is not held", () => {
     const [held, near] = buildAreaGroups(ROWS, SCORES, { record: RECORD });
-    assert.equal(held?.history, "It rose above 76 in May 2014. The last time, in Jun 2012, it took 5 months to fall below 66.");
+    assert.equal(held?.history, "It rose above 76 in May 2014. The last time, in Jun 2012, it took 5 months to thaw.");
     assert.equal(near?.history, null);
   });
 
@@ -124,7 +124,7 @@ describe("describePastHolds", () => {
   it("counts the one earlier hold and names when this one began", () => {
     assert.equal(
       describePastHolds({ series: RECORD, ...LINES }),
-      "It rose above 76 in May 2014. The last time, in Jun 2012, it took 5 months to fall below 66.",
+      "It rose above 76 in May 2014. The last time, in Jun 2012, it took 5 months to thaw.",
     );
   });
 
@@ -144,7 +144,7 @@ describe("describePastHolds", () => {
     const holds = new Set([2, 3, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18]);
     assert.equal(
       describePastHolds({ series: series((index) => (holds.has(index) ? 80 : 50)), ...LINES }),
-      "The 3 earlier times, it took 2 to 7 months to fall below 66; half took 4 months or fewer.",
+      "The 3 earlier times, it took 2 to 7 months to thaw; half took 4 months or fewer.",
     );
   });
 

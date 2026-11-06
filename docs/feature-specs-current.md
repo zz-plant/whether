@@ -359,6 +359,14 @@ until the report resolves.
   and a raw input that did not move drops out of "What changed". The capped-score note prints once,
   under the funding-pressure ladder. "What would change this guidance" keeps one label per answer.
   "What you may be hearing" has no lead. The record section drops two lines of method.
+- **The weather says what plain words took longer to** (2026-11-05). `REGIME_WEATHER_LINES` closes
+  "Why conditions are…": price is what money costs, going out in it is whether investors will. A
+  past hold "took 39 months to thaw"; "One warm week isn't spring" says why a restart line sits
+  further out than a pause; the record's band is the climate and the guidance the weather; the
+  calibration line opens "Same weather, your rules"; the excluded-inputs band heads "Why it feels
+  like Freezing" when the card says so; the alert form is "Get an alert the day conditions turn".
+  The bar: true of the data, readable with no decoding, and shorter or sharper than the plain line.
+  Warning/watch labels and data "stations" did not clear it.
 - **"Feels like" beside the condition** (2026-11-05, `ScoringBasis.countedRegime`): the conditions
   the left-out inputs would give, on a live reading where they differ from the published ones. It
   moves "Counted, conditions would be …" off the trust strip, which still names the inputs.

@@ -30,7 +30,7 @@ describe("how long conditions lasted before", () => {
     const series = walk([S, S, S, F, F, F, F, C, C, S, S]);
     assert.equal(
       spellText({ series, currentRegime: F, runwayBand: null }),
-      "The only earlier Freezing stretch lasted 4 months, Apr 2020 to Jul 2020. Since 2020, every stretch of conditions has lasted at least 2 months. That's a count of what happened, not a forecast.",
+      "The only earlier Freezing stretch lasted 4 months, Apr 2020 to Jul 2020. Since 2020, every stretch of conditions has lasted at least 2 months. That's a count, not a forecast.",
     );
   });
 
@@ -66,7 +66,7 @@ describe("how long conditions lasted before", () => {
   it("leads with how long this spell has run, beside the earlier ones, while it is still running", () => {
     const one = describeSpellLengths({ series: walk([F, F, F, S, S, F, F]), currentRegime: F, runwayBand: null });
     assert.equal(one?.lead, "It's been Freezing for 2 months so far. The last Freezing stretch lasted 3 months, Jan 2020 to Mar 2020.");
-    assert.match(one?.rest ?? "", /^Since 2020, every stretch of conditions has lasted at least 2 months\. That's a count of what happened, not a forecast\.$/);
+    assert.match(one?.rest ?? "", /^Since 2020, every stretch of conditions has lasted at least 2 months\. That's a count, not a forecast\.$/);
     const first = describeSpellLengths({ series: walk([S, S, F]), currentRegime: F, runwayBand: null });
     assert.equal(first?.lead, "This is the first Freezing stretch since 2020, 1 month so far.");
     const many = describeSpellLengths({ series: walk([F, F, S, F, F, F, C, F]), currentRegime: F, runwayBand: null });

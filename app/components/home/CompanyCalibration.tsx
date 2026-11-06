@@ -16,8 +16,8 @@ import { DEFAULT_RUNWAY_BAND, runwayBandPhrase, type RunwayBand } from "../../..
  * carried a "Change" link down to them. They lead the areas now, as one sentence
  * and two compact tablists, and nothing lower on the page repeats them.
  *
- * Since 2026-10-14 the two tablists fold under one sentence, "Rules for a
- * Series A company with 12–24 months of runway · Change". Since 2026-10-31 the
+ * Since 2026-10-14 the two tablists fold under one sentence, "Same weather, your
+ * rules: a Series A company with 12–24 months of runway · Change". Since 2026-10-31 the
  * section renders at every width (the mobile header pills were removed), and
  * clicking the card's stage/runway chip (`#your-stage-and-runway`) opens the
  * disclosure automatically so the reader is not asked to click twice.
@@ -85,7 +85,7 @@ export function CompanyCalibration({
         <summary className="weather-hit cursor-pointer list-none text-fluid-sm text-slate-300 [&::-webkit-details-marker]:hidden">
           {/* One span: the site's summary rule lays its children out as a flex row, which spread the sentence's words across the line. */}
           <span>
-            Rules for a <span className="font-semibold text-slate-100">{stageLabel}</span> company with{" "}
+            Same weather, your rules: a <span className="font-semibold text-slate-100">{stageLabel}</span> company with{" "}
             <span className="font-semibold text-slate-100">{runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}</span> of runway
             {horizon ? (
               <>

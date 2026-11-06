@@ -148,7 +148,7 @@ describe("/ states the stage and runway in the controls alone", () => {
     const html = renderToStaticMarkup(
       <CompanyCalibration stageLabel="Series A" activeStage="series-a" horizon={{ control: <span data-control />, current: "monthly" }} />,
     );
-    assert.match(text(html), /Rules for a Series A company with 12–24 months of runway, planned monthly · Change(?! settings)/);
+    assert.match(text(html), /Same weather, your rules: a Series A company with 12–24 months of runway, planned monthly · Change(?! settings)/);
     assert.match(html, /data-plan-horizon/);
   });
 });

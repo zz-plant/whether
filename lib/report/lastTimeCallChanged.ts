@@ -362,7 +362,7 @@ export const describeSpellLengths = ({
       `${earlier.length === 1 ? "That stretch" : "Each one"} lasted longer than ${band.phrase} of runway, the band you chose.`,
     );
   }
-  parts.push("That's a count of what happened, not a forecast.");
+  parts.push("That's a count, not a forecast.");
   return { lead, rest: parts.join(" ") };
 };
 
@@ -373,7 +373,7 @@ const isPast = (score: number, line: HoldLine) => (line.holdsAbove ? score > lin
 /**
  * How long a hold has run, and how long the earlier ones at the same lines took to lift,
  * from the month-end walk (2026-11-03): "It rose above 76 in Sep 2026. The last time, in
- * Sep 2022, it took 39 months to fall below 66." "Restarts when funding pressure falls
+ * Sep 2022, it took 39 months to thaw." "Restarts when funding pressure falls
  * below 66" says what lifts a hold and not when, and when is what a hiring plan needs.
  *
  * A hold starts at the first month-end past the pause line and lifts at the first one past
@@ -411,7 +411,6 @@ export const describePastHolds = ({
     }
   }
   const rose = pause.holdsAbove ? "rose above" : "fell below";
-  const lifted = restart.holdsAbove ? "rise above" : "fall below";
   const since = open && !censored ? `It ${rose} ${pause.value} in ${formatMonthLabel(open.start.year, open.start.month)}` : null;
   if (holds.length === 0) {
     return since
@@ -421,13 +420,13 @@ export const describePastHolds = ({
   const lead = since ? `${since}. ` : "";
   const only = holds.length === 1 ? holds.at(0) : undefined;
   if (only) {
-    return `${lead}The last time, in ${formatMonthLabel(only.start.year, only.start.month)}, it took ${monthEnds(only.months)} to ${lifted} ${restart.value}.`;
+    return `${lead}The last time, in ${formatMonthLabel(only.start.year, only.start.month)}, it took ${monthEnds(only.months)} to thaw.`;
   }
   const lengths = holds.map((hold) => hold.months);
   if (holds.length === 2) {
-    return `${lead}The 2 earlier times, it took ${lengths.join(" and ")} months to ${lifted} ${restart.value}.`;
+    return `${lead}The 2 earlier times, it took ${lengths.join(" and ")} months to thaw.`;
   }
   const sorted = [...lengths].sort((a, b) => a - b);
   const median = sorted.at(Math.floor((sorted.length - 1) / 2)) ?? 0;
-  return `${lead}The ${holds.length} earlier times, it took ${sorted.at(0)} to ${monthEnds(sorted.at(-1) ?? 0)} to ${lifted} ${restart.value}; half took ${monthEnds(median)} or fewer.`;
+  return `${lead}The ${holds.length} earlier times, it took ${sorted.at(0)} to ${monthEnds(sorted.at(-1) ?? 0)} to thaw; half took ${monthEnds(median)} or fewer.`;
 };
