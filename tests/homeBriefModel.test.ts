@@ -100,7 +100,7 @@ describe("buildHomeBriefModel", () => {
        guidance is unchanged." until 2026-10-07. */
     assert.equal(model.weeklyLeadershipSummary.boldnessDelta, 0);
     assert.equal(model.weeklyLeadershipSummary.guidanceChange, "lines");
-    assert.equal(model.weeklyLeadershipSummary.shorthandLine, "Operating latitude unchanged since last week.");
+    assert.equal(model.weeklyLeadershipSummary.shorthandLine, "Room to move unchanged since last week.");
     assert.match(model.decisionReadiness.label, /Act|Act with caution|Hold/);
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
@@ -141,7 +141,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(dated.postureDeltaLabel, / since Aug 31$/);
     assert.equal(dated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs Aug 31");
     assert.equal(dated.weeklyLeadershipSummary.comparedWith?.label, "Aug 31");
-    assert.equal(dated.weeklyLeadershipSummary.shorthandLine, "Operating latitude unchanged since Aug 31.");
+    assert.equal(dated.weeklyLeadershipSummary.shorthandLine, "Room to move unchanged since Aug 31.");
     /* A sentence about the decisions, not a figure in a unit of its own: funding pressure 55 to 57
        crosses the pause line at 56, so four of the five areas pause. */
     assert.equal(
@@ -156,7 +156,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(undated.postureDeltaLabel, /than last week$/);
     assert.equal(undated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs last week");
     assert.equal(undated.weeklyLeadershipSummary.comparedWith, undefined);
-    assert.equal(undated.weeklyLeadershipSummary.shorthandLine, "Operating latitude unchanged since last week.");
+    assert.equal(undated.weeklyLeadershipSummary.shorthandLine, "Room to move unchanged since last week.");
     assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*, because funding pressure rose above 56\.$/);
   });
 

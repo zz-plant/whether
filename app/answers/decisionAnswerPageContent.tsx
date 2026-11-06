@@ -123,7 +123,7 @@ export async function DecisionAnswerPageContent({
     page.title,
     `Short answer: ${answer.shortAnswer}`,
     `For: ${page.audience}`,
-    `Company inputs to check: ${answer.companyInputs.join(" ")}`,
+    `What to check at your company: ${answer.companyInputs.join(" ")}`,
     `Decision note to complete: ${answer.decisionNote}`,
     `Market guidance as of ${recordDateLabel}`,
     `${publicDecisionLabels.call}: ${headline.composed}`,
@@ -306,7 +306,7 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title={page.contextHeading}>
           <p className="text-sm text-slate-200">{page.context}</p>
-          <h3 className="mt-4 text-sm font-semibold text-slate-100">Company inputs to check</h3>
+          <h3 className="mt-4 text-sm font-semibold text-slate-100">What to check at your company</h3>
           <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-200">
             {answer.companyInputs.map((input) => <li key={input}>{input}</li>)}
           </ul>

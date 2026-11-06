@@ -69,10 +69,10 @@ describe("a brief frame worth opening", () => {
 
   it("leads a section with its answer, before its evidence", () => {
     const html = renderToStaticMarkup(
-      <HomeSection id="record" heading="How unusual is this?" lead="This spell has run 2 month-ends so far.">
+      <HomeSection id="record" heading="Has this happened before?" lead="This spell has run 2 month-ends so far.">
         <figure>band</figure>
       </HomeSection>,
     );
-    assert.match(html, /How unusual is this\?<\/h2>[\s\S]*data-section-lead[^>]*>This spell has run 2 month-ends so far\.<\/p><figure>/);
+    assert.match(html, /Has this happened before\?<\/h2>[\s\S]*data-section-lead[^>]*>This spell has run 2 month-ends so far\.<\/p><figure>/);
   });
 });

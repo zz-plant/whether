@@ -50,14 +50,14 @@ export const FALLBACK_PAUSE_THRESHOLD = "Pause if thresholds weaken";
  * but not immediately interpretable, and two names for one scalar let surfaces
  * drift into describing different verdicts.
  */
-export const OPERATING_LATITUDE_LABEL = "Operating latitude";
+export const OPERATING_LATITUDE_LABEL = "Room to move";
 
 /**
  * What the latitude number means, said wherever the number is. It was defined
  * only inside the hero's collapsed "Why this call" panel and on /glossary, so
  * the largest figure on the homepage arrived with no scale above the fold.
  */
-export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room";
+export const OPERATING_LATITUDE_GLOSS = "how much you can hire, spend and commit, blended from risk appetite and funding pressure; higher means more room";
 
 export const DECISION_CONTRACT_LABELS = {
   /* Noun slots for exports. "Threshold" and "Reversal" were retired on
@@ -84,7 +84,7 @@ export const DECISION_CONTRACT_LABELS = {
     resumeWhen: "Restart when",
   },
   watch: {
-    flipWatch: "What would change this guidance",
+    flipWatch: "What would change our mind",
     /**
      * The regime line, as distinct from a rule's pause line: where the call
      * itself changes.

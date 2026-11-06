@@ -36,7 +36,7 @@ import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../.
  * off, the largest single cluster in the sitemap.
  */
 export const metadata: Metadata = buildPageMetadata({
-  title: "History and Track Record",
+  title: "Has it been right?",
   description:
     "Startup funding conditions every month since 2012: each change, how long each stretch lasted, and the weekly briefs we published.",
   path: "/history",
@@ -157,7 +157,7 @@ export default async function HistoryPage({
         },
         /* "History", the group this page is the hub of (`navigationGroups`): the
            header tab, the sub-tab and the breadcrumb all name it so. */
-        page: { pageTitle: "History", pageSummary: "Look up the guidance for any past month and see how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
+        page: { pageTitle: "History", pageSummary: "Has it been right? Look up the guidance for any past month and see how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },

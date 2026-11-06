@@ -89,7 +89,7 @@ describe("formula reference visuals", () => {
       ["Inversion depth", /how far below, in percentage points/],
       ["VIX", /forecast of turbulence over the next month/],
       ["short-term borrowing rate", /one-month Treasury bill rate/],
-      ["Operating latitude", /room to hire, spend and commit/],
+      ["Room to move", /how much you can hire, spend and commit/],
     ] as const) {
       assert.ok(text.includes(term), `formula cards should name ${term}`);
       assert.match(text, gloss, `${term} should be glossed in place`);

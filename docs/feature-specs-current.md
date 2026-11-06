@@ -69,7 +69,7 @@ those names.
 
 | Group | Hub | Pages (sub-tabs, then secondary links) |
 | --- | --- | --- |
-| This week | `/` | Why it changed (`/signals`); Method (`/trust`) |
+| This week | `/` | Why it changed (`/signals`); Can I trust this? (`/trust`) |
 | Plan | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`); Your decisions (`/decisions`) |
 | History | `/history` | How it held up (`/calibration`); Compare periods (`/history/compare`), Advice vs. market (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
 | Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix |
@@ -265,19 +265,19 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    hollow dot (§1.1.26) and what moved it (§1.1.27); a market input prints this week's value over
    the earlier one. It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
-6. **What would change this guidance** (`WhatWouldChangeSection`): two questions, named apart —
+6. **What would change our mind** (`WhatWouldChangeSection`): two questions, named apart —
    when conditions change (the change line, in points, with the market move folded under it) and
    when a paused decision may resume (the pause line and the restart line, a chosen stage's else the
    lead area's). A sentence says a change in conditions is not permission to resume. Below `md` the
    conditions map draws here (no distance caption: the trust strip's margin states it).
-7. **What you may be hearing** (`home/HearingSection.tsx`, `#what-you-may-hear`): the questions
+7. **What your team will ask** (`home/HearingSection.tsx`, `#what-you-may-hear`): the questions
    this week's crossed pause lines invite, one per crossed area, group and speaker
    (`selectHearingForAreas`, `app/guides/stakeholderGuides.ts`), each drawn as a chat pair — the
    group asks, the published line answers (`app/components/ui/hearingBubbles.tsx`, the same pair
    Guides' role panels print). It renders nothing on a week no pause line is crossed, so a calm
    brief does not grow a section that repeats every week, and nothing on an archived week, whose
    lines are a record rather than a present conversation. "By role →" opens Guides' role list.
-8. **How unusual is this?** (`RecordSection`): on a week conditions changed, the last time
+8. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
    these conditions lasted before (§1.1.76); the last turns as links. On a live week the record is
    drawn above those sentences as `/history`'s month strip (every month-end since 2012 in its
@@ -368,8 +368,8 @@ until the report resolves.
   gone, since one score holding four areas drew one row four times; the fold under the groups is
   the reader's runway and the test. "What the score means" drops its eras and team prompt on `/`,
   and a raw input that did not move drops out of "What changed". The capped-score note prints once,
-  under the funding-pressure ladder. "What would change this guidance" keeps one label per answer.
-  "What you may be hearing" has no lead. The record section drops two lines of method.
+  under the funding-pressure ladder. "What would change our mind" keeps one label per answer.
+  "What your team will ask" has no lead. The record section drops two lines of method.
 - **The weather says what plain words took longer to** (2026-11-05). `REGIME_WEATHER_LINES` closes
   "Why conditions are…": price is what money costs, going out in it is whether investors will. A
   past hold "took 39 months to thaw"; "One warm week isn't spring" says why a restart line sits
@@ -393,7 +393,7 @@ until the report resolves.
 
 ### 1.1.0s One side of each rule on the brief, the map's readings as a table, a quiet Monday email (2026-11-03)
 
-- "What would change this guidance" prints the side of the lead area's rule that can change it:
+- "What would change our mind" prints the side of the lead area's rule that can change it:
   "When can paused decisions resume?" with "Restart when" while the lead area is on hold, or
   "What would pause decisions?" with "Pause if" otherwise (`leadHeld`).
 - The decision picker's answer and its Slack takeaway print the same one side: an area on hold,
@@ -1299,7 +1299,7 @@ pill that overlapped the hero's tablist at every width above `sm`; `TimelineBar`
 swipe-anywhere month gesture leave with `SwipeableWeek` (the chevrons and the calendar picker are
 the period controls; `/history` keeps the scrubber); `BriefSectionNav` goes (three sections do
 not need a sticky index; J/K still step the `data-page-section` ids). In the hero: the delta
-caption under the sparkline repeated the badge beside the score, and the Operating latitude gloss
+caption under the sparkline repeated the badge beside the score, and the Room to move gloss
 moved from a hover-only `title` into the Why-this-call disclosure. Below the call: the four
 numbered `SectionSignpost`s (the cards carry their titles); `KeyDriversCard`'s threshold rows (the
 hero's rails encode them — §XV, one encoding per concept per screen) and its rate-derivation
@@ -1922,7 +1922,7 @@ week any more.
   toward tighter money since Aug 31.") and both ladders' hollow dot; `/signals` (table head, each row's move,
   score cells, call-line ladders); `/trust` ladders; `/share`, Slack and every paste ("… · 14 pts above ·
   was 63 on Aug 31 · restart line 66 (24 pts away)"), the "• vs Aug 31: worse" direction line and the
-  Operating latitude line; the `/api/posture/current` summary; the agent payload's `decision_delta`
+  Room to move line; the `/api/posture/current` summary; the agent payload's `decision_delta`
   (`compared_with: { record_date, label }` beside `from` and `delta`, and a summary that says "since Aug 31");
   the home brief's own labels (posture delta, indicator deltas, net delta, and the weekly-movement sentence the
   published-brief record freezes).
@@ -1940,12 +1940,12 @@ against their own previous observation; and the published archive's "vs prior we
 which prints deltas frozen into append-only records that do not say what they were measured against. The
 follow-up for that is to freeze `comparedWith` into newly published records.
 
-**Found, not changed: Operating latitude's move is zero on any week that crossed no line.**
+**Found, not changed: Room to move's move is zero on any week that crossed no line.**
 `buildHomeBriefModel` builds the previous assessment behind `weeklyLeadershipSummary` only when a regime
 alert exists, which needs a regime change or a crossed line. With the same movement (funding pressure +12,
 risk appetite −6) it reports −8, "More defensive since Aug 31.", and `steadyWeek: false` when a line was
 crossed, and `0`, "The guidance is holding where it was on Aug 31.", `steadyWeek: true` when none was, so the
-exports' "Operating latitude … · vs Aug 31: no change" can be printed over a week the scores moved. The
+exports' "Room to move … · vs Aug 31: no change" can be printed over a week the scores moved. The
 guidance is the same on that week, which is what the sentence claims; the number is the open question.
 Building the previous assessment from the dynamics whenever a comparison exists would change `steadyWeek`,
 and with it the quiet-day line, so it is recorded here and not changed. (Changed 2026-10-07, §1.1.52: the
@@ -2088,7 +2088,7 @@ A predicted-attention pass (DOM saliency: type size, weight, contrast, numbers, 
 reading, scored per element at 1440×900 and 390×844; no real sessions) over eight routes ranked twelve
 changes. What shipped:
 
-- **`/brief/[week]`** leads with *What changed* and *What would change this guidance*; the share panel
+- **`/brief/[week]`** leads with *What changed* and *What would change our mind*; the share panel
   follows, its preview folded to a few lines behind "Show the whole preview". Every shared paste links here,
   and the Slack preview used to fill the first desktop screen with the delta on the fold. The panel's primary
   "Copy Slack update" also rendered white on white in the light theme: `ClipboardActionRow` stacked
@@ -2269,14 +2269,14 @@ Visual navigation upgrades across the five homepage sections to sharpen decision
 The first capture of the returning reader's homepage (`ui:iterate --visitor returning`) showed the two
 score ladders drawn three times in three sections: per row in *What changed* (all three lines and the
 earlier reading's dot), as the pause/resume rails above the rules table in *What that changes*, and as
-a pair again beside the radar in *What would change this guidance* (DD-039).
+a pair again beside the radar in *What would change our mind* (DD-039).
 
 - *What changed* keeps them. Each row carries where the score is, where it was, and where its lines
   are (`tests/whatChangedSignalRows.test.tsx`).
 - *What that changes* drops the rails. Each area row prints its pause and restart lines and the distance
   to each, which refers up to the ladders. `/operate` keeps the rails over its own rules table, where no
   ladder sits above it.
-- *What would change this guidance* keeps the radar (the second dimension) and lists the market move
+- *What would change our mind* keeps the radar (the second dimension) and lists the market move
   that would cross each call line under the score it moves, without redrawing either ladder.
 - The recession gauge's relationship line now says what the engine does: it sets risk appetite and
   adds to funding pressure only once inverted (`computeRiskAppetiteScore`, the inversion points in
@@ -2590,7 +2590,7 @@ below moves data the page already computed to where the eye lands first; nothing
   earlier scores were built from fewer inputs, the like-for-like note (`describeScoreMovementCaveat`)
   sit under the trust row as `asideNote`, so the map stays compact; its distance caption is off
   there because the trust row already says it. The left column stretches to the map's height and
-  the trust row sits at its foot. "What would change this guidance" stops drawing the quadrant from
+  the trust row sits at its foot. "What would change our mind" stops drawing the quadrant from
   `md` up (one picture of where the reading sits per screen) and keeps it, with the same path,
   below `md`.
 - **The answers before the click.** Each "What are you deciding?" choice carries a second line:
@@ -2646,7 +2646,7 @@ A screenshot review of `/resolve` and `/signals` in both themes, returning reade
 - **"What changed"**: the short-term rate's "Why it matters" was a bare dash in the unfiltered
   table; it carries the sentence the Inflation filter already had. The focus filters were checked
   and kept: each shows a different subset of the four rows with its own notes and follow-up links.
-- **"What would change this guidance"**: each score ladder is capped at 28rem, the wide track its
+- **"What would change our mind"**: each score ladder is capped at 28rem, the wide track its
   labels are laid out for (§XVII, §XVIII); the two had stretched to about 620px each on a desktop.
 - Seen, not changed: `ScoreCell` prints the short-term rate as "4.0%" beside the chip's "4.05%"
   (and the gauge "0.5pp" beside "0.47pp") — one figure at two precisions in one row, in a shared
@@ -2994,11 +2994,11 @@ Four facts were still stated two ways on one page or paste.
   under a Spending rule that approves new spend only inside 6 months. Both read
   `SPENDING_PAYBACK_BAR_MONTHS` now (`lib/report/boundedDecisionRules.ts`): a stage adds emphasis and
   never relaxes the Spending bar, the precedent the tight-runway bar set in §1.1.51.
-- **Operating latitude and the guidance.** The latitude blends the two scores, so it stays flat on a
+- **Room to move and the guidance.** The latitude blends the two scores, so it stays flat on a
   week one score crosses a pause line, and every "nothing changed" line read it: a week that paused
   four areas printed "This week's guidance is unchanged." (operator paste, `/history/compare`), "Call
   unchanged" (`/share` standup) and "The guidance is holding where it was on Aug 31." The latitude's
-  line now speaks about the number ("Operating latitude unchanged since Sep 29.", `getNetDeltaLabel`),
+  line now speaks about the number ("Room to move unchanged since Sep 29.", `getNetDeltaLabel`),
   measured whenever a comparison exists rather than only on a regime alert (closing §1.1.26's "found,
   not changed"), and the quiet-day and standup lines read `describeGuidanceChange`
   (`lib/report/decisionMovement.ts`: `regimeChanged` or the movement's conditions change, then a crossed
@@ -3110,7 +3110,7 @@ the frozen archive record. A surface that does not print a claim is not held to 
   which read "Conditions unchanged — If the 1-month Treasury bill rate rises 0.15%, conditions turn
   Cloudy.", closes the what-changed lead with the same line ("…Last week's guidance stands. Conditions change
   if: …"); the lapsed-return panel prints it, and the `/share` work-item blocks print the contract's whole
-  sentence under "What would change this guidance".
+  sentence under "What would change our mind".
 - **The interest-rate moves, kept as a translation.** Read against the code, each move crossed the same line
   as the sentence's clause on its axis, but the set was a different answer: sorted by the size of a move in
   two different rates (a 0.22-point bill-rate move to a line 38 points away led a 0.25-point curve move to one
@@ -4042,7 +4042,7 @@ devices, lines a team shares) would have needed accounts, which Whether does not
   was crossed since …". It is "Past its pause line"; the count is "4 of 5 areas
   are past their pause line"; table cells say "past the line". Pastes state a pause-line distance as
   "past the line" or "N pts away", where "14 pts above" meant opposite things for the two scores.
-- **The three lines are defined once**, at the head of "What would change this guidance".
+- **The three lines are defined once**, at the head of "What would change our mind".
 - **Settings fold.** On desktop, stage and runway are one line ("Rules for a Series A company with
   12–24 months of runway · Change"). On a live week the phone legend defines this week's condition
   only, with a link to all four.
@@ -4345,7 +4345,7 @@ one size per width (24.6px and 34px); section headings are 22px on a phone. Rule
   at 22px.
 - **The `/concepts` corpus chart** draws a 360-unit version below `sm`, at about 1:1, with 11px labels
   and a year every four years; the wide drawing is unchanged.
-- **The conditions map** in "What would change this guidance" is 320px wide on a phone (from 240).
+- **The conditions map** in "What would change our mind" is 320px wide on a phone (from 240).
 - **Small type:** `text-fluid-nano` has a 12px floor, the ladder's line numbers are 12px, the
   `/about` corridor diagram's labels render at about 11px, and "Since Sep 30" on `/signals` rows is
   in the readable ink.
@@ -4459,7 +4459,7 @@ and full-page phone captures).
   no longer adds "Not counted: −11…": the "What the headline reading leaves out" band says it, and the
   card's strip links it. The area picker's line drops "Pick one." The conditions map keeps its two
   scores: it is the one place each width draws them (`tests/onePlacePerFact.test.tsx`).
-- **/signals and /trust link to the brief's "What would change this guidance"** instead of drawing
+- **/signals and /trust link to the brief's "What would change our mind"** instead of drawing
   the same ladders and the same "Pause if / Restart when" (§1.2). /signals' chips print "from" like the
   brief's, and its "Feeds into" links go to the score's own row.
 - **/history.** Consecutive weeks that published the same conditions and summary are one card
@@ -4708,7 +4708,7 @@ in the order a reader asks:
   or "Confirms later" (funding pressure): the premise test found both scores track deal count most
   closely in the same quarter and the next, falling off together (`docs/research/premise-test-results.md`,
   "Lead and lag"), so neither label was supported. The focus filters narrow it and travel in the URL. Under the table, a link to
-  the brief's "What would change this guidance": the two score ladders with their Pause if and
+  the brief's "What would change our mind": the two score ladders with their Pause if and
   Restart when lines were this page's second section until 2026-10-27, the brief's section drawn again.
 - **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
   interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores

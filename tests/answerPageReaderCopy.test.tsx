@@ -58,7 +58,7 @@ describe("answer page reader copy", () => {
       const html = await renderAnswer(slug);
       const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
       assert.ok(visible.includes(page.shortAnswer), `${slug} lost its question-specific answer`);
-      assert.ok(visible.includes("Company inputs to check"));
+      assert.ok(visible.includes("What to check at your company"));
       assert.ok(visible.includes("Decision note to complete"));
       assert.ok(visible.includes("Data as of"), "the card's trust strip dates the market guidance, once");
       assert.ok(!visible.includes("Market guidance as of"), "and no second line dates it again");

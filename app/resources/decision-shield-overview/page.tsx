@@ -9,11 +9,11 @@ export const runtime = "edge";
 export const revalidate = 21600;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Decision Shield",
+  title: "Would this plan hold up?",
   description:
     "Decision Shield checks a plan against this week's guidance and returns Safe, Risky or Dangerous — with the pause line to hold and the restart line that would change the guidance.",
   path: "/resources/decision-shield-overview",
-  imageAlt: "Decision Shield overview",
+  imageAlt: "Would this plan hold up?",
 });
 
 metadata.robots = noindexRobots;
@@ -26,11 +26,11 @@ export default async function DecisionShieldOverviewPage() {
   return (
     <ContentPageShell measure="prose">
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">Decision Shield</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">Would this plan hold up?</h1>
         <p className="text-sm text-slate-200">
           Decision Shield checks a plan against this week&apos;s guidance and returns one verdict —
-          Safe, Risky or Dangerous — with the guardrail to hold and the reversal that would change
-          the guidance. It records what you decided.
+          Safe, Risky or Dangerous — with the pause line to hold and the restart line that would
+          change the guidance. It records what you decided.
         </p>
         <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p className="type-eyebrow">This week</p>
@@ -57,7 +57,7 @@ export default async function DecisionShieldOverviewPage() {
           <li className="flex gap-2">
             <span aria-hidden="true" className="text-slate-500">•</span>
             <span>
-              <span className="font-semibold text-slate-100">A guardrail.</span> The condition to
+              <span className="font-semibold text-slate-100">A pause line.</span> The condition to
               hold while you proceed — phase hiring in tranches, ship milestones, cap the discount
               window.
             </span>
@@ -65,7 +65,7 @@ export default async function DecisionShieldOverviewPage() {
           <li className="flex gap-2">
             <span aria-hidden="true" className="text-slate-500">•</span>
             <span>
-              <span className="font-semibold text-slate-100">A reversal.</span> The condition that
+              <span className="font-semibold text-slate-100">A restart line.</span> The condition that
               would change the guidance, so the decision carries a stop rather than a one-time
               guess.
             </span>

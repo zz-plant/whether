@@ -118,7 +118,7 @@
       "Salary, benefits, recruiting and onboarding costs, including management capacity during ramp.",
       "Cash remaining after the hire in a downside plan and a dated outcome review."
     ],
-    "decisionNote": "Approve [role] to address [bottleneck] within [cost envelope]. Hold further hiring if [cash or outcome limit] is breached. Reopen after [funding and delivery evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Approve [role] to address [bottleneck] within [cost envelope]. Hold further hiring if [cash or outcome limit] is breached. Start again after [funding and delivery evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Should we freeze hiring this week?",
@@ -270,7 +270,7 @@
     ],
     "category": "decision",
     "shortAnswer": "Freeze hiring when your cash plan can't support new commitments, and decide on backfills and critical roles one by one.",
-    "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence needed to reopen hiring.",
+    "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence that would let you start hiring again.",
     "audience": "Founders, VP Engineering, CFO",
     "applyHeading": "Which open roles to keep",
     "mappedDecisionAreas": [
@@ -287,7 +287,7 @@
       "Work to stop or defer if vacancies remain unfilled.",
       "The cash buffer, workload evidence and approver required to reopen a role."
     ],
-    "decisionNote": "Hold [requisitions] and allow exceptions for [specific need]. Defer [work] to match capacity. Reopen when [cash and workload criteria] hold. Approver: [name]. Review: [date].",
+    "decisionNote": "Hold [requisitions] and allow exceptions for [specific need]. Defer [work] to match capacity. Start again when [cash and workload criteria] hold. Approver: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "The standing policy: which roles to keep, gate or pause",
@@ -515,8 +515,8 @@
       "what if the economy slows down"
     ],
     "category": "decision",
-    "shortAnswer": "Work out now what each pause line would mean for your company. The pause lines are already set, so getting ready means knowing your runway, burn and demand, not guessing when things turn.",
-    "directAnswer": "Put cash, burn and demand numbers next to the pause lines for hiring, roadmap and spend, and write down for each what you would cut, defer or stop if it trips — so a change in conditions means a decision you already made.",
+    "shortAnswer": "Work out now what pausing would mean for your company. The points where you would pause are already set, so getting ready means knowing your runway, burn and demand, not guessing when things turn.",
+    "directAnswer": "Put cash, burn and demand numbers next to where hiring, roadmap and spend would pause, and write down for each what you would cut, defer or stop if it trips — so a change in conditions means a decision you already made.",
     "audience": "Founders, COOs and CFOs",
     "applyHeading": "Decide now what a tripped line means",
     "mappedDecisionAreas": [
@@ -532,7 +532,7 @@
       "Which commitments stop, defer or survive a pause in each area.",
       "The approver and evidence required to execute each cut."
     ],
-    "decisionNote": "If [score] crosses [line], we will [action] in [area] within [timeframe]. Approver: [name]. Evidence to reopen: [criteria]. Review: [date].",
+    "decisionNote": "If [score] crosses [line], we will [action] in [area] within [timeframe]. Approver: [name]. Evidence to start again: [criteria]. Review: [date].",
     "supportingLinks": [
       {
         "href": "/calibration",

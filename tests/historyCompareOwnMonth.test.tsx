@@ -233,10 +233,10 @@ describe("the period caption on a replayed month", () => {
         comparedWith: { recordDate: "2011-12-30", label: "Dec 30, 2011" },
       },
     };
-    assert.equal(modelFor(compared).weeklyLeadershipSummary.shorthandLine, "Operating latitude down since Dec 30, 2011.");
+    assert.equal(modelFor(compared).weeklyLeadershipSummary.shorthandLine, "Room to move down since Dec 30, 2011.");
     assert.equal(
       modelFor({ ...compared, historicalSelection: null }).weeklyLeadershipSummary.shorthandLine,
-      "Operating latitude down since Dec 30, 2011.",
+      "Room to move down since Dec 30, 2011.",
     );
   });
 
@@ -252,7 +252,7 @@ describe("the period caption on a replayed month", () => {
       },
     }).weeklyLeadershipSummary;
     assert.equal(summary.boldnessDelta, -7);
-    assert.equal(summary.shorthandLine, "Operating latitude down since Dec 30, 2011.");
+    assert.equal(summary.shorthandLine, "Room to move down since Dec 30, 2011.");
   });
 });
 

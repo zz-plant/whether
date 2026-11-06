@@ -91,8 +91,8 @@ export const HOME_SECTIONS = {
   diagnosis: { id: "why-conditions" },
   changed: { id: "what-changed", heading: "What changed this week" },
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
-  hearing: { id: "what-you-may-hear", heading: "What you may be hearing" },
-  record: { id: "has-this-happened-before", heading: "How unusual is this?" },
+  hearing: { id: "what-you-may-hear", heading: "What your team will ask" },
+  record: { id: "has-this-happened-before", heading: "Has this happened before?" },
   alert: { id: "subscribe", heading: "Get an alert the day conditions turn" },
 } as const;
 

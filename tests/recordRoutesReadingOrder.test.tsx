@@ -166,7 +166,7 @@ describe("/history/compare draws each score against its lines", () => {
     assert.match(html, /Period B: \d+(\.\d+)?/, "the hollow dot is named for period B, not last week");
     assert.doesNotMatch(html, /Last week/);
     assert.match(html, /Corporate borrowing premium, A minus B/);
-    assert.doesNotMatch(html, /Operating latitude change|Yield curve slope change/, "the delta tiles are the ladders now");
+    assert.doesNotMatch(html, /Room to move change|Yield curve slope change/, "the delta tiles are the ladders now");
   });
 
   /*

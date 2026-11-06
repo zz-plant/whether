@@ -825,7 +825,7 @@ and shows them where to look. What the research on images people engage with say
   week's dot too, so the card shows a move toward a line, not only a position.
 - MUST: lead a section with its answer, before its evidence. `HomeSection`'s `lead` is the
   finding, set at `text-fluid-lg` between body and heading: a reader's eye reaches a frame's title
-  first and keeps its claim. "How unusual is this?" leads with this spell beside the earlier ones
+  first and keeps its claim. "Has this happened before?" leads with this spell beside the earlier ones
   (`describeSpellLengths` returns `{ lead, rest }`); "Why conditions are …" leads with the rule
   that answers it, over the table.
 - MUST: keep a focal point at preview size where a frame can. Slack previews an image about 360px

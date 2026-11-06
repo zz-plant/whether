@@ -12,7 +12,7 @@ describe("answer section headings", () => {
     });
 
     assert.equal(headings.posture, "When to start the raise");
-    assert.equal(headings.rules, "Rules in force: fundraising and spending");
+    assert.equal(headings.rules, "What's binding this week: fundraising and spending");
     assert.equal(headings.threshold, "What would change this answer: funding pressure");
     assert.equal(headings.next, "Related pages");
   });
@@ -20,7 +20,7 @@ describe("answer section headings", () => {
   it("reads one area without a conjunction and three with one", () => {
     assert.equal(
       buildAnswerSectionHeadings({ applyHeading: "a", mappedDecisionAreas: ["hiring"], thresholdFocus: "risk" }).rules,
-      "Rules in force: hiring",
+      "What's binding this week: hiring",
     );
     assert.equal(
       buildAnswerSectionHeadings({
@@ -28,7 +28,7 @@ describe("answer section headings", () => {
         mappedDecisionAreas: ["hiring", "product-tempo", "burn-discipline"],
         thresholdFocus: "both",
       }).rules,
-      "Rules in force: hiring, roadmap and spending",
+      "What's binding this week: hiring, roadmap and spending",
     );
   });
 
@@ -39,7 +39,7 @@ describe("answer section headings", () => {
         mappedDecisionAreas: ["expansion-bets", "burn-discipline", "product-tempo"],
         thresholdFocus: "both",
       }).rules,
-      "Rules in force: roadmap, spending and new bets",
+      "What's binding this week: roadmap, spending and new bets",
     );
   });
 

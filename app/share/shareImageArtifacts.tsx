@@ -102,7 +102,7 @@ export const buildShareImageArtifacts = (
     {
       /* No format line: "PPTX · PDF · SVG" named the three buttons under it
          (2026-10-09). */
-      title: "Board slide",
+      title: "For your board",
       description:
         `One slide: the guidance, when it pauses, what would change conditions and both scores, drawn for a ${operatorStageLabel(stage)} company (the stage you picked on the brief).`,
       preview: {

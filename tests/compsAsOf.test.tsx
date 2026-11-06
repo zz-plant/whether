@@ -46,10 +46,10 @@ describe("/comps title and as-of date", () => {
     stubMarketData({ ...filings, ...prices, ...offline });
 
     const metadata = await generateMetadata();
-    assert.equal(metadata.title, "SaaS Valuation Multiples, January 2027");
+    assert.equal(metadata.title, "What a SaaS company is worth, January 2027");
 
     const html = renderToStaticMarkup(await CompsPage());
-    assert.match(html, /<h1[^>]*>\s*SaaS valuation multiples, January 2027\s*<\/h1>/);
+    assert.match(html, /<h1[^>]*>\s*What a SaaS company is worth, January 2027\s*<\/h1>/);
     assert.match(html, /<time dateTime="2027-01-15T12:00:00.000Z">Jan 15, 2027<\/time>/);
     assert.ok(
       visibleText(html).includes("As of Jan 15, 2027, from SEC EDGAR filings and Cboe delayed prices."),
@@ -71,10 +71,10 @@ describe("/comps title and as-of date", () => {
     stubMarketData({ ...offline });
 
     const metadata = await generateMetadata();
-    assert.equal(metadata.title, "SaaS Valuation Multiples: Public SaaS EV/Revenue");
+    assert.equal(metadata.title, "What is a SaaS company worth right now?");
 
     const html = renderToStaticMarkup(await CompsPage());
-    assert.match(html, /<h1[^>]*>\s*SaaS valuation multiples\s*<\/h1>/);
+    assert.match(html, /<h1[^>]*>\s*What a SaaS company is worth\s*<\/h1>/);
     assert.ok(!html.includes("<time"), "no read, so no read date");
     assert.ok(!html.includes("January 2027"));
     assert.ok(visibleText(html).includes("None of our market data sources is answering right now"));

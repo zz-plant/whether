@@ -90,7 +90,7 @@ describe("/share current weekly artifact", () => {
     assert.notEqual(textOf("slack-post"), fullBrief);
     const labels = options.map((option) => option.label);
     assert.equal(new Set(labels).size, labels.length, "no two formats share a name");
-    for (const label of ["Slack post", "Full brief", "Meeting pack", "Investor update", "Portfolio note", "Ticket brief", "Email"]) {
+    for (const label of ["Slack post", "Full brief", "Meeting pack", "For your investors", "For your portfolio", "Ticket brief", "Email"]) {
       assert.ok(labels.includes(label), `offers ${label}`);
     }
   });
@@ -104,8 +104,8 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /Download PPTX/);
     assert.match(html, /Download PDF/);
     // Every format is named in the picker the server renders, and each copy action says what it copies.
-    assert.match(html, />Investor update</);
-    assert.match(html, />Portfolio note</);
+    assert.match(html, />For your investors</);
+    assert.match(html, />For your portfolio</);
     const copyLabel = (id: string) => {
       const option = options.find((candidate) => candidate.id === id);
       return option?.copyLabel ?? "";

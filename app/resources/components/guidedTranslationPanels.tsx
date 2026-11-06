@@ -105,7 +105,7 @@ function HearingThread({ guide }: { guide: (typeof stakeholderGuides)[number] })
           {guide.avatar}
         </span>
         <div className="space-y-1">
-          <p id="guided-hearing-heading" className="type-eyebrow">What you may be hearing</p>
+          <p id="guided-hearing-heading" className="type-eyebrow">What your team will ask</p>
           <p className="max-w-prose text-xs text-slate-400">
             The pushback, takes and questions that come up in the room, and the reply each line gives. Which reach you depends on who you answer to.
           </p>
