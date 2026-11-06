@@ -55,9 +55,9 @@ export const runtime = "edge";
    and the whole tag has to fit a result line (~60 characters with the site suffix).
    The H1 asks the page's question; the title stays the phrase people search. */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Best Product Management Books, Dated by Market",
+  title: "Best Product Management Books and Articles",
   description:
-    `${canonEssays.length} product management essays, books and investor memos, from Cagan to Sequoia, each dated and placed on the market conditions of the month it came out.`,
+    `${canonEssays.length} product management essays, books, articles and investor memos, from Cagan to Sequoia, each dated and placed on the month it came out.`,
   path: "/concepts",
   imageAlt: "Product management reading list, dated by market conditions",
   /* Without these the share card is the live weekly-guidance card, so a link to a
@@ -66,7 +66,7 @@ export const metadata: Metadata = buildPageMetadata({
     template: "reading",
     eyebrow: "Product management reading list",
     title: "Does startup advice follow the market?",
-    subtitle: `${canonEssays.length} essays, books and investor memos, each placed on the record at the month it came out since 2012.`,
+    subtitle: `${canonEssays.length} essays, books, articles and investor memos, each placed on the record at the month it came out since 2012.`,
     kicker: "Whether — weekly operating guidance",
   },
 });
