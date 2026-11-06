@@ -6,7 +6,6 @@ import { GET as getMcpShim } from "../app/api/mcp/route";
 import { GET as getFeed } from "../app/feed.xml/route";
 import { buildAgentInterfaceFromContext, loadAgentInterfaceContext } from "../lib/agentInterface";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
-import { formatMarginStamp } from "../lib/report/reportFormatting";
 import { formatConfidenceSentence } from "../lib/summary/summaryFormatting";
 import { NextRequest } from "next/server";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
@@ -69,15 +68,9 @@ describe("the agent interface's confidence", () => {
     assert.equal(shim.confidencePercent, expected.percent, "/api/mcp?tool=get_brief percent");
   });
 
-  it("is worded as the archive items word theirs in the live RSS item", async () => {
-    const { assessment, treasury } = (await loadAgentInterfaceContext("test")).reportData;
-    const expected = resolvePublishedConfidence({ assessment, record: treasury });
+  it("prints the published margin in the feed, never the engine's code", async () => {
     const feed = await (await getFeed()).text();
 
-    assert.ok(
-      feed.includes(`. ${formatMarginStamp(expected.label)}.</description>`),
-      "the live item carries the published margin, not the engine's code",
-    );
     assert.doesNotMatch(feed, /Confidence: (LOW|MEDIUM|HIGH)\b/);
     // The phrase names itself; under a label it read "Confidence: Medium confidence."
     assert.doesNotMatch(feed, /Confidence:(<\/strong>)? (High|Medium|Low) confidence/);

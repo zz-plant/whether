@@ -14,7 +14,7 @@ import {
   indexableResourcePillarSlugs,
 } from "../lib/seo/indexationPolicy";
 import { buildPostureArchivePath, getPostureArchivePeriods } from "../lib/summary/postureArchive";
-import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefModifiedAt } from "../lib/report/publishedBriefs";
 
 describe("sitemap", () => {
   it("returns canonical URLs and includes only the curated indexable routes", async () => {
@@ -164,7 +164,7 @@ describe("sitemap", () => {
         const entry = entryByUrl.get(`${siteUrl}${buildPublishedBriefPath(brief.slug)}`);
         assert.ok(entry, `published week ${brief.slug} missing when programmaticEligible=${eligible}`);
         assert.ok(entry?.lastModified instanceof Date, `published week ${brief.slug} carries no lastModified date`);
-        assert.equal(entry.lastModified.toISOString(), new Date(brief.publishedAt).toISOString());
+        assert.equal(entry.lastModified.toISOString(), new Date(publishedBriefModifiedAt(brief)).toISOString());
       }
     }
   });

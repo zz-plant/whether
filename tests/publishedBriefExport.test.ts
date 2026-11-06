@@ -124,11 +124,11 @@ describe("published brief comparisons", () => {
     assert.equal(publishedBriefDisplay(w39).whatChanged, "The scores moved toward tighter money since Sep 15.");
     assert.equal(
       publishedBriefDisplay(w38).whatChanged,
-      "Conditions tightened. This record does not name the earlier reading it compared with.",
+      "Conditions tightened. This record does not name the earlier reading it compared with. The last brief, for the week of Jul 27, 2026, read Sunny.",
     );
     const w40 = findPublishedBrief("2026-w40");
     assert.ok(w40);
-    assert.equal(publishedBriefDisplay(w40).whatChanged, w40.whatChanged, "a sentence that names its reading is kept");
+    assert.ok(publishedBriefDisplay(w40).whatChanged.startsWith(w40.whatChanged), "a sentence that names its reading is kept");
   });
 });
 

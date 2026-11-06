@@ -11,8 +11,8 @@ const NEWS_WINDOW_MS = 2 * 24 * 60 * 60 * 1000;
 /**
  * Published weeks inside Google News's two-day window, as a news sitemap.
  *
- * The brief lands on Mondays, so the file holds the newest week for two days and
- * is then a valid, empty `urlset`; the archive stays in `sitemap.xml` and the
+ * A week's `publishedAt` is the moment it was frozen, so the file holds each new week for
+ * two days and is then a valid, empty `urlset`; the archive stays in `sitemap.xml` and the
  * whole run in `feed.xml`. The title is the page's own, because News matches it to the article.
  */
 export async function GET() {

@@ -107,6 +107,8 @@ type PublishedBriefRecordInput = {
   isoWeek: IsoWeek;
   /** A record already frozen for this week; its `publishedAt` and `correction` are kept. */
   existing?: PublishedBrief;
+  /** The moment of the freeze: when this week's permalink starts to exist. */
+  now?: Date;
 };
 
 export const buildPublishedBriefRecord = ({
@@ -115,6 +117,7 @@ export const buildPublishedBriefRecord = ({
   recordDate,
   isoWeek,
   existing,
+  now = new Date(),
 }: PublishedBriefRecordInput): PublishedBrief => {
   const { homeBriefModel } = snapshot;
   const inputs = storedInputs(reportData, recordDate);
@@ -122,7 +125,9 @@ export const buildPublishedBriefRecord = ({
     slug: formatIsoWeekSlug(isoWeek),
     year: isoWeek.year,
     week: isoWeek.week,
-    publishedAt: existing?.publishedAt ?? new Date(recordDate).toISOString(),
+    /* The freeze, not the record date. It was the record date, and the freeze runs days after
+       it, so each week arrived already older than the two days a news sitemap may list. */
+    publishedAt: existing?.publishedAt ?? now.toISOString(),
     recordDate,
     recordDateLabel: reportData.recordDateLabel,
     headline: `${homeBriefModel.postureWithStageLabel} — week of ${reportData.recordDateLabel}`,
@@ -234,6 +239,7 @@ export const assembleCurrentWeekBrief = async ({
     recordDate,
     isoWeek,
     existing: findExisting?.(slug),
+    now,
   });
 
   return { ok: true, record, slug, recordDate };

@@ -1146,7 +1146,7 @@
     "sourceLabel": "Federal Reserve Economic Data (FRED)",
     "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
     "freshnessLabel": "Oct 27, 2026, 11:37 PM UTC",
-    "correction": null
+    "correction": "Corrected Nov 5, 2026. No brief was published for the weeks of Oct 12 and Oct 19, so What changed compares this week with Sep 30, not with the last brief. That brief, for the week of Oct 5, read Freezing with risk appetite at 48. This week reads Cloudy at 53 because scoring changed on Oct 9, when the venture funding pace and the tech-layoff trend stopped counting. Scored the same way, the Oct 6 reading is Cloudy at 59, so risk appetite fell 6 points and conditions did not change."
   },
   {
     "slug": "2026-w45",

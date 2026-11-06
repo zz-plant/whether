@@ -249,7 +249,8 @@ describe("assembleCurrentWeekBrief", () => {
     assert.equal(result.record.slug, result.slug);
     assert.equal(result.record.recordDate, liveReportData.treasury.record_date);
     assert.ok(PublishedBriefSchema.safeParse(result.record).success, "the record is what data/published_briefs.json carries");
-    assert.equal(result.record.publishedAt, new Date(liveReportData.treasury.record_date).toISOString());
+    /* The freeze, not the record date: every week reached the news sitemap already past its two days. */
+    assert.equal(result.record.publishedAt, now.toISOString());
     assert.equal(result.record.correction, null);
     assert.ok(result.record.decisions.length > 0);
     assert.ok(result.record.scores);

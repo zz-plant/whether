@@ -2844,7 +2844,7 @@ The read in §1.1.49 went on to the other surfaces that assemble sentences from 
   Spending rule's 6-month payback bar (`SPENDING_PAYBACK_BAR_MONTHS`) instead of setting its own 12-
   or 9-month cap beside conditions the reading contradicted.
 - **Cadence summaries** (`/api/weekly`, `/api/monthly`, `/api/quarterly`, `/api/yearly`,
-  `/api/summary-delta`, `/api/cadence`, the agent interface, the RSS live item, `/api/scores`). Dated
+  `/api/summary-delta`, `/api/cadence`, the agent interface, `/api/scores`). Dated
   by the reading's record date, never the week-ending Friday, which printed "Updated Oct 9" on Oct
   7. Each states the published confidence word and then "Conditions change if:" with the canonical
   sentence; "the signals behind it are barely moving" is gone, because the number behind it was a

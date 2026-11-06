@@ -2,40 +2,82 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { GET } from "../app/feed.xml/route";
-import { formatDateUTC } from "../lib/formatters";
-import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
+import {
+  buildPublishedBriefPath,
+  buildPublishedBriefTitle,
+  correctionBody,
+  findPublishedBrief,
+  getPublishedBriefs,
+  labelForArea,
+} from "../lib/report/publishedBriefs";
 import { siteUrl } from "../lib/siteUrl";
 import { escapeXml } from "../lib/seo";
-import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
-import { weeklyHeadline } from "../lib/report/reportEvidence";
-import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
-
-serveUnreachableUpstreams();
 
 const items = (xml: string) => [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((match) => match[1]);
 const tag = (block: string, name: string) => block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`))?.[1] ?? "";
+const itemFor = (xml: string, slug: string) => {
+  const link = `${siteUrl}${buildPublishedBriefPath(slug)}`;
+  const entry = items(xml).find((block) => tag(block, "link") === link);
+  assert.ok(entry, `an item at ${link}`);
+  return entry;
+};
 
 describe("feed.xml", () => {
-  it("carries one permalink item per published week, plus the live week", async () => {
+  it("carries one permalink item per published week, and nothing else", async () => {
     const xml = await (await GET()).text();
     const published = getPublishedBriefs();
     assert.ok(published.length > 0, "the archive has at least one published week");
 
     const entries = items(xml);
-    assert.ok(entries.length >= published.length, `${entries.length} items for ${published.length} published weeks`);
+    assert.equal(entries.length, published.length, "a news platform takes every item's link as an article");
 
     for (const brief of published) {
-      const link = `${siteUrl}${buildPublishedBriefPath(brief.slug)}`;
-      const entry = entries.find((block) => tag(block, "link") === link);
-      assert.ok(entry, `published week ${brief.slug} has an item at ${link}`);
+      const entry = itemFor(xml, brief.slug);
       assert.match(entry, /isPermaLink="true"/);
-      assert.equal(tag(entry, "guid"), link);
+      assert.equal(tag(entry, "guid"), `${siteUrl}${buildPublishedBriefPath(brief.slug)}`);
       assert.equal(tag(entry, "pubDate"), new Date(brief.publishedAt).toUTCString());
     }
+    assert.ok(!entries.some((block) => tag(block, "link") === `${siteUrl}/`), "no item points at the homepage");
+  });
 
-    /* A live item, when present, is the only one allowed to point at the homepage. */
-    const homepageItems = entries.filter((block) => tag(block, "link") === `${siteUrl}/`);
-    assert.ok(homepageItems.length <= 1, "at most one item points at the live homepage");
+  it("titles each item with the page's own title, not the archive's slug", async () => {
+    const xml = await (await GET()).text();
+    for (const brief of getPublishedBriefs()) {
+      assert.equal(tag(itemFor(xml, brief.slug), "title"), escapeXml(buildPublishedBriefTitle(brief)));
+    }
+    assert.doesNotMatch(xml, /<title>Week \d{4}-w/);
+  });
+
+  it("carries each week in full, so a platform that takes only full text can run it", async () => {
+    const xml = await (await GET()).text();
+    for (const brief of getPublishedBriefs()) {
+      const content = tag(itemFor(xml, brief.slug), "content:encoded");
+      for (const decision of brief.decisions) {
+        assert.ok(content.includes(`<h3>${escapeXml(labelForArea(decision.area))}</h3>`), `${brief.slug}: ${decision.area}`);
+      }
+      assert.ok(content.includes("<h2>What changed this week</h2>"), brief.slug);
+      assert.ok(content.includes("<h2>Provenance</h2>"), brief.slug);
+    }
+    const w45 = findPublishedBrief("2026-w45");
+    assert.ok(w45);
+    const content = tag(itemFor(xml, w45.slug), "content:encoded");
+    assert.ok(content.includes("<h2>The numbers behind the guidance</h2>"));
+    assert.ok(content.includes("Only replace people who leave"), "an area's own action, not only its name");
+    assert.ok(content.split(/\s+/).length > 250, "more words than a teaser");
+  });
+
+  it("prints a correction inside the item it corrects", async () => {
+    const xml = await (await GET()).text();
+    const w44 = findPublishedBrief("2026-w44");
+    assert.ok(w44?.correction);
+    const content = tag(itemFor(xml, w44.slug), "content:encoded");
+    assert.ok(content.includes(`<strong>Correction:</strong> ${escapeXml(correctionBody(w44.correction))}`));
+  });
+
+  it("names the channel's image in a format RSS allows", async () => {
+    const xml = await (await GET()).text();
+    assert.match(tag(xml, "image"), /<url>[^<]+\.png<\/url>/);
+    assert.ok(readFileSync(new URL("../public/icon-192.png", import.meta.url)).length > 0, "the file the feed names exists");
   });
 
   it("gives every item a byline and a lead image, for readers and Apple News", async () => {
@@ -64,36 +106,11 @@ describe("feed.xml", () => {
     assert.equal((xml.match(/<item>/g) ?? []).length, (xml.match(/<\/item>/g) ?? []).length);
   });
 
-  /*
-   * The live item printed "Data as of: Oct 9, 2026" (the week-ending Friday) under
-   * a guid and pubDate dated Oct 5, and its confidence as "Confidence: Medium
-   * confidence." Its record date is the one its guid names, and its confidence reads
-   * as the published items' do.
-   */
-  it("dates the live item by its record date and states the margin once", async () => {
+  /* The items' html had no test, so the 2026-10-28 rename of the margin label missed every
+     frozen week: the feed kept printing "Margin:" beside each record date. */
+  it("words each item's margin the way the page does", async () => {
     const xml = await (await GET()).text();
-    const live = items(xml).find((block) => tag(block, "link") === `${siteUrl}/`);
-    if (!live) return; // the archive already carries this week
-
-    const recordDate = tag(live, "guid").replace("whether-brief-live-", "");
-    assert.match(recordDate, /^\d{4}-\d{2}-\d{2}$/);
-    assert.equal(tag(live, "pubDate"), new Date(recordDate).toUTCString());
-    assert.match(live, new RegExp(`<strong>Data as of:</strong> ${formatDateUTC(recordDate)} · Room before a change: (plenty|some|little)</p>`));
-    assert.doesNotMatch(live, /Confidence:|\b(High|Medium|Low) confidence\b/);
-    /* The week's one headline action (`weeklyHeadline`), not the weekly summary's own sentence. */
-    const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "test" });
-    assert.ok(tag(live, "title").includes(escapeXml(weeklyHeadline(snapshot.weeklyCall).action)), tag(live, "title"));
-  });
-
-  /* The published items' html branch had no test, so the 2026-10-28 rename of the
-     margin label reached the live item and missed every frozen week: the feed kept
-     printing "Margin:" beside each record date. The archive is always present, so
-     this runs on every invocation regardless of whether the live item does. */
-  it("words the published items' margin the way the live item does", async () => {
-    const xml = await (await GET()).text();
-    const published = items(xml).filter((block) => tag(block, "link") !== `${siteUrl}/`);
-    assert.ok(published.length > 0, "the archive is the feed's content; at least one frozen week is on the record");
-    for (const item of published) {
+    for (const item of items(xml)) {
       assert.match(item, /<strong>Data as of:<\/strong> [^<]* · Room before a change: (plenty|some|little)<\/p>/);
       assert.doesNotMatch(item, /Margin:|Confidence:/);
     }
