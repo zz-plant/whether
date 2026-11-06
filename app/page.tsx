@@ -20,7 +20,6 @@ import { CadenceSelector } from "./components/cadenceSelector";
 import { QuietWeekFold } from "./components/home/QuietWeekFold";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
-import { getPlaybookForRegime } from "../lib/playbook";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { describeSavedCopyBanner, resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
@@ -472,6 +471,8 @@ async function PageContent({
      earlier reading ("Risk appetite fell through 54."), or that none was.
      Nothing on a week with no comparison, which the stamp line already says. */
   const whyLine = decisionMovement ? describeMovementCause(decisionMovement) : undefined;
+  /* A week nothing moved says so once, on the stamp line, in place of "Holding this week". */
+  const unmovedLine = decisionMovement?.moved.length === 0 && cardCall.directionLabel === "Holding this week" ? whyLine?.replace(/\.$/, "") : undefined;
   /* Whose lines these are: the stage and runway the reader chose, or the
      defaults, said once, at the head of the areas. */
   const calibrationChosen = Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway);
@@ -644,16 +645,11 @@ async function PageContent({
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
   const countedRegime = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedRegime ?? null;
-  /* One sentence the reader can say in a meeting, from the same playbook /operate
-     prints in full. A score has to be interpreted; a sentence can be repeated.
-     A held week prints none: "take share while money is cheap" under "hold
-     anything you can't undo" is two instructions disagreeing. */
-  const heroPhrase =
-    !historicalSelection && !reportData.assessment.policyAssessment?.refusal?.refused && isRegimeKey(regime)
-      ? getPlaybookForRegime(regime)?.leadershipPhrases.more[0]
-      : undefined;
+  /* The card sizes the room before a change once; the count of months held at this
+     distance is /trust's. */
   const heroTrust = {
     ...trustStripProps,
+    baseRate: null,
     basis: {
       ...trustStripProps.basis,
       consequenceOnCard: Boolean(countedRegime),
@@ -809,9 +805,9 @@ async function PageContent({
                 location={readingLocation}
                 reading={heroReading}
                 weeklyCall={cardCall.action}
-                callDetail={historicalSelection ? undefined : whyLine}
+                callDetail={historicalSelection || unmovedLine ? undefined : whyLine}
                 regime={regime}
-                direction={historicalSelection ? undefined : cardCall.directionLabel}
+                direction={historicalSelection ? undefined : unmovedLine ?? cardCall.directionLabel}
                 earlier={earlierConditions}
                 since={conditionsSince}
                 /* The map from `md` up, where it is the one definition of the four
@@ -851,7 +847,6 @@ async function PageContent({
                 published={publishedNotice}
                 areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} /> : undefined}
                 feelsLike={countedRegime ? { regime: countedRegime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
-                phrase={heroPhrase}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={
                   nearestLadder && !historicalSelection ? (

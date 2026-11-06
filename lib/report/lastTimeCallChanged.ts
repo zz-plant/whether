@@ -236,8 +236,8 @@ const describeScoreAgainstRecord = ({
   if (series.length < 24 || firstYear === undefined) return null;
   const below = series.filter((entry) => entry[metric] < value).length / series.length;
   const above = series.filter((entry) => entry[metric] > value).length / series.length;
-  if (below >= 0.6) return `higher than in ${shareWords(below)} since ${firstYear}`;
-  if (above >= 0.6) return `lower than in ${shareWords(above)} since ${firstYear}`;
+  if (below >= 0.6) return `higher than ${shareWords(below)} since ${firstYear}`;
+  if (above >= 0.6) return `lower than ${shareWords(above)} since ${firstYear}`;
   return "about typical";
 };
 
@@ -255,7 +255,7 @@ const CONDITION_SIDES: Record<RegimeKey, { money: "pricey" | "cheap"; investors:
 
 /**
  * The two plain facts the weather word stands for, each with its score set against the
- * record (2026-11-03): "Money is pricey: funding pressure 90, higher than in most
+ * record (2026-11-03): "Money is pricey: funding pressure 90, higher than most
  * months since 2012. Investors are willing: risk appetite 53, about typical." It takes
  * the place of the regime's one-line rationale under the call: the four words are not a
  * severity scale (Stormy is not worse than Cloudy), and the two facts are what they

@@ -391,36 +391,26 @@ export type LineStateBandModel = {
 };
 
 export const describeLineStateBand = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "changedKind">[],
 ): LineStateBandModel | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
 
-  const band = (state: LineStateBandModel["state"], row: Pick<HomeAreaRow, "area" | "pause" | "resume">, text: string) => ({
+  const band = (state: LineStateBandModel["state"], row: Pick<HomeAreaRow, "area">, text: string) => ({
     state,
     area: row.area,
     text,
   });
 
-  /* Held: the area whose restart line is nearest, since that is the hold that
-     lifts first. An area with no numeric restart line still belongs here — it
-     is on hold — it just cannot say how far from lifting it is. */
-  const held = ruled.filter((row) => row.pause?.met);
-  if (held.length > 0) {
-    const nearestRestart = (row: Pick<HomeAreaRow, "resume">) =>
-      row.resume && !row.resume.met && Number.isFinite(row.resume.points) ? row.resume.points : Number.POSITIVE_INFINITY;
-    const binding = held.reduce((best, row) => (nearestRestart(row) < nearestRestart(best) ? row : best));
-    const restart = binding.resume;
-    /* How big a move lifts the hold, against the record ("a rare move from
-       restarting"), where "24 pts from restarting" gave a size with nothing to
-       hold it against (2026-11-03). */
-    return band(
-      "crossed",
-      binding,
-      restart && !restart.met && Number.isFinite(restart.points)
-        ? `${decisionAreaLabel(binding.area)} — ${describeSlotDistance(restart)} from restarting.`
-        : `${decisionAreaLabel(binding.area)} is on hold.`,
-    );
+  /* Only the week a hold starts (2026-11-05). A hold can stand for years, and the last
+     one at these lines took 39 months to lift; red every week of that is a band nobody
+     reads. The card's area strip states a standing hold. */
+  const paused = ruled.filter((row) => row.pause?.met && row.changedKind === "paused");
+  const [firstPaused] = paused;
+  if (firstPaused) {
+    const names = paused.map((row) => decisionAreaLabel(row.area));
+    const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+    return band("crossed", firstPaused, `${list} just paused.`);
   }
 
   /* Close: the shared cutoff, through the same resolver the badges use, so the
@@ -438,35 +428,23 @@ export const describeLineStateBand = (
   );
 };
 
-/**
- * The card's bridge from the weather word to the five areas (2026-10-14).
- *
- * The condition comes from the change lines and the area answers from the
- * pause and restart lines, so a card could say "Cloudy: money is available"
- * over a picker where four areas were held, and nothing tied the two. This
- * names the held areas on the card without repeating its condition stamp:
- * "On hold: Hiring, Fundraising, Spending and New bets."
- *
- * Since 2026-11-03 it also names the score holding them when one score holds them
- * all ("On hold while funding pressure is above 76: …"). The card prints the
- * weather word and the two scores just above, and "Cloudy: money is available"
- * over four held areas left the reader to work out that the holds come from the
- * score, not the weather word.
- */
-const describeHoldingScore = (slots: readonly HomeAreaLineSlot[]): string | null => {
-  const [first] = slots;
-  if (!first || first.value === undefined || first.holdsAbove === undefined) return null;
-  const same = slots.every(
-    (slot) => slot.metric === first.metric && slot.value === first.value && slot.holdsAbove === first.holdsAbove,
-  );
-  if (!same) return null;
-  return `${ruleMetricLabel[first.metric].toLowerCase()} is ${first.holdsAbove ? "above" : "below"} ${first.value}`;
-};
-
 export type AreaStripModel = {
   cells: { area: DecisionArea; state: LineState; label: string; href: string }[];
-  /** The one score holding every held area, as a sentence. Null when none is held or two scores hold them. */
-  holding: string | null;
+  /** What the holds wait on, where every held area names the same restart line. */
+  restart: string | null;
+};
+
+/* Where every held area waits on one line: the fact a reader of a held week asks next,
+   and the size of the move it takes. "No restart until", because a rule can ask for a
+   second score as well, and this names the one line it shows. */
+const describeSharedRestart = (rows: readonly Pick<HomeAreaRow, "pause" | "resume">[]): string | null => {
+  const slots = rows.filter((row) => row.pause?.met).map((row) => row.resume);
+  const [first] = slots;
+  if (!first || first.met) return null;
+  const phrase = slotPhrase(first);
+  if (!phrase || slots.some((slot) => !slot || slotPhrase(slot) !== phrase)) return null;
+  const band = describeScoreMoveBand(first.metric, first.points);
+  return `No restart until ${phrase}${band ? `, ${band}` : ""}.`;
 };
 
 const AREA_STRIP_STATE_LABEL: Record<LineState, string> = {
@@ -477,10 +455,10 @@ const AREA_STRIP_STATE_LABEL: Record<LineState, string> = {
 
 /**
  * The card's five-area row: where each area stands against its pause line, in the words
- * the page's groups use. Null when no area states a line. The distance stays out: areas
- * held by one score would print one distance in every column.
+ * the page's groups use. Null when no area states a line. The distance is the line under
+ * the columns: areas held by one score would print one distance in every column.
  */
-export const buildAreaStrip = (rows: readonly Pick<HomeAreaRow, "area" | "pause">[]): AreaStripModel | null => {
+export const buildAreaStrip = (rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[]): AreaStripModel | null => {
   const cells = rows.flatMap((row) => {
     const status = describeAreaPauseStatus(row);
     return status
@@ -488,8 +466,7 @@ export const buildAreaStrip = (rows: readonly Pick<HomeAreaRow, "area" | "pause"
       : [];
   });
   if (cells.length === 0) return null;
-  const holding = describeHoldingScore(rows.flatMap((row) => (row.pause?.met ? [row.pause] : [])));
-  return { cells, holding: holding ? `Held while ${holding}.` : null };
+  return { cells, restart: describeSharedRestart(rows) };
 };
 
 /**

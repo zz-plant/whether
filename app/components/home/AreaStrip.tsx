@@ -11,7 +11,7 @@ import { AreaIcon, LineStateIcon } from "../ui/conceptIcons";
  */
 export function AreaStrip({ model }: { model: AreaStripModel }) {
   return (
-    <div data-area-strip className="border-y border-[color:var(--border-faint)] py-2">
+    <div data-area-strip className="border-t border-[color:var(--border-faint)] pt-2">
       <ul className="grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-x-1 gap-y-1">
         {model.cells.map((cell) => (
           <li key={cell.area} className="min-w-0">
@@ -34,7 +34,7 @@ export function AreaStrip({ model }: { model: AreaStripModel }) {
           </li>
         ))}
       </ul>
-      {model.holding ? <p className="mt-1 text-sm leading-snug text-slate-300">{model.holding}</p> : null}
+      {model.restart ? <p className="mt-1 text-sm leading-snug text-slate-300">{model.restart}</p> : null}
     </div>
   );
 }

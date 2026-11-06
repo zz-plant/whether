@@ -86,9 +86,9 @@ export type HomeLoadReading = z.infer<typeof readingSchema>;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  words: 1663,
-  numbers: 289,
-  wordsBeforeAreas: 339,
+  words: 1643,
+  numbers: 287,
+  wordsBeforeAreas: 319,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
      appetite, room before a change). A deliberate raise, said here and in its PR.

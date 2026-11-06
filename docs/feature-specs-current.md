@@ -344,13 +344,14 @@ until the report resolves.
   out to pay for the words; the calibration line and the card's pill say the same.
 - **Your decisions is in the Plan group** as a secondary page: its row, footer column and the
   phone's sheet. It was a footer link beside Privacy. It stays out of the sitemap and `/llms.txt`.
-- **The card names the score holding the areas** when one score holds them all (2026-11-05: "Held
-  while funding pressure is above 76." under the area strip). With two scores holding different
-  areas it names neither.
 - **The five areas cross the card** (2026-11-05, `AreaStrip`, `buildAreaStrip`), the way a weather
   app's forecast row reads: a name and a state per column, in place of the "On hold: …" sentence.
-  Each column goes to that area's rule. The line-state band above the card lost its "What to do"
-  link, which the strip replaces.
+  Each column goes to that area's rule, and the line under them says what the holds wait on when they
+  share one restart line ("No restart until funding pressure falls below 66, a rare move.").
+- **The card edited down** (2026-11-05). The line-state band prints the week a hold starts or a
+  line is close, not every week of a hold, and has no link. "Say it" left the card, since it
+  restated the call; `/operate` keeps the phrases. A week nothing moved says so once on the stamp
+  line. The months-held count is `/trust`'s, and the card's strip drops it.
 - **"Feels like" beside the condition** (2026-11-05, `ScoringBasis.countedRegime`): the conditions
   the left-out inputs would give, on a live reading where they differ from the published ones. It
   moves "Counted, conditions would be …" off the trust strip, which still names the inputs.

@@ -4,18 +4,12 @@ import { LineStateIcon } from "../ui/conceptIcons";
 /**
  * The week's exception, above the call (2026-10-31).
  *
- * A crossed pause line was drawn in five places on `/` — the stamp, the
- * ladder, the picker's badges, the area table and the card's "On hold:" line —
- * and loud in none, so a week with an area held looked like a week with none.
- * The band is the page's silhouette changing with the weather: it renders only
- * when `describeLineStateBand` finds an area on hold or close to its line, and
- * returns nothing on a calm week.
+ * The band is the page's silhouette changing with the weather: it renders only when
+ * `describeLineStateBand` finds a hold that just started or a line that is close, and
+ * returns nothing otherwise, a standing hold included (2026-11-05). The card's area strip
+ * states a hold and links to its rule, so the band carries no link of its own.
  *
- * Its glyph is the line state's own (§XXIV: pause for crossed, the dashed ring
- * for close), and the sentence carries the distance to the binding line — the
- * one fact the card does not state. It names no state word and carries no link,
- * because the card's area strip does both, and two statements of the same state forty pixels
- * apart is how a page starts repeating itself.
+ * Its glyph is the line state's own (§XXIV: pause for crossed, the dashed ring for close).
  */
 export function LineStateBand({ model }: { model: LineStateBandModel }) {
   return (

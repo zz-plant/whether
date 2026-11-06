@@ -23,7 +23,7 @@ Use this guide when editing the home route shell, workspace bands, route handoff
 The homepage should read as (one order for every reader since 2026-10-22; `HOME_SECTIONS`), following
 the four questions a reader arrives with — what is happening, what do I do, what would change it, how
 far can I trust it:
-1. settle the weekly guidance: the exception band (only on a week a line is crossed or close), the
+1. settle the weekly guidance: the exception band (only the week a hold starts or a line is close), the
    verdict, then the five areas and whose stage and runway their lines are scaled to
 2. answer the plan: the areas' rules, what changed (delta before explanation, 2026-10-31), what the
    conditions are made of (the two readings, the excluded inputs, the capped score), what would

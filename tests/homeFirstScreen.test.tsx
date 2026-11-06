@@ -24,14 +24,6 @@ const pauseSlot = (met: boolean, points: number): HomeAreaLineSlot => ({
   metric: "tightness",
 });
 
-const restartSlot = (met: boolean, points: number): HomeAreaLineSlot => ({
-  line: "Funding pressure < 66",
-  distance: met ? "already met" : `${points} pts away`,
-  points,
-  met,
-  metric: "tightness",
-});
-
 describe("the band states the week's exception, or nothing", () => {
   it("says nothing on a calm week", () => {
     assert.equal(describeLineStateBand([]), null);
@@ -49,32 +41,33 @@ describe("the band states the week's exception, or nothing", () => {
     assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 0) }])?.text, "Hiring is on the edge of pausing.");
   });
 
-  it("says how far a hold is from lifting, not just that it is one", () => {
+  it("marks the week a hold starts, naming every area it took", () => {
     const model = describeLineStateBand([
-      { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
+      { area: "hiring", pause: pauseSlot(true, 0), changedKind: "paused" },
+      { area: "capital-raising", pause: pauseSlot(true, 0), changedKind: "paused" },
+      { area: "burn-discipline", pause: pauseSlot(true, 0), changedKind: "held" },
     ]);
     assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring — a rare move from restarting.");
+    assert.equal(model?.text, "Hiring and Fundraising just paused.");
   });
 
-  it("picks the hold that lifts first", () => {
+  it("leaves a standing hold to the card", () => {
+    assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0), changedKind: "held" }]), null);
+    assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0) }]), null);
+  });
+
+  it("still warns of a line close to pausing under a standing hold", () => {
     const model = describeLineStateBand([
-      { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
-      { area: "capital-raising", pause: pauseSlot(true, 0), resume: restartSlot(false, 2) },
+      { area: "hiring", pause: pauseSlot(true, 0), changedKind: "held" },
+      { area: "burn-discipline", pause: pauseSlot(false, 1) },
     ]);
-    assert.equal(model?.text, "Fundraising — an unusual move from restarting.");
-  });
-
-  it("still states a hold with no numeric restart line", () => {
-    const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0) }]);
-    assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring is on hold.");
+    assert.equal(model?.state, "near");
   });
 
   it("prefers a crossed line to a close one", () => {
     const model = describeLineStateBand([
       { area: "hiring", pause: pauseSlot(false, 1) },
-      { area: "burn-discipline", pause: pauseSlot(true, 0) },
+      { area: "burn-discipline", pause: pauseSlot(true, 0), changedKind: "paused" },
     ]);
     assert.equal(model?.state, "crossed");
   });

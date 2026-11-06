@@ -40,29 +40,31 @@ describe("the card ties the weather word to the areas", () => {
     assert.equal(buildAreaStrip([]), null, "no area states a line");
   });
 
-  it("names the score holding them when one score holds them all", () => {
-    assert.equal(
-      buildAreaStrip([
-        { area: "hiring", pause: held("tightness", 76, true) },
+  it("says what the holds wait on when they share one restart line", () => {
+    const restart = { ...slot(false), line: "Funding pressure < 66", points: 24, value: 66, holdsAbove: false };
+    const strip = (rows: Parameters<typeof buildAreaStrip>[0]) => buildAreaStrip(rows)?.restart;
+    assert.match(
+      strip([
+        { area: "hiring", pause: held("tightness", 76, true), resume: restart },
         { area: "product-tempo", pause: slot(false) },
-        { area: "capital-raising", pause: held("tightness", 76, true) },
-      ])?.holding,
-      "Held while funding pressure is above 76.",
+        { area: "capital-raising", pause: held("tightness", 76, true), resume: restart },
+      ]) ?? "",
+      /^No restart until funding pressure falls below 66, an? [a-z]+ move\.$/,
     );
     assert.equal(
-      buildAreaStrip([
-        { area: "hiring", pause: held("tightness", 76, true) },
-        { area: "capital-raising", pause: held("riskAppetite", 44, false) },
-      ])?.holding,
+      strip([
+        { area: "hiring", pause: held("tightness", 76, true), resume: restart },
+        { area: "capital-raising", pause: held("riskAppetite", 44, false), resume: { ...restart, value: 54, holdsAbove: true } },
+      ]),
       null,
-      "two scores holding different areas name neither",
+      "two restart lines name neither",
     );
-    assert.equal(buildAreaStrip([{ area: "hiring", pause: slot(false) }])?.holding, null, "nothing held");
+    assert.equal(strip([{ area: "hiring", pause: slot(false) }]), null, "nothing held");
   });
 
   it("links each column on the card to its area's rule", () => {
     const html = renderToStaticMarkup(
-      <AreaStrip model={{ cells: [{ area: "hiring", state: "crossed", label: "On hold", href: "#area-hiring" }], holding: null }} />,
+      <AreaStrip model={{ cells: [{ area: "hiring", state: "crossed", label: "On hold", href: "#area-hiring" }], restart: null }} />,
     );
     assert.match(html, /data-line-state="crossed"[^>]*href="#area-hiring"|href="#area-hiring"[^>]*data-line-state="crossed"/);
     assert.ok(html.includes("On hold"));
