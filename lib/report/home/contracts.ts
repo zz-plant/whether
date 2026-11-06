@@ -1,122 +1,7 @@
 import type { ReportData } from "../reportData";
-import type { buildTrustStatus } from "../trustStatus";
-import type { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "../homeBriefModel";
+import type { buildWeeklyDecisionCardViewModel } from "../homeBriefModel";
 import type { loadHomePageReportData } from "../homePageData";
 import type { WeeklyCallContract } from "../weeklyCallContract";
-
-export type HomePageDiagnosticsLane = {
-  weeklyMemoLines: ReturnType<typeof buildHomeBriefModel>["weeklyMemoLines"];
-  immediateDecision: string;
-  revisitDecisions: boolean;
-  guardrail: string;
-  regimeDistance: ReturnType<typeof buildHomeBriefModel>["regimeDistance"];
-  postureWithStageLabel: string;
-  statusLabel: string;
-  trendLabel: string;
-  confidencePercent: number;
-  decisionMatrix: ReturnType<typeof buildHomeBriefModel>["decisionMatrix"];
-  decisionRules: ReturnType<typeof buildHomeBriefModel>["decisionRules"];
-  roleAwareTemplates: ReturnType<typeof buildHomeBriefModel>["roleAwareTemplates"];
-  evidenceItems: ReturnType<typeof buildHomeBriefModel>["evidenceItems"];
-  reportDynamics: ReportData["reportDynamics"];
-  weeklyMovement: ReturnType<typeof buildHomeBriefModel>["weeklyMovement"];
-  transitionProbabilities: ReturnType<typeof buildHomeBriefModel>["transitionProbabilities"];
-  failureModes: ReturnType<typeof buildHomeBriefModel>["failureModes"];
-  historicalTimeline: ReturnType<typeof buildHomeBriefModel>["historicalTimeline"];
-};
-
-export type HomePageWorkspaceModel = {
-  sectionLinks: { href: string; label: string }[];
-  workspaceActions: {
-    auditHref: string;
-    operationsHref: string;
-  };
-  audit: {
-    trustStatusLabel: string;
-    trustStatusDetail: string;
-    trustStatusAction: string;
-    trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
-    outageType: ReturnType<typeof buildTrustStatus>["outageType"];
-    outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
-    decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
-    approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
-    recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
-    outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
-    freshnessSummary: string;
-    sourceCoverageLine: string;
-    trustMarkerLabel: string;
-    trustMarkerTone: "stable" | "warning" | "historical";
-    trustMarkerDetail: string;
-    sourceDegraded: boolean;
-    sourceRows: Array<{
-      sourceName: string;
-      modeLabel: string;
-      freshnessStatus: string;
-    }>;
-    degradedSourceRows: Array<{
-      sourceName: string;
-      modeLabel: string;
-      freshnessStatus: string;
-    }>;
-    revisitHeadline: string;
-    revisitDetail: string;
-    flipHeadline: string;
-    flipDetail: string;
-    evidenceMovers: Array<{
-      key: string;
-      title: string;
-      detail: string;
-    }>;
-  };
-  replay: {
-    initialDate: string;
-    summary: string;
-    openFullHref: string;
-    preview: Array<{
-      key: string;
-      label: string;
-      summary: string;
-    }>;
-  };
-  operations: {
-    continueHref: string;
-    approvalHeadline: string;
-    approvalDetail: string;
-    topGuardrails: Array<{
-      key: string;
-      label: string;
-      detail: string;
-    }>;
-    financeSnapshot: Array<{
-      key: string;
-      label: string;
-      actionNow: string;
-      reversalCondition: string;
-    }>;
-    exportActions: Array<{
-      href: string;
-      label: string;
-    }>;
-  };
-  translate: {
-    primaryPath: {
-      href: string;
-      title: string;
-      detail: string;
-      kicker: string;
-    };
-    fallbackUtility: {
-      href: string;
-      title: string;
-      detail: string;
-    };
-    toolkitShortcuts: Array<{
-      href: string;
-      title: string;
-      detail: string;
-    }>;
-  };
-};
 
 export type HomePageAssembly = {
   reportShell: {
@@ -124,18 +9,10 @@ export type HomePageAssembly = {
     statusLabel: string;
     recordDateLabel: string;
     fetchedAtLabel: string;
-    freshnessLine: string;
     treasurySource: ReportData["treasury"]["source"];
     trustStatusLabel: string;
     trustStatusDetail: string;
     trustStatusAction: string;
-    trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
-    outageType: ReturnType<typeof buildTrustStatus>["outageType"];
-    outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
-    decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
-    approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
-    recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
-    outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
     degradedSourceRows: Array<{
       sourceName: string;
       modeLabel: string;
@@ -143,7 +20,6 @@ export type HomePageAssembly = {
     }>;
     provenance: ReportData["treasuryProvenance"];
     showOfflineBadge: boolean;
-    sectionLinks: { href: string; label: string }[];
     structuredData: unknown;
     historicalBanner: {
       banner: string;
@@ -155,13 +31,4 @@ export type HomePageAssembly = {
   reportResult: Awaited<ReturnType<typeof loadHomePageReportData>>;
   weeklyCall: WeeklyCallContract;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
-  diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
-  workspaceModelPromise: Promise<HomePageWorkspaceModel>;
-  fallbackActive: boolean;
-  fallbackAlert: {
-    lastCachedTimestamp: string;
-    sourceLabel?: string;
-    effectiveRecordDate?: string;
-    fallbackReason?: string | null;
-  } | null;
 };

@@ -18,8 +18,6 @@ describe("buildTrustStatus trust tones", () => {
     const result = buildTrustStatus({
       historicalSelection: false,
       isFallback: false,
-      confidenceLabel: "LOW",
-      freshnessLabel: "Updated 1h ago",
       historicalAction: "unused",
       fallbackAction: "unused",
       stableAction: "None.",
@@ -52,13 +50,6 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusLabel, /Live · all sources answered/);
     assert.equal(result.trustStatusDetail, "Every source answered, so this week's guidance rests on current data.");
     assert.equal(result.trustStatusAction, "None.");
-    assert.equal(result.outageType, "live-data");
-    assert.equal(result.outageSeverity, "advisory");
-    assert.equal(result.outageExitGate.metCount, 2);
-    assert.equal(
-      result.decisionImpactWindow,
-      "Use this live reading for this week's decisions; this week's pauses apply.",
-    );
   });
 
   it("returns warning trust copy that keeps decision path but stages irreversible approvals", () => {
@@ -69,7 +60,6 @@ describe("buildTrustStatus trust tones", () => {
       historicalAction: "unused",
       fallbackAction: "Use cached read for pacing.",
       stableAction: "unused",
-      freshnessLabel: "Unavailable",
     });
 
     assert.equal(result.trustStatusTone, "warning");
@@ -78,9 +68,6 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /Treasury API timeout/);
     assert.match(result.trustStatusAction, /Use cached read for pacing/);
     assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source`));
-    assert.equal(result.outageType, "feed-unavailable");
-    assert.equal(result.outageSeverity, "critical");
-    assert.equal(result.outageExitGate.metCount, 1);
   });
 
   it("returns historical trust copy for retrospective use with explicit confidence fallback action", () => {
@@ -97,7 +84,6 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /A past week, not this one/);
     assert.match(result.trustStatusAction, /Use this view for retrospective review/);
     assert.ok(result.trustStatusAction.includes("Switch to current live data"));
-    assert.equal(result.outageType, "historical-snapshot");
   });
 
   it("returns policy-refusal trust copy that holds approvals and states the reason it is held for", () => {
@@ -117,14 +103,13 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(disagree.trustStatusDetail, /The two scores point in different directions, so the guidance is not changing this week/);
     assert.match(disagree.trustStatusAction, /Keep new commitments reversible\./);
     assert.ok(disagree.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores agree.`));
-    assert.equal(disagree.decisionImpactWindow, "Only moves you can undo, until the two scores agree.");
 
     /* A week held for missing inputs printed "the two scores point in different
        directions" here, and "signals unstable" above it. */
     const missing = build(POLICY_OVERRIDE_CALL["inputs-missing"]);
     assert.match(missing.trustStatusDetail, /^Too many inputs are missing this week/);
     assert.ok(missing.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the missing inputs return.`));
-    for (const text of [missing.trustStatusLabel, missing.trustStatusDetail, missing.trustStatusAction, missing.decisionImpactWindow]) {
+    for (const text of [missing.trustStatusLabel, missing.trustStatusDetail, missing.trustStatusAction]) {
       assert.doesNotMatch(text, /two scores|unstable/, text);
     }
   });

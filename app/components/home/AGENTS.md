@@ -45,7 +45,6 @@ Evidence, trust, replay, and tools are exception paths.
 Prefer changing these before changing home presentation:
 - `app/page.tsx`
 - `lib/report/homePageAssembler.ts`
-- `lib/report/home/workspaceModel.ts`
 - `lib/report/home/contracts.ts`
 - `lib/report/homeBriefModel.ts`
 

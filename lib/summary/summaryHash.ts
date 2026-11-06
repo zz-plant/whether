@@ -12,21 +12,7 @@ type SummaryHashInput = {
   };
 };
 
-type StableSummaryPayload = {
-  title: string;
-  summary: string;
-  regime: string;
-  regimeLabel: string;
-  guidance: string;
-  constraints: string[];
-  recordDateLabel: string | null;
-  provenance: {
-    sourceLabel: string;
-    sourceUrl?: string;
-  };
-};
-
-const buildStableSummaryPayload = (summary: SummaryHashInput): StableSummaryPayload => ({
+const buildStableSummaryPayload = (summary: SummaryHashInput): SummaryHashInput => ({
   title: summary.title,
   summary: summary.summary,
   regime: summary.regime,
