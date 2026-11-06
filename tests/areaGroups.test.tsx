@@ -60,12 +60,12 @@ describe("buildAreaGroups", () => {
     assert.equal(near?.condition, "Pauses if risk appetite falls below 44.");
   });
 
-  it("puts today's score and the size of the move beside each condition", () => {
+  it("puts the size of the move beside each condition", () => {
     const [held, near] = groups;
     const band = describeScoreMoveBand("tightness", 24);
     assert.ok(band, "the record sizes a 24-point move");
-    assert.equal(held?.distance, `It is 90 today, ${band} away.`);
-    assert.match(near?.distance ?? "", /^It is 48 today, .+ away\.$/);
+    assert.equal(held?.distance, `${band?.charAt(0).toUpperCase()}${band?.slice(1)} away.`);
+    assert.match(near?.distance ?? "", /^An? .+ away\.$/);
   });
 
   it("keeps a pause or a lift with the area it moved, and drops what the group already says", () => {

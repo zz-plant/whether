@@ -5,6 +5,8 @@ import { Sparkline, interquartileRange, sparklineDomain, type SparklinePoint } f
 import { ScoreLadder } from "../ui/scoreLadder";
 import { GovernedAreas } from "../ui/governedAreas";
 import { SignalContextDetails } from "../ui/plainLanguage";
+import type { ScoreMoveRanges } from "../../../lib/report/marketMoveScale";
+import type { RegimeKey } from "../../../lib/types";
 import { TrendGlyph, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
@@ -115,6 +117,8 @@ function InputHistoryGrid({ series }: { series: readonly { key: string; label: s
 }
 
 export function WhatChangedSection({
+  moveRanges,
+  feelsLike,
   rows,
   lead,
   comparisonUnavailable,
@@ -126,6 +130,10 @@ export function WhatChangedSection({
   compact = false,
   historyOpen = false,
 }: {
+  /** How far the record's months moved each score, for its ladder. */
+  moveRanges?: ScoreMoveRanges | null;
+  /** The reading with the left-out inputs counted, where its conditions differ. */
+  feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
   rows: readonly SignalChangeRow[];
   compact?: boolean;
   historyOpen?: boolean;
@@ -266,6 +274,12 @@ export function WhatChangedSection({
                           previous={comparisonUnavailable ? null : row.previous}
                           previousLabel={basis.label}
                           lines={row.lines}
+                          monthRange={row.key === "tightness" || row.key === "riskAppetite" ? moveRanges?.[row.key] : null}
+                          feelsLike={
+                            feelsLike && (row.key === "tightness" || row.key === "riskAppetite") && feelsLike[row.key] !== row.value
+                              ? { value: feelsLike[row.key], regime: feelsLike.regime }
+                              : null
+                          }
                         />
                       </Link>
                       {row.saturatedPressure !== undefined ? (

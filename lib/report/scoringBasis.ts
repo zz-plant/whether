@@ -133,8 +133,8 @@ export type ScoringBasis = {
    * below 50", but can weigh a different answer. Null when nothing would change.
    */
   consequence?: string | null;
-  /** The conditions counting the left-out inputs would give, where they differ from the published ones. */
-  countedRegime?: RegimeKey | null;
+  /** The reading counting the left-out inputs would give, where its conditions differ from the published ones. */
+  countedReading?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
 };
 
 /*
@@ -237,18 +237,18 @@ const crossedLine = (metric: RuleConditionMetric, counted: number, assessment: B
  * The answer the left-out inputs would give: other conditions first, since they move
  * every area; otherwise the areas whose pause or restart they would flip.
  */
-const resolveCountedRegime = (notCounted: readonly NotCountedScore[], assessment: BasisAssessment): RegimeKey | null => {
+const resolveCountedReading = (notCounted: readonly NotCountedScore[], assessment: BasisAssessment): ScoringBasis["countedReading"] => {
   const counted = {
     tightness: notCounted.find((entry) => entry.metric === "tightness")?.score ?? assessment.scores.tightness,
     riskAppetite: notCounted.find((entry) => entry.metric === "riskAppetite")?.score ?? assessment.scores.riskAppetite,
   };
-  const countedRegime = classifyRegimeQuadrant({ ...counted, thresholds: assessment.thresholds });
-  return countedRegime === assessment.regime ? null : countedRegime;
+  const regime = classifyRegimeQuadrant({ ...counted, thresholds: assessment.thresholds });
+  return regime === assessment.regime ? null : { regime, ...counted };
 };
 
 const describeConsequence = (notCounted: readonly NotCountedScore[], assessment: BasisAssessment): string | null => {
-  const countedRegime = resolveCountedRegime(notCounted, assessment);
-  if (countedRegime) return `Counted, conditions would be ${getRegimePublicLabel(countedRegime)}.`;
+  const countedReading = resolveCountedReading(notCounted, assessment);
+  if (countedReading) return `Counted, conditions would be ${getRegimePublicLabel(countedReading.regime)}.`;
   const areaChange = notCounted.flatMap((entry) => (entry.line?.includes(", where ") ? [entry.line.slice(entry.line.indexOf(", where ") + 8)] : [])).at(0);
   return areaChange ? `Counted, ${areaChange}.` : null;
 };
@@ -290,7 +290,7 @@ export const resolveScoringBasis = ({
     warning: crossing.length > 0 ? `${crossing.map(describeCrossing).join("; ")}.` : null,
     warningShort: crossing.length > 0 ? `${[...new Set(crossing.map((entry) => entry.label))].join(" and ")} left out` : null,
     consequence: crossing.length > 0 ? describeConsequence(notCounted, assessment) : null,
-    countedRegime: crossing.length > 0 ? resolveCountedRegime(notCounted, assessment) : null,
+    countedReading: crossing.length > 0 ? resolveCountedReading(notCounted, assessment) : null,
   };
 };
 

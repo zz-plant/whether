@@ -3,6 +3,7 @@ import { BoundedValue } from "../ui/boundedValue";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
 import { RegimeRadar } from "./RegimeRadar";
+import type { RegimeKey } from "../../../lib/types";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
 
@@ -61,6 +62,7 @@ type FlipProximityLine = {
  * it stays here.
  */
 export function WhatWouldChangeSection({
+  feelsLike,
   ladders,
   flipProximity,
   reversalTrigger,
@@ -73,6 +75,7 @@ export function WhatWouldChangeSection({
   regime,
   conditionsTrail,
 }: {
+  feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
   ladders: readonly HomeScoreLadder[];
   flipProximity: readonly FlipProximityLine[];
   reversalTrigger?: string;
@@ -143,6 +146,7 @@ export function WhatWouldChangeSection({
             trail={conditionsTrail?.points}
             trailCaption={conditionsTrail?.caption}
             caveat={conditionsTrail?.caveat}
+            feelsLike={feelsLike}
             readingsId="conditions-chart-readings"
             /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
                and line numbers drew at 8–10px with empty ground either side. */

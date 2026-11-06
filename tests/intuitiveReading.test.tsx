@@ -80,6 +80,34 @@ describe("the card ties the weather word to the areas", () => {
   });
 });
 
+describe("the ladder and the map draw the weather's own devices", () => {
+  const lines = [{ kind: "pause", value: 44 }, { kind: "resume", value: 54 }, { kind: "callChange", value: 50 }] as const;
+
+  it("draws a month's range around the dot, and names it", () => {
+    const html = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={53} lines={lines} monthRange={{ common: 5, unusual: 13 }} />);
+    assert.match(html, /data-ladder-month-range="common"[^>]*left:48%;width:10%/);
+    assert.match(html, /data-ladder-month-range="unusual"[^>]*left:40%;width:26%/);
+    assert.ok(html.includes("Common month") && html.includes("Unusual month"));
+  });
+
+  it("draws no band for a move most months do not make", () => {
+    const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} lines={lines} monthRange={{ common: 0, unusual: 3 }} />);
+    assert.doesNotMatch(html, /data-ladder-month-range="common"/);
+    assert.ok(html.includes("Unusual month") && !html.includes("Common month"));
+  });
+
+  it("plots what it feels like in that condition's glyph, on the ladder and the map", () => {
+    const ladder = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={53} lines={lines} feelsLike={{ value: 42, regime: "SCARCITY" }} />);
+    assert.match(ladder, /data-ladder-feels-like/);
+    assert.ok(ladder.includes("Feels like 42"));
+    const map = renderToStaticMarkup(
+      <RegimeRadar tightness={90} riskAppetite={53} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="DEFENSIVE" feelsLike={{ regime: "SCARCITY", tightness: 90, riskAppetite: 42 }} />,
+    );
+    assert.match(map, /data-feels-like-point/);
+    assert.doesNotMatch(renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={53} lines={lines} />), /data-ladder-feels-like|data-ladder-range-key/);
+  });
+});
+
 describe("each ladder says which way is worse", () => {
   it("reads the direction off the pause and restart lines", () => {
     const pressure = renderToStaticMarkup(

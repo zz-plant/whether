@@ -499,12 +499,12 @@ export const describeConditionsTrail = (recordDates: readonly string[]): string 
   const firstDate = new Date(`${first.slice(0, 10)}T00:00:00Z`);
   const lastDate = new Date(`${last.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(firstDate.getTime()) || Number.isNaN(lastDate.getTime())) return null;
-  if (recordDates.length === 1) return `The trail shows the end of ${MONTH_YEAR.format(lastDate)}, then this week.`;
+  if (recordDates.length === 1) return `Trail: the end of ${MONTH_YEAR.format(lastDate)}, then this week.`;
   const range =
     firstDate.getUTCFullYear() === lastDate.getUTCFullYear()
       ? `${MONTH_SHORT.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`
       : `${MONTH_YEAR.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`;
-  return `The trail shows each month, ${range}, then this week.`;
+  return `Trail: month-ends, ${range}.`;
 };
 
 /*
@@ -692,7 +692,9 @@ export const buildAreaGroups = (
     const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;
     const trend = slot && comparison ? describeTrend(slot, scores[slot.metric], comparison.scores[slot.metric], comparison.since) : null;
     const distance = slot && phrase
-      ? `It is ${Math.round(scores[slot.metric])} today${[band ? `${band} away` : null, trend].filter(Boolean).map((part) => `, ${part}`).join("")}.`
+      ? band
+        ? `${[`${band.charAt(0).toUpperCase()}${band.slice(1)} away`, trend].filter(Boolean).join(", ")}.`
+        : `It is ${Math.round(scores[slot.metric])} today${trend ? `, ${trend}` : ""}.`
       : null;
     /* The record reads the lines the group shows, so both must be on one score. */
     const history =

@@ -81,7 +81,7 @@ describe("the basis on every surface", () => {
     assert.match(line, /<dt[^>]*>Based on<\/dt>\s*<dd[^>]*>Startup-market inputs left out<span[^>]*data-basis-warning[^>]*>\u00A0·\u00A0Counted, conditions would be Stormy\.<\/span>/);
     assert.doesNotMatch(line, /would put risk appetite at 41/);
     assert.match(html, /Startup-market inputs would put risk appetite at 41, below 50\./);
-    assert.equal(reportData.scoringBasis.countedRegime, "VOLATILE");
+    assert.equal(reportData.scoringBasis.countedReading?.regime, "VOLATILE");
 
     /* Where the card says "Feels like", the strip still names the inputs and stops there. */
     const props = buildTrustStripProps({

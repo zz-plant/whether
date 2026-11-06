@@ -367,6 +367,15 @@ until the report resolves.
   like Freezing" when the card says so; the alert form is "Get an alert the day conditions turn".
   The bar: true of the data, readable with no decoding, and shorter or sharper than the plain line.
   Warning/watch labels and data "stations" did not clear it.
+- **The drawings use it too** (2026-11-05). `ScoreLadder` takes `monthRange` from
+  `describeScoreMoveRanges`: a common and an unusual month's move around the dot, read like a
+  weather app's day range, a count of past months and never a chance. `feelsLike` plots the score
+  with the left-out inputs counted, in that condition's glyph, on the ladder and on the conditions
+  map. Rings on the map were tried first: funding pressure usually does not move in a month, so
+  they flattened to a sliver at that size.
+  To pay for them the map's caption shortens, its "How they are set" link goes (the card's trust
+  strip links to the method), a group gives the size of the move without restating the score, and a
+  ladder drops the hollow dot when the earlier reading is the same.
 - **"Feels like" beside the condition** (2026-11-05, `ScoringBasis.countedRegime`): the conditions
   the left-out inputs would give, on a live reading where they differ from the published ones. It
   moves "Counted, conditions would be …" off the trust strip, which still names the inputs.

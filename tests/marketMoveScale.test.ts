@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { describeMarketMoveScale, describeRateMoveInFedSteps, describeScoreMoveBand } from "../lib/report/marketMoveScale";
+import { describeMarketMoveScale, describeRateMoveInFedSteps, describeScoreMoveBand, describeScoreMoveRanges } from "../lib/report/marketMoveScale";
 import {
   getTimeMachineRegimeSeries,
   getTimeMachineYieldCurveSeries,
@@ -106,6 +106,21 @@ describe("a score's distance as a move the record makes", () => {
         const expected = share === 0 ? "a record move" : share >= 1 / 3 ? "a common move" : share >= 1 / 12 ? "an unusual move" : "a rare move";
         assert.equal(describeScoreMoveBand(key, points), expected, `${key} ${points}`);
       }
+    }
+  });
+});
+
+describe("how far a month has moved each score", () => {
+  it("draws the same bands the sentences name", () => {
+    const ranges = describeScoreMoveRanges();
+    if (!ranges) throw new Error("the bundled record is longer than a year");
+    for (const score of ["tightness", "riskAppetite"] as const) {
+      const range: { common: number; unusual: number } = ranges[score];
+      const { common, unusual } = range;
+      assert.ok(unusual >= common, score);
+      if (common > 0) assert.equal(describeScoreMoveBand(score, common), "a common move", score);
+      assert.notEqual(describeScoreMoveBand(score, unusual), "a rare move", `${score}: an unusual month reached it`);
+      assert.equal(describeScoreMoveBand(score, unusual + 1), "a rare move", `${score}: one point past it is rare`);
     }
   });
 });

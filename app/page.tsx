@@ -29,7 +29,7 @@ import {
 import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
+import { describeMarketMoveScale, describeScoreMoveRanges } from "../lib/report/marketMoveScale";
 import { describeGuidanceChange, describeMovementCause } from "../lib/report/decisionMovement";
 import { anyPauseLineMet } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
@@ -44,7 +44,6 @@ import {
 } from "../lib/timeMachine/timeMachineSelection";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
-import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AreaStrip } from "./components/home/AreaStrip";
@@ -639,7 +638,9 @@ async function PageContent({
     ? undefined
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
-  const countedRegime = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedRegime ?? null;
+  const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
+  /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
+  const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
   /* The card sizes the room before a change once; the count of months held at this
      distance is /trust's. */
   const heroTrust = {
@@ -647,7 +648,7 @@ async function PageContent({
     baseRate: null,
     basis: {
       ...trustStripProps.basis,
-      consequenceOnCard: Boolean(countedRegime),
+      consequenceOnCard: Boolean(countedReading),
       ...(publishedNotice ? { note: null, omitReason: true } : {}),
     },
   };
@@ -821,17 +822,10 @@ async function PageContent({
                     trail={conditionsTrail.points}
                     trailCaption={conditionsTrail.caption}
                     caveat={conditionsTrail.caveat}
+                    feelsLike={countedReading}
                     compact
                     detailsOpen={searchParams?.chart === "1"}
                     readingsId="conditions-map-readings"
-                    footer={
-                      <Link
-                        href="/trust#formula-reference"
-                        className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
-                      >
-                        How they are set
-                      </Link>
-                    }
                     className="ml-auto w-full max-w-[18rem]"
                   />
                 }
@@ -841,7 +835,7 @@ async function PageContent({
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
                 areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} /> : undefined}
-                feelsLike={countedRegime ? { regime: countedRegime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
+                feelsLike={countedReading ? { regime: countedReading.regime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={
                   nearestLadder && !historicalSelection ? (
@@ -851,6 +845,12 @@ async function PageContent({
                       previous={comparisonUnavailable ? null : nearestLadder.previous}
                       previousLabel={basis.label}
                       lines={nearestLadder.lines}
+                      monthRange={moveRanges?.[nearestLadder.metric]}
+                      feelsLike={
+                        countedReading && countedReading[nearestLadder.metric] !== nearestLadder.value
+                          ? { value: countedReading[nearestLadder.metric], regime: countedReading.regime }
+                          : null
+                      }
                     />
                   ) : undefined
                 }
@@ -969,6 +969,8 @@ async function PageContent({
                 historyOpen={searchParams?.inputs === "1"}
                 heading={`What changed ${basis.since}`}
                 rows={signalChangeRows}
+                moveRanges={moveRanges}
+                feelsLike={countedReading}
                 history={{
                   tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
                   riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
@@ -995,6 +997,7 @@ async function PageContent({
               {/* 6. What would change the guidance: its pause and restart lines, the
                   line where conditions change, and where the reading sits. */}
               <WhatWouldChangeSection
+                feelsLike={countedReading}
                 ladders={scoreLadders}
                 flipProximity={v2HeroSignalData.flipProximity}
                 reversalTrigger={reversalTriggerLabel}

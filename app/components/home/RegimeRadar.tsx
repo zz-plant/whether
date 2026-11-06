@@ -4,6 +4,7 @@ import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regi
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { UrlDetails } from "../ui/urlDetails";
 import { ConditionIcon } from "../ui/conceptIcons";
+import type { RegimeKey } from "../../../lib/types";
 
 type RegimeRadarProps = {
   compact?: boolean;
@@ -25,7 +26,7 @@ type RegimeRadarProps = {
   trailCaption?: string | null;
   /** The like-for-like note when the earlier readings were scored from fewer inputs. */
   caveat?: string | null;
-  /** A last line under the caption: on the brief's card, the link to how the lines are set. */
+  /** A last line under the caption. */
   footer?: ReactNode;
   /**
    * The id the "Scores on this chart" fold takes, so a tap on the map opens it: the
@@ -43,6 +44,8 @@ type RegimeRadarProps = {
   primaryLabel?: string;
   /** What the hollow marker is, on a surface whose two points both need names ("This week"). */
   previousLabel?: string | null;
+  /** Where the reading would sit with the left-out inputs counted: its condition's own glyph, plotted. */
+  feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
   className?: string;
 };
 
@@ -55,6 +58,7 @@ const PLOT_RIGHT = PLOT_X + PLOT_SIZE;
 const PLOT_BOTTOM = PLOT_Y + PLOT_SIZE;
 /* The corner glyphs, centred on the cap height of the 10-unit words beside them. */
 const QUADRANT_ICON = 12.5;
+const FEELS_LIKE_ICON = 11;
 const TOP_ICON_Y = PLOT_Y + 12 - 3.6 - QUADRANT_ICON / 2;
 const BOTTOM_ICON_Y = PLOT_BOTTOM - 6 - 3.6 - QUADRANT_ICON / 2;
 
@@ -91,8 +95,14 @@ export function RegimeRadar({
   readingsId,
   primaryLabel,
   previousLabel,
+  feelsLike,
   className = "",
 }: RegimeRadarProps) {
+  /* The plotted glyph and Freezing's corner word want the same corner when the left-out
+     inputs land there: the word moves to the top of its quadrant, and the plotted glyph
+     stands in for the one beside it. */
+  const freezingUp =
+    Boolean(feelsLike) && yFor(feelsLike?.tightness ?? 0) > PLOT_BOTTOM - 26 && xFor(feelsLike?.riskAppetite ?? 100) < PLOT_X + 76;
   const boundaryX = xFor(riskAppetiteThreshold);
   const boundaryY = yFor(tightnessThreshold);
   const currentX = xFor(riskAppetite);
@@ -260,7 +270,7 @@ export function RegimeRadar({
             Cloudy in the caution one), which tied a condition to a state. */}
         <text
           x={PLOT_X + 6}
-          y={PLOT_BOTTOM - 6}
+          y={freezingUp ? boundaryY + 12 : PLOT_BOTTOM - 6}
           className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-freezing-ink)"
         >
@@ -298,7 +308,7 @@ export function RegimeRadar({
             ones. Inside, "Freezing" and its glyph would reach the change line
             at the default risk-appetite line of 50. 12.5 units is 16px at the
             plot's 16rem (256px) cap. */}
-        <ConditionIcon regime="SCARCITY" x={PLOT_X - QUADRANT_ICON - 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        {freezingUp ? null : <ConditionIcon regime="SCARCITY" x={PLOT_X - QUADRANT_ICON - 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />}
         <ConditionIcon regime="DEFENSIVE" x={PLOT_RIGHT + 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
         <ConditionIcon regime="VOLATILE" x={PLOT_X - QUADRANT_ICON - 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
         <ConditionIcon regime="EXPANSION" x={PLOT_RIGHT + 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
@@ -443,6 +453,28 @@ export function RegimeRadar({
           </g>
         ) : null}
 
+        {/* Where it feels like: the other condition's own glyph, tied to the reading. */}
+        {feelsLike ? (
+          <g data-feels-like-point>
+            <line
+              x1={currentX}
+              y1={currentY}
+              x2={xFor(feelsLike.riskAppetite)}
+              y2={yFor(feelsLike.tightness)}
+              stroke={`var(--color-condition-${getRegimePublicLabel(feelsLike.regime).toLowerCase()}-ink)`}
+              strokeDasharray="2 2"
+              strokeWidth="1"
+            />
+            <ConditionIcon
+              regime={feelsLike.regime}
+              x={xFor(feelsLike.riskAppetite) - FEELS_LIKE_ICON / 2}
+              y={yFor(feelsLike.tightness) - FEELS_LIKE_ICON / 2}
+              width={FEELS_LIKE_ICON}
+              height={FEELS_LIKE_ICON}
+            />
+          </g>
+        ) : null}
+
         {/* Current reading marker */}
         <g>
           <title>{`${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
@@ -515,6 +547,12 @@ export function RegimeRadar({
             {compact ? <>Up: {CONDITION_SIDE_MEANINGS.pressureBelow}. Right: {CONDITION_SIDE_MEANINGS.appetiteAbove}.</> : <>Up means {CONDITION_SIDE_MEANINGS.pressureBelow}, right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, top right, is the easiest; Freezing, bottom left, the hardest.</>}
           </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
+          {feelsLike && !compact ? (
+            <span className="block" data-feels-like-key>
+              <ConditionIcon regime={feelsLike.regime} className="mr-1 inline align-text-bottom" />
+              Where it feels like.
+            </span>
+          ) : null}
           {!compact && hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {compact && (readableReadings.length > 1 || caveat) ? (
             <UrlDetails id={readingsId} queryKey="chart" initialOpen={detailsOpen} summary="Scores on this chart"

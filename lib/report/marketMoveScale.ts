@@ -135,6 +135,26 @@ export const describeScoreMoveBand = (
   return `${describeMoveBand(counted)}${modifier} move`;
 };
 
+export type ScoreMoveRanges = Record<ScoreKey, { common: number; unusual: number }>;
+
+/**
+ * The largest month-to-month move each band reaches, as a size in points: how far a
+ * common and an unusual month has moved each score. The same counts as
+ * `describeScoreMoveBand`, for a drawing of them: a cone made of what the record did, not
+ * a chance of what the next month does. Null under a year of record.
+ */
+export const describeScoreMoveRanges = (): ScoreMoveRanges | null => {
+  const range = (score: ScoreKey) => {
+    const values = scoreValues(score);
+    const moves = values.slice(1).map((value, index) => Math.abs(value - (values[index] ?? value))).sort((a, b) => b - a);
+    const reached = (share: number) => moves[Math.max(Math.ceil(moves.length * share) - 1, 0)] ?? 0;
+    return moves.length < MIN_RECORD_CHANGES ? null : { common: reached(1 / 3), unusual: reached(1 / 12) };
+  };
+  const tightness = range("tightness");
+  const riskAppetite = range("riskAppetite");
+  return tightness && riskAppetite ? { tightness, riskAppetite } : null;
+};
+
 /**
  * A short-rate move in the Fed's own steps, leading the sentence it ends:
  * "Less than one quarter-point Fed cut turns conditions Stormy." A rise is a
