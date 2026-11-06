@@ -50,7 +50,7 @@ counterevidence mode verifies. Contract, commands and evaluation limits: [decisi
 
 - On `/`, the call precedes the horizon selector and confidence popover, which sit beside Copy Brief before the evidence sections. A first visit uses the canonical site name as the short opening line, with the longer score explanation inside the existing reading guide.
 - The header keeps all six operator tabs at tablet widths; Search becomes a labelled field only from `xl`, and the bottom navigation owns Search below `md`.
-- The homepage header wraps its company controls on the smallest phones (up to 360px). The footer reserves its side-by-side brand column for `lg`, giving its link groups enough room at landscape and tablet widths.
+- The header is one row at every width (since 2026-11-06; it wrapped its controls below 360px while it carried the company pills). The footer reserves its side-by-side brand column for `lg`, giving its link groups enough room at landscape and tablet widths.
 - Desktop section outlines wrap long labels; the mobile section index uses readable shared metadata text and contains horizontal overscroll.
 - The shared area table and homepage signal table stack below `md`, including landscape phone widths. Shared controls retain at least 44px touch targets on tablets; the compact 36px treatment requires a fine pointer with hover. Native text fields remain at least 16px on coarse pointers.
 
@@ -4633,6 +4633,33 @@ warning gauge" for 10Y−2Y, "2-year minus 3-month" for 2Y−3M, and "1-month", 
 
 The running head keeps its four-word "2 pts from Freezing" (`formatNearestChange`), and the pastes
 keep `formatMargin`'s band and points: neither has room for a second clause.
+
+### 1.1.103 Phone chrome (2026-11-06)
+
+A pass over the header, running head, tab bar, More sheet and tab rows at 320, 360, 390 and 700px,
+in both themes, found the frame around the page working against it:
+
+- **The header runs edge to edge below `md`.** Its fill sat on a box inside a 16px gutter, so the
+  sticky header was a card with the page scrolling past in the strips either side of it. The
+  wordmark now sits on the page's 16px gutter, over the content and the running head's mark.
+- **One header row at every width.** Below 360px it wrapped the share and theme cells onto a
+  second row, 106px of a 640px screen; the wrap was for the company pills, gone since 2026-10-31.
+- **The theme cell is a cell.** It was a `.weather-pill`, whose fill and border beat the header's
+  utilities from unlayered CSS, so it drew as a raised, lit key beside a flat share cell and read
+  as switched on. `ThemeToggleButton` now takes its caller's class; the More sheet's matches the
+  share row beside it.
+- **Sheets are opaque on the light theme.** The More sheet, the share rail and the time-machine
+  picker filled with `bg-slate-950/95`, which the light theme maps to a 3.5% tint: clear glass
+  over the page. They take `--bg-panel`, as the command palette does.
+- **A group's page tabs fade the end they run past** on a phone, as the section chips do
+  (`watchRowEdges`, `app/components/rowEdges.ts`; `data-row-fade` in layout-effects.css). The row
+  cut its last tab mid-word ("Test a c", "Finance s") with nothing to say it scrolled.
+- **The running head drops its mark while the header shows.** On a scroll up the head sits under
+  the header's wordmark and printed "Whether" twice in 95px.
+- **Targets and labels.** Breadcrumbs (16px tall) and the header wordmark (35px) grow to a 44px
+  tap area without moving the line; the sheet's search and share rows are 44px; "This week" in
+  the tab bar stays on one line at 320px; on a tablet held upright the tab bar's tabs sit within
+  36rem rather than 140px apart.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

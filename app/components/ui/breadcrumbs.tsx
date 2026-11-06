@@ -59,9 +59,11 @@ export function Breadcrumbs({
                   {item.label}
                 </span>
               ) : (
+                /* `weather-hit` grows the 16px-tall crumb to a 44px tap area without
+                   opening the line (§II); the trail measured 16px on phones. */
                 <Link
                   href={item.href}
-                  className="text-slate-400 hover:text-slate-200 transition-colors rounded-[var(--radius-sm)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                  className="weather-hit text-slate-400 hover:text-slate-200 transition-colors rounded-[var(--radius-sm)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                 >
                   {item.label}
                 </Link>

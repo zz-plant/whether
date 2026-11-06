@@ -11,6 +11,13 @@ type ThemeToggleButtonProps = Omit<ComponentProps<"button">, "children" | "onCli
   showLabel?: boolean;
 };
 
+/**
+ * The paint is the caller's: the toggle sits among buttons of another shape, the
+ * header's cells and the phone sheet's bordered rows, and takes their class. It
+ * was a `.weather-pill`, whose fill and border come from unlayered CSS and beat
+ * every utility a caller passed, so in the header it drew as a raised, lit key
+ * beside a flat share cell and read as switched on (2026-11-06).
+ */
 export function ThemeToggleButton({ className = "", showLabel = false, ...props }: ThemeToggleButtonProps) {
   const [theme, setTheme] = useLocalStorageState<ThemeMode>(STORAGE_KEYS.theme, "dark");
   const isDark = theme === "dark";
@@ -27,7 +34,7 @@ export function ThemeToggleButton({ className = "", showLabel = false, ...props 
       {...props}
       type="button"
       onClick={toggleTheme}
-      className={`weather-pill inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 px-2.5 py-1.5 text-xs font-semibold ${className}`.trim()}
+      className={className}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={!isDark}
       suppressHydrationWarning

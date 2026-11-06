@@ -146,7 +146,10 @@ export function MobileTabBar() {
         data-scrolled-away={hidden ? "true" : undefined}
         className={`fixed inset-x-0 bottom-0 z-[var(--z-chrome)] border-t border-[color:var(--border-default)] bg-[var(--bg-body)] px-2 pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden ${hidden ? "translate-y-full" : ""}`}
       >
-        <ul className="flex items-stretch">
+        {/* Capped from `sm`: on a tablet held upright (the bar shows to 767px) the
+            five tabs spread to 140px apiece, each label a long reach from the
+            next. Centred at 36rem they sit where a thumb expects them. */}
+        <ul className="flex items-stretch sm:mx-auto sm:max-w-xl">
           {tabs.map((tab) => {
             const Icon = TAB_ICONS[tab.key];
             return (
@@ -157,7 +160,8 @@ export function MobileTabBar() {
                   className={`relative ${TAB_CLASS} ${tab.isActive ? "text-sky-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
                 >
                   <Icon aria-hidden="true" size={20} strokeWidth={tab.isActive ? 2.2 : 1.8} />
-                  <span>{tab.label}</span>
+                  {/* One line: at 320px "This week" broke in two under its own marker. */}
+                  <span className="whitespace-nowrap">{tab.label}</span>
                   {tab.isActive ? (
                     <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-sky-400" aria-hidden="true" />
                   ) : null}
@@ -183,9 +187,14 @@ export function MobileTabBar() {
       <Drawer.Root open={showMore} onOpenChange={setShowMore}>
         <Drawer.Portal>
           <Drawer.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/50 backdrop-blur-sm" />
-          {/* Viewport is what gives the sheet its swipe-to-dismiss and scroll lock. */}
+          {/* Viewport is what gives the sheet its swipe-to-dismiss and scroll lock.
+              The panel token, opaque, as the command palette uses: `bg-slate-950/95`
+              resolves to a 3.5% tint on the light theme (tokens.css), so the sheet
+              was clear glass over the page it covers (2026-11-06). `dvh`, so the
+              sheet's 85% is of the screen a phone shows, not of the one behind its
+              toolbars. */}
           <Drawer.Viewport className="fixed inset-0 z-[var(--z-modal)] flex items-end md:hidden">
-            <Drawer.Popup className="w-full max-h-[85vh] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-lg">
+            <Drawer.Popup className="w-full max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-2xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] shadow-2xl">
               <MobileNavContent
                 navigationLinks={tabs}
                 currentPathname={pathname}
