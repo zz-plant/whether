@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { LineStateBand } from "../app/components/home/LineStateBand";
 import { DecisionHero } from "../app/components/DecisionHero";
 import { describeLineStateBand, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
@@ -48,7 +49,12 @@ describe("the band states the week's exception, or nothing", () => {
       { area: "burn-discipline", pause: pauseSlot(true, 0), changedKind: "held" },
     ]);
     assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring and Fundraising just paused.");
+    assert.equal(model?.text, "Hiring and Fundraising paused since last week.");
+    assert.equal(
+      describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0), changedKind: "paused" }], comparisonBasis({ label: "Aug 31" }))?.text,
+      "Hiring paused since Aug 31.",
+      "a month-end comparison dates the hold, so a later week cannot call it new",
+    );
   });
 
   it("leaves a standing hold to the card", () => {

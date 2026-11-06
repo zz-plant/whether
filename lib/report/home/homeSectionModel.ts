@@ -392,6 +392,7 @@ export type LineStateBandModel = {
 
 export const describeLineStateBand = (
   rows: readonly Pick<HomeAreaRow, "area" | "pause" | "changedKind">[],
+  basis: ComparisonBasis = comparisonBasis(),
 ): LineStateBandModel | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
@@ -402,15 +403,17 @@ export const describeLineStateBand = (
     text,
   });
 
-  /* Only the week a hold starts (2026-11-05). A hold can stand for years, and the last
-     one at these lines took 39 months to lift; red every week of that is a band nobody
-     reads. The card's area strip states a standing hold. */
+  /* Only a hold that started since the earlier reading (2026-11-05). A hold can stand for
+     years, and the last one at these lines took 39 months to lift; red every week of that
+     is a band nobody reads. The card's area strip states a standing hold. Dated by the
+     comparison, because the earlier reading can be a month-end weeks back: "this week"
+     or "just" would repeat for as long as that reading stayed the comparison. */
   const paused = ruled.filter((row) => row.pause?.met && row.changedKind === "paused");
   const [firstPaused] = paused;
   if (firstPaused) {
     const names = paused.map((row) => decisionAreaLabel(row.area));
     const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
-    return band("crossed", firstPaused, `${list} just paused.`);
+    return band("crossed", firstPaused, `${list} paused ${basis.since}.`);
   }
 
   /* Close: the shared cutoff, through the same resolver the badges use, so the

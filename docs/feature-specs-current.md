@@ -348,8 +348,9 @@ until the report resolves.
   app's forecast row reads: a name and a state per column, in place of the "On hold: …" sentence.
   Each column goes to that area's rule, and the line under them says what the holds wait on when they
   share one restart line ("No restart until funding pressure falls below 66, a rare move.").
-- **The card edited down** (2026-11-05). The line-state band prints the week a hold starts or a
-  line is close, not every week of a hold, and has no link. "Say it" left the card, since it
+- **The card edited down** (2026-11-05). The line-state band prints a hold that started since the
+  earlier reading, dated by it ("Hiring paused since Oct 26."), or a line that is close, not every
+  week of a hold, and has no link. "Say it" left the card, since it
   restated the call; `/operate` keeps the phrases. A week nothing moved says so once on the stamp
   line. The months-held count is `/trust`'s, and the card's strip drops it.
 - **The sections under the card edited down** (2026-11-05). Area groups head on their state alone

@@ -621,7 +621,7 @@ async function PageContent({
   /* The week's exception, above the call: null on a calm week, so the page's
      silhouette changes with the weather rather than being drawn the same way
      whatever the reading says. */
-  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows);
+  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows, basis);
   /* The meaning line under the call carries the two scores it rests on: they
      lived only inside the map, so the week's word could be screenshotted but
      not cited. One click to the section that shows the change lines and what
