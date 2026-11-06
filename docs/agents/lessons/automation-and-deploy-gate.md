@@ -153,8 +153,8 @@ it was enabled), so the Oct 26 reading compared with Sep 30; w44 was frozen by h
 **The separate monthly and weekly summary files were removed (2026-11-05).** `data/monthly_summaries_2012_2025.json`
 and `data/weekly_summaries_2018_2026.json` held the same rows as `data/summary_archive.json`, minus
 the `cadence` field, and the only code reading them was the writer merging each into itself. The
-data-file census did not flag them because the writer named them. The Tuesday routine's prompt still
-lists the monthly file as one of its three; the routine is superseded by the Worker's rebuild below.
+data-file census did not flag them because the writer named them. The Tuesday routine's prompt listed the
+monthly file as one of its three, so that prompt had to change with them.
 
 **The rebuild moved into the Worker (2026-11-03).** `RegimeHistoryRefreshWorkflow` now runs the
 whole refresh the routine was for: the monthly, weekly and quarterly generators and
