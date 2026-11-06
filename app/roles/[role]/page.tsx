@@ -53,7 +53,6 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(path), [
-            { name: "Roles", path: toRoute("/roles") },
             { name: role.title, path: toRoute(path) },
           ]),
         )}

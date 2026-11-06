@@ -5,9 +5,10 @@ import { SectionTabsActiveInView } from "./sectionTabsActiveInView";
 
 /**
  * The group's pages as a row of text tabs, under the header on every page of a
- * group that has more than one: This week (the brief, why it changed, how much
- * to trust it), Decide (the plan, the runway planner, scenarios, SaaS
- * multiples) and Record (the record, compare periods, calibration).
+ * group that has more than one: This week (the brief, why it changed, the
+ * method), Plan (the plan, the runway planner, scenarios, SaaS multiples),
+ * History (the record, calibration, compare periods) and Guides (the guides,
+ * roles, companies).
  *
  * It replaces two rows that each did half the job. /operate drew a "Planning
  * views" switcher for its three pages and nothing else did; /signals, /operate
@@ -15,7 +16,7 @@ import { SectionTabsActiveInView } from "./sectionTabsActiveInView";
  * intro, which read as tabs, named none of the pages it sat on, and linked to
  * nothing.
  *
- * Secondary pages (Product writing under Record) and cross-links (Record's
+ * Secondary pages (Advice vs. market under History) and cross-links (History's
  * reach into the sources and the score derivation on /trust) follow the tabs
  * after a rule, in lighter type. `query` carries a page's own selection (the
  * month an archived plan is read for) across the group's pages.

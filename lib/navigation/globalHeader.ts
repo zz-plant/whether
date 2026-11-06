@@ -34,7 +34,7 @@ const memberPrefixesBySpecificity = navigationGroups
 
 /**
  * The group a path belongs to: its page's group, or the group that owns its
- * route family (the frozen weeks under Record, the answers under Guides).
+ * route family (the frozen weeks under History, the answers under Guides).
  * Utility and legal routes belong to none.
  */
 export const findActiveGroup = (pathname: string): NavigationGroup | undefined => {

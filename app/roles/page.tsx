@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
-import { toRoute } from "../../lib/navigation/routeType";
 import { ROLES } from "../../lib/report/companyRoles";
 import { conditionQuestions } from "../../lib/report/workQuestions";
 import { buildPageMetadata } from "../../lib/seo";
@@ -9,7 +7,7 @@ import { buildHubStructuredData } from "../../lib/seo/pageStructuredData";
 import { ConditionsSection } from "../companies/companyPageSections";
 import { loadWeekConditions } from "../companies/loadCompanyPage";
 import { JsonLdScript } from "../components/jsonLdScript";
-import { Breadcrumbs } from "../components/ui/breadcrumbs";
+import { SectionTabs } from "../components/sectionTabs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 import { ConditionQuestionsSection } from "./workQuestionsSections";
 
@@ -42,7 +40,7 @@ export default async function RolesPage() {
           items: ROLES.map((role) => ({ path: `/roles/${role.slug}`, name: role.title })),
         })}
       />
-      <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(toRoute("/roles"), [{ name: "Roles", path: toRoute("/roles") }]))} />
+      <SectionTabs currentPath="/roles" />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">This week&apos;s conditions by role</h1>
         <p className="text-sm text-slate-300">

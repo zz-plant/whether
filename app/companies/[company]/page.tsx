@@ -63,7 +63,6 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
       <Breadcrumbs
         items={toVisibleBreadcrumbs(
           buildGroupBreadcrumbs(toRoute(path), [
-            { name: "Companies", path: toRoute("/companies") },
             { name: company.name, path: toRoute(path) },
           ]),
         )}

@@ -60,41 +60,51 @@ The brief, report pages, answer pages and share groups use the spacing roles in 
 
 The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
 
-### 1.0a Four groups: This week, Decide, Record, Guides (2026-10-08)
+### 1.0a Four groups: This week, Plan, History, Guides (2026-10-08; renamed 2026-10-28)
 
 The header carries four groups, each with a hub, read from one module
-(`navigationGroups` and `navigationPages`, `lib/navigation/informationArchitecture.ts`):
+(`navigationGroups` and `navigationPages`, `lib/navigation/informationArchitecture.ts`). The groups
+were "This week, Decide, Record, Guides" until 2026-10-28; the code keys (`decide`, `record`) kept
+those names.
 
 | Group | Hub | Pages (sub-tabs, then secondary links) |
 | --- | --- | --- |
-| This week | `/` | Why it changed (`/signals`), How much to trust this week (`/trust`) |
-| Decide | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`) |
-| Record | `/history` | Compare periods (`/history/compare`), Calibration (`/calibration`); Product writing (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
-| Guides | `/resources` | the direct answers and guides by decision area, the frameworks and templates, and More tools |
+| This week | `/` | Why it changed (`/signals`); Method (`/trust`) |
+| Plan | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`); Your decisions (`/decisions`) |
+| History | `/history` | Calibration (`/calibration`); Compare periods (`/history/compare`), Advice vs. market (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
+| Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix |
 
-- **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Decide"
-  and on `/history` "Record". `/signals` keeps its URL; it is "Why it changed" in the tabs, the
-  breadcrumb and the header sublabel.
-- **Header.** From `md`: the wordmark, the four group tabs (one-key jumps `w`, `d`, `r`, `g`), then
-  the utility links Use it elsewhere (`/share`) and About in lighter type, then search
-  (⌘K) and theme. There is no More menu. Below `md` the bottom bar carries the four groups and
-  More; More opens a sheet with Search, every group's pages and the utility links
+- **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Plan"
+  and on `/history` "History". `/signals` keeps its URL; it is "Why it changed" in the tabs, the
+  breadcrumb and the header sublabel. A page under a grouped page takes that page's name over the
+  wordmark: a role's page reads "Roles", a company's "Companies".
+- **Roles and Companies are Guides' tabs** (2026-11-06). The role and company pages sat outside the
+  IA: two links in Guides' More tools, at the foot of the page, were the one way in, and each family
+  had three names ("Role guidance" over the wordmark, "Roles" in the trail, "This week's conditions
+  by role" as the title). As pages they take one name, the tab row on `/resources`, `/roles` and
+  `/companies`, and an entry in the phone's More sheet, the footer and the palette; a role's or a
+  company's own page keeps its trail ("Guides › Roles › Software engineers").
+- **Header.** From `md`: the wordmark, the four group tabs (one-key jumps `w`, `p`, `h`, `g`), then
+  the utility links Share and embed (`/share`, from `lg`) and About in lighter type, then search
+  (⌘K), share and theme. There is no More menu. Below `md` the bottom bar carries the four groups and
+  More; More opens a sheet with Search, share, theme, every group's pages and the utility links
   (`app/components/MobileTabBar.tsx`, `app/components/globalHeaderNavClient.tsx`).
 - **Sub-tabs.** `SectionTabs` (`app/components/sectionTabs.tsx`) draws the group's pages above the
   intro on every grouped working page (the report shell takes `page.currentPath`;
-  `/comps`, `/calibration` and `/concepts` render it themselves). It replaced the planning
+  `/comps`, `/calibration`, `/concepts`, `/resources`, `/roles` and `/companies` render it
+  themselves). It replaced the planning
   switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro. Three routes
   deliberately keep the breadcrumb trail instead of the row (verified 2026-10-23): `/`, whose
   first screen is the one-screen brief and whose siblings it reaches by its own links (each changed
-  signal links `Why it changed`; the trust strip links `How much to trust this week`); and the
+  signal links `Why it changed`; the trust strip links `/trust`); and the
   frozen archive reads `/brief/<week>` and `/history/<period>`, which are shareable artifacts and
   closed records, not group workspaces.
 - **Breadcrumbs** come from `buildGroupBreadcrumbs` (`lib/navigation/breadcrumbs.ts`): the group,
   the page when it is not the hub, then the caller's crumbs — "This week › Why it changed",
-  "Decide › Runway planner", "Record › Week of …", "Guides › <question>",
+  "Plan › Runway planner", "History › Week of …", "Guides › Roles › <role>", "Guides › <question>",
   "Guides › More tools › For CEO". A hub alone gets Home first.
-- **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, About,
-  Contact, Search, RSS); then one column per group, headed by the group's name linking its hub.
+- **Footer.** The brand column carries the utility links (Share and embed, API & MCP, About,
+  Contact, Search, RSS, Calendar); then one column per group (from `md`), headed by the group's name linking its hub.
   Contact is a utility link since 2026-10-23: until then no page, nav, footer or palette linked
   `/contact` — only the sitemap named it — so the corrections policy pointed at an editor a
   reader could not reach. As a utility link it reaches the footer, the phone's More sheet, the

@@ -14,9 +14,10 @@ import {
 import { pathMatchesLink } from "../lib/navigation/pathMatching";
 
 /*
- * The 2026-10-08 regrouping: four groups in the header — This week, Decide,
- * Record, Guides — each with a hub and its own pages, and the utility links
- * (Use it elsewhere, About) beside them rather than in a More menu.
+ * The 2026-10-08 regrouping: four groups in the header, each with a hub and its
+ * own pages, and the utility links beside them rather than in a More menu. The
+ * groups were "This week, Decide, Record, Guides" then and are "This week, Plan,
+ * History, Guides" since 2026-10-28; the code keys kept the first names.
  */
 describe("navigation groups", () => {
   it("puts four groups in the header, in this order, each on its hub", () => {
@@ -48,7 +49,7 @@ describe("navigation groups", () => {
         "this-week": ["/", "/signals", "/trust"],
         decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps", "/decisions"],
         record: ["/history", "/calibration", "/history/compare", "/concepts"],
-        guides: ["/resources"],
+        guides: ["/resources", "/roles", "/companies"],
       },
     );
     for (const group of navigationGroups) {
@@ -63,23 +64,37 @@ describe("navigation groups", () => {
     }
   });
 
-  it("calls /signals 'Why it changed' and /trust 'How much to trust this week'", () => {
+  it("calls /signals 'Why it changed' and /trust 'Method'", () => {
     assert.equal(navigationLabelByPath["/signals"], "Why it changed");
     assert.equal(navigationLabelByPath["/trust"], "Method");
   });
 
-  it("files Product writing under Record as a secondary page, not a tab", () => {
+  it("files Advice vs. market under History as a secondary page, not a tab", () => {
     const concepts = navigationPages.find((page) => page.href === "/concepts");
     assert.equal(concepts?.group, "record");
     assert.equal(concepts?.placement, "secondary");
     assert.ok(!utilityLinks.some((link) => String(link.href) === "/concepts"), "not a utility link");
   });
 
-  it("files SaaS multiples under Decide", () => {
+  it("gives Guides its role and company pages as tabs, with one name each", () => {
+    assert.deepEqual(
+      pagesInGroup("guides").map((page) => [page.href, page.label, page.placement]),
+      [
+        ["/resources", "Guides", "tab"],
+        ["/roles", "Roles", "tab"],
+        ["/companies", "Companies", "tab"],
+      ],
+    );
+    // Their pages under them are the group's through the page, not a member prefix or a content section.
+    assert.ok(!navigationGroupByKey.guides.memberPrefixes.some((prefix) => prefix === "/roles" || prefix === "/companies"));
+    assert.ok(!contentSections.some((section) => section.prefix === "/roles" || section.prefix === "/companies"));
+  });
+
+  it("files SaaS multiples under Plan", () => {
     assert.equal(navigationPages.find((page) => page.href === "/comps")?.group, "decide");
   });
 
-  it("reaches the sources and the score derivation on /trust from Record", () => {
+  it("reaches the sources and the score derivation on /trust from History", () => {
     assert.deepEqual(
       navigationGroupByKey.record.crossLinks.map((link) => link.href),
       ["/trust#source-board", "/trust#formula-reference"],
@@ -121,7 +136,7 @@ describe("navigation groups", () => {
 });
 
 describe("utility links", () => {
-  it("draws Use it elsewhere and About in the header, not behind a menu", () => {
+  it("draws Share and embed and About in the header, not behind a menu", () => {
     assert.deepEqual(
       headerUtilityLinks.map((link) => [link.label, link.href]),
       [

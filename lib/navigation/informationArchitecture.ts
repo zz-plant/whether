@@ -32,7 +32,9 @@ type NavigationPageKey =
   | "compare"
   | "calibration"
   | "concepts"
-  | "guides";
+  | "guides"
+  | "roles"
+  | "companies";
 
 export type NavigationPage = {
   key: NavigationPageKey;
@@ -61,7 +63,7 @@ export type NavigationGroup = {
   shortcut: string;
   /**
    * Route families the group owns beyond its pages, prefix-matched: the frozen
-   * weeks under Record, the answer and guide pages under Guides. They light the
+   * weeks under History, the answer and guide pages under Guides. They light the
    * group's tab and start their breadcrumb with it, and are not sub-tabs.
    */
   memberPrefixes: readonly Route[];
@@ -119,8 +121,10 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     description: "Answers and guides for each decision area, and the frameworks behind them.",
     shortcut: "g",
     /* /resolve/<slug> (help by role and situation) and /toolkits/<slug> are the
-       "More tools" at the foot of Guides; /answers/<slug> are its answers. */
-    memberPrefixes: ["/answers", "/companies", "/resources", "/resolve", "/roles", "/toolkits"],
+       "More tools" at the foot of Guides; /answers/<slug> are its answers. /roles and
+       /companies are the group's own pages since 2026-11-06, so their pages under them
+       belong to the group through those. */
+    memberPrefixes: ["/answers", "/resources", "/resolve", "/toolkits"],
     crossLinks: [],
     footerLinks: [
       { href: "/resources#answers", label: "Answers by decision area" },
@@ -252,6 +256,28 @@ export const navigationPages: readonly NavigationPage[] = [
     description: "Direct answers and long-form guides for each decision area, and the governance frameworks behind them.",
     placement: "tab",
   },
+  /* Guides' own tabs since 2026-11-06. The role and company pages, ten roles and fifty
+     companies with a page for each role at each, sat outside the IA: two links in Guides'
+     "More tools" at the foot of the page were the one way in, and each family had three
+     names, "Role guidance" over the wordmark, "Roles" in the trail and "This week's
+     conditions by role" as its title. As pages they take one name, a tab row, an entry in
+     the phone's More sheet, the footer and the palette. */
+  {
+    key: "roles",
+    group: "guides",
+    href: "/roles",
+    label: "Roles",
+    description: "What each kind of tech worker can ask for this week, and what to ask leadership, at any company.",
+    placement: "tab",
+  },
+  {
+    key: "companies",
+    group: "guides",
+    href: "/companies",
+    label: "Companies",
+    description: "This week's conditions beside what 50 public tech companies have filed, for each role there.",
+    placement: "tab",
+  },
 ];
 
 /** A group's pages in nav order, hub first. */
@@ -334,8 +360,6 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
-  { prefix: "/companies", label: "Company guidance" },
-  { prefix: "/roles", label: "Role guidance" },
   { prefix: "/resolve", label: "More tools" },
   { prefix: "/toolkits", label: "Toolkit" },
   { prefix: "/privacy", label: "Privacy" },

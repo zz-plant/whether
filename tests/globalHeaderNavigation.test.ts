@@ -128,8 +128,20 @@ describe("sub-tabs", () => {
     );
   });
 
-  it("draws none for a one-page group or a route outside the groups", () => {
-    assert.equal(resolveSectionTabs("/resources"), null);
+  it("draws none for a route outside the groups", () => {
     assert.equal(resolveSectionTabs("/about"), null);
+  });
+
+  /* Guides was a one-page group, with no row, until Roles and Companies joined it (2026-11-06). */
+  it("draws Guides' tabs, and lights Roles on a role's own page", () => {
+    assert.deepEqual(
+      resolveSectionTabs("/roles/software-engineers")?.links.map((link) => [link.label, link.isActive]),
+      [
+        ["Guides", false],
+        ["Roles", true],
+        ["Companies", false],
+      ],
+    );
+    assert.equal(resolveSectionTabs("/answers/should-startups-hire-engineers-right-now")?.links.find((link) => link.isActive), undefined);
   });
 });
