@@ -154,13 +154,12 @@ export function WhatWouldChangeSection({
             right half of a laptop screen empty, and a frame held one question and the
             top of the next. Side by side, one frame holds both answers whole. */}
         <div className="weather-switch items-start gap-x-8 gap-y-4 [--col-min:20rem]">
-          {/* Two different questions, named as two (2026-10-22): a change in
+          {/* Two different questions, each named by its own label (2026-10-22): a change in
               conditions is not permission to resume, and the old flat list read
               as one question with three answers. The conditions question comes
               first because it is the one the weather word answers. */}
           {reversalTrigger || marketMoves.length > 0 ? (
             <div className="space-y-2">
-              <h3 className="text-fluid-sm font-semibold text-slate-100">When would conditions change?</h3>
               {reversalTrigger ? (
                 <dl className="text-fluid-sm">
                   <div className="space-y-0.5">
@@ -192,9 +191,6 @@ export function WhatWouldChangeSection({
 
           {pauseLine || resumeLine ? (
             <div className="space-y-2">
-              <h3 className="text-fluid-sm font-semibold text-slate-100">
-                {resumeLine ? "When can paused decisions resume?" : "What would pause decisions?"}
-              </h3>
               <dl className="space-y-3 text-fluid-sm">
                 {pauseLine ? (
                   <div className="space-y-0.5">
@@ -211,7 +207,7 @@ export function WhatWouldChangeSection({
               </dl>
               {resumeLine ? (
                 <p className="max-w-[52ch] text-fluid-sm leading-relaxed text-slate-400">
-                  Better conditions alone won&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
+                  One good week can&rsquo;t lift a pause: the restart line sits further out.
                 </p>
               ) : null}
             </div>

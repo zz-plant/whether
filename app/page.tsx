@@ -48,7 +48,7 @@ import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AreaStrip } from "./components/home/AreaStrip";
-import { AreaDistancesFold } from "./components/home/AreaDistancesFold";
+import { RunwayFold } from "./components/home/RunwayFold";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
@@ -74,7 +74,6 @@ import {
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
-import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
@@ -424,10 +423,6 @@ async function PageContent({
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
-  const corridorModel = buildDecisionCorridorModel(
-    homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
-    { tightness, riskAppetite },
-  );
   /* The questions this week's crossed pause lines invite, for the section after
      the lines: one per crossed area, one per group, one per speaker
      (`selectHearingForAreas`). Empty on a week no pause line is crossed, and the
@@ -925,17 +920,11 @@ async function PageContent({
                 record: historicalSelection ? undefined : recordSeries,
               })}
             >
-              <AreaDistancesFold regime={regime} isHistorical={Boolean(historicalSelection)} corridorModel={corridorModel} />
+              <RunwayFold regime={regime} isHistorical={Boolean(historicalSelection)} />
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <ActionLink href={operateHref} variant="primary">
                   {cadenceCall?.planLabel ?? "Build this week’s plan →"}
                 </ActionLink>
-                {/* Live weeks only, as both of these read today's guidance. */}
-                {!historicalSelection ? (
-                  <PlainActionLink href="/operate#ops-decision-shield" data-test-decision-link>
-                    Test a decision →
-                  </PlainActionLink>
-                ) : null}
               </div>
               {/* The formats a reader with one of these roles came for, named. They sat
                   behind "Share or embed this" at the foot of the page. After the areas
@@ -999,7 +988,6 @@ async function PageContent({
                 tightness={tightness}
                 riskAppetite={riskAppetite}
                 changeLines={callChangeLines}
-                saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
               />

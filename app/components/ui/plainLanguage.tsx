@@ -92,8 +92,7 @@ const isCompositeSignalKey = (key: RegimeSignalKey): key is CompositeSignalKey =
 
 /**
  * An expandable plain-English disclosure providing indicator context:
- * what it captures, its active scale/band meaning, historical era anchors,
- * and an operator prompt for leadership planning.
+ * what it captures and its active scale/band meaning.
  */
 export function SignalContextDetails({
   signalKey,
@@ -140,18 +139,6 @@ export function SignalContextDetails({
             score={score}
             className="whitespace-normal font-normal text-slate-300/90"
           />
-        ) : null}
-        {info.historicalContext ? (
-          <p className="text-slate-400">
-            <span className="font-medium text-slate-300">Historical context: </span>
-            {info.historicalContext}
-          </p>
-        ) : null}
-        {info.operatorPrompt ? (
-          <p className="border-t border-[color:var(--border-faint)] pt-1 text-slate-400">
-            <span className="font-medium text-slate-200">Ask your team: </span>
-            {info.operatorPrompt}
-          </p>
         ) : null}
       </div>
     </details>

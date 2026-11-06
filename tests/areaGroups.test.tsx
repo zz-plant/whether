@@ -55,7 +55,7 @@ describe("buildAreaGroups", () => {
     const [held, near] = groups;
     assert.equal(held?.status, "On hold");
     assert.deepEqual(held?.areas.map((entry) => entry.label), ["Hiring", "Fundraising", "Spending", "New bets"]);
-    assert.equal(held?.condition, "Restarts when funding pressure falls below 66.");
+    assert.equal(held?.condition, "No restart until funding pressure falls below 66.");
     assert.equal(near?.status, "Close to pausing");
     assert.equal(near?.condition, "Pauses if risk appetite falls below 44.");
   });
@@ -84,7 +84,7 @@ describe("buildAreaGroups", () => {
   it("says which way the score went since the comparison reading, against the condition", () => {
     const trend = (tightness: number) =>
       buildAreaGroups(ROWS, SCORES, { comparison: { scores: { tightness, riskAppetite: 48 }, since: "since Oct 19" } }).at(0)?.distance ?? "";
-    assert.match(trend(90), /, unchanged since Oct 19\.$/);
+    assert.doesNotMatch(trend(90), /unchanged/, "the stamp line already says nothing moved");
     assert.match(trend(94), /, 4 points closer since Oct 19\.$/, "falling toward a restart below 66");
     assert.match(trend(89), /, 1 point farther since Oct 19\.$/);
     assert.doesNotMatch(buildAreaGroups(ROWS, SCORES).at(0)?.distance ?? "", /closer|farther|unchanged/, "nothing compared, no direction");
@@ -166,17 +166,17 @@ describe("AreaGroups", () => {
   const html = renderToStaticMarkup(<AreaGroups groups={buildAreaGroups(ROWS, SCORES)} />);
 
   it("names a held group with the crossed-line glyph and the word, in the line ink", () => {
-    assert.match(html, /<h3 class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>On hold: Hiring, Fundraising, Spending and New bets<\/span><\/h3>/);
+    assert.match(html, /<h3 class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>On hold<\/span><\/h3>/);
     assert.doesNotMatch(html, /warning/i);
     assert.doesNotMatch(html, /border-l-\d|border-l-semantic/, "no side stripe");
   });
 
-  it("prints each area's action under its group, with the anchor the distance ladder links to", () => {
+  it("prints each area's action under its group, with the anchor the card links to", () => {
     for (const area of ["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"]) {
       assert.equal((html.match(new RegExp(`id="area-${area}"`, "g")) ?? []).length, 1, area);
     }
     assert.match(html, /<span class="[^"]*">Roadmap\.<\/span> Ship what is committed\./);
-    assert.equal((html.match(/Restarts when funding pressure falls below 66/g) ?? []).length, 1, "the shared condition, once");
+    assert.equal((html.match(/No restart until funding pressure falls below 66/g) ?? []).length, 1, "the shared condition, once");
   });
 
   it("offers the restart email on a held group only, live briefs only", () => {

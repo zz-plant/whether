@@ -352,6 +352,13 @@ until the report resolves.
   line is close, not every week of a hold, and has no link. "Say it" left the card, since it
   restated the call; `/operate` keeps the phrases. A week nothing moved says so once on the stamp
   line. The months-held count is `/trust`'s, and the card's strip drops it.
+- **The sections under the card edited down** (2026-11-05). Area groups head on their state alone
+  ("On hold") and name what a hold waits on ("No restart until…"). The area distance ladder is
+  gone, since one score holding four areas drew one row four times; the fold under the groups is
+  the reader's runway and the test. "What the score means" drops its eras and team prompt on `/`,
+  and a raw input that did not move drops out of "What changed". The capped-score note prints once,
+  under the funding-pressure ladder. "What would change this guidance" keeps one label per answer.
+  "What you may be hearing" has no lead. The record section drops two lines of method.
 - **"Feels like" beside the condition** (2026-11-05, `ScoringBasis.countedRegime`): the conditions
   the left-out inputs would give, on a live reading where they differ from the published ones. It
   moves "Counted, conditions would be …" off the trust strip, which still names the inputs.
@@ -520,8 +527,6 @@ the Slack block, and developer access lives under the header's More menu):
 - `ScoreLadder` draws a score that is worse higher from high to low (from the pause and restart
   lines, or the change line when one of the pair is missing), so the pause range is on the left
   and the restart range on the right for both scores; the key reads in tick order.
-- The area corridor ladder on `/` mirrors its rows the same way: "Left: pause zone", "Right:
-  restart zone".
 - Names and numbers do not change: published briefs are never edited and print "Funding
   pressure 90". Time-series line charts keep their natural axis.
 - The `/trust` margin ladder's bands read Little / Some / Plenty, as every other surface does

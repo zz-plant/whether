@@ -48,8 +48,7 @@ export function RecordSection({
               once, under the band, because a reader comparing the two would
               otherwise read the difference as a data gap (2026-10-22). */}
           <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-400" data-record-sampling>
-            This band shows end-of-month readings; the guidance above is this week&rsquo;s. A week that changed
-            the guidance shows up at the end of its month.
+            This band shows end-of-month readings; the guidance above is this week&rsquo;s.
           </p>
         </>
       ) : null}
@@ -60,7 +59,7 @@ export function RecordSection({
         {spellLengths?.rest ? <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300">{spellLengths.rest}</p> : null}
         {turningPoints.length > 0 ? (
           <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300">
-            What the guidance said the last few times conditions changed:{" "}
+            Last changes:{" "}
             {turningPoints.map((point, index) => (
               <span key={point.href}>
                 {index > 0 ? " · " : null}

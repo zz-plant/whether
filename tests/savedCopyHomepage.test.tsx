@@ -132,7 +132,7 @@ describe("the saved-copy homepage", () => {
     const { areaGroups } = await page();
     assert.equal(areaGroups.flatMap((group) => group.areas).length, 5);
     for (const { areas, condition } of areaGroups) {
-      assert.match(condition, /^(Pauses if|Restarts when) /, `${areas.join(", ")}: ${condition}`);
+      assert.match(condition, /^(Pauses if|No restart until) /, `${areas.join(", ")}: ${condition}`);
       // No restart line on an area with nothing to restart, and no pause line it is already past.
       assert.doesNotMatch(condition, /nothing to resume|in effect/, `${areas.join(", ")}: ${condition}`);
     }

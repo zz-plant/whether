@@ -627,9 +627,9 @@ const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
  */
 export type AreaGroup = {
   state: LineState;
-  /** "On hold", "Close to pausing" or "Not on hold". */
+  /** "On hold", "Close to pausing" or "Clear". */
   status: string;
-  /** "Restarts when funding pressure falls below 66." */
+  /** "No restart until funding pressure falls below 66." */
   condition: string | null;
   /** Today's score, how big a move the condition is, and which way it went: "It is 90 today, a rare move away, unchanged since Oct 19." */
   distance: string | null;
@@ -644,7 +644,7 @@ const describeTrend = (slot: HomeAreaLineSlot, today: number, earlier: number, s
   if (value === undefined || holdsAbove === undefined) return null;
   const gap = (score: number) => (holdsAbove ? value - Math.round(score) : Math.round(score) - value);
   const closer = gap(earlier) - gap(today);
-  if (closer === 0) return `unchanged ${since}`;
+  if (closer === 0) return null;
   const points = Math.abs(closer) === 1 ? "1 point" : `${Math.abs(closer)} points`;
   return `${points} ${closer > 0 ? "closer" : "farther"} ${since}`;
 };
@@ -686,7 +686,7 @@ export const buildAreaGroups = (
     const slot = held ? row.resume : row.pause;
     const state: LineState = held ? "crossed" : resolveLineState(row.pause.points, "pause", false) === "near" ? "near" : "clear";
     const phrase = slot ? slotPhrase(slot) : null;
-    const condition = phrase ? `${held ? "Restarts when" : "Pauses if"} ${phrase}.` : null;
+    const condition = phrase ? `${held ? "No restart until" : "Pauses if"} ${phrase}.` : null;
     /* The score the condition just named, so "it": the name twice in two sentences was
        the page's most repeated term. At the line there is no move to size. */
     const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;

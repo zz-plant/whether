@@ -31,17 +31,12 @@ type NotCountedReading = {
  *     score across its change line and the conditions would not be what the
  *     headline says. The qualification is stated where the conditions are
  *     explained, not buried on /trust (2026-10-22).
- *   - a capped score shows less distance to its line than the pressure behind
- *     it. 90 against a 70 line reads "20 points"; the uncapped calculation is
- *     110, so the real distance is 40. Without that, a 0.22-point rate move
- *     suggested by the scenario fold looks inconsistent with the number.
  */
 export function WhyConditionsSection({
   regime,
   tightness,
   riskAppetite,
   changeLines,
-  saturatedPressure,
   notCounted,
   warning,
 }: {
@@ -51,7 +46,6 @@ export function WhyConditionsSection({
   /** The two change lines the conditions are cut at. */
   changeLines: { tightness: number; riskAppetite: number };
   /** The unclipped pressure behind a score pinned at the top of its scale. */
-  saturatedPressure?: number;
   notCounted: readonly NotCountedReading[];
   /** What the uncounted inputs would do to a line, in one sentence; null when they would cross none. */
   warning: string | null;
@@ -68,14 +62,6 @@ export function WhyConditionsSection({
     riskAppetiteRegime: changeLines.riskAppetite,
   });
   const countedRegimeLabel = getRegimePublicLabel(countedRegime);
-  /* How far the printed (capped) score sits from its change line. The uncapped
-     distance was printed beside it too, so one paragraph gave two answers to
-     "how far past the line" and a reader had to pick. The line is set against the
-     capped score, so that is the only distance this states. */
-  const cappedDistance =
-    typeof saturatedPressure === "number" && saturatedPressure > tightness
-      ? Math.abs(tightness - changeLines.tightness)
-      : null;
 
   return (
     /* The rule that turns two numbers into a weather word leads (2026-10-27): it is
@@ -119,14 +105,6 @@ export function WhyConditionsSection({
               {NOT_COUNTED_REASON}
             </p>
           </div>
-        ) : null}
-
-        {cappedDistance ? (
-          <p className="mt-4 text-fluid-sm leading-relaxed text-slate-400" data-capped-reading>
-            Funding pressure shows {tightness} because that&rsquo;s as high as the score goes; uncapped it would be{" "}
-            {saturatedPressure}. Conditions are judged on the capped {tightness}, {cappedDistance} points above{" "}
-            {changeLines.tightness}.
-          </p>
         ) : null}
       </div>
 
