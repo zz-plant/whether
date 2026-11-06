@@ -69,13 +69,13 @@ The tables below are dated records. Their commands are written as they run today
 
 **Owner:** Platform (Codex agent run)
 
-| Command | Outcome | Notes | Output log |
-| --- | --- | --- | --- |
-| `bun run lint` | Pass | Completed cleanly on pinned dependencies. | `docs/evidence/stack-modernization/2026-03-12-baseline/lint.log` |
-| `bun run typecheck` | Fail | Pre-existing TypeScript drift across app/test contracts and generated payload typings. | `docs/evidence/stack-modernization/2026-03-12-baseline/typecheck.log` |
-| `bun run test` | Fail | 12 failing tests (weekly card shell assumptions + posture/payload contract assertions). | `docs/evidence/stack-modernization/2026-03-12-baseline/test.log` |
+| Command | Outcome | Notes |
+| --- | --- | --- |
+| `bun run lint` | Pass | Completed cleanly on pinned dependencies. |
+| `bun run typecheck` | Fail | Pre-existing TypeScript drift across app/test contracts and generated payload typings. |
+| `bun run test` | Fail | 12 failing tests (weekly card shell assumptions + posture/payload contract assertions). |
 
-The pre-cutover build baseline on the old `next-on-pages` lane passed with warnings; its log is `docs/evidence/stack-modernization/2026-03-12-baseline/build-pages.log`. The `build:pages` script that produced it was removed on 2026-03-31.
+The pre-cutover build baseline on the old `next-on-pages` lane passed with warnings. The `build:pages` script that produced it was removed on 2026-03-31. The raw logs left the tree on 2026-11-05; read them with `git show db4970f1:docs/evidence/stack-modernization/2026-03-12-baseline/test.log`, or list the folder with `git ls-tree -r db4970f1 docs/evidence/stack-modernization`.
 
 ### Post-cutover verification (2026-03-15)
 
