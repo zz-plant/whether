@@ -86,8 +86,9 @@ describe("navigation groups", () => {
       ],
     );
     // Their pages under them are the group's through the page, not a member prefix or a content section.
-    assert.ok(!navigationGroupByKey.guides.memberPrefixes.some((prefix) => prefix === "/roles" || prefix === "/companies"));
-    assert.ok(!contentSections.some((section) => section.prefix === "/roles" || section.prefix === "/companies"));
+    const owned = new Set<string>(["/roles", "/companies"]);
+    assert.ok(!navigationGroupByKey.guides.memberPrefixes.some((prefix) => owned.has(prefix)));
+    assert.ok(!contentSections.some((section) => owned.has(section.prefix)));
   });
 
   it("files SaaS multiples under Plan", () => {
