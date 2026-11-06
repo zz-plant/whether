@@ -127,8 +127,7 @@ and 1c describe the behavior it must keep.
 
 `worker/workflows/regimeHistoryRefresh.ts` rebuilds the regime archive from FRED's full history and
 lands every file that changed behind one pull request on `automation/regime-archive-rebuild`: the
-summary archive, the month rail, the homepage's four weeks, the monthly and weekly summary files,
-the Time Machine cache, the calibration extract and the `/history` index. It runs the generators'
+summary archive, the month rail, the homepage's four weeks, the Time Machine cache, the calibration extract and the `/history` index. It runs the generators'
 own code (`lib/summary/regimeArchiveRebuild.ts` over `regimeArchiveFiles.ts` and
 `regimeArchiveReplay.ts`), reads the base branch at one commit and commits on top of that same
 commit, never over the series bundled into the running deployment. The daily 02:00 UTC cron starts

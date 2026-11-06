@@ -8,14 +8,14 @@
  * text differs from it.
  *
  * Memory is the limit that binds in a Worker (128MB per isolate, shared with the app), not
- * CPU (about 1.2s of the 30s default) or subrequests (about 30 of 10,000). Three files hold
- * non-ASCII text, so the engine stores them at two bytes a character: the archive alone is
- * 10MB as a string and several times that parsed. So nothing is held longer than its stage:
- * a base file is kept as a digest once read, each stage's built entries go out of scope when
- * it has written them, and the series are dropped after the last replay. Measured on
- * 2026-11-03 against FRED's full history, under Node's V8 with the old space capped: the run
- * completes at 60MB and fails at 56MB, of which 12MB is the loaded modules, so the rebuild
- * itself needs about 45-48MB. Production isolates of this Worker sat at 53MB (median) and
+ * CPU (about 1.2s of the 30s default) or subrequests (about 30 of 10,000). The archive holds
+ * non-ASCII text, so the engine stores it at two bytes a character: 10MB as a string and
+ * several times that parsed. So nothing is held longer than its stage: a base file is kept
+ * as a digest once read, each stage's built entries go out of scope when it has written them,
+ * and the series are dropped after the last replay. Measured on 2026-11-03 against FRED's full
+ * history, under Node's V8 with the old space capped and with two more copies of the archive's
+ * rows in the run: it completes at 60MB and fails at 56MB, of which 12MB is the loaded modules,
+ * so the rebuild itself needed about 45-48MB. Production isolates of this Worker sat at 53MB (median) and
  * 88MB (p99) that week, so a rebuild on a busy isolate can exceed the limit; the Workflow's
  * step retries land it on another.
  */

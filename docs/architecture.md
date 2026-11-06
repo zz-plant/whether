@@ -317,8 +317,6 @@ The data layer uses structured files, live fetchers with fallback caches, and KV
 | File | Purpose |
 |------|---------|
 | `macro_snapshot.json` | Current macro indicators with sources |
-| `weekly_summaries_2018_2026.json` | Historical weekly briefs |
-| `monthly_summaries_2012_2025.json` | Monthly summaries |
 | `summary_archive.json` | Materialized weekly, monthly, quarterly, and yearly summaries (Time Machine archive) |
 | `recommendations.ts` | Playbook insight database |
 

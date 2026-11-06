@@ -34,7 +34,6 @@ import { parseSummaryArchive } from "./summaryArchive";
 export const REGIME_ARCHIVE_PATHS = {
   summaryArchive: "data/summary_archive.json",
   calibrationMonths: "data/confidence_record_months.json",
-  monthlySummaries: "data/monthly_summaries_2012_2025.json",
   timeMachineCache: "data/time_machine_cache.json",
   weeklyPostureHistory: "data/summary_memory_rail_weekly.json",
   monthlyRegimeHistory: "data/summary_monthly_regime_history.json",
@@ -42,9 +41,6 @@ export const REGIME_ARCHIVE_PATHS = {
   postureArchiveYears: "data/posture_archive_years.json",
   postureOgTimeline: "data/posture_og_timeline.json",
 } as const;
-
-/** The weekly archive is named for the last year it covers, as the generator always named it. */
-export const weeklySummariesPath = (endYear: number) => `data/weekly_summaries_2018_${endYear}.json`;
 
 /** Where a stage reads and writes. `read` answers null for a file that does not exist yet. */
 export type ArchiveFileStore = {
@@ -87,37 +83,6 @@ const byAsOfAscending = (left: { asOf: string }, right: { asOf: string }) =>
 
 const byRecordDateAscending = (left: { record_date: string }, right: { record_date: string }) =>
   new Date(left.record_date).getTime() - new Date(right.record_date).getTime();
-
-// ── The weekly and monthly summary files ──
-
-const isPeriodRow = guardFor(
-  z.looseObject({ asOf: z.string(), year: z.number(), week: z.number().optional(), month: z.number().optional() }),
-);
-type PeriodRow = { asOf: string; year: number; week?: number; month?: number };
-
-const nextPeriodFile = <Entry extends PeriodRow>({
-  existing,
-  path,
-  entries,
-  mode,
-  getKey,
-}: {
-  existing: string | null;
-  path: string;
-  entries: Entry[];
-  mode: ArchiveMode;
-  getKey: (entry: PeriodRow) => string;
-}) => {
-  const stored = readRows(existing, path, isPeriodRow);
-  let nextEntries = carryUnchangedEntries(stored, entries, getKey);
-
-  if (mode === "merge") {
-    const incomingKeys = new Set(entries.map(getKey));
-    nextEntries = [...stored.filter((entry) => !incomingKeys.has(getKey(entry))), ...nextEntries];
-  }
-
-  return toJsonFile([...nextEntries].sort(byAsOfAscending));
-};
 
 // ── The Time Machine cache ──
 
@@ -324,21 +289,11 @@ const writeDerivedSummaryHistory = async (store: ArchiveFileStore, archive: stri
 
 // ── The stages, one per generator, in the order a refresh runs them ──
 
-/** `scripts/generateMonthlySummaries.ts`: the monthly file, the archive's month-ends, the Time Machine cache, the derived history. */
+/** `scripts/generateMonthlySummaries.ts`: the archive's month-ends, the Time Machine cache, the derived history. */
 export const writeMonthlyArchive = async (
   store: ArchiveFileStore,
   built: { entries: MonthlySummaryArchiveEntry[]; timeMachineEntries: TimeMachineCacheEntry[]; mode: ArchiveMode },
 ) => {
-  await store.write(
-    REGIME_ARCHIVE_PATHS.monthlySummaries,
-    nextPeriodFile({
-      existing: await store.read(REGIME_ARCHIVE_PATHS.monthlySummaries),
-      path: REGIME_ARCHIVE_PATHS.monthlySummaries,
-      entries: built.entries,
-      mode: built.mode,
-      getKey: (entry) => `${entry.year}-${entry.month}`,
-    }),
-  );
   const archive = await writeSummaryArchive(store, { monthlyEntries: built.entries }, built.mode);
   await store.write(
     REGIME_ARCHIVE_PATHS.timeMachineCache,
@@ -347,22 +302,11 @@ export const writeMonthlyArchive = async (
   await writeDerivedSummaryHistory(store, archive);
 };
 
-/** `scripts/generateWeeklySummaries.ts`: the weekly file, the archive's weeks, the derived history. */
+/** `scripts/generateWeeklySummaries.ts`: the archive's weeks, the derived history. */
 export const writeWeeklyArchive = async (
   store: ArchiveFileStore,
-  built: { entries: WeeklySummaryArchiveEntry[]; effectiveEndYear: number; mode: ArchiveMode },
+  built: { entries: WeeklySummaryArchiveEntry[]; mode: ArchiveMode },
 ) => {
-  const path = weeklySummariesPath(built.effectiveEndYear);
-  await store.write(
-    path,
-    nextPeriodFile({
-      existing: await store.read(path),
-      path,
-      entries: built.entries,
-      mode: built.mode,
-      getKey: (entry) => `${entry.year}-${entry.week}`,
-    }),
-  );
   const archive = await writeSummaryArchive(store, { weeklyEntries: built.entries }, built.mode);
   await writeDerivedSummaryHistory(store, archive);
 };

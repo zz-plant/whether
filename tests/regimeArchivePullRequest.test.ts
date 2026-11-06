@@ -6,7 +6,7 @@ import { z } from "zod";
 import { GitHubApiError, GitHubRepoClient } from "../lib/github/repoClient";
 import { extractCalibrationMonths } from "../lib/report/confidenceCalibration";
 import { buildPostureArchivePeriods } from "../lib/summary/postureArchiveIndex";
-import { REGIME_ARCHIVE_PATHS, weeklySummariesPath } from "../lib/summary/regimeArchiveFiles";
+import { REGIME_ARCHIVE_PATHS } from "../lib/summary/regimeArchiveFiles";
 import { commitRegimeArchiveRebuild, openRegimeArchivePullRequest } from "../lib/summary/regimeArchivePullRequest";
 import { parseSummaryArchive } from "../lib/summary/summaryArchive";
 import { bundledCache, bundledGeneratedAt, buildBundledSeries, type BundledSeriesId } from "./fixtures/bundledArchiveSeries";
@@ -17,7 +17,7 @@ import { bundledCache, bundledGeneratedAt, buildBundledSeries, type BundledSerie
  */
 
 const MAIN_SHA = "sha-main-000";
-const ARCHIVE_PATHS = [...Object.values(REGIME_ARCHIVE_PATHS), weeklySummariesPath(2026)];
+const ARCHIVE_PATHS: string[] = Object.values(REGIME_ARCHIVE_PATHS);
 const readCheckout = () => new Map(ARCHIVE_PATHS.map((path) => [path, readFileSync(path, "utf8")]));
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -194,7 +194,7 @@ describe("commitRegimeArchiveRebuild", () => {
     const reads = github.calls.filter((call) => call.path.startsWith("/contents/"));
     assert.ok(reads.length >= ARCHIVE_PATHS.length);
     assert.deepEqual([...new Set(reads.map((call) => call.accept))], ["application/vnd.github.raw+json"]);
-    // A Workflow step's result must stay under 1MiB; the files themselves are 11MB.
+    // A Workflow step's result must stay under 1MiB; the files themselves are 7MB.
     assert.ok(JSON.stringify(result).length < 4096);
   });
 

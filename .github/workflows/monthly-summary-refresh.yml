@@ -61,6 +61,5 @@ jobs:
           add-paths: |
             data/summary_archive.json
             data/summary_monthly_regime_history.json
-            data/monthly_summaries_2012_2025.json
             data/time_machine_cache.json
             data/summary_memory_rail_weekly.json

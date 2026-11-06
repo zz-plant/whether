@@ -9,7 +9,7 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 
 | Routine | ID | Cadence (UTC) | Produces |
 | --- | --- | --- | --- |
-| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json`, `posture_archive_index.json`, `posture_archive_years.json` (once the owner pastes the prompt; see below). Superseded by the Worker's rebuild since 2026-11-03 ("The rebuild moved into the Worker"); disable it once that has landed a pull request |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `time_machine_cache.json`, `confidence_record_months.json`, `summary_memory_rail_weekly.json`, `posture_archive_index.json`, `posture_archive_years.json` (once the owner pastes the prompt; see below). Superseded by the Worker's rebuild since 2026-11-03 ("The rebuild moved into the Worker"); disable it once that has landed a pull request |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
 | Whether — claims read-through (Tue, after the Monday send) | `trig_011EVxtoaiNMXk6CnKUPdfnZ` | Tue 02:13 | nothing committed: a read-only report, pushed to the owner's phone, comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly and month-end comparison bases are current |
 
@@ -149,6 +149,12 @@ reads the frozen weeks from `/calendar.ics` and `/api/agent?week=` when the repo
 unreachable, and no longer asks for pull requests. w42 and w43 were never frozen (the Thursday
 routine hit the usage cap on Oct 22, and the Monday freeze Workflow has opened no pull request since
 it was enabled), so the Oct 26 reading compared with Sep 30; w44 was frozen by hand.
+
+**The separate monthly and weekly summary files were removed (2026-11-05).** `data/monthly_summaries_2012_2025.json`
+and `data/weekly_summaries_2018_2026.json` held the same rows as `data/summary_archive.json`, minus
+the `cadence` field, and the only code reading them was the writer merging each into itself. The
+data-file census did not flag them because the writer named them. The Tuesday routine's prompt listed the
+monthly file as one of its three, so that prompt had to change with them.
 
 **The rebuild moved into the Worker (2026-11-03).** `RegimeHistoryRefreshWorkflow` now runs the
 whole refresh the routine was for: the monthly, weekly and quarterly generators and
