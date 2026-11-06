@@ -241,11 +241,11 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
               </td>
               {bothSides ? (
                 <>
-                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
+                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:col-span-2 max-md:p-0">
                     <CellLabel className={SIDE_INK.pause}>{SIDE_LABEL.pause}</CellLabel>
                     <LineCell value={row.pause} kind="pause" />
                   </td>
-                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
+                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:col-span-2 max-md:p-0">
                     <CellLabel className={SIDE_INK.resume}>{SIDE_LABEL.resume}</CellLabel>
                     {/* A met restart line on an area that is not on hold stamped "already
                         met" beside "14 pts away" from its pause line, which read as a

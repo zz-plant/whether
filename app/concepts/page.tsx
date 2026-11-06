@@ -392,6 +392,18 @@ export default function ProductCanonPage() {
         description="The date is first publication. If an essay later became a book, the note says which version the date refers to."
       >
         <EssayYearStrip timeline={timeline} recordStart={recordStart} />
+        {/* A jump rail for a list that runs to ten thousand pixels: the strip
+            above says where the years are, this takes a reader to one. */}
+        <nav aria-label="Jump to a year" className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+          {[...new Set(timeline.map((essay) => essay.published.year))].sort((a, b) => a - b).map((year) => {
+            const first = timeline.find((essay) => essay.published.year === year);
+            return first ? (
+              <a key={year} href={`#${first.slug}`} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                {year}
+              </a>
+            ) : null;
+          })}
+        </nav>
         {/* From `sm` each entry has a rail: when it came out and the conditions
             that month, as a stamp. Down the page the rail reads as a timeline
             and the stamps as the record's colours, so the list can be scanned

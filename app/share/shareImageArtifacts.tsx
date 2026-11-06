@@ -177,6 +177,23 @@ const BRIEF_THEME_OPTIONS: readonly SegmentedOption<BriefImageTheme>[] = [
   { key: "light", label: "Light" },
 ];
 
+/* The picture the files draw. On a phone it sits behind a "Preview" disclosure:
+   two full-width images stacked made the file formats a several-screen scroll
+   before the embed and subscribe blocks. From `sm` it is always visible. */
+const ArtifactPreview = ({ artifact }: { artifact: ImageArtifact }) => (
+  <div className="flex items-center justify-center overflow-hidden rounded-md border border-[color:var(--border-default)] bg-[var(--bg-nested)] sm:aspect-[3/2]">
+    <Image
+      src={artifact.preview.src}
+      width={artifact.preview.width}
+      height={artifact.preview.height}
+      alt={artifact.preview.alt}
+      unoptimized
+      loading="lazy"
+      className="h-auto w-full max-sm:max-h-40 max-sm:object-contain"
+    />
+  </div>
+);
+
 export function ShareImageArtifacts() {
   const { stage } = useOperatorStage();
   /* The brief context rides in the address the visitor arrived with; empty
@@ -211,17 +228,7 @@ export function ShareImageArtifacts() {
                 card's shape, so the two cards' titles and descriptions line up;
                 the slide letterboxes inside it rather than being cropped. On a
                 phone each card stands alone and the picture keeps its own shape. */}
-            <div className="flex items-center overflow-hidden rounded-md border border-[color:var(--border-default)] bg-[var(--bg-nested)] sm:aspect-[3/2]">
-              <Image
-                src={artifact.preview.src}
-                width={artifact.preview.width}
-                height={artifact.preview.height}
-                alt={artifact.preview.alt}
-                unoptimized
-                loading="lazy"
-                className="h-auto w-full"
-              />
-            </div>
+            <ArtifactPreview artifact={artifact} />
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-sm font-semibold text-white/90">{artifact.title}</h3>
               {artifact.meta ? <p className="text-fluid-nano font-medium tracking-[0.04em] text-slate-300">{artifact.meta}</p> : null}

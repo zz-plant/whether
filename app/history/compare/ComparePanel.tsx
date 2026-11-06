@@ -163,6 +163,22 @@ export async function ComparePanel({
         </p>
       </section>
 
+      {/* On a phone the two period columns stack, so a reader deep in Period B
+          has to remember what Period A was. The bar stays with the scroll and
+          names both, with the conditions that make them different. */}
+      <div className="sticky top-0 z-10 -mx-2 flex items-center justify-between gap-3 border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)]/95 px-2 py-2 text-xs backdrop-blur md:hidden">
+        <span className="min-w-0 truncate">
+          <span className="font-semibold text-slate-100">A</span>{" "}
+          {getRegimePublicLabel(reportA.assessment.regime)}
+          <span className="text-slate-400"> · {reportA.recordDateLabel}</span>
+        </span>
+        <span className="min-w-0 truncate text-right">
+          <span className="font-semibold text-slate-100">B</span>{" "}
+          {getRegimePublicLabel(reportB.assessment.regime)}
+          <span className="text-slate-400"> · {reportB.recordDateLabel}</span>
+        </span>
+      </div>
+
       <div id="ops-compare-grid" className="weather-switch gap-6 [--col-min:22rem]">
         <ComparePeriodColumn snapshot={snapA} report={reportA} label="Period A" />
         <ComparePeriodColumn snapshot={snapB} report={reportB} label="Period B" />
