@@ -3660,7 +3660,7 @@ reads that has a long public series, so the record is scored on the same basis a
   March to May 2020.
 - **Regenerated.** `generateMonthlySummaries.ts`, `generateWeeklySummaries.ts` and
   `generateQuarterlyYearlySummaries.ts`, then `bun run archive:index`: the Time Machine cache, the
-  summary archive (all four cadences), the monthly and weekly summary files, the month-rail and
+  summary archive (all four cadences), the month-rail and
   memory-rail histories, the confidence-record months and the `/history/[period]` index. Two
   independent runs matched except for their generation timestamps. Published briefs are untouched
   (`tests/recordBasis.test.ts` pins w31–w41 byte for byte).

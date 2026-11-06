@@ -12,7 +12,7 @@
  *
  * The work itself is in lib/summary/regimeArchivePullRequest.ts, where bun tests can reach it;
  * this class only sequences it into durable steps. The rebuild is one step because its
- * intermediate files (11MB) cannot be a step's result (1MiB); a retry fetches and rebuilds
+ * intermediate files (7MB) cannot be a step's result (1MiB); a retry fetches and rebuilds
  * again, which costs about a second of CPU and six FRED requests.
  */
 import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloudflare:workers";

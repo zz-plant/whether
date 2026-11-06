@@ -51,7 +51,7 @@ const describeCoverage = ({ newMonthEnds, latest }: RegimeArchiveSummary) =>
  * Fetches the six FRED series, rebuilds every archive file against `base` as it stands, and,
  * when something changed and it lands today, commits the changed files to
  * `REGIME_ARCHIVE_BRANCH` in one commit. Returns only names and shas: a Workflow step's result
- * must stay under 1MiB, and the files are 11MB.
+ * must stay under 1MiB, and the files are 7MB.
  */
 export const commitRegimeArchiveRebuild = async ({
   client,

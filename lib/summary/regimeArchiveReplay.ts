@@ -123,7 +123,6 @@ const buildWeekDescriptors = (
  */
 export const buildWeeklyArchive = ({ datasets, vixDataset, chicagoFciDataset, now, scope = {} }: ArchiveInputs): {
   entries: WeeklySummaryArchiveEntry[];
-  effectiveEndYear: number;
   mode: ArchiveMode;
 } => {
   const fetchedAt = now.toISOString();
@@ -178,7 +177,6 @@ export const buildWeeklyArchive = ({ datasets, vixDataset, chicagoFciDataset, no
 
   return {
     entries,
-    effectiveEndYear,
     mode: isPartial || historyWeeksLimit !== null ? "merge" : "replace",
   };
 };
