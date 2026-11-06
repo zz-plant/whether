@@ -1376,9 +1376,8 @@ do-now and pause lines and the reversal becomes a cash milestone (past six month
 boundary, or bridge financing banked; a bootstrapped company's names only the cash) rather than a macro read; above twenty-four the corridor still binds but a
 counter-cyclical move is offered at the same payback bar. The balanced band is the corridor the
 stage rules already assume, so it leaves them untouched — an operator who picks the default sees
-the same brief as one who never picked. The hero carries a second tablist from `sm` up and the
-header a second pill on phones (`RunwayPersonaSelector`, `RunwayDropdownPill`; the phone pill
-reads the cookie itself, since the header has no page model in reach), and when a band has
+the same brief as one who never picked. The hero carries a second tablist
+(`RunwayPersonaSelector`), and when a band has
 reshaped the rule the hero prints the binding constraint under the calibration row ("Runway is
 the binding constraint this week, not the regime line; the corridor sets tempo again once cash
 clears six months"). `WeeklyCallContract` carries `runwayBand` and `runwayLabel`, both absent
