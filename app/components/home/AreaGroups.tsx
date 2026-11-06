@@ -73,9 +73,7 @@ export function AreaGroups({
           >
             <h3 className={`flex items-center gap-2 text-fluid-lg font-semibold leading-snug ${HEADING_INK[group.state]}`}>
               <LineStateIcon state={group.state} className="shrink-0" />
-              <span>
-                {group.status}: {names}
-              </span>
+              <span>{group.status}</span>
             </h3>
             {group.condition || group.distance ? (
               <p className="max-w-[60ch] text-fluid-sm text-slate-300" data-group-condition>

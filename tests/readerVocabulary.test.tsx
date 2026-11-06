@@ -39,12 +39,10 @@ import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { DecisionPicker } from "../app/components/home/DecisionPicker";
 import { buildAreaGroups } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
-import { AreaCorridorLadder } from "../app/components/ui/areaCorridorLadder";
-import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
 import { AlertSection } from "../app/components/home/AlertSection";
-import { decisionAreaOrder, buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
 serveUnreachableUpstreams();
@@ -298,24 +296,6 @@ const routeSurfaces: Surface[] = [
         ),
       );
     },
-  },
-  {
-    name: "/ area ladder",
-    text: () =>
-      visibleText(
-        renderToStaticMarkup(
-          <AreaCorridorLadder
-            model={buildDecisionCorridorModel(
-              buildCanonicalBoundedDecisionRules({
-                regime: "SCARCITY",
-                thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-                scores: { tightness: 90, riskAppetite: 55 },
-              }),
-              { tightness: 90, riskAppetite: 55 },
-            )}
-          />,
-        ),
-      ),
   },
   {
     name: "/ legend, stage and runway, alert",

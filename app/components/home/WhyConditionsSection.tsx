@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { HomeSection } from "./HomeSection";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
-import { signalReadingMeaning } from "../../../lib/report/signalTranslations";
+import { getRegimePublicLabel, isRegimeKey, REGIME_WEATHER_LINES } from "../../../lib/regimePresentation";
 import { NOT_COUNTED_REASON } from "../../../lib/report/scoringBasis";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
@@ -21,9 +20,9 @@ type NotCountedReading = {
  * What the week's conditions are made of, and what the reading leaves out.
  *
  * It answers "how reliable is this?" where the reader asks it — after the
- * decisions, not inside a methodology page. The two scores print with their
- * meaning (`signalReadingMeaning`, the same phrase the brief card uses), so a
- * reader does not have to learn the 0–100 scale to know what 90 and 55 say.
+ * decisions, not inside a methodology page. The two scores print against their lines,
+ * and `REGIME_WEATHER_LINES` says what they add up to, so a reader does not have to
+ * learn the 0–100 scale to know what 90 and 55 say.
  *
  * Two qualifications live here because they change the classification rather
  * than decorate it:
@@ -31,17 +30,12 @@ type NotCountedReading = {
  *     score across its change line and the conditions would not be what the
  *     headline says. The qualification is stated where the conditions are
  *     explained, not buried on /trust (2026-10-22).
- *   - a capped score shows less distance to its line than the pressure behind
- *     it. 90 against a 70 line reads "20 points"; the uncapped calculation is
- *     110, so the real distance is 40. Without that, a 0.22-point rate move
- *     suggested by the scenario fold looks inconsistent with the number.
  */
 export function WhyConditionsSection({
   regime,
   tightness,
   riskAppetite,
   changeLines,
-  saturatedPressure,
   notCounted,
   warning,
 }: {
@@ -51,7 +45,6 @@ export function WhyConditionsSection({
   /** The two change lines the conditions are cut at. */
   changeLines: { tightness: number; riskAppetite: number };
   /** The unclipped pressure behind a score pinned at the top of its scale. */
-  saturatedPressure?: number;
   notCounted: readonly NotCountedReading[];
   /** What the uncounted inputs would do to a line, in one sentence; null when they would cross none. */
   warning: string | null;
@@ -68,14 +61,6 @@ export function WhyConditionsSection({
     riskAppetiteRegime: changeLines.riskAppetite,
   });
   const countedRegimeLabel = getRegimePublicLabel(countedRegime);
-  /* How far the printed (capped) score sits from its change line. The uncapped
-     distance was printed beside it too, so one paragraph gave two answers to
-     "how far past the line" and a reader had to pick. The line is set against the
-     capped score, so that is the only distance this states. */
-  const cappedDistance =
-    typeof saturatedPressure === "number" && saturatedPressure > tightness
-      ? Math.abs(tightness - changeLines.tightness)
-      : null;
 
   return (
     /* The rule that turns two numbers into a weather word leads (2026-10-27): it is
@@ -89,27 +74,23 @@ export function WhyConditionsSection({
          own, what each reading means, is a clause here. */
       lead={(
         <>
-          {/* One template for two lines with opposite polarity (2026-11-01). "Risk
-              appetite is above its 50 change line: investors are selective about
-              risk" read as a penalty, because the funding-pressure sentence before
-              it uses the colon to mean "this is what being above the line costs
-              you". Above the risk-appetite line is the safe side. The semicolon
-              states the position and then the reading, and the score is named so a
-              reader can hold it against the line on the map. */}
-          {/* The cut as a number, not "its 70 change line" (2026-11-03): the
-              heading already says these are the lines conditions turn on. */}
+          {/* The numbers against their lines, then what they add up to in the weather's
+              terms (2026-11-05). Each score carried its meaning in brackets; the closing
+              line says it once, for both. */}
           Funding pressure is {Math.round(tightness)}, {tightness > changeLines.tightness ? "above" : "below"}{" "}
-          {changeLines.tightness} ({signalReadingMeaning("tightness", tightness)}). Risk appetite is{" "}
-          {Math.round(riskAppetite)}, {riskAppetite > changeLines.riskAppetite ? "above" : "below"} {changeLines.riskAppetite}{" "}
-          ({signalReadingMeaning("riskAppetite", riskAppetite)}). Together they put conditions in{" "}
-          <span className="font-semibold">{regimeLabel}</span>.
+          {changeLines.tightness}. Risk appetite is {Math.round(riskAppetite)},{" "}
+          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} {changeLines.riskAppetite}.{" "}
+          {isRegimeKey(regime) ? `${REGIME_WEATHER_LINES[regime]} ` : null}
+          <span className="font-semibold">That&rsquo;s {regimeLabel}.</span>
         </>
       )}
     >
       <div className="min-w-0">
         {notCounted.length > 0 ? (
           <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
-            <p className="weather-caveat-mark text-fluid-sm font-semibold">What the headline reading leaves out</p>
+            <p className="weather-caveat-mark text-fluid-sm font-semibold">
+              {countedRegimeLabel !== regimeLabel ? `Why it feels like ${countedRegimeLabel}` : "What the headline reading leaves out"}
+            </p>
             <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
               {warning
                 ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
@@ -119,14 +100,6 @@ export function WhyConditionsSection({
               {NOT_COUNTED_REASON}
             </p>
           </div>
-        ) : null}
-
-        {cappedDistance ? (
-          <p className="mt-4 text-fluid-sm leading-relaxed text-slate-400" data-capped-reading>
-            Funding pressure shows {tightness} because that&rsquo;s as high as the score goes; uncapped it would be{" "}
-            {saturatedPressure}. Conditions are judged on the capped {tightness}, {cappedDistance} points above{" "}
-            {changeLines.tightness}.
-          </p>
         ) : null}
       </div>
 

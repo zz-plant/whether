@@ -5,6 +5,8 @@ import { Sparkline, interquartileRange, sparklineDomain, type SparklinePoint } f
 import { ScoreLadder } from "../ui/scoreLadder";
 import { GovernedAreas } from "../ui/governedAreas";
 import { SignalContextDetails } from "../ui/plainLanguage";
+import type { ScoreMoveRanges } from "../../../lib/report/marketMoveScale";
+import type { RegimeKey } from "../../../lib/types";
 import { TrendGlyph, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
@@ -115,6 +117,8 @@ function InputHistoryGrid({ series }: { series: readonly { key: string; label: s
 }
 
 export function WhatChangedSection({
+  moveRanges,
+  feelsLike,
   rows,
   lead,
   comparisonUnavailable,
@@ -126,6 +130,10 @@ export function WhatChangedSection({
   compact = false,
   historyOpen = false,
 }: {
+  /** How far the record's months moved each score, for its ladder. */
+  moveRanges?: ScoreMoveRanges | null;
+  /** The reading with the left-out inputs counted, where its conditions differ. */
+  feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
   rows: readonly SignalChangeRow[];
   compact?: boolean;
   historyOpen?: boolean;
@@ -145,15 +153,18 @@ export function WhatChangedSection({
   const meanings = new Map(rows.map((row) => [row.key, meaningOf(row, basis)] as const));
   /* A score that moved enough to say so goes first; one whose row says "No real
      change." keeps its place, or the table opened on a row with nothing to say. */
+  /* The two scores always print: their ladders are the page's drawing of the lines. A
+     raw input that did not move has nothing to say this week (2026-11-05). */
+  const movingRows = rows.filter((row) => row.key === "tightness" || row.key === "riskAppetite" || row.delta !== 0);
   const displayRows = compact
-    ? [...rows].sort((a, b) => {
+    ? [...movingRows].sort((a, b) => {
         const priority = (row: SignalChangeRow) =>
           row.key === "tightness" || row.key === "riskAppetite"
             ? (meanings.get(row.key)?.direction ?? "flat") === "flat" ? 1 : 0
             : 2;
         return priority(a) - priority(b);
       })
-    : rows;
+    : movingRows;
   const hasHistory = Object.values(history ?? {}).some((points) => points.length >= 3)
     || (inputHistory ?? []).some((entry) => entry.points.length >= 3);
   return (
@@ -241,9 +252,8 @@ export function WhatChangedSection({
                         {row.movement}
                       </p>
                     ) : null}
-                    {/* Plain-English meaning, scale anchors, historical startup era
-                        context, and team reflection prompt. Folded in a 1-click disclosure
-                        to maintain clean table scanning. */}
+                    {/* What the score captures and what this reading means, folded so the
+                        table scans. */}
                     {!compact || row.lines ? <SignalContextDetails
                       signalKey={row.key}
                       score={typeof row.value === "number" ? row.value : undefined}
@@ -264,6 +274,12 @@ export function WhatChangedSection({
                           previous={comparisonUnavailable ? null : row.previous}
                           previousLabel={basis.label}
                           lines={row.lines}
+                          monthRange={row.key === "tightness" || row.key === "riskAppetite" ? moveRanges?.[row.key] : null}
+                          feelsLike={
+                            feelsLike && (row.key === "tightness" || row.key === "riskAppetite") && feelsLike[row.key] !== row.value
+                              ? { value: feelsLike[row.key], regime: feelsLike.regime }
+                              : null
+                          }
                         />
                       </Link>
                       {row.saturatedPressure !== undefined ? (

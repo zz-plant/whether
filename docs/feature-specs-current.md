@@ -344,9 +344,42 @@ until the report resolves.
   out to pay for the words; the calibration line and the card's pill say the same.
 - **Your decisions is in the Plan group** as a secondary page: its row, footer column and the
   phone's sheet. It was a footer link beside Privacy. It stays out of the sitemap and `/llms.txt`.
-- **The card names the score holding the areas** when one score holds them all: "On hold while
-  funding pressure is above 76: Hiring, Fundraising, Spending and New bets." With two scores
-  holding different areas it lists the areas alone.
+- **The five areas cross the card** (2026-11-05, `AreaStrip`, `buildAreaStrip`), the way a weather
+  app's forecast row reads: a name and a state per column, in place of the "On hold: …" sentence.
+  Each column goes to that area's rule, and the line under them says what the holds wait on when they
+  share one restart line ("No restart until funding pressure falls below 66, a rare move.").
+- **The card edited down** (2026-11-05). The line-state band prints a hold that started since the
+  earlier reading, dated by it ("Hiring paused since Oct 26."), or a line that is close, not every
+  week of a hold, and has no link. "Say it" left the card, since it
+  restated the call; `/operate` keeps the phrases. A week nothing moved says so once on the stamp
+  line. The months-held count is `/trust`'s, and the card's strip drops it.
+- **The sections under the card edited down** (2026-11-05). Area groups head on their state alone
+  ("On hold") and name what a hold waits on ("No restart until…"). The area distance ladder is
+  gone, since one score holding four areas drew one row four times; the fold under the groups is
+  the reader's runway and the test. "What the score means" drops its eras and team prompt on `/`,
+  and a raw input that did not move drops out of "What changed". The capped-score note prints once,
+  under the funding-pressure ladder. "What would change this guidance" keeps one label per answer.
+  "What you may be hearing" has no lead. The record section drops two lines of method.
+- **The weather says what plain words took longer to** (2026-11-05). `REGIME_WEATHER_LINES` closes
+  "Why conditions are…": price is what money costs, going out in it is whether investors will. A
+  past hold "took 39 months to thaw"; "One warm week isn't spring" says why a restart line sits
+  further out than a pause; the record's band is the climate and the guidance the weather; the
+  calibration line opens "Same weather, your rules"; the excluded-inputs band heads "Why it feels
+  like Freezing" when the card says so; the alert form is "Get an alert the day conditions turn".
+  The bar: true of the data, readable with no decoding, and shorter or sharper than the plain line.
+  Warning/watch labels and data "stations" did not clear it.
+- **The drawings use it too** (2026-11-05). `ScoreLadder` takes `monthRange` from
+  `describeScoreMoveRanges`: a common and an unusual month's move around the dot, read like a
+  weather app's day range, a count of past months and never a chance. `feelsLike` plots the score
+  with the left-out inputs counted, in that condition's glyph, on the ladder and on the conditions
+  map. Rings on the map were tried first: funding pressure usually does not move in a month, so
+  they flattened to a sliver at that size.
+  To pay for them the map's caption shortens, its "How they are set" link goes (the card's trust
+  strip links to the method), a group gives the size of the move without restating the score, and a
+  ladder drops the hollow dot when the earlier reading is the same.
+- **"Feels like" beside the condition** (2026-11-05, `ScoringBasis.countedRegime`): the conditions
+  the left-out inputs would give, on a live reading where they differ from the published ones. It
+  moves "Counted, conditions would be …" off the trust strip, which still names the inputs.
 
 ### 1.1.0s One side of each rule on the brief, the map's readings as a table, a quiet Monday email (2026-11-03)
 
@@ -512,8 +545,6 @@ the Slack block, and developer access lives under the header's More menu):
 - `ScoreLadder` draws a score that is worse higher from high to low (from the pause and restart
   lines, or the change line when one of the pair is missing), so the pause range is on the left
   and the restart range on the right for both scores; the key reads in tick order.
-- The area corridor ladder on `/` mirrors its rows the same way: "Left: pause zone", "Right:
-  restart zone".
 - Names and numbers do not change: published briefs are never edited and print "Funding
   pressure 90". Time-series line charts keep their natural axis.
 - The `/trust` margin ladder's bands read Little / Some / Plenty, as every other surface does

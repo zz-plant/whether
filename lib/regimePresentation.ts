@@ -59,6 +59,18 @@ export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
 };
 
 /**
+ * What the two scores add up to, said in the weather the word names (2026-11-05):
+ * price is what money costs, and going out in it is whether investors will. It closes
+ * the section that explains the word; the facts above it are the evidence.
+ */
+export const REGIME_WEATHER_LINES: Record<RegimeKey, string> = {
+  SCARCITY: "Money is pricey, and investors won't go out in it.",
+  DEFENSIVE: "Investors will still go out in this, and they'll charge you for it.",
+  VOLATILE: "Money is cheap, and investors still won't go out in it.",
+  EXPANSION: "Money is cheap, and investors are out in it.",
+};
+
+/**
  * What each side of the two change lines means in money terms, for a reader who
  * has not learned the scores: above the funding-pressure line money is pricey,
  * above the risk-appetite line investors are willing. The conditions legend

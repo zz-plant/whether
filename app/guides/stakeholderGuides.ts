@@ -171,7 +171,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Investors",
         question: "Public markets bounced this month — we should go out and raise now.",
-        answer: "One good week won't restart fundraising. Wait until both scores meet its restart condition before opening a round.",
+        answer: "One warm week isn't spring. Wait until both scores meet fundraising's restart condition before opening a round.",
         area: "capital-raising",
       },
       {

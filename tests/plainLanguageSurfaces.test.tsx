@@ -120,12 +120,10 @@ describe("the plain-English layer beside the week's readings", () => {
     assert.match(html, /would be 114/);
   });
 
-  it("provides historical era context and leadership team prompt", () => {
+  it("keeps the score's fold to what it captures and what this reading means", () => {
     const html = render();
-    assert.ok(html.includes("Historical context:"));
-    assert.ok(html.includes(signalPlainEnglish.tightness.historicalContext));
-    assert.ok(html.includes("Ask your team:"));
-    assert.ok(html.includes(signalPlainEnglish.tightness.operatorPrompt));
+    assert.ok(html.includes("What it captures:"));
+    assert.doesNotMatch(html, /Historical context:|Ask your team:/);
   });
 });
 

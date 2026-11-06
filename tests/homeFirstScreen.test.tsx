@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { LineStateBand } from "../app/components/home/LineStateBand";
 import { DecisionHero } from "../app/components/DecisionHero";
 import { describeLineStateBand, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
@@ -24,14 +25,6 @@ const pauseSlot = (met: boolean, points: number): HomeAreaLineSlot => ({
   metric: "tightness",
 });
 
-const restartSlot = (met: boolean, points: number): HomeAreaLineSlot => ({
-  line: "Funding pressure < 66",
-  distance: met ? "already met" : `${points} pts away`,
-  points,
-  met,
-  metric: "tightness",
-});
-
 describe("the band states the week's exception, or nothing", () => {
   it("says nothing on a calm week", () => {
     assert.equal(describeLineStateBand([]), null);
@@ -46,49 +39,54 @@ describe("the band states the week's exception, or nothing", () => {
     const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 3) }]);
     assert.equal(model?.state, "near");
     assert.equal(model?.text, "Hiring — an unusual move from pausing.");
-    assert.equal(model?.href, "#what-it-changes");
     assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 0) }])?.text, "Hiring is on the edge of pausing.");
   });
 
-  it("says how far a hold is from lifting, not just that it is one", () => {
+  it("marks the week a hold starts, naming every area it took", () => {
     const model = describeLineStateBand([
-      { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
+      { area: "hiring", pause: pauseSlot(true, 0), changedKind: "paused" },
+      { area: "capital-raising", pause: pauseSlot(true, 0), changedKind: "paused" },
+      { area: "burn-discipline", pause: pauseSlot(true, 0), changedKind: "held" },
     ]);
     assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring — a rare move from restarting.");
+    assert.equal(model?.text, "Hiring and Fundraising paused since last week.");
+    assert.equal(
+      describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0), changedKind: "paused" }], comparisonBasis({ label: "Aug 31" }))?.text,
+      "Hiring paused since Aug 31.",
+      "a month-end comparison dates the hold, so a later week cannot call it new",
+    );
   });
 
-  it("picks the hold that lifts first", () => {
+  it("leaves a standing hold to the card", () => {
+    assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0), changedKind: "held" }]), null);
+    assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0) }]), null);
+  });
+
+  it("still warns of a line close to pausing under a standing hold", () => {
     const model = describeLineStateBand([
-      { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
-      { area: "capital-raising", pause: pauseSlot(true, 0), resume: restartSlot(false, 2) },
+      { area: "hiring", pause: pauseSlot(true, 0), changedKind: "held" },
+      { area: "burn-discipline", pause: pauseSlot(false, 1) },
     ]);
-    assert.equal(model?.text, "Fundraising — an unusual move from restarting.");
-  });
-
-  it("still states a hold with no numeric restart line", () => {
-    const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(true, 0) }]);
-    assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring is on hold.");
+    assert.equal(model?.state, "near");
   });
 
   it("prefers a crossed line to a close one", () => {
     const model = describeLineStateBand([
       { area: "hiring", pause: pauseSlot(false, 1) },
-      { area: "burn-discipline", pause: pauseSlot(true, 0) },
+      { area: "burn-discipline", pause: pauseSlot(true, 0), changedKind: "paused" },
     ]);
     assert.equal(model?.state, "crossed");
   });
 });
 
 describe("the band is drawn in the line state's ink", () => {
-  it("prints the sentence and the way to the areas", () => {
+  it("prints the sentence and leaves the way to the areas to the card", () => {
     const html = renderToStaticMarkup(
-      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — a common move from pausing.", href: "#what-it-changes", action: "What to do" }} />,
+      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — a common move from pausing." }} />,
     );
     assert.match(html, /data-line-state-band="near"/);
     assert.ok(html.includes("Hiring — a common move from pausing."));
-    assert.match(html, /href="#what-it-changes"/);
+    assert.doesNotMatch(html, /href=/);
   });
 
   it("mounts above the card and nowhere else on the route", () => {

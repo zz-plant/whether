@@ -93,7 +93,7 @@ export const HOME_SECTIONS = {
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
   hearing: { id: "what-you-may-hear", heading: "What you may be hearing" },
   record: { id: "has-this-happened-before", heading: "How unusual is this?" },
-  alert: { id: "subscribe", heading: "Get notified when something changes" },
+  alert: { id: "subscribe", heading: "Get an alert the day conditions turn" },
 } as const;
 
 /** `/share` opens on the format its hash names; the slide is in the files section under it. */
@@ -388,43 +388,32 @@ export type LineStateBandModel = {
   state: Exclude<LineState, "clear">;
   area: DecisionArea;
   text: string;
-  href: string;
-  action: string;
 };
 
 export const describeLineStateBand = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "changedKind">[],
+  basis: ComparisonBasis = comparisonBasis(),
 ): LineStateBandModel | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
 
-  const band = (state: LineStateBandModel["state"], row: Pick<HomeAreaRow, "area" | "pause" | "resume">, text: string) => ({
+  const band = (state: LineStateBandModel["state"], row: Pick<HomeAreaRow, "area">, text: string) => ({
     state,
     area: row.area,
     text,
-    href: `#${HOME_SECTIONS.areas.id}`,
-    action: "What to do",
   });
 
-  /* Held: the area whose restart line is nearest, since that is the hold that
-     lifts first. An area with no numeric restart line still belongs here — it
-     is on hold — it just cannot say how far from lifting it is. */
-  const held = ruled.filter((row) => row.pause?.met);
-  if (held.length > 0) {
-    const nearestRestart = (row: Pick<HomeAreaRow, "resume">) =>
-      row.resume && !row.resume.met && Number.isFinite(row.resume.points) ? row.resume.points : Number.POSITIVE_INFINITY;
-    const binding = held.reduce((best, row) => (nearestRestart(row) < nearestRestart(best) ? row : best));
-    const restart = binding.resume;
-    /* How big a move lifts the hold, against the record ("a rare move from
-       restarting"), where "24 pts from restarting" gave a size with nothing to
-       hold it against (2026-11-03). */
-    return band(
-      "crossed",
-      binding,
-      restart && !restart.met && Number.isFinite(restart.points)
-        ? `${decisionAreaLabel(binding.area)} — ${describeSlotDistance(restart)} from restarting.`
-        : `${decisionAreaLabel(binding.area)} is on hold.`,
-    );
+  /* Only a hold that started since the earlier reading (2026-11-05). A hold can stand for
+     years, and the last one at these lines took 39 months to lift; red every week of that
+     is a band nobody reads. The card's area strip states a standing hold. Dated by the
+     comparison, because the earlier reading can be a month-end weeks back: "this week"
+     or "just" would repeat for as long as that reading stayed the comparison. */
+  const paused = ruled.filter((row) => row.pause?.met && row.changedKind === "paused");
+  const [firstPaused] = paused;
+  if (firstPaused) {
+    const names = paused.map((row) => decisionAreaLabel(row.area));
+    const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+    return band("crossed", firstPaused, `${list} paused ${basis.since}.`);
   }
 
   /* Close: the shared cutoff, through the same resolver the badges use, so the
@@ -442,43 +431,45 @@ export const describeLineStateBand = (
   );
 };
 
-/**
- * The card's bridge from the weather word to the five areas (2026-10-14).
- *
- * The condition comes from the change lines and the area answers from the
- * pause and restart lines, so a card could say "Cloudy: money is available"
- * over a picker where four areas were held, and nothing tied the two. This
- * names the held areas on the card without repeating its condition stamp:
- * "On hold: Hiring, Fundraising, Spending and New bets."
- *
- * Since 2026-11-03 it also names the score holding them when one score holds them
- * all ("On hold while funding pressure is above 76: …"). The card prints the
- * weather word and the two scores just above, and "Cloudy: money is available"
- * over four held areas left the reader to work out that the holds come from the
- * score, not the weather word.
- */
-const describeHoldingScore = (slots: readonly HomeAreaLineSlot[]): string | null => {
-  const [first] = slots;
-  if (!first || first.value === undefined || first.holdsAbove === undefined) return null;
-  const same = slots.every(
-    (slot) => slot.metric === first.metric && slot.value === first.value && slot.holdsAbove === first.holdsAbove,
-  );
-  if (!same) return null;
-  return `${ruleMetricLabel[first.metric].toLowerCase()} is ${first.holdsAbove ? "above" : "below"} ${first.value}`;
+export type AreaStripModel = {
+  cells: { area: DecisionArea; state: LineState; label: string; href: string }[];
+  /** What the holds wait on, where every held area names the same restart line. */
+  restart: string | null;
 };
 
-export const describeHeldAreasForCard = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
-): string | null => {
-  const ruled = rows.filter((row) => row.pause);
-  if (ruled.length === 0) return null;
-  const heldRows = ruled.filter((row) => row.pause?.met);
-  const held = heldRows.map((row) => decisionAreaLabel(row.area));
-  if (held.length === 0) return "No area is on hold.";
-  const holding = describeHoldingScore(heldRows.flatMap((row) => (row.pause ? [row.pause] : [])));
-  if (held.length === ruled.length) return holding ? `Every area is on hold while ${holding}.` : "Every area is on hold.";
-  const list = held.length === 1 ? held[0] : `${held.slice(0, -1).join(", ")} and ${held.at(-1)}`;
-  return holding ? `On hold while ${holding}: ${list}.` : `On hold: ${list}.`;
+/* Where every held area waits on one line: the fact a reader of a held week asks next,
+   and the size of the move it takes. "No restart until", because a rule can ask for a
+   second score as well, and this names the one line it shows. */
+const describeSharedRestart = (rows: readonly Pick<HomeAreaRow, "pause" | "resume">[]): string | null => {
+  const slots = rows.filter((row) => row.pause?.met).map((row) => row.resume);
+  const [first] = slots;
+  if (!first || first.met) return null;
+  const phrase = slotPhrase(first);
+  if (!phrase || slots.some((slot) => !slot || slotPhrase(slot) !== phrase)) return null;
+  const band = describeScoreMoveBand(first.metric, first.points);
+  return `No restart until ${phrase}${band ? `, ${band}` : ""}.`;
+};
+
+const AREA_STRIP_STATE_LABEL: Record<LineState, string> = {
+  crossed: "On hold",
+  near: "Close to pausing",
+  clear: "Clear",
+};
+
+/**
+ * The card's five-area row: where each area stands against its pause line, in the words
+ * the page's groups use. Null when no area states a line. The distance is the line under
+ * the columns: areas held by one score would print one distance in every column.
+ */
+export const buildAreaStrip = (rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[]): AreaStripModel | null => {
+  const cells = rows.flatMap((row) => {
+    const status = describeAreaPauseStatus(row);
+    return status
+      ? [{ area: row.area, state: status.state, label: AREA_STRIP_STATE_LABEL[status.state], href: `#area-${row.area}` }]
+      : [];
+  });
+  if (cells.length === 0) return null;
+  return { cells, restart: describeSharedRestart(rows) };
 };
 
 /**
@@ -511,12 +502,12 @@ export const describeConditionsTrail = (recordDates: readonly string[]): string 
   const firstDate = new Date(`${first.slice(0, 10)}T00:00:00Z`);
   const lastDate = new Date(`${last.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(firstDate.getTime()) || Number.isNaN(lastDate.getTime())) return null;
-  if (recordDates.length === 1) return `The trail shows the end of ${MONTH_YEAR.format(lastDate)}, then this week.`;
+  if (recordDates.length === 1) return `Trail: the end of ${MONTH_YEAR.format(lastDate)}, then this week.`;
   const range =
     firstDate.getUTCFullYear() === lastDate.getUTCFullYear()
       ? `${MONTH_SHORT.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`
       : `${MONTH_YEAR.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`;
-  return `The trail shows each month, ${range}, then this week.`;
+  return `Trail: month-ends, ${range}.`;
 };
 
 /*
@@ -639,9 +630,9 @@ const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
  */
 export type AreaGroup = {
   state: LineState;
-  /** "On hold", "Close to pausing" or "Not on hold". */
+  /** "On hold", "Close to pausing" or "Clear". */
   status: string;
-  /** "Restarts when funding pressure falls below 66." */
+  /** "No restart until funding pressure falls below 66." */
   condition: string | null;
   /** Today's score, how big a move the condition is, and which way it went: "It is 90 today, a rare move away, unchanged since Oct 19." */
   distance: string | null;
@@ -656,7 +647,7 @@ const describeTrend = (slot: HomeAreaLineSlot, today: number, earlier: number, s
   if (value === undefined || holdsAbove === undefined) return null;
   const gap = (score: number) => (holdsAbove ? value - Math.round(score) : Math.round(score) - value);
   const closer = gap(earlier) - gap(today);
-  if (closer === 0) return `unchanged ${since}`;
+  if (closer === 0) return null;
   const points = Math.abs(closer) === 1 ? "1 point" : `${Math.abs(closer)} points`;
   return `${points} ${closer > 0 ? "closer" : "farther"} ${since}`;
 };
@@ -674,7 +665,7 @@ const STATE_ORDER: readonly LineState[] = ["crossed", "near", "clear"];
 const GROUP_STATUS: Record<LineState, string> = {
   crossed: "On hold",
   near: "Close to pausing",
-  clear: "Not on hold",
+  clear: "Clear",
 };
 
 export const buildAreaGroups = (
@@ -698,13 +689,15 @@ export const buildAreaGroups = (
     const slot = held ? row.resume : row.pause;
     const state: LineState = held ? "crossed" : resolveLineState(row.pause.points, "pause", false) === "near" ? "near" : "clear";
     const phrase = slot ? slotPhrase(slot) : null;
-    const condition = phrase ? `${held ? "Restarts when" : "Pauses if"} ${phrase}.` : null;
+    const condition = phrase ? `${held ? "No restart until" : "Pauses if"} ${phrase}.` : null;
     /* The score the condition just named, so "it": the name twice in two sentences was
        the page's most repeated term. At the line there is no move to size. */
     const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;
     const trend = slot && comparison ? describeTrend(slot, scores[slot.metric], comparison.scores[slot.metric], comparison.since) : null;
     const distance = slot && phrase
-      ? `It is ${Math.round(scores[slot.metric])} today${[band ? `${band} away` : null, trend].filter(Boolean).map((part) => `, ${part}`).join("")}.`
+      ? band
+        ? `${[`${band.charAt(0).toUpperCase()}${band.slice(1)} away`, trend].filter(Boolean).join(", ")}.`
+        : `It is ${Math.round(scores[slot.metric])} today${trend ? `, ${trend}` : ""}.`
       : null;
     /* The record reads the lines the group shows, so both must be on one score. */
     const history =

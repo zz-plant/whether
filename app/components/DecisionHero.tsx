@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
+import type { RegimeKey } from "../../lib/types";
 import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
 import { TrustStrip, type TrustStripProps } from "./trustStrip";
 import { ScreenshotCaption } from "./screenshotCaption";
@@ -92,19 +93,18 @@ type Props = {
    */
   published?: { text: string; href: string };
   /**
-   * The condition tied to the areas: which are on hold, and where each one's
-   * concrete answer is. The call is a sentence about every decision at once;
-   * this is the line that says which decisions it binds.
+   * The areas across the card: where each stands and a way to its answer. The call
+   * is a sentence about every decision at once; this says which decisions it binds.
    */
-  areas?: { text: string; href: string; action: string };
+  areaStrip?: ReactNode;
+  /**
+   * The conditions the left-out inputs would give, beside the ones published
+   * (`ScoringBasis.countedRegime`), the way a forecast sets "feels like" beside the
+   * temperature. Only where the two differ; `href` is the section that says why.
+   */
+  feelsLike?: { regime: RegimeKey; href: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
-  /**
-   * The week's spoken line, from the regime playbook: the sentence a leader can
-   * use in a meeting. Guidance travels as words; one line on the card is the
-   * difference between a score a reader has to interpret and something to say.
-   */
-  phrase?: string;
   /**
    * The nearer score on its ladder, drawn on a phone only, above the trust strip
    * (2026-10-27). From `md` the conditions map beside the call draws where the
@@ -165,9 +165,9 @@ export function DecisionHero({
   captionDetail,
   question,
   lines,
-  phrase,
   published,
-  areas,
+  areaStrip,
+  feelsLike,
   reading,
   phoneFigure,
 }: Props) {
@@ -253,6 +253,20 @@ export function DecisionHero({
               ) : null}
             </span>
           ) : null}
+
+          {feelsLike ? (
+            <Link
+              href={feelsLike.href}
+              data-feels-like
+              className="weather-hit text-fluid-sm font-medium text-slate-200 underline decoration-slate-600 underline-offset-4"
+            >
+              Feels like{" "}
+              <span data-regime={feelsLike.regime} className="font-semibold" style={{ color: "var(--regime-ink)" }}>
+                <ConditionIcon regime={feelsLike.regime} className="mr-1 inline align-text-bottom" />
+                {REGIME_LABELS[feelsLike.regime]}
+              </span>
+            </Link>
+          ) : null}
         </div>
 
         {/* The homepage's `h1`. It was an `h2` under a visually hidden `h1`
@@ -303,14 +317,7 @@ export function DecisionHero({
           </p>
         ) : null}
 
-        {areas ? (
-          <p className="max-w-xl text-fluid-sm font-medium leading-snug text-slate-100" data-held-areas>
-            {areas.text}{" "}
-            <Link href={areas.href} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
-              {areas.action}
-            </Link>
-          </p>
-        ) : null}
+        {areaStrip}
 
         {published ? (
           <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
@@ -336,12 +343,6 @@ export function DecisionHero({
           <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
             <p className="text-sm leading-relaxed text-slate-300">{detail}</p>
           </div>
-        ) : null}
-
-        {phrase ? (
-          <p className="max-w-xl text-fluid-sm leading-relaxed text-slate-300" data-say-line>
-            <span className="font-semibold text-slate-200">Say it:</span> “{phrase}”
-          </p>
         ) : null}
 
         {/* Freshness and confidence, once, where every reading route puts them:

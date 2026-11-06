@@ -108,10 +108,10 @@ describe("what would change this guidance: the pause and restart lines", () => {
     const pause = lined.indexOf(">Pause if<");
     const resume = lined.indexOf(">Restart when<");
     assert.ok(change > 0 && pause > change && resume > pause, "conditions change, then the pause and restart lines");
-    assert.match(lined, /When would conditions change\?/);
-    assert.match(lined, /When can paused decisions resume\?/);
+    assert.match(lined, /Conditions change if/);
+    assert.match(lined, /Restart when/);
     assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
-    assert.match(lined.replace(/<[^>]+>/g, ""), /Better conditions alone won(?:’|')t lift a pause\. The restart condition sits further out/);
+    assert.match(lined.replace(/<[^>]+>/g, ""), /One warm week isn(?:’|')t spring: the restart line sits further out\./);
   });
 
   it("prefers a chosen stage's restart line to the lead area's", () => {

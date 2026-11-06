@@ -26,10 +26,6 @@ type SignalPlainEnglish = {
   midMeans: string;
   /** The jargon term this translates. */
   jargonTerm: string;
-  /** What to ask yourself when you see this number change. */
-  operatorPrompt: string;
-  /** Historical context anchoring this indicator in recognizable startup eras. */
-  historicalContext: string;
 };
 
 export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
@@ -44,9 +40,6 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     midMeans:
       "Money is balanced — fund proven milestones; unproven bets face questions. Keep options open.",
     jargonTerm: "Funding pressure",
-    operatorPrompt: "Can we afford a project that takes a year to pay back, or do we need cash in 90 days?",
-    historicalContext:
-      "During the 2020–2021 funding boom, this read 20–35. In the 2022–2023 reset, it peaked above 80. Above 70 means money is scarce, investors demand proof of revenue, and rounds take longer.",
   },
   riskAppetite: {
     plainLabel: "Risk appetite",
@@ -59,9 +52,6 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     midMeans:
       "Markets are selectively open — buyers require clear customer proof before signing large contracts. Prove traction before scaling.",
     jargonTerm: "Risk appetite",
-    operatorPrompt: "Are customers looking to cut costs, or are they eager to try something new?",
-    historicalContext:
-      "During bull markets, this reads 70–85+. In major pullbacks, it falls below 30. Below 45 means investors and buyers demand proof of retention and profitability over pure growth.",
   },
   baseRate: {
     /*
@@ -82,9 +72,6 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     midMeans:
       "Rates are moderate — plan as if rates stay here; hedge floating-rate exposure if you carry debt.",
     jargonTerm: "Base rate",
-    operatorPrompt: "Does my company carry debt or rely on outside capital? If yes, this number matters.",
-    historicalContext:
-      "Near 0% from 2008–2021, climbing above 5% in 2023. Above 4.5% keeps venture debt expensive and raises investor return hurdles.",
   },
   curveSlope: {
     plainLabel: "Recession warning gauge",
@@ -97,9 +84,6 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     midMeans:
       "Curve is neutral/flat — don't rely on this signal alone; also check funding pressure and risk appetite.",
     jargonTerm: "Yield curve slope",
-    operatorPrompt: "If I'm planning a 12+ month project, does this signal support that timeline?",
-    historicalContext:
-      "Normally positive (+0.5% to +1.5%). When it dips below 0% (an inverted yield curve), it has preceded every modern U.S. recession.",
   },
 };
 

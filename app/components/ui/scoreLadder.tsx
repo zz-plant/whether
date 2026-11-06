@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { LineStateIcon } from "./conceptIcons";
+import { ConditionIcon, LineStateIcon } from "./conceptIcons";
+import type { RegimeKey } from "../../../lib/types";
 
 /**
  * A score drawn against its lines.
@@ -42,6 +43,14 @@ type ScoreLadderProps = {
   previousLabel?: string;
   lines: readonly LadderLine[];
   max?: number;
+  /**
+   * How far a common and an unusual month has moved this score, drawn around the dot as a
+   * weather app draws a day's range (2026-11-05). Where it reaches a line, a month like
+   * those crosses it. A count of past months, not a chance of the next one.
+   */
+  monthRange?: { common: number; unusual: number } | null;
+  /** The score with the left-out inputs counted, where that changes conditions: their glyph, plotted. */
+  feelsLike?: { value: number; regime: RegimeKey } | null;
   className?: string;
 };
 
@@ -241,6 +250,8 @@ export function ScoreLadder({
   previousLabel = "Last week",
   lines,
   max = 100,
+  monthRange,
+  feelsLike,
   className = "",
 }: ScoreLadderProps) {
   const caption = describeLadderPosition(value, lines);
@@ -260,7 +271,9 @@ export function ScoreLadder({
   );
   const laidOut = narrow.map(({ line, row }) => ({ line, row, wideRow: wideRows.get(line) ?? row }));
   const maxRow = (key: "row" | "wideRow") => Math.max(0, ...laidOut.map((entry) => entry[key]));
-  const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
+  /* An earlier reading at the same score draws under the dot, and its key says what the
+     caption does: only a reading that differs has anything to add. */
+  const hasPrevious = typeof previous === "number" && Number.isFinite(previous) && previous !== value;
   const zones = ladderZones(lines, max).map((zone) =>
     reversed ? { ...zone, left: roundPercent(100 - zone.left - zone.width) } : zone,
   );
@@ -273,6 +286,15 @@ export function ScoreLadder({
           width: roundPercent(Math.abs(at(value) - at(previous))),
         }
       : null;
+  const rangeBands = monthRange
+    ? (["unusual", "common"] as const).flatMap((band) => {
+        const size = monthRange[band];
+        if (!(size > 0)) return [];
+        const low = at(value - size);
+        const high = at(value + size);
+        return [{ band, left: roundPercent(Math.min(low, high)), width: roundPercent(Math.abs(high - low)) }];
+      })
+    : [];
   const trackStyle: TrackStyle = {
     "--ladder-rows": maxRow("row"),
     "--ladder-rows-wide": maxRow("wideRow"),
@@ -305,6 +327,14 @@ export function ScoreLadder({
             />
           ))}
         </div>
+        {rangeBands.map((range) => (
+          <span
+            key={range.band}
+            data-ladder-month-range={range.band}
+            className={`absolute top-[9px] h-3 rounded-full ${range.band === "common" ? "bg-slate-300/45" : "bg-slate-300/20"}`}
+            style={{ left: `${range.left}%`, width: `${range.width}%` }}
+          />
+        ))}
         {/* Ticks first, then every label as a second layer. Each line used to
             be one translated wrapper holding its tick and its label; a
             transform makes a stacking context, so a later line's tick painted
@@ -343,6 +373,14 @@ export function ScoreLadder({
             title={`${previousLabel}: ${formatPoints(previous)}`}
           />
         ) : null}
+        {feelsLike ? (
+          <ConditionIcon
+            regime={feelsLike.regime}
+            className="absolute top-[7px] -translate-x-1/2"
+            style={{ left: `${at(feelsLike.value)}%` }}
+            data-ladder-feels-like
+          />
+        ) : null}
         <span
           className="absolute top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-[var(--bg-panel)] bg-slate-100"
           style={{ left: `${at(value)}%` }}
@@ -367,6 +405,22 @@ export function ScoreLadder({
       </p>
       {/* The hollow dot's key. It was a tooltip inside an aria-hidden track, so
           a sighted reader had nothing saying which dot was which. */}
+      {rangeBands.length > 0 || feelsLike ? (
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] leading-none text-slate-400" data-ladder-range-key>
+          {rangeBands.map((range) => (
+            <span key={range.band} className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className={`inline-block h-2 w-3 rounded-full ${range.band === "common" ? "bg-slate-300/45" : "bg-slate-300/20"}`} />
+              {range.band === "common" ? "Common month" : "Unusual month"}
+            </span>
+          ))}
+          {feelsLike ? (
+            <span className="inline-flex items-center gap-1 tabular-nums">
+              <ConditionIcon regime={feelsLike.regime} />
+              {`Feels like ${formatPoints(feelsLike.value)}`}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
       {hasPrevious ? (
         <p className="flex items-center gap-1.5 text-[12px] leading-none text-slate-400">
           <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-2 border-slate-300" />

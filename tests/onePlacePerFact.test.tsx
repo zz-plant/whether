@@ -84,13 +84,11 @@ describe("/ defines the four conditions once at each width", () => {
     assert.doesNotMatch(/<section[^>]*>/.exec(shared)?.[0] ?? "", /md:hidden/, "the share greeting is not a definition and shows at every width");
   });
 
-  it("as the map from md up, with each line's value at the line and the method one click away", () => {
+  it("as the map from md up, with each line's value at the line", () => {
     const html = renderToStaticMarkup(
-      <RegimeRadar tightness={90} riskAppetite={49} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" footer={<span>How they are set</span>} />,
+      <RegimeRadar tightness={90} riskAppetite={49} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" />,
     );
     assert.match(html, />70<\/text>[\s\S]*>50<\/text>/);
-    assert.match(html, /How they are set/);
-    assert.match(route, /footer=\{[\s\S]*?href="\/trust#formula-reference"[\s\S]*?How they are set/);
   });
 });
 
@@ -148,7 +146,7 @@ describe("/ states the stage and runway in the controls alone", () => {
     const html = renderToStaticMarkup(
       <CompanyCalibration stageLabel="Series A" activeStage="series-a" horizon={{ control: <span data-control />, current: "monthly" }} />,
     );
-    assert.match(text(html), /Rules for a Series A company with 12–24 months of runway, planned monthly · Change(?! settings)/);
+    assert.match(text(html), /Same weather, your rules: a Series A company with 12–24 months of runway, planned monthly · Change(?! settings)/);
     assert.match(html, /data-plan-horizon/);
   });
 });

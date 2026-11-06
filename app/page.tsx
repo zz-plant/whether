@@ -20,7 +20,6 @@ import { CadenceSelector } from "./components/cadenceSelector";
 import { QuietWeekFold } from "./components/home/QuietWeekFold";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
-import { getPlaybookForRegime } from "../lib/playbook";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { describeSavedCopyBanner, resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
@@ -30,7 +29,7 @@ import {
 import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
+import { describeMarketMoveScale, describeScoreMoveRanges } from "../lib/report/marketMoveScale";
 import { describeGuidanceChange, describeMovementCause } from "../lib/report/decisionMovement";
 import { anyPauseLineMet } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
@@ -45,10 +44,10 @@ import {
 } from "../lib/timeMachine/timeMachineSelection";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
-import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
-import { AreaDistancesFold } from "./components/home/AreaDistancesFold";
+import { AreaStrip } from "./components/home/AreaStrip";
+import { RunwayFold } from "./components/home/RunwayFold";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
@@ -69,12 +68,11 @@ import {
   buildSignalChangeRows,
   describeConditionsTrail,
   describeEarlierConditions,
-  describeHeldAreasForCard,
+  buildAreaStrip,
   describeLineStateBand,
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
-import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
@@ -424,10 +422,6 @@ async function PageContent({
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
-  const corridorModel = buildDecisionCorridorModel(
-    homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
-    { tightness, riskAppetite },
-  );
   /* The questions this week's crossed pause lines invite, for the section after
      the lines: one per crossed area, one per group, one per speaker
      (`selectHearingForAreas`). Empty on a week no pause line is crossed, and the
@@ -471,6 +465,8 @@ async function PageContent({
      earlier reading ("Risk appetite fell through 54."), or that none was.
      Nothing on a week with no comparison, which the stamp line already says. */
   const whyLine = decisionMovement ? describeMovementCause(decisionMovement) : undefined;
+  /* A week nothing moved says so once, on the stamp line, in place of "Holding this week". */
+  const unmovedLine = decisionMovement?.moved.length === 0 && cardCall.directionLabel === "Holding this week" ? whyLine?.replace(/\.$/, "") : undefined;
   /* Whose lines these are: the stage and runway the reader chose, or the
      defaults, said once, at the head of the areas. */
   const calibrationChosen = Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway);
@@ -621,11 +617,11 @@ async function PageContent({
      own: the banner (or, on a held week, the call) says what waits for live data,
      and the areas below are dated to the reading. "No area is on hold." sat under
      "hold new hires, spend and vendor contracts" (2026-11-02). */
-  const heldAreasLine = historicalSelection || savedCopy ? null : describeHeldAreasForCard(decisionPickerOptions);
+  const areaStripModel = historicalSelection || savedCopy ? null : buildAreaStrip(decisionPickerOptions);
   /* The week's exception, above the call: null on a calm week, so the page's
      silhouette changes with the weather rather than being drawn the same way
      whatever the reading says. */
-  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows);
+  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows, basis);
   /* The meaning line under the call carries the two scores it rests on: they
      lived only inside the map, so the week's word could be screenshotted but
      not cited. One click to the section that shows the change lines and what
@@ -641,20 +637,21 @@ async function PageContent({
   const conditionsSince = historicalSelection || !isRegimeKey(regime)
     ? undefined
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
-  const heroAreas = heldAreasLine
-    ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do by area" }
-    : undefined;
-  /* One sentence the reader can say in a meeting, from the same playbook /operate
-     prints in full. A score has to be interpreted; a sentence can be repeated.
-     A held week prints none: "take share while money is cheap" under "hold
-     anything you can't undo" is two instructions disagreeing. */
-  const heroPhrase =
-    !historicalSelection && !reportData.assessment.policyAssessment?.refusal?.refused && isRegimeKey(regime)
-      ? getPlaybookForRegime(regime)?.leadershipPhrases.more[0]
-      : undefined;
-  const heroTrust = publishedNotice
-    ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
-    : trustStripProps;
+  /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
+  const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
+  /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
+  const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
+  /* The card sizes the room before a change once; the count of months held at this
+     distance is /trust's. */
+  const heroTrust = {
+    ...trustStripProps,
+    baseRate: null,
+    basis: {
+      ...trustStripProps.basis,
+      consequenceOnCard: Boolean(countedReading),
+      ...(publishedNotice ? { note: null, omitReason: true } : {}),
+    },
+  };
 
   /* A quiet week (2026-11-03): no area moved and the conditions held since the
      earlier reading, and nothing is close to changing. The card and the areas are
@@ -804,9 +801,9 @@ async function PageContent({
                 location={readingLocation}
                 reading={heroReading}
                 weeklyCall={cardCall.action}
-                callDetail={historicalSelection ? undefined : whyLine}
+                callDetail={historicalSelection || unmovedLine ? undefined : whyLine}
                 regime={regime}
-                direction={historicalSelection ? undefined : cardCall.directionLabel}
+                direction={historicalSelection ? undefined : unmovedLine ?? cardCall.directionLabel}
                 earlier={earlierConditions}
                 since={conditionsSince}
                 /* The map from `md` up, where it is the one definition of the four
@@ -825,17 +822,10 @@ async function PageContent({
                     trail={conditionsTrail.points}
                     trailCaption={conditionsTrail.caption}
                     caveat={conditionsTrail.caveat}
+                    feelsLike={countedReading}
                     compact
                     detailsOpen={searchParams?.chart === "1"}
                     readingsId="conditions-map-readings"
-                    footer={
-                      <Link
-                        href="/trust#formula-reference"
-                        className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
-                      >
-                        How they are set
-                      </Link>
-                    }
                     className="ml-auto w-full max-w-[18rem]"
                   />
                 }
@@ -844,8 +834,8 @@ async function PageContent({
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
-                areas={heroAreas}
-                phrase={heroPhrase}
+                areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} /> : undefined}
+                feelsLike={countedReading ? { regime: countedReading.regime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={
                   nearestLadder && !historicalSelection ? (
@@ -855,6 +845,12 @@ async function PageContent({
                       previous={comparisonUnavailable ? null : nearestLadder.previous}
                       previousLabel={basis.label}
                       lines={nearestLadder.lines}
+                      monthRange={moveRanges?.[nearestLadder.metric]}
+                      feelsLike={
+                        countedReading && countedReading[nearestLadder.metric] !== nearestLadder.value
+                          ? { value: countedReading[nearestLadder.metric], regime: countedReading.regime }
+                          : null
+                      }
                     />
                   ) : undefined
                 }
@@ -924,17 +920,11 @@ async function PageContent({
                 record: historicalSelection ? undefined : recordSeries,
               })}
             >
-              <AreaDistancesFold regime={regime} isHistorical={Boolean(historicalSelection)} corridorModel={corridorModel} />
+              <RunwayFold regime={regime} isHistorical={Boolean(historicalSelection)} />
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <ActionLink href={operateHref} variant="primary">
                   {cadenceCall?.planLabel ?? "Build this week’s plan →"}
                 </ActionLink>
-                {/* Live weeks only, as both of these read today's guidance. */}
-                {!historicalSelection ? (
-                  <PlainActionLink href="/operate#ops-decision-shield" data-test-decision-link>
-                    Test a decision →
-                  </PlainActionLink>
-                ) : null}
               </div>
               {/* The formats a reader with one of these roles came for, named. They sat
                   behind "Share or embed this" at the foot of the page. After the areas
@@ -979,6 +969,8 @@ async function PageContent({
                 historyOpen={searchParams?.inputs === "1"}
                 heading={`What changed ${basis.since}`}
                 rows={signalChangeRows}
+                moveRanges={moveRanges}
+                feelsLike={countedReading}
                 history={{
                   tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
                   riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
@@ -998,7 +990,6 @@ async function PageContent({
                 tightness={tightness}
                 riskAppetite={riskAppetite}
                 changeLines={callChangeLines}
-                saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
               />
@@ -1006,6 +997,7 @@ async function PageContent({
               {/* 6. What would change the guidance: its pause and restart lines, the
                   line where conditions change, and where the reading sits. */}
               <WhatWouldChangeSection
+                feelsLike={countedReading}
                 ladders={scoreLadders}
                 flipProximity={v2HeroSignalData.flipProximity}
                 reversalTrigger={reversalTriggerLabel}
