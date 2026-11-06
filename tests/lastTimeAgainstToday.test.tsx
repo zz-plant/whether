@@ -22,14 +22,26 @@ const month = (year: number, monthNumber: number, regime: RegimeKey, tightness: 
   riskAppetite,
 });
 
+const sunnyToFreezingIn2021 = () => [
+  month(2021, 1, "EXPANSION", 55, 60),
+  month(2021, 2, "EXPANSION", 56, 60),
+  month(2021, 3, "SCARCITY", 78, 30),
+  month(2021, 4, "SCARCITY", 82, 25),
+  month(2021, 5, "SCARCITY", 84, 24),
+  month(2021, 6, "SCARCITY", 85, 22),
+];
+
+const lastTimeForSep25Reading = () =>
+  findLastTimeCallChanged({
+    series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+    currentRegime: "SCARCITY",
+    previousRegime: "EXPANSION",
+    currentScores: { tightness: 90, riskAppetite: 43 },
+  });
+
 describe("the last time conditions moved this way, against this week", () => {
   it("names how the month it found differed, on the real record for the Sep 25 reading", () => {
-    const record = findLastTimeCallChanged({
-      series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
-      currentRegime: "SCARCITY",
-      previousRegime: "EXPANSION",
-      currentScores: { tightness: 90, riskAppetite: 43 },
-    });
+    const record = lastTimeForSep25Reading();
 
     assert.ok(record);
     assert.equal(record.changedAt.year, 2022);
@@ -46,14 +58,7 @@ describe("the last time conditions moved this way, against this week", () => {
   });
 
   it("does not add the caveat, or the pair, where the same change looks the same", () => {
-    const series = [
-      month(2021, 1, "EXPANSION", 55, 60),
-      month(2021, 2, "EXPANSION", 56, 60),
-      month(2021, 3, "SCARCITY", 78, 30),
-      month(2021, 4, "SCARCITY", 82, 25),
-      month(2021, 5, "SCARCITY", 84, 24),
-      month(2021, 6, "SCARCITY", 85, 22),
-    ];
+    const series = sunnyToFreezingIn2021();
     // The change in Mar 2021 was Sunny to Freezing at 78 and 30; this week's is the same change at 80 and 28.
     const record = findLastTimeCallChanged({
       series,
@@ -70,14 +75,7 @@ describe("the last time conditions moved this way, against this week", () => {
   });
 
   it("says the setups differ when the pair matches and a score is far from where it was", () => {
-    const series = [
-      month(2021, 1, "EXPANSION", 55, 60),
-      month(2021, 2, "EXPANSION", 56, 60),
-      month(2021, 3, "SCARCITY", 78, 30),
-      month(2021, 4, "SCARCITY", 82, 25),
-      month(2021, 5, "SCARCITY", 84, 24),
-      month(2021, 6, "SCARCITY", 85, 22),
-    ];
+    const series = sunnyToFreezingIn2021();
     const record = findLastTimeCallChanged({
       series,
       currentRegime: "SCARCITY",
@@ -93,12 +91,7 @@ describe("the last time conditions moved this way, against this week", () => {
   });
 
   it("prints on the card under the two scores, above the way to the comparison", () => {
-    const record = findLastTimeCallChanged({
-      series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
-      currentRegime: "SCARCITY",
-      previousRegime: "EXPANSION",
-      currentScores: { tightness: 90, riskAppetite: 43 },
-    });
+    const record = lastTimeForSep25Reading();
     assert.ok(record);
     const html = renderToStaticMarkup(<LastTimeCallChangedCard record={record} callChangeLines={{ tightness: 70, riskAppetite: 50 }} />);
 

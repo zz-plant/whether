@@ -11,42 +11,18 @@ import type { PreviousReading } from "../../lib/export/scoreReference";
 import { buildBriefDocument } from "../../lib/report/briefDocument";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildWeeklyCallContract, type WeeklyCallContract } from "../../lib/report/weeklyCallContract";
+import { buildAssessmentFixture } from "../fixtures/reportFixtures";
 
-export const assessment: RegimeAssessment = {
+export const assessment: RegimeAssessment = buildAssessmentFixture({
   regime: "EXPANSION",
-  scores: {
-    tightness: 12,
-    riskAppetite: 68,
-    baseRateUsed: "1M",
-    baseRate: 3.75,
-    curveSlope: 0.55,
-  },
-  diagnostics: {
-    tightnessVsThreshold: 0,
-    riskAppetiteVsThreshold: 0,
-    nearestThresholdDelta: 0,
-    confidence: "MEDIUM",
-    transitionWatch: false,
-    intensity: "MILD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
-  },
+  regimeTransition: null,
+  scores: { tightness: 12, riskAppetite: 68, baseRate: 3.75, curveSlope: 0.55 },
+  diagnostics: { tightnessVsThreshold: 0, riskAppetiteVsThreshold: 0, nearestThresholdDelta: 0, confidence: "MEDIUM", transitionWatch: false },
   description: "Capital is available and risk appetite is healthy. The weekly guidance sets the tempo inside that window.",
   constraints: ["Constraint one", "Constraint two", "Constraint three"],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-  inputs: [],
   policyAssessment: {
     version: "v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
     posture: "RISK_ON",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
     governanceParameters: {
       hiringThreshold: "MODERATE",
       paybackWindowTolerance: "LONGER",
@@ -56,7 +32,7 @@ export const assessment: RegimeAssessment = {
       experimentationTolerance: "HIGH",
     },
   },
-};
+});
 
 export const treasury: TreasuryData = {
   source: "https://fred.stlouisfed.org",
@@ -66,40 +42,24 @@ export const treasury: TreasuryData = {
   yields: { oneMonth: 3.75, threeMonth: 3.8, twoYear: 4.1, tenYear: 4.65 },
 };
 
-export const sensors: SensorReading[] = [
-  {
-    id: "BASE_RATE",
-    label: "Base rate",
-    value: 3.75,
-    unit: "%",
-    explanation: "",
-    category: "Rates",
-    group: { id: "Rates", label: "Financial conditions", description: "Core funding conditions" },
-    availableTimeWindows: ["1M", "3M", "6M", "12M"],
-    sourceLabel: "FRED",
-    sourceUrl: "https://fred.stlouisfed.org",
-    formulaUrl: "",
-    record_date: "2026-03-04",
-    fetched_at: "2026-03-04T00:00:00.000Z",
-    isLive: true,
-  },
-  {
-    id: "CURVE_SLOPE",
-    label: "Curve slope",
-    value: 0.55,
-    unit: "%",
-    explanation: "",
-    category: "Rates",
-    group: { id: "Rates", label: "Financial conditions", description: "Core funding conditions" },
-    availableTimeWindows: ["1M", "3M", "6M", "12M"],
-    sourceLabel: "FRED",
-    sourceUrl: "https://fred.stlouisfed.org",
-    formulaUrl: "",
-    record_date: "2026-03-04",
-    fetched_at: "2026-03-04T00:00:00.000Z",
-    isLive: true,
-  },
-];
+const rateSensor = (id: SensorReading["id"], label: string, value: number): SensorReading => ({
+  id,
+  label,
+  value,
+  unit: "%",
+  explanation: "",
+  category: "Rates",
+  group: { id: "Rates", label: "Financial conditions", description: "Core funding conditions" },
+  availableTimeWindows: ["1M", "3M", "6M", "12M"],
+  sourceLabel: "FRED",
+  sourceUrl: "https://fred.stlouisfed.org",
+  formulaUrl: "",
+  record_date: "2026-03-04",
+  fetched_at: "2026-03-04T00:00:00.000Z",
+  isLive: true,
+});
+
+export const sensors: SensorReading[] = [rateSensor("BASE_RATE", "Base rate", 3.75), rateSensor("CURVE_SLOPE", "Curve slope", 0.55)];
 
 export const macros: MacroSeriesReading[] = [
   {

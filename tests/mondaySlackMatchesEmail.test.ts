@@ -1,15 +1,13 @@
 import assert from "node:assert/strict";
 import { weeklyHeadline } from "../lib/report/reportEvidence";
 import { describe, it } from "bun:test";
-import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
-import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import type { OperatingSnapshot } from "../lib/operatingState/types";
-import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { snapshotData } from "../lib/snapshot";
 import { macros, treasury as fixtureTreasury } from "./factories/exportFixtures";
+import { mailedBriefText, postedBriefText } from "./fixtures/mondaySends";
 
 /*
  * The Monday cron sends one week twice: the email to subscribers and the post to
@@ -40,50 +38,6 @@ const ordinarySnapshot = () =>
     now: new Date("2026-08-31T12:00:00.000Z"),
   });
 
-const postedText = async (snapshot: OperatingSnapshot, now: Date): Promise<string> => {
-  let body = "";
-  const capture = async (_url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    body = typeof init?.body === "string" ? init.body : "";
-    return new Response("ok", { status: 200 });
-  };
-  const result = await deliverSlackBrief({ webhookUrls, snapshot, now, fetchImpl: capture });
-  assert.equal(result.status, "posted", result.error);
-  const parsed: unknown = JSON.parse(body);
-  const blocks = typeof parsed === "object" && parsed !== null ? Reflect.get(parsed, "blocks") : undefined;
-  assert.ok(Array.isArray(blocks));
-  return blocks
-    .map((block: unknown) => {
-      const text = typeof block === "object" && block !== null ? Reflect.get(block, "text") : undefined;
-      const value = typeof text === "object" && text !== null ? Reflect.get(text, "text") : undefined;
-      return typeof value === "string" ? value : "";
-    })
-    .join("\n");
-};
-
-const mailedText = async (snapshot: OperatingSnapshot, now: Date): Promise<string> => {
-  resetSubscriberStore();
-  const store = getSubscriberStore();
-  const subscriber = await store.subscribe("operator@example.com");
-  await store.verifyEmail(subscriber.confirmToken ?? "");
-
-  const sent: string[] = [];
-  const previousBinding = Reflect.get(globalThis, "EMAIL");
-  Reflect.set(globalThis, "EMAIL", {
-    send: async (message: { text: string }) => {
-      sent.push(message.text);
-    },
-  });
-  try {
-    const result = await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now });
-    assert.equal(result.sent, 1, result.error);
-  } finally {
-    if (previousBinding === undefined) Reflect.deleteProperty(globalThis, "EMAIL");
-    else Reflect.set(globalThis, "EMAIL", previousBinding);
-  }
-  assert.ok(sent[0], "the one subscriber was mailed");
-  return sent[0];
-};
-
 /** The value printed after `label: ` on a line of its own, with any bullet stripped. */
 const slot = (text: string, label: string): string | undefined => {
   for (const line of text.split("\n")) {
@@ -111,8 +65,8 @@ describe("the Monday Slack post carries the email's call", () => {
     const snapshot = overrideSnapshot();
     assert.equal(snapshot.weeklyCall.policyOverrideActive, true, "the fixture is an override week");
 
-    const post = await postedText(snapshot, now);
-    const mail = await mailedText(snapshot, now);
+    const post = await postedBriefText(snapshot, { webhookUrls, now });
+    const mail = await mailedBriefText(snapshot, { now });
 
     assertSameCall(post, mail, snapshot);
     // Held first because the two scores disagree, so the post leads with that reason's lines.
@@ -128,6 +82,6 @@ describe("the Monday Slack post carries the email's call", () => {
     const snapshot = ordinarySnapshot();
     assert.equal(snapshot.weeklyCall.policyOverrideActive, false, "the fixture is an ordinary week");
 
-    assertSameCall(await postedText(snapshot, now), await mailedText(snapshot, now), snapshot);
+    assertSameCall(await postedBriefText(snapshot, { webhookUrls, now }), await mailedBriefText(snapshot, { now }), snapshot);
   });
 });

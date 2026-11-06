@@ -1,47 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { getHistoricalAnalogPlaybook } from "../lib/analogPlaybook";
-import type { RegimeAssessment } from "../lib/regimeEngine";
-
-const createMockAssessment = (overrides: Partial<RegimeAssessment> = {}): RegimeAssessment =>
-  ({
-    regime: "DEFENSIVE",
-    scores: {
-      baseRate: 5.25,
-      baseRateUsed: "FED",
-      curveSlope: -0.30,
-      tightness: 72,
-      riskAppetite: 42,
-    },
-    thresholds: {
-      baseRateTightness: 4.0,
-      tightnessRegime: 60,
-      riskAppetiteRegime: 50,
-    },
-    diagnostics: {
-      tightnessDelta: 0,
-      riskAppetiteDelta: 0,
-      nearestThresholdDelta: 10,
-      confidence: "HIGH",
-      transitionWatch: false,
-      intensity: "STANDARD",
-      boundaryContributors: [],
-      weakReadCount: 0,
-      twoWeakReadsWarning: false,
-    },
-    description: "Defensive conditions",
-    constraints: [],
-    tightnessExplanation: "",
-    riskAppetiteExplanation: "",
-    dataWarnings: [],
-    inputs: [],
-    policyAssessment: {} as any,
-    ...overrides,
-  } as RegimeAssessment);
+import { buildLateCycleAssessmentFixture } from "./fixtures/reportFixtures";
 
 describe("analogPlaybook", () => {
   it("matches defensive late-cycle macro conditions to Q3 2007 analog", () => {
-    const playbook = getHistoricalAnalogPlaybook(createMockAssessment());
+    const playbook = getHistoricalAnalogPlaybook(buildLateCycleAssessmentFixture());
 
     assert.equal(playbook.analogPeriod, "Q3 2007");
     // A nearness score, not a correlation: 100 is an exact coordinate match and
@@ -75,7 +39,7 @@ describe("analogPlaybook", () => {
     ];
     const periods = new Set<string>();
     for (const reading of readings) {
-      const base = createMockAssessment();
+      const base = buildLateCycleAssessmentFixture();
       const playbook = getHistoricalAnalogPlaybook({ ...base, scores: { ...base.scores, ...reading } });
       periods.add(playbook.analogPeriod);
       const text = [

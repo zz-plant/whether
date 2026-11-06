@@ -5,61 +5,20 @@ import {
   resetPostureTransitionEventRepository,
   type PostureTransitionEventRepository,
 } from "../lib/storage/postureTransitionEventRepository";
-import type { RegimeAssessment } from "../lib/regimeEngine";
+import { buildAssessmentFixture } from "./fixtures/reportFixtures";
 
-const committedAssessment: RegimeAssessment = {
+const committedAssessment = buildAssessmentFixture({
   regime: "DEFENSIVE",
   regimeTransition: {
-    nextState: "DEFENSIVE",
-    candidateState: "DEFENSIVE",
     committed: true,
-    pending: false,
     transitionReason: "Tightness crossed above 70.",
     transitionPendingCount: 1,
-    snapshot: {
-      committedState: "VOLATILE",
-      pendingState: null,
-      pendingCount: 0,
-      lastSignals: { tightness: 72, riskAppetite: 45 },
-    },
+    snapshot: { committedState: "VOLATILE", lastSignals: { tightness: 72, riskAppetite: 45 } },
   },
-  scores: { tightness: 72, riskAppetite: 45, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.2 },
-  diagnostics: {
-    tightnessVsThreshold: 2,
-    riskAppetiteVsThreshold: -5,
-    nearestThresholdDelta: 7,
-    confidence: "MEDIUM",
-    transitionWatch: true,
-    intensity: "MILD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
-  },
-  description: "",
+  scores: { tightness: 72, riskAppetite: 45, curveSlope: -0.2 },
+  diagnostics: { riskAppetiteVsThreshold: -5, nearestThresholdDelta: 7, confidence: "MEDIUM" },
   constraints: [],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-  inputs: [],
-  policyAssessment: {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
-    },
-  },
-};
+});
 
 describe("posture state source", () => {
   let repository: PostureTransitionEventRepository;

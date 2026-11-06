@@ -14,7 +14,47 @@ import {
 import { TREASURY_POLICY_HISTORY } from "../lib/policy/history";
 import { scoreRegime } from "../lib/regimeEngineScoring";
 import { advanceRegimeState } from "../lib/regimeStateMachine";
-import type { TreasuryData } from "../lib/types";
+import type { MacroSeriesReading, TreasuryData } from "../lib/types";
+
+/** A Treasury read of these yields; a case overrides the date or liveness only where it turns on them. */
+const treasuryAt = (yields: TreasuryData["yields"], overrides: Partial<TreasuryData> = {}): TreasuryData => ({
+  source: "US Treasury",
+  record_date: "2026-02-01",
+  fetched_at: "2026-02-02T00:00:00Z",
+  isLive: true,
+  yields,
+  ...overrides,
+});
+
+/** A record whose every yield failed to arrive. */
+const treasuryWithNoYields = () =>
+  treasuryAt({ oneMonth: null, threeMonth: null, twoYear: null, tenYear: null }, { isLive: false });
+
+const fredSeries = (
+  id: MacroSeriesReading["id"],
+  label: string,
+  value: number,
+  unit: MacroSeriesReading["unit"],
+  overrides: Partial<MacroSeriesReading> = {},
+): MacroSeriesReading => ({
+  id,
+  label,
+  value,
+  unit,
+  explanation: "",
+  sourceLabel: "FRED",
+  sourceUrl: "https://fred.stlouisfed.org/",
+  formulaUrl: "/trust#formula-reference",
+  record_date: "2026-02-01",
+  fetched_at: "2026-02-02T00:00:00Z",
+  isLive: true,
+  ...overrides,
+});
+
+const cpiAt = (value: number) => fredSeries("CPI_YOY", "CPI", value, "%", { sourceUrl: "https://fred.stlouisfed.org" });
+
+const unemploymentAt = (value: number) =>
+  fredSeries("UNEMPLOYMENT_RATE", "Unemployment", value, "%", { sourceUrl: "https://fred.stlouisfed.org" });
 
 describe("regime engine scoring", () => {
   it("ramps tightness as rates move above threshold and curve inverts", () => {
@@ -58,17 +98,7 @@ describe("regime classification", () => {
 
 describe("regime assessment", () => {
   it("returns explainable outputs", () => {
-    const treasury: TreasuryData = {
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 5.2,
-        twoYear: 4.8,
-        tenYear: 4.5,
-      },
-    };
+    const treasury = treasuryAt({ oneMonth: 5.2, twoYear: 4.8, tenYear: 4.5 });
 
     const assessment = evaluateRegime(treasury);
     assert.equal(assessment.regime, "SCARCITY");
@@ -87,62 +117,15 @@ describe("regime assessment", () => {
 
 
   it("returns policy assessment composites and refusal state", () => {
-    const treasury: TreasuryData = {
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 5.2,
-        twoYear: 4.8,
-        tenYear: 4.5,
-      },
-    };
-
-    const assessment = evaluateRegime(treasury, undefined, [
-      {
-        id: "BBB_CREDIT_SPREAD",
-        label: "BBB",
-        value: 1.8,
-        unit: "%",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/",
-        formulaUrl: "/trust#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
+    const assessment = evaluateRegime(treasuryAt({ oneMonth: 5.2, twoYear: 4.8, tenYear: 4.5 }), undefined, [
+      fredSeries("BBB_CREDIT_SPREAD", "BBB", 1.8, "%", {
         history: [
           { date: "2024-09-01", value: 1.7 },
           { date: "2024-08-01", value: 1.6 },
         ],
-      },
-      {
-        id: "CPI_YOY",
-        label: "CPI",
-        value: 3.1,
-        unit: "%",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org",
-        formulaUrl: "/trust#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-      },
-      {
-        id: "UNEMPLOYMENT_RATE",
-        label: "Unemployment",
-        value: 4.2,
-        unit: "%",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org",
-        formulaUrl: "/trust#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-      },
+      }),
+      cpiAt(3.1),
+      unemploymentAt(4.2),
     ]);
 
     assert.equal(assessment.policyAssessment.version, "policy-v1");
@@ -156,116 +139,27 @@ describe("regime assessment", () => {
 
 
   it("maps aligned policy signals to risk-on and safety postures", () => {
-    const baseMacro = {
-      id: "BBB_CREDIT_SPREAD" as const,
-      label: "BBB",
-      value: 1.2,
-      unit: "%" as const,
-      explanation: "",
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org/",
-      formulaUrl: "/trust#formula-reference",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-      history: [
-        { date: "2024-09-01", value: 2.5 },
-        { date: "2024-08-01", value: 2.6 },
-      ],
-    };
-
-    const baseCPI = {
-      id: "CPI_YOY" as const,
-      label: "CPI",
-      value: 2.5,
-      unit: "%" as const,
-      explanation: "",
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org",
-      formulaUrl: "/trust#formula-reference",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-    };
-
-    const baseUnemployment = {
-      id: "UNEMPLOYMENT_RATE" as const,
-      label: "Unemployment",
-      value: 4.0,
-      unit: "%" as const,
-      explanation: "",
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org",
-      formulaUrl: "/trust#formula-reference",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-    };
-
-    const riskOnTreasury: TreasuryData = {
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 3.2,
-        twoYear: 3.5,
-        tenYear: 4.5,
-      },
-    };
-
-    const riskOnAssessment = evaluateRegime(riskOnTreasury, undefined, [
-      { ...baseMacro, value: 1.2, history: [{ date: "2024-09-01", value: 2.5 }, { date: "2024-08-01", value: 2.6 }] },
-      baseCPI,
-      baseUnemployment,
+    const riskOnAssessment = evaluateRegime(treasuryAt({ oneMonth: 3.2, twoYear: 3.5, tenYear: 4.5 }), undefined, [
+      fredSeries("BBB_CREDIT_SPREAD", "BBB", 1.2, "%", { history: [{ date: "2024-09-01", value: 2.5 }, { date: "2024-08-01", value: 2.6 }] }),
+      cpiAt(2.5),
+      unemploymentAt(4.0),
     ]);
 
     assert.equal(riskOnAssessment.policyAssessment.posture, "RISK_ON");
 
-    const safetyTreasury: TreasuryData = {
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 5.8,
-        twoYear: 5.0,
-        tenYear: 4.0,
-      },
-    };
-
-    const safetyAssessment = evaluateRegime(safetyTreasury, undefined, [
-      { ...baseMacro, value: 3.0, history: [{ date: "2024-09-01", value: 2.0 }, { date: "2024-08-01", value: 2.1 }] },
-      baseCPI,
-      baseUnemployment,
+    const safetyAssessment = evaluateRegime(treasuryAt({ oneMonth: 5.8, twoYear: 5.0, tenYear: 4.0 }), undefined, [
+      fredSeries("BBB_CREDIT_SPREAD", "BBB", 3.0, "%", { history: [{ date: "2024-09-01", value: 2.0 }, { date: "2024-08-01", value: 2.1 }] }),
+      cpiAt(2.5),
+      unemploymentAt(4.0),
     ]);
 
     assert.equal(safetyAssessment.policyAssessment.posture, "SAFETY_MODE");
   });
 
   it("preserves treasury normalization magnitude in the policy pilot", () => {
-    const nearThresholdAssessment = evaluateRegime({
-      source: "US Treasury",
-      record_date: "2026-03-31",
-      fetched_at: "2026-04-01T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 5.1,
-        twoYear: 4.8,
-        tenYear: 4.7,
-      },
-    });
-    const extremeAssessment = evaluateRegime({
-      source: "US Treasury",
-      record_date: "2026-03-31",
-      fetched_at: "2026-04-01T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 8,
-        twoYear: 4.8,
-        tenYear: 3.3,
-      },
-    });
+    const endOfMarch = { record_date: "2026-03-31", fetched_at: "2026-04-01T00:00:00Z" };
+    const nearThresholdAssessment = evaluateRegime(treasuryAt({ oneMonth: 5.1, twoYear: 4.8, tenYear: 4.7 }, endOfMarch));
+    const extremeAssessment = evaluateRegime(treasuryAt({ oneMonth: 8, twoYear: 4.8, tenYear: 3.3 }, endOfMarch));
 
     const nearBaseRate = nearThresholdAssessment.policyAssessment.normalizations.find(
       (item) => item.id === "BASE_RATE",
@@ -287,40 +181,14 @@ describe("regime assessment", () => {
   });
 
   it("refuses posture change when policy signal gaps are too large", () => {
-    const treasury: TreasuryData = {
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: null,
-        threeMonth: null,
-        twoYear: null,
-        tenYear: null,
-      },
-    };
-
-    const assessment = evaluateRegime(treasury);
+    const assessment = evaluateRegime(treasuryWithNoYields());
     assert.equal(assessment.policyAssessment.refusal.refused, true);
     assert.equal(assessment.policyAssessment.refusal.fallbackMessage, "PROCEED_WITH_CAUTION");
     assert.equal(assessment.policyAssessment.refusal.executionMode, "REVERSIBLE_BETS_ONLY");
     assert.equal(assessment.policyAssessment.governanceParameters.rollbackRequirement, "REVERSIBLE_ONLY");
   });
   it("flags missing inputs with warnings", () => {
-    const treasury: TreasuryData = {
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: null,
-        threeMonth: null,
-        twoYear: null,
-        tenYear: null,
-      },
-    };
-
-    const assessment = evaluateRegime(treasury);
+    const assessment = evaluateRegime(treasuryWithNoYields());
     assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Base rate missing")));
     assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Curve slope missing")));
     assert.equal(assessment.scores.riskAppetite, 0);
@@ -330,28 +198,10 @@ describe("regime assessment", () => {
 
 describe("regime trend", () => {
   it("derives improving trend when tightness eases across the threshold", () => {
-    const previous = evaluateRegime({
-      source: "US Treasury",
-      record_date: "2026-02-01",
-      fetched_at: "2026-02-02T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 5.8,
-        twoYear: 5.1,
-        tenYear: 4.0,
-      },
-    });
-    const current = evaluateRegime({
-      source: "US Treasury",
-      record_date: "2024-11-01",
-      fetched_at: "2024-11-02T00:00:00Z",
-      isLive: true,
-      yields: {
-        oneMonth: 4.2,
-        twoYear: 4.0,
-        tenYear: 4.4,
-      },
-    });
+    const previous = evaluateRegime(treasuryAt({ oneMonth: 5.8, twoYear: 5.1, tenYear: 4.0 }));
+    const current = evaluateRegime(
+      treasuryAt({ oneMonth: 4.2, twoYear: 4.0, tenYear: 4.4 }, { record_date: "2024-11-01", fetched_at: "2024-11-02T00:00:00Z" }),
+    );
 
     assert.equal(deriveRegimeTrend(previous, current), "IMPROVING");
   });
@@ -359,60 +209,14 @@ describe("regime trend", () => {
 
 
 describe("regime macro overlays", () => {
-  const treasury: TreasuryData = {
-    source: "US Treasury",
-    record_date: "2026-02-01",
-    fetched_at: "2026-02-02T00:00:00Z",
-    isLive: true,
-    yields: {
-      oneMonth: 4.3,
-      twoYear: 4.0,
-      tenYear: 4.2,
-    },
-  };
+  const treasury = treasuryAt({ oneMonth: 4.3, twoYear: 4.0, tenYear: 4.2 });
 
   it("adjusts both scores on the record's market reads, and reports the high-yield spread it leaves out", () => {
     const baseline = evaluateRegime(treasury);
     const stressed = evaluateRegime(treasury, undefined, [
-      {
-        id: "HY_CREDIT_SPREAD",
-        label: "HY",
-        value: 6.2,
-        unit: "%",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/",
-        formulaUrl: "/trust#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-      },
-      {
-        id: "VIX_INDEX",
-        label: "VIX",
-        value: 28,
-        unit: "index",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/",
-        formulaUrl: "/trust#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-      },
-      {
-        id: "CHICAGO_FCI",
-        label: "NFCI",
-        value: 0.35,
-        unit: "index",
-        explanation: "",
-        sourceLabel: "FRED",
-        sourceUrl: "https://fred.stlouisfed.org/",
-        formulaUrl: "/trust#formula-reference",
-        record_date: "2026-02-01",
-        fetched_at: "2026-02-02T00:00:00Z",
-        isLive: true,
-      },
+      fredSeries("HY_CREDIT_SPREAD", "HY", 6.2, "%"),
+      fredSeries("VIX_INDEX", "VIX", 28, "index"),
+      fredSeries("CHICAGO_FCI", "NFCI", 0.35, "index"),
     ]);
 
     /* VIX and the Chicago Fed index are on the record basis; the high-yield spread is not

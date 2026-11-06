@@ -16,21 +16,23 @@ export const asLiveMacroSeries = <Series extends Pick<MacroSeriesReading, "sourc
 
 export const liveMacroSeries = asLiveMacroSeries(snapshotMacroSeries);
 
+type RegimeTransition = NonNullable<RegimeAssessment["regimeTransition"]>;
+type PolicyAssessment = RegimeAssessment["policyAssessment"];
+
 type AssessmentOverrides = Omit<
   Partial<RegimeAssessment>,
   "regimeTransition" | "scores" | "diagnostics" | "thresholds" | "policyAssessment"
 > & {
-  regimeTransition?: Partial<RegimeAssessment["regimeTransition"]> & {
-    snapshot?: Partial<NonNullable<RegimeAssessment["regimeTransition"]>["snapshot"]>;
-  };
+  /** `null` builds a reading with no transition record, as one the state machine never ran on. */
+  regimeTransition?: null | (Omit<Partial<RegimeTransition>, "snapshot"> & { snapshot?: Partial<RegimeTransition["snapshot"]> });
   scores?: Partial<RegimeAssessment["scores"]>;
   diagnostics?: Partial<RegimeAssessment["diagnostics"]>;
   thresholds?: Partial<RegimeAssessment["thresholds"]>;
-  policyAssessment?: Partial<RegimeAssessment["policyAssessment"]> & {
-    composites?: Partial<RegimeAssessment["policyAssessment"]["composites"]>;
-    confidenceIndex?: Partial<RegimeAssessment["policyAssessment"]["confidenceIndex"]>;
-    refusal?: Partial<RegimeAssessment["policyAssessment"]["refusal"]>;
-    governanceParameters?: Partial<RegimeAssessment["policyAssessment"]["governanceParameters"]>;
+  policyAssessment?: Omit<Partial<PolicyAssessment>, "composites" | "confidenceIndex" | "refusal" | "governanceParameters"> & {
+    composites?: Partial<PolicyAssessment["composites"]>;
+    confidenceIndex?: Partial<PolicyAssessment["confidenceIndex"]>;
+    refusal?: Partial<PolicyAssessment["refusal"]>;
+    governanceParameters?: Partial<PolicyAssessment["governanceParameters"]>;
   };
 };
 
@@ -101,7 +103,7 @@ export const buildAssessmentFixture = (overrides: AssessmentOverrides = {}): Reg
     },
   };
 
-  return {
+  const built: RegimeAssessment = {
     ...base,
     ...overrides,
     regimeTransition: {
@@ -145,7 +147,22 @@ export const buildAssessmentFixture = (overrides: AssessmentOverrides = {}): Reg
       },
     },
   };
+  if (overrides.regimeTransition === null) delete built.regimeTransition;
+  return built;
 };
+
+/** A defensive late-cycle reading, for code that reads only the regime, the scores and the lines. */
+export const buildLateCycleAssessmentFixture = (overrides: AssessmentOverrides = {}): RegimeAssessment =>
+  buildAssessmentFixture({
+    regime: "DEFENSIVE",
+    regimeTransition: null,
+    scores: { baseRate: 5.25, baseRateUsed: "FED", curveSlope: -0.3, tightness: 72, riskAppetite: 42 },
+    thresholds: { baseRateTightness: 4.0, tightnessRegime: 60, riskAppetiteRegime: 50 },
+    diagnostics: { nearestThresholdDelta: 10, confidence: "HIGH", transitionWatch: false, intensity: "STANDARD" },
+    description: "Defensive conditions",
+    constraints: [],
+    ...overrides,
+  });
 
 export const buildTreasuryFixture = (overrides: TreasuryOverrides = {}): TreasuryData => {
   const base: TreasuryData = {
@@ -171,6 +188,14 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
   const treasury = buildTreasuryFixture(overrides.treasury);
   const liveTreasury = buildTreasuryFixture(overrides.liveTreasury ?? overrides.treasury);
 
+  const provenanceFields: Omit<ReportData["treasuryProvenance"], "sourceLabel"> = {
+    sourceUrl: treasury.source,
+    recordDateLabel: "Mar 1, 2026",
+    timestampLabel: "Mar 1, 2026 00:00 UTC",
+    ageLabel: "0h",
+    statusLabel: "Live reading",
+  };
+
   const base: ReportData = {
     assessment,
     scoringBasis: resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment }),
@@ -187,14 +212,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     liveAssessment: null,
     liveTreasury,
     monthEndComparison: null,
-    macroProvenance: {
-      sourceLabel: "FRED & US Treasury",
-      sourceUrl: treasury.source,
-      recordDateLabel: "Mar 1, 2026",
-      timestampLabel: "Mar 1, 2026 00:00 UTC",
-      ageLabel: "0h",
-      statusLabel: "Live reading",
-    },
+    macroProvenance: { sourceLabel: "FRED & US Treasury", ...provenanceFields },
     macroSeries: [],
     macroCoverage: {
       mode: "live",
@@ -241,14 +259,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     confidenceTrend: "unstable",
     thresholds: assessment.thresholds,
     treasury,
-    treasuryProvenance: {
-      sourceLabel: "Federal Reserve Economic Data (FRED)",
-      sourceUrl: treasury.source,
-      recordDateLabel: "Mar 1, 2026",
-      timestampLabel: "Mar 1, 2026 00:00 UTC",
-      ageLabel: "0h",
-      statusLabel: "Live reading",
-    },
+    treasuryProvenance: { sourceLabel: "Federal Reserve Economic Data (FRED)", ...provenanceFields },
     sourceHealth: [],
     materializedSignals: null,
     operatingSnapshot: null,

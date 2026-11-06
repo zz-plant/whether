@@ -9,6 +9,14 @@ import { SHOCK_CROSSING_CUE } from "../lib/summary/summaryFormatting";
 import { buildWeeklySummary } from "../lib/summary/weeklySummary";
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
 
+const octoberRecord = () => ({
+  source: "https://example.com/treasury",
+  record_date: "2026-10-05",
+  fetched_at: "2026-10-05T12:00:00.000Z",
+  isLive: true,
+  yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
+});
+
 describe("buildWeeklySummary", () => {
   it("generates a copy block that starts with summary context and bulleted weekly sections", () => {
     const assessment = evaluateRegime({
@@ -91,13 +99,7 @@ describe("buildWeeklySummary", () => {
    * Aug 31. The sentence now states that distance, in the canonical words.
    */
   it("states how far each score sits from its line, not a speed it never measured", () => {
-    const record = {
-      source: "https://example.com/treasury",
-      record_date: "2026-10-05",
-      fetched_at: "2026-10-05T12:00:00.000Z",
-      isLive: true,
-      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
-    };
+    const record = octoberRecord();
     /* With the market series the reading is not held, so its change line is the lines. */
     const assessment = evaluateRegime(record, undefined, macroSeries);
     assert.equal(assessment.regime, "SCARCITY");
@@ -122,13 +124,7 @@ describe("buildWeeklySummary", () => {
      named both scores' lines beside "The guidance is not changing this week" until
      2026-10-07; it is the hold's own condition now (docs/claims-ledger.md). */
   it("says what ends the hold on a held reading, not a line", () => {
-    const record = {
-      source: "https://example.com/treasury",
-      record_date: "2026-10-05",
-      fetched_at: "2026-10-05T12:00:00.000Z",
-      isLive: true,
-      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
-    };
+    const record = octoberRecord();
     const assessment = evaluateRegime(record);
     assert.equal(assessment.policyAssessment.refusal.refused, true);
     const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
@@ -141,13 +137,7 @@ describe("buildWeeklySummary", () => {
   });
 
   it("dates the paste by the record date it is handed and prints the published confidence", () => {
-    const record = {
-      source: "https://example.com/treasury",
-      record_date: "2026-10-05",
-      fetched_at: "2026-10-05T12:00:00.000Z",
-      isLive: true,
-      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
-    };
+    const record = octoberRecord();
     const assessment = evaluateRegime(record);
     const weekly = buildWeeklySummary({
       assessment,
@@ -171,13 +161,7 @@ describe("buildWeeklySummary", () => {
    * override is holding the posture in place" and "This flip crossed its line".
    */
   it("speaks in the conditions word on every cadence, including a held or shock week", () => {
-    const record = {
-      source: "https://example.com/treasury",
-      record_date: "2026-10-05",
-      fetched_at: "2026-10-05T12:00:00.000Z",
-      isLive: true,
-      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
-    };
+    const record = octoberRecord();
     const live = evaluateRegime(record);
     const assessment = {
       ...live,

@@ -1,11 +1,23 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import type { RegimeAssessment } from "../lib/regimeEngine";
 import { buildRegimeFlipState } from "../lib/report/regimeFlipState";
 
 const EXPANSION_READINGS = {
   scores: { tightness: 74, riskAppetite: 56 },
   thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
 };
+
+/** One confirmation in: the machine holds EXPANSION while the readings classify as DEFENSIVE. */
+const heldForDefensive = (): RegimeAssessment["regimeTransition"] => ({
+  nextState: "EXPANSION",
+  candidateState: "DEFENSIVE",
+  committed: false,
+  pending: true,
+  transitionReason: "Funding pressure crossed above 70.",
+  transitionPendingCount: 1,
+  snapshot: { committedState: "EXPANSION", pendingState: "DEFENSIVE", pendingCount: 1 },
+});
 
 describe("buildRegimeFlipState", () => {
   it("states a truthful pending change when the machine holds the call behind its gate", () => {
@@ -14,19 +26,7 @@ describe("buildRegimeFlipState", () => {
       ...EXPANSION_READINGS,
       // The machine's own transition: the readings classify as DEFENSIVE while
       // the committed call holds, pending confirmation.
-      regimeTransition: {
-        nextState: "EXPANSION",
-        candidateState: "DEFENSIVE",
-        committed: false,
-        pending: true,
-        transitionReason: "Funding pressure crossed above 70.",
-        transitionPendingCount: 1,
-        snapshot: {
-          committedState: "EXPANSION",
-          pendingState: "DEFENSIVE",
-          pendingCount: 1,
-        },
-      },
+      regimeTransition: heldForDefensive(),
     });
 
     assert.equal(state.pendingCandidate, "DEFENSIVE");
@@ -76,19 +76,7 @@ describe("buildRegimeFlipState", () => {
     const state = buildRegimeFlipState({
       regime: "EXPANSION",
       ...EXPANSION_READINGS,
-      regimeTransition: {
-        nextState: "EXPANSION",
-        candidateState: "DEFENSIVE",
-        committed: false,
-        pending: true,
-        transitionReason: "Funding pressure crossed above 70.",
-        transitionPendingCount: 1,
-        snapshot: {
-          committedState: "EXPANSION",
-          pendingState: "DEFENSIVE",
-          pendingCount: 1,
-        },
-      },
+      regimeTransition: heldForDefensive(),
     });
 
     assert.match(state.text, /If risk appetite falls to or below 50, conditions would turn Freezing\./);

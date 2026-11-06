@@ -137,16 +137,39 @@ const patientProbe = (patienceMs: number) => {
 
 const hasExited = (child: ChildProcess | undefined) => child?.exitCode != null || child?.signalCode != null;
 
+/** A server on an ephemeral port that answers every request with `text`. */
+const serveText = async (text: string) => {
+  const server = createHttpServer((request, response) => response.end(text));
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  return { server, url: `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}` };
+};
+
+/** vinext's lock file, saying this checkout's dev server listens at `appUrl`. */
+const claimFor = (root: string, appUrl: string) => {
+  const lockfilePath = join(root, "lock.json");
+  writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+  return lockfilePath;
+};
+
+const startThatMustFail = async (root: string, devScript: string, why = "the work must not run against a server that never came up") =>
+  withDevServer({
+    baseUrl: `http://127.0.0.1:${await freePort()}`,
+    outDir: root,
+    lockfilePath: noLock(root),
+    devScript,
+    timeoutMs: 60000,
+    probe: patientProbe(300),
+    body: async () => assert.fail(why),
+  });
+
 describe("withDevServer", () => {
   /* A listener at the default base URL that this checkout does not claim may be another
      worktree's server or an old build: reusing it audited one tree's landmarks as another's
      (2026-10-29). The default is a fresh server for this tree; only an explicitly named
      base URL is audited as given. */
   it("does not audit a listener no checkout claims: it starts one for this tree instead", async () => {
-    const foreign = createHttpServer((request, response) => response.end("another checkout"));
-    await new Promise<void>((resolve) => foreign.listen(0, "127.0.0.1", resolve));
-    const address = foreign.address();
-    const baseUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const { server: foreign, url: baseUrl } = await serveText("another checkout");
     const root = workspace();
 
     const statuses: string[] = [];
@@ -172,10 +195,7 @@ describe("withDevServer", () => {
   });
 
   it("reuses the server at the base URL when the caller named it explicitly", async () => {
-    const foreign = createHttpServer((request, response) => response.end("the named server"));
-    await new Promise<void>((resolve) => foreign.listen(0, "127.0.0.1", resolve));
-    const address = foreign.address();
-    const baseUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const { server: foreign, url: baseUrl } = await serveText("the named server");
 
     const statuses: string[] = [];
     try {
@@ -198,18 +218,11 @@ describe("withDevServer", () => {
   });
 
   it("prefers the checkout's own dev server over an unclaimed listener at the base URL", async () => {
-    const foreign = createHttpServer((request, response) => response.end("unclaimed"));
-    await new Promise<void>((resolve) => foreign.listen(0, "127.0.0.1", resolve));
-    const address = foreign.address();
-    const baseUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const { server: foreign, url: baseUrl } = await serveText("unclaimed");
 
-    const checkout = createHttpServer((request, response) => response.end("checkout server"));
-    await new Promise<void>((resolve) => checkout.listen(0, "127.0.0.1", resolve));
-    const checkoutAddress = checkout.address();
-    const appUrl = `http://127.0.0.1:${typeof checkoutAddress === "object" && checkoutAddress ? checkoutAddress.port : 0}`;
+    const { server: checkout, url: appUrl } = await serveText("checkout server");
     const root = workspace();
-    const lockfilePath = join(root, "lock.json");
-    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+    const lockfilePath = claimFor(root, appUrl);
 
     const statuses: string[] = [];
     try {
@@ -233,13 +246,9 @@ describe("withDevServer", () => {
   });
 
   it("reuses this checkout's dev server from vinext's lock file, wherever it listens", async () => {
-    const server = createHttpServer((request, response) => response.end("checkout server"));
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const address = server.address();
-    const appUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const { server, url: appUrl } = await serveText("checkout server");
     const root = workspace();
-    const lockfilePath = join(root, "lock.json");
-    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+    const lockfilePath = claimFor(root, appUrl);
 
     const statuses: string[] = [];
     try {
@@ -262,13 +271,9 @@ describe("withDevServer", () => {
   /* The landmark and capture commands take a remote --base-url to audit a preview or staging
      deployment; a local server answering in its place would pass local code off as that deployment. */
   it("refuses an unreachable remote target rather than run the work against this checkout's server", async () => {
-    const server = createHttpServer((request, response) => response.end("checkout server"));
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const address = server.address();
-    const appUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const { server, url: appUrl } = await serveText("checkout server");
     const root = workspace();
-    const lockfilePath = join(root, "lock.json");
-    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+    const lockfilePath = claimFor(root, appUrl);
 
     let ranAgainst: string | null = null;
     try {
@@ -382,15 +387,7 @@ describe("withDevServer", () => {
     const startedAt = Date.now();
 
     await assert.rejects(
-      withDevServer({
-        baseUrl: `http://127.0.0.1:${await freePort()}`,
-        outDir: root,
-        lockfilePath: noLock(root),
-        devScript: exitingServer(root),
-        timeoutMs: 60000,
-        probe: patientProbe(300),
-        body: async () => assert.fail("the work must not run against a server that never came up"),
-      }),
+      startThatMustFail(root, exitingServer(root)),
       (error: unknown) =>
         error instanceof Error &&
         /exited before .* became ready/.test(error.message) &&
@@ -405,15 +402,7 @@ describe("withDevServer", () => {
     const startedAt = Date.now();
 
     await assert.rejects(
-      withDevServer({
-        baseUrl: `http://127.0.0.1:${await freePort()}`,
-        outDir: root,
-        lockfilePath: noLock(root),
-        devScript: killedServer(root),
-        timeoutMs: 60000,
-        probe: patientProbe(300),
-        body: async () => assert.fail("the work must not run against a server that never came up"),
-      }),
+      startThatMustFail(root, killedServer(root)),
       /exited before .* became ready/,
     );
 
@@ -445,15 +434,7 @@ describe("withDevServer", () => {
     const root = workspace();
 
     await assert.rejects(
-      withDevServer({
-        baseUrl: `http://127.0.0.1:${await freePort()}`,
-        outDir: root,
-        lockfilePath: noLock(root),
-        devScript: noisyExitingServer(root),
-        timeoutMs: 60000,
-        probe: patientProbe(300),
-        body: async () => assert.fail("the work must not run against a server that never came up"),
-      }),
+      startThatMustFail(root, noisyExitingServer(root)),
       /exited before .* became ready[\s\S]*bind failed: port in use/,
     );
   });
@@ -487,15 +468,7 @@ describe("withDevServer", () => {
     const root = workspace();
 
     await assert.rejects(
-      withDevServer({
-        baseUrl: `http://127.0.0.1:${await freePort()}`,
-        outDir: root,
-        lockfilePath: noLock(root),
-        devScript: secondStartServer(root),
-        timeoutMs: 60000,
-        probe: patientProbe(300),
-        body: async () => assert.fail("one start was allowed, and it exited"),
-      }),
+      startThatMustFail(root, secondStartServer(root), "one start was allowed, and it exited"),
       /exited before .* became ready/,
     );
   });

@@ -5,55 +5,23 @@ import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
 import { buildPostureStateContract } from "../lib/report/postureStateContract";
 import { buildSensorReadings } from "../lib/sensors";
 import { snapshotData } from "../lib/snapshot";
-import type { TreasuryData } from "../lib/types";
+import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 
-const assessment = {
+const assessment = buildAssessmentFixture({
   regime: "DEFENSIVE",
-  scores: { tightness: 72, riskAppetite: 48, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.1 },
+  regimeTransition: null,
+  scores: { tightness: 72, riskAppetite: 48 },
   diagnostics: {
-    tightnessVsThreshold: 2,
     riskAppetiteVsThreshold: -3,
-    nearestThresholdDelta: 2,
-    confidence: "LOW",
-    transitionWatch: true,
-    intensity: "MILD",
     boundaryContributors: ["tightness near threshold"],
     weakReadCount: 2,
     twoWeakReadsWarning: true,
   },
   description: "Capital is expensive but risk appetite is moderate. Operate for efficiency.",
   constraints: ["Focus on margin expansion and retention."],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-  inputs: [],
-  policyAssessment: {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
-    },
-  },
-} as const;
+});
 
-const treasury = {
-  source: "https://example.com",
-  record_date: "2026-03-01",
-  fetched_at: "2026-03-01T00:00:00Z",
-  isLive: true,
-  yields: { oneMonth: 5.2, twoYear: 4.6, tenYear: 4.5 },
-} as const;
+const treasury = buildTreasuryFixture({ source: "https://example.com" });
 
 const sensors = [
   {
@@ -90,7 +58,7 @@ const macroSignals = [
 
 describe("agent handoff contract", () => {
   it("adds decision delta, flip watch, and bounded decision rules to the payload", () => {
-    const payload = buildAgentPayload(assessment as any, treasury as any, sensors, macroSignals, {
+    const payload = buildAgentPayload(assessment, treasury, sensors, macroSignals, {
       decisionSupport: {
         reportDynamics: {
           changedSignals: [
@@ -174,7 +142,7 @@ describe("agent handoff contract", () => {
   });
 
   it("updates the prompt to request decision delta and flip watch outputs", () => {
-    const prompt = buildAgentPrompt(assessment as any, treasury as any);
+    const prompt = buildAgentPrompt(assessment, treasury);
 
     assert.match(prompt, /decision delta/i);
     assert.match(prompt, /watchlist of the change lines/i);
@@ -222,24 +190,7 @@ describe("flip watch under a held call", () => {
      held Sunny behind its confirmation gate. `transition_watch` read OFF — the
      reading was 7 points past the nearest line, outside the near band — and the
      payload carried nothing that said a flip was one read away. */
-  const policyAssessment: RegimeAssessment["policyAssessment"] = {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
-    },
-  };
-  const heldAssessment: RegimeAssessment = {
+  const heldAssessment = buildAssessmentFixture({
     regime: "EXPANSION",
     regimeTransition: {
       nextState: "EXPANSION",
@@ -255,27 +206,21 @@ describe("flip watch under a held call", () => {
         lastSignals: { tightness: 77, riskAppetite: 42 },
       },
     },
-    scores: { tightness: 77, riskAppetite: 42, baseRateUsed: "1M", baseRate: 3.93, curveSlope: 0.33 },
+    scores: { tightness: 77, riskAppetite: 42, baseRate: 3.93, curveSlope: 0.33 },
     diagnostics: {
       tightnessVsThreshold: 7,
       riskAppetiteVsThreshold: -8,
       nearestThresholdDelta: 7,
       confidence: "MEDIUM",
       transitionWatch: false,
-      intensity: "MILD",
       boundaryContributors: ["VC funding slowdown", "Tech layoff pressure"],
       weakReadCount: 2,
       twoWeakReadsWarning: true,
     },
     description: "Capital is available and financing conditions are supportive.",
     constraints: ["Prioritize reach and learning velocity over perfect finish."],
-    tightnessExplanation: "",
-    riskAppetiteExplanation: "",
-    dataWarnings: [],
-    thresholds: { baseRateTightness: 3.5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-    inputs: [],
-    policyAssessment,
-  };
+    thresholds: { baseRateTightness: 3.5 },
+  });
   const confirmedAssessment: RegimeAssessment = {
     ...heldAssessment,
     regime: "SCARCITY",
@@ -294,13 +239,12 @@ describe("flip watch under a held call", () => {
       },
     },
   };
-  const treasuryData: TreasuryData = {
+  const treasuryData = buildTreasuryFixture({
     source: "https://fred.stlouisfed.org/series/DGS1MO",
     record_date: "2026-09-11",
     fetched_at: "2026-09-15T02:01:00Z",
-    isLive: true,
     yields: { oneMonth: 3.93, twoYear: 3.6, tenYear: 3.93 },
-  };
+  });
   const decisionSupport: NonNullable<NonNullable<Parameters<typeof buildAgentPayload>[4]>["decisionSupport"]> = {
     reportDynamics: { changedSignals: [], directionLabel: "deteriorating", regimeChanged: false },
     guidance: "Stage anything new.",

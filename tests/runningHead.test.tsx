@@ -46,7 +46,7 @@ const intro = (overrides: Partial<Parameters<typeof CommandCenterNavBlock>[0]> =
 
 describe("running head facts", () => {
   it("reads back exactly what a page wrote, leaving out what it did not", () => {
-    const written = frameFactsAttributes({
+    const facts = {
       regime: "SCARCITY",
       condition: "Freezing",
       date: "Week of Oct 19, 2026",
@@ -55,17 +55,9 @@ describe("running head facts", () => {
       tensionNear: true,
       call: "Freeze new commitments.",
       jump: { href: "#what-it-changes", label: "By area" },
-    });
-    assert.deepEqual(readFrameFacts({ dataset: datasetOf(written) }, "ignored"), {
-      regime: "SCARCITY",
-      condition: "Freezing",
-      date: "Week of Oct 19, 2026",
-      title: "This week",
-      tension: "3 pts from Cloudy",
-      tensionNear: true,
-      call: "Freeze new commitments.",
-      jump: { href: "#what-it-changes", label: "By area" },
-    });
+    };
+    const written = frameFactsAttributes(facts);
+    assert.deepEqual(readFrameFacts({ dataset: datasetOf(written) }, "ignored"), facts);
     assert.equal(
       readFrameFacts({ dataset: datasetOf(frameFactsAttributes({ tensionNear: true })) }, null).tensionNear,
       false,

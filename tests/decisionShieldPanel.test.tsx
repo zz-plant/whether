@@ -19,17 +19,13 @@ mockAny.module("next/navigation", () => ({
 
 import { DecisionShieldPresetsSection } from "../app/operate/components/decisionShieldPresetsSection";
 import { DecisionShieldPanel } from "../app/operate/components/decisionShieldPanel";
-import type { RegimeAssessment } from "../lib/regimeEngine";
+import { buildAssessmentFixture } from "./fixtures/reportFixtures";
+import { Toast } from "@base-ui/react/toast";
 
-const sampleAssessment: RegimeAssessment = {
+const sampleAssessment = buildAssessmentFixture({
   regime: "DEFENSIVE",
-  scores: {
-    tightness: 75,
-    riskAppetite: 35,
-    baseRateUsed: "1M",
-    baseRate: 5.25,
-    curveSlope: -0.15,
-  },
+  regimeTransition: null,
+  scores: { tightness: 75, riskAppetite: 35, baseRate: 5.25, curveSlope: -0.15 },
   diagnostics: {
     tightnessVsThreshold: 5,
     riskAppetiteVsThreshold: -15,
@@ -37,39 +33,23 @@ const sampleAssessment: RegimeAssessment = {
     confidence: "HIGH",
     transitionWatch: false,
     intensity: "STANDARD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
   },
   description: "Defensive posture",
   constraints: [],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: {
-    baseRateTightness: 5,
-    tightnessRegime: 70,
-    riskAppetiteRegime: 50,
-  },
-  inputs: [],
-  policyAssessment: {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
-    },
-  },
-};
+});
+
+/** The panel as a page mounts it: the toast provider around it, for whatever the search params say. */
+const renderPanel = () =>
+  renderToStaticMarkup(
+    createElement(
+      Toast.Provider,
+      null,
+      createElement(DecisionShieldPanel, {
+        assessment: sampleAssessment,
+        recordDate: "2026-09-25",
+      })
+    )
+  );
 
 describe("DecisionShieldPresetsSection markup", () => {
   it("renders empty preset state when no presets are saved", () => {
@@ -96,12 +76,36 @@ describe("DecisionShieldPresetsSection markup", () => {
   });
 });
 
-import { Toast } from "@base-ui/react/toast";
 import { PlanStressTestMode, ComparePlansMode } from "../app/operate/components/decisionShieldPlanModes";
 import { companyFinancialProfileFor, stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
-import { EMPTY_OPERATOR_PROFILE } from "../lib/operatorProfile";
+import { EMPTY_OPERATOR_PROFILE, type OperatorProfile } from "../lib/operatorProfile";
 
 describe("DecisionShieldPlanModes markup", () => {
+  /** The mode's markup for a plan and a profile; the setters stay inert, since markup is all these cases read. */
+  const renderStressMode = ({
+    planText,
+    planReady,
+    profile = EMPTY_OPERATOR_PROFILE,
+    stressTestResult,
+  }: {
+    planText: string;
+    planReady: boolean;
+    profile?: OperatorProfile;
+    stressTestResult: ReturnType<typeof stressTestDecisionPlan>;
+  }) =>
+    renderToStaticMarkup(
+      createElement(PlanStressTestMode, {
+        planText,
+        setPlanText: () => {},
+        planReady,
+        profile,
+        setProfileField: () => {},
+        businessModel: "VC_BACKED",
+        setBusinessModel: () => {},
+        stressTestResult,
+      })
+    );
+
   /* Compact until used (2026-10-07): the step opened on runway, spend, model, a
      three-line box and a verdict panel announcing there was no verdict. Before a
      plan is typed it is one field and the examples; the figures and the verdict
@@ -109,18 +113,7 @@ describe("DecisionShieldPlanModes markup", () => {
      "Plan stress test" heading, which the mode switch above already names. */
   it("opens as one field and the examples, with no figures and no empty verdict", () => {
     const stressResult = stressTestDecisionPlan(sampleAssessment, { planText: "" });
-    const markup = renderToStaticMarkup(
-      createElement(PlanStressTestMode, {
-        planText: "",
-        setPlanText: () => {},
-        planReady: false,
-        profile: EMPTY_OPERATOR_PROFILE,
-        setProfileField: () => {},
-        businessModel: "VC_BACKED",
-        setBusinessModel: () => {},
-        stressTestResult: stressResult,
-      })
-    );
+    const markup = renderStressMode({ planText: "", planReady: false, stressTestResult: stressResult });
 
     assert.ok(markup.includes("id=\"decision-shield-plan-input\""));
     assert.ok(markup.includes("Try an example:"));
@@ -139,18 +132,7 @@ describe("DecisionShieldPlanModes markup", () => {
   it("adds the figures and the verdict once a plan is typed", () => {
     const planText = "Hire 3 senior engineers @ $180k";
     const stressResult = stressTestDecisionPlan(sampleAssessment, { planText });
-    const markup = renderToStaticMarkup(
-      createElement(PlanStressTestMode, {
-        planText,
-        setPlanText: () => {},
-        planReady: true,
-        profile: EMPTY_OPERATOR_PROFILE,
-        setProfileField: () => {},
-        businessModel: "VC_BACKED",
-        setBusinessModel: () => {},
-        stressTestResult: stressResult,
-      })
-    );
+    const markup = renderStressMode({ planText, planReady: true, stressTestResult: stressResult });
 
     assert.ok(markup.includes("Runway (months)"));
     assert.ok(markup.includes("decision-shield-model"));
@@ -169,18 +151,7 @@ describe("DecisionShieldPlanModes markup", () => {
       planText,
       companyProfile: companyFinancialProfileFor(profile, "VC_BACKED"),
     });
-    const markup = renderToStaticMarkup(
-      createElement(PlanStressTestMode, {
-        planText,
-        setPlanText: () => {},
-        planReady: true,
-        profile,
-        setProfileField: () => {},
-        businessModel: "VC_BACKED",
-        setBusinessModel: () => {},
-        stressTestResult: stressResult,
-      })
-    );
+    const markup = renderStressMode({ planText, planReady: true, profile, stressTestResult: stressResult });
     assert.ok(markup.includes("Revenue covers your spending, so no runway is counting down."));
     assert.ok(markup.includes("Revenue covers your spending, so there is no burn to size it against"));
     assert.ok(!markup.includes("needs your cash or monthly burn"));
@@ -213,16 +184,7 @@ describe("DecisionShieldPlanModes markup", () => {
 
 describe("DecisionShieldPanel markup", () => {
   it("opens on the mode switch and one field, with nothing to copy yet", () => {
-    const markup = renderToStaticMarkup(
-      createElement(
-        Toast.Provider,
-        null,
-        createElement(DecisionShieldPanel, {
-          assessment: sampleAssessment,
-          recordDate: "2026-09-25",
-        })
-      )
-    );
+    const markup = renderPanel();
 
     assert.ok(markup.includes("id=\"decision-shield\""));
     // The step around it asks the question; the panel no longer asks it again.
@@ -241,16 +203,7 @@ describe("DecisionShieldPanel markup", () => {
   it("puts the copy and record actions after the verdict they act on", () => {
     mockSearchParams = new URLSearchParams({ planMode: "natural_language", plan: "Hire 2 staff engineers at $250k salary" });
     try {
-      const markup = renderToStaticMarkup(
-        createElement(
-          Toast.Provider,
-          null,
-          createElement(DecisionShieldPanel, {
-            assessment: sampleAssessment,
-            recordDate: "2026-09-25",
-          })
-        )
-      );
+      const markup = renderPanel();
       assert.ok(markup.includes("Copy verdict"));
       assert.ok(markup.includes("Copy link"));
       assert.ok(markup.indexOf("Decision verdict") < markup.indexOf("Copy verdict"), "the verdict comes before the copy action");
@@ -263,18 +216,6 @@ describe("DecisionShieldPanel markup", () => {
     afterEach(() => {
       mockSearchParams = new URLSearchParams();
     });
-
-    const renderPanel = () =>
-      renderToStaticMarkup(
-        createElement(
-          Toast.Provider,
-          null,
-          createElement(DecisionShieldPanel, {
-            assessment: sampleAssessment,
-            recordDate: "2026-09-25",
-          })
-        )
-      );
 
     it("opens on the plan text and mode the link carries", () => {
       mockSearchParams = new URLSearchParams({

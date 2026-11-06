@@ -9,6 +9,12 @@ import {
   type ContentMeasurementEvent,
 } from "../lib/contentMeasurement";
 
+/** The conversion, then a turn of the event loop for its fire-and-forget send. */
+const trackHeroCopyConversion = async () => {
+  trackContentCtaConversion({ pagePath: "/", cluster: "tool", intent: "board", ctaId: "hero-copy" });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+};
+
 describe("buildContentMeasurementReport", () => {
   it("aggregates entrances, CTA conversions, assisted paths, and intent counts", () => {
     const events: ContentMeasurementEvent[] = [
@@ -100,14 +106,7 @@ describe("trackContentCtaConversion", () => {
     }) as typeof fetch;
 
     try {
-      trackContentCtaConversion({
-        pagePath: "/",
-        cluster: "tool",
-        intent: "board",
-        ctaId: "hero-copy",
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await trackHeroCopyConversion();
       assert.equal(fetchCalls, 1);
     } finally {
       Object.defineProperty(globalThis, "navigator", {
@@ -136,14 +135,7 @@ describe("trackContentCtaConversion", () => {
     }) as typeof fetch;
 
     try {
-      trackContentCtaConversion({
-        pagePath: "/",
-        cluster: "tool",
-        intent: "board",
-        ctaId: "hero-copy",
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await trackHeroCopyConversion();
       assert.equal(fetchCalls, 1);
     } finally {
       Object.defineProperty(globalThis, "navigator", {

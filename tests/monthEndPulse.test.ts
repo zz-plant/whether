@@ -18,15 +18,15 @@ const history: MonthlyRegimeHistoryEntry[] = [
   { record_date: "2026-08-31", regime: "EXPANSION", tightness: 22, riskAppetite: 68 },
 ];
 
+const septemberSnapshot = () =>
+  buildOperatingSnapshot({
+    treasury: mockTreasury({ oneMonth: 4.3, threeMonth: 4.3, twoYear: 4.0, tenYear: 4.1 }, "2026-09-02"),
+    macroSeries: [],
+  });
+
 describe("evaluateMonthEndPulse", () => {
   it("fires a changed month with a headline naming the move", () => {
-    const snapshot = buildOperatingSnapshot({
-      treasury: mockTreasury(
-        { oneMonth: 4.3, threeMonth: 4.3, twoYear: 4.0, tenYear: 4.1 },
-        "2026-09-02",
-      ),
-      macroSeries: [],
-    });
+    const snapshot = septemberSnapshot();
 
     const verdict = evaluateMonthEndPulse({
       assessment: snapshot.assessment,
@@ -42,13 +42,7 @@ describe("evaluateMonthEndPulse", () => {
   });
 
   it("stays silent when the month-end reading matches the prior one", () => {
-    const snapshot = buildOperatingSnapshot({
-      treasury: mockTreasury(
-        { oneMonth: 4.3, threeMonth: 4.3, twoYear: 4.0, tenYear: 4.1 },
-        "2026-09-02",
-      ),
-      macroSeries: [],
-    });
+    const snapshot = septemberSnapshot();
     const identical: MonthlyRegimeHistoryEntry[] = [
       {
         record_date: "2026-08-31",
@@ -69,13 +63,7 @@ describe("evaluateMonthEndPulse", () => {
   });
 
   it("cannot fire without a prior month-end to compare against", () => {
-    const snapshot = buildOperatingSnapshot({
-      treasury: mockTreasury(
-        { oneMonth: 4.3, threeMonth: 4.3, twoYear: 4.0, tenYear: 4.1 },
-        "2026-09-02",
-      ),
-      macroSeries: [],
-    });
+    const snapshot = septemberSnapshot();
 
     const verdict = evaluateMonthEndPulse({
       assessment: snapshot.assessment,
@@ -90,13 +78,7 @@ describe("evaluateMonthEndPulse", () => {
   it("uses the same score-change cut as the investor update's own wording", () => {
     // A sub-0.5-point move reads "unchanged" in the investor update; the pulse
     // must not contradict it by firing on a move the block describes as unchanged.
-    const snapshot = buildOperatingSnapshot({
-      treasury: mockTreasury(
-        { oneMonth: 4.3, threeMonth: 4.3, twoYear: 4.0, tenYear: 4.1 },
-        "2026-09-02",
-      ),
-      macroSeries: [],
-    });
+    const snapshot = septemberSnapshot();
     const withinCut: MonthlyRegimeHistoryEntry[] = [
       {
         record_date: "2026-08-31",

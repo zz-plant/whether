@@ -16,46 +16,71 @@ const buildCsv = (seriesId: string, values: Array<{ date: string; value: string 
   return `DATE,${seriesId}\n${rows}`;
 };
 
+/** Each of the four series FRED serves, by the id in the URL; anything else is the ten-year. */
+const fredTenorCsv = (url: string) => {
+  if (url.includes("DGS1MO")) {
+    return buildCsv("DGS1MO", [
+      { date: "2026-02-01", value: "5.2" },
+      { date: "2026-02-02", value: "5.1" },
+    ]);
+  }
+  if (url.includes("DGS3MO")) {
+    return buildCsv("DGS3MO", [
+      { date: "2026-02-01", value: "5.0" },
+      { date: "2026-02-02", value: "4.9" },
+    ]);
+  }
+  if (url.includes("DGS2")) {
+    return buildCsv("DGS2", [
+      { date: "2026-02-01", value: "4.8" },
+      { date: "2026-02-02", value: "4.7" },
+    ]);
+  }
+  return buildCsv("DGS10", [
+    { date: "2026-02-01", value: "4.6" },
+    { date: "2026-02-02", value: "4.5" },
+  ]);
+};
+
+/** One flat series for every tenor: enough for the cases about the request, not the values. */
+const flatDgsResponse = () =>
+  new Response(
+    buildCsv("DGS", [
+      { date: "2026-02-01", value: "5.2" },
+      { date: "2026-02-02", value: "5.1" },
+    ]),
+  );
+
+const snapshotFallback = (overrides: Partial<TreasuryData> = {}): TreasuryData => ({
+  source: "snapshot",
+  record_date: "2024-09-30",
+  fetched_at: "2026-02-01T00:00:00Z",
+  isLive: false,
+  yields: { oneMonth: 5.1, twoYear: 4.7, tenYear: 4.5 },
+  ...overrides,
+});
+
+const abortError = () => {
+  const error = new Error("The operation was aborted");
+  error.name = "AbortError";
+  return error;
+};
+
+const TREASURY_DAILY_HEADER = "Date,1 Mo,3 Mo,2 Yr,10 Yr";
+
+/** Treasury's daily file serves these rows; FRED is down. */
+const treasuryFileOnly = (...rows: string[]): typeof fetch => async (input) =>
+  requestUrl(input).includes("home.treasury.gov")
+    ? new Response([TREASURY_DAILY_HEADER, ...rows].join("\n"))
+    : new Response("{}", { status: 500 });
+
 describe("treasury client", () => {
   it("returns live data when fetch succeeds", async () => {
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
       const url = requestUrl(input);
       requestedUrls.push(url);
-
-      if (url.includes("DGS1MO")) {
-        return new Response(
-          buildCsv("DGS1MO", [
-            { date: "2026-02-01", value: "5.2" },
-            { date: "2026-02-02", value: "5.1" },
-          ])
-        );
-      }
-
-      if (url.includes("DGS3MO")) {
-        return new Response(
-          buildCsv("DGS3MO", [
-            { date: "2026-02-01", value: "5.0" },
-            { date: "2026-02-02", value: "4.9" },
-          ])
-        );
-      }
-
-      if (url.includes("DGS2")) {
-        return new Response(
-          buildCsv("DGS2", [
-            { date: "2026-02-01", value: "4.8" },
-            { date: "2026-02-02", value: "4.7" },
-          ])
-        );
-      }
-
-      return new Response(
-        buildCsv("DGS10", [
-          { date: "2026-02-01", value: "4.6" },
-          { date: "2026-02-02", value: "4.5" },
-        ])
-      );
+      return new Response(fredTenorCsv(url));
     };
 
     const data = await fetchTreasuryData({ fetcher });
@@ -78,22 +103,7 @@ describe("treasury client", () => {
       return new Response("{}", { status: 500 });
     };
 
-    const snapshot: TreasuryData = {
-      source: "snapshot",
-      record_date: "2024-09-30",
-      fetched_at: "2026-02-01T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: 5.1,
-        twoYear: 4.7,
-        tenYear: 4.5,
-      },
-    };
-
-    const data = await fetchTreasuryData({
-      fetcher,
-      snapshotFallback: snapshot,
-    });
+    const data = await fetchTreasuryData({ fetcher, snapshotFallback: snapshotFallback() });
 
     assert.equal(data.record_date, "2024-09-30");
     assert.equal(data.isLive, false);
@@ -116,22 +126,7 @@ describe("treasury client", () => {
       );
     };
 
-    const snapshot: TreasuryData = {
-      source: "snapshot",
-      record_date: "2024-09-30",
-      fetched_at: "2026-02-01T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: 5.1,
-        twoYear: 4.7,
-        tenYear: 4.5,
-      },
-    };
-
-    const data = await fetchTreasuryData({
-      fetcher,
-      snapshotFallback: snapshot,
-    });
+    const data = await fetchTreasuryData({ fetcher, snapshotFallback: snapshotFallback() });
 
     assert.equal(data.record_date, "2024-09-30");
     assert.equal(data.isLive, false);
@@ -140,21 +135,13 @@ describe("treasury client", () => {
   });
 
   it("returns snapshot fallback with explicit reason for historical cache miss", async () => {
-    const snapshot: TreasuryData = {
-      source: "snapshot",
-      record_date: "2024-08-31",
-      fetched_at: "2024-09-01T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: 5.0,
-        twoYear: 4.6,
-        tenYear: 4.4,
-      },
-    };
-
     const data = await fetchTreasuryData({
       asOf: "2010-01-31",
-      snapshotFallback: snapshot,
+      snapshotFallback: snapshotFallback({
+        record_date: "2024-08-31",
+        fetched_at: "2024-09-01T00:00:00Z",
+        yields: { oneMonth: 5.0, twoYear: 4.6, tenYear: 4.4 },
+      }),
     });
 
     assert.equal(data.record_date, "2024-08-31");
@@ -168,12 +155,7 @@ describe("treasury client", () => {
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
       requestedUrls.push(requestUrl(input));
-      return new Response(
-        buildCsv("DGS", [
-          { date: "2026-02-01", value: "5.2" },
-          { date: "2026-02-02", value: "5.1" },
-        ])
-      );
+      return flatDgsResponse();
     };
 
     const data = await fetchTreasuryData({
@@ -202,12 +184,7 @@ describe("treasury client", () => {
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
       requestedUrls.push(requestUrl(input));
-      return new Response(
-        buildCsv("DGS", [
-          { date: "2026-02-01", value: "5.2" },
-          { date: "2026-02-02", value: "5.1" },
-        ])
-      );
+      return flatDgsResponse();
     };
 
     await fetchTreasuryData({
@@ -232,18 +209,9 @@ describe("treasury client", () => {
       const count = attempts.get(url) ?? 0;
       attempts.set(url, count + 1);
 
-      if (count === 0) {
-        const error = new Error("The operation was aborted");
-        error.name = "AbortError";
-        throw error;
-      }
+      if (count === 0) throw abortError();
 
-      return new Response(
-        buildCsv("DGS", [
-          { date: "2026-02-01", value: "5.2" },
-          { date: "2026-02-02", value: "5.1" },
-        ])
-      );
+      return flatDgsResponse();
     };
 
     const data = await fetchTreasuryData({ fetcher });
@@ -264,37 +232,7 @@ describe("treasury client", () => {
         return new Response("upstream unavailable", { status: 520 });
       }
 
-      if (url.includes("DGS1MO")) {
-        return new Response(
-          buildCsv("DGS1MO", [
-            { date: "2026-02-01", value: "5.2" },
-            { date: "2026-02-02", value: "5.1" },
-          ])
-        );
-      }
-      if (url.includes("DGS3MO")) {
-        return new Response(
-          buildCsv("DGS3MO", [
-            { date: "2026-02-01", value: "5.0" },
-            { date: "2026-02-02", value: "4.9" },
-          ])
-        );
-      }
-      if (url.includes("DGS2")) {
-        return new Response(
-          buildCsv("DGS2", [
-            { date: "2026-02-01", value: "4.8" },
-            { date: "2026-02-02", value: "4.7" },
-          ])
-        );
-      }
-
-      return new Response(
-        buildCsv("DGS10", [
-          { date: "2026-02-01", value: "4.6" },
-          { date: "2026-02-02", value: "4.5" },
-        ])
-      );
+      return new Response(fredTenorCsv(url));
     };
 
     const data = await fetchTreasuryData({ fetcher });
@@ -316,22 +254,7 @@ describe("treasury client", () => {
       return new Response("{}", { status: 500 });
     };
 
-    const snapshot: TreasuryData = {
-      source: "snapshot",
-      record_date: "2024-09-30",
-      fetched_at: "2026-02-01T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: 5.1,
-        twoYear: 4.7,
-        tenYear: 4.5,
-      },
-    };
-
-    const data = await fetchTreasuryData({
-      fetcher,
-      snapshotFallback: snapshot,
-    });
+    const data = await fetchTreasuryData({ fetcher, snapshotFallback: snapshotFallback() });
 
     assert.equal(
       data.fallback_reason,
@@ -341,27 +264,10 @@ describe("treasury client", () => {
 
   it("uses a clearer fallback reason after repeated timeout aborts", async () => {
     const fetcher: typeof fetch = async () => {
-      const error = new Error("The operation was aborted");
-      error.name = "AbortError";
-      throw error;
+      throw abortError();
     };
 
-    const snapshot: TreasuryData = {
-      source: "snapshot",
-      record_date: "2024-09-30",
-      fetched_at: "2026-02-01T00:00:00Z",
-      isLive: false,
-      yields: {
-        oneMonth: 5.1,
-        twoYear: 4.7,
-        tenYear: 4.5,
-      },
-    };
-
-    const data = await fetchTreasuryData({
-      fetcher,
-      snapshotFallback: snapshot,
-    });
+    const data = await fetchTreasuryData({ fetcher, snapshotFallback: snapshotFallback() });
 
     assert.equal(
       data.fallback_reason,
@@ -370,14 +276,7 @@ describe("treasury client", () => {
   });
 
   it("uses Treasury daily rates CSV as a live backup when FRED is unavailable", async () => {
-    const fetcher: typeof fetch = async (input) => {
-      const url = requestUrl(input);
-      if (url.includes("home.treasury.gov")) {
-        return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "01/09/2026,4.12,4.23,4.31,4.56"].join("\n"));
-      }
-
-      return new Response("{}", { status: 500 });
-    };
+    const fetcher = treasuryFileOnly("01/09/2026,4.12,4.23,4.31,4.56");
 
     const data = await fetchTreasuryData({ fetcher });
     assert.equal(data.isLive, true);
@@ -392,20 +291,7 @@ describe("treasury client", () => {
   });
 
   it("uses the next newest Treasury CSV row when the latest row has placeholder tenor values", async () => {
-    const fetcher: typeof fetch = async (input) => {
-      const url = requestUrl(input);
-      if (url.includes("home.treasury.gov")) {
-        return new Response(
-          [
-            "Date,1 Mo,3 Mo,2 Yr,10 Yr",
-            "01/10/2026,.,4.25,4.34,4.58",
-            "01/09/2026,4.12,4.23,4.31,4.56",
-          ].join("\n")
-        );
-      }
-
-      return new Response("{}", { status: 500 });
-    };
+    const fetcher = treasuryFileOnly("01/10/2026,.,4.25,4.34,4.58", "01/09/2026,4.12,4.23,4.31,4.56");
 
     const data = await fetchTreasuryData({ fetcher });
     assert.equal(data.isLive, true);
@@ -420,21 +306,11 @@ describe("treasury client", () => {
   });
 
   it("chooses the latest valid Treasury CSV row regardless of response ordering", async () => {
-    const fetcher: typeof fetch = async (input) => {
-      const url = requestUrl(input);
-      if (url.includes("home.treasury.gov")) {
-        return new Response(
-          [
-            "Date,1 Mo,3 Mo,2 Yr,10 Yr",
-            "01/08/2026,4.10,4.20,4.30,4.50",
-            "01/09/2026,4.12,4.23,4.31,4.56",
-            "01/10/2026,4.14,4.25,4.34,4.58",
-          ].join("\n")
-        );
-      }
-
-      return new Response("{}", { status: 500 });
-    };
+    const fetcher = treasuryFileOnly(
+      "01/08/2026,4.10,4.20,4.30,4.50",
+      "01/09/2026,4.12,4.23,4.31,4.56",
+      "01/10/2026,4.14,4.25,4.34,4.58",
+    );
 
     const data = await fetchTreasuryData({ fetcher });
     assert.equal(data.isLive, true);
@@ -453,7 +329,7 @@ describe("treasury client", () => {
       const url = requestUrl(input);
       requested.push(url);
       if (url.includes("home.treasury.gov")) {
-        return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "08/21/2026,3.80,3.88,4.24,4.74"].join("\n"));
+        return new Response([TREASURY_DAILY_HEADER, "08/21/2026,3.80,3.88,4.24,4.74"].join("\n"));
       }
 
       return new Response("{}", { status: 500 });
@@ -482,7 +358,7 @@ describe("treasury client", () => {
       }
 
       if (url.includes(`/${currentYear - 1}/all`)) {
-        return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "12/31/2025,4.02,4.11,4.20,4.51"].join("\n"));
+        return new Response([TREASURY_DAILY_HEADER, "12/31/2025,4.02,4.11,4.20,4.51"].join("\n"));
       }
 
       return new Response("{}", { status: 500 });
@@ -528,13 +404,7 @@ describe("treasury client", () => {
     try {
       await fetchTreasuryData({
         fetcher: async () => new Response("{}", { status: 503 }),
-        snapshotFallback: {
-          source: "snapshot",
-          record_date: "2024-09-30",
-          fetched_at: "2026-02-01T00:00:00Z",
-          isLive: false,
-          yields: { oneMonth: 5.1, twoYear: 4.7, tenYear: 4.5 },
-        },
+        snapshotFallback: snapshotFallback(),
       });
       assert.equal(getFredCircuitBreakerState().consecutiveFailures, 0);
 

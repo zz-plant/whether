@@ -4,6 +4,18 @@ import { GET } from "../app/api/decision-events/route";
 import { buildRegimeDecisionEvent, getDecisionEventStore, resetDecisionEventStore } from "../lib/events/decisionEventStore";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngine";
 
+const committedDefensiveEvent = () =>
+  buildRegimeDecisionEvent({
+    previousState: "EXPANSION",
+    nextState: "DEFENSIVE",
+    tightness: 74,
+    riskAppetite: 53,
+    thresholds: DEFAULT_THRESHOLDS,
+    diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 5, transitionWatch: true },
+    pendingCount: 2,
+    transitionReason: "Tightness crossed above 70. Transition committed.",
+  });
+
 describe("/api/decision-events", () => {
   beforeEach(() => {
     resetDecisionEventStore();
@@ -12,16 +24,7 @@ describe("/api/decision-events", () => {
   it("returns paginated events with cursor metadata", async () => {
     const store = getDecisionEventStore();
     store.append(
-      buildRegimeDecisionEvent({
-        previousState: "EXPANSION",
-        nextState: "DEFENSIVE",
-        tightness: 74,
-        riskAppetite: 53,
-        thresholds: DEFAULT_THRESHOLDS,
-        diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 5, transitionWatch: true },
-        pendingCount: 2,
-        transitionReason: "Tightness crossed above 70. Transition committed.",
-      }),
+      committedDefensiveEvent(),
     );
     store.append(
       buildRegimeDecisionEvent({
@@ -55,16 +58,7 @@ describe("/api/decision-events", () => {
   it("supports deterministic replay from the requested cursor window", async () => {
     const store = getDecisionEventStore();
     store.append(
-      buildRegimeDecisionEvent({
-        previousState: "EXPANSION",
-        nextState: "DEFENSIVE",
-        tightness: 74,
-        riskAppetite: 53,
-        thresholds: DEFAULT_THRESHOLDS,
-        diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 5, transitionWatch: true },
-        pendingCount: 2,
-        transitionReason: "Tightness crossed above 70. Transition committed.",
-      }),
+      committedDefensiveEvent(),
     );
 
     const request = { nextUrl: new URL("http://localhost/api/decision-events?replay=1&initialState=EXPANSION") };
