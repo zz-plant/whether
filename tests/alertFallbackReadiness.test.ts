@@ -7,8 +7,8 @@ import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { checkRegimeChange } from "../lib/alert/checkRegimeChange";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
-import type { KvNamespace } from "../lib/runtime/kv";
 import { getSlackWebhookStore, resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
+import { FakeKv } from "./fixtures/fakeKv";
 
 /*
  * The manual runs of the two between-Monday checks, with nothing stored.
@@ -26,30 +26,6 @@ import { getSlackWebhookStore, resetSlackWebhookStore } from "../lib/slack/slack
  */
 
 const originalFetch = globalThis.fetch;
-
-class FakeKv implements KvNamespace {
-  readonly entries = new Map<string, string>();
-
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return {
-      keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-    };
-  }
-}
 
 /** Records Slack posts and refuses everything else, the way an outage does. */
 const offlineExceptSlack = () => {

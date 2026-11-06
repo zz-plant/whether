@@ -10,9 +10,9 @@ import { resolveEmailBaseUrl } from "../lib/email/publicBaseUrl";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
-import type { KvNamespace } from "../lib/runtime/kv";
 import { siteUrl } from "../lib/siteUrl";
 import { snapshotData } from "../lib/snapshot";
+import { FakeKv } from "./fixtures/fakeKv";
 
 /*
  * One email shell, resolved through `lib/siteUrl`.
@@ -30,30 +30,6 @@ import { snapshotData } from "../lib/snapshot";
  */
 
 const PRODUCTION_ORIGIN = "https://whether.work";
-
-class FakeKv implements KvNamespace {
-  private readonly entries = new Map<string, string>();
-
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return {
-      keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-    };
-  }
-}
 
 /** Installs an EMAIL binding that keeps what it was handed; the stub drops the bodies. */
 const captureMail = () => {
@@ -98,6 +74,22 @@ afterEach(() => {
   Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
   resetSubscriberStore();
 });
+
+/** The Monday mail for the Aug 28 reading, as a verified subscriber receives it. */
+const mailWeeklyBrief = async (now: Date, options: { baseUrl?: string } = {}) => {
+  const snapshot = buildOperatingSnapshot({
+    treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
+    macroSeries: liveMacroSeries,
+    now,
+  });
+  const mail = captureMail();
+  try {
+    await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now, ...options });
+  } finally {
+    mail.restore();
+  }
+  return mail.sent;
+};
 
 describe("the shared email shell, on production", () => {
   it("mails an alert byte for byte as it was mailed before", () => {
@@ -149,20 +141,7 @@ describe("the shared email shell, on production", () => {
     await store.verifyEmail(subscriber.confirmToken ?? "");
 
     const now = new Date("2026-08-31T12:00:00.000Z");
-    const snapshot = buildOperatingSnapshot({
-      treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-      macroSeries: liveMacroSeries,
-      now,
-    });
-
-    const mail = captureMail();
-    try {
-      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now });
-    } finally {
-      mail.restore();
-    }
-
-    const [message] = mail.sent;
+    const [message] = await mailWeeklyBrief(now);
     assert.ok(message, "the subscriber was mailed");
     const lines = message.html.split("\n");
     assert.equal(lines[0], PRODUCTION_SHELL_HEAD);
@@ -213,20 +192,7 @@ describe("the shared email shell, on a deployment that is not production", () =>
     await store.verifyEmail(subscriber.confirmToken ?? "");
 
     const now = new Date("2026-08-31T12:00:00.000Z");
-    const snapshot = buildOperatingSnapshot({
-      treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-      macroSeries: liveMacroSeries,
-      now,
-    });
-
-    const mail = captureMail();
-    try {
-      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now, baseUrl: previewOrigin });
-    } finally {
-      mail.restore();
-    }
-
-    const [message] = mail.sent;
+    const [message] = await mailWeeklyBrief(now, { baseUrl: previewOrigin });
     assert.ok(message);
     assert.match(message.html, /abc123-whether\.example\.workers\.dev\/api\/email\/unsubscribe\?token=/, "the footer link reaches the deployment that sent it");
     assert.match(message.text, /https:\/\/abc123-whether\.example\.workers\.dev\/operate#ops-plan-lines/, "the plan-lines link stays on the deployment");
@@ -266,20 +232,7 @@ describe("what a mail client can act on", () => {
     await store.verifyEmail(subscriber.confirmToken ?? "");
 
     const now = new Date("2026-08-31T12:00:00.000Z");
-    const snapshot = buildOperatingSnapshot({
-      treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-      macroSeries: liveMacroSeries,
-      now,
-    });
-
-    const mail = captureMail();
-    try {
-      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now });
-    } finally {
-      mail.restore();
-    }
-
-    const [message] = mail.sent;
+    const [message] = await mailWeeklyBrief(now);
     assert.ok(message?.headers?.["List-Unsubscribe"]?.includes(`token=${encodeURIComponent(subscriber.token)}`));
     assert.equal(message?.headers?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
   });

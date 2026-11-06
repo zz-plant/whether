@@ -1,12 +1,11 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { ImageResponse } from "next/og";
 import { isValidElement, type ReactNode } from "react";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { buildScoreReadings, buildScoreReferenceLines, scoreReadingDetail, type ScoreReadingParts } from "../lib/export/scoreReference";
 import { renderBriefImage, type BriefImageProps } from "../lib/image/briefImageTemplate";
-import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "../lib/image/ogFonts";
+import { toImageSafeText } from "../lib/image/ogFonts";
 import { DISPLAY_EM, SANS_EM, wrappedLines } from "../lib/image/textFit";
 import { buildRuleCondition } from "../lib/report/boundedDecisionRules";
 import { parseImageBriefRequestContext } from "../lib/report/imageBriefSearchParams";
@@ -15,6 +14,7 @@ import { PROVENANCE_STATUS } from "../lib/report/provenanceStatus";
 import type { ReportDynamics } from "../lib/report/reportDataTypes";
 import { getPreviousTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { buildWeeklyDecisionCardModel } from "./factories/weeklyDecisionCardModel";
+import { findSatoriLayoutViolations, ogFontFaces } from "./fixtures/ogCardLayout";
 
 const collectText = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === "boolean") {
@@ -217,35 +217,6 @@ describe("buildBriefImagePayload", () => {
   });
 });
 
-/**
- * Satori's own rule, verbatim: a <div> whose children are anything other than a
- * single string must declare display. Breaking it throws *during* the render,
- * after the response headers are out -- so the route answers 200 with an empty
- * body and the decision card downloads as a 0-byte PNG. Nothing short of
- * rendering catches that, which is how it shipped unnoticed.
- */
-const findSatoriLayoutViolations = (node: ReactNode, path = "root"): string[] => {
-  if (!isValidElement<{ children?: ReactNode; style?: Record<string, unknown> }>(node)) return [];
-
-  const { children, style } = node.props;
-  const tag = typeof node.type === "string" ? node.type : "component";
-  const here = `${path} > ${tag}`;
-  const display = style?.display;
-  const violations: string[] = [];
-
-  if (tag === "div" && children !== undefined && children !== null && typeof children !== "string") {
-    if (display !== "flex" && display !== "none" && display !== "contents") {
-      violations.push(`${here} holds a ${Array.isArray(children) ? "list" : typeof children} child without an explicit display`);
-    }
-  }
-
-  const list = Array.isArray(children) ? children : [children];
-  return list.reduce<string[]>(
-    (found, child, index) => found.concat(findSatoriLayoutViolations(child, `${here}[${index}]`)),
-    violations,
-  );
-};
-
 /** Every font size set anywhere on the card. */
 const fontSizes = (node: ReactNode): number[] => {
   if (Array.isArray(node)) return node.flatMap(fontSizes);
@@ -253,13 +224,6 @@ const fontSizes = (node: ReactNode): number[] => {
   const own = typeof node.props.style?.fontSize === "number" ? [node.props.style.fontSize] : [];
   return own.concat(fontSizes(node.props.children));
 };
-
-const ogFontFaces = [
-  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/archivo-semicondensed-700.ttf"), weight: 700 as const, style: "normal" as const },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-400.ttf"), weight: 400 as const, style: "normal" as const },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-600.ttf"), weight: 600 as const, style: "normal" as const },
-  { name: OG_FONT_STAMP, data: readFileSync("public/fonts/og/archivo-expanded-700.ttf"), weight: 700 as const, style: "normal" as const },
-];
 
 const briefImageProps: BriefImageProps = buildBriefImagePayload(buildHomepage());
 

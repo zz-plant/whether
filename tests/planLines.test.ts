@@ -11,7 +11,7 @@ import { deliverAlerts } from "../lib/alert/alertDelivery";
 import { publishedScoreLines, evaluateAlert } from "../lib/alert/alertEvaluator";
 import { describeSubscription } from "../lib/email/subscriptionFlow";
 import { resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
-import type { KvNamespace } from "../lib/runtime/kv";
+import { FakeKv } from "./fixtures/fakeKv";
 
 /*
  * A plan's own lines (2026-10-01). The guidance moves a few times a year, so the
@@ -129,23 +129,6 @@ describe("a crossing at the reader's own runway", () => {
     assert.doesNotMatch(body, /runway/);
   });
 });
-
-class FakeKv implements KvNamespace {
-  readonly entries = new Map<string, string>();
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return { keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })), list_complete: true };
-  }
-}
 
 let store: SubscriberStore;
 let kv: FakeKv;

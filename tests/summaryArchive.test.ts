@@ -2,6 +2,26 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { parseSummaryArchive } from "../lib/summary/summaryArchive";
 
+/** A summary as the archive stored it before the structured blocks existed. */
+const legacySummary = (title: string, copy: string) => ({
+  title,
+  summary: "Growth Mode posture: sample summary.",
+  regime: "EXPANSION",
+  regimeLabel: "Growth Mode",
+  guidance: "scale proven bets",
+  constraints: ["Keep payback discipline"],
+  recordDateLabel: "Feb 14, 2026",
+  provenance: {
+    sourceLabel: "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+    sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
+    timestampLabel: "Feb 14, 2026, 09:00 AM",
+    ageLabel: "2h",
+    statusLabel: "Live",
+  },
+  inputs: [],
+  copy,
+});
+
 describe("parseSummaryArchive", () => {
   it("hydrates missing weekly/monthly structured blocks for legacy archive entries", () => {
     const input = [
@@ -11,24 +31,7 @@ describe("parseSummaryArchive", () => {
         week: 7,
         asOf: "2026-02-14",
         record_date: "2026-02-14",
-        summary: {
-          title: "Weekly action summary — Feb 14, 2026",
-          summary: "Growth Mode posture: sample summary.",
-          regime: "EXPANSION",
-          regimeLabel: "Growth Mode",
-          guidance: "scale proven bets",
-          constraints: ["Keep payback discipline"],
-          recordDateLabel: "Feb 14, 2026",
-          provenance: {
-            sourceLabel: "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-            sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
-            timestampLabel: "Feb 14, 2026, 09:00 AM",
-            ageLabel: "2h",
-            statusLabel: "Live",
-          },
-          inputs: [],
-          copy: "legacy weekly copy",
-        },
+        summary: legacySummary("Weekly action summary — Feb 14, 2026", "legacy weekly copy"),
       },
       {
         cadence: "monthly",
@@ -36,24 +39,7 @@ describe("parseSummaryArchive", () => {
         month: 2,
         asOf: "2026-02-14",
         record_date: "2026-02-14",
-        summary: {
-          title: "Monthly action summary — Feb 2026",
-          summary: "Growth Mode posture: sample summary.",
-          regime: "EXPANSION",
-          regimeLabel: "Growth Mode",
-          guidance: "scale proven bets",
-          constraints: ["Keep payback discipline"],
-          recordDateLabel: "Feb 14, 2026",
-          provenance: {
-            sourceLabel: "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-            sourceUrl: "https://fred.stlouisfed.org/series/DGS10",
-            timestampLabel: "Feb 14, 2026, 09:00 AM",
-            ageLabel: "2h",
-            statusLabel: "Live",
-          },
-          inputs: [],
-          copy: "legacy monthly copy",
-        },
+        summary: legacySummary("Monthly action summary — Feb 2026", "legacy monthly copy"),
       },
     ];
 

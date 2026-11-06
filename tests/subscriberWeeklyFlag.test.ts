@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, it } from "bun:test";
 import { getSubscriberStore, resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
 import { getActiveSubscriptions } from "../lib/email/emailDelivery";
 import { describeConfirmation, describeSubscription, subscribeAndSendVerification } from "../lib/email/subscriptionFlow";
-import type { KvNamespace } from "../lib/runtime/kv";
 import type { PlanLines } from "../lib/alert/planLines";
+import { FakeKv } from "./fixtures/fakeKv";
 
 const HIRING_LINES: PlanLines = {
   area: "hiring",
@@ -21,30 +21,6 @@ const HIRING_LINES: PlanLines = {
  * from the second — and every record written before the flag existed was a weekly
  * subscription, so absence has to read as yes.
  */
-
-class FakeKv implements KvNamespace {
-  readonly entries = new Map<string, string>();
-
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return {
-      keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-    };
-  }
-}
 
 let store: SubscriberStore;
 let kv: FakeKv;

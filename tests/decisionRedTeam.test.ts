@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { compareDecisionPlans, stressTestDecisionPlan as runStressTest, type GradedPlan } from "../lib/decisionShield";
-import type { RegimeAssessment } from "../lib/regimeEngine";
+import { buildLateCycleAssessmentFixture } from "./fixtures/reportFixtures";
 
 const stressTestDecisionPlan = (...args: Parameters<typeof runStressTest>): GradedPlan => {
   const plan = runStressTest(...args);
@@ -9,45 +9,9 @@ const stressTestDecisionPlan = (...args: Parameters<typeof runStressTest>): Grad
   return plan;
 };
 
-const createMockAssessment = (overrides: Partial<RegimeAssessment> = {}): RegimeAssessment =>
-  ({
-    regime: "DEFENSIVE",
-    scores: {
-      baseRate: 5.25,
-      baseRateUsed: "FED",
-      curveSlope: -0.30,
-      tightness: 72,
-      riskAppetite: 42,
-    },
-    thresholds: {
-      baseRateTightness: 4.0,
-      tightnessRegime: 60,
-      riskAppetiteRegime: 50,
-    },
-    diagnostics: {
-      tightnessDelta: 0,
-      riskAppetiteDelta: 0,
-      nearestThresholdDelta: 10,
-      confidence: "HIGH",
-      transitionWatch: false,
-      intensity: "STANDARD",
-      boundaryContributors: [],
-      weakReadCount: 0,
-      twoWeakReadsWarning: false,
-    },
-    description: "Defensive conditions",
-    constraints: [],
-    tightnessExplanation: "",
-    riskAppetiteExplanation: "",
-    dataWarnings: [],
-    inputs: [],
-    policyAssessment: {} as any,
-    ...overrides,
-  } as RegimeAssessment);
-
 describe("decisionRedTeam", () => {
   it("detects hiring plans and returns bounded guardrails under defensive regime", () => {
-    const result = stressTestDecisionPlan(createMockAssessment(), {
+    const result = stressTestDecisionPlan(buildLateCycleAssessmentFixture(), {
       planText: "We want to hire 4 senior engineers and expand our outbound sales team.",
     });
 
@@ -61,7 +25,7 @@ describe("decisionRedTeam", () => {
   });
 
   it("detects infrastructure and cloud commitments and returns cash-preservation alternatives", () => {
-    const result = stressTestDecisionPlan(createMockAssessment(), {
+    const result = stressTestDecisionPlan(buildLateCycleAssessmentFixture(), {
       planText: "We want to sign a 3-year upfront GPU cluster lease with AWS.",
     });
 
@@ -72,7 +36,7 @@ describe("decisionRedTeam", () => {
 
   it("evaluates plans more favorably under expansion conditions", () => {
     const result = stressTestDecisionPlan(
-      createMockAssessment({
+      buildLateCycleAssessmentFixture({
         regime: "EXPANSION",
         scores: {
           baseRate: 3.25,
@@ -92,7 +56,7 @@ describe("decisionRedTeam", () => {
   });
 
   it("escalates verdict to DANGEROUS when runway is under 12 months in defensive regime", () => {
-    const result = stressTestDecisionPlan(createMockAssessment(), {
+    const result = stressTestDecisionPlan(buildLateCycleAssessmentFixture(), {
       planText: "We want to hire 4 engineers.",
       companyProfile: {
         runwayMonths: 8,
@@ -110,7 +74,7 @@ describe("decisionRedTeam", () => {
 
   it("compares Plan A vs Plan B side-by-side and recommends the safer option", () => {
     const comparison = compareDecisionPlans(
-      createMockAssessment(),
+      buildLateCycleAssessmentFixture(),
       "We want to hire 2 engineers on 6-month contract-to-hire with 100% revenue milestones.",
       "We want to sign a 3-year upfront GPU cluster lease with AWS for $250k upfront."
     );

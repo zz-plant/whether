@@ -8,11 +8,11 @@ import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscribe
 import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
-import type { KvNamespace } from "../lib/runtime/kv";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { forceRequested } from "../lib/delivery/onceFor";
 import { getSlackWebhookStore, resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 import { snapshotData } from "../lib/snapshot";
+import { FakeKv } from "./fixtures/fakeKv";
 
 /*
  * Once a week per recipient, for the two weekly sends.
@@ -30,30 +30,6 @@ const originalFetch = globalThis.fetch;
 const MONDAY = new Date("2026-08-31T14:00:00.000Z");
 const LATER_THAT_WEEK = new Date("2026-09-03T09:00:00.000Z");
 const NEXT_MONDAY = new Date("2026-09-07T14:00:00.000Z");
-
-class FakeKv implements KvNamespace {
-  readonly entries = new Map<string, string>();
-
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return {
-      keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-    };
-  }
-}
 
 const liveSnapshot = (recordDate: string, now: Date) =>
   buildOperatingSnapshot({

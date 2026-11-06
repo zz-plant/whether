@@ -6,6 +6,26 @@ import { REGIME_LABELS } from "../lib/regimePresentation";
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+type BriefInput = Parameters<typeof buildHomeBriefModel>[0];
+
+/** The reading a brief needs: a regime and its scores, on lines at 50 and with a watch on unless the case moves them. */
+const reading = (
+  regime: BriefInput["assessment"]["regime"],
+  scores: BriefInput["assessment"]["scores"],
+  { transitionWatch = true, tightnessRegime = 50, riskAppetiteRegime = 50 } = {},
+): BriefInput["assessment"] => ({
+  regime,
+  diagnostics: { transitionWatch },
+  thresholds: { tightnessRegime, riskAppetiteRegime },
+  scores,
+});
+
+/** The brief for a reading, with no previous regime on record and one guardrail unless the case says otherwise. */
+const briefFor = (assessment: BriefInput["assessment"], rest: Partial<BriefInput> = {}) =>
+  buildHomeBriefModel({ assessment, regimeAlert: null, stopItems: ["Guardrail"], ...rest });
+
+const steadyWeek = (): BriefInput["reportDynamics"] => ({ directionLabel: "stable", changedSignals: [], anomalySignals: [] });
+
 describe("buildHomeBriefModel", () => {
   it("keeps the memory rail labels and posture sequence aligned with the recent weekly posture artifact", () => {
     const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
@@ -23,15 +43,8 @@ describe("buildHomeBriefModel", () => {
     ]);
   });
   it("derives stable labels and decision rules from brief inputs", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 57, riskAppetite: 54 },
-      },
+    const model = briefFor(reading("DEFENSIVE", { tightness: 57, riskAppetite: 54 }), {
       regimeAlert: { previousRegime: "VOLATILE" },
-      stopItems: ["Guardrail"],
       reportDynamics: {
         directionLabel: "deteriorating",
         changedSignals: [{ key: "tightness", delta: 2 }],
@@ -114,15 +127,8 @@ describe("buildHomeBriefModel", () => {
 
   it("names the reading its delta labels are measured against, where the week records one", () => {
     const build = (comparedWith?: { recordDate: string; label: string }) =>
-      buildHomeBriefModel({
-        assessment: {
-          regime: "DEFENSIVE",
-          diagnostics: { transitionWatch: true },
-          thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-          scores: { tightness: 57, riskAppetite: 54 },
-        },
+      briefFor(reading("DEFENSIVE", { tightness: 57, riskAppetite: 54 }), {
         regimeAlert: { previousRegime: "VOLATILE" },
-        stopItems: ["Guardrail"],
         reportDynamics: {
           directionLabel: "deteriorating",
           changedSignals: [{ key: "tightness", delta: 2 }],
@@ -161,15 +167,8 @@ describe("buildHomeBriefModel", () => {
    * all, and said no line had been crossed on the week both pause lines were.
    */
   it("reads a move that landed in anomalySignals as the move it is, when it says what crossed a line", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "SCARCITY",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-        scores: { tightness: 90, riskAppetite: 43 },
-      },
+    const model = briefFor(reading("SCARCITY", { tightness: 90, riskAppetite: 43 }, { transitionWatch: false, tightnessRegime: 70 }), {
       regimeAlert: { previousRegime: "EXPANSION" },
-      stopItems: ["Guardrail"],
       reportDynamics: {
         directionLabel: "deteriorating",
         changedSignals: [],
@@ -190,15 +189,7 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("preserves all normalized evidence items including curve-slope", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 48, riskAppetite: 52 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
+    const model = briefFor(reading("DEFENSIVE", { tightness: 48, riskAppetite: 52 }), {
       reportEvidenceItems: [
         { key: "tightness", title: "Capital conditions", supportingBullets: ["A"], confidenceLabel: "High", directionLabel: "Tightening", immediateImplication: "A" },
         { key: "riskAppetite", title: "Risk appetite", supportingBullets: ["B"], confidenceLabel: "High", directionLabel: "Easing", immediateImplication: "B" },
@@ -212,21 +203,7 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("returns no-change decision summary when there are no deltas", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 50, riskAppetite: 50 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
-    });
+    const model = briefFor(reading("DEFENSIVE", { tightness: 50, riskAppetite: 50 }), { reportDynamics: steadyWeek() });
 
     assert.match(model.decisionShiftSummary, /^Conditions held steady this week, and no area paused or restarted\. Last week's guidance stands\./);
     assert.match(model.decisionShiftSummary, /Conditions change if:/);
@@ -252,15 +229,7 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("describes momentum using signal-improvement semantics and strongest move", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 54, riskAppetite: 55 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
+    const model = briefFor(reading("DEFENSIVE", { tightness: 54, riskAppetite: 55 }), {
       reportDynamics: {
         directionLabel: "improving",
         changedSignals: [
@@ -277,16 +246,8 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("uses per-signal semantics when deriving primary risk from dominant move", () => {
-    const improvingRiskAppetite = buildHomeBriefModel({
+    const improvingRiskAppetite = briefFor(reading("DEFENSIVE", { tightness: 25, riskAppetite: 80 }, { transitionWatch: false }), {
       fetchedAtLabel: "Updated 2h ago",
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 25, riskAppetite: 80 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
       reportDynamics: {
         directionLabel: "improving",
         changedSignals: [
@@ -298,16 +259,8 @@ describe("buildHomeBriefModel", () => {
 
     assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: risk appetite strengthened 3\.2 points\.$/);
 
-    const worseningRiskAppetite = buildHomeBriefModel({
+    const worseningRiskAppetite = briefFor(reading("DEFENSIVE", { tightness: 25, riskAppetite: 70 }, { transitionWatch: false }), {
       fetchedAtLabel: "Updated 2h ago",
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 25, riskAppetite: 70 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
       reportDynamics: {
         directionLabel: "deteriorating",
         changedSignals: [{ key: "riskAppetite", delta: -2.4 }],
@@ -319,21 +272,7 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("uses direction-aware reversal trigger language for expansion risk-appetite boundaries", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "EXPANSION",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 40, riskAppetiteRegime: 50 },
-        scores: { tightness: 10, riskAppetite: 56 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
-    });
+    const model = briefFor(reading("EXPANSION", { tightness: 10, riskAppetite: 56 }, { transitionWatch: false, tightnessRegime: 40 }), { reportDynamics: steadyWeek() });
 
     /* Both of Sunny's edges, each in the direction that leaves it: the same
        sentence the brief prints, not the nearest line alone. */
@@ -347,26 +286,14 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("builds ordered historical timeline entries from regime series", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 54, riskAppetite: 55 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
+    const model = briefFor(reading("DEFENSIVE", { tightness: 54, riskAppetite: 55 }), {
       historicalSelection: { month: 2, year: 2026, banner: "Historical" },
       regimeSeries: [
         { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Stabilizing", tightness: 50, riskAppetite: 50 },
         { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Tighten", tightness: 50, riskAppetite: 50 },
         { year: 2026, month: 3, recordDate: "2026-03-31", regime: "SCARCITY", summary: "Not selected", tightness: 50, riskAppetite: 50 },
       ],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
+      reportDynamics: steadyWeek(),
     });
 
     assert.equal(model.historicalTimeline.length, 2);
@@ -388,15 +315,7 @@ describe("buildHomeBriefModel", () => {
         riskAppetite: 50,
       }));
     const build = (regimeSeries: ReturnType<typeof series>) =>
-      buildHomeBriefModel({
-        assessment: {
-          regime: "SCARCITY",
-          diagnostics: { transitionWatch: false },
-          thresholds: { tightnessRegime: 55, riskAppetiteRegime: 45 },
-          scores: { tightness: 75, riskAppetite: 30 },
-        },
-        regimeAlert: null,
-        stopItems: ["Guardrail"],
+      briefFor(reading("SCARCITY", { tightness: 75, riskAppetite: 30 }, { transitionWatch: false, tightnessRegime: 55, riskAppetiteRegime: 45 }), {
         regimeSeries,
         reportDynamics: { directionLabel: "improving", changedSignals: [], anomalySignals: [] },
       });
@@ -413,15 +332,8 @@ describe("buildHomeBriefModel", () => {
 
 
   it("does not emit expansion stance copy when regime improves within contraction states", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 60, riskAppetite: 62 },
-      },
+    const model = briefFor(reading("DEFENSIVE", { tightness: 60, riskAppetite: 62 }, { transitionWatch: false }), {
       regimeAlert: { previousRegime: "SCARCITY" },
-      stopItems: ["Guardrail"],
       reportDynamics: {
         directionLabel: "improving",
         changedSignals: [{ key: "riskAppetite", delta: 2 }],
@@ -436,15 +348,7 @@ describe("buildHomeBriefModel", () => {
 
 
   it("keeps noun discipline in top summary fields", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "VOLATILE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-        scores: { tightness: 69, riskAppetite: 52 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
+    const model = briefFor(reading("VOLATILE", { tightness: 69, riskAppetite: 52 }, { tightnessRegime: 70 }), {
       reportDynamics: {
         directionLabel: "mixed",
         changedSignals: [{ key: "riskAppetite", delta: 1 }],
@@ -462,20 +366,8 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("marks missing macro series as fallback indicators", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 58, riskAppetite: 45 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
+    const model = briefFor(reading("DEFENSIVE", { tightness: 58, riskAppetite: 45 }), {
+      reportDynamics: steadyWeek(),
       macroSeries: [],
     });
 
@@ -487,15 +379,7 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("uses assessment base rate and curve slope in indicators and influence copy when available", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 58, riskAppetite: 45, baseRate: 5.4, curveSlope: -0.3 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
+    const model = briefFor(reading("DEFENSIVE", { tightness: 58, riskAppetite: 45, baseRate: 5.4, curveSlope: -0.3 }), {
       reportDynamics: {
         directionLabel: "deteriorating",
         changedSignals: [
@@ -521,21 +405,7 @@ describe("buildHomeBriefModel", () => {
 
 
   it("builds complete decision matrix across all row and column intersections", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 58, riskAppetite: 45 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
-    });
+    const model = briefFor(reading("DEFENSIVE", { tightness: 58, riskAppetite: 45 }), { reportDynamics: steadyWeek() });
 
     assert.equal(model.decisionMatrix.columns.length, 3);
     assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Restart when"]);
@@ -613,13 +483,7 @@ describe("buildHomeBriefModel", () => {
 
 
   it("builds start-route since-last-review delta when regime or drivers moved", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 56, riskAppetite: 46 },
-      },
+    const model = briefFor(reading("DEFENSIVE", { tightness: 56, riskAppetite: 46 }), {
       regimeAlert: { previousRegime: "VOLATILE" },
       stopItems: ["Pause non-core hiring."],
       reportDynamics: {
@@ -650,20 +514,9 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("returns compact fallback start-route copy when no meaningful delta exists", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "DEFENSIVE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
-        scores: { tightness: 50, riskAppetite: 50 },
-      },
-      regimeAlert: null,
+    const model = briefFor(reading("DEFENSIVE", { tightness: 50, riskAppetite: 50 }), {
       stopItems: ["Hold guardrails."],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
+      reportDynamics: steadyWeek(),
       regimeSeries: [
         { year: 2026, month: 1, recordDate: "2026-01-31", regime: "DEFENSIVE", summary: "Earlier", tightness: 50, riskAppetite: 50 },
         { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current", tightness: 50, riskAppetite: 50 },
@@ -677,16 +530,9 @@ describe("buildHomeBriefModel", () => {
   });
 
   it("derives a measurable guardrail when upstream copy is absent", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "VOLATILE",
-        diagnostics: { transitionWatch: true },
-        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-        scores: { tightness: 64, riskAppetite: 52 },
-      },
-      regimeAlert: null,
+    const model = briefFor(reading("VOLATILE", { tightness: 64, riskAppetite: 52 }, { tightnessRegime: 70 }), {
       stopItems: [],
-      reportDynamics: { directionLabel: "stable", changedSignals: [], anomalySignals: [] },
+      reportDynamics: steadyWeek(),
     });
 
     assert.match(model.guardrail, /funding pressure.*76|risk appetite.*44/i);

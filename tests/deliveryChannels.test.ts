@@ -5,9 +5,9 @@ import { DEFAULT_FAN_OUT_CONCURRENCY, fanOut, type DeliveryOutcome } from "../li
 import { slackAlertBlocks, slackChannel } from "../lib/delivery/slack";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
-import type { KvNamespace } from "../lib/runtime/kv";
 import { getSlackWebhookStore, resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 import { siteUrl } from "../lib/siteUrl";
+import { FakeKv } from "./fixtures/fakeKv";
 
 /*
  * The shared delivery layer every channel sends through.
@@ -19,30 +19,6 @@ import { siteUrl } from "../lib/siteUrl";
  */
 
 const originalFetch = globalThis.fetch;
-
-class FakeKv implements KvNamespace {
-  private readonly entries = new Map<string, string>();
-
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return {
-      keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-    };
-  }
-}
 
 const respondWith = (status: number): typeof fetch => async () => new Response(status === 200 ? "ok" : "no", { status });
 

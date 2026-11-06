@@ -100,6 +100,77 @@ const buildIsolatedEnv = (overrides: Partial<NodeJS.ProcessEnv> = {}) => {
   return env;
 };
 
+const inHome = (homeDir: string) => ({ env: buildIsolatedEnv({ HOME: homeDir }) });
+
+const sendJson = (res: http.ServerResponse, body: unknown, status = 200) => {
+  res.writeHead(status, { "content-type": "application/json" });
+  res.end(JSON.stringify(body));
+};
+
+/** Answers a URL prefix with a JSON body, 200 unless the third entry says otherwise. */
+type JsonRoute = readonly [prefix: string, body: unknown, status?: number];
+
+const jsonRoutes = (...routes: JsonRoute[]): http.RequestListener => (req, res) => {
+  const route = routes.find(([prefix]) => (req.url ?? "").startsWith(prefix));
+  if (route) {
+    sendJson(res, route[1], route[2]);
+    return;
+  }
+  res.writeHead(404);
+  res.end();
+};
+
+const alwaysJson = (body: unknown): http.RequestListener => (_req, res) => sendJson(res, body);
+
+const closeServer = (server: http.Server) => new Promise<void>((resolve) => server.close(() => resolve()));
+
+/** A local API for one case, on a port of its own, keeping the URLs it was asked for. */
+const startApi = async (respond: http.RequestListener) => {
+  const requests: string[] = [];
+  const server = http.createServer((req, res) => {
+    requests.push(req.url ?? "");
+    respond(req, res);
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  return { baseUrl: `http://127.0.0.1:${resolveServerPort(server)}`, requests, close: () => closeServer(server) };
+};
+
+/** What /api/cli/status answers where a case needs only a live answer, not particular words. */
+const liveStatus = (overrides: Record<string, unknown> = {}) => ({
+  version: "v1",
+  regime: "Current",
+  cyclePhase: "Now",
+  confidence: { label: "HIGH", score: 93 },
+  trend: "stable",
+  decisionStability: "stable",
+  updatedAt: "live",
+  call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
+  ...overrides,
+});
+
+const guardedStatus = (view: string, extra: Record<string, unknown> = {}) => ({
+  version: "v1",
+  view,
+  regime: "Guarded",
+  cyclePhase: "Late",
+  confidence: { label: "MED", score: 66 },
+  trend: "Deteriorating",
+  decisionStability: "unstable",
+  updatedAt: "2026-03-12T12:00:00.000Z",
+  freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+  call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
+  ...extra,
+  degraded: false,
+});
+
+const slackBrief = () => ({
+  brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
+  recordDate: "2026-03-12",
+  generatedAt: "2026-03-12T12:00:00.000Z",
+});
+
+const tempHome = () => fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+
 const listenOnPreferredLocalPort = async (server: http.Server, preferredPorts = [3002, 3003, 3004, 3005]) => {
   for (const port of preferredPorts) {
     const opened = await new Promise<boolean>((resolve, reject) => {
@@ -141,8 +212,8 @@ describe("whether cli", () => {
 
 
   it("install fails in non-interactive shells without --yes/--ci", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const result = await runCli(["install"], { env: buildIsolatedEnv({ HOME: homeDir }) });
+    const homeDir = tempHome();
+    const result = await runCli(["install"], inHome(homeDir));
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 1);
@@ -151,16 +222,12 @@ describe("whether cli", () => {
   });
 
   it("install supports --ci and writes config for automation", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const install = await runCli(["install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
+    const homeDir = tempHome();
+    const install = await runCli(["install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"], inHome(homeDir));
 
     assert.equal(install.status, 0);
 
-    const readConfig = await runCli(["config", "--json"], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
+    const readConfig = await runCli(["config", "--json"], inHome(homeDir));
 
     fs.rmSync(homeDir, { recursive: true, force: true });
 
@@ -190,20 +257,9 @@ describe("whether cli", () => {
   });
 
   it("ping reports healthy API for smoke checks", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ status: "ok" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/health", { status: "ok" }]));
+    const result = await runCli(["ping", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -213,20 +269,9 @@ describe("whether cli", () => {
   });
 
   it("ping treats degraded API health as reachable", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(503, { "content-type": "application/json" });
-        res.end(JSON.stringify({ status: "degraded" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/health", { status: "degraded" }, 503]));
+    const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -237,25 +282,12 @@ describe("whether cli", () => {
   });
 
   it("smoke brief --json stays machine-readable without stderr noise", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/brief")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(
-          JSON.stringify({
-            brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
-            generatedAt: "2026-03-12T12:00:00.000Z",
-          }),
-        );
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["brief", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/brief", {
+      brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
+      generatedAt: "2026-03-12T12:00:00.000Z",
+    }]));
+    const result = await runCli(["brief", "--no-local-discovery", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -269,14 +301,11 @@ describe("whether cli", () => {
   });
 
   it("agent --json forwards the canonical backend payload and cadence selection", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
+    const api = await startApi((req, res) => {
       if ((req.url ?? "").startsWith("/api/agent")) {
         const url = new URL(req.url ?? "/", "http://localhost");
         const cadence = url.searchParams.get("cadence") ?? "weekly";
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
+        sendJson(res, {
           cadence,
           defaultCadence: "weekly",
           supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
@@ -304,18 +333,15 @@ describe("whether cli", () => {
             prompt: `Prompt for ${cadence}`,
           },
           version: "v1",
-        }));
+        });
         return;
       }
       res.writeHead(404);
       res.end();
     });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const weekly = await runCli(["agent", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
-    const monthly = await runCli(["agent", "monthly", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const weekly = await runCli(["agent", "--json", "--api-base-url", api.baseUrl]);
+    const monthly = await runCli(["agent", "monthly", "--json", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(weekly.status, 0);
     assert.equal(monthly.status, 0);
@@ -328,53 +354,42 @@ describe("whether cli", () => {
     assert.equal(monthlyParsed.cadence, "monthly");
     assert.equal(monthlyParsed.agentHandoff.payload.flip_watch.flip_trigger, "monthly nested flip trigger");
     assert.equal(monthlyParsed.summaryHash, "monthly-hash");
-    assert.ok(requests.includes("/api/agent?cadence=weekly"));
-    assert.ok(requests.includes("/api/agent?cadence=monthly"));
+    assert.ok(api.requests.includes("/api/agent?cadence=weekly"));
+    assert.ok(api.requests.includes("/api/agent?cadence=monthly"));
   });
 
   it("agent renders a readable handoff summary in text mode", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/agent")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          cadence: "weekly",
-          defaultCadence: "weekly",
-          supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
-          decision_delta: {
-            summary: "Top-level decision delta",
-          },
-          flip_watch: {
-            flip_trigger: "Top-level flip trigger",
-          },
-          copy: "Weekly operator handoff",
-          recordDateLabel: "Week of 2026-03-12",
-          generatedAt: "2026-03-12T12:00:00.000Z",
-          summaryHash: "weekly-hash",
-          links: {
-            self: "/api/agent?cadence=weekly",
-            llms: "/llms.txt",
-            discovery: "/.well-known/whether-agent.json",
-          },
-          agentHandoff: {
-            payload: {
-              posture: "guarded",
-              decision_delta: { summary: "Nested decision delta" },
-              flip_watch: { flip_trigger: "Nested flip trigger" },
-            },
-            prompt: "Give me the weekly operator summary.",
-          },
-          version: "v1",
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["agent", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/agent", {
+      cadence: "weekly",
+      defaultCadence: "weekly",
+      supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
+      decision_delta: {
+        summary: "Top-level decision delta",
+      },
+      flip_watch: {
+        flip_trigger: "Top-level flip trigger",
+      },
+      copy: "Weekly operator handoff",
+      recordDateLabel: "Week of 2026-03-12",
+      generatedAt: "2026-03-12T12:00:00.000Z",
+      summaryHash: "weekly-hash",
+      links: {
+        self: "/api/agent?cadence=weekly",
+        llms: "/llms.txt",
+        discovery: "/.well-known/whether-agent.json",
+      },
+      agentHandoff: {
+        payload: {
+          posture: "guarded",
+          decision_delta: { summary: "Nested decision delta" },
+          flip_watch: { flip_trigger: "Nested flip trigger" },
+        },
+        prompt: "Give me the weekly operator summary.",
+      },
+      version: "v1",
+    }]));
+    const result = await runCli(["agent", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Cadence: weekly/);
@@ -404,9 +419,7 @@ describe("whether cli", () => {
   });
 
   it("status forwards asOf and supported params materially change output", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
+    const api = await startApi((req, res) => {
       if ((req.url ?? "").startsWith("/api/cli/status")) {
         const url = new URL(req.url ?? "/", "http://localhost");
         const asOf = url.searchParams.get("asOf");
@@ -421,67 +434,33 @@ describe("whether cli", () => {
               updatedAt: asOf,
               call: { summary: "historical summary", do: ["hold"], avoid: ["expand"], flipConditions: ["n/a"] },
             }
-          : {
-              version: "v1",
-              regime: "Current",
-              cyclePhase: "Now",
-              confidence: { label: "HIGH", score: 93 },
-              trend: "stable",
-              decisionStability: "stable",
-              updatedAt: "live",
-              call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
-            };
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify(body));
+          : liveStatus();
+        sendJson(res, body);
         return;
       }
       res.writeHead(404);
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
+    const live = await runCli(["status", "--api-base-url", api.baseUrl, "--json"]);
+    const historical = await runCli(["status", "--api-base-url", api.baseUrl, "--json", "--as-of", "2024-07"]);
 
-    const live = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    const historical = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--json", "--as-of", "2024-07"]);
-
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await api.close();
 
     assert.equal(live.status, 0);
     assert.equal(historical.status, 0);
     assert.match(live.stdout, /"updatedAt": "live"/);
     assert.match(historical.stdout, /"updatedAt": "2024-07"/);
-    assert.ok(requests.some((url) => url === "/api/cli/status"));
-    assert.ok(requests.some((url) => url.includes("/api/cli/status?asOf=2024-07")));
+    assert.ok(api.requests.some((url) => url === "/api/cli/status"));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/status?asOf=2024-07")));
   });
 
   it("status writes requested output files without treating the path like an output format", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const homeDir = tempHome();
     const outputPath = path.join(homeDir, "status.json");
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          regime: "Current",
-          cyclePhase: "Now",
-          confidence: { label: "HIGH", score: 93 },
-          trend: "stable",
-          decisionStability: "stable",
-          updatedAt: "live",
-          call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
-          degraded: false,
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--json", "--output", outputPath, "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", liveStatus({ degraded: false })]));
+    const result = await runCli(["status", "--json", "--output", outputPath, "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
     const stdout = JSON.parse(result.stdout);
@@ -503,28 +482,22 @@ describe("whether cli", () => {
   });
 
   it("prints status in the site's words and keeps the API's fields for --json", async () => {
-    const server = http.createServer((req, res) => {
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({
-        version: "v1",
-        regime: "Cloudy",
-        cyclePhase: "Mid (Fragile)",
-        confidence: { label: "LOW", score: 60 },
-        trend: "Deteriorating",
-        decisionStability: "unstable",
-        updatedAt: "2026-11-02T02:00:00.000Z",
-        freshness: { line: "Updated 2026-11-02T02:00:00.000Z · live · room before a change: little" },
-        call: { summary: "Protect revenue.", do: ["Keep customers"], avoid: ["New markets"], flipConditions: ["Funding pressure at or below 70"] },
-        degraded: false,
-      }));
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const baseUrl = `http://127.0.0.1:${resolveServerPort(server)}`;
-    const text = await runCli(["status", "--api-base-url", baseUrl]);
-    const compact = await runCli(["status", "--compact", "--api-base-url", baseUrl]);
-    const json = await runCli(["status", "--json", "--api-base-url", baseUrl]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(alwaysJson({
+      version: "v1",
+      regime: "Cloudy",
+      cyclePhase: "Mid (Fragile)",
+      confidence: { label: "LOW", score: 60 },
+      trend: "Deteriorating",
+      decisionStability: "unstable",
+      updatedAt: "2026-11-02T02:00:00.000Z",
+      freshness: { line: "Updated 2026-11-02T02:00:00.000Z · live · room before a change: little" },
+      call: { summary: "Protect revenue.", do: ["Keep customers"], avoid: ["New markets"], flipConditions: ["Funding pressure at or below 70"] },
+      degraded: false,
+    }));
+    const text = await runCli(["status", "--api-base-url", api.baseUrl]);
+    const compact = await runCli(["status", "--compact", "--api-base-url", api.baseUrl]);
+    const json = await runCli(["status", "--json", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(text.status, 0);
     assert.match(text.stdout, /Conditions: Cloudy/);
@@ -543,37 +516,15 @@ describe("whether cli", () => {
   });
 
   it("auto-discovers a healthy local API when the default localhost port is unavailable", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ status: "ok" }));
-        return;
-      }
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          regime: "Current",
-          cyclePhase: "Now",
-          confidence: { label: "HIGH", score: 93 },
-          trend: "stable",
-          decisionStability: "stable",
-          updatedAt: "live",
-          freshness: { line: "Updated live" },
-          call: {
-            summary: "live summary",
-            do: ["go now", "protect margin"],
-            avoid: ["wait"],
-            flipConditions: ["risk appetite > 55"],
-          },
-          degraded: false,
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
+    const homeDir = tempHome();
+    const server = http.createServer(jsonRoutes(
+      ["/api/health", { status: "ok" }],
+      ["/api/cli/status", liveStatus({
+        freshness: { line: "Updated live" },
+        call: { summary: "live summary", do: ["go now", "protect margin"], avoid: ["wait"], flipConditions: ["risk appetite > 55"] },
+        degraded: false,
+      })],
+    ));
 
     const port = await listenOnPreferredLocalPort(server);
     const result = await runCli(["status", "--compact", "--json"], {
@@ -582,7 +533,7 @@ describe("whether cli", () => {
         WHETHER_LOCAL_API_PORT_CANDIDATES: String(port),
       }),
     });
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await closeServer(server);
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 0);
@@ -596,20 +547,9 @@ describe("whether cli", () => {
 
 
   it("maps auth category with remediation and preserves cause", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(401, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "unauthorized" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", { error: "unauthorized" }, 401]));
+    const result = await runCli(["status", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
@@ -619,20 +559,9 @@ describe("whether cli", () => {
   });
 
   it("maps forbidden category with remediation and preserves cause", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(403, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "forbidden" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", { error: "forbidden" }, 403]));
+    const result = await runCli(["status", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /forbidden: Access denied by API \(invalid scope\)\./);
@@ -642,20 +571,9 @@ describe("whether cli", () => {
   });
 
   it("maps rate limit category with remediation and preserves cause", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(429, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "too_many_requests" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", { error: "too_many_requests" }, 429]));
+    const result = await runCli(["status", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 7);
     assert.match(result.stderr, /rate limit: Request quota exceeded\./);
@@ -664,20 +582,9 @@ describe("whether cli", () => {
   });
 
   it("maps server fault category with remediation and preserves cause", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(503, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "downstream_unavailable" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", { error: "downstream_unavailable" }, 503]));
+    const result = await runCli(["status", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 7);
     assert.match(result.stderr, /server fault: API returned 503\./);
@@ -699,20 +606,9 @@ describe("whether cli", () => {
 
 
   it("ping maps auth failures to auth exit semantics", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(401, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "unauthorized" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/health", { error: "unauthorized" }, 401]));
+    const result = await runCli(["ping", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
@@ -722,21 +618,9 @@ describe("whether cli", () => {
      doctor reads the body, not only a 503, or it reports "ok" beside health: "degraded". */
   for (const httpStatus of [503, 200]) {
     it(`doctor warns on degraded health sent with HTTP ${httpStatus}`, async () => {
-      const server = http.createServer((req, res) => {
-        if ((req.url ?? "").startsWith("/api/health")) {
-          res.writeHead(httpStatus, { "content-type": "application/json" });
-          res.end(JSON.stringify({ status: "degraded" }));
-          return;
-        }
-        res.writeHead(404);
-        res.end();
-      });
-
-      await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-      const address = server.address();
-      const port = typeof address === "object" && address ? address.port : 0;
-      const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-      await new Promise<void>((resolve) => server.close(() => resolve()));
+      const api = await startApi(jsonRoutes(["/api/health", { status: "degraded" }, httpStatus]));
+      const result = await runCli(["doctor", "--api-base-url", api.baseUrl, "--json"]);
+      await api.close();
 
       assert.equal(result.status, 0);
       const parsed = JSON.parse(result.stdout);
@@ -748,20 +632,9 @@ describe("whether cli", () => {
   }
 
   it("doctor keeps non-degraded health failures as error", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(503, { "content-type": "application/json" });
-        res.end(JSON.stringify({ status: "down" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/health", { status: "down" }, 503]));
+    const result = await runCli(["doctor", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -771,24 +644,9 @@ describe("whether cli", () => {
   });
 
   it("share email renders a ready-to-send subject and body", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/brief/slack")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
-          recordDate: "2026-03-12",
-          generatedAt: "2026-03-12T12:00:00.000Z",
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["share", "email", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/brief/slack", slackBrief()]));
+    const result = await runCli(["share", "email", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Subject: Whether weekly brief/);
@@ -797,35 +655,18 @@ describe("whether cli", () => {
   });
 
   it("share slack --json returns blocks and metadata for automation", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/brief/slack")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
-          recordDate: "2026-03-12",
-          generatedAt: "2026-03-12T12:00:00.000Z",
-        }));
-        return;
-      }
-      if ((req.url ?? "").startsWith("/api/integrations/weekly-mandate?target=slack")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          target: "slack",
-          payload: {
-            blocks: [{ type: "header", text: { type: "plain_text", text: "Weekly mandate" } }],
-            metadata: { title: "Weekly mandate", markdown: "## Weekly mandate" },
-          },
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["share", "slack", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(
+      ["/api/brief/slack", slackBrief()],
+      ["/api/integrations/weekly-mandate?target=slack", {
+        target: "slack",
+        payload: {
+          blocks: [{ type: "header", text: { type: "plain_text", text: "Weekly mandate" } }],
+          metadata: { title: "Weekly mandate", markdown: "## Weekly mandate" },
+        },
+      }],
+    ));
+    const result = await runCli(["share", "slack", "--json", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -835,32 +676,27 @@ describe("whether cli", () => {
   });
 
   it("maps expired and invalid API key errors with actionable remediation", async () => {
-    const server = http.createServer((req, res) => {
+    const api = await startApi((req, res) => {
       if ((req.url ?? "").startsWith("/api/cli/status")) {
         const auth = req.headers.authorization ?? "";
         if (auth.includes("expired-token")) {
-          res.writeHead(401, { "content-type": "application/json" });
-          res.end(JSON.stringify({ error: "token_expired" }));
+          sendJson(res, { error: "token_expired" }, 401);
           return;
         }
-        res.writeHead(401, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "invalid_token" }));
+        sendJson(res, { error: "invalid_token" }, 401);
         return;
       }
       res.writeHead(404);
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-
-    const expired = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const expired = await runCli(["status", "--api-base-url", api.baseUrl], {
       env: { ...process.env, WHETHER_API_KEY: "expired-token" },
     });
-    const invalid = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const invalid = await runCli(["status", "--api-base-url", api.baseUrl], {
       env: { ...process.env, WHETHER_API_KEY: "invalid-token" },
     });
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await api.close();
 
     assert.equal(expired.status, 2);
     assert.match(expired.stderr, /auth: Authentication failed \(expired key\)\./);
@@ -871,14 +707,12 @@ describe("whether cli", () => {
   });
 
   it("auth login accepts WHETHER_API_KEY in env when --token is omitted", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const homeDir = tempHome();
     const login = await runCli(["auth", "login"], {
       env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "env-api-key" },
     });
 
-    const status = await runCli(["auth", "status", "--json"], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
+    const status = await runCli(["auth", "status", "--json"], inHome(homeDir));
 
     fs.rmSync(homeDir, { recursive: true, force: true });
 
@@ -890,9 +724,9 @@ describe("whether cli", () => {
   });
 
   it("auth status returns machine-readable output and clear exit codes", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const homeDir = tempHome();
     const [missing, withEnv] = await Promise.all([
-      runCli(["auth", "status", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) }),
+      runCli(["auth", "status", "--json"], inHome(homeDir)),
       runCli(["auth", "status", "--json"], { env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "present" } }),
     ]);
 
@@ -910,39 +744,13 @@ describe("whether cli", () => {
   });
 
   it("company select persists stage and company status reuses that saved context", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          regime: "Current",
-          cyclePhase: "Now",
-          confidence: { label: "HIGH", score: 93 },
-          trend: "stable",
-          decisionStability: "stable",
-          updatedAt: "live",
-          freshness: { line: "Updated live" },
-          call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
-          degraded: false,
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
+    const homeDir = tempHome();
+    const api = await startApi(jsonRoutes(["/api/cli/status", liveStatus({ freshness: { line: "Updated live" }, degraded: false })]));
 
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
+    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", api.baseUrl], inHome(homeDir));
+    const status = await runCliWithRetries(["company", "status", "--api-base-url", api.baseUrl], inHome(homeDir));
 
-    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
-    const status = await runCliWithRetries(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
-
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await api.close();
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(select.status, 0, select.stderr);
@@ -953,39 +761,13 @@ describe("whether cli", () => {
   });
 
   it("company status --json preserves backend payload without local context wrappers", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          regime: "Current",
-          cyclePhase: "Now",
-          confidence: { label: "HIGH", score: 93 },
-          trend: "stable",
-          decisionStability: "stable",
-          updatedAt: "live",
-          freshness: { line: "Updated live" },
-          call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
-          degraded: false,
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
+    const homeDir = tempHome();
+    const api = await startApi(jsonRoutes(["/api/cli/status", liveStatus({ freshness: { line: "Updated live" }, degraded: false })]));
 
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
+    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", api.baseUrl], inHome(homeDir));
+    const status = await runCliWithRetries(["company", "status", "--json", "--api-base-url", api.baseUrl], inHome(homeDir));
 
-    const select = await runCliWithRetries(["company", "select", "acme", "--stage", "seed", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
-    const status = await runCliWithRetries(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
-
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await api.close();
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(select.status, 0, select.stderr);
@@ -996,39 +778,28 @@ describe("whether cli", () => {
   });
 
   it("agent extraction flags return compact, payload, skills, and prompt views", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/agent")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          cadence: "weekly",
-          recordDateLabel: "Week of 2026-03-12",
-          generatedAt: "2026-03-12T12:00:00.000Z",
-          summaryHash: "weekly-hash",
-          summary: { summary: "Compact weekly summary." },
-          links: { self: "/api/agent?cadence=weekly" },
-          skills: [{ id: "top-level-skill", label: "Top level", purpose: "Fallback skill", outputs: ["note"] }],
-          agentHandoff: {
-            payload: {
-              decision_delta: { summary: "Tighten approvals now." },
-              flip_watch: { flip_trigger: "Risk appetite > 55" },
-              skills: [{ id: "decision-delta", label: "Decision delta", purpose: "Summarize the change", outputs: ["delta_brief"] }],
-            },
-            prompt: "Draft the weekly operator handoff.",
-          },
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const compact = await runCli(["agent", "--compact", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
-    const payload = await runCli(["agent", "--payload-only", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
-    const skills = await runCli(["agent", "--skills-only", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
-    const prompt = await runCli(["agent", "--prompt-only", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/agent", {
+      cadence: "weekly",
+      recordDateLabel: "Week of 2026-03-12",
+      generatedAt: "2026-03-12T12:00:00.000Z",
+      summaryHash: "weekly-hash",
+      summary: { summary: "Compact weekly summary." },
+      links: { self: "/api/agent?cadence=weekly" },
+      skills: [{ id: "top-level-skill", label: "Top level", purpose: "Fallback skill", outputs: ["note"] }],
+      agentHandoff: {
+        payload: {
+          decision_delta: { summary: "Tighten approvals now." },
+          flip_watch: { flip_trigger: "Risk appetite > 55" },
+          skills: [{ id: "decision-delta", label: "Decision delta", purpose: "Summarize the change", outputs: ["delta_brief"] }],
+        },
+        prompt: "Draft the weekly operator handoff.",
+      },
+    }]));
+    const compact = await runCli(["agent", "--compact", "--json", "--api-base-url", api.baseUrl]);
+    const payload = await runCli(["agent", "--payload-only", "--json", "--api-base-url", api.baseUrl]);
+    const skills = await runCli(["agent", "--skills-only", "--json", "--api-base-url", api.baseUrl]);
+    const prompt = await runCli(["agent", "--prompt-only", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(compact.status, 0);
     assert.equal(payload.status, 0);
@@ -1052,60 +823,39 @@ describe("whether cli", () => {
   });
 
   it("export pdf writes a real pdf artifact to the requested path", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const homeDir = tempHome();
     const outputPath = path.join(homeDir, "briefing.pdf");
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          regime: "Guarded Expansion",
-          cyclePhase: "Late",
-          confidence: { label: "MED", score: 66 },
-          trend: "Deteriorating",
-          decisionStability: "unstable",
-          updatedAt: "2026-03-12T12:00:00.000Z",
-          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
-          call: {
-            summary: "Stage decisions",
-            do: ["Do x"],
-            avoid: ["Avoid y"],
-            flipConditions: ["tightness ≤ 60"],
-          },
-          degraded: false,
-        }));
-        return;
-      }
-      if ((req.url ?? "").startsWith("/api/cli/changes")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          generatedAt: "2026-03-12T12:10:00.000Z",
-          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
-          changed: [{ metric: "tightness", from: 62, to: 60, direction: "down", impact: "negative" }],
-          revisit: ["Recheck approvals"],
-          flip: [{ condition: "tightness ≤ 60", distance: 0 }],
-          degraded: false,
-        }));
-        return;
-      }
-      if ((req.url ?? "").startsWith("/api/brief/slack")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
-          recordDate: "2026-03-12",
-          generatedAt: "2026-03-12T12:00:00.000Z",
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["export", "pdf", "--output", outputPath, "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(
+      ["/api/cli/status", {
+        version: "v1",
+        regime: "Guarded Expansion",
+        cyclePhase: "Late",
+        confidence: { label: "MED", score: 66 },
+        trend: "Deteriorating",
+        decisionStability: "unstable",
+        updatedAt: "2026-03-12T12:00:00.000Z",
+        freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+        call: {
+          summary: "Stage decisions",
+          do: ["Do x"],
+          avoid: ["Avoid y"],
+          flipConditions: ["tightness ≤ 60"],
+        },
+        degraded: false,
+      }],
+      ["/api/cli/changes", {
+        version: "v1",
+        generatedAt: "2026-03-12T12:10:00.000Z",
+        freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+        changed: [{ metric: "tightness", from: 62, to: 60, direction: "down", impact: "negative" }],
+        revisit: ["Recheck approvals"],
+        flip: [{ condition: "tightness ≤ 60", distance: 0 }],
+        degraded: false,
+      }],
+      ["/api/brief/slack", slackBrief()],
+    ));
+    const result = await runCli(["export", "pdf", "--output", outputPath, "--api-base-url", api.baseUrl]);
+    await api.close();
 
     const written = fs.readFileSync(outputPath);
     fs.rmSync(homeDir, { recursive: true, force: true });
@@ -1116,38 +866,31 @@ describe("whether cli", () => {
   });
 
   it("auth status --check validates token against authenticated endpoint", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
+    const api = await startApi((req, res) => {
       if ((req.url ?? "") === "/api/auth/status") {
         const authHeader = req.headers.authorization ?? "";
         if (authHeader === "Bearer valid-token") {
-          res.writeHead(200, { "content-type": "application/json" });
-          res.end(JSON.stringify({ ok: true, authenticated: true }));
+          sendJson(res, { ok: true, authenticated: true });
           return;
         }
-        res.writeHead(401, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "invalid_token" }));
+        sendJson(res, { error: "invalid_token" }, 401);
         return;
       }
       res.writeHead(404);
       res.end();
     });
 
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-
-    const valid = await runCli(["auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const valid = await runCli(["auth", "status", "--check", "--api-base-url", api.baseUrl], {
       env: { ...process.env, WHETHER_API_KEY: "valid-token" },
     });
 
-    const invalid = await runCli(["auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
+    const invalid = await runCli(["auth", "status", "--check", "--api-base-url", api.baseUrl], {
       env: { ...process.env, WHETHER_API_KEY: "invalid-token" },
     });
 
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await api.close();
 
-    assert.ok(requests.every((url) => url === "/api/auth/status"));
+    assert.ok(api.requests.every((url) => url === "/api/auth/status"));
     assert.equal(valid.status, 0);
     assert.equal(invalid.status, 2);
     assert.match(invalid.stderr, /auth: Authentication failed \(invalid key\)\./);
@@ -1161,23 +904,10 @@ describe("whether cli", () => {
   });
 
   it("doctor reports resolved API base URL and token source when URL is explicitly provided", async () => {
-    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ status: "ok" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const port = resolveServerPort(server);
-    const result = await runCliWithRetries(["doctor", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const homeDir = tempHome();
+    const api = await startApi(jsonRoutes(["/api/health", { status: "ok" }]));
+    const result = await runCliWithRetries(["doctor", "--json", "--api-base-url", api.baseUrl], inHome(homeDir));
+    await api.close();
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 0, result.stderr);
@@ -1189,7 +919,7 @@ describe("whether cli", () => {
 
     assert.ok(healthCheck);
     assert.equal(healthCheck?.autodiscovered, false);
-    assert.equal(healthCheck?.apiBaseUrl, `http://127.0.0.1:${port}`);
+    assert.equal(healthCheck?.apiBaseUrl, api.baseUrl);
     assert.ok(apiBaseUrlCheck);
     assert.equal(apiBaseUrlCheck?.source, "flag");
     assert.ok(authCheck);
@@ -1197,170 +927,70 @@ describe("whether cli", () => {
   });
 
   it("status does not pass unsupported flags to the status endpoint", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          view: "default",
-          regime: "Guarded",
-          cyclePhase: "Late",
-          confidence: { label: "MED", score: 66 },
-          trend: "Deteriorating",
-          decisionStability: "unstable",
-          updatedAt: "2026-03-12T12:00:00.000Z",
-          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
-          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
-          degraded: false,
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme", "--stage", "seed"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", guardedStatus("default")]));
+    const result = await runCli(["status", "--api-base-url", api.baseUrl, "--company", "acme", "--stage", "seed"]);
+    await api.close();
 
     assert.equal(result.status, 0);
-    assert.ok(requests.some((url) => url === "/api/cli/status"));
-    assert.ok(requests.every((url) => !url.includes("company=") && !url.includes("stage=")));
+    assert.ok(api.requests.some((url) => url === "/api/cli/status"));
+    assert.ok(api.requests.every((url) => !url.includes("company=") && !url.includes("stage=")));
   });
 
 
   it("history forwards weeks to API and prints server-bounded metadata", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
-      if ((req.url ?? "").startsWith("/api/cli/history")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(
-          JSON.stringify({
-            version: "v1",
-            generatedAt: new Date().toISOString(),
-            requestedWeeks: 99,
-            windowWeeks: 52,
-            maxWeeks: 52,
-            truncatedToMax: true,
-            history: [{ recordDate: "2026-03-10", regime: "Guarded", confidenceLabel: "MED", trend: "stable" }],
-            degraded: false,
-          }),
-        );
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["history", "--weeks", "99", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/history", {
+      version: "v1",
+      generatedAt: new Date().toISOString(),
+      requestedWeeks: 99,
+      windowWeeks: 52,
+      maxWeeks: 52,
+      truncatedToMax: true,
+      history: [{ recordDate: "2026-03-10", regime: "Guarded", confidenceLabel: "MED", trend: "stable" }],
+      degraded: false,
+    }]));
+    const result = await runCli(["history", "--weeks", "99", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
-    assert.ok(requests.some((url) => url.includes("/api/cli/history?weeks=99")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/history?weeks=99")));
     assert.match(result.stdout, /max 52/);
   });
 
   it("status --verbose requests expanded contract and renders bounded decision section", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          view: "expanded",
-          regime: "Guarded",
-          cyclePhase: "Late",
-          confidence: { label: "MED", score: 66 },
-          trend: "Deteriorating",
-          decisionStability: "unstable",
-          updatedAt: "2026-03-12T12:00:00.000Z",
-          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
-          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
-          boundedDecision: {
-            guardrailThreshold: "Keep fixed-cost approvals staged.",
-            reversalTrigger: "Re-open only after two confirming reads.",
-            flipConditionsCompact: ["tightness < 60"],
-            topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }],
-          },
-          degraded: false,
-        }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["status", "--verbose", "--api-base-url", `http://127.0.0.1:${port}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(jsonRoutes(["/api/cli/status", guardedStatus("expanded", {
+      boundedDecision: {
+        guardrailThreshold: "Keep fixed-cost approvals staged.",
+        reversalTrigger: "Re-open only after two confirming reads.",
+        flipConditionsCompact: ["tightness < 60"],
+        topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }],
+      },
+    })]));
+    const result = await runCli(["status", "--verbose", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
-    assert.ok(requests.some((url) => url.includes("/api/cli/status?view=expanded")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/status?view=expanded")));
     assert.match(result.stdout, /Decision detail:/);
   });
 
   it("forwards only route-supported params for each CLI command endpoint", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      const url = req.url ?? "";
-      requests.push(url);
-      if (url.startsWith("/api/cli/status")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1", view: "expanded", regime: "Guarded", cyclePhase: "Late",
-          confidence: { label: "MED", score: 66 }, trend: "Deteriorating", decisionStability: "unstable",
-          updatedAt: "2026-03-12T12:00:00.000Z", freshness: { line: "Updated" },
-          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
-          boundedDecision: { guardrailThreshold: "Keep staged", reversalTrigger: "Re-open later", flipConditionsCompact: ["tightness < 60"], topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }] },
-          degraded: false,
-        }));
-        return;
-      }
-      if (url.startsWith("/api/cli/call")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ call: "Stage", leadershipShould: ["Do x"], watch: ["Watch y"], freshness: { line: "Updated" } }));
-        return;
-      }
-      if (url.startsWith("/api/cli/changes")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ changed: [], revisit: [], flip: [], freshness: { line: "Updated" } }));
-        return;
-      }
-      if (url.startsWith("/api/cli/diagnostics")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ version: "v1", generatedAt: new Date().toISOString(), topDrivers: [], degraded: false }));
-        return;
-      }
-      if (url.startsWith("/api/cli/regime")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ regime: "Guarded", phase: "Late", confidence: "MED", trend: "stable", interpretation: "Interpret cautiously" }));
-        return;
-      }
-      if (url.startsWith("/api/cli/history")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ version: "v1", generatedAt: new Date().toISOString(), requestedWeeks: 8, windowWeeks: 8, maxWeeks: 52, truncatedToMax: false, history: [], degraded: false }));
-        return;
-      }
-      if (url.startsWith("/api/cli/scenario")) {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ version: "v1", postureBefore: "Guarded", postureAfter: "Stable", inputs: { tightness: 70, riskAppetite: 65 } }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
-    });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const base = ["--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme", "--stage", "seed"];
+    const api = await startApi(jsonRoutes(
+      ["/api/cli/status", {
+        version: "v1", view: "expanded", regime: "Guarded", cyclePhase: "Late",
+        confidence: { label: "MED", score: 66 }, trend: "Deteriorating", decisionStability: "unstable",
+        updatedAt: "2026-03-12T12:00:00.000Z", freshness: { line: "Updated" },
+        call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
+        boundedDecision: { guardrailThreshold: "Keep staged", reversalTrigger: "Re-open later", flipConditionsCompact: ["tightness < 60"], topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }] },
+        degraded: false,
+      }],
+      ["/api/cli/call", { call: "Stage", leadershipShould: ["Do x"], watch: ["Watch y"], freshness: { line: "Updated" } }],
+      ["/api/cli/changes", { changed: [], revisit: [], flip: [], freshness: { line: "Updated" } }],
+      ["/api/cli/diagnostics", { version: "v1", generatedAt: new Date().toISOString(), topDrivers: [], degraded: false }],
+      ["/api/cli/regime", { regime: "Guarded", phase: "Late", confidence: "MED", trend: "stable", interpretation: "Interpret cautiously" }],
+      ["/api/cli/history", { version: "v1", generatedAt: new Date().toISOString(), requestedWeeks: 8, windowWeeks: 8, maxWeeks: 52, truncatedToMax: false, history: [], degraded: false }],
+      ["/api/cli/scenario", { version: "v1", postureBefore: "Guarded", postureAfter: "Stable", inputs: { tightness: 70, riskAppetite: 65 } }],
+    ));
+    const base = ["--api-base-url", api.baseUrl, "--company", "acme", "--stage", "seed"];
 
     const commands = [
       ["status", "--as-of", "2024-07", "--verbose", ...base],
@@ -1376,16 +1006,16 @@ describe("whether cli", () => {
       const result = await runCli(args);
       assert.equal(result.status, 0, `command failed: ${args.join(" ")}\n${result.stderr}`);
     }
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await api.close();
 
-    assert.ok(requests.some((url) => url.includes("/api/cli/status?asOf=2024-07&view=expanded")));
-    assert.ok(requests.some((url) => url.includes("/api/cli/call?asOf=2024-07")));
-    assert.ok(requests.some((url) => url.includes("/api/cli/changes?asOf=2024-07")));
-    assert.ok(requests.some((url) => url.includes("/api/cli/diagnostics?asOf=2024-07")));
-    assert.ok(requests.some((url) => url.includes("/api/cli/regime?asOf=2024-07")));
-    assert.ok(requests.some((url) => url.includes("/api/cli/history?asOf=2024-07&weeks=8")));
-    assert.ok(requests.some((url) => url.includes("/api/cli/scenario?tightness=70&risk-appetite=65")));
-    assert.ok(requests.every((url) => !url.includes("company=") && !url.includes("stage=")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/status?asOf=2024-07&view=expanded")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/call?asOf=2024-07")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/changes?asOf=2024-07")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/diagnostics?asOf=2024-07")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/regime?asOf=2024-07")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/history?asOf=2024-07&weeks=8")));
+    assert.ok(api.requests.some((url) => url.includes("/api/cli/scenario?tightness=70&risk-appetite=65")));
+    assert.ok(api.requests.every((url) => !url.includes("company=") && !url.includes("stage=")));
   });
 
   // Guard test: kebab-case CLI flags are not silently dropped by Commander's camelCase conversion.
@@ -1402,16 +1032,9 @@ describe("whether cli", () => {
     const help = await runCli(["--help"]);
     assert.match(help.stdout, /no-local-discovery/);
     // Verify --api-base-url flag routes correctly (the previously broken path)
-    const server = http.createServer((_req, res) => {
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ status: "ok" }));
-    });
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const addr = server.address();
-    if (!addr || typeof addr === 'string') throw new Error('Expected AddressInfo from server');
-    const { port } = addr;
-    const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(alwaysJson({ status: "ok" }));
+    const result = await runCli(["ping", "--no-local-discovery", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
     assert.equal(parsed.ok, true);
@@ -1436,30 +1059,21 @@ describe("whether cli", () => {
   });
 
   it("still shows the status when no command is given, with options before it or none at all", async () => {
-    const requests: string[] = [];
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(
-        JSON.stringify({
-          version: "v1",
-          regime: "Stormy",
-          cyclePhase: "Mid",
-          confidence: { label: "HIGH", score: 92 },
-          trend: "Stable",
-          decisionStability: "stable",
-          call: { summary: "Hold.", do: ["Hold spend"], avoid: ["Rebrands"], flipConditions: ["Funding pressure <= 66"] },
-        }),
-      );
-    });
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const base = `http://127.0.0.1:${resolveServerPort(server)}`;
-    const bare = await runCli(["--no-local-discovery", "--api-base-url", base, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(alwaysJson({
+      version: "v1",
+      regime: "Stormy",
+      cyclePhase: "Mid",
+      confidence: { label: "HIGH", score: 92 },
+      trend: "Stable",
+      decisionStability: "stable",
+      call: { summary: "Hold.", do: ["Hold spend"], avoid: ["Rebrands"], flipConditions: ["Funding pressure <= 66"] },
+    }));
+    const bare = await runCli(["--no-local-discovery", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
 
     assert.equal(bare.status, 0);
     assert.equal(JSON.parse(bare.stdout).regime, "Stormy");
-    assert.ok(requests.every((url) => url.startsWith("/api/cli/status")), "the status route, and nothing else");
+    assert.ok(api.requests.every((url) => url.startsWith("/api/cli/status")), "the status route, and nothing else");
   });
 
   it("lists every command in its completion scripts, from the commands it has", async () => {
@@ -1478,7 +1092,6 @@ describe("whether cli", () => {
   });
 
   it("state reads the compact state and prints it for a person, or as it is with --json", async () => {
-    const requests: string[] = [];
     const state = {
       version: "v1",
       recordDate: "2026-09-25",
@@ -1504,18 +1117,12 @@ describe("whether cli", () => {
       guidance: { call: "Conditions are tightening.", doNow: ["Hold spend"], avoidNow: ["Rebrands"], flipConditions: ["Funding pressure <= 66"] },
       use: { summary: "Informational only." },
     };
-    const server = http.createServer((req, res) => {
-      requests.push(req.url ?? "");
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify(state));
-    });
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const base = `http://127.0.0.1:${resolveServerPort(server)}`;
-    const text = await runCli(["state", "--no-local-discovery", "--api-base-url", base]);
-    const json = await runCli(["state", "--no-local-discovery", "--api-base-url", base, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(alwaysJson(state));
+    const text = await runCli(["state", "--no-local-discovery", "--api-base-url", api.baseUrl]);
+    const json = await runCli(["state", "--no-local-discovery", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
 
-    assert.deepEqual([...new Set(requests)], ["/api/agent?view=state"]);
+    assert.deepEqual([...new Set(api.requests)], ["/api/agent?view=state"]);
     assert.equal(text.status, 0);
     assert.match(text.stdout, /Whether — State, reading of 2026-09-25/);
     assert.match(text.stdout, /The data is live and current\./);
@@ -1532,18 +1139,10 @@ describe("whether cli", () => {
    * saved copy: `--require-ready` makes that the exit code, and still prints the state.
    */
   it("state --require-ready exits 8 when the data is not live and current, and 0 when it is", async () => {
-    const respond = (automation: { ready: boolean; refusal: string | null }) => {
-      const server = http.createServer((_req, res) => {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ version: "v1", automation, headline: "A state.", recordDate: "2026-06-17" }));
-      });
-      return server;
-    };
     const run = async (automation: { ready: boolean; refusal: string | null }, extra: string[]) => {
-      const server = respond(automation);
-      await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-      const result = await runCli(["state", "--json", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${resolveServerPort(server)}`, ...extra]);
-      await new Promise<void>((resolve) => server.close(() => resolve()));
+      const api = await startApi(alwaysJson({ version: "v1", automation, headline: "A state.", recordDate: "2026-06-17" }));
+      const result = await runCli(["state", "--json", "--no-local-discovery", "--api-base-url", api.baseUrl, ...extra]);
+      await api.close();
       return result;
     };
 
@@ -1561,31 +1160,25 @@ describe("whether cli", () => {
   });
 
   it("changes names the reading it is measured against, the signals by their names, and what a score's move is made of", async () => {
-    const server = http.createServer((_req, res) => {
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(
-        JSON.stringify({
-          version: "v1",
-          freshness: { line: "Updated 2026-09-29 · live" },
-          basis: "since Aug 31",
-          comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
-          changed: [
-            { metric: "tightness", label: "Funding pressure", from: 63, to: 90, direction: "up", impact: "negative", moved: [{ source: "rates", label: "interest rates", points: 27 }] },
-            { metric: "base_rate", label: "Base rate", from: 3.85, to: 4.04, direction: "up", impact: "negative", moved: [] },
-          ],
-          revisit: ["Hiring ahead of revenue"],
-          flip: [
-            { condition: "Funding pressure <= 66 for two readings in a row", distance: 24 },
-            { condition: "Funding pressure > 76: tighten again", distance: -1 },
-            { condition: "Risk appetite < 44", distance: 0 },
-            { condition: "No numeric line", distance: null },
-          ],
-        }),
-      );
-    });
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const result = await runCli(["changes", "--no-local-discovery", "--api-base-url", `http://127.0.0.1:${resolveServerPort(server)}`]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
+    const api = await startApi(alwaysJson({
+      version: "v1",
+      freshness: { line: "Updated 2026-09-29 · live" },
+      basis: "since Aug 31",
+      comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
+      changed: [
+        { metric: "tightness", label: "Funding pressure", from: 63, to: 90, direction: "up", impact: "negative", moved: [{ source: "rates", label: "interest rates", points: 27 }] },
+        { metric: "base_rate", label: "Base rate", from: 3.85, to: 4.04, direction: "up", impact: "negative", moved: [] },
+      ],
+      revisit: ["Hiring ahead of revenue"],
+      flip: [
+        { condition: "Funding pressure <= 66 for two readings in a row", distance: 24 },
+        { condition: "Funding pressure > 76: tighten again", distance: -1 },
+        { condition: "Risk appetite < 44", distance: 0 },
+        { condition: "No numeric line", distance: null },
+      ],
+    }));
+    const result = await runCli(["changes", "--no-local-discovery", "--api-base-url", api.baseUrl]);
+    await api.close();
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /^What changed since Aug 31\n/);

@@ -5,39 +5,19 @@ import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } fr
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
 import { buildBriefDocument } from "../lib/report/briefDocument";
-import type { RegimeAssessment } from "../lib/regimeEngine";
-import type { TreasuryData } from "../lib/types";
+import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 import type { PostureStateContract } from "../lib/report/postureStateContract";
 
-const assessment: RegimeAssessment = {
+const assessment = buildAssessmentFixture({
   regime: "DEFENSIVE",
-  scores: { tightness: 72, riskAppetite: 42, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.3 },
-  diagnostics: {
-    tightnessVsThreshold: 1,
-    riskAppetiteVsThreshold: -1,
-    nearestThresholdDelta: 4,
-    confidence: "MEDIUM",
-    transitionWatch: true,
-    intensity: "MILD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
-  },
-  description: "",
+  regimeTransition: null,
+  scores: { tightness: 72, riskAppetite: 42, curveSlope: -0.3 },
+  diagnostics: { tightnessVsThreshold: 1, riskAppetiteVsThreshold: -1, nearestThresholdDelta: 4, confidence: "MEDIUM" },
   constraints: ["Preserve runway"],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-  inputs: [],
   policyAssessment: {
     version: "v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
     posture: "SAFETY_MODE",
     band: "ELEVATED",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
     governanceParameters: {
       hiringThreshold: "VERY_HIGH",
       paybackWindowTolerance: "SHORTER",
@@ -47,15 +27,14 @@ const assessment: RegimeAssessment = {
       experimentationTolerance: "LOW",
     },
   },
-};
+});
 
-const treasury: TreasuryData = {
+const treasury = buildTreasuryFixture({
   source: "https://fred.stlouisfed.org",
   record_date: "2026-03-07",
   fetched_at: "2026-03-08T00:00:00.000Z",
-  isLive: true,
   yields: { oneMonth: 5.2, threeMonth: 5.1, twoYear: 4.7, tenYear: 4.4 },
-};
+});
 
 const postureState: PostureStateContract = {
   currentState: {

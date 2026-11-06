@@ -7,9 +7,9 @@ import { snapshotData } from "../lib/snapshot";
 import { resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
 import type { EmailDeliveryAdapter } from "../lib/email/emailDelivery";
 import type { AlertDecision } from "../lib/alert/alertEvaluator";
-import type { KvNamespace } from "../lib/runtime/kv";
 import { resetRegimeAlertRepository } from "../lib/storage/regimeAlertRepository";
 import { sha256Hex } from "../lib/crypto";
+import { FakeKv } from "./fixtures/fakeKv";
 
 /**
  * Alert mail is enrolled through the email subscription, not through a per-device record.
@@ -20,30 +20,6 @@ import { sha256Hex } from "../lib/crypto";
  * own inbox. No surface could write a record under a token, so the enrollment path these
  * tests described was unreachable from the product and every real record was skipped.
  */
-
-class FakeKv implements KvNamespace {
-  private readonly entries = new Map<string, string>();
-
-  async get(key: string) {
-    return this.entries.get(key) ?? null;
-  }
-
-  async put(key: string, value: string) {
-    this.entries.set(key, value);
-  }
-
-  async delete(key: string) {
-    this.entries.delete(key);
-  }
-
-  async list(options?: { prefix?: string }) {
-    const prefix = options?.prefix ?? "";
-    return {
-      keys: [...this.entries.keys()].filter((name) => name.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-    };
-  }
-}
 
 const CONDITIONS = {
   regime: "VOLATILE",

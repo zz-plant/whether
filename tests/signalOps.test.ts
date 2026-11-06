@@ -10,74 +10,40 @@ import {
 } from "../lib/signalOps";
 import { DEFAULT_THRESHOLDS, type RegimeAssessment } from "../lib/regimeEngine";
 import { buildDecisionDeltaRules, buildDecisionVerdictHeadline } from "../lib/alert/decisionDeltaRules";
+import { buildAssessmentFixture } from "./fixtures/reportFixtures";
 
 const assessment = (
   regime: RegimeAssessment["regime"],
   tightness: number,
   riskAppetite: number,
   confidence: RegimeAssessment["diagnostics"]["confidence"] = "MEDIUM",
-): RegimeAssessment => ({
-  regime,
-  regimeTransition: {
-    nextState: regime,
-    candidateState: regime,
-    committed: true,
-    pending: false,
-    transitionReason: "",
-    transitionPendingCount: 0,
-    snapshot: {
-      committedState: regime,
-      pendingState: null,
-      pendingCount: 0,
-      lastSignals: { tightness, riskAppetite },
+): RegimeAssessment =>
+  buildAssessmentFixture({
+    regime,
+    regimeTransition: {
+      nextState: regime,
+      candidateState: regime,
+      committed: true,
+      pending: false,
+      transitionReason: "",
+      transitionPendingCount: 0,
+      snapshot: { committedState: regime, pendingState: null, pendingCount: 0, lastSignals: { tightness, riskAppetite } },
     },
-  },
-  constraints: [],
-  dataWarnings: [],
-  description: "",
-  inputs: [],
-  riskAppetiteExplanation: "",
-  tightnessExplanation: "",
-  thresholds: DEFAULT_THRESHOLDS,
-  diagnostics: {
-    tightnessVsThreshold: tightness - DEFAULT_THRESHOLDS.tightnessRegime,
-    riskAppetiteVsThreshold: riskAppetite - DEFAULT_THRESHOLDS.riskAppetiteRegime,
-    nearestThresholdDelta: Math.min(
-      Math.abs(tightness - DEFAULT_THRESHOLDS.tightnessRegime),
-      Math.abs(riskAppetite - DEFAULT_THRESHOLDS.riskAppetiteRegime),
-    ),
-    confidence,
-    transitionWatch: false,
-    intensity: "STANDARD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
-  },
-  scores: {
-    baseRate: 5,
-    baseRateUsed: "1M",
-    curveSlope: -0.1,
-    tightness,
-    riskAppetite,
-  },
-  policyAssessment: {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
+    constraints: [],
+    thresholds: DEFAULT_THRESHOLDS,
+    diagnostics: {
+      tightnessVsThreshold: tightness - DEFAULT_THRESHOLDS.tightnessRegime,
+      riskAppetiteVsThreshold: riskAppetite - DEFAULT_THRESHOLDS.riskAppetiteRegime,
+      nearestThresholdDelta: Math.min(
+        Math.abs(tightness - DEFAULT_THRESHOLDS.tightnessRegime),
+        Math.abs(riskAppetite - DEFAULT_THRESHOLDS.riskAppetiteRegime),
+      ),
+      confidence,
+      transitionWatch: false,
+      intensity: "STANDARD",
     },
-  },
-});
+    scores: { baseRate: 5, curveSlope: -0.1, tightness, riskAppetite },
+  });
 
 const basePayload = (
   previousAssessment: RegimeAssessment,

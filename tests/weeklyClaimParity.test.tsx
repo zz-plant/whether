@@ -15,12 +15,10 @@ import { z } from "zod";
 import { buildCliStatusExpandedContract } from "../lib/cli/contracts";
 import { formatConditionsChangeLine } from "../lib/summary/summaryFormatting";
 import { formatGuidance } from "../lib/export/briefBuilders";
-import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
-import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
+import { resetSubscriberStore } from "../lib/email/subscriberStore";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
-import type { OperatingSnapshot } from "../lib/operatingState/types";
 import { getRegimePublicLabel, REGIME_SEVERITY_RANK } from "../lib/regimePresentation";
 import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
 import { buildFlipProximity } from "../lib/report/flipProximity";
@@ -43,10 +41,10 @@ import {
   weeklyHeadline,
 } from "../lib/report/reportEvidence";
 import { buildWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
-import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
 import { snapshotData } from "../lib/snapshot";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 import { macros, treasury as fixtureTreasury } from "./factories/exportFixtures";
+import { mailedBriefText, postedBriefText } from "./fixtures/mondaySends";
 
 /*
  * One week, one set of claims, every surface (docs/claims-ledger.md).
@@ -111,51 +109,6 @@ const slot = (text: string, label: string): string | undefined => {
   return undefined;
 };
 
-/** The Monday post's text, as the webhook receives it. */
-const postedText = async (snapshot: OperatingSnapshot): Promise<string> => {
-  let body = "";
-  const capture = async (_url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    body = typeof init?.body === "string" ? init.body : "";
-    return new Response("ok", { status: 200 });
-  };
-  const result = await deliverSlackBrief({ webhookUrls, snapshot, now: NOW, fetchImpl: capture, force: true });
-  assert.equal(result.status, "posted", result.error);
-  const parsed: unknown = JSON.parse(body);
-  const blocks = typeof parsed === "object" && parsed !== null ? Reflect.get(parsed, "blocks") : undefined;
-  assert.ok(Array.isArray(blocks));
-  return blocks
-    .map((block: unknown) => {
-      const text = typeof block === "object" && block !== null ? Reflect.get(block, "text") : undefined;
-      const value = typeof text === "object" && text !== null ? Reflect.get(text, "text") : undefined;
-      return typeof value === "string" ? value : "";
-    })
-    .join("\n");
-};
-
-/** The Monday email's plain text, to one verified subscriber. */
-const mailedText = async (snapshot: OperatingSnapshot): Promise<string> => {
-  resetSubscriberStore();
-  const store = getSubscriberStore();
-  const subscriber = await store.subscribe("operator@example.com");
-  await store.verifyEmail(subscriber.confirmToken ?? "");
-  const sent: string[] = [];
-  const previousBinding = Reflect.get(globalThis, "EMAIL");
-  Reflect.set(globalThis, "EMAIL", {
-    send: async (message: { text: string }) => {
-      sent.push(message.text);
-    },
-  });
-  try {
-    const result = await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: NOW, force: true });
-    assert.equal(result.sent, 1, result.error);
-  } finally {
-    if (previousBinding === undefined) Reflect.deleteProperty(globalThis, "EMAIL");
-    else Reflect.set(globalThis, "EMAIL", previousBinding);
-  }
-  assert.ok(sent[0], "the one subscriber was mailed");
-  return sent[0];
-};
-
 /** Every surface, from one stored reading. */
 const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]) => {
   const snapshot = buildOperatingSnapshot({ treasury, macroSeries: readings, now: NOW });
@@ -190,8 +143,8 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
     standup: z.object({ standupLine: z.string() }).parse((await callAgentTool("get_standup_line", {}, "http")).structuredContent).standupLine,
     investorUpdate: share.options.flatMap((option) => (option.kind === "investor" ? [formatInvestorUpdateSnippet(option.parts, null)] : []))[0] ?? "",
     record: frozen.record,
-    slack: await postedText(snapshot),
-    email: await mailedText(snapshot),
+    slack: await postedBriefText(snapshot, { webhookUrls, now: NOW, force: true }),
+    email: await mailedBriefText(snapshot, { now: NOW, force: true }),
   };
 };
 

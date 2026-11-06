@@ -9,47 +9,14 @@ import {
 import { buildBriefDocument } from "../lib/report/briefDocument";
 import { fixtureWeeklyCall } from "./factories/exportFixtures";
 import type { RegimeAssessment } from "../lib/regimeEngine";
-import type { TreasuryData } from "../lib/types";
+import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 
-const assessment: RegimeAssessment = {
+const assessment = buildAssessmentFixture({
   regime: "DEFENSIVE",
-  scores: { tightness: 72, riskAppetite: 48, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.1 },
-  diagnostics: {
-    tightnessVsThreshold: 0,
-    riskAppetiteVsThreshold: 0,
-    nearestThresholdDelta: 0,
-    confidence: "LOW",
-    transitionWatch: false,
-    intensity: "MILD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
-  },
-  description: "",
-  constraints: ["Cut low-leverage experiments."],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-  inputs: [],
-  policyAssessment: {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
-    },
-  },
-};
+  regimeTransition: null,
+  scores: { tightness: 72, riskAppetite: 48 },
+  diagnostics: { tightnessVsThreshold: 0, riskAppetiteVsThreshold: 0, nearestThresholdDelta: 0, transitionWatch: false },
+});
 
 const postureState = {
   currentState: {
@@ -74,19 +41,16 @@ const postureState = {
   },
 } as const;
 
-const treasury = {
-  source: "https://example.com",
-  record_date: "2026-03-01",
-  fetched_at: "2026-03-01T00:00:00Z",
-  isLive: true,
-  yields: { oneMonth: 5.2, twoYear: 4.6, tenYear: 4.5 },
-} as TreasuryData;
+const treasury = buildTreasuryFixture({ source: "https://example.com" });
 
 /* The week's brief document for this reading, under the call contract every production caller builds. */
-const document = buildBriefDocument(
-  { assessment, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
-  fixtureWeeklyCall(assessment),
-);
+const documentFor = (reading: RegimeAssessment) =>
+  buildBriefDocument(
+    { assessment: reading, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+    fixtureWeeklyCall(reading),
+  );
+
+const document = documentFor(assessment);
 
 describe("integration briefs", () => {
   it("parses only supported targets", () => {
@@ -108,13 +72,7 @@ describe("integration briefs", () => {
     assert.doesNotMatch(envelope.markdown, /^Restart when: /m);
     // On hold at 90, its restart line is what can change it.
     const held = { ...assessment, scores: { ...assessment.scores, tightness: 90 } };
-    const heldMarkdown = buildWeeklyMandateEnvelope(
-      buildBriefDocument(
-        { assessment: held, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
-        fixtureWeeklyCall(held),
-      ),
-      postureState,
-    ).markdown;
+    const heldMarkdown = buildWeeklyMandateEnvelope(documentFor(held), postureState).markdown;
     assert.match(heldMarkdown, /^Restart when: Funding pressure falls below 66/m);
     assert.doesNotMatch(heldMarkdown, /Restart when: .*tighten again/i, "a condition that tightens is not a restart line");
     assert.doesNotMatch(envelope.markdown, /flip|Reversal:|regime|DEFENSIVE/i);

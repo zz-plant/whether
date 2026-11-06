@@ -19,8 +19,9 @@ import { buildMonthlySummary } from "../lib/summary/monthlySummary";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import summaryArchive from "../data/summary_archive.json";
 import { z } from "zod";
-import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
+import { evaluateRegime } from "../lib/regimeEngine";
 import type { MacroSeriesReading } from "../lib/types";
+import { buildAssessmentFixture } from "./fixtures/reportFixtures";
 
 const thresholds: RegimeThresholds = { ...DEFAULT_THRESHOLDS };
 
@@ -242,15 +243,14 @@ const assessment = (
   const regime = overrides.regime ?? "EXPANSION";
   const tightness = regime === "EXPANSION" || regime === "VOLATILE" ? 40 : 80;
   const riskAppetite = regime === "SCARCITY" || regime === "VOLATILE" ? 40 : 60;
-  const fixture: RegimeAssessment = {
+  return buildAssessmentFixture({
     regime,
-    regimeTransition: undefined,
+    regimeTransition: null,
     scores: {
       tightness,
       tightnessPressure: overrides.tightnessSaturated ? 101 : 40,
       tightnessSaturated: overrides.tightnessSaturated === true,
       riskAppetite,
-      baseRateUsed: "1M" as const,
       baseRate: 2.0,
       curveSlope: 0.5,
     },
@@ -258,41 +258,23 @@ const assessment = (
       tightnessVsThreshold: 0,
       riskAppetiteVsThreshold: 0,
       nearestThresholdDelta: 20,
-      confidence: "HIGH" as const,
+      confidence: "HIGH",
       transitionWatch: false,
-      intensity: "STRONG" as const,
-      boundaryContributors: [],
-      weakReadCount: 0,
-      twoWeakReadsWarning: false,
+      intensity: "STRONG",
       shockCrossing: overrides.shockCrossing === true,
     },
     description: "test description",
     constraints: [],
     tightnessExplanation: "test",
     riskAppetiteExplanation: "test",
-    dataWarnings: [],
     thresholds,
-    inputs: [],
     policyAssessment: {
       version: "test",
-      normalizations: [],
-      composites: { cts: 0, ras: 0 },
-      posture: "RISK_ON" as const,
-      band: "NEUTRAL" as const,
-      confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-      refusal: { refused: false, reasons: [] },
-      governanceParameters: {
-        hiringThreshold: "MODERATE",
-        paybackWindowTolerance: "STANDARD",
-        rollbackRequirement: "REVERSIBLE_ONLY",
-        approvalVelocity: "BALANCED",
-        expansionScope: "BALANCED",
-        experimentationTolerance: "MEDIUM",
-      },
+      posture: "RISK_ON",
+      governanceParameters: { hiringThreshold: "MODERATE", rollbackRequirement: "REVERSIBLE_ONLY" },
     },
     signalInfluence: [],
-  };
-  return fixture;
+  });
 };
 
 describe("saturated-financing tempo", () => {

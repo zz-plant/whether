@@ -9,68 +9,11 @@ import { buildWeeklyMandateEnvelope } from "../lib/integrationBriefs";
 import { buildBriefDocument } from "../lib/report/briefDocument";
 import { buildPostureTransitionEvent } from "../lib/storage/postureTransitionEventRepository";
 import type { RegimeAssessment } from "../lib/regimeEngine";
-import type { TreasuryData } from "../lib/types";
+import { buildAssessmentFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 
-const assessment: RegimeAssessment = {
-  regime: "DEFENSIVE",
-  regimeTransition: {
-    nextState: "DEFENSIVE",
-    candidateState: "DEFENSIVE",
-    committed: false,
-    pending: false,
-    transitionReason: "No threshold crossing changed the committed state.",
-    snapshot: {
-      committedState: "DEFENSIVE",
-      pendingState: null,
-      pendingCount: 0,
-      lastSignals: { tightness: 72, riskAppetite: 48 },
-    },
-  },
-  scores: { tightness: 72, riskAppetite: 48, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.1 },
-  diagnostics: {
-    tightnessVsThreshold: 2,
-    riskAppetiteVsThreshold: -2,
-    nearestThresholdDelta: 2,
-    confidence: "LOW",
-    transitionWatch: true,
-    intensity: "MILD",
-    boundaryContributors: [],
-    weakReadCount: 0,
-    twoWeakReadsWarning: false,
-  },
-  description: "",
-  constraints: ["Cut low-leverage experiments."],
-  tightnessExplanation: "",
-  riskAppetiteExplanation: "",
-  dataWarnings: [],
-  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
-  inputs: [],
-  policyAssessment: {
-    version: "policy-v1",
-    normalizations: [],
-    composites: { cts: 0, ras: 0 },
-    posture: "TRANSITION",
-    band: "NEUTRAL",
-    confidenceIndex: { signalDisagreement: 0, distanceFromNeutral: 0, signalDispersion: 0 },
-    refusal: { refused: false, reasons: [] },
-    governanceParameters: {
-      hiringThreshold: "HIGH",
-      paybackWindowTolerance: "STANDARD",
-      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
-      approvalVelocity: "BALANCED",
-      expansionScope: "BALANCED",
-      experimentationTolerance: "MEDIUM",
-    },
-  },
-};
+const assessment = buildAssessmentFixture({ regime: "DEFENSIVE" });
 
-const treasury = {
-  source: "https://example.com",
-  record_date: "2026-03-01",
-  fetched_at: "2026-03-01T00:00:00Z",
-  isLive: true,
-  yields: { oneMonth: 5.2, twoYear: 4.6, tenYear: 4.5 },
-} as TreasuryData;
+const treasury = buildTreasuryFixture({ source: "https://example.com" });
 
 describe("posture state contract consumers", () => {
   it("keeps homepage, exports, and integration envelope aligned", () => {
