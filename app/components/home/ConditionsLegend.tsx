@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { X } from "lucide-react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { CONDITION_SIDE_MEANINGS, getOrderedRegimeLegend, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 import { ConditionIcon } from "../ui/conceptIcons";
@@ -10,6 +9,8 @@ import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { SharedArrivalActions } from "../sharedArrival";
+import { CLOSE_CONTROL_CLASS } from "../ui/closeControl";
+import { CloseIcon } from "../uiIcons";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
 
@@ -183,9 +184,9 @@ export function ConditionsLegend({
         type="button"
         onClick={handleDismiss}
         aria-label={orientation ? "Dismiss this introduction" : "Dismiss the conditions legend"}
-        className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-slate-100 hover:bg-[color:var(--bg-raised)] transition-colors"
+        className={`${CLOSE_CONTROL_CLASS} -mr-2 -mt-2`}
       >
-        <X size={16} aria-hidden="true" />
+        <CloseIcon />
       </button>
     </section>
   );

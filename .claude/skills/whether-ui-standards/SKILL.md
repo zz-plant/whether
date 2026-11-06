@@ -44,7 +44,7 @@ Sections VIII and XI are the ones most often violated by accident, because they'
 
 ## Reuse the primitives before writing class chains
 
-`app/components/ui/` holds `actionLink.tsx`, `buttonLink.tsx`, and `tag.tsx`. These already encode the 44px target, `touch-action`, and focus-visible behavior. A new one-off `className` chain on a bare `<a>` will silently drop all three. Use `className` overrides for layout positioning only — `mt-auto`, `justify-center`, icon gaps — never to strip a focus affordance.
+`app/components/ui/` holds `actionLink.tsx` (link-buttons), `segmentedControl.tsx` (any pick-one choice), `closeControl.ts` (every ×) and `tag.tsx`, and `app/components/clipboardActionRow.tsx` is every copy button. These already encode the 44px target, `touch-action`, and focus-visible behavior. A new one-off `className` chain on a bare `<a>` will silently drop all three. Use `className` overrides for layout positioning only — `mt-auto`, `justify-center`, icon gaps — never to strip a focus affordance.
 
 Design tokens live in `app/styles/tokens.css` (fluid type scale `--text-fluid-*`, semantic posture colors `--color-semantic-*`). Theme overrides live in the `html[data-theme="light"]` block of the same `tokens.css` (there is no `theme-variants.css`). Any new color must come from a token, because a hardcoded hex will look correct in dark mode and break in light. A token added to the dark `:root` block also needs a light override there, or it renders a dark-tuned pastel on `--bg-body`.
 

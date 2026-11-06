@@ -50,7 +50,7 @@ counterevidence mode verifies. Contract, commands and evaluation limits: [decisi
 
 - On `/`, the call precedes the horizon selector and confidence popover, which sit beside Copy Brief before the evidence sections. A first visit uses the canonical site name as the short opening line, with the longer score explanation inside the existing reading guide.
 - The header keeps all six operator tabs at tablet widths; Search becomes a labelled field only from `xl`, and the bottom navigation owns Search below `md`.
-- The homepage header wraps its company controls on the smallest phones (up to 360px). The footer reserves its side-by-side brand column for `lg`, giving its link groups enough room at landscape and tablet widths.
+- The header is one row at every width (since 2026-11-06; it wrapped its controls below 360px while it carried the company pills). The footer reserves its side-by-side brand column for `lg`, giving its link groups enough room at landscape and tablet widths.
 - Desktop section outlines wrap long labels; the mobile section index uses readable shared metadata text and contains horizontal overscroll.
 - The shared area table and homepage signal table stack below `md`, including landscape phone widths. Shared controls retain at least 44px touch targets on tablets; the compact 36px treatment requires a fine pointer with hover. Native text fields remain at least 16px on coarse pointers.
 
@@ -60,41 +60,51 @@ The brief, report pages, answer pages and share groups use the spacing roles in 
 
 The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
 
-### 1.0a Four groups: This week, Decide, Record, Guides (2026-10-08)
+### 1.0a Four groups: This week, Plan, History, Guides (2026-10-08; renamed 2026-10-28)
 
 The header carries four groups, each with a hub, read from one module
-(`navigationGroups` and `navigationPages`, `lib/navigation/informationArchitecture.ts`):
+(`navigationGroups` and `navigationPages`, `lib/navigation/informationArchitecture.ts`). The groups
+were "This week, Decide, Record, Guides" until 2026-10-28; the code keys (`decide`, `record`) kept
+those names.
 
 | Group | Hub | Pages (sub-tabs, then secondary links) |
 | --- | --- | --- |
-| This week | `/` | Why it changed (`/signals`), How much to trust this week (`/trust`) |
-| Decide | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`) |
-| Record | `/history` | Compare periods (`/history/compare`), Calibration (`/calibration`); Product writing (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
-| Guides | `/resources` | the direct answers and guides by decision area, the frameworks and templates, and More tools |
+| This week | `/` | Why it changed (`/signals`); Method (`/trust`) |
+| Plan | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`); Your decisions (`/decisions`) |
+| History | `/history` | Calibration (`/calibration`); Compare periods (`/history/compare`), Advice vs. market (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
+| Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix |
 
-- **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Decide"
-  and on `/history` "Record". `/signals` keeps its URL; it is "Why it changed" in the tabs, the
-  breadcrumb and the header sublabel.
-- **Header.** From `md`: the wordmark, the four group tabs (one-key jumps `w`, `d`, `r`, `g`), then
-  the utility links Use it elsewhere (`/share`) and About in lighter type, then search
-  (⌘K) and theme. There is no More menu. Below `md` the bottom bar carries the four groups and
-  More; More opens a sheet with Search, every group's pages and the utility links
+- **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Plan"
+  and on `/history` "History". `/signals` keeps its URL; it is "Why it changed" in the tabs, the
+  breadcrumb and the header sublabel. A page under a grouped page takes that page's name over the
+  wordmark: a role's page reads "Roles", a company's "Companies".
+- **Roles and Companies are Guides' tabs** (2026-11-06). The role and company pages sat outside the
+  IA: two links in Guides' More tools, at the foot of the page, were the one way in, and each family
+  had three names ("Role guidance" over the wordmark, "Roles" in the trail, "This week's conditions
+  by role" as the title). As pages they take one name, the tab row on `/resources`, `/roles` and
+  `/companies`, and an entry in the phone's More sheet, the footer and the palette; a role's or a
+  company's own page keeps its trail ("Guides › Roles › Software engineers").
+- **Header.** From `md`: the wordmark, the four group tabs (one-key jumps `w`, `p`, `h`, `g`), then
+  the utility links Share and embed (`/share`, from `lg`) and About in lighter type, then search
+  (⌘K), share and theme. There is no More menu. Below `md` the bottom bar carries the four groups and
+  More; More opens a sheet with Search, share, theme, every group's pages and the utility links
   (`app/components/MobileTabBar.tsx`, `app/components/globalHeaderNavClient.tsx`).
 - **Sub-tabs.** `SectionTabs` (`app/components/sectionTabs.tsx`) draws the group's pages above the
   intro on every grouped working page (the report shell takes `page.currentPath`;
-  `/comps`, `/calibration` and `/concepts` render it themselves). It replaced the planning
+  `/comps`, `/calibration`, `/concepts`, `/resources`, `/roles` and `/companies` render it
+  themselves). It replaced the planning
   switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro. Three routes
   deliberately keep the breadcrumb trail instead of the row (verified 2026-10-23): `/`, whose
   first screen is the one-screen brief and whose siblings it reaches by its own links (each changed
-  signal links `Why it changed`; the trust strip links `How much to trust this week`); and the
+  signal links `Why it changed`; the trust strip links `/trust`); and the
   frozen archive reads `/brief/<week>` and `/history/<period>`, which are shareable artifacts and
   closed records, not group workspaces.
 - **Breadcrumbs** come from `buildGroupBreadcrumbs` (`lib/navigation/breadcrumbs.ts`): the group,
   the page when it is not the hub, then the caller's crumbs — "This week › Why it changed",
-  "Decide › Runway planner", "Record › Week of …", "Guides › <question>",
+  "Plan › Runway planner", "History › Week of …", "Guides › Roles › <role>", "Guides › <question>",
   "Guides › More tools › For CEO". A hub alone gets Home first.
-- **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, About,
-  Contact, Search, RSS); then one column per group, headed by the group's name linking its hub.
+- **Footer.** The brand column carries the utility links (Share and embed, API & MCP, About,
+  Contact, Search, RSS, Calendar); then one column per group (from `md`), headed by the group's name linking its hub.
   Contact is a utility link since 2026-10-23: until then no page, nav, footer or palette linked
   `/contact` — only the sitemap named it — so the corrections policy pointed at an editor a
   reader could not reach. As a utility link it reaches the footer, the phone's More sheet, the
@@ -4633,6 +4643,61 @@ warning gauge" for 10Y−2Y, "2-year minus 3-month" for 2Y−3M, and "1-month", 
 
 The running head keeps its four-word "2 pts from Freezing" (`formatNearestChange`), and the pastes
 keep `formatMargin`'s band and points: neither has room for a second clause.
+
+### 1.1.103 Phone chrome (2026-11-06)
+
+A pass over the header, running head, tab bar, More sheet and tab rows at 320, 360, 390 and 700px,
+in both themes, found the frame around the page working against it:
+
+- **The header runs edge to edge below `md`.** Its fill sat on a box inside a 16px gutter, so the
+  sticky header was a card with the page scrolling past in the strips either side of it. The
+  wordmark now sits on the page's 16px gutter, over the content and the running head's mark.
+- **One header row at every width.** Below 360px it wrapped the share and theme cells onto a
+  second row, 106px of a 640px screen; the wrap was for the company pills, gone since 2026-10-31.
+- **The theme cell is a cell.** It was a `.weather-pill`, whose fill and border beat the header's
+  utilities from unlayered CSS, so it drew as a raised, lit key beside a flat share cell and read
+  as switched on. `ThemeToggleButton` now takes its caller's class; the More sheet's matches the
+  share row beside it.
+- **Sheets are opaque on the light theme.** The More sheet, the share rail and the time-machine
+  picker filled with `bg-slate-950/95`, which the light theme maps to a 3.5% tint: clear glass
+  over the page. They take `--bg-panel`, as the command palette does.
+- **A group's page tabs fade the end they run past** on a phone, as the section chips do
+  (`watchRowEdges`, `app/components/rowEdges.ts`; `data-row-fade` in layout-effects.css). The row
+  cut its last tab mid-word ("Test a c", "Finance s") with nothing to say it scrolled.
+- **The running head drops its mark while the header shows.** On a scroll up the head sits under
+  the header's wordmark and printed "Whether" twice in 95px.
+- **Targets and labels.** Breadcrumbs (16px tall) and the header wordmark (35px) grow to a 44px
+  tap area without moving the line; the sheet's search and share rows are 44px; "This week" in
+  the tab bar stays on one line at 320px; on a tablet held upright the tab bar's tabs sit within
+  36rem rather than 140px apart.
+
+### 1.1.104 Controls, one of each (2026-11-06)
+
+An inventory of the controls under `app/` found the same job built several ways. The ones with a
+defect a reader meets, or a shared part to reach for, changed:
+
+- **The .pptx download on a published brief drew as bare text.** It carried `weather-button-pill`,
+  a class no stylesheet defines. It is the pill beside the copy buttons (`PlainActionLink`).
+- **History's phase-map window showed no selection.** The chosen span set `aria-current="true"`,
+  which `.weather-pill[aria-current="page"]` never matches, and its sky utilities lost to the pill's
+  unlayered paint. It sets `"page"` now.
+- **One close key.** Ten × buttons share `CLOSE_CONTROL_CLASS`: 44px, the control radius, one hover
+  fill, one icon size. The help modal's (shadcn's) was 28px.
+- **One segmented control.** The share panel's presets and formats and the time machine's years use
+  `SegmentedControl`; the presets and years had no pressed state for a screen reader.
+- **Links that go somewhere are links.** The time machine's "Back to this week" (it said "Return to
+  current") and its month steps, and the calendar picker's "Back to this week" (drawn as a stamp),
+  were buttons calling `router.push`. The time machine's link to History said "History Dashboard".
+- **44px targets.** The share panel's switch rows, the time machine's steps and years, `/share`'s
+  format list on a touch screen, and the browser-alert toggle.
+- **One text size for buttons.** Copy buttons were `text-xs` unless compact, beside link-buttons at
+  `text-fluid-sm`; both are `text-fluid-sm`. Copy buttons say "Copied".
+- **Pill links use `ActionLink`.** Thirteen `Link`s that wrote the pill's classes out by hand, at a
+  smaller size, on Guides, the answer and toolkit pages, `/comps` and the scenario pages.
+
+Left as found, for a decision rather than a fix: how many filled primaries the brief shows at once,
+the four wordings of "go to this week's brief", the retry buttons' four looks, and the disclosures'
+seven chevrons.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

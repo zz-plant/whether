@@ -18,6 +18,7 @@ import {
   pagesInGroup,
   utilityLinks,
 } from "../../lib/navigation/informationArchitecture";
+import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
 
 type MobileNavContentProps = {
   navigationLinks?: GlobalHeaderNavigationLink[];
@@ -49,9 +50,9 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
           type="button"
           onClick={onClose}
           aria-label="Close menu"
-          className="absolute -right-2 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
+          className={`${CLOSE_CONTROL_CLASS} absolute -right-2 top-1/2 -translate-y-1/2`}
         >
-          <CloseIcon className="size-4" />
+          <CloseIcon />
         </button>
       </div>
       <div className="space-y-4">
@@ -61,7 +62,7 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
             onClose();
             document.dispatchEvent(new CustomEvent("whether-open-command-palette"));
           }}
-          className={`${SHEET_LINK_CLASS} w-full flex-row items-center gap-2 border border-slate-800/80 text-left ${sheetLinkTone(false)}`}
+          className={`${SHEET_LINK_CLASS} min-h-11 w-full flex-row items-center gap-2 border border-slate-800/80 text-left ${sheetLinkTone(false)}`}
         >
           <Search aria-hidden="true" size={16} strokeWidth={1.8} />
           <span>Search or jump to a page</span>
@@ -76,12 +77,16 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
               onClose();
               openShareRail();
             }}
-            className={`${SHEET_LINK_CLASS} flex-1 flex-row items-center gap-2 border border-[color:var(--border-default)] text-left ${sheetLinkTone(false)}`}
+            className={`${SHEET_LINK_CLASS} min-h-11 flex-1 flex-row items-center gap-2 border border-[color:var(--border-default)] text-left ${sheetLinkTone(false)}`}
           >
             <Share2 aria-hidden="true" size={16} strokeWidth={1.8} />
             <span>Share this page</span>
           </button>
-          <ThemeToggleButton showLabel className="border border-[color:var(--border-default)] !bg-transparent text-slate-300" />
+          {/* The share row's own class, so the two read as one pair of rows. */}
+          <ThemeToggleButton
+            showLabel
+            className={`${SHEET_LINK_CLASS} min-h-11 flex-row items-center gap-2 border border-[color:var(--border-default)] ${sheetLinkTone(false)}`}
+          />
         </div>
 
         {groups.map((group) => (

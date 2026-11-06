@@ -32,8 +32,12 @@ const BUTTON_VARIANT_CLASS: Record<"button" | "primary" | "pill", string> = {
   pill: "weather-pill text-slate-200",
 };
 
+/* `text-fluid-sm` at every size, as `ActionLink` sets its buttons (2026-11-06). The
+   copy buttons were `text-xs` unless compact, so a copy button and the link-button
+   beside it (the published brief's .pptx download, the plan's next step) printed at
+   two sizes in one row; ActionLink's own comment assumed they matched. */
 const BUTTON_BASE_CLASS =
-  "inline-flex items-center justify-center px-4 py-2 text-xs font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400";
+  "inline-flex items-center justify-center px-4 py-2 text-fluid-sm font-semibold transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400";
 
 export function ClipboardActionRow({
   label,
@@ -69,7 +73,7 @@ export function ClipboardActionRow({
         onClick={onClick}
         disabled={isDisabled}
         aria-busy={isCopying}
-        className={`${BUTTON_VARIANT_CLASS[buttonVariant]} ${BUTTON_BASE_CLASS} ${compact ? "min-h-[44px] px-3 py-1 text-fluid-sm" : "min-h-[44px]"} ${buttonClassName ?? ""}`.trim()}
+        className={`${BUTTON_VARIANT_CLASS[buttonVariant]} ${BUTTON_BASE_CLASS} ${compact ? "min-h-[44px] px-3 py-1" : "min-h-[44px]"} ${buttonClassName ?? ""}`.trim()}
       >
         {buttonIcon ? <span className="mr-1.5 inline-flex items-center">{buttonIcon}</span> : null}
         {buttonLabel}

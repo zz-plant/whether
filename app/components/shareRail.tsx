@@ -15,6 +15,8 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
 import { CalendarButton, buildMondayAgendaDescription } from "./calendarButton";
+import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
+import { SegmentedControl } from "./ui/segmentedControl";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
@@ -52,14 +54,14 @@ const GenericSharePresets = ({
     onClick={onCopyPlain}
     className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
   >
-    {copiedTarget === "plain" ? "Copied!" : "Plain text"}
+    {copiedTarget === "plain" ? "Copied" : "Plain text"}
   </button>
   <button
     type="button"
     onClick={onCopySlack}
     className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
   >
-    {copiedTarget === "slack" ? "Copied!" : "Slack format"}
+    {copiedTarget === "slack" ? "Copied" : "Slack format"}
   </button>
 </div>
 );
@@ -135,10 +137,10 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-[var(--z-modal)] bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share this page">
+        <Dialog.Popup className="weather-slide-panel fixed z-[var(--z-modal)] bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-[color:var(--border-strong)] bg-[color:var(--bg-panel)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share this page">
         <div className="flex items-center justify-between gap-3">
           <h2 className="type-eyebrow text-slate-300">Share</h2>
-          <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">
+          <Dialog.Close className={CLOSE_CONTROL_CLASS} aria-label="Close share panel">
             <CloseIcon />
           </Dialog.Close>
         </div>
@@ -150,27 +152,23 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               only where there is no call to copy. */}
           {artifact ? null : (
             <>
-              <fieldset>
-              <legend className="type-eyebrow">Preset</legend>
-              <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-                {SHARE_PRESETS.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => setPreset(option.id)}
-                    className={`rounded-md px-3 py-2 text-left text-xs font-medium transition-colors ${
-                      preset === option.id
-                        ? "bg-sky-500/12 text-sky-100 border border-sky-500/30"
-                        : "text-slate-300 border border-transparent hover:bg-slate-800/50"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+              {/* The site's segmented control (2026-11-06). The presets were hand-drawn
+                  buttons with no pressed state, so a screen reader heard four buttons and
+                  never which one was chosen. */}
+              <div>
+                <p className="type-eyebrow" aria-hidden="true">Preset</p>
+                <SegmentedControl
+                  className="mt-1.5"
+                  layout="choices"
+                  ariaLabel="Preset"
+                  options={SHARE_PRESETS.map((option) => ({ key: option.id, label: option.label }))}
+                  value={preset}
+                  onSelect={setPreset}
+                />
               </div>
-              </fieldset>
 
-            <label className="flex items-center gap-2 text-sm text-slate-300" htmlFor={`${includeContextLabelId}-control`}>
+            {/* The row is the target: 44px, not the 20px switch alone (§II). */}
+            <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-300" htmlFor={`${includeContextLabelId}-control`}>
               <Switch.Root
                 id={`${includeContextLabelId}-control`}
                 checked={includeContext}
@@ -185,7 +183,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             </>
           )}
 
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer" htmlFor={`${slackOverlayLabelId}-control`}>
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-300" htmlFor={`${slackOverlayLabelId}-control`}>
             <Switch.Root
               id={`${slackOverlayLabelId}-control`}
               checked={slackOverlayActive}
@@ -238,7 +236,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 }}
                 className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >
-                {copiedTarget === "link" ? "Link copied!" : "Copy page link"}
+                {copiedTarget === "link" ? "Copied" : "Copy page link"}
               </button>
             </div>
           </div>

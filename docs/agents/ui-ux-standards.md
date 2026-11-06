@@ -96,6 +96,10 @@
   - `ghost`: tertiary button-style navigation (`weather-button`) for lower-emphasis actions.
   - `inline`: textual back-navigation links that still preserve focus-visible and touch-manipulation rules.
 - Keep touch/manipulation and min-height behavior intact; only add `className` overrides for layout positioning (e.g., `mt-auto`, `justify-center`, icon gaps), not to remove focus affordances.
+- A link that goes somewhere is a link (`ActionLink`, or `Link` with the register's class), not a button that calls `router.push`: it opens in a new tab and says where it goes. The time machine's "Back to this week" and month steps were buttons until 2026-11-06.
+- Copy buttons are `ClipboardActionRow`, at `text-fluid-sm` like `ActionLink`, and say "Copied" when done ("Copied!" and "Link copied!" went 2026-11-06).
+- Every × that closes a dialog, sheet, popover, toast or notice takes `CLOSE_CONTROL_CLASS` (`app/components/ui/closeControl.ts`) and `<CloseIcon />` at its default size; the call site adds only its position. Ten were hand-written on three radii until 2026-11-06.
+- Pick-one choices are `SegmentedControl` (`app/components/ui/segmentedControl.tsx`): `segmented` for a short strip, `choices` for a longer list. The share presets, the share format and the time machine's years were hand-drawn sky-tinted buttons until 2026-11-06, and the presets and years had no pressed state. A choice that navigates on every arrow key (a month grid in a dialog) stays a set of buttons.
 
 ## XI. Report Shell Hierarchy
 - Scope: shared report-shell routes such as `/signals`, `/operate`, `/resolve`, and `/trust`.

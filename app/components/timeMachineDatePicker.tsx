@@ -7,6 +7,8 @@ import Link from "next/link";
 import { CloseIcon, ChevronLeftIcon, ChevronRightIcon } from "./uiIcons";
 import { MonthGrid } from "./history/monthGrid";
 import { getTimeMachineMonthsByYear, getAdjacentTimeMachineEntry } from "../../lib/timeMachine/timeMachineCache";
+import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
+import { SegmentedControl } from "./ui/segmentedControl";
 
 type CoverageMap = Record<number, number[]>;
 
@@ -38,10 +40,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
     onClose();
   }, [router, onClose]);
 
-  const clearDate = useCallback(() => {
-    router.push("/");
-    onClose();
-  }, [router, onClose]);
+  const monthHref = (year: number, month: number) => `/?month=${month}&year=${year}`;
 
   const adjacentPrev = isActive ? getAdjacentTimeMachineEntry(currentYear, currentMonth, "previous") : null;
   const adjacentNext = isActive ? getAdjacentTimeMachineEntry(currentYear, currentMonth, "next") : null;
@@ -49,33 +48,37 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-[var(--z-modal)] mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[20rem] sm:mr-4 top-0 right-0 rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl" aria-label="Time machine">
+        <Dialog.Popup className="weather-slide-panel fixed z-[var(--z-modal)] mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[20rem] sm:mr-4 top-0 right-0 rounded-lg border border-[color:var(--border-strong)] bg-[color:var(--bg-panel)] p-4 shadow-xl" aria-label="Time machine">
           <div className="flex items-center justify-between gap-3">
             <h2 className="type-eyebrow text-slate-300">Historical view</h2>
-            <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close">
+            <Dialog.Close className={CLOSE_CONTROL_CLASS} aria-label="Close">
               <CloseIcon />
             </Dialog.Close>
           </div>
 
           {isActive ? (
             <div className="weather-caveat-band mt-3 px-3 py-2 text-xs">
+              {/* Links, not buttons that push the router (2026-11-06): each goes to an
+                  address, so it can open in a new tab, and each is a 44px key. "Back to
+                  this week" is the phrase the calendar picker and the archived banner use;
+                  this said "Return to current" in 16px of underlined text. */}
               <div className="flex items-center justify-between gap-2">
                 <span className="weather-caveat-mark">Viewing {currentMonth}/{currentYear}</span>
-                <button type="button" onClick={clearDate} className="underline decoration-slate-600 underline-offset-4 hover:decoration-current">Return to current</button>
+                <Link href="/" onClick={onClose} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:decoration-current">
+                  Back to this week
+                </Link>
               </div>
               {adjacentPrev || adjacentNext ? (
                 <div className="mt-2 flex items-center gap-2">
                   {adjacentPrev ? (
-                    <button type="button" onClick={() => navigateTo(adjacentPrev.year, adjacentPrev.month)}
-                      className="flex items-center gap-1 rounded border border-slate-700/60 px-2 py-1 text-fluid-nano hover:bg-slate-800/50">
+                    <Link href={monthHref(adjacentPrev.year, adjacentPrev.month)} onClick={onClose} className="weather-button inline-flex min-h-11 items-center gap-1 px-3 text-fluid-nano font-medium">
                       <ChevronLeftIcon className="h-3 w-3" /> {adjacentPrev.month}/{adjacentPrev.year}
-                    </button>
+                    </Link>
                   ) : null}
                   {adjacentNext ? (
-                    <button type="button" onClick={() => navigateTo(adjacentNext.year, adjacentNext.month)}
-                      className="flex items-center gap-1 rounded border border-slate-700/60 px-2 py-1 text-fluid-nano hover:bg-slate-800/50">
+                    <Link href={monthHref(adjacentNext.year, adjacentNext.month)} onClick={onClose} className="weather-button inline-flex min-h-11 items-center gap-1 px-3 text-fluid-nano font-medium">
                       {adjacentNext.month}/{adjacentNext.year} <ChevronRightIcon className="h-3 w-3" />
-                    </button>
+                    </Link>
                   ) : null}
                 </div>
               ) : null}
@@ -86,16 +89,18 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
             <p className="mt-4 text-xs text-slate-400">No historical data available.</p>
           ) : (
             <div className="mt-4 space-y-3">
-              <fieldset>
-                <legend className="type-eyebrow">Year</legend>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {years.map((year) => (
-                    <button key={year} type="button" onClick={() => setPickedYear(year)}
-                      className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${selectedYear === year ? "bg-sky-500/12 text-sky-100 border border-sky-500/30" : "text-slate-300 border border-slate-800/60 hover:bg-slate-800/50"}`}
-                    >{year}</button>
-                  ))}
-                </div>
-              </fieldset>
+              {/* The site's one segmented control (2026-11-06): these were 28px buttons on the
+                  data radius, sky-tinted when chosen, with no pressed state for a screen reader. */}
+              <div>
+                <p className="type-eyebrow" aria-hidden="true">Year</p>
+                <SegmentedControl
+                  className="mt-1.5"
+                  ariaLabel="Year"
+                  options={years.map((year) => ({ key: String(year), label: String(year) }))}
+                  value={String(selectedYear)}
+                  onSelect={(year) => setPickedYear(Number(year))}
+                />
+              </div>
               {months.length > 0 ? (
                 <div>
                   <p className="type-eyebrow">Month</p>
@@ -111,8 +116,9 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
             </div>
           )}
           <div className="mt-4 border-t border-slate-800/60 pt-3 text-center">
-            <Link href="/history" onClick={() => onClose()} className="inline-flex items-center gap-1 text-fluid-nano font-medium text-sky-200 hover:text-sky-100 hover:underline">
-              Go to History Dashboard &rarr;
+            {/* The page's own name: there is no "History Dashboard". */}
+            <Link href="/history" onClick={() => onClose()} className="weather-hit inline-flex items-center gap-1 text-fluid-nano font-medium text-sky-200 hover:text-sky-100 hover:underline">
+              Open History &rarr;
             </Link>
           </div>
         </Dialog.Popup>

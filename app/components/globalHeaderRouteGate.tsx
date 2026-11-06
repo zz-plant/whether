@@ -33,7 +33,7 @@ type GlobalHeaderRouteGateProps = {
  * route name: shown at every width where no group tab marks the route
  * (`/about`, `/share`, the legal pages), and below `md` everywhere
  * else, because the bottom bar names the group rather than the page. The home
- * brief carries the phone-only stage pill and the present-mode toggle; the
+ * brief carries the present-mode toggle, and below `sm` no actions at all; the
  * cadence control that used to sit here belongs to the brief and renders
  * inside the page.
  */
@@ -58,9 +58,18 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
       {/* Every route has the header, so the runway band's one re-render
           listener lives here rather than beside any one control. */}
       <RunwayServerSync />
-      <div className="rounded-b-md border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)]">
-        <div className="flex items-center justify-between gap-2 px-3 py-2 max-[360px]:flex-wrap sm:gap-3">
-          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 no-underline">
+      <div className="border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)] md:rounded-b-md">
+        {/* px-4 below `md` puts the wordmark on the page's own 16px gutter, under
+            the running head's mark and over the content's left edge. */}
+        {/* One row at every width. Under 360px it wrapped, which put the share
+            and theme cells on a second full-width row and made the header 106px
+            of a 640px screen: the wrap dates from the stage and runway pills,
+            which left the header on 2026-10-31. The wordmark gives way instead,
+            truncating its route name. */}
+        <div className="flex items-center justify-between gap-2 px-4 py-2 sm:gap-3 md:px-3">
+          {/* `weather-hit-box`: the wordmark and route name are 35px tall, so
+              the tap area grows past them to 44px without moving the band. */}
+          <Link href="/" className="weather-hit-box flex min-w-0 items-center gap-2.5 no-underline">
             <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0">
               <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
               <circle cx="5" cy="11" r="1.5" fill="currentColor" />
@@ -74,7 +83,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
             </div>
           </Link>
           <GlobalHeaderNavClient pathname={pathname} />
-          <div className="flex shrink-0 items-center justify-end gap-1.5 max-[360px]:w-full sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
+          <div className="flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
             {/* The stage and runway pills left the phone header (2026-10-31).
                 They existed because the inline calibration was `hidden sm:block`,
                 so a phone had no way to answer. The calibration is visible at

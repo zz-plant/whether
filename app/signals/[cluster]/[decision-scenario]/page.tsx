@@ -263,14 +263,14 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
-          <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">The evidence</Link>
+        <div className="flex flex-wrap gap-2">
+          <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
+          <ActionLink href={`/signals/${cluster}`} variant="pill">The evidence</ActionLink>
           {leadAnswer ? (
             <ActionLink href={`/answers/${leadAnswer.slug}`} variant="pill">Full answer</ActionLink>
           ) : null}
-          <Link href="/resolve/ceo" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
-          <Link href="/operate#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">What to do</Link>
+          <ActionLink href="/resolve/ceo" variant="pill">Decision tool</ActionLink>
+          <ActionLink href="/operate#ops-monthly-action-summary" variant="pill">What to do</ActionLink>
         </div>
       </section>
     </ContentPageShell>

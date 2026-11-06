@@ -13,9 +13,9 @@ type BreadcrumbItem = {
  * not the group's hub, then any crumbs the caller names (an intermediate such as
  * "More tools", and the leaf — an answer, a week, a period).
  *
- * `/signals` reads "This week › Why it changed", `/operate/financial` "Decide ›
- * Runway planner", `/history/compare` "Record › Compare periods", an answer
- * "Guides › <question>". A hub on its own (`/operate`) gets Home first, so the
+ * `/signals` reads "This week › Why it changed", `/operate/financial` "Plan ›
+ * Runway planner", `/history/compare` "History › Compare periods", a role
+ * "Guides › Roles › <role>", an answer "Guides › <question>". A hub on its own (`/operate`) gets Home first, so the
  * trail is never one crumb long. A path outside the groups starts at Home.
  *
  * The trails used to be hand-written per route — "Home › Evidence › …",

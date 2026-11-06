@@ -5,7 +5,8 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 
 import { cn } from "../../../lib/utils"
 import { Button } from "./button"
-import { XIcon } from "lucide-react"
+import { CloseIcon } from "../uiIcons"
+import { CLOSE_CONTROL_CLASS } from "./closeControl"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -60,19 +61,13 @@ function DialogContent({
       >
         {children}
         {showCloseButton && (
+          /* The site's close key, not shadcn's 28px icon button (2026-11-06). */
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            render={
-              <Button
-                variant="ghost"
-                className="absolute top-2 right-2"
-                size="icon-sm"
-              />
-            }
+            aria-label="Close"
+            className={`${CLOSE_CONTROL_CLASS} absolute top-1 right-1`}
           >
-            <XIcon
-            />
-            <span className="sr-only">Close</span>
+            <CloseIcon />
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>

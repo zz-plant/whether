@@ -7,6 +7,7 @@ import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { classifyReturnGap, weeksBetweenSlugs } from "../../../lib/activationFunnel";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../../../lib/isoWeek";
 import { CloseIcon } from "../uiIcons";
+import { CLOSE_CONTROL_CLASS } from "../ui/closeControl";
 
 type SeenCall = {
   recordDate: string;
@@ -188,9 +189,9 @@ export function SinceLastVisit({
       type="button"
       onClick={() => setIsDismissed(true)}
       aria-label="Dismiss"
-      className="-my-2.5 -mr-3 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:text-slate-200 weather-focus-ring"
+      className={`${CLOSE_CONTROL_CLASS} -my-2.5 -mr-3`}
     >
-      <CloseIcon className="size-3.5" />
+      <CloseIcon />
     </button>
   );
 

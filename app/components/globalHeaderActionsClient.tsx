@@ -70,9 +70,9 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
       </button>
       {/* The light theme has a full token set in tokens.css and layout.tsx
           restores the saved choice pre-paint, but nothing rendered the control,
-          so the theme was unreachable from the UI. Takes the cell class rather
-          than its own pill default, like the buttons either side. */}
-      <ThemeToggleButton className={`!rounded-none !shadow-none !outline-offset-[-2px] ${CELL}`} />
+          so the theme was unreachable from the UI. The cell class, like the
+          buttons either side. */}
+      <ThemeToggleButton className={`${CELL} !outline-offset-[-2px]`} />
       {showPresentMode ? (
         <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
       ) : null}

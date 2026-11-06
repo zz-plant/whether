@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Toast } from "@base-ui/react/toast";
 import { AlertTriangleIcon, CheckIcon, CloseIcon } from "./uiIcons";
+import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
 
 const toneClassByType: Record<string, string> = {
   success: "border-emerald-400/60 bg-emerald-500/10",
@@ -46,7 +47,7 @@ const ToastList = () => {
                 ) : null}
               </div>
               <Toast.Close
-                className="inline-flex min-h-11 min-w-11 items-center justify-center -mr-2 -mt-1 rounded-lg text-xs text-slate-400 transition-colors hover:text-slate-200 weather-focus-ring"
+                className={`${CLOSE_CONTROL_CLASS} -mr-2 -mt-1`}
                 aria-label="Dismiss notification"
               >
                 <CloseIcon />

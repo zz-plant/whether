@@ -23,9 +23,13 @@ export function GlobalHeaderScrollWrapper({ children }: GlobalHeaderScrollWrappe
      element (§XXIII: name what moves; the every-property utility is banned and
      tested against). `motion-reduce:transition-none` is the standard's required
      reduced-motion end state: the header shows and hides instantly. */
+  /* Edge to edge below `md`, the way the tab bar at the foot is: with a 16px
+     gutter on the band and its fill only on the box inside, the sticky header
+     was a card floating over the page, and the page scrolled past in the two
+     strips either side of it (2026-11-06). From `md` it keeps the inset box. */
   return (
     <header
-      className={`mx-auto sticky top-0 z-[var(--z-chrome)] w-full max-w-[96rem] px-4 transition motion-reduce:transition-none duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`mx-auto sticky top-0 z-[var(--z-chrome)] w-full max-w-[96rem] md:px-4 transition motion-reduce:transition-none duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${atTop ? "" : "shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)]"}`}
     >

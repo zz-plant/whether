@@ -6,9 +6,8 @@ import { buildHubStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildResourceHubEntries } from "../../lib/resourceHub";
 import { resourceSupportingPages } from "../../lib/resourcesContent";
 import { PageShell } from "../components/pageShell";
-import { Breadcrumbs } from "../components/ui/breadcrumbs";
+import { SectionTabs } from "../components/sectionTabs";
 import { ActionLink } from "../components/ui/actionLink";
-import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { weeklyHeadline } from "../../lib/report/reportEvidence";
@@ -129,7 +128,9 @@ export default async function ResourcesHubPage({
       })}
     >
       <OperatorWorkflowRouteTracker />
-      <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs("/resources"))} />
+      {/* The group's tabs, as on every grouped working page: Guides has three pages
+          since Roles and Companies joined it (2026-11-06), so its trail gave way to them. */}
+      <SectionTabs currentPath="/resources" />
       <article className="weather-panel space-y-8 px-5 max-sm:px-0 py-5">
         {/* No emblem: the "Governance Pillars" glyph beside the title was
             decoration from when the page was "Governance resources", and the
@@ -256,13 +257,9 @@ export default async function ResourcesHubPage({
               guides" until 2026-10-08; that block repeated this page. */}
           <div className="flex flex-wrap gap-2">
             {templates.map((resource) => (
-              <Link
-                key={resource.path}
-                href={resource.path}
-                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100"
-              >
+              <ActionLink key={resource.path} href={resource.path} variant="pill">
                 {resource.title}
-              </Link>
+              </ActionLink>
             ))}
           </div>
         </section>
@@ -273,18 +270,8 @@ export default async function ResourcesHubPage({
             keep their addresses. Open when a link arrives with a selection. */}
         <section id="more-tools" aria-labelledby="resources-more-tools-heading" className="space-y-3">
           <h2 id="resources-more-tools-heading" className="type-section">More tools</h2>
-          <p className="text-sm text-slate-300">
-            <Link href="/companies" className="text-[var(--accent-action)] underline underline-offset-4">
-              This week&apos;s conditions by company and role
-            </Link>
-            : this week&apos;s rules for a role, beside what 50 public companies have filed.
-          </p>
-          <p className="text-sm text-slate-300">
-            <Link href="/roles" className="text-[var(--accent-action)] underline underline-offset-4">
-              This week&apos;s conditions by role
-            </Link>
-            : what to ask for and what to ask leadership, at any tech company.
-          </p>
+          {/* The role and company pages are Guides' own tabs since 2026-11-06, at the
+              top of this page; the two links that stood here were the one way in. */}
           {/* The worksheets by name, outside the fold (2026-10-27). They were
               listed only inside the closed disclosure below, so a reader who
               did not open it never learned the site had them. */}

@@ -131,3 +131,22 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/*
+ * A row of tabs that scrolls sideways fades the ends its tabs run past
+ * (`SectionTabsActiveInView` sets the attribute from `watchRowEdges`). A mask,
+ * not an overlay: the mask belongs to the scroller's own box, so it stays at
+ * the edge while the tabs scroll under it, and it fades into whatever ground
+ * the row sits on, which on the report pages is the week's atmosphere rather
+ * than the body colour an overlay would have to name. The end fade is wider:
+ * that is where the next tab is cut, and where a thumb starts the swipe.
+ */
+[data-row-fade="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 3.5rem), transparent);
+}
+[data-row-fade="start"] {
+  mask-image: linear-gradient(to left, #000 calc(100% - 2rem), transparent);
+}
+[data-row-fade="both"] {
+  mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 3.5rem), transparent);
+}

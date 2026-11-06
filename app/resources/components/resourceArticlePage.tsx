@@ -272,9 +272,9 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             <Link href={article.toolLink.href} className="weather-button inline-flex w-full items-center justify-center" data-conversion-event="download">
               {article.toolLink.label}
             </Link>
-            <Link href="/resources/decision-shield-overview" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100" data-conversion-event="request">
+            <ActionLink href="/resources/decision-shield-overview" variant="pill" className="justify-center" data-conversion-event="request">
               Open Decision Shield
-            </Link>
+            </ActionLink>
             <div className="space-y-2 border-t border-slate-700/80 pt-3 text-xs text-slate-300">
               <p className="font-semibold text-slate-100">Related pages</p>
               <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link>

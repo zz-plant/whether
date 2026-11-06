@@ -109,12 +109,20 @@ export function RunningHead() {
       }`}
       style={{ transform: `translateY(${offset}px)` }}
     >
-      <div className="mx-auto flex h-8 max-w-[96rem] items-center gap-2 px-4 text-fluid-nano leading-none text-slate-400 sm:px-7">
+      <div className="mx-auto flex h-8 max-w-[96rem] items-center gap-2 px-4 text-fluid-nano leading-none text-slate-400 md:px-7">
         <p aria-hidden="true" className="flex min-w-0 flex-1 items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-slate-300">
-            <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
-          </svg>
-          <span className="shrink-0 font-semibold text-slate-100">Whether</span>
+          {/* The mark and name only while the header is away. With the header back
+              on a scroll up, the head sits right under its wordmark and printed
+              "Whether" twice in 95px; the frame still names the site, through the
+              header (2026-11-06). */}
+          {offset === 0 ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-slate-300">
+                <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
+              </svg>
+              <span className="shrink-0 font-semibold text-slate-100">Whether</span>
+            </>
+          ) : null}
           {facts.condition ? (
             <span className="type-stamp shrink-0 font-semibold" style={{ color: "var(--regime-ink)" }}>
               {facts.condition}
@@ -164,7 +172,7 @@ export function RunningHead() {
         /* The brief's own line on a phone: the call, which is what a screenshot of the
            brief is for, and the jump to what it changes. The desktop brief keeps its
            floating strip for both. */
-        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-4 pb-1 text-fluid-sm sm:px-7 md:hidden">
+        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-4 pb-1 text-fluid-sm md:hidden">
           <span aria-hidden="true" className="min-w-0 flex-1 truncate font-medium text-slate-50">
             {facts.call}
           </span>

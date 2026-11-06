@@ -21,6 +21,21 @@ describe("breadcrumbs follow the groups", () => {
     assert.deepEqual(names(buildGroupBreadcrumbs("/history/compare")), ["History", "Compare periods"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/calibration")), ["History", "Calibration"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/concepts")), ["History", "Advice vs. market"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/roles")), ["Guides", "Roles"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/companies")), ["Guides", "Companies"]);
+  });
+
+  /* The role and company pages added their family's crumb by hand until they became
+     Guides' pages (2026-11-06); a caller that still did would print it twice. */
+  it("names a role's or a company's family once, from the IA", () => {
+    assert.deepEqual(
+      names(buildGroupBreadcrumbs("/roles/software-engineers", [{ name: "Software engineers", path: "/roles/software-engineers" }])),
+      ["Guides", "Roles", "Software engineers"],
+    );
+    assert.deepEqual(
+      names(buildGroupBreadcrumbs("/companies/microsoft", [{ name: "Microsoft", path: "/companies/microsoft" }])),
+      ["Guides", "Companies", "Microsoft"],
+    );
   });
 
   it("put Home before a hub, so no trail is one crumb long", () => {

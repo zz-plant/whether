@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Route } from "../../../lib/navigation/routeType";
+import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildToolkitHowTo } from "../../../lib/seo/pageStructuredData";
 import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
@@ -12,6 +12,7 @@ import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { ArrowRightIcon } from "../../components/uiIcons";
+import { ActionLink } from "../../components/ui/actionLink";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -160,7 +161,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         <h2 className="text-lg font-semibold text-slate-100">Common mistakes to avoid</h2>
         <ul className="space-y-2 text-sm text-slate-200">{toolkit.misuseCases.map((item) => <li key={item}>• {item}</li>)}</ul>
         <h2 className="pt-2 text-lg font-semibold text-slate-100">Related guidance</h2>
-        <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <Link key={link.href} href={link.href as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">{link.label}</Link>)}</div>
+        <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <ActionLink key={link.href} href={toRoute(link.href)} variant="pill">{link.label}</ActionLink>)}</div>
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start from your role or situation</h2>

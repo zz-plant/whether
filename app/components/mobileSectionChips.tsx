@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReportSectionLink } from "./reportShellNavigation";
 import { useActiveSectionId } from "./AppSidebar";
 import { scrollRowToItem } from "./scrollRowToItem";
+import { watchRowEdges } from "./rowEdges";
 
 /**
  * The outline rail, for phones.
@@ -32,20 +33,7 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
-    const syncEdges = () => {
-      const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
-      setHiddenEdges({
-        left: nav.scrollLeft > 1,
-        right: nav.scrollLeft < maxScrollLeft - 1,
-      });
-    };
-    syncEdges();
-    nav.addEventListener("scroll", syncEdges, { passive: true });
-    window.addEventListener("resize", syncEdges, { passive: true });
-    return () => {
-      nav.removeEventListener("scroll", syncEdges);
-      window.removeEventListener("resize", syncEdges);
-    };
+    return watchRowEdges(nav, ({ start, end }) => setHiddenEdges({ left: start, right: end }));
   }, [sectionLinks]);
 
   // The row scrolls; the page it is stuck to does not (scrollRowToItem.ts).
