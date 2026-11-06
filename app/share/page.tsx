@@ -268,7 +268,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     {
       id: "investor-update",
       group: "Docs and email",
-      label: "Investor update",
+      label: "For your investors",
       hint: "Two paragraphs for a monthly letter: the conditions and how they moved since the end of last month, then the guidance and what your runway band means for it.",
       kind: "investor",
       parts: artifact.investorUpdate,
@@ -277,7 +277,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     {
       id: "portfolio-note",
       group: "Docs and email",
-      label: "Portfolio note",
+      label: "For your portfolio",
       hint: "For an investor or accelerator writing to the companies it backs: each area's rule, a note on the week for every runway band, and a link for each company to set its own lines.",
       kind: "text",
       text: artifact.portfolioNote,

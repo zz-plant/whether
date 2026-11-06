@@ -141,12 +141,12 @@ describe("the facts the head keeps", () => {
 describe("the section a frame is in", () => {
   const headings = [
     { label: "What changed", top: -400 },
-    { label: "What would change this guidance", top: 30 },
+    { label: "What would change our mind", top: 30 },
     { label: "Deeper evidence", top: 500 },
   ];
 
   it("is the last heading that has reached the line under the head", () => {
-    assert.equal(runningHeadSection(headings, 80), "What would change this guidance");
+    assert.equal(runningHeadSection(headings, 80), "What would change our mind");
     assert.equal(runningHeadSection(headings, 20), "What changed");
   });
 

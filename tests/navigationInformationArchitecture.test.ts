@@ -66,7 +66,7 @@ describe("navigation groups", () => {
 
   it("calls /signals 'Why it changed' and /trust 'Method'", () => {
     assert.equal(navigationLabelByPath["/signals"], "Why it changed");
-    assert.equal(navigationLabelByPath["/trust"], "Method");
+    assert.equal(navigationLabelByPath["/trust"], "Can I trust this?");
   });
 
   it("files Advice vs. market under History as a secondary page, not a tab", () => {

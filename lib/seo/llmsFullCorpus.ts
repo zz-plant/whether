@@ -65,7 +65,7 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
         `What to do: ${page.directAnswer}`,
         heading(4, page.contextHeading),
         page.context,
-        `Company inputs to check: ${page.companyInputs.join(" ")}`,
+        `What to check at your company: ${page.companyInputs.join(" ")}`,
         `Decision note to complete: ${page.decisionNote}`,
         `References: ${page.supportingLinks.map((link) => `${link.label}: ${link.href.startsWith("/") ? `${baseUrl}${link.href}` : link.href}`).join("; ")}`,
         `Decision areas: ${page.mappedDecisionAreas.join(", ")}`,

@@ -39,7 +39,7 @@ describe("regime colour contract", () => {
     // via `regimeDataAttribute`, the same table the plane on /history reads.
     const html = renderToStaticMarkup(
       <Sparkline
-        label="Operating latitude"
+        label="Room to move"
         points={[
           { label: "May 2026", value: 40, ground: REGIME_HEX_COLORS.SCARCITY, groundLabel: "Freezing" },
           { label: "Jun 2026", value: 44, ground: REGIME_HEX_COLORS.VOLATILE, groundLabel: "Stormy" },

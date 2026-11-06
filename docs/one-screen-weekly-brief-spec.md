@@ -1,9 +1,9 @@
 # One-screen weekly leadership brief spec (v2, decision-complete)
 
 > **Status (2026-09-29).** Blocks A–H below are the v2 design intent. The rendered homepage carries none of
-> their required labels ("THIS WEEK", "Operating latitude", "Revisit decisions", "Window velocity", "Memory
+> their required labels ("THIS WEEK", "Room to move", "Revisit decisions", "Window velocity", "Memory
 > rail", "Confidence strip", "What changes if wrong"); since 2026-10-09 its order is the verdict, the stage and
-> runway, "What are you deciding?", "What would change this guidance", "Get an email the day a line is
+> runway, "What are you deciding?", "What would change our mind", "Get an email the day a line is
 > crossed", "What changed this week", "Has this happened before?" and "Share". Read "Current implementation
 > contract" below and `docs/feature-specs-current.md`
 > §1.1 for what ships; do not build to the block labels.
@@ -30,7 +30,7 @@ If leaders start saying “we’re +1 bold this week,” the surface is working.
 ## Hard constraints (non-negotiable)
 1. **10-second readability:** first viewport answers posture and action delta without scroll.
 2. **30-second decisiveness:** user can state what changed and what to revisit.
-3. **Single anchor metric:** Operating latitude is the canonical scalar.
+3. **Single anchor metric:** Room to move is the canonical scalar.
 4. **Bounded downside:** explicit conditional triggers define what changes if wrong.
 5. **Slack portability:** screenshot is decision-complete and clean at preview scale.
 
@@ -46,7 +46,7 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 
 **Required copy format (exact labels):**
 - `THIS WEEK`
-- `Operating latitude: +1 notch`
+- `Room to move: +1 notch`
 - `Hiring window: Open`
 - `Expansion window: Strong`
 - `Raise window: Improving`
@@ -67,11 +67,11 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 **Optional line (max one):**
 - `Baseline posture: [posture label].`
 
-### Block C — Operating latitude module (single scalar)
+### Block C — Room to move module (single scalar)
 **Purpose:** establish one numeric anchor for cross-functional alignment.
 
 **Required structure:**
-- `Operating latitude: 63 / 100`
+- `Room to move: 63 / 100`
 - `Change: +4`
 - driver chips (max 3):
   - `Risk appetite +4`
@@ -115,7 +115,7 @@ nowhere rather than invented.
 `If [trigger] → [policy consequence 1] → [policy consequence 2]`
 
 **Minimum two rows:**
-- `If tightness rises 20 points → Hiring window closes → Operating latitude drops 12 points`
+- `If tightness rises 20 points → Hiring window closes → Room to move drops 12 points`
 - `If curve inverts → Payback tolerance tightens to ≤ 9 months`
 
 **Rules:**
@@ -179,14 +179,14 @@ went on 2026-08-14, and were removed on 2026-10-27 (`docs/feature-specs-current.
 Canonical top-fold order on homepage must remain:
 1. **This week strip** (compact posture, trend, confidence, and flip trigger metadata only; no second operating call)
 2. **Action-first weekly call** (single canonical decision block with readiness/trust chips, `Action now`, `Current call`, and the bounded `What changed` / `Pause if` / `Change course if` triplet)
-3. **Compact backdrop row** (`Operating latitude` plus external market backdrops for hiring, expansion, and raise conditions)
+3. **Compact backdrop row** (`Room to move` plus external market backdrops for hiring, expansion, and raise conditions)
 4. **Share actions + lower-emphasis detail** (one routine-first artifact card stays visible; citation and continuity remain secondary collapsed details)
 5. **Why this call** disclosure (supporting evidence hidden behind details/summary)
 6. **Decision matrix + action strip** (headed “What can we do this week?” and showing bounded rules as `Do now`, `Stop or tighten if`, and `Open up again when`)
 7. **Planning next / exception paths** (Planning visible as the default next step; proof stays visible and deeper paths stay behind an explicit optional disclosure)
 
 Implementation guardrails:
-- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Operating latitude`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
+- Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Room to move`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
 - The weekly call's reversal side is two fields, printed under two labels (2026-09-22). `weeklyCall.callChangesIf` is where the call itself changes — the regime flip trigger — under `Call changes if`; a stage never replaces it. `weeklyCall.resumeWhen` is set only when a stage or runway is calibrated and carries that stage's `reversalTriggerDiscipline` under `Restart when`, beside the call-change line. They used to share one field (`changeCourseIf`), so choosing a stage swapped the flip trigger out for a resume condition while every surface still labelled it `Call changes if`. Surfaces print both through `weeklyCallChangeLines`. A read that projects the stored `OperatingSnapshot` lays the reader's stage over the stored (stage-agnostic) call with `applyStageToWeeklyCall`; before that, a chosen stage reached the brief only when the store was empty.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
 - The homepage action strip translates structured lane states into explicit action phrases (`Keep this closed`, `Proceed with guardrails`, `Stage the next move`, `Move ahead now`). The underlying `Closed` / `Guarded` / `Staged` / `Open` values remain stable for model consumers.
@@ -209,7 +209,7 @@ Implementation guardrails:
 - The canonical weekly-call block should expose one dominant action lane first, then the smaller `Revisit now` lane, before any backdrop summaries.
 - The homepage shell above the weekly call should stay compressed: one slim brand/status row, one quiet workspace rail, and no large search field in the first scan path.
 - Search has one visible global entry point per viewport: the header launcher at `md` and above, and the bottom navigation Search control below `md`. Both open the single global command palette, which also handles free-text guidance queries; informational pages do not add a second header search form.
-- The compact backdrop row should expose the scalar anchor (`Operating latitude`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance. V2 homepage variants should keep that same scalar hierarchy in the hero: Operating latitude first, tightness only as a supporting driver or guardrail input.
+- The compact backdrop row should expose the scalar anchor (`Room to move`) plus external market labels (`Hiring market`, `Expansion market`, `Raise market`) so it does not read like company stance guidance. V2 homepage variants should keep that same scalar hierarchy in the hero: Room to move first, tightness only as a supporting driver or guardrail input.
 - The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane and **why that lane is queued this week** — not the bounded action. The action is already stated verbatim in the bounded-decisions ledger below, and rendering it twice made the queue pure duplication. Each item carries `driver` (the signal move) and `recheck` (the area-specific instruction); because one signal can queue up to three lanes, a `driver` shared by every visible item is hoisted above the list instead of repeated per row.
@@ -369,7 +369,7 @@ The homepage now renders one dominant weekly decision block instead of several e
 - **Flip watch moved into the hero.** The standalone `FlipMeter` barometer card was removed. Its `compactFlipConditionLabels` now render as a compact `Flip watch:` line inside `DecisionHero`. The distinct transition forecast follows as subordinate text with its modeled event and monthly horizon; it is never appended to the decision-reversal sentence. The tightness barometer visual duplicated hero metrics and was cut.
 - **Trust is inline, not a separate summary card.** `DeltaTrustStrip` was removed from the right rail; the hero already carried confidence, source mode, freshness, and record date. Confidence is now surfaced in the hero's compact trust line (`Source · record date · Confidence · trust status`).
 - **The revisit ritual now lives in the hero.** The adjacent `WeeklyTopFoldContract` was removed instead of restating posture delta and continuity. `DecisionHero` owns the binary revisit verdict plus at most two queued decision areas; comparison and history remain lower-emphasis continuity tools.
-- **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Operating latitude, delta, and pause/reversal conditions remain visible.
+- **Diagnostics are progressive.** The detailed signal cells sit behind one `Why this call` disclosure while the call, Room to move, delta, and pause/reversal conditions remain visible.
 - **Threshold distance names the decision consequence.** The hero preserves the nearest bounded-rule distance but labels it with one associated surfaced decision (for example, `3 points until hiring review`). Shared thresholds use revisit priority rather than listing every affected lever; crossed lines render as crossed instead of implying distance remains.
 - **History no longer competes in a sticky rail.** Regime history, subscription, and the citable permalink now sit in a lower continuity-and-delivery section after the operating workflow.
 
@@ -571,8 +571,8 @@ still wrap naturally, and all touch targets keep their 44px minimum height.
 
 ### What the reader may hear (2026-10-31)
 
-A seventh section, “What you may be hearing” (`#what-you-may-hear`), sits between “What
-would change this guidance” and “How unusual is this?”. It gets the reader ahead of the
+A seventh section, “What your team will ask” (`#what-you-may-hear`), sits between “What
+would change this guidance” and “Has this happened before?”. It gets the reader ahead of the
 pushback, competing takes and questions the crossed lines above tend to bring into the
 room: one exchange per crossed area, one per role thread and one per speaker, capped at
 three, each drawn as a chat pair — what the group says on the left, and what to say back

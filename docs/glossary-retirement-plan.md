@@ -15,7 +15,7 @@ causes. They need to be fixed in this order, because each one inflates the next.
      "Reversal trigger", "WATCH:", "FLIP:", and others.
    - The line where the call itself changes ships under about 9: "Posture flips", "watch line",
      "regime boundary", "regime line", "posture boundary", "Flip trigger", and others.
-   - Operating latitude also appears as "Boldness", "BOLDNESS BUDGET", "Latitude signal" and a
+   - Room to move also appears as "Boldness", "BOLDNESS BUDGET", "Latitude signal" and a
      bare `NN/100`.
    - A regime appears as its weather name, as the raw engine key (`SCARCITY` reaches `/history`,
      `/resources`, `/history/compare`, Scenario Studio, exports and alerts), as "Transitional
@@ -36,7 +36,7 @@ causes. They need to be fixed in this order, because each one inflates the next.
    - Bond-desk shorthand (10Y−2Y, bp, 1M, OAS, BBB, U-3, EV/Revenue, FRED codes) and engine
      vocabulary (corridor, rate stack, leg, hysteresis, haircut, veto) reach primary surfaces.
    - The 10Y−2Y spread is written in five units: %, pp, bp, pts and "points".
-   - Operating latitude, the biggest number on `/`, is defined only inside the collapsed "Why
+   - Room to move, the biggest number on `/`, is defined only inside the collapsed "Why
      this call" panel.
 
 The one translation layer that exists, `applyPlainEnglishSubstitutions`, rewrites jargon with
@@ -64,7 +64,7 @@ follows it. The decisions below cover only what the table left open.
 |---|---|---|
 | D1 | Names for the three lines | **Pause if** / **Restart when** / **Call changes if**. `DECISION_CONTRACT_LABELS.reversal.resumeWhen` replaces `changeCourseIf`, and `publicDecisionLabels.reversal` reads it, so "Re-open when" is gone. |
 | D2 | "Posture" | Already settled on `main`: "the call". Reader copy keeps ratcheting it down. |
-| D3 | Operating latitude | Keep the name (table). `OPERATING_LATITUDE_GLOSS` sits beside the number wherever the number is. Retire "Boldness" and "BOLDNESS BUDGET". |
+| D3 | Room to move | Keep the name (table). `OPERATING_LATITUDE_GLOSS` sits beside the number wherever the number is. Retire "Boldness" and "BOLDNESS BUDGET". |
 | D4 | Confidence | The word names the engine band only (High / Medium / Low confidence). No percent on reader surfaces. Data freshness never uses the word. |
 | D5 | Forecast outcome labels | Rendered as weather names; the typed layer stays internal. |
 | D6 | Stage word | Duration ("Freezing for 5 months"), not Early / Mid / Late. |

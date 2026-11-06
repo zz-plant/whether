@@ -75,10 +75,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const comps = await loadComps();
   const month = comps.status === "ok" ? formatTitleMonth(comps.data.fetchedAt) : null;
   return buildPageMetadata({
-    title: month ? `SaaS Valuation Multiples, ${month}` : "SaaS Valuation Multiples: Public SaaS EV/Revenue",
-    description: `Median EV/Revenue multiple and revenue growth across ${SAAS_BASKET.length} public SaaS companies, with the date of the read and this week's fundraising guidance.`,
+    title: month ? `What a SaaS company is worth, ${month}` : "What is a SaaS company worth right now?",
+    description: `What public SaaS companies are worth right now: the median EV/Revenue multiple and revenue growth across ${SAAS_BASKET.length} companies, with the date of the read and this week's fundraising guidance.`,
     path: "/comps",
-    imageAlt: "Whether SaaS valuation multiples",
+    imageAlt: "What a SaaS company is worth right now",
   });
 }
 
@@ -116,7 +116,7 @@ export default async function CompsPage() {
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5">
         <div className="space-y-2 max-w-2xl">
           <h1 className="text-fluid-2xl font-semibold text-slate-100">
-            SaaS valuation multiples{readMonth ? `, ${readMonth}` : ""}
+            What a SaaS company is worth{readMonth ? `, ${readMonth}` : ""}
           </h1>
           <p className="text-sm text-slate-300">
             Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public

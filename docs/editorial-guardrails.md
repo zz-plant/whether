@@ -142,7 +142,7 @@ answering a question the answer pages already answer.
   stays the label for the stance itself, not a description of what the product is. The cost
   of drift here is not tidiness: this product spreads by an operator repeating it in a Slack
   channel, and a category that changes per surface does not survive that retelling.
-- **The metric noun is "Operating latitude"** — the one proper noun in this vocabulary a
+- **The metric noun is "Room to move"** — the one proper noun in this vocabulary a
   competitor cannot use, so it is spelled out on first mention rather than shortened to
   "the score". `buildBoldnessScore` in `lib/report/weeklyLeadershipBrief.ts` is the source.
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
@@ -248,7 +248,7 @@ inventory of every heading in `app/`:
   matters, and what would change the guidance", which was the index as a sentence (found
   2026-10-04). Same rule for a caption narrating controls the rows already show: the `/share` tag
   table's caption pointed at its own copy buttons.
-- **Sentence case everywhere.** Capitals only for proper nouns: Whether, Operating latitude, the
+- **Sentence case everywhere.** Capitals only for proper nouns: Whether, Room to move, the
   weather regime names, FRED. No all-caps in source — `.type-eyebrow` uppercases in CSS — and no
   emoji in a heading or label.
 - **One name per thing, across surfaces.** The paste-a-plan tester is "Plan stress test" on `/`

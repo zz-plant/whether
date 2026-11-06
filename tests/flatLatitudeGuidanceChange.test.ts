@@ -63,7 +63,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
     assert.equal(summary.boldnessDelta, 0, "the latitude did not move");
     assert.ok((model.decisionMovement?.moved.length ?? 0) > 0, "a pause line was crossed");
     assert.equal(summary.guidanceChange, "lines");
-    assert.equal(summary.shorthandLine, "Operating latitude unchanged since Sep 29.");
+    assert.equal(summary.shorthandLine, "Room to move unchanged since Sep 29.");
 
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
@@ -94,7 +94,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
       buildWeeklyOperatorBriefPayload(document, { weeklyLeadershipSummary: model.weeklyLeadershipSummary }),
     );
 
-    assert.match(text, /^Operating latitude: 51\/100 \(room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs Sep 29: no change$/m);
+    assert.match(text, /^Room to move: 51\/100 \(how much you can hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs Sep 29: no change$/m);
     assert.doesNotMatch(text, /guidance is (unchanged|holding)|guidance is holding where it was/i);
   });
 });

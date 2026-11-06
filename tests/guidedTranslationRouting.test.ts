@@ -140,7 +140,7 @@ describe("guided translation routing", () => {
     /* React escapes apostrophes, so the comparison reads the text the browser shows. */
     const visibleText = roleHtml.replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
 
-    assert.match(visibleText, /What you may be hearing/);
+    assert.match(visibleText, /What your team will ask/);
     assert.match(visibleText, /What to say/);
     assert.doesNotMatch(visibleText, /Open CFOs and finance leads view/, "does not offer to open the role already on screen");
     assert.match(visibleText, /Open Engineering leads view/, "all other roles are reachable");
@@ -153,7 +153,7 @@ describe("guided translation routing", () => {
     const stageHtml = renderToStaticMarkup(
       createElement(GuidedTranslationPanels, { searchParams: { stage: "series-a" } }),
     );
-    assert.doesNotMatch(stageHtml, /What you may be hearing/);
+    assert.doesNotMatch(stageHtml, /What your team will ask/);
   });
 
   it("renders the homepage section from the crossed lines, and nothing without them", () => {
@@ -162,7 +162,7 @@ describe("guided translation routing", () => {
 
     const entries = selectHearingForAreas(["burn-discipline"]);
     const html = renderToStaticMarkup(createElement(HearingSection, { entries }));
-    assert.match(html, /What you may be hearing/);
+    assert.match(html, /What your team will ask/);
     assert.match(html, /id="what-you-may-hear"/);
     assert.match(html, /href="\/resources\?stakeholder=[^"#]+#guided-translation-results"/);
     for (const { hearing } of entries) {

@@ -14,7 +14,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 **Clicks**
 1. Open `/` or click `This week` in the header.
 2. Read the verdict card: the conditions word, the week's headline action, one line on why, and the trust strip (`Data as of`, `Sources`, and `Margin`, which ends with whether the call could change next week). The card's conditions map says what each of the four conditions means; below `md`, where the card has no map, the one-line legend above the week says it.
-3. Every visit reads the same order (re-checked against `app/page.tsx` on 2026-10-27): `What are you deciding?` (pick an area), the stage and runway the lines are set for (`Rules for a <stage> company with <runway> · Change`), `Why conditions are <condition>`, `What changed this week`, `What would change this guidance`, `How unusual is this?`, `Get notified when something changes` and `Share`. Before a band is chosen, the area rules' runway note links `pick your cash runway` to the stage and runway line.
+3. Every visit reads the same order (re-checked against `app/page.tsx` on 2026-10-27): `What are you deciding?` (pick an area), the stage and runway the lines are set for (`Rules for a <stage> company with <runway> · Change`), `Why conditions are <condition>`, `What changed this week`, `What would change our mind`, `Has this happened before?`, `Get notified when something changes` and `Share`. Before a band is chosen, the area rules' runway note links `pick your cash runway` to the stage and runway line.
 4. For execution detail, click `Build this week’s plan →` under the areas (the label follows the `Plan horizon` choice), or `Decide` in the header.
 
 **Current output**
@@ -51,7 +51,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 
 **Clicks**
 1. Click `Why it changed` in the `This week` tab row (`/signals`), or follow the link from `What changed this week` on `/`.
-2. Read `What changed` and `What would change this guidance`.
+2. Read `What changed` and `What would change our mind`.
 3. Under `Deeper evidence`, open the question you need, such as `What are interest rates doing?`, `How have the two scores moved this year?` or `What would conditions be with different lines?`.
 4. For provenance, click `How much to trust this week` in the tab row, or `How this is judged` on the call card.
 5. On `/trust`, read `How the scores are built` and `Sources and last update`. In a week with live data and no active warning, `Limits, and what would change the guidance` folds `Margin and reliability limits` and `What would make this recommendation wrong?`; in any other week they render open. The citation and the meeting snippet are `/share` formats.

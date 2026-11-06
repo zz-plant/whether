@@ -50,7 +50,7 @@ export const buildAnswerSectionHeadings = (page: AnswerSectionHeadingInput) => (
    * leaders and board operators" on the climate page.
    */
   posture: page.applyHeading,
-  rules: `Rules in force: ${joinAreas(page.mappedDecisionAreas)}`,
+  rules: `What's binding this week: ${joinAreas(page.mappedDecisionAreas)}`,
   threshold: `What would change this answer: ${THRESHOLD_FOCUS_LABELS[page.thresholdFocus]}`,
   /** Labels the provenance block. The same block on every page. */
   citation: "Citation",

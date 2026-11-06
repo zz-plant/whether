@@ -251,7 +251,7 @@ export const buildWeeklyDecisionCardModel = (
       boldnessScore: 58,
       boldnessDelta: -2,
       guidanceChange: "lines",
-      shorthandLine: "Operating latitude down slightly since last week.",
+      shorthandLine: "Room to move down slightly since last week.",
     },
     weeklyMovement: { score: 1.2, direction: "tightening", summary: "Model pressure increased by +1.2 this week; tighten approvals until a conditions reverse." },
     decisionMovement: null,
