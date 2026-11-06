@@ -34,8 +34,7 @@ const NOT_CONTAINERS = new Set([
   "weather-line-band",
 ]);
 
-const isPrefixedNonContainer = (name: string) =>
-  name.startsWith("weather-tag-") || name.startsWith("weather-data-mode-");
+const isPrefixedNonContainer = (name: string) => name.startsWith("weather-tag-");
 
 const readStyles = () =>
   readdirSync(STYLES_DIR)

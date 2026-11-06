@@ -211,7 +211,7 @@ describe("tablists support the keyboard", () => {
   it("keeps a setting out of the history stack", async () => {
     const componentsDir = join(testDir, "..", "app", "components");
 
-    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "StageDropdownPill.tsx", "RunwayConditionedNotes.tsx", "RunwayServerSync.tsx"]) {
+    for (const name of ["cadenceSelector.tsx", "StagePersonaSelector.tsx", "RunwayConditionedNotes.tsx", "RunwayServerSync.tsx"]) {
       const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
       assert.match(source, /router\.replace\(/, `${name} should replace rather than push`);
       assert.doesNotMatch(source, /router\.push\(/, `${name} pushes a setting onto history`);
@@ -220,9 +220,7 @@ describe("tablists support the keyboard", () => {
     // write the cookie, and RunwayServerSync (checked above) re-renders from it.
     // Writing `?runway=` outranked the cookie on the server and put the reader's
     // band in every URL they pasted.
-    for (const name of ["RunwayPersonaSelector.tsx", "RunwayDropdownPill.tsx"]) {
-      const source = codeOnly(await readFile(join(componentsDir, name), "utf8"));
-      assert.doesNotMatch(source, /router\.(push|replace)\(|params\.set\("runway"/, `${name} writes the runway into the address again`);
-    }
+    const runwaySource = codeOnly(await readFile(join(componentsDir, "RunwayPersonaSelector.tsx"), "utf8"));
+    assert.doesNotMatch(runwaySource, /router\.(push|replace)\(|params\.set\("runway"/, "the runway selector writes the runway into the address again");
   });
 });

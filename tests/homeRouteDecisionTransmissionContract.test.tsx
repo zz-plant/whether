@@ -238,26 +238,20 @@ describe("home route render contract", () => {
       "<StressTestQuickCard",
       "<DirectAnswersStrip",
       "<WeeklyRetrospectiveCard",
-      "<StageDropdownPill",
       "<SectionSignpost",
       "<BriefSectionNav",
     ]) {
       assert.ok(!routeSource.includes(tag), `${tag} has no render site on /`);
     }
 
-    /* One control per axis at every width. The phone pills existed only because
-       the inline calibration was sm-only; it is visible everywhere now, so the
-       header asks nothing and the calibration is the one control. */
-    const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
-    assert.ok(!headerSource.includes("<StageDropdownPill"), "the header asks for no stage");
-    assert.ok(!headerSource.includes("<RunwayDropdownPill"), "the header asks for no runway");
+    /* One control per axis at every width: the inline calibration is visible everywhere,
+       so the header asks nothing and the calibration is the one control. */
     const calibrationSource = readFileSync("app/components/home/CompanyCalibration.tsx", "utf8");
     assert.match(
       calibrationSource,
       /<details[^>]*className="group block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
       "the sm+ tablists lead the areas they reshape, folded under the line that names them",
     );
-    assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");
     const explainerSource = readFileSync("app/components/home/ConditionsLegend.tsx", "utf8");
     assert.ok(!explainerSource.includes("OPERATOR_STAGE_OPTIONS"), "the legend does not ask the stage a third time");
 

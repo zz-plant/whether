@@ -112,23 +112,6 @@ html[data-theme="light"] .weather-hero-card {
     inset 0 0 0 1px var(--bg-nested-light);
 }
 
-.weather-data-mode {
-  @apply inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-semibold;
-}
-
-/* Live data is the clear state: the ink, framed. */
-.weather-data-mode-dynamic {
-  border-color: color-mix(in srgb, var(--line-clear) 30%, transparent);
-  background-color: color-mix(in srgb, var(--line-clear) 8%, transparent);
-  color: var(--color-semantic-easing-fg);
-}
-
-.weather-data-mode-static {
-  border-color: var(--border-strong);
-  background-color: var(--bg-nested-light);
-  color: var(--app-text-secondary);
-}
-
 /* Depth de-escalation ---------------------------------------------------
    A container nested inside another container must not out-weigh it, or
    proximity and enclosure stop signalling grouping and every level reads as
@@ -197,7 +180,7 @@ html[data-theme="light"] .weather-hero-card {
 }
 
 /* Chip base — normalizes sizing across all chip-like elements */
-:where(.weather-chip, .weather-tag, .weather-hub-chip, .weather-data-mode) {
+:where(.weather-chip, .weather-tag, .weather-hub-chip) {
   border-radius: var(--radius-sm);
   font-size: var(--fs-nano);
   font-weight: 600;
