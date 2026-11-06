@@ -107,7 +107,6 @@ Available starter skills:
 - `signal-provenance-audit` → source URL/timestamp/formula provenance audits
 - `executive-brief-pack` → leadership-ready strategy/export brief outputs
 - `system-skill-router` → routes skill-management tasks with deterministic sequencing and standardized output sections
-- `vercel-react-best-practices` → React/Next.js performance rules for rendering, bundling, server, and async code
 - `whether-ui-loop` → screenshot-driven UI iteration with `bun run ui:iterate`
 - `whether-ui-standards` → UI/UX rules for anything that renders under `app/`
 
@@ -123,7 +122,7 @@ which Claude Code already gets from a global plugin). `tests/skillsMirror.test.t
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description
-- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/subagent-handoff`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, `/system-skill-router`, or `/vercel-react-best-practices`
+- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/subagent-handoff`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, or `/system-skill-router`
 
 When using skill outputs in a deliverable, preserve each skill's output-contract sections so reviewers can verify completeness quickly.
 
