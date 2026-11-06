@@ -163,6 +163,7 @@ export default async function ResourcesHubPage({
             ) : null}
           </div>
 
+          <div className="weather-grid gap-x-8 gap-y-6 [--col-min:28rem] [--grid-max:2]">
           {areaGroups.map((group) => {
             /* The area's standing once, beside its name (2026-10-09). Every decision
                answer in a group argues that area first, so each of its rows printed
@@ -173,7 +174,7 @@ export default async function ResourcesHubPage({
               .map((page) => describeAnswerStanding({ page, areaRows, conditionsLabel }))
               .find((standing) => standing?.kind === "area");
             return (
-              <section key={group.area} id={`area-${group.area}`} aria-labelledby={`area-${group.area}-heading`} className="space-y-1">
+              <section key={group.area} id={`area-${group.area}`} aria-labelledby={`area-${group.area}-heading`} className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                   <h3 id={`area-${group.area}-heading`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
                     <AreaIcon area={group.area} />
@@ -233,6 +234,7 @@ export default async function ResourcesHubPage({
               </section>
             );
           })}
+          </div>
 
           {/* Two references the answers lean on, linked under the list they serve. */}
           <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5 gap-y-2">

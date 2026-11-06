@@ -4699,12 +4699,40 @@ Left as found, for a decision rather than a fix: how many filled primaries the b
 the four wordings of "go to this week's brief", the retry buttons' four looks, and the disclosures'
 seven chevrons.
 
+### 1.1.105 Ten pages got a structure, not a coat of paint (2026-11-06)
+
+A screenshot pass over every page family, both themes at phone and desktop frames, found ten
+surfaces spending width or scroll on the wrong thing. What changed:
+
+- **`/share` file artifacts.** Each picture is capped at 160px on a phone, so the format list, the
+  embed block and the subscribe form come into reach; from `sm` the picture keeps its 3:2 frame.
+  Still one `<img>` per artifact, sized before it loads.
+- **`/resources`.** The answer groups sit two across on a wide frame (`weather-grid`,
+  `--col-min:28rem`), so "This week's answers, by area" reads as one screen instead of five.
+- **`/signals`.** The "Since" column folded into the signal cell ("Signal and move · since Oct 26"),
+  so the table spends its width on the line and the consequence instead of a column that mostly
+  said "No change".
+- **`/trust`.** The derivation and the source board sit side by side (`weather-grid`,
+  `--col-min:28rem`); stacked, each left half the page empty.
+- **`/brief/[week]`.** The copy panel follows "Guidance by area" rather than sitting between the
+  delta and the rules it copies (`tests/publishedBriefPageOrder.test.tsx`).
+- **`/operate`.** Each area's Pause and Restart cells take the full phone row, so the pair stacks
+  instead of sharing a line with the rule beside it.
+- **`/history/compare`.** A sticky A/B bar on a phone names both periods and their conditions: the
+  two columns stack, and a reader deep in Period B had to remember Period A.
+- **`/concepts`.** A year rail under the year strip jumps to a year's first entry, in a list that
+  runs to ten thousand pixels.
+
+Left as found: `/history` (already a structure), `/` (right order; it needs compression, not a
+restructure), and `/compare`'s full A/B toggle.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:
 
 - **What changed.** One table of every signal: where it came from, where it sits against its line,
-  and why it matters. Since 2026-11-03 a row no longer says "Moves first" (risk appetite, the curve)
+  and why it matters. Since 2026-11-06 the move sits under the signal it belongs to ("Signal and
+  move · since Oct 26") rather than in a "Since" column of its own (§1.1.105). Since 2026-11-03 a row no longer says "Moves first" (risk appetite, the curve)
   or "Confirms later" (funding pressure): the premise test found both scores track deal count most
   closely in the same quarter and the next, falling off together (`docs/research/premise-test-results.md`,
   "Lead and lag"), so neither label was supported. The focus filters narrow it and travel in the URL. Under the table, a link to

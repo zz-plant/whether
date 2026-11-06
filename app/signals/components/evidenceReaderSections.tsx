@@ -121,16 +121,16 @@ export const SignalsWhatChangedSection = ({
               name needs the first's: left to the browser, "+3 from the yield curve…"
               wrapped to four lines beside a one-line "Why it matters". */}
           <colgroup className="max-md:hidden">
-            <col className="w-[14rem]" />
-            <col className="w-[20rem]" />
-            <col className="w-[15rem]" />
-            {showNotes ? <col /> : null}
+            <col />
+            <col className="w-[18rem]" />
+            {showNotes ? <col className="w-[18rem]" /> : null}
           </colgroup>
           <caption className="sr-only">{`Every signal this week, against its line and ${basis.reference}`}</caption>
           <thead className="max-md:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
-              <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
-              <th scope="col" className="py-2 pr-3 font-medium">{`Since ${basis.reference}`}</th>
+              <th scope="col" className="py-2 pr-3 font-medium">
+                Signal and move <span className="font-normal text-slate-500">· since {basis.reference}</span>
+              </th>
               <th scope="col" className="py-2 pr-3 font-medium">Against its line</th>
               {showNotes ? <th scope="col" className="py-2 pr-3 font-medium">Why it matters</th> : null}
             </tr>
@@ -175,21 +175,20 @@ export const SignalsWhatChangedSection = ({
                       Feeds into <a href="#riskAppetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted (short-term rates above long-term)
                     </span>
                   )}
-                </th>
-                <td className="py-2.5 pr-3 max-md:p-0">
-                  {/* The column head, on the row itself where the head is hidden: a phone
-                      frame of one row read "4.02 → 4.11" with nothing saying since when. */}
-                  <span className="mb-1 block text-fluid-nano text-slate-400 md:hidden">{`Since ${basis.reference}`}</span>
+                  {/* The move sits under the signal it belongs to, so the table
+                      spends its width on the line and the consequence instead of
+                      a separate "since" column whose cells mostly said "No change". */}
+                  <span className="mt-1 block text-fluid-nano font-normal text-slate-400 md:hidden">{`Since ${basis.reference}`}</span>
                   <DeltaChip row={row} />
                   {/* What the score's move is made of. The chip says how far it
                       went; this says which inputs took it there, and that the
                       earlier score was built from rates alone. */}
                   {row.movement ? (
-                    <p className="mt-1.5 max-w-[26rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
+                    <p className="mt-1.5 max-w-[26rem] text-pretty text-xs font-normal leading-5 text-slate-400" data-movement={row.key}>
                       {row.movement}
                     </p>
                   ) : null}
-                </td>
+                </th>
                 <td className="py-2.5 pr-3 max-md:p-0">
                   {row.value === null ? (
                     <span className="text-slate-500">—</span>

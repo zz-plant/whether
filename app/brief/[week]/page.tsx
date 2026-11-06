@@ -298,15 +298,6 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           <p className="text-sm text-slate-300">{display.whatChanged}</p>
         </section>
 
-        <PublishedBriefCopyControls
-          weekLabel={publishedBriefWeekLabel(brief)}
-          slackUpdate={slackUpdate}
-          emailUpdate={emailUpdate}
-          boardUpdate={boardUpdate}
-          permanentUrl={canonicalUrl}
-          slidePptxUrl={`/api/export/board-slide?week=${brief.slug}&format=pptx`}
-        />
-
         {video && videoOpenGraph ? (
           <>
             <meta property="og:video:type" content={videoOpenGraph.type} />
@@ -465,6 +456,18 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             )}
           </section>
         ) : null}
+
+        {/* Share after the guidance, not between "What changed" and the area
+            rules: a cold reader arriving from a pasted link met a copy panel
+            before the rules it was copying (2026-11-06). */}
+        <PublishedBriefCopyControls
+          weekLabel={publishedBriefWeekLabel(brief)}
+          slackUpdate={slackUpdate}
+          emailUpdate={emailUpdate}
+          boardUpdate={boardUpdate}
+          permanentUrl={canonicalUrl}
+          slidePptxUrl={`/api/export/board-slide?week=${brief.slug}&format=pptx`}
+        />
 
         {brief.evidence.length ? (
           <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

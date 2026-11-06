@@ -159,21 +159,25 @@ export default async function MethodPage({
           folds "Limits" below — and opens from `?derivation=1`. On a week with
           warnings or a cached reading it renders open, where the reader who
           needs to distrust it finds it unprompted (DD-040). */}
-      <FormulaReference
-        scoringBasis={reportData.scoringBasis}
-        plainLanguageFolded={!isFallback && warnings.length === 0}
-        plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
-      />
+      {/* Derivation and sources side by side from `lg`: each is a half-page of
+          detail, and stacked they left the right half of the page empty. */}
+      <div className="weather-grid gap-8 [--col-min:28rem] [--grid-max:2] items-start">
+        <FormulaReference
+          scoringBasis={reportData.scoringBasis}
+          plainLanguageFolded={!isFallback && warnings.length === 0}
+          plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
+        />
 
-      {/* Open, under the derivation: the page's question is whether the
-          reading is current enough to act on, and this is where that is
-          checked. It sat folded at the foot of the page, under the method
-          essay and a blank form. */}
-      <SourceBoard
-        rows={sourceBoardRows}
-        treasurySourceUrl={reportData.treasuryProvenance.sourceUrl}
-        macroSourceUrl={reportData.macroProvenance.sourceUrl}
-      />
+        {/* Open, under the derivation: the page's question is whether the
+            reading is current enough to act on, and this is where that is
+            checked. It sat folded at the foot of the page, under the method
+            essay and a blank form. */}
+        <SourceBoard
+          rows={sourceBoardRows}
+          treasurySourceUrl={reportData.treasuryProvenance.sourceUrl}
+          macroSourceUrl={reportData.macroProvenance.sourceUrl}
+        />
+      </div>
 
       {/* The query key stays "sources": a link someone already shared with
           `?sources=1` still opens this panel, though the board itself is
