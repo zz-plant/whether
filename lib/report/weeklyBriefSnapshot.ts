@@ -114,9 +114,6 @@ export const buildWeeklyBriefSnapshot = ({
     historicalSelection: Boolean(reportData.historicalSelection),
     isFallback,
     fallbackReason: reportData.treasury.fallback_reason ?? undefined,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-    freshnessState: freshnessMeta,
     policyHold: reportData.assessment.policyAssessment.refusal.refused
       ? describePolicyHold(reportData.assessment.policyAssessment.refusal)
       : null,

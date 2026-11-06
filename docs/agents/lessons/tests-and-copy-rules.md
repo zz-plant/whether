@@ -106,11 +106,11 @@ company), and ratchets the ones that have a place somewhere (`posture`, `regime`
 expansion on the same surface. `<code>` is stripped before counting, because an API signature on
 `/api-docs` names the parameter the API takes.
 
-What the guardrail cannot see, recorded here: `buildTrustStatus` still computes `approvalBuckets`,
+What the guardrail cannot see: a field nothing draws. `buildTrustStatus` computed `approvalBuckets`,
 `recoveryPlan`, `outageExitGate` and `decisionImpactWindow`, threaded through `homePageAssembler`
-into the page contracts, and nothing under `app/` renders any of them. Their strings were rewritten
-along with everything else, which is the wrong fix for a field nothing draws; they belong to the
-"published field with no reading behind it" class above and should go.
+into the page contracts, and nothing under `app/` rendered any of them. Their strings were rewritten
+along with everything else, which is the wrong fix; they belonged to the "published field with no
+reading behind it" class above and were deleted on 2026-11-05.
 
 ## What a page says against what the rest of the site says (2026-09-17)
 

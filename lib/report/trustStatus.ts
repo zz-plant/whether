@@ -6,35 +6,6 @@ import { formatDateUTC } from "../formatters";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
 
-type TrustOutageSeverity = "advisory" | "blocking" | "critical";
-
-type TrustOutageType = "live-data" | "feed-unavailable" | "stale-cache" | "source-divergence" | "historical-snapshot";
-
-type TrustApprovalBucket = {
-  label: "Allowed now" | "Hold" | "Blocked";
-  detail: string;
-};
-
-type TrustRecoveryPlan = {
-  owner: string;
-  nextCheckpoint: string;
-  exitCondition: string;
-};
-
-type TrustExitGateCriterion = {
-  key: "live-mode" | "freshness" | "confidence";
-  label: string;
-  met: boolean;
-};
-
-type TrustExitGate = {
-  label: string;
-  summary: string;
-  metCount: number;
-  totalCount: number;
-  criteria: TrustExitGateCriterion[];
-};
-
 export type TrustWarning = {
   id: "boundary-whipsaw" | "stale-cached" | "anomaly-divergence";
   warning: string;
@@ -117,132 +88,6 @@ const hasStrongSignalDisagreement = (
   }
 
   return positive > 0 && negative > 0;
-};
-
-const buildOutageExitGate = ({
-  isFallback,
-  confidenceLow,
-  freshnessUnavailable,
-}: {
-  isFallback: boolean;
-  confidenceLow: boolean;
-  freshnessUnavailable: boolean;
-}): TrustExitGate => {
-  const criteria: TrustExitGateCriterion[] = [
-    {
-      key: "live-mode",
-      label: "Live data is back",
-      met: !isFallback,
-    },
-    {
-      key: "freshness",
-      label: "The reading carries a fresh timestamp",
-      met: !freshnessUnavailable,
-    },
-    {
-      key: "confidence",
-      label: "The scores are clear of a change",
-      met: !confidenceLow,
-    },
-  ];
-  const metCount = criteria.filter((criterion) => criterion.met).length;
-
-  return {
-    label: "The hold lifts once all three are true.",
-    summary: `${metCount} of ${criteria.length} are true on this refresh.`,
-    metCount,
-    totalCount: criteria.length,
-    criteria,
-  };
-};
-
-const ALLOWED_DETAILS: Record<TrustStatusTone, [string, string, string]> = {
-  historical: [
-    "Reading a past week and testing a plan against it.",
-    "Any change to this week's plan, until you are back on the current week.",
-    "New fixed-cost commitments.",
-  ],
-  warning: [
-    "Changes you can undo, within the pauses already set.",
-    "New hires and multi-quarter vendor contracts.",
-    "Anything you can't undo, until one live refresh lands.",
-  ],
-  stable: [
-    "This week's usual decisions, under the current guidance.",
-    "Nothing extra.",
-    "Nothing.",
-  ],
-};
-
-const buildApprovalBuckets = ({
-  tone,
-}: {
-  tone: TrustStatusTone;
-}): TrustApprovalBucket[] => {
-  const [allowed, hold, blocked] = ALLOWED_DETAILS[tone];
-  return [
-    { label: "Allowed now", detail: allowed },
-    { label: "Hold", detail: hold },
-    { label: "Blocked", detail: blocked },
-  ];
-};
-
-const buildRecoveryPlan = ({
-  tone,
-}: {
-  tone: TrustStatusTone;
-}): TrustRecoveryPlan => {
-  if (tone === "warning") {
-    return {
-      owner: "Whoever owns the plan",
-      nextCheckpoint: "Daily, until live data is back",
-      exitCondition: "Every source has answered once with live data.",
-    };
-  }
-
-  if (tone === "historical") {
-    return {
-      owner: "Whoever owns the plan",
-      nextCheckpoint: "Before acting on it",
-      exitCondition: "You are reading the current week, not a past one.",
-    };
-  }
-
-  return {
-    owner: "Whoever owns the plan",
-    nextCheckpoint: "The next weekly review",
-    exitCondition: "The scores are clear of a change.",
-  };
-};
-
-const resolveOutageClassification = ({
-  historicalSelection,
-  isFallback,
-  fallbackReason,
-}: {
-  historicalSelection: boolean;
-  isFallback: boolean;
-  fallbackReason?: string;
-}): { outageType: TrustOutageType; outageSeverity: TrustOutageSeverity } => {
-  if (historicalSelection) {
-    return { outageType: "historical-snapshot", outageSeverity: "advisory" };
-  }
-
-  if (!isFallback) {
-    return { outageType: "live-data", outageSeverity: "advisory" };
-  }
-
-  const normalizedReason = fallbackReason?.toLowerCase() ?? "";
-
-  if (normalizedReason.includes("timeout") || normalizedReason.includes("unavailable") || normalizedReason.includes("down")) {
-    return { outageType: "feed-unavailable", outageSeverity: "critical" };
-  }
-
-  if (normalizedReason.includes("diverg") || normalizedReason.includes("anomal")) {
-    return { outageType: "source-divergence", outageSeverity: "blocking" };
-  }
-
-  return { outageType: "stale-cache", outageSeverity: "blocking" };
 };
 
 export const buildTrustWarnings = ({
@@ -606,9 +451,6 @@ export const buildTrustStatus = ({
   historicalAction,
   fallbackAction,
   stableAction,
-  confidenceLabel = "MED",
-  freshnessLabel = FALLBACK_FRESHNESS_LABEL,
-  freshnessState,
   policyHold = null,
   historicalMacroCoverageLabel,
 }: {
@@ -618,21 +460,10 @@ export const buildTrustStatus = ({
   historicalAction: string;
   fallbackAction: string;
   stableAction: string;
-  confidenceLabel?: "HIGH" | "MED" | "LOW";
-  freshnessLabel?: string;
-  freshnessState?: Partial<SourceFreshnessState>;
   /** Set when the guidance is held: the held guidance for the reason it is held (`describePolicyHold`). */
   policyHold?: PolicyHoldCall | null;
   historicalMacroCoverageLabel?: string | null;
 }) => {
-  const confidenceLow = confidenceLabel === "LOW";
-  const resolvedFreshness = resolveFreshnessState({
-    freshnessLabel,
-    freshnessState,
-    isFallbackSnapshot: isFallback,
-    isHistoricalSelection: historicalSelection,
-  });
-  const freshnessUnavailable = resolvedFreshness.freshnessStatus === "unknown";
   const historicalMacroCoverageDetail = historicalSelection && historicalMacroCoverageLabel
     ? ` Macro coverage: ${historicalMacroCoverageLabel}.`
     : "";
@@ -675,74 +506,10 @@ export const buildTrustStatus = ({
       ? "warning"
       : "stable";
 
-  const classification = resolveOutageClassification({
-    historicalSelection,
-    isFallback,
-    fallbackReason,
-  });
-
-  const outageWindow = historicalSelection
-    ? "A past week. Not for this week's decisions."
-    : isFallback
-      ? "Only moves you can undo, until a live update lands."
-      : policyHold
-        ? `Only moves you can undo, until ${policyHold.holdsUntil}.`
-      : "Use this live reading for this week's decisions; this week's pauses apply.";
-
-  const outageExitGate = buildOutageExitGate({
-    isFallback,
-    confidenceLow,
-    freshnessUnavailable,
-  });
-
   return {
     trustStatusLabel: label,
     trustStatusDetail: detail,
     trustStatusAction: action,
     trustStatusTone: tone,
-    outageType: classification.outageType,
-    outageSeverity: classification.outageSeverity,
-    decisionImpactWindow: outageWindow,
-    approvalBuckets: buildApprovalBuckets({ tone }),
-    recoveryPlan: buildRecoveryPlan({ tone }),
-    outageExitGate,
-  };
-};
-
-export const buildTrustMarker = ({
-  confidenceLabel,
-  freshnessMeta,
-  isFallbackSnapshot,
-  isHistoricalSelection = false,
-}: {
-  confidenceLabel: "HIGH" | "MED" | "LOW";
-  freshnessMeta: CompactFreshnessMeta;
-  isFallbackSnapshot: boolean;
-  isHistoricalSelection?: boolean;
-}) => {
-  const trustSummary = buildCompactTrustSummary({
-    confidenceLabel,
-    freshnessLabel: freshnessMeta.updatedAtLabel,
-    isFallbackSnapshot,
-    isHistoricalSelection,
-  });
-  const degraded = isFallbackSnapshot || freshnessMeta.maxAge === "stale" || confidenceLabel === "LOW";
-  const label = isHistoricalSelection
-    ? "Historical snapshot"
-    : degraded
-      ? "Degraded trust"
-      : "Live trust";
-  const tone: "stable" | "warning" | "historical" = isHistoricalSelection
-    ? "historical"
-    : degraded
-      ? "warning"
-      : "stable";
-
-  return {
-    label,
-    tone,
-    degraded,
-    summaryLine: freshnessMeta.line,
-    detail: trustSummary,
   };
 };

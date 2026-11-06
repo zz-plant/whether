@@ -13,7 +13,6 @@ import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet
 import { buildPortfolioNote } from "../lib/export/portfolioNote";
 import { buildRecordSummary } from "../app/components/history/ExportBoardAnnexButton";
 import type { TrackRecord } from "../lib/report/trackRecord";
-import { buildTrustStatus } from "../lib/report/trustStatus";
 import { fixtureBriefDocument, treasury, macros } from "./factories/exportFixtures";
 
 /**
@@ -97,16 +96,4 @@ describe("artifacts that leave the site carry no facts about a company the site 
     assert.match(memo, /176 months/);
     assert.match(memo, /https:\/\/example\.test\/history/);
   });
-
-  it("trust status names no owner inside the reader's company", () => {
-    const base = { historicalAction: "unused", fallbackAction: "unused", stableAction: "unused" };
-    for (const input of [
-      { ...base, historicalSelection: false, isFallback: false },
-      { ...base, historicalSelection: false, isFallback: true, fallbackReason: "Treasury API timeout." },
-      { ...base, historicalSelection: true, isFallback: false },
-    ]) {
-      assert.doesNotMatch(JSON.stringify(buildTrustStatus(input).recoveryPlan), FIXTURE_COMPANY);
-    }
-  });
-
 });

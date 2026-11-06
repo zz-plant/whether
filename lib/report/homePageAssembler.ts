@@ -2,27 +2,16 @@ import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
 } from "../timeMachine/timeMachineSelection";
-import { type ReportData, type ReportDataFallback } from "./reportData";
-import { buildTrustMarker, buildTrustStatus } from "./trustStatus";
 import { buildDegradedSourceRows } from "./sourceHealth";
-import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
-import { buildPostureState } from "./postureStateSource";
-import { homeSectionSequence } from "./homeSections";
 import type { HomePageSearchParams } from "./homeMetadata";
 import { loadHomePageReportData } from "./homePageData";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 import { resolveStartupVariantMode } from "./boundedDecisionRules";
 import { parseOperatorRunwayParam } from "./operatorRunway";
-import { buildDiagnosticsLanePayload } from "./home/diagnosticsLane";
-import { buildHomeWorkspaceModel } from "./home/workspaceModel";
 import { buildHomeStructuredData } from "./home/structuredData";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { OperatorContext } from "./operatorContext";
-import type {
-  HomePageAssembly,
-  HomePageDiagnosticsLane,
-  HomePageWorkspaceModel,
-} from "./home/contracts";
+import type { HomePageAssembly } from "./home/contracts";
 
 export type {
   HomePageAssembly,
@@ -30,89 +19,10 @@ export type {
 
 type HomePageAssemblerDependencies = {
   loadHomePageReportData: typeof loadHomePageReportData;
-  buildPostureState: typeof buildPostureState;
-};
-
-type DeferredHomeSupportModels = {
-  diagnosticsLane: HomePageDiagnosticsLane;
-  workspaceModel: HomePageWorkspaceModel;
 };
 
 const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
   loadHomePageReportData,
-  buildPostureState,
-};
-
-const buildDeferredHomeSupportModels = ({
-  reportData,
-  homeBriefModel,
-  weeklyDecisionCardModel,
-  statusLabel,
-  reportDynamics,
-  trustStatusLabel,
-  trustStatusDetail,
-  trustStatusAction,
-  trustStatusTone,
-  outageType,
-  outageSeverity,
-  decisionImpactWindow,
-  approvalBuckets,
-  recoveryPlan,
-  outageExitGate,
-  freshnessLabel,
-  trustMarker,
-  sectionLinks,
-}: {
-  reportData: ReportData | ReportDataFallback;
-  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
-  weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
-  statusLabel: string;
-  reportDynamics: ReportData["reportDynamics"];
-  trustStatusLabel: string;
-  trustStatusDetail: string;
-  trustStatusAction: string;
-  trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
-  outageType: ReturnType<typeof buildTrustStatus>["outageType"];
-  outageSeverity: ReturnType<typeof buildTrustStatus>["outageSeverity"];
-  decisionImpactWindow: ReturnType<typeof buildTrustStatus>["decisionImpactWindow"];
-  approvalBuckets: ReturnType<typeof buildTrustStatus>["approvalBuckets"];
-  recoveryPlan: ReturnType<typeof buildTrustStatus>["recoveryPlan"];
-  outageExitGate: ReturnType<typeof buildTrustStatus>["outageExitGate"];
-  freshnessLabel: string;
-  trustMarker: ReturnType<typeof buildTrustMarker>;
-  sectionLinks: { href: string; label: string }[];
-}): DeferredHomeSupportModels => {
-  const diagnosticsLane = buildDiagnosticsLanePayload({
-    homeBriefModel,
-    weeklyDecisionCardModel,
-    statusLabel,
-    reportDynamics,
-  });
-
-  return {
-    diagnosticsLane,
-    workspaceModel: buildHomeWorkspaceModel({
-      reportData,
-      diagnosticsLane,
-      weeklyDecisionCardModel,
-      trustStatusLabel,
-      trustStatusDetail,
-      trustStatusAction,
-      trustStatusTone,
-      outageType,
-      outageSeverity,
-      decisionImpactWindow,
-      approvalBuckets,
-      recoveryPlan,
-      outageExitGate,
-      freshnessLabel,
-      trustMarkerLabel: trustMarker.label,
-      trustMarkerTone: trustMarker.tone,
-      trustMarkerDetail: trustMarker.detail,
-      sourceDegraded: trustMarker.degraded,
-      sectionLinks,
-    }),
-  };
 };
 
 export const assembleHomePage = async ({
@@ -137,7 +47,6 @@ export const assembleHomePage = async ({
   const runwayBand = (searchParams?.runway
     ? parseOperatorRunwayParam(searchParams.runway)
     : operatorContext?.companyRunway) ?? undefined;
-  const sectionLinks = homeSectionSequence.map((section) => ({ href: section.href, label: section.label }));
 
   const reportResult = await resolvedDependencies.loadHomePageReportData(searchParams);
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
@@ -146,7 +55,6 @@ export const assembleHomePage = async ({
     fetchedAtLabel,
     historicalSelection,
     recordDateLabel,
-    reportDynamics,
     statusLabel,
     treasury,
     treasuryProvenance,
@@ -165,168 +73,24 @@ export const assembleHomePage = async ({
     startupVariantMode,
     runwayBand,
   });
-  const { isFallback, trustStatus, freshnessMeta, homeBriefModel, weeklyDecisionCardModel, weeklyCall } = baseSnapshot;
-  const {
-    trustStatusLabel,
-    trustStatusDetail,
-    trustStatusAction,
-    trustStatusTone,
-    outageType,
-    outageSeverity,
-    decisionImpactWindow,
-    approvalBuckets,
-    recoveryPlan,
-    outageExitGate,
-  } = trustStatus;
-  const trustMarker = buildTrustMarker({
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessMeta,
-    isFallbackSnapshot: isFallback && !historicalSelection,
-    isHistoricalSelection: Boolean(historicalSelection),
-  });
-
-  // Lazy, and memoised on first access.
-  //
-  // These two promises are a streaming contract: a consumer can render the
-  // weekly call immediately and await the enriched models behind a Suspense
-  // boundary. Today nothing reads them — the homepage renders `reportResult`,
-  // `reportShell`, and `weeklyDecisionCardModel` only — and the work is not
-  // free: it costs a decision-events query (64 rows) plus the support-model
-  // build, on every request to all eight routes that call this assembler.
-  //
-  // A third, `leadershipArtifactPayloadPromise`, built a second meeting pack,
-  // board note and guidance snapshot beside the ones `/share` serves, and only
-  // a test read it; it was deleted rather than kept for a consumer that never
-  // came, because a second build of the same week is how two artifacts drift.
-  //
-  // Eager, that cost was paid by everyone and used by no one. Deferred behind
-  // getters, the contract stays available for whoever wires it up and costs
-  // nothing until someone touches a property.
-  let enrichedHomePageModelMemo: ReturnType<typeof buildEnrichedHomePageModel> | null = null;
-  const buildEnrichedHomePageModel = () => (async () => {
-    try {
-      const postureState = await resolvedDependencies.buildPostureState({
-        record: treasury,
-        historical: Boolean(historicalSelection),
-        assessment,
-        reportDynamics,
-      });
-      const enrichedSnapshot = buildWeeklyBriefSnapshot({
-        reportData,
-        degraded: !reportResult.ok,
-        postureState,
-        startupVariantMode,
-        runwayBand,
-      });
-
-      return {
-        homeBriefModel: enrichedSnapshot.homeBriefModel,
-        weeklyDecisionCardModel: enrichedSnapshot.weeklyDecisionCardModel,
-      };
-    } catch (error) {
-      console.error("[home] deferred posture-state enrichment unavailable", error);
-      return {
-        homeBriefModel: baseSnapshot.homeBriefModel,
-        weeklyDecisionCardModel: baseSnapshot.weeklyDecisionCardModel,
-      };
-    }
-  })();
-
-  const enrichedHomePageModel = () => {
-    enrichedHomePageModelMemo ??= buildEnrichedHomePageModel();
-    return enrichedHomePageModelMemo;
-  };
-
-  // Both the diagnostics lane and the workspace model come out of one build.
-  // Called once each, that builder ran twice per request on identical inputs.
-  let deferredSupportModelsMemo: ReturnType<typeof buildDeferredHomeSupportModels> | null = null;
-
-  const fallbackAlert = !historicalSelection && isFallback
-    ? {
-        lastCachedTimestamp: reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp,
-        sourceLabel: treasury.source,
-        effectiveRecordDate: treasury.record_date,
-        fallbackReason: treasury.fallback_reason,
-      }
-    : null;
-
+  const { isFallback, trustStatus, weeklyDecisionCardModel, weeklyCall } = baseSnapshot;
+  const { trustStatusLabel, trustStatusDetail, trustStatusAction } = trustStatus;
   return {
     reportResult,
     weeklyCall,
     weeklyDecisionCardModel,
-    fallbackActive: !historicalSelection && isFallback,
-    fallbackAlert,
-    get diagnosticsLanePromise() {
-      return enrichedHomePageModel().then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
-        deferredSupportModelsMemo ??= buildDeferredHomeSupportModels({
-        reportData,
-        homeBriefModel: enrichedHomeBriefModel,
-        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
-        statusLabel,
-        reportDynamics,
-        trustStatusLabel,
-        trustStatusDetail,
-        trustStatusAction,
-        trustStatusTone,
-        outageType,
-        outageSeverity,
-        decisionImpactWindow,
-        approvalBuckets,
-        recoveryPlan,
-        outageExitGate,
-        freshnessLabel: freshnessMeta.line,
-        trustMarker,
-        sectionLinks,
-      });
-        return deferredSupportModelsMemo.diagnosticsLane;
-      });
-    },
-    get workspaceModelPromise() {
-      return enrichedHomePageModel().then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
-        deferredSupportModelsMemo ??= buildDeferredHomeSupportModels({
-        reportData,
-        homeBriefModel: enrichedHomeBriefModel,
-        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
-        statusLabel,
-        reportDynamics,
-        trustStatusLabel,
-        trustStatusDetail,
-        trustStatusAction,
-        trustStatusTone,
-        outageType,
-        outageSeverity,
-        decisionImpactWindow,
-        approvalBuckets,
-        recoveryPlan,
-        outageExitGate,
-        freshnessLabel: freshnessMeta.line,
-        trustMarker,
-        sectionLinks,
-      });
-        return deferredSupportModelsMemo.workspaceModel;
-      });
-    },
     reportShell: {
       regime: assessment.regime,
       statusLabel,
       recordDateLabel,
       fetchedAtLabel,
-      freshnessLine: freshnessMeta.line,
       treasurySource: treasury.source,
       trustStatusLabel,
       trustStatusDetail,
       trustStatusAction,
-      trustStatusTone,
-      outageType,
-      outageSeverity,
-      decisionImpactWindow,
-      approvalBuckets,
-      recoveryPlan,
-      outageExitGate,
       degradedSourceRows: buildDegradedSourceRows(reportData.sourceHealth),
       provenance: treasuryProvenance,
       showOfflineBadge: isFallback && !historicalSelection,
-      sectionLinks,
       structuredData: buildHomeStructuredData({
         headline: `Whether Weekly Brief — ${recordDateLabel}`,
         description: weeklyCall.currentCall,

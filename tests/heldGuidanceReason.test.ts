@@ -208,7 +208,6 @@ const heldText = (assessment: RegimeAssessment): string[] => {
     trust.trustStatusLabel,
     trust.trustStatusDetail,
     trust.trustStatusAction,
-    trust.decisionImpactWindow,
     readiness.detail,
   ];
 };
