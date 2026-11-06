@@ -14,7 +14,7 @@ import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
-import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
+import { buildCanonicalUrl, buildOgImageUrl, escapeXml } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
 import { MARGIN_LABEL, formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
@@ -123,7 +123,10 @@ export const PublishedBriefSchema = z.object({
   slug: z.string(),
   year: z.number(),
   week: z.number(),
-  /** Publication date. Frozen at freeze time and never updated. */
+  /**
+   * When the week's permalink started to exist, never updated. Records frozen before
+   * 2026-11-05 carry their record date instead, which the freeze ran days after.
+   */
   publishedAt: z.string(),
   recordDate: z.string(),
   recordDateLabel: z.string(),
@@ -367,8 +370,35 @@ const RETIRED_EVIDENCE_TITLES: Record<string, string> = {
   "Market risk appetite": regimeSignalLabel.riskAppetite,
 };
 
+const CONDITIONS_CHANGE = /conditions changed from (\S+) to (\S+?)\b/i;
+
+/**
+ * Where a frozen week meets the brief before it, for a reader going through them in order.
+ *
+ * "What changed" compares with the reading the week was frozen against, which is the month-end
+ * after a missed week and a re-scored record after a scoring change, so it need not be the brief
+ * before it. w40 said conditions had changed to Freezing when w39 already read Freezing, and w38
+ * moved from Sunny to Freezing without saying so. Said at render, so no frozen sentence is edited
+ * and a later week cannot repeat the gap. A correction states the difference in its own words,
+ * and a corrected week prints no second version.
+ */
+const describeLastBrief = (brief: PublishedBrief, whatChanged: string): string | null => {
+  const last = findAdjacentPublishedBriefs(brief.slug).previous;
+  if (!last || brief.correction) return null;
+  const conditions = getRegimePublicLabel(last.regime);
+  const week = publishedBriefWeekLabel(last);
+  const named = CONDITIONS_CHANGE.exec(whatChanged);
+  if (last.regime === brief.regime) return named ? `The last brief, for the week of ${week}, already read ${conditions}.` : null;
+  if (named?.[1] === conditions) return null;
+  const engines = [last.scores?.engineVersion, brief.scores?.engineVersion];
+  const rescored = engines.every(Boolean) && engines[0] !== engines[1];
+  return `The last brief, for the week of ${week}, read ${conditions}${rescored ? " under earlier scoring" : ""}.`;
+};
+
 export const publishedBriefDisplay = (brief: PublishedBrief) => {
   const comparison = resolvePublishedComparison(brief);
+  const whatChanged = displayWhatChanged(brief, comparison);
+  const lastBrief = describeLastBrief(brief, whatChanged);
   return {
     /* From the engine key, not the stored label: the earliest records stored a
        third vocabulary ("Guarded Expansion — Late") that no stripping recovers. */
@@ -391,7 +421,7 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
        number; with no number in it there is no line, and the slot is left out. */
     pauseIf: /\d/.test(brief.guardrailThreshold) ? translateStoredSentence(brief.guardrailThreshold) : null,
     conditionsChangeIf: restateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
-    whatChanged: displayWhatChanged(brief, comparison),
+    whatChanged: lastBrief ? `${whatChanged} ${lastBrief}` : whatChanged,
     /**
      * Which inputs set the week's scores, from the engine its record names: "Scored on
      * more inputs than the record." for every week frozen before 2026-10-09, whose
@@ -530,6 +560,17 @@ export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" |
 export const correctionBody = (correction: string) => correction.replace(/^Corrected\s+/i, "");
 
 export const publishedBriefWeekLabel = (brief: Pick<PublishedBrief, "recordDate">) => formatWeekMondayUTC(brief.recordDate);
+
+/**
+ * When a record last changed: the date its correction opens with ("Corrected Sep 30, 2026. …"),
+ * else its publication. A correction is the one edit a record takes, and every surface that
+ * dates the page printed the publication as its last change.
+ */
+export const publishedBriefModifiedAt = (brief: Pick<PublishedBrief, "publishedAt" | "correction">) => {
+  const stated = brief.correction?.match(/^Corrected (\w+ \d{1,2}, \d{4})\./)?.[1];
+  const corrected = stated ? Date.parse(`${stated} UTC`) : Number.NaN;
+  return Number.isFinite(corrected) ? new Date(corrected).toISOString() : brief.publishedAt;
+};
 
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
 export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
@@ -694,6 +735,45 @@ export const buildPublishedBriefSlug = (year: number, week: number) => formatIso
 /* One table: this used to carry its own copy of the five area names, so /brief/<week> called an
    area "Product tempo" while the homepage called it "Roadmap". */
 export const labelForArea = (area: string) => (isDecisionArea(area) ? decisionAreaLabel(area) : area);
+
+/**
+ * A frozen week in full, as the feed carries it: the page's sections in the page's order, from
+ * the record alone. The feed printed five lines and a link, which leaves out the five areas and
+ * is not what a platform that takes only full text (Flipboard, SmartNews) can run.
+ */
+export const buildPublishedBriefFeedHtml = (brief: PublishedBrief): string => {
+  const display = publishedBriefDisplay(brief);
+  const labelled = (label: string, value: string) => `<p><strong>${escapeXml(label)}:</strong> ${escapeXml(value)}</p>`;
+  const paragraph = (value: string) => `<p>${escapeXml(value)}</p>`;
+  const heading = (value: string) => `<h2>${escapeXml(value)}</h2>`;
+  const list = (items: readonly string[]) => `<ul>${items.map((item) => `<li>${escapeXml(item)}</li>`).join("")}</ul>`;
+  const readings = buildPublishedBriefReadingLines(brief);
+  const decisions = decisionsInAreaOrder(brief).flatMap((decision) => [
+    `<h3>${escapeXml(labelForArea(decision.area))}</h3>`,
+    paragraph(display.sentence(decision.call)),
+    ...(decision.doNow ? [labelled(publicDecisionLabels.action, display.sentence(decision.doNow))] : []),
+    labelled(publicDecisionLabels.threshold, formatDecisionThreshold(display.sentence(decision.pauseTrigger))),
+    labelled(publicDecisionLabels.reversal, formatDecisionReversal(display.sentence(decision.resumeTrigger))),
+  ]);
+  const evidence = brief.evidence.map((item) => `${display.evidenceTitle(item.title)}: ${item.detail}`);
+  return [
+    labelled("Conditions", display.conditions),
+    paragraph(publishedBriefHeadline(brief).composed),
+    ...(display.pauseIf ? [labelled(publicDecisionLabels.threshold, display.pauseIf)] : []),
+    labelled(DECISION_CONTRACT_LABELS.watch.postureFlips, display.conditionsChangeIf),
+    ...(brief.correction ? [labelled("Correction", correctionBody(brief.correction))] : []),
+    heading("What changed this week"),
+    paragraph(display.whatChanged),
+    ...(readings.length > 0 ? [heading("The numbers behind the guidance"), list(readings)] : []),
+    ...(decisions.length > 0 ? [heading("Guidance by area"), ...decisions] : []),
+    ...(evidence.length > 0 ? [heading("Evidence behind the guidance"), list(evidence)] : []),
+    heading("Provenance"),
+    labelled("Data as of", `${brief.recordDateLabel} · ${MARGIN_LABEL}: ${display.confidence.toLowerCase()}`),
+    paragraph(`${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`),
+    ...(brief.sourceUrl ? [`<p><a href="${escapeXml(brief.sourceUrl)}">View the source series</a></p>`] : []),
+    `<p><a href="${escapeXml(buildCanonicalUrl(buildPublishedBriefPath(brief.slug)))}">Read the published brief →</a></p>`,
+  ].join("\n");
+};
 
 /**
  * Generates a date-pinned Slack update constructed strictly from PublishedBrief.

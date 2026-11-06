@@ -136,9 +136,8 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
      returns the matching summary shape with no type assertion — a conditional
      expression cannot narrow against a generic and would need one. */
   const summaryBuilders: { [C in AgentCadence]: () => SummaryByCadence[C] } = {
-    /* The record date, not `weeklyRecordDateLabel` (the week-ending Friday). The
-       RSS live item prints this as "Data as of:", and on the Oct 5, 2026 reading
-       it said Oct 9 beside a guid and pubDate dated Oct 5. */
+    /* The record date, not `weeklyRecordDateLabel` (the week-ending Friday): on the
+       Oct 5, 2026 reading this said Oct 9 under an RSS guid and pubDate dated Oct 5. */
     weekly: () =>
       buildWeeklySummary({
         assessment: summarizedAssessment,

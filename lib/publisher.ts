@@ -20,6 +20,9 @@ export const publisherAuthor = {
   sameAs: ["https://kanav.net"],
 } as const;
 
+/** The periodical the frozen weeks are issues of: the feed's title and their structured data's. */
+export const weeklyPublicationName = "Whether Weekly Brief";
+
 export const publisherProfilePath = "/about";
 export const publisherContactPath = "/contact";
 

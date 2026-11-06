@@ -29,12 +29,14 @@ import {
   latestPublishedBrief,
   publishedBriefDisplay,
   publishedBriefHeadline,
+  publishedBriefModifiedAt,
   correctionBody,
   publishedBriefWeekLabel,
   publishedBriefStaticParams,
   type PublishedBrief,
   type PublishedRuleLine,
 } from "../../../lib/report/publishedBriefs";
+import { formatDateUTC } from "../../../lib/formatters";
 import { PublishedBriefCopyControls } from "./publishedBriefCopyControls";
 import { ThresholdLadder } from "../../components/illustrations/ThresholdLadder";
 import { DecisionHero } from "../../components/DecisionHero";
@@ -113,7 +115,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     ...metadata.openGraph,
     type: "article",
     publishedTime: brief.publishedAt,
-    modifiedTime: brief.publishedAt,
+    modifiedTime: publishedBriefModifiedAt(brief),
     authors: [buildCanonicalUrl("/about")],
     ...(video ? {
       videos: [briefVideoOpenGraph(video)],
@@ -184,6 +186,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
     imageUrl: buildPublishedBriefImageUrl(brief),
     headline: briefTitle(brief),
     description: buildPublishedBriefDescription(brief),
+    dateModified: publishedBriefModifiedAt(brief),
   });
 
   return (
@@ -266,7 +269,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               {publisherAuthor.name}
             </Link>{" "}
             ·{" "}
-            <time dateTime={brief.publishedAt}>Published {brief.recordDateLabel}</time>
+            <time dateTime={brief.publishedAt}>Published {formatDateUTC(brief.publishedAt)}</time>
           </p>
           {/* Every shared artifact links here, so most arrivals are cold and land
               on a frozen week rather than the live call. The route onward existed

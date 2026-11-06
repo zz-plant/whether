@@ -277,7 +277,7 @@ describe("/answers/[slug]", () => {
 });
 
 describe("/brief/[week]", () => {
-  it("declares Article schema with temporalCoverage and keywords for frozen brief", () => {
+  it("declares a news article, as an issue of the periodical, with temporalCoverage and keywords", () => {
     const briefs = getPublishedBriefs();
     const brief = briefs[0];
     assert.ok(brief);
@@ -287,10 +287,23 @@ describe("/brief/[week]", () => {
       imageUrl: `https://whether.work/brief/${brief.slug}/opengraph-image`,
       headline: "Test headline",
       description: "Test description",
+      dateModified: "2026-12-01T00:00:00.000Z",
     });
-    const article = one(graph, "Article");
+    const article = one(graph, "NewsArticle");
     assert.equal(article.headline, "Test headline");
     assert.equal(article.datePublished, brief.publishedAt);
+    assert.equal(article.dateModified, "2026-12-01T00:00:00.000Z");
+    assert.deepEqual(article.isPartOf, {
+      "@type": "PublicationIssue",
+      issueNumber: brief.slug,
+      datePublished: brief.publishedAt,
+      isPartOf: {
+        "@type": "Periodical",
+        name: "Whether Weekly Brief",
+        url: "https://whether.work/history",
+        publisher: { "@id": organizationId },
+      },
+    });
     assert.equal(article.temporalCoverage, `${brief.recordDate}/${brief.recordDate}`);
     assert.ok(Array.isArray(article.keywords));
   });

@@ -37,6 +37,13 @@ is not in its way; it shares the record builder with `brief:freeze` and opens th
 `automation/weekly-brief-freeze-<slug>` branch, so it and the routine cannot both freeze a week
 differently. Details: `docs/cloudflare-deployment-runbook.md` ("Trial infrastructure").
 
+**`publishedAt` is the freeze, not the record date (2026-11-05).** A news sitemap may list only
+articles from the last two days. A record stored its record date as `publishedAt` and the routine
+froze on Thursdays, so all six weeks from w38 to w45 reached `main` 48 to 68 hours after their stamp
+and `/news-sitemap.xml` never listed one. Records frozen before this keep the stamp they were cited
+with. A routine freeze still has to merge inside the two days to be listed. The Workflow's Monday run
+merges itself, once production has `GITHUB_TOKEN`.
+
 The site no longer waits on any of them to show a current month. The Worker cron records the month
 in progress to KV on every run (`lib/summary/refreshMonthlyRegimeHistory.ts`), and the read path
 merges it over the bundled snapshot, so the month rail stays current between deploys. The regime

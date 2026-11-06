@@ -1,6 +1,6 @@
 import { buildBreadcrumbList, buildCanonicalUrl, buildOgImageUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
 import { siteUrl } from "../siteUrl";
-import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
+import { buildAuthorSchema, buildPublisherSchema, weeklyPublicationName } from "../publisher";
 import { buildGroupBreadcrumbs, createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
@@ -643,8 +643,8 @@ export const buildProductCanonStructuredData = ({
 
 /**
  * `/brief/[week]`: structured data for a frozen weekly brief.
- * Declares Article schema with explicit temporalCoverage, variableMeasured,
- * and semantic topics.
+ * A dated news article, and an issue of the periodical the weeks make up, with
+ * explicit temporalCoverage and semantic topics.
  */
 export const buildPublishedBriefStructuredData = ({
   brief,
@@ -652,21 +652,35 @@ export const buildPublishedBriefStructuredData = ({
   imageUrl,
   headline,
   description,
+  dateModified,
 }: {
   brief: PublishedBrief;
   canonicalUrl: string;
   imageUrl: string;
   headline: string;
   description: string;
+  /** `publishedBriefModifiedAt`: a correction is the one edit a record takes. */
+  dateModified: string;
 }): JsonLdGraph =>
   graph([
     {
-      "@type": "Article",
+      "@type": "NewsArticle",
       "@id": `${canonicalUrl}#article`,
       headline,
       description,
       datePublished: brief.publishedAt,
-      dateModified: brief.publishedAt,
+      dateModified,
+      isPartOf: {
+        "@type": "PublicationIssue",
+        issueNumber: brief.slug,
+        datePublished: brief.publishedAt,
+        isPartOf: {
+          "@type": "Periodical",
+          name: weeklyPublicationName,
+          url: buildCanonicalUrl("/history"),
+          publisher: { "@id": organizationId },
+        },
+      },
       temporalCoverage: `${brief.recordDate}/${brief.recordDate}`,
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),

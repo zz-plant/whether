@@ -26,7 +26,7 @@ import {
   isIndexableResourcePillarSlug,
 } from "../lib/seo/indexationPolicy";
 import { buildPostureArchivePath, getPostureArchivePeriods } from "../lib/summary/postureArchive";
-import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefModifiedAt } from "../lib/report/publishedBriefs";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -201,7 +201,7 @@ export default async function sitemap(options?: {
   /* /history lists every published week and every archive period, so it
      changes when either gains an entry. */
   const historyLastModified = [
-    ...getPublishedBriefs().map((brief) => parseLastModified(brief.publishedAt)),
+    ...getPublishedBriefs().map((brief) => parseLastModified(publishedBriefModifiedAt(brief))),
     ...getPostureArchivePeriods().map((period) => parseLastModified(period.asOf)),
   ].reduce<Date | null>((latest, date) => (date && (!latest || date > latest) ? date : latest), null);
 
@@ -296,7 +296,7 @@ export default async function sitemap(options?: {
   // freshness risk, so the live-payload gate does not apply to them.
   const publishedBriefEntries: SitemapEntryDescriptor[] = getPublishedBriefs().map((brief) => ({
     path: buildPublishedBriefPath(brief.slug),
-    lastModified: resolveLastModified(brief.publishedAt),
+    lastModified: resolveLastModified(publishedBriefModifiedAt(brief)),
     changeFrequency: "yearly",
     priority: 0.7,
   }));
