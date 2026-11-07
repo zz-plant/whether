@@ -62,7 +62,6 @@ export function ChatPreview({ label, text }: { label: string; text: string }) {
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
           {label} · how it reads in Slack
         </span>
-        <span className="text-slate-500 tabular-nums">Ready to paste</span>
       </figcaption>
       <div className="whitespace-pre-wrap break-words p-3 text-sm leading-6 text-slate-300" data-chat-preview>
         {blocks.map((block, index) => (

@@ -216,9 +216,6 @@ export default async function CompsPage() {
             </Link>{" "}
             prints what public companies like these have filed.
           </p>
-          <p className="text-sm text-slate-300">
-            These {SAAS_BASKET_COMPANIES.length} companies represent a cross-section of modern public SaaS: cloud infrastructure, enterprise applications, security, data, and vertical SaaS.
-          </p>
         </section>
 
         <section className="space-y-3">

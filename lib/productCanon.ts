@@ -1,4 +1,4 @@
-import { ADVICE_STANCE_DEFINITIONS, type AdviceStance } from "./adviceStance";
+import type { AdviceStance } from "./adviceStance";
 import type { RegimeKey } from "./regimeEngine";
 import { DEFAULT_THRESHOLDS } from "./regimeEngineCore";
 import { REGIME_ORDER, getRegimePublicLabel } from "./regimePresentation";
@@ -783,20 +783,13 @@ export const describeCanonBaseRate = (baseRate: CanonBaseRate): string => {
   const craftHard = craft.of > 0 ? craft.inHard / craft.of : 0;
   const expandLeans = expand.of > 0 && expandShare - summary.sunnyMonths >= LEAN;
   const conserveLeans = conserve.of > 0 && conserveShare - summary.hardMonths >= LEAN;
-  const craftTracks = Math.abs(craftSunny - summary.sunnyMonths) < LEAN && Math.abs(craftHard - summary.hardMonths) < LEAN;
-
-  const sentences = [
-    `Sunny months make up ${formatCanonShare(summary.sunnyMonths)} of the record, and Freezing or Stormy months ${formatCanonShare(summary.hardMonths)}.`,
-    expand.of > 0
-      ? `Of the ${expand.of} texts tagged ${ADVICE_STANCE_DEFINITIONS.expand.label}, ${expand.inSunny} came out in a Sunny month (${formatCanonShare(expandShare)}).`
-      : null,
-    conserve.of > 0
-      ? `Of the ${conserve.of} tagged ${ADVICE_STANCE_DEFINITIONS.conserve.label}, ${conserve.inHard} came out in a Freezing or Stormy month (${formatCanonShare(conserveShare)}).`
-      : null,
-    craft.of > 0
-      ? `Craft texts came out ${formatCanonShare(craftSunny)} in Sunny months and ${formatCanonShare(craftHard)} in Freezing or Stormy ones${craftTracks ? ", close to the months themselves" : ""}.`
-      : null,
-  ];
+  /* Craft has fewer texts than capital, so its share moves in coarser steps; track
+     the months within one of those steps rather than the ten-point lean used for
+     capital's larger sample. */
+  const craftTolerance = craft.of > 0 ? Math.max(LEAN, 1 / craft.of / 2) : LEAN;
+  const craftTracks = craft.of > 0
+    && Math.abs(craftSunny - summary.sunnyMonths) < craftTolerance
+    && Math.abs(craftHard - summary.hardMonths) < craftTolerance;
 
   const smaller = Math.min(...[expand.of, conserve.of].filter((count) => count > 0));
   const larger = Math.max(expand.of, conserve.of);
@@ -805,14 +798,14 @@ export const describeCanonBaseRate = (baseRate: CanonBaseRate): string => {
       ? `adding or removing one text moves a share by ${Math.round(100 / larger)} points`
       : `adding or removing one text moves a share by ${Math.round(100 / larger)} to ${Math.round(100 / smaller)} points`;
   const verdict =
-    expandLeans && conserveLeans && craftTracks
-      ? "On this sample, capital advice leans with the conditions and craft advice does not."
-      : expandLeans && conserveLeans
-        ? "On this sample, capital advice leans with the conditions. Craft advice departs from the months too, so the comparison is weaker."
-        : expandLeans || conserveLeans
-          ? `On this sample, only ${expandLeans ? "expand" : "conserve"} advice leans with the conditions.`
-          : "On this sample, capital advice does not lean with the conditions.";
-  return [...sentences.filter((sentence) => sentence !== null), verdict, `With ${expand.of + conserve.of} capital texts, ${swing}.`].join(" ");
+    expandLeans && conserveLeans
+      ? craftTracks
+        ? "In this sample, capital advice leaned with the conditions, while craft advice tracked the mix of months on record."
+        : "In this sample, capital advice leaned with the conditions."
+      : expandLeans || conserveLeans
+        ? `In this sample, only ${expandLeans ? "expand" : "conserve"} advice leans with the conditions.`
+        : "In this sample, capital advice does not lean with the conditions.";
+  return `${verdict} With ${expand.of + conserve.of} capital texts, ${swing}.`;
 };
 
 /** Essays written in the given conditions, oldest first. */

@@ -39,6 +39,13 @@ describe("why conditions", () => {
     assert.match(html, /That(?:&rsquo;|’|&#x27;|')s Cloudy\./);
   });
 
+  it("separates the current scores from the published conditions while a change is pending", () => {
+    const html = render({ riskAppetite: 42, pendingConditions: "SCARCITY" });
+    assert.match(html, /Where the scores land/);
+    assert.match(html, /Those scores land in Freezing\. The published conditions remain Cloudy\./);
+    assert.doesNotMatch(html, /Investors will still go out/);
+  });
+
   it("shows what the excluded inputs would change, when they would change the classification", () => {
     const html = render({
       notCounted: [{ metric: "riskAppetite", label: "startup-market inputs", score: 44, published: 55, line: "50" }],
@@ -47,7 +54,7 @@ describe("why conditions", () => {
     assert.match(html, /Why it feels like Freezing/);
     assert.match(html, /would put risk appetite at 44/);
     // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
-    assert.match(html, /conditions would be Freezing, not Cloudy/);
+    assert.match(html, /the scores would land in Freezing/);
     assert.match(html, /doesn(?:&#x27;|')t go back far enough to check against past months/);
   });
 

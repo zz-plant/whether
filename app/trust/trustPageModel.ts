@@ -100,17 +100,15 @@ export async function buildTrustPageModel() {
      method before the revisit triggers, while the page drew the formula first,
      the method next and every other section folded at its foot. */
   const sectionLinks = [
+    { href: "#source-board", label: "Sources" },
+    { href: "#formula-reference", label: "Formula reference" },
+    { href: "#confidence-limits", label: "How close to changing" },
+    { href: "#revisit-call", label: "When to look again" },
     // Only when the telemetry read is configured: an index entry for a section that
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
     // Same rule: an index entry for a section that never renders is a broken anchor.
     ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
-    { href: "#formula-reference", label: "Formula reference" },
-    { href: "#source-board", label: "Sources" },
-    // "Cite this guidance" moved to /share on 2026-10-08, with every other paste
-    // of the week; "Meeting snippet" went with it and was folded into the agenda.
-    { href: "#confidence-limits", label: "How close to changing" },
-    { href: "#revisit-call", label: "When to look again" },
     /* Last, with the section itself: the owner's cron-health panel led a page a
        reader opens to check this week's reading. */
     { href: "#trust-snapshot", label: "System status" },

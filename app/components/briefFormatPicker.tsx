@@ -15,7 +15,6 @@ export const BriefPreview = ({ label, text }: { label: string; text: string }) =
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
         {label}
       </span>
-      <span className="text-slate-500 tabular-nums">Ready to paste</span>
     </div>
     <pre
       aria-label={`Preview of ${label}`}

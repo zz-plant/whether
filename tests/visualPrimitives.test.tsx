@@ -587,7 +587,7 @@ describe("MonthStrip", () => {
 });
 
 describe("BriefFormatPicker preview framing", () => {
-  it("renders a channel format header bar with readiness indicator", () => {
+  it("renders a channel format header bar", () => {
     const { BriefFormatPicker } = require("../app/components/briefFormatPicker");
     const { BRIEF_FORMATS } = require("../lib/report/briefArtifact");
     const html = renderToStaticMarkup(
@@ -601,7 +601,7 @@ describe("BriefFormatPicker preview framing", () => {
       />,
     );
     assert.match(html, /Slack format/);
-    assert.match(html, /Ready to paste/);
+    assert.doesNotMatch(html, /Ready to paste/);
     assert.match(html, /<pre[^>]*>\*Whether Weekly Brief\*<\/pre>/);
   });
 });

@@ -8,9 +8,8 @@ serveUnreachableUpstreams();
 
 /*
  * /trust opened on a method essay and a blank five-prompt form, while the
- * sources — the thing a reader opens the page to check, and the rail's second
- * entry — were folded at its foot as two timestamps. The board is open under
- * the derivation now and the method is folded; these hold that order.
+ * sources were folded at its foot. The source board now leads the formula
+ * reference, with the method available from its own link.
  */
 
 /** True when `index` sits inside an open-tag-to-close-tag span of some <details>. */
@@ -24,14 +23,14 @@ const renderTrust = async () => {
   return renderToStaticMarkup(await page.default({}));
 };
 
-describe("/trust draws its sources open, under the derivation", () => {
-  it("puts one row per source after the formula and before anything folded", async () => {
+describe("/trust leads with its open source board", () => {
+  it("puts one row per source before the formula and anything folded", async () => {
     const html = await renderTrust();
     const formula = html.indexOf('id="formula-reference"');
     const board = html.indexOf('id="source-board"');
     const method = html.indexOf('href="/about#method"');
 
-    assert.ok(formula !== -1 && formula < board, "the board follows the score derivation");
+    assert.ok(board !== -1 && board < formula, "the sources lead the score derivation");
     assert.ok(board < html.lastIndexOf('href="/about#method"'), "and comes before the one-line link to the method");
     assert.ok(method !== -1, "/trust links to the method on /about");
     assert.doesNotMatch(html, /id="framework"/, "the method itself lives on /about");

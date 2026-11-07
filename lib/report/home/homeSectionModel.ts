@@ -21,7 +21,7 @@ import { describeScoreMovement } from "../scoreMovement";
 import { describeScoreMoveBand } from "../marketMoveScale";
 import { describePastHolds } from "../lastTimeCallChanged";
 import type { TimeMachineRegimeEntry } from "../../timeMachine/timeMachineCache";
-import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
+import { describeMovementCause, type AreaMovementKind, type DecisionMovement } from "../decisionMovement";
 
 /**
  * The homepage's sections in the reader's order (`HOME_SECTIONS` below). Each
@@ -75,7 +75,7 @@ export const buildHomeDecisionCookie = (area: DecisionArea | null): string =>
 /*
  * The homepage's sections, in the order they print (2026-10-22): the verdict, the
  * five areas, whose lines they are, what the conditions are made of, what changed,
- * what would change the guidance, who will ask about it, how unusual this is, and
+ * what would change the guidance, how unusual this is, and
  * the alert. The order follows the four questions a reader arrives with — what is
  * happening, what do I do, what would change it, how far can I trust it — and keeps
  * the plan before the evidence. `areas` keeps the id the old "What that changes for
@@ -91,7 +91,6 @@ export const HOME_SECTIONS = {
   diagnosis: { id: "why-conditions" },
   changed: { id: "what-changed", heading: "What changed this week" },
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
-  hearing: { id: "what-you-may-hear", heading: "What your team will ask" },
   record: { id: "has-this-happened-before", heading: "Has this happened before?" },
   alert: { id: "subscribe", heading: "Get an alert the day conditions turn" },
 } as const;
@@ -393,6 +392,7 @@ export type LineStateBandModel = {
 export const describeLineStateBand = (
   rows: readonly Pick<HomeAreaRow, "area" | "pause" | "changedKind">[],
   basis: ComparisonBasis = comparisonBasis(),
+  movement?: Pick<DecisionMovement, "groups" | "comparedWith"> | null,
 ): LineStateBandModel | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
@@ -413,6 +413,11 @@ export const describeLineStateBand = (
   if (firstPaused) {
     const names = paused.map((row) => decisionAreaLabel(row.area));
     const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+    const pauseGroups = movement?.groups.filter((group) => group.kind === "paused" && group.crossed.length > 0);
+    if (pauseGroups?.length) {
+      const cause = describeMovementCause({ groups: pauseGroups, comparedWith: basis.date });
+      return band("crossed", firstPaused, `Since ${basis.reference}, ${list} paused after ${cause.charAt(0).toLowerCase()}${cause.slice(1)}`);
+    }
     return band("crossed", firstPaused, `${list} paused ${basis.since}.`);
   }
 

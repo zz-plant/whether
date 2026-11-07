@@ -6,8 +6,7 @@ import { Copy, Check } from "lucide-react";
 /**
  * What the reader is likely to hear in the room — pushback, a take or a
  * question — and what the published line says back, as one pair of chat
- * bubbles. Shared by the role panels on Guides and the homepage section, so
- * the two surfaces cannot draw the same content two ways.
+ * bubbles. Shared by the role panels on Guides and the examples on Roles.
  *
  * The group speaks on the left, in a recessed bubble with a square bottom-left
  * corner; the reply sits right-aligned on the panel surface with a square

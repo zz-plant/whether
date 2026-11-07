@@ -44,7 +44,7 @@ describe("a quiet week folds the explanation", () => {
       assert.ok(rule.includes(guard), `the quiet-week rule checks ${guard}`);
     }
     const fold = page.slice(page.indexOf("<QuietWeekFold"), page.indexOf("</QuietWeekFold>"));
-    for (const section of ["<WhatChangedSection", "<WhyConditionsSection", "<WhatWouldChangeSection", "<HearingSection", "<RecordSection"]) {
+    for (const section of ["<WhatChangedSection", "<WhyConditionsSection", "<WhatWouldChangeSection", "<RecordSection"]) {
       assert.ok(fold.includes(section), `${section} folds on a quiet week`);
     }
     for (const answer of ["<DecisionHero", "<DecisionPicker", "<CompanyCalibration", "<AlertSection"]) {

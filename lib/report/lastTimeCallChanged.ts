@@ -241,26 +241,7 @@ const describeScoreAgainstRecord = ({
   return "about typical";
 };
 
-/*
- * Which side of each change line each condition sits on. From the assessed conditions,
- * not the raw scores, so the facts under the weather word cannot disagree with it while
- * a change waits on its second reading.
- */
-const CONDITION_SIDES: Record<RegimeKey, { money: "pricey" | "cheap"; investors: "willing" | "wary" }> = {
-  SCARCITY: { money: "pricey", investors: "wary" },
-  DEFENSIVE: { money: "pricey", investors: "willing" },
-  VOLATILE: { money: "cheap", investors: "wary" },
-  EXPANSION: { money: "cheap", investors: "willing" },
-};
-
-/**
- * The two plain facts the weather word stands for, each with its score set against the
- * record (2026-11-03): "Money is pricey: funding pressure 90, higher than most
- * months since 2012. Investors are willing: risk appetite 53, about typical." It takes
- * the place of the regime's one-line rationale under the call: the four words are not a
- * severity scale (Stormy is not worse than Cloudy), and the two facts are what they
- * encode. Null for an unmodelled regime.
- */
+/** The current scores against the record, even when the committed conditions are holding. */
 export const describeConditionFacts = ({
   series,
   regime,
@@ -273,14 +254,13 @@ export const describeConditionFacts = ({
   riskAppetite: number;
 }): string | null => {
   if (!isRegimeKey(regime)) return null;
-  const sides = CONDITION_SIDES[regime];
   /* "since 2012" once: the second comparison is against the same record. */
   const pressure = describeScoreAgainstRecord({ series, metric: "tightness", value: tightness });
   const appetiteRecord = describeScoreAgainstRecord({ series, metric: "riskAppetite", value: riskAppetite });
   const appetite = pressure?.includes(" since ") ? appetiteRecord?.replace(/ since \d{4}$/, "") : appetiteRecord;
   return (
-    `Money is ${sides.money}: funding pressure ${Math.round(tightness)}${pressure ? `, ${pressure}` : ""}. ` +
-    `Investors are ${sides.investors}: risk appetite ${Math.round(riskAppetite)}${appetite ? `, ${appetite}` : ""}.`
+    `Funding pressure is ${Math.round(tightness)}${pressure ? `, ${pressure}` : ""}. ` +
+    `Risk appetite is ${Math.round(riskAppetite)}${appetite ? `, ${appetite}` : ""}.`
   );
 };
 

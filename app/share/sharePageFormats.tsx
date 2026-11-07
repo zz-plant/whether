@@ -208,22 +208,6 @@ export function SharePageFormats({
   return (
     <section id="formats" className="weather-panel weather-section-stack p-0" aria-labelledby="copy-call-heading">
       <h2 id="copy-call-heading" className="type-section">Copy this week&apos;s guidance</h2>
-      {/* Labelled and ruled at the left, so the lines read as the readings
-          behind every format rather than the opening of the text below. At the
-          explanatory floor (§VI, text-fluid-sm) and a reading measure: at 12px
-          across the full 72rem column each line ran to ~150 characters, the
-          densest text on the page, above the preview it explains. */}
-      {scoreReferences.length > 0 ? (
-        <div className="max-w-3xl space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
-          <p id="copy-call-scores-label" className="type-eyebrow">This week&apos;s readings</p>
-          <ul className="space-y-1.5 text-fluid-sm leading-5 tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
-            {scoreReferences.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
       <div className="grid gap-5 md:grid-cols-[13rem_minmax(0,1fr)] md:gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
         {/* A phone gets the platform's own grouped picker: fifteen buttons
             stacked above the preview put the text a screen and a half down. */}
@@ -278,41 +262,49 @@ export function SharePageFormats({
         </nav>
 
         <div className="min-w-0 space-y-3" data-share-format={selected.id}>
-          <div className="space-y-1">
-            {/* Below `md` the select above already shows the format's name, so
-                the heading printed it twice in a row; it stays for the outline. */}
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <h3 className="text-fluid-base font-semibold text-slate-100 max-md:sr-only">{selected.label}</h3>
-            <p className="text-xs leading-relaxed text-slate-400">{hint}</p>
+            <ClipboardActionRow
+              label={selected.copyLabel}
+              state={getClipboardUiState(selected.id, { status, error, activeTarget, copiedTarget })}
+              onClick={() => void copyToClipboard(text, selected.id)}
+              buttonLabels={{ error: "Copy failed" }}
+            />
           </div>
-          <>
-              {selected.kind === "text" && selected.preview === "chat" ? (
-                <ChatPreview label={selected.label} text={text} />
-              ) : (
-                <BriefPreview label={selected.label} text={text} />
-              )}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <ClipboardActionRow
-                  label={selected.copyLabel}
-                  state={getClipboardUiState(selected.id, { status, error, activeTarget, copiedTarget })}
-                  onClick={() => void copyToClipboard(text, selected.id)}
-                  buttonLabels={{ error: "Copy failed" }}
-                />
-                {selected.kind === "text" && selected.compose ? (
-                  <ActionLink href={selected.compose.href} variant="inline" target="_blank" rel="noreferrer">
-                    {selected.compose.label}
-                  </ActionLink>
-                ) : null}
-                {selected.kind === "text" && selected.offersCalendar ? (
-                  <>
-                    <CalendarLink title={calendar.title} details={calendar.details} />
-                    <CalendarSubscribeLinks feedUrl={calendar.feedUrl} />
-                  </>
-                ) : null}
-              </div>
-              {error ? (
-                <p className="text-xs text-amber-200">Clipboard access failed. Select the preview text and copy it manually.</p>
+          <p className="text-xs leading-relaxed text-slate-400">{hint}</p>
+          {error ? (
+            <p className="text-xs text-amber-200">Clipboard access failed. Select the preview text and copy it manually.</p>
+          ) : null}
+          {selected.kind === "text" && selected.preview === "chat" ? (
+            <ChatPreview label={selected.label} text={text} />
+          ) : (
+            <BriefPreview label={selected.label} text={text} />
+          )}
+          {selected.kind === "text" && (selected.compose || selected.offersCalendar) ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              {selected.compose ? (
+                <ActionLink href={selected.compose.href} variant="inline" target="_blank" rel="noreferrer">
+                  {selected.compose.label}
+                </ActionLink>
               ) : null}
-          </>
+              {selected.offersCalendar ? (
+                <>
+                  <CalendarLink title={calendar.title} details={calendar.details} />
+                  <CalendarSubscribeLinks feedUrl={calendar.feedUrl} />
+                </>
+              ) : null}
+            </div>
+          ) : null}
+          {scoreReferences.length > 0 ? (
+            <details className="weather-auto-chevron">
+              <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-medium text-slate-300">
+                This week&apos;s readings
+              </summary>
+              <ul className="max-w-3xl space-y-1.5 border-l-2 border-[color:var(--border-subtle)] pl-3 text-fluid-sm leading-5 tabular-nums text-slate-300">
+                {scoreReferences.map((line) => <li key={line}>{line}</li>)}
+              </ul>
+            </details>
+          ) : null}
         </div>
       </div>
     </section>

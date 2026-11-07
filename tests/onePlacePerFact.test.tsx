@@ -174,7 +174,7 @@ describe("/history prints each record fact once", () => {
     const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
     const visible = text(html.replace(/<p class="sr-only">[\s\S]*?<\/p>/g, ""));
 
-    assert.match(visible, /Last completed month/);
+    assert.match(visible, /Latest archived month/);
     assert.equal((visible.match(/Current conditions held/g) ?? []).length, 1);
     assert.doesNotMatch(visible, /held \d+ months? since|month-end conditions had been/);
     assert.doesNotMatch(visible, /\d+ changes in conditions/, "the change count is its tile's");

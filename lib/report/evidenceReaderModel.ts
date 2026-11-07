@@ -1,4 +1,6 @@
 import type { RegimeAssessment } from "../regimeEngine";
+import { getRegimePublicLabel } from "../regimePresentation";
+import { buildCallChangeLines } from "./reportEvidence";
 import type { RegimeSignalKey } from "./reportFormatting";
 import { regimeSignalLabelByKey } from "./reportFormatting";
 import type { ReportDynamics } from "./reportDataTypes";
@@ -204,12 +206,24 @@ export const buildSignalReferenceRows = (
   ];
 };
 
-/* Why the next reading could change conditions, when the margin cell beside it
-   does not already say: a change waiting on its second reading. The distance to
-   the nearer line is the margin cell's (`resolveNearestLineMargin`), so the two
-   cells no longer state it twice, or pick different lines to state it from. */
-const describeChangeReason = (assessment: { regimeTransition?: { pending?: unknown } }): string | undefined =>
-  assessment.regimeTransition?.pending ? "a change is waiting on a second reading" : undefined;
+type TrustAssessment = Parameters<typeof couldCallChangeNextWeek>[0] & {
+  regimeTransition?: Pick<NonNullable<RegimeAssessment["regimeTransition"]>, "pending"> &
+    Partial<Pick<NonNullable<RegimeAssessment["regimeTransition"]>, "nextState" | "candidateState">>;
+  scores?: ConfidenceInputs["scores"];
+  thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
+};
+
+const describeChangeReason = ({ regimeTransition, scores, thresholds }: TrustAssessment): string | undefined => {
+  if (!regimeTransition?.pending) return undefined;
+  const { candidateState, nextState } = regimeTransition;
+  if (!candidateState) return "a change is waiting on a second reading";
+  const crossed = nextState && scores && thresholds
+    ? buildCallChangeLines({ regime: nextState, scores, thresholds })
+        .filter((line) => line.tripped)
+        .map((line) => line.boundary.toLowerCase())
+    : [];
+  return `${getRegimePublicLabel(candidateState)} awaits a second reading${crossed.length ? ` with ${crossed.join(" and ")}` : ""}`;
+};
 
 /**
  * The four trust facts, the one way every reading route states them.
@@ -247,10 +261,7 @@ export const buildTrustStripProps = ({
   scoringBasis?: Pick<ScoringBasis, "key" | "value" | "warning" | "warningShort" | "consequence">;
   /** Why the published week's conditions differ, where the basis is why (`describePublishedWeekBasis`): the homepage's alone. */
   basisNote?: string | null;
-  assessment: Parameters<typeof couldCallChangeNextWeek>[0] & {
-    scores?: ConfidenceInputs["scores"];
-    thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
-  };
+  assessment: TrustAssessment;
 }): Omit<TrustStripProps, "href" | "className"> => {
   const margin =
     assessment.scores && assessment.thresholds

@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { buildDecisionMovement } from "../lib/report/decisionMovement";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { LineStateBand } from "../app/components/home/LineStateBand";
 import { DecisionHero } from "../app/components/DecisionHero";
@@ -55,6 +56,22 @@ describe("the band states the week's exception, or nothing", () => {
       "Hiring paused since Aug 31.",
       "a month-end comparison dates the hold, so a later week cannot call it new",
     );
+  });
+
+  it("puts the cause of a new pause with its comparison date", () => {
+    const movement = buildDecisionMovement({
+      previous: { tightness: 90, riskAppetite: 53, comparedWith: { label: "Oct 26" } },
+      scores: { tightness: 90, riskAppetite: 42 },
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      regime: "DEFENSIVE",
+      areas: [{ area: "product-tempo", pause: [{ metric: "riskAppetite", operator: "<", value: 44, label: "Risk appetite" }], resume: [] }],
+    });
+    const model = describeLineStateBand(
+      [{ area: "product-tempo", pause: pauseSlot(true, 0), changedKind: "paused" }],
+      comparisonBasis({ label: "Oct 26" }),
+      movement,
+    );
+    assert.equal(model?.text, "Since Oct 26, Roadmap paused after risk appetite fell below 44.");
   });
 
   it("leaves a standing hold to the card", () => {

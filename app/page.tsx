@@ -52,8 +52,6 @@ import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
-import { HearingSection } from "./components/home/HearingSection";
-import { selectHearingForAreas } from "./guides/stakeholderGuides";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { ShareLinks } from "./components/home/ShareLinks";
@@ -422,13 +420,6 @@ async function PageContent({
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
-  /* The questions this week's crossed pause lines invite, for the section after
-     the lines: one per crossed area, one per group, one per speaker
-     (`selectHearingForAreas`). Empty on a week no pause line is crossed, and the
-     section renders nothing. */
-  const hearingPreview = selectHearingForAreas(
-    homeAreaRows.filter((row) => row.pause?.met).map((row) => row.area),
-  );
   const scoreLadders = [
     {
       metric: "tightness" as const,
@@ -621,7 +612,9 @@ async function PageContent({
   /* The week's exception, above the call: null on a calm week, so the page's
      silhouette changes with the weather rather than being drawn the same way
      whatever the reading says. */
-  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows, basis);
+  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows, basis, decisionMovement);
+  const pauseCauseOnBand = lineStateBand?.state === "crossed"
+    && decisionMovement?.moved.every((area) => area.kind === "paused");
   /* The meaning line under the call carries the two scores it rests on: they
      lived only inside the map, so the week's word could be screenshotted but
      not cited. One click to the section that shows the change lines and what
@@ -801,7 +794,7 @@ async function PageContent({
                 location={readingLocation}
                 reading={heroReading}
                 weeklyCall={cardCall.action}
-                callDetail={historicalSelection || unmovedLine ? undefined : whyLine}
+                callDetail={historicalSelection || unmovedLine || pauseCauseOnBand ? undefined : whyLine}
                 regime={regime}
                 direction={historicalSelection ? undefined : unmovedLine ?? cardCall.directionLabel}
                 earlier={earlierConditions}
@@ -925,6 +918,11 @@ async function PageContent({
                 <ActionLink href={operateHref} variant="primary">
                   {cadenceCall?.planLabel ?? "Build this week’s plan →"}
                 </ActionLink>
+                {!historicalSelection && homeAreaRows.some((row) => row.pause?.met) ? (
+                  <ActionLink id="what-you-may-hear" href="/roles#decision-conversations" variant="inline">
+                    Sample conversations about pause rules
+                  </ActionLink>
+                ) : null}
               </div>
               {/* The formats a reader with one of these roles came for, named. They sat
                   behind "Share or embed this" at the foot of the page. After the areas
@@ -990,6 +988,9 @@ async function PageContent({
                 tightness={tightness}
                 riskAppetite={riskAppetite}
                 changeLines={callChangeLines}
+                pendingConditions={reportData.assessment.regimeTransition?.pending
+                  ? reportData.assessment.regimeTransition.candidateState
+                  : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
               />
@@ -1010,13 +1011,6 @@ async function PageContent({
                 regime={regime}
                 conditionsTrail={conditionsTrail}
               />
-
-              {/* 7. Who will ask about those lines: the questions this week's
-                  crossed lines invite, and the answer each one has. Renders
-                  nothing on a week no pause line is crossed, and nothing on an
-                  archived week, whose lines are a record rather than a present
-                  conversation. */}
-              {historicalSelection ? null : <HearingSection entries={hearingPreview} />}
 
               {/* 8. How unusual is this? */}
               <RecordSection

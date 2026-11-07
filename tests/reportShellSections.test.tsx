@@ -237,7 +237,7 @@ describe("report route page summaries", () => {
     assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);
 
     const plan = await readFile("app/operate/planningPageModel.ts", "utf8");
-    assert.match(plan, /pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap."/);
+    assert.match(plan, /pageTitle: "Operating rules and decision tools"/);
     assert.doesNotMatch(plan, /Set the rules, check runway/);
   });
 });

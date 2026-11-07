@@ -209,11 +209,6 @@ export function WhatWouldChangeSection({
                   </div>
                 ) : null}
               </dl>
-              {resumeLine ? (
-                <p className="max-w-[52ch] text-fluid-sm leading-relaxed text-slate-400">
-                  One warm week isn&rsquo;t spring: the restart line sits further out.
-                </p>
-              ) : null}
             </div>
           ) : null}
 

@@ -182,7 +182,12 @@ describe("/share current weekly artifact", () => {
       assert.ok(heading, `${id} renders as an h2`);
       assert.doesNotMatch(heading[1] ?? "", /type-eyebrow/, `${id} is a heading, not a label`);
     }
-    assert.equal((html.match(/Ready to paste/g) ?? []).length, 1, "one preview");
+    assert.equal((html.match(/data-chat-preview/g) ?? []).length, 1, "one preview");
+    assert.doesNotMatch(html, /Ready to paste/);
+    const copy = html.indexOf("Copy Slack post");
+    const preview = html.indexOf("data-chat-preview");
+    const readings = html.indexOf("This week&#x27;s readings");
+    assert.ok(copy > 0 && copy < preview && preview < readings, "copy is beside the preview heading, with readings below the preview");
     for (const id of ["formats", "image-artifacts", "embed"]) assert.match(html, new RegExp(`id="${id}"`));
     // The stacked page's anchors, and the formats folded on 2026-11-03, open the format that carries them.
     for (const id of ["slack-post", "ticket-brief", "agenda", "email"]) {

@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import { SharedArrivalNote } from "../app/components/sharedArrival";
 import { isSharedArrivalQuery, SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
-import { latestPublishedBrief, getPublishedBriefs, publishedBriefWeekLabel } from "../lib/report/publishedBriefs";
+import { latestPublishedBrief, getPublishedBriefs } from "../lib/report/publishedBriefs";
 
 /*
  * A reader who follows a pasted brief knows who sent it and nothing else. Most
@@ -59,13 +59,13 @@ describe("a dated record that newer weeks replaced", () => {
   const latest = latestPublishedBrief;
   const older = getPublishedBriefs().find((brief) => brief.slug !== latest?.slug);
 
-  it("says newer guidance is out, above the card, naming the latest week", async () => {
+  it("links to live guidance above the dated card", async () => {
     assert.ok(latest && older, "the archive holds at least two weeks");
     const html = await renderRecord(older.slug);
     const notice = html.indexOf("data-newer-guidance");
     assert.ok(notice !== -1, "the notice renders");
     assert.ok(notice < html.indexOf('id="share-ready-artifact"'), "it is read before the card");
-    assert.ok(html.includes(`This record keeps the week of ${publishedBriefWeekLabel(older)}.`));
+    assert.doesNotMatch(html, /This record keeps the week of/);
     assert.equal(html.match(/Read this week&#x27;s guidance/g)?.length, 1, "one link to the live brief, in the notice");
   });
 
