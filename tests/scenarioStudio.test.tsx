@@ -3,6 +3,9 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FossilRecordSection } from "../app/signals/components/fossilRecordSection";
 import { ScenarioStudioSimulator } from "../app/operate/components/scenarioStudioSimulator";
+import { ScenarioDeltas } from "../app/operate/components/scenarioDeltas";
+import { buildScenarioBriefText, buildSimulatedTreasury, invertScoresToScenario } from "../lib/report/scenarioStudio";
+import { getPlaybookGuidance } from "../lib/playbook";
 import type { TreasuryData } from "../lib/types";
 import { evaluateRegime } from "../lib/regimeEngine";
 import * as nextNavigation from "next/navigation";
@@ -110,5 +113,82 @@ describe("ScenarioStudioSimulator", () => {
     assert.match(html, /What you&#x27;d stop and start in this scenario/);
     assert.match(html, /What to stop in this scenario/);
     assert.match(html, /What to start in this scenario/);
+  });
+
+  it("inverts scrubbed map or ladder scores back into rate and slope slider values across all four quadrants", () => {
+    const quadrants = [
+      { targetTightness: 30, targetRiskAppetite: 76, expectedRegime: "EXPANSION" },
+      { targetTightness: 85, targetRiskAppetite: 72, expectedRegime: "DEFENSIVE" },
+      { targetTightness: 35, targetRiskAppetite: 28, expectedRegime: "VOLATILE" },
+      { targetTightness: 88, targetRiskAppetite: 24, expectedRegime: "SCARCITY" },
+    ] as const;
+
+    for (const { targetTightness, targetRiskAppetite, expectedRegime } of quadrants) {
+      const { rate, slope } = invertScoresToScenario(targetTightness, targetRiskAppetite);
+      const simulated = evaluateRegime(buildSimulatedTreasury(mockTreasury, rate, slope));
+      assert.equal(simulated.regime, expectedRegime);
+      assert.ok(Math.abs(simulated.scores.riskAppetite - targetRiskAppetite) <= 2);
+      assert.ok(Math.abs(simulated.scores.tightness - targetTightness) <= 9);
+    }
+  });
+
+  it("renders operating runbook comparison diffs with flipped rule indicators and owner roles when scenario diverges", () => {
+    const liveAssessment = evaluateRegime(mockTreasury); // SCARCITY (Freezing)
+    const simulatedTreasury = buildSimulatedTreasury(mockTreasury, 2.0, 1.2); // EXPANSION (Sunny)
+    const simulatedAssessment = evaluateRegime(simulatedTreasury);
+
+    const livePlaybook = getPlaybookGuidance(liveAssessment.regime, {
+      scores: liveAssessment.scores,
+      thresholds: liveAssessment.thresholds,
+    });
+    const simulatedPlaybook = getPlaybookGuidance(simulatedAssessment.regime, {
+      scores: simulatedAssessment.scores,
+      thresholds: simulatedAssessment.thresholds,
+    });
+
+    const html = renderToStaticMarkup(
+      <ScenarioDeltas
+        liveAssessment={liveAssessment}
+        simulatedAssessment={simulatedAssessment}
+        simulatedPlaybook={simulatedPlaybook}
+        livePlaybook={livePlaybook}
+        tightnessDelta={simulatedAssessment.scores.tightness - liveAssessment.scores.tightness}
+        riskAppetiteDelta={simulatedAssessment.scores.riskAppetite - liveAssessment.scores.riskAppetite}
+      />,
+    );
+
+    // Shows regime shift
+    assert.match(html, /Conditions would change/);
+    assert.match(html, /Freezing/);
+    assert.match(html, /Sunny/);
+
+    // Shows stop/start diff tags
+    assert.match(html, /Unblocks in scenario/);
+
+    // Shows rule flip indicators and owner roles
+    assert.match(html, /Rule flips/);
+    assert.match(html, /This week:/);
+    assert.match(html, /VP Eng/);
+    assert.match(html, /CEO/);
+    assert.match(html, /VP Product/);
+    assert.match(html, /Show restart lines/);
+
+    // Verifies brief text includes action flips
+    const briefText = buildScenarioBriefText({
+      simulatedBaseRate: 2.0,
+      simulatedCurveSlope: 1.2,
+      baseRateDelta: -3.25,
+      curveSlopeDelta: 2.25,
+      tightnessDelta: -50,
+      riskAppetiteDelta: 40,
+      liveAssessment,
+      simulatedAssessment,
+      simulatedPlaybook,
+      livePlaybook,
+      shareUrl: "https://whether.work/operate/scenarios",
+    });
+
+    assert.match(briefText, /\[ACTION FLIPPED\]/);
+    assert.match(briefText, /\[This week:/);
   });
 });

@@ -36,6 +36,7 @@ export function WhyConditionsSection({
   tightness,
   riskAppetite,
   changeLines,
+  pendingConditions,
   notCounted,
   warning,
 }: {
@@ -44,12 +45,14 @@ export function WhyConditionsSection({
   riskAppetite: number;
   /** The two change lines the conditions are cut at. */
   changeLines: { tightness: number; riskAppetite: number };
+  pendingConditions?: string;
   /** The unclipped pressure behind a score pinned at the top of its scale. */
   notCounted: readonly NotCountedReading[];
   /** What the uncounted inputs would do to a line, in one sentence; null when they would cross none. */
   warning: string | null;
 }) {
   const regimeLabel = getRegimePublicLabel(regime);
+  const readingLabel = pendingConditions ? getRegimePublicLabel(pendingConditions) : regimeLabel;
   /* Where the reading would land with the excluded inputs counted, in the
      weather vocabulary — the same quadrant function the map uses, so the
      sentence cannot disagree with the picture. */
@@ -67,7 +70,7 @@ export function WhyConditionsSection({
        the answer to the heading, and it sat under the table that is its evidence. */
     <HomeSection
       id={HOME_SECTIONS.diagnosis.id}
-      heading={`Why conditions are ${regimeLabel}`}
+      heading={pendingConditions ? "Where the scores land" : `Why conditions are ${regimeLabel}`}
       /* What each side means, in the lead, and no table under it (2026-10-27). The
          table printed the two scores a third time on the brief, beside the card's
          ladder and the rows of "What changed" further down; its one column of its
@@ -77,11 +80,17 @@ export function WhyConditionsSection({
           {/* The numbers against their lines, then what they add up to in the weather's
               terms (2026-11-05). Each score carried its meaning in brackets; the closing
               line says it once, for both. */}
-          Funding pressure is {Math.round(tightness)}, {tightness > changeLines.tightness ? "above" : "below"}{" "}
+          Funding pressure is {Math.round(tightness)}, {tightness > changeLines.tightness ? "above" : "at or below"}{" "}
           {changeLines.tightness}. Risk appetite is {Math.round(riskAppetite)},{" "}
-          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} {changeLines.riskAppetite}.{" "}
-          {isRegimeKey(regime) ? `${REGIME_WEATHER_LINES[regime]} ` : null}
-          <span className="font-semibold">That&rsquo;s {regimeLabel}.</span>
+          {riskAppetite > changeLines.riskAppetite ? "above" : "at or below"} {changeLines.riskAppetite}.{" "}
+          {pendingConditions ? (
+            <span className="font-semibold">Those scores land in {readingLabel}. The published conditions remain {regimeLabel}.</span>
+          ) : (
+            <>
+              {isRegimeKey(regime) ? `${REGIME_WEATHER_LINES[regime]} ` : null}
+              <span className="font-semibold">That&rsquo;s {regimeLabel}.</span>
+            </>
+          )}
         </>
       )}
     >
@@ -89,11 +98,11 @@ export function WhyConditionsSection({
         {notCounted.length > 0 ? (
           <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
             <p className="weather-caveat-mark text-fluid-sm font-semibold">
-              {countedRegimeLabel !== regimeLabel ? `Why it feels like ${countedRegimeLabel}` : "What the headline reading leaves out"}
+              {countedRegimeLabel !== readingLabel ? `Why it feels like ${countedRegimeLabel}` : "What the headline reading leaves out"}
             </p>
             <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
               {warning
-                ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
+                ? `${warning}${countedRegimeLabel !== readingLabel ? ` If we counted them, the scores would land in ${countedRegimeLabel}.` : ""}`
                 : `If we counted them, we'd have ${notCounted
                     .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
                     .join(" and ")}.`}{" "}

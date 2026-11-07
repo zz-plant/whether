@@ -27,7 +27,7 @@ describe("/trust notes the ramp test once", () => {
     const note = html.indexOf("data-ramp-test-note");
     const formula = html.indexOf('id="formula-reference"');
     const board = html.indexOf('id="source-board"');
-    assert.ok(formula !== -1 && formula < note && note < board, "the note sits in the score derivation");
+    assert.ok(board !== -1 && board < formula && formula < note, "the note sits in the score derivation");
 
     const paragraph = html.slice(note, html.indexOf("</p>", note));
     assert.match(paragraph, /none of them sets the guidance/);

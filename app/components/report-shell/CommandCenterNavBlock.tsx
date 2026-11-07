@@ -96,7 +96,7 @@ export function CommandCenterNavBlock({
       /* The running head's facts, for every frame after this one (lib/navigation/runningHead.ts). */
       {...frameFactsAttributes({
         regime,
-        /* A qualified status (/history's "Last completed month") is a condition word
+        /* A qualified status (/history's "Latest archived month") is a condition word
            too, and the head keeps its qualifier on the date, so a frame of the record
            does not read as this week's call. It also carries no regime: that page
            draws in neutral ink on purpose. */
@@ -157,7 +157,7 @@ export function CommandCenterNavBlock({
                 {pageSummary}
               </p>
             ) : null}
-            {trustStrip ? <TrustStrip {...trustStrip} regime={regime} phoneLayout="line" className="sm:pt-2" /> : null}
+            {trustStrip ? <TrustStrip {...trustStrip} regime={regime} phoneLayout="line" sourceSummary={Boolean(trustStrip.href)} className="sm:pt-2" /> : null}
           </div>
 
           <div className={`space-y-3 @3xl:min-w-[14rem] @3xl:max-w-sm @3xl:shrink-0 ${showActions ? "" : "max-sm:hidden"}`.trim()}>

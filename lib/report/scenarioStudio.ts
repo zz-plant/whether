@@ -1,6 +1,15 @@
 import type { TreasuryData } from "../types";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeAssessment } from "../regimeEngine";
+import {
+  BASE_RATE_TIGHTNESS_MULTIPLIER,
+  BASE_RATE_TIGHTNESS_THRESHOLD,
+  CURVE_INVERSION_TIGHTNESS_MULTIPLIER,
+  RISK_APPETITE_MAX_SLOPE,
+  RISK_APPETITE_MIN_SLOPE,
+  TIGHTNESS_INVERSION_POINTS,
+  clamp,
+} from "../regimeEngineCore";
 import type { getPlaybookGuidance } from "../playbook";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { buildCanonicalBoundedDecisionRules, ruleMetricLabel, type RuleConditionMetric } from "./boundedDecisionRules";
@@ -118,6 +127,35 @@ export const formatScenarioDelta = (value: number, unit = "") => {
   return `0${unit}`;
 };
 
+const snapToStep = (value: number, range: { min: number; max: number; step: number }) => {
+  const stepped = Math.round(value / range.step) * range.step;
+  return Number(clamp(stepped, range.min, range.max).toFixed(2));
+};
+
+/**
+ * Invert a scrubbed `(tightness, riskAppetite)` coordinate pair on the scenario
+ * studio's map or ladders back into the `(rate, slope)` slider values that
+ * produce it, snapped to the slider steps.
+ */
+export const invertScoresToScenario = (
+  targetTightness: number,
+  targetRiskAppetite: number,
+  baseRateThreshold: number = BASE_RATE_TIGHTNESS_THRESHOLD,
+): { rate: number; slope: number } => {
+  const rawSlope =
+    RISK_APPETITE_MIN_SLOPE +
+    (clamp(targetRiskAppetite, 0, 100) / 100) * (RISK_APPETITE_MAX_SLOPE - RISK_APPETITE_MIN_SLOPE);
+  const slope = snapToStep(rawSlope, SCENARIO_SLOPE_RANGE);
+  const inversionPoints =
+    slope < 0
+      ? clamp(Math.round(Math.abs(slope) * CURVE_INVERSION_TIGHTNESS_MULTIPLIER), 0, TIGHTNESS_INVERSION_POINTS)
+      : 0;
+  const remainingTightness = Math.max(0, clamp(targetTightness, 0, 100) - inversionPoints);
+  const rawRate = baseRateThreshold + remainingTightness / BASE_RATE_TIGHTNESS_MULTIPLIER;
+  const rate = snapToStep(rawRate, SCENARIO_RATE_RANGE);
+  return { rate, slope };
+};
+
 // Pure deterministic counterfactual simulation
 export const buildSimulatedTreasury = (
   liveTreasury: TreasuryData,
@@ -147,6 +185,7 @@ type ScenarioBriefInput = {
   liveAssessment: RegimeAssessment;
   simulatedAssessment: RegimeAssessment;
   simulatedPlaybook: ReturnType<typeof getPlaybookGuidance>;
+  livePlaybook?: ReturnType<typeof getPlaybookGuidance>;
   shareUrl: string;
 };
 
@@ -160,6 +199,7 @@ export const buildScenarioBriefText = ({
   liveAssessment,
   simulatedAssessment,
   simulatedPlaybook,
+  livePlaybook,
   shareUrl,
 }: ScenarioBriefInput): string =>
   [
@@ -183,9 +223,12 @@ export const buildScenarioBriefText = ({
     ...simulatedPlaybook.startItems.map((item) => ` • START: ${item}`),
     "",
     "--- RULES BY AREA ---",
-    ...simulatedPlaybook.operatingLevers.map(
-      (lever) => ` • ${lever.label}: ${lever.actionNow} (${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${lever.triggerThreshold})`,
-    ),
+    ...simulatedPlaybook.operatingLevers.map((lever) => {
+      const liveLever = livePlaybook?.operatingLevers.find((l) => l.lever === lever.lever);
+      const isFlipped = Boolean(liveLever && liveLever.actionNow !== lever.actionNow);
+      const flipTag = isFlipped ? " [ACTION FLIPPED]" : "";
+      return ` • ${lever.label}${flipTag}: ${lever.actionNow} (${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${lever.triggerThreshold})${isFlipped ? ` [This week: ${liveLever?.actionNow}]` : ""}`;
+    }),
     "",
     `Link to this scenario: ${shareUrl}`,
   ].join("\n");

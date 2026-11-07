@@ -1,4 +1,13 @@
-import type { CSSProperties, ReactNode } from "react";
+"use client";
+
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { ConditionIcon, LineStateIcon } from "./conceptIcons";
 import type { RegimeKey } from "../../../lib/types";
@@ -51,6 +60,11 @@ type ScoreLadderProps = {
   monthRange?: { common: number; unusual: number } | null;
   /** The score with the left-out inputs counted, where that changes conditions: their glyph, plotted. */
   feelsLike?: { value: number; regime: RegimeKey } | null;
+  /**
+   * Direct-manipulation callback when a surface (such as Scenario Studio) commits
+   * the scrubbed score rather than springing back to `value`.
+   */
+  onScrubValue?: (nextValue: number) => void;
   className?: string;
 };
 
@@ -134,6 +148,8 @@ const LADDER_TRACK_WIDTHS = { narrow: 224, wide: 448 } as const;
    the common 66/70/76 lines still share one row on a wide track. */
 const LABEL_CHAR_PX = 6.2;
 const LABEL_GAP_PX = 5;
+const SNAP_DETENT_POINTS = 1.4;
+const DRAG_ACTIVATION_PX = 4;
 
 type TrackStyle = CSSProperties & { "--ladder-rows": number; "--ladder-rows-wide": number };
 type MarkStyle = CSSProperties & { "--row": number; "--row-wide": number };
@@ -146,6 +162,13 @@ const markStyle = (left: number, row: number, wideRow: number): MarkStyle => ({
 
 const tickText = (line: LadderLine) => formatPoints(line.value);
 const lineName = (line: LadderLine) => line.label ?? LINE_LABELS[line.kind];
+
+const formatSignedDelta = (delta: number) => {
+  const rounded = Math.round(delta);
+  if (rounded > 0) return `+${rounded}`;
+  if (rounded < 0) return `−${Math.abs(rounded)}`;
+  return "0";
+};
 
 /**
  * Each label on the lowest row where it clears every label already placed on
@@ -252,9 +275,42 @@ export function ScoreLadder({
   max = 100,
   monthRange,
   feelsLike,
+  onScrubValue,
   className = "",
 }: ScoreLadderProps) {
-  const caption = describeLadderPosition(value, lines);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const dragStateRef = useRef<{
+    pointerId: number;
+    startX: number;
+    didDrag: boolean;
+  } | null>(null);
+  const suppressClickRef = useRef(false);
+
+  const [scrub, setScrub] = useState<{
+    value: number;
+    settling: boolean;
+  } | null>(null);
+  const scrubRef = useRef(scrub);
+
+  const updateScrub = (next: { value: number; settling: boolean } | null) => {
+    scrubRef.current = next;
+    setScrub(next);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const stopSpring = () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
+
   const worse = ladderWorseDirection(lines);
   /* A score that is worse higher is drawn high to low (2026-11-03), so right is the
      easier side on every ladder, as up and right are on the conditions map. The two
@@ -262,6 +318,125 @@ export function ScoreLadder({
      note to know which end of each track was good. */
   const reversed = (worse ?? ladderWorseByChangeLine(lines)) === "higher";
   const at = (point: number) => (reversed ? roundPercent(100 - clampPercent(point, max)) : clampPercent(point, max));
+
+  const animateBackToRest = (startValue: number) => {
+    stopSpring();
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      Math.abs(startValue - value) < 0.25
+    ) {
+      updateScrub(null);
+      return;
+    }
+
+    let pos = startValue;
+    let vel = 0;
+    let lastTime = performance.now();
+    const stiffness = 300;
+    const damping = 28;
+
+    const step = (now: number) => {
+      const dt = Math.min(0.032, Math.max(0.001, (now - lastTime) / 1000));
+      lastTime = now;
+      const force = -stiffness * (pos - value) - damping * vel;
+      vel += force * dt;
+      pos += vel * dt;
+
+      if (Math.abs(pos - value) < 0.3 && Math.abs(vel) < 1.5) {
+        rafRef.current = null;
+        updateScrub(null);
+        return;
+      }
+
+      updateScrub({
+        value: Math.min(max, Math.max(0, pos)),
+        settling: true,
+      });
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    updateScrub({
+      value: startValue,
+      settling: true,
+    });
+    rafRef.current = requestAnimationFrame(step);
+  };
+
+  const readPointerScore = (clientX: number) => {
+    const track = trackRef.current;
+    if (!track) return null;
+    const rect = track.getBoundingClientRect();
+    if (rect.width <= 0) return null;
+    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const rawValue = (reversed ? 1 - ratio : ratio) * max;
+    const nearest = nearestLadderLine(rawValue, lines);
+    const snapped = nearest && nearest.distance <= SNAP_DETENT_POINTS ? nearest.line.value : Math.round(rawValue);
+    return Math.min(max, Math.max(0, snapped));
+  };
+
+  const applyScrub = (nextValue: number) => {
+    stopSpring();
+    if (onScrubValue) {
+      onScrubValue(nextValue);
+      updateScrub({ value: nextValue, settling: false });
+      return;
+    }
+    updateScrub({ value: nextValue, settling: false });
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 && event.pointerType === "mouse") return;
+    stopSpring();
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      didDrag: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    if (onScrubValue) {
+      const initial = readPointerScore(event.clientX);
+      if (initial !== null) {
+        dragStateRef.current.didDrag = true;
+        applyScrub(initial);
+      }
+    }
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = dragStateRef.current;
+    if (!state || state.pointerId !== event.pointerId) return;
+    if (!state.didDrag && Math.abs(event.clientX - state.startX) < DRAG_ACTIVATION_PX) return;
+    state.didDrag = true;
+    const next = readPointerScore(event.clientX);
+    if (next !== null) applyScrub(next);
+  };
+
+  const finishPointerInteraction = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = dragStateRef.current;
+    if (!state || state.pointerId !== event.pointerId) return;
+    dragStateRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (state.didDrag) {
+      suppressClickRef.current = true;
+      const latest = scrubRef.current;
+      if (onScrubValue) {
+        updateScrub(null);
+      } else if (latest) {
+        animateBackToRest(latest.value);
+      }
+    } else if (scrubRef.current) {
+      animateBackToRest(scrubRef.current.value);
+    }
+  };
+
+  const isScrubbing = scrub !== null;
+  const scrubbedRounded = scrub ? Math.round(scrub.value) : value;
+  const caption = isScrubbing
+    ? `${describeLadderPosition(scrubbedRounded, lines)} (${formatSignedDelta(scrubbedRounded - value)} vs ${formatPoints(value)})`
+    : describeLadderPosition(value, lines);
   /* Rows for each width the ladder is drawn at; the container query on the
      track picks one. Positions go through custom properties so one element
      serves both layouts. */
@@ -286,6 +461,12 @@ export function ScoreLadder({
           width: roundPercent(Math.abs(at(value) - at(previous))),
         }
       : null;
+  const scrubMove = isScrubbing
+    ? {
+        left: roundPercent(Math.min(at(value), at(scrub.value))),
+        width: roundPercent(Math.abs(at(scrub.value) - at(value))),
+      }
+    : null;
   const rangeBands = monthRange
     ? (["unusual", "common"] as const).flatMap((band) => {
         const size = monthRange[band];
@@ -298,9 +479,16 @@ export function ScoreLadder({
   const trackStyle: TrackStyle = {
     "--ladder-rows": maxRow("row"),
     "--ladder-rows-wide": maxRow("wideRow"),
+    touchAction: "none",
+    userSelect: "none",
+    cursor: isScrubbing ? "grabbing" : "ew-resize",
   };
   return (
-    <figure className={`@container space-y-1.5 ${className}`.trim()} data-score-ladder>
+    <figure
+      className={`@container space-y-1.5 ${className}`.trim()}
+      data-score-ladder
+      data-scrubbing={isScrubbing ? "" : undefined}
+    >
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs">
         <span className="font-medium text-slate-200">
           {label}
@@ -310,12 +498,26 @@ export function ScoreLadder({
             </span>
           ) : null}
         </span>
-        <span className="tabular-nums text-slate-400">{caption}</span>
+        <span className={`tabular-nums ${isScrubbing ? "text-slate-100" : "text-slate-400"}`} data-ladder-caption>
+          {caption}
+        </span>
       </figcaption>
       <div
+        ref={trackRef}
         className="relative h-[calc(38px+var(--ladder-rows)*13px)] @[28rem]:h-[calc(38px+var(--ladder-rows-wide)*13px)]"
         style={trackStyle}
         aria-hidden="true"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishPointerInteraction}
+        onPointerCancel={finishPointerInteraction}
+        onClick={(event) => {
+          if (suppressClickRef.current) {
+            suppressClickRef.current = false;
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
       >
         <div className="absolute inset-x-0 top-3 h-1.5 overflow-hidden rounded-full bg-[color:var(--bg-raised)]">
           {zones.map((zone) => (
@@ -385,6 +587,20 @@ export function ScoreLadder({
           className="absolute top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-[var(--bg-panel)] bg-slate-100"
           style={{ left: `${at(value)}%` }}
         />
+        {isScrubbing && scrubMove ? (
+          <>
+            <span
+              data-ladder-scrub-move
+              className="absolute top-[13px] h-1 rounded-full bg-[color:var(--regime-ink)] opacity-75"
+              style={{ left: `${scrubMove.left}%`, width: `${scrubMove.width}%` }}
+            />
+            <span
+              data-ladder-scrub-thumb
+              className="absolute top-1.5 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-[color:var(--regime-ink)] bg-[color:var(--bg-body)]"
+              style={{ left: `${at(scrub.value)}%` }}
+            />
+          </>
+        ) : null}
       </div>
       {/* The lines' key, left to right in the order the ticks sit, so a line
           can be matched by position as well as by colour. The pause and resume

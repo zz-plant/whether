@@ -226,7 +226,6 @@ export default function ProductCanonPage() {
   const alignment = buildScoreAlignment(series, timeline);
   const pairs = buildAdvicePairs(timeline);
   const recordStart = series.length > 0 ? formatDateUTC(series[0].recordDate) : null;
-  const recordEnd = series.length > 0 ? formatDateUTC(series[series.length - 1].recordDate) : null;
   const planePoints: AdvicePlanePoint[] = timeline.flatMap((essay) =>
     essay.reading.kind === "reading"
       ? [
@@ -261,10 +260,10 @@ export default function ProductCanonPage() {
 
       <SecondaryPageHeader
         title="Does startup advice follow the market?"
-        description={`Mostly no: the advice did not change direction when the money did. ${timeline.length} widely read essays, books and investor memos, each placed on the record at the month it came out${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. The list below is a reading list. The corpus beneath it tests the list.`}
+        description={describeCanonBaseRate(baseRate)}
       />
 
-      <SecondaryPageSection title="What the record shows" description={describeCanonBaseRate(baseRate)}>
+      <SecondaryPageSection title="What the record shows">
         <div className="weather-sidebar-start gap-8 [--aside:26rem] [--main-min:24rem]">
           <AdvicePlane points={planePoints} lines={canonChangeLines} />
           <div className="min-w-0 space-y-6">

@@ -33,6 +33,8 @@ export type TrustStripProps = {
   changeReason?: string;
   /** The reading is a saved copy, not this week's: the margin cell says nothing about next week. */
   savedCopy?: boolean;
+  /** The report intro on a task page keeps freshness and scoring warnings. */
+  sourceSummary?: boolean;
   /**
    * How often conditions held at this distance, from the month-end record
    * (`calibrationForDistance`). A historical count, not a probability: the brief
@@ -103,6 +105,7 @@ export function TrustStrip({
   couldChangeNextWeek,
   changeReason,
   savedCopy = false,
+  sourceSummary = false,
   baseRate,
   basis,
   href,
@@ -202,7 +205,7 @@ export function TrustStrip({
   return (
     <div className={`${layout} ${className}`.trim()} data-trust-strip>
       <dl className="contents">
-        {cells.filter((cell) => !(foldRoutine && cell.routine)).map((cell) => (
+        {cells.filter((cell) => !(foldRoutine && cell.routine) && !(sourceSummary && cell.label === MARGIN_LABEL)).map((cell) => (
           /* The margin cell carries two facts, so on the phone grid it takes the
              row the could-change cell used to share with it. */
           <div

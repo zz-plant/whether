@@ -142,7 +142,7 @@ export default async function HistoryPage({
              beside it, reads as the current call on a week the brief may be
              calling something else. */
           statusLabel: trackRecord ? trackRecord.currentRegimeLabel : "Historical",
-          statusPrefix: trackRecord ? "Last completed month" : undefined,
+          statusPrefix: trackRecord ? "Latest archived month" : undefined,
           /* Deliberately no regime. This field is only the page accent — the hue
              the whole chrome, every section rule and the mobile outline draw in
              — and it is the site saying "this is the weather". Fed the month-end

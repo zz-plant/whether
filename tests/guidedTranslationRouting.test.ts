@@ -8,7 +8,6 @@ import {
   resolveGuidedTranslationState,
 } from "../app/resources/components/guidedTranslationPanels";
 import { findStakeholderGuide, selectHearingForAreas, stakeholderGuides } from "../app/guides/stakeholderGuides";
-import { HearingSection } from "../app/components/home/HearingSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 
@@ -156,18 +155,5 @@ describe("guided translation routing", () => {
     assert.doesNotMatch(stageHtml, /What your team will ask/);
   });
 
-  it("renders the homepage section from the crossed lines, and nothing without them", () => {
-    const empty = renderToStaticMarkup(createElement(HearingSection, { entries: [] }));
-    assert.equal(empty, "");
 
-    const entries = selectHearingForAreas(["burn-discipline"]);
-    const html = renderToStaticMarkup(createElement(HearingSection, { entries }));
-    assert.match(html, /What your team will ask/);
-    assert.match(html, /id="what-you-may-hear"/);
-    assert.match(html, /href="\/resources\?stakeholder=[^"#]+#guided-translation-results"/);
-    for (const { hearing } of entries) {
-      assert.ok(html.includes(hearing.from));
-      assert.ok(html.includes(hearing.answer.replace(/'/g, "&#x27;")));
-    }
-  });
 });

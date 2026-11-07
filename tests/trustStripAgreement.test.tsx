@@ -55,6 +55,21 @@ describe("buildTrustStripProps", () => {
     assert.equal(buildTrustStripProps({ ...base, assessment: assessment(true) }).couldChangeNextWeek, true);
     assert.equal(buildTrustStripProps({ ...base, assessment: assessment(false, true) }).couldChangeNextWeek, true);
   });
+  it("names the pending conditions and the score that has to stay across its line", () => {
+    const props = buildTrustStripProps({
+      recordDateLabel: "Nov 6, 2026",
+      confidenceLabel: "MED",
+      isFallback: false,
+      assessment: {
+        diagnostics: { transitionWatch: true },
+        regimeTransition: { pending: true, candidateState: "SCARCITY", nextState: "DEFENSIVE" },
+        scores: { tightness: 90, riskAppetite: 42 },
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      },
+    });
+    assert.equal(props.changeReason, "Freezing awaits a second reading with risk appetite at or below 50");
+  });
+
 });
 
 describe("resolvePublishedConfidence", () => {

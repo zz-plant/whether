@@ -143,10 +143,8 @@ describe("product canon: base rate by kind of advice", () => {
 
   it("states the lean only where ten points of it exist, and never as a cause", () => {
     const sentence = describeCanonBaseRate(baseRate);
-    assert.match(sentence, /Sunny months make up 67% of the record, and Freezing or Stormy months 33%\./);
-    assert.match(sentence, /Of the 2 texts tagged Expand, 2 came out in a Sunny month \(100%\)\./);
-    assert.match(sentence, /Of the 2 tagged Conserve, 2 came out in a Freezing or Stormy month \(100%\)\./);
-    assert.match(sentence, /capital advice leans with the conditions/);
+    assert.match(sentence, /^In this sample, capital advice leaned with the conditions, while craft advice tracked the mix of months on record\./);
+    assert.match(sentence, /With 4 capital texts/);
     assert.match(sentence, /adding or removing one text moves a share by 50 points/);
     assert.doesNotMatch(sentence, /\bbecause\b|\bcaused?\b|\bdrove\b|\bdriven\b/i);
   });
@@ -362,8 +360,8 @@ describe("product canon: the list itself", () => {
     if (latestPublishedBrief) assert.ok(html.includes(`href="/brief/${latestPublishedBrief.slug}"`));
   });
 
-  it("keeps the line that the list is a reading list and the corpus tests it", async () => {
-    assert.match(await renderPage(), /The list below is a reading list\. The corpus beneath it tests the list\./);
+  it("keeps the reading list and corpus framing out of the lead", async () => {
+    assert.doesNotMatch(await renderPage(), /The list below is a reading list/);
   });
 });
 

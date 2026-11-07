@@ -1,7 +1,16 @@
-import type { ReactNode } from "react";
+"use client";
+
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
 import { scaleLinear } from "d3-scale";
 import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
+import { classifyRegime } from "../../../lib/regimeEngineCore";
 import { UrlDetails } from "../ui/urlDetails";
 import { ConditionIcon } from "../ui/conceptIcons";
 import type { RegimeKey } from "../../../lib/types";
@@ -46,6 +55,11 @@ type RegimeRadarProps = {
   previousLabel?: string | null;
   /** Where the reading would sit with the left-out inputs counted: its condition's own glyph, plotted. */
   feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
+  /**
+   * Direct-manipulation callback when a surface (such as Scenario Studio) commits
+   * the scrubbed coordinates rather than springing back to the live reading.
+   */
+  onScrubScores?: (scores: { tightness: number; riskAppetite: number }) => void;
   className?: string;
 };
 
@@ -66,6 +80,8 @@ const BOTTOM_ICON_Y = PLOT_BOTTOM - 6 - 3.6 - QUADRANT_ICON / 2;
    the funding-pressure line, clear of the corner glyphs above and below it. */
 const LINE_LABEL_MIN_Y = TOP_ICON_Y + QUADRANT_ICON + 7;
 const LINE_LABEL_MAX_Y = BOTTOM_ICON_Y - 2;
+const SNAP_DETENT_POINTS = 1.6;
+const DRAG_ACTIVATION_PX = 4;
 
 const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
 /* Funding pressure rises downward (2026-11-03), so up and right are both the easier
@@ -77,6 +93,18 @@ const yScale = scaleLinear().domain([0, 100]).range([PLOT_Y, PLOT_BOTTOM]).clamp
 
 const xFor = (riskAppetite: number) => xScale(riskAppetite);
 const yFor = (tightness: number) => yScale(tightness);
+
+const clampScore = (value: number) => Math.min(100, Math.max(0, value));
+
+const formatSignedDelta = (delta: number) => {
+  const rounded = Math.round(delta);
+  if (rounded > 0) return `+${rounded}`;
+  if (rounded < 0) return `−${Math.abs(rounded)}`;
+  return "0";
+};
+
+const snapToThreshold = (value: number, threshold: number) =>
+  Math.abs(value - threshold) <= SNAP_DETENT_POINTS ? threshold : value;
 
 export function RegimeRadar({
   compact = false,
@@ -96,8 +124,176 @@ export function RegimeRadar({
   primaryLabel,
   previousLabel,
   feelsLike,
+  onScrubScores,
   className = "",
 }: RegimeRadarProps) {
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const dragStateRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    didDrag: boolean;
+  } | null>(null);
+  const suppressClickRef = useRef(false);
+
+  const [scrub, setScrub] = useState<{
+    tightness: number;
+    riskAppetite: number;
+    settling: boolean;
+  } | null>(null);
+  const scrubRef = useRef(scrub);
+
+  const updateScrub = (
+    next: { tightness: number; riskAppetite: number; settling: boolean } | null,
+  ) => {
+    scrubRef.current = next;
+    setScrub(next);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const stopSpring = () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
+
+  const animateBackToRest = (startTightness: number, startRiskAppetite: number) => {
+    stopSpring();
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      (Math.abs(startTightness - tightness) < 0.25 && Math.abs(startRiskAppetite - riskAppetite) < 0.25)
+    ) {
+      updateScrub(null);
+      return;
+    }
+
+    let posT = startTightness;
+    let posR = startRiskAppetite;
+    let velT = 0;
+    let velR = 0;
+    let lastTime = performance.now();
+    const stiffness = 290;
+    const damping = 28;
+
+    const step = (now: number) => {
+      const dt = Math.min(0.032, Math.max(0.001, (now - lastTime) / 1000));
+      lastTime = now;
+      const forceT = -stiffness * (posT - tightness) - damping * velT;
+      const forceR = -stiffness * (posR - riskAppetite) - damping * velR;
+      velT += forceT * dt;
+      velR += forceR * dt;
+      posT += velT * dt;
+      posR += velR * dt;
+
+      if (
+        Math.hypot(posT - tightness, posR - riskAppetite) < 0.35 &&
+        Math.hypot(velT, velR) < 1.5
+      ) {
+        rafRef.current = null;
+        updateScrub(null);
+        return;
+      }
+
+      updateScrub({
+        tightness: clampScore(posT),
+        riskAppetite: clampScore(posR),
+        settling: true,
+      });
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    updateScrub({
+      tightness: startTightness,
+      riskAppetite: startRiskAppetite,
+      settling: true,
+    });
+    rafRef.current = requestAnimationFrame(step);
+  };
+
+  const readPointerScores = (clientX: number, clientY: number) => {
+    const svg = svgRef.current;
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    const viewX = ((clientX - rect.left) / rect.width) * VIEW_W;
+    const viewY = ((clientY - rect.top) / rect.height) * VIEW_H;
+    const rawRisk = ((viewX - PLOT_X) / PLOT_SIZE) * 100;
+    const rawTightness = ((viewY - PLOT_Y) / PLOT_SIZE) * 100;
+    const nextRisk = snapToThreshold(clampScore(rawRisk), riskAppetiteThreshold);
+    const nextTightness = snapToThreshold(clampScore(rawTightness), tightnessThreshold);
+    return {
+      tightness: Math.round(nextTightness),
+      riskAppetite: Math.round(nextRisk),
+    };
+  };
+
+  const applyScrub = (next: { tightness: number; riskAppetite: number }) => {
+    stopSpring();
+    if (onScrubScores) {
+      onScrubScores(next);
+      updateScrub({ ...next, settling: false });
+      return;
+    }
+    updateScrub({ ...next, settling: false });
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (event.button !== 0 && event.pointerType === "mouse") return;
+    stopSpring();
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      didDrag: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    if (onScrubScores) {
+      const initial = readPointerScores(event.clientX, event.clientY);
+      if (initial) {
+        dragStateRef.current.didDrag = true;
+        applyScrub(initial);
+      }
+    }
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const state = dragStateRef.current;
+    if (!state || state.pointerId !== event.pointerId) return;
+    const distance = Math.hypot(event.clientX - state.startX, event.clientY - state.startY);
+    if (!state.didDrag && distance < DRAG_ACTIVATION_PX) return;
+    state.didDrag = true;
+    const next = readPointerScores(event.clientX, event.clientY);
+    if (next) applyScrub(next);
+  };
+
+  const finishPointerInteraction = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const state = dragStateRef.current;
+    if (!state || state.pointerId !== event.pointerId) return;
+    dragStateRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (state.didDrag) {
+      suppressClickRef.current = true;
+      const latest = scrubRef.current;
+      if (onScrubScores) {
+        updateScrub(null);
+      } else if (latest) {
+        animateBackToRest(latest.tightness, latest.riskAppetite);
+      }
+    } else if (scrubRef.current) {
+      animateBackToRest(scrubRef.current.tightness, scrubRef.current.riskAppetite);
+    }
+  };
+
   /* The plotted glyph and Freezing's corner word want the same corner when the left-out
      inputs land there: the word moves to the top of its quadrant, and the plotted glyph
      stands in for the one beside it. */
@@ -107,6 +303,21 @@ export function RegimeRadar({
   const boundaryY = yFor(tightnessThreshold);
   const currentX = xFor(riskAppetite);
   const currentY = yFor(tightness);
+
+  const isScrubbing = scrub !== null;
+  const scrubTightness = scrub ? Math.round(scrub.tightness) : tightness;
+  const scrubRiskAppetite = scrub ? Math.round(scrub.riskAppetite) : riskAppetite;
+  const scrubX = scrub ? xFor(scrub.riskAppetite) : currentX;
+  const scrubY = scrub ? yFor(scrub.tightness) : currentY;
+  const scrubbedRegime = isScrubbing
+    ? classifyRegime(scrubTightness, scrubRiskAppetite, {
+        tightnessRegime: tightnessThreshold,
+        riskAppetiteRegime: riskAppetiteThreshold,
+      })
+    : null;
+  const scrubbedWeatherLabel = scrubbedRegime ? getRegimePublicLabel(scrubbedRegime) : null;
+  const snapTightnessActive = isScrubbing && Math.abs(scrub.tightness - tightnessThreshold) < 0.5;
+  const snapRiskActive = isScrubbing && Math.abs(scrub.riskAppetite - riskAppetiteThreshold) < 0.5;
 
   const trailPoints = (trail ?? []).map((point) => ({
     x: xFor(point.riskAppetite),
@@ -190,7 +401,7 @@ export function RegimeRadar({
     { key: "VOLATILE", x: PLOT_X, y: PLOT_Y, width: boundaryX - PLOT_X, height: boundaryY - PLOT_Y, fill: "var(--phase-volatile)" },
     { key: "EXPANSION", x: boundaryX, y: PLOT_Y, width: PLOT_RIGHT - boundaryX, height: boundaryY - PLOT_Y, fill: "var(--phase-expansion)" },
   ];
-  const activeKey = currentRegime.toUpperCase();
+  const activeKey = (scrubbedRegime ?? currentRegime).toUpperCase();
   const hasActive = quadrants.some((quadrant) => quadrant.key === activeKey);
   /* A tap on the map opens the readings it plots (2026-11-03). Out of the tab order and
      hidden like the picture: the fold's own summary is the keyboard's way in. */
@@ -208,11 +419,26 @@ export function RegimeRadar({
     <figure
       className={`relative m-0 flex flex-col items-center justify-center rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 ${className}`.trim()}
       aria-label={`Conditions radar: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}`}
+      data-scrubbing={isScrubbing ? "" : undefined}
     >
       <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
-        <span className="font-semibold text-slate-100">Conditions</span>
+        <span className="font-semibold text-slate-100">
+          {isScrubbing && scrubbedWeatherLabel ? (
+            <span data-radar-scrub-status>
+              {scrub.settling ? "Returning · " : "Exploring "}
+              <span className="text-[color:var(--regime-ink)]">{scrubbedWeatherLabel}</span>
+              {scrubbedRegime !== currentRegime.toUpperCase() ? " (changes conditions)" : ""}
+            </span>
+          ) : (
+            "Conditions"
+          )}
+        </span>
         {/* Not on the card (2026-11-03): the facts line beside the map states both scores. */}
-        {compact ? null : (
+        {isScrubbing ? (
+          <span className="tabular-nums text-slate-200" data-radar-scrub-readout>
+            {`Pressure ${scrubTightness} (${formatSignedDelta(scrubTightness - tightness)}) · Appetite ${scrubRiskAppetite} (${formatSignedDelta(scrubRiskAppetite - riskAppetite)})`}
+          </span>
+        ) : compact ? null : (
           <span className="tabular-nums text-slate-400">
             Funding pressure {tightness} · Risk appetite {riskAppetite}
           </span>
@@ -227,6 +453,7 @@ export function RegimeRadar({
       </p>
 
       {linkToReadings(<svg
+        ref={svgRef}
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
         /* 16rem (256px) at most: the plot is the card's one picture, and at
            200px its month-end trail bunched into a knot beside the current
@@ -235,6 +462,18 @@ export function RegimeRadar({
            display root step instead of shrinking against the text beside it. */
         className="block h-auto w-full max-w-[16rem]"
         aria-hidden="true"
+        style={isScrubbing ? { touchAction: "none", userSelect: "none", cursor: "grabbing" } : { touchAction: "none", userSelect: "none", cursor: "crosshair" }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishPointerInteraction}
+        onPointerCancel={finishPointerInteraction}
+        onClick={(event) => {
+          if (suppressClickRef.current) {
+            suppressClickRef.current = false;
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
       >
         <title>{`Funding pressure ${tightness} vs risk appetite ${riskAppetite} (${weatherLabel})`}</title>
 
@@ -319,9 +558,9 @@ export function RegimeRadar({
           y1={boundaryY}
           x2={PLOT_RIGHT}
           y2={boundaryY}
-          stroke="var(--phase-boundary)"
-          strokeDasharray="3 3"
-          strokeWidth="1"
+          stroke={snapTightnessActive ? "var(--regime-ink)" : "var(--phase-boundary)"}
+          strokeDasharray={snapTightnessActive ? undefined : "3 3"}
+          strokeWidth={snapTightnessActive ? "1.6" : "1"}
         >
           <title>{`Funding pressure change line at ${tightnessThreshold}`}</title>
         </line>
@@ -330,9 +569,9 @@ export function RegimeRadar({
           y1={PLOT_Y}
           x2={boundaryX}
           y2={PLOT_BOTTOM}
-          stroke="var(--phase-boundary)"
-          strokeDasharray="3 3"
-          strokeWidth="1"
+          stroke={snapRiskActive ? "var(--regime-ink)" : "var(--phase-boundary)"}
+          strokeDasharray={snapRiskActive ? undefined : "3 3"}
+          strokeWidth={snapRiskActive ? "1.6" : "1"}
         >
           <title>{`Risk appetite change line at ${riskAppetiteThreshold}`}</title>
         </line>
@@ -513,6 +752,58 @@ export function RegimeRadar({
             fill="var(--regime-accent)"
           />
         </g>
+
+        {/* Direct-manipulation scrub overlay: rendered only while actively scrubbing or spring-settling */}
+        {isScrubbing ? (
+          <g data-radar-scrub-overlay>
+            {/* Projection guides from scrubbed crosshair to both change lines */}
+            <line
+              x1={scrubX}
+              y1={scrubY}
+              x2={scrubX}
+              y2={boundaryY}
+              stroke="var(--regime-ink)"
+              strokeDasharray="1.5 1.5"
+              strokeWidth="1"
+              strokeOpacity="0.85"
+            />
+            <line
+              x1={scrubX}
+              y1={scrubY}
+              x2={boundaryX}
+              y2={scrubY}
+              stroke="var(--regime-ink)"
+              strokeDasharray="1.5 1.5"
+              strokeWidth="1"
+              strokeOpacity="0.85"
+            />
+            {/* Vector from live reading to scrubbed crosshair */}
+            <line
+              x1={currentX}
+              y1={currentY}
+              x2={scrubX}
+              y2={scrubY}
+              stroke="var(--regime-ink)"
+              strokeWidth="1.25"
+              strokeOpacity="0.9"
+            />
+            <circle
+              cx={scrubX}
+              cy={scrubY}
+              r="7.5"
+              fill="none"
+              stroke="var(--regime-ink)"
+              strokeWidth="1.4"
+              strokeOpacity="0.9"
+            />
+            <circle
+              cx={scrubX}
+              cy={scrubY}
+              r="3.2"
+              fill="var(--regime-ink)"
+            />
+          </g>
+        ) : null}
 
         {/* Axes guides */}
         <text

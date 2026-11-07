@@ -427,11 +427,6 @@ export default async function SharePage() {
           </ul>
         </nav>
         <SubscribeForm />
-        <div>
-          <ActionLink href="/" variant="pill">
-            Return to weekly brief
-          </ActionLink>
-        </div>
       </div>
     </PageShell>
   );

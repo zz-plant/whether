@@ -12,6 +12,7 @@ import {
   buildScenarioBriefText,
   buildScenarioSearch,
   buildSimulatedTreasury,
+  invertScoresToScenario,
   parseScenarioParam,
   type ScenarioPreset,
 } from "../../../lib/report/scenarioStudio";
@@ -79,6 +80,15 @@ export function ScenarioStudioSimulator({
     [simulatedAssessment],
   );
 
+  const livePlaybook = useMemo(
+    () =>
+      getPlaybookGuidance(liveAssessment.regime, {
+        scores: liveAssessment.scores,
+        thresholds: liveAssessment.thresholds,
+      }),
+    [liveAssessment],
+  );
+
   // Deltas vs live baseline
   const baseRateDelta = simulatedBaseRate - liveBaseRate;
   const curveSlopeDelta = simulatedCurveSlope - liveCurveSlope;
@@ -89,6 +99,14 @@ export function ScenarioStudioSimulator({
 
   const applyPreset = (preset: ScenarioPreset) => setScenario(preset.rate, preset.slope);
   const resetToLive = () => setScenario(liveBaseRate, liveCurveSlope);
+  const handleScrubScores = ({ tightness, riskAppetite }: { tightness: number; riskAppetite: number }) => {
+    const next = invertScoresToScenario(
+      tightness,
+      riskAppetite,
+      liveAssessment.thresholds.baseRateTightness,
+    );
+    setScenario(next.rate, next.slope);
+  };
 
   const handleCopySimulatedBrief = () => {
     const briefText = buildScenarioBriefText({
@@ -101,6 +119,7 @@ export function ScenarioStudioSimulator({
       liveAssessment,
       simulatedAssessment,
       simulatedPlaybook,
+      livePlaybook,
       shareUrl: window.location.href,
     });
     void copyToClipboard(briefText, "simulated-brief");
@@ -150,6 +169,7 @@ export function ScenarioStudioSimulator({
         tightnessThreshold={liveAssessment.thresholds.tightnessRegime}
         riskAppetiteThreshold={liveAssessment.thresholds.riskAppetiteRegime}
         currentRegime={simulatedAssessment.regime}
+        onScrubScores={handleScrubScores}
         footer={
           isAtLiveBaseline ? null : (
             <span>
@@ -163,8 +183,21 @@ export function ScenarioStudioSimulator({
         liveAssessment={liveAssessment}
         simulatedAssessment={simulatedAssessment}
         simulatedPlaybook={simulatedPlaybook}
+        livePlaybook={livePlaybook}
         tightnessDelta={tightnessDelta}
         riskAppetiteDelta={riskAppetiteDelta}
+        onScrubTightness={(nextTightness) =>
+          handleScrubScores({
+            tightness: nextTightness,
+            riskAppetite: simulatedAssessment.scores.riskAppetite,
+          })
+        }
+        onScrubRiskAppetite={(nextRiskAppetite) =>
+          handleScrubScores({
+            tightness: simulatedAssessment.scores.tightness,
+            riskAppetite: nextRiskAppetite,
+          })
+        }
       />
     </div>
   );

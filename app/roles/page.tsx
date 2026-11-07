@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { HearingBubbles } from "../components/ui/hearingBubbles";
+import { selectHearingForAreas } from "../guides/stakeholderGuides";
+import { decisionAreaOrder } from "../../lib/report/boundedDecisionRules";
 import { ROLES } from "../../lib/report/companyRoles";
 import { conditionQuestions } from "../../lib/report/workQuestions";
 import { buildPageMetadata } from "../../lib/seo";
@@ -12,6 +15,10 @@ import { ContentPageShell } from "../components/ui/contentPageShell";
 import { ConditionQuestionsSection } from "./workQuestionsSections";
 
 export const revalidate = 3600;
+
+const decisionConversations = decisionAreaOrder.flatMap((area) =>
+  selectHearingForAreas([area]).map(({ hearing }) => hearing),
+);
 
 const title = "What each role can ask for this week";
 const description = "What each role can ask for this week at any tech company: what to ask leadership, the general rules, and the questions that come up.";
@@ -62,6 +69,10 @@ export default async function RolesPage() {
       </section>
       <ConditionsSection conditions={conditions} />
       <ConditionQuestionsSection regime={regime} questions={conditionQuestions(regime)} pagePath="/roles" />
+      <section id="decision-conversations" aria-labelledby="decision-conversations-heading" className="space-y-4">
+        <h2 id="decision-conversations-heading" className="type-section">Sample conversations about pause rules</h2>
+        <HearingBubbles entries={decisionConversations} className="max-w-2xl" />
+      </section>
     </ContentPageShell>
   );
 }
