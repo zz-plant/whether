@@ -5,6 +5,7 @@ import {
   formatScenarioDelta,
   type ScenarioPreset,
 } from "../../../lib/report/scenarioStudio";
+import { OrdinalMarker } from "../../components/ui/ordinalMarker";
 
 export function ScenarioPresets({
   simulatedBaseRate,
@@ -47,7 +48,7 @@ export function ScenarioPresets({
       {/* Four keys, so two steps the panel's own width picks: two by two, then
           one row. A fitted grid would leave one stranded under three. */}
       <div className="mt-4 grid gap-3 @md:grid-cols-2 @4xl:grid-cols-4">
-        {SCENARIO_PRESETS.map((preset) => {
+        {SCENARIO_PRESETS.map((preset, index) => {
           const isActive =
             Math.abs(simulatedBaseRate - preset.rate) < 0.05 &&
             Math.abs(simulatedCurveSlope - preset.slope) < 0.05;
@@ -56,6 +57,9 @@ export function ScenarioPresets({
             <button
               key={preset.id}
               type="button"
+              /* The name is the two settings the preset applies; the marker is
+                 aria-hidden, and the description below is supplementary. */
+              aria-label={`Short-term borrowing rate ${preset.rate.toFixed(2)}%, recession warning gauge ${formatScenarioDelta(preset.slope, "%")}`}
               aria-pressed={isActive}
               onClick={() => onApplyPreset(preset)}
               /* `!` throughout: `.weather-surface` sets border and background
@@ -67,13 +71,16 @@ export function ScenarioPresets({
                   : "hover:!border-slate-600"
               }`}
             >
-              <span className="text-xs font-semibold text-slate-100">
-                {/* Named as the two sliders are named, so a preset reads as a setting of them. */}
-                Short-term borrowing rate {preset.rate.toFixed(2)}%, recession warning gauge {formatScenarioDelta(preset.slope, "%")}
-              </span>
-              <p className="mt-2 text-fluid-sm leading-snug text-slate-400">
-                {preset.description}
-              </p>
+              <div className="grid w-full grid-cols-[auto_1fr] items-start gap-x-2.5 gap-y-1.5">
+                <OrdinalMarker className="mt-0.5">{index + 1}</OrdinalMarker>
+                <span className="text-xs font-semibold text-slate-100">
+                  {/* Named as the two sliders are named, so a preset reads as a setting of them. */}
+                  Short-term borrowing rate {preset.rate.toFixed(2)}%, recession warning gauge {formatScenarioDelta(preset.slope, "%")}
+                </span>
+                <p className="col-start-2 text-fluid-sm leading-snug text-slate-400">
+                  {preset.description}
+                </p>
+              </div>
             </button>
           );
         })}

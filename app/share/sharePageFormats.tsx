@@ -11,6 +11,7 @@ import { ChatPreview } from "./chatPreview";
 import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { ActionLink } from "../components/ui/actionLink";
+import { OrdinalMarker } from "../components/ui/ordinalMarker";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import { useOperatorRunway } from "../components/useOperatorRunway";
 
@@ -39,7 +40,11 @@ import { useOperatorRunway } from "../components/useOperatorRunway";
  * The selection is the URL hash, so a link can open the page on a format
  * (`/share#investor-update`) and the page's old section anchors still land.
  */
-type ShareFormatGroup = "Chat" | "Social" | "Meetings" | "Docs and email" | "Tickets";
+type ShareFormatGroup =
+  | "Team and tickets"
+  | "Leadership and board"
+  | "Investors and portfolio"
+  | "Citation and social";
 
 type ShareFormatBase = {
   id: string;
@@ -75,7 +80,12 @@ export type ShareFormatOption = ShareFormatBase &
     | { kind: "investor"; parts: InvestorUpdateSnippetParts; copyLabel: string }
   );
 
-const GROUP_ORDER: readonly ShareFormatGroup[] = ["Chat", "Social", "Meetings", "Docs and email", "Tickets"];
+const GROUP_ORDER: readonly ShareFormatGroup[] = [
+  "Team and tickets",
+  "Leadership and board",
+  "Investors and portfolio",
+  "Citation and social",
+];
 
 /** The anchors the stacked page linked to, so an old link opens the format that lived there. */
 const LEGACY_HASHES: Readonly<Record<string, string>> = {
@@ -231,11 +241,14 @@ export function SharePageFormats({
         </label>
 
         <nav aria-label="Formats" className="max-md:hidden">
-          <div className="space-y-3">
-            {grouped.map(({ group, items }) => (
-              <div key={group} className="space-y-1">
-                <p className="type-eyebrow">{group}</p>
-                <ul>
+          <div className="space-y-4">
+            {grouped.map(({ group, items }, groupIdx) => (
+              <div key={group} className="space-y-1.5">
+                <div className="flex items-center gap-1.5 px-2">
+                  <OrdinalMarker>{groupIdx + 1}</OrdinalMarker>
+                  <p className="type-eyebrow text-slate-400">{group}</p>
+                </div>
+                <ul className="space-y-0.5">
                   {items.map((option) => {
                     const active = option.id === selected.id;
                     return (
@@ -244,13 +257,16 @@ export function SharePageFormats({
                           type="button"
                           onClick={() => select(option.id)}
                           aria-pressed={active}
-                          className={`weather-focus-ring flex min-h-11 w-full items-center rounded-lg border px-2.5 text-left text-sm transition-colors [@media(hover:hover)_and_(pointer:fine)]:min-h-8 ${
+                          className={`weather-focus-ring flex min-h-11 w-full items-center justify-between rounded-lg border px-3 text-left text-sm transition-colors [@media(hover:hover)_and_(pointer:fine)]:min-h-8 ${
                             active
                               ? "border-sky-500/30 bg-sky-500/12 font-semibold text-sky-100"
                               : "border-transparent text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
                           }`}
                         >
-                          {option.label}
+                          <span>{option.label}</span>
+                          {active ? (
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true" />
+                          ) : null}
                         </button>
                       </li>
                     );

@@ -247,6 +247,7 @@ take the other's job.
   | Dashed ring (`CircleDashed`) | a score close to its line | the line-state "close" glyph (§XXIV) |
   | Pause and play | a pause line crossed; clear of it, or a restart line met | the line states (§XXIV) |
   | Outlined diamond (`.weather-caveat-mark`) | read this reading with care | cached sources, a scoring note, an archived week, guidance held back |
+  | Numeral in a bordered square (`OrdinalMarker`) | the item's position in a fixed list | the area table, the signals table, the share formats, the presets, the scenario rules |
 
   The diamond is the one mark that is not round: it is a warning sign's shape, not a data marker,
   and its colour is the caveat ink, never the crossed red. A new kind of mark gets a row here

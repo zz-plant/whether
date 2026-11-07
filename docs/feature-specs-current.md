@@ -4726,6 +4726,30 @@ surfaces spending width or scroll on the wrong thing. What changed:
 Left as found: `/history` (already a structure), `/` (right order; it needs compression, not a
 restructure), and `/compare`'s full A/B toggle.
 
+### 1.1.106 The scenario studio gets keys, and one mark for a list position (2026-11-07)
+
+- **The sliders step.** Each value carries a −/+ key that moves it 25 basis points (clamped to the
+  slider's range), and the four labelled ends of each rail ("0.00% (zero rates)" … "8.00%
+  (extreme)") are keys that set the value rather than captions under it. The range input takes the
+  control focus ring. The value and its "vs this week" delta stay one tabular block.
+- **A scenario names itself.** Off this week's values, one line above the map reads "Active
+  scenario › Short rate … › Gauge … › {regime}". The verdict stays in the deltas panel below, which
+  has the transition to show it; the strip does not print "Conditions would change" a second time.
+- **The rules table names its rows.** The area cell is a `<th scope="row">`, so a screen reader
+  reads the area before its action and lines; the owner stays under the area name. Below `md` the
+  four columns restack as a block per area, each cell naming its column, the same phone pattern as
+  `AreaTable` — before this the columns were squeezed to one word a line.
+- **No count beside a heading that already counts.** "4 presets" and "5 areas" are gone: the
+  sentence under each heading already says "Four preset scenarios" and "All 5 areas steady".
+- **`/share` groups by who receives the format.** Team and tickets (Slack post, full brief, ticket
+  brief) · Leadership and board (Monday agenda, slide text, meeting pack, email) · Investors and
+  portfolio (investor update, portfolio note) · Citation and social (citation, LinkedIn, X,
+  Bluesky). The active format carries a lit dot in the picker.
+- **One ordinal marker.** `app/components/ui/ordinalMarker.tsx` draws a list position once: Data
+  tier (`rounded-md`), `aria-hidden` because the row's label is the accessible name. The area
+  table, the signals table, the share formats, the presets and the scenario rules each drew their
+  own copy of it before.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

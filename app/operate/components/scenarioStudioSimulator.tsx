@@ -12,10 +12,12 @@ import {
   buildScenarioBriefText,
   buildScenarioSearch,
   buildSimulatedTreasury,
+  formatScenarioDelta,
   invertScoresToScenario,
   parseScenarioParam,
   type ScenarioPreset,
 } from "../../../lib/report/scenarioStudio";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { ScenarioDeltas } from "./scenarioDeltas";
 import { ScenarioPresets } from "./scenarioPresets";
 import { ScenarioSliders } from "./scenarioSliders";
@@ -152,6 +154,19 @@ export function ScenarioStudioSimulator({
         onCopyShareableLink={handleCopyShareableLink}
         onCopySimulatedBrief={handleCopySimulatedBrief}
       />
+      {!isAtLiveBaseline ? (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-xs text-slate-400">
+          <span className="font-semibold text-slate-200">Active scenario</span>
+          <span className="text-slate-600">›</span>
+          <span className="tabular-nums">Short rate {simulatedBaseRate.toFixed(2)}% ({formatScenarioDelta(baseRateDelta, "%")})</span>
+          <span className="text-slate-600">›</span>
+          <span className="tabular-nums">Gauge {simulatedCurveSlope.toFixed(2)}% ({formatScenarioDelta(curveSlopeDelta, "%")})</span>
+          <span className="text-slate-600">›</span>
+          <span className="font-semibold text-slate-100">{getRegimePublicLabel(simulatedAssessment.regime)}</span>
+          {/* No verdict here: the deltas panel below states whether conditions
+              would change, with the transition, and says it once. */}
+        </div>
+      ) : null}
       {/*
         * The sliders, drawn where the map is: the scenario's reading as the
         * filled dot, this week's as the hollow one — the same filled/hollow
@@ -171,11 +186,17 @@ export function ScenarioStudioSimulator({
         currentRegime={simulatedAssessment.regime}
         onScrubScores={handleScrubScores}
         footer={
-          isAtLiveBaseline ? null : (
-            <span>
-              Filled dot: the simulated reading. Hollow: this week&apos;s reading, before the sliders.
-            </span>
-          )
+          <span>
+            {isAtLiveBaseline ? (
+              <span className="text-slate-400">
+                Drag the marker or click any quadrant to explore other conditions directly.
+              </span>
+            ) : (
+              <span>
+                Filled dot: the simulated reading. Hollow: this week&apos;s reading, before the sliders. Drag marker or ladders to scrub.
+              </span>
+            )}
+          </span>
         }
         className="mx-auto w-full max-w-[18rem]"
       />
@@ -186,18 +207,7 @@ export function ScenarioStudioSimulator({
         livePlaybook={livePlaybook}
         tightnessDelta={tightnessDelta}
         riskAppetiteDelta={riskAppetiteDelta}
-        onScrubTightness={(nextTightness) =>
-          handleScrubScores({
-            tightness: nextTightness,
-            riskAppetite: simulatedAssessment.scores.riskAppetite,
-          })
-        }
-        onScrubRiskAppetite={(nextRiskAppetite) =>
-          handleScrubScores({
-            tightness: simulatedAssessment.scores.tightness,
-            riskAppetite: nextRiskAppetite,
-          })
-        }
+        onScrubScores={handleScrubScores}
       />
     </div>
   );

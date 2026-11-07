@@ -3,6 +3,7 @@ import { ReportSection } from "../../components/reportSection";
 import { ScoreCell, formatPoints } from "../../components/ui/scoreCell";
 import { GovernedAreas } from "../../components/ui/governedAreas";
 import { ActionLink } from "../../components/ui/actionLink";
+import { OrdinalMarker } from "../../components/ui/ordinalMarker";
 import { toRoute } from "../../../lib/navigation/routeType";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { SignalReferenceRow } from "../../../lib/report/evidenceReaderModel";
@@ -136,7 +137,7 @@ export const SignalsWhatChangedSection = ({
             </tr>
           </thead>
           <tbody className="max-md:block">
-            {rows.map((row) => (
+            {rows.map((row, idx) => (
               <tr
                 key={row.key}
                 id={row.key}
@@ -146,13 +147,16 @@ export const SignalsWhatChangedSection = ({
                 data-frame-block=""
               >
                 <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:p-0">
-                  {row.watchHref ? (
-                    <Link href={toRoute(row.watchHref)} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
-                      {row.label}
-                    </Link>
-                  ) : (
-                    row.label
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    <OrdinalMarker>{idx + 1}</OrdinalMarker>
+                    {row.watchHref ? (
+                      <Link href={toRoute(row.watchHref)} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
+                        {row.label}
+                      </Link>
+                    ) : (
+                      row.label
+                    )}
+                  </div>
                   {/* No "Moves first" / "Confirms later" under the name (2026-11-03): the
                       premise test found both scores track deal count in the same quarter and the
                       next, with the same decay (docs/research/premise-test-results.md, "Lead and
