@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it, mock } from "bun:test";
+import { afterEach, describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FossilRecordSection } from "../app/signals/components/fossilRecordSection";
 import { ScenarioStudioSimulator } from "../app/operate/components/scenarioStudioSimulator";
@@ -14,11 +14,14 @@ const mockAny: any = mock;
 
 /* The simulator reads the app router's search params; renderToStaticMarkup
    mounts none. Installed here so the file answers for its own dependencies
-   rather than passing on another suite's ordering luck. */
+   rather than passing on another suite's ordering luck. The value is mutable
+   so a test can open the studio on a scenario the URL carries. */
+let currentSearchParams = new URLSearchParams();
+
 mockAny.module("next/navigation", () => ({
   ...nextNavigation,
   usePathname: () => "/signals",
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => currentSearchParams,
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
 }));
 
@@ -113,6 +116,60 @@ describe("ScenarioStudioSimulator", () => {
     assert.match(html, /What you&#x27;d stop and start in this scenario/);
     assert.match(html, /What to stop in this scenario/);
     assert.match(html, /What to start in this scenario/);
+  });
+
+  afterEach(() => {
+    currentSearchParams = new URLSearchParams();
+  });
+
+  it("names the scenario the URL carries, above the map, without repeating the deltas verdict", () => {
+    const assessment = evaluateRegime(mockTreasury);
+    currentSearchParams = new URLSearchParams("rate=2.00&slope=1.20");
+    const html = renderToStaticMarkup(
+      <ScenarioStudioSimulator liveTreasury={mockTreasury} liveAssessment={assessment} />,
+    );
+
+    assert.match(html, /Active scenario/);
+    assert.match(html, /Short rate 2\.00%/);
+    assert.match(html, /Gauge 1\.20%/);
+    assert.match(html, /Active scenario[\s\S]{0,400}Sunny/, "the strip names the regime the scenario lands in");
+    // The verdict belongs to the deltas panel, which has the transition to show it.
+    assert.equal((html.match(/Conditions would change/g) ?? []).length, 1);
+
+    // At this week's values there is no scenario to name.
+    currentSearchParams = new URLSearchParams();
+    const atBaseline = renderToStaticMarkup(
+      <ScenarioStudioSimulator liveTreasury={mockTreasury} liveAssessment={assessment} />,
+    );
+    assert.doesNotMatch(atBaseline, /Active scenario/);
+  });
+
+  it("steps a slider a quarter point and jumps to a named milestone", () => {
+    const html = renderToStaticMarkup(
+      <ScenarioStudioSimulator liveTreasury={mockTreasury} liveAssessment={evaluateRegime(mockTreasury)} />,
+    );
+
+    for (const label of [
+      "Decrease short-term borrowing rate by 25 basis points",
+      "Increase short-term borrowing rate by 25 basis points",
+      "Decrease recession warning gauge by 25 basis points",
+      "Increase recession warning gauge by 25 basis points",
+    ]) {
+      assert.ok(html.includes(`aria-label="${label}"`), `offers ${label}`);
+    }
+    // The labelled ends of each rail are keys that set the value, not captions.
+    for (const milestone of [
+      "0.00% (zero rates)",
+      "2.50% (neutral)",
+      "5.00% (tight)",
+      "8.00% (extreme)",
+      "-1.50% (deeply inverted)",
+      "0.00% (flat)",
+      "+1.00% (normal)",
+      "+2.50% (steep)",
+    ]) {
+      assert.ok(html.includes(`>${milestone}</button>`), `${milestone} sets the slider`);
+    }
   });
 
   it("inverts scrubbed map or ladder scores back into rate and slope slider values across all four quadrants", () => {

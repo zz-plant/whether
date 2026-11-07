@@ -1,8 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { getPlaybookGuidance } from "../../../lib/playbook";
 import { Tag } from "../../components/ui/tag";
+import { OrdinalMarker } from "../../components/ui/ordinalMarker";
+import { CellLabel } from "../../components/ui/cellLabel";
+import { CheckIcon, CloseIcon } from "../../components/uiIcons";
 import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../../lib/report/boundedDecisionRules";
@@ -17,6 +20,57 @@ const deltaClassName = (delta: number, worseWhenUp: boolean) => {
   return worse ? "text-rose-400" : "text-emerald-400";
 };
 
+type PlaybookListProps = {
+  title: string;
+  titleColorClass: string;
+  items: readonly string[];
+  liveSet: Set<string>;
+  diffTagText: string;
+  diffTagTone: "amber" | "emerald";
+  /** Drawn from the icon set: neither text face carries a cross or a check, so
+   *  a glyph string rendered in whatever symbol font the reader's OS had. */
+  glyph: ReactNode;
+  glyphClass: string;
+};
+
+function PlaybookDiffList({
+  title,
+  titleColorClass,
+  items,
+  liveSet,
+  diffTagText,
+  diffTagTone,
+  glyph,
+  glyphClass,
+}: PlaybookListProps) {
+  return (
+    <div className="space-y-3">
+      <h4 className={`text-sm font-semibold ${titleColorClass}`}>{title}</h4>
+      <ul className="space-y-2.5 text-xs text-slate-300">
+        {items.map((item, idx) => {
+          const isNew = !liveSet.has(item);
+          return (
+            <li key={idx} className="flex items-start gap-2.5">
+              <span
+                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${glyphClass}`}
+                aria-hidden="true"
+              >
+                {glyph}
+              </span>
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className={isNew ? "font-medium text-slate-100" : "text-slate-300"}>{item}</span>
+                  {isNew ? <Tag tone={diffTagTone}>{diffTagText}</Tag> : null}
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 export function ScenarioDeltas({
   liveAssessment,
   simulatedAssessment,
@@ -24,8 +78,7 @@ export function ScenarioDeltas({
   livePlaybook: propLivePlaybook,
   tightnessDelta,
   riskAppetiteDelta,
-  onScrubTightness,
-  onScrubRiskAppetite,
+  onScrubScores,
 }: {
   liveAssessment: RegimeAssessment;
   simulatedAssessment: RegimeAssessment;
@@ -34,8 +87,8 @@ export function ScenarioDeltas({
   /** Computed once by the simulator, so the copied brief and this panel cannot disagree. */
   tightnessDelta: number;
   riskAppetiteDelta: number;
-  onScrubTightness?: (nextTightness: number) => void;
-  onScrubRiskAppetite?: (nextRiskAppetite: number) => void;
+  /** One pair of scores, because the two ladders move the same point on the map. */
+  onScrubScores?: ({ tightness, riskAppetite }: { tightness: number; riskAppetite: number }) => void;
 }) {
   const livePlaybook = useMemo(
     () =>
@@ -91,6 +144,14 @@ export function ScenarioDeltas({
 
   const displayedLevers = filterFlippedOnly && flippedLevers.length > 0 ? flippedLevers : leverComparisons;
 
+  const handleTightnessScrub = onScrubScores
+    ? (next: number) => onScrubScores({ tightness: next, riskAppetite: simulatedAssessment.scores.riskAppetite })
+    : undefined;
+
+  const handleRiskAppetiteScrub = onScrubScores
+    ? (next: number) => onScrubScores({ tightness: simulatedAssessment.scores.tightness, riskAppetite: next })
+    : undefined;
+
   return (
     <>
       <section aria-labelledby="deltas-heading" className="weather-panel p-6 space-y-5">
@@ -132,7 +193,7 @@ export function ScenarioDeltas({
             previous={liveAssessment.scores.tightness}
             previousLabel="This week"
             lines={buildLadderLines(ladderLines.tightness)}
-            onScrubValue={onScrubTightness}
+            onScrubValue={handleTightnessScrub}
           />
           <ScoreLadder
             label={
@@ -147,7 +208,7 @@ export function ScenarioDeltas({
             previous={liveAssessment.scores.riskAppetite}
             previousLabel="This week"
             lines={buildLadderLines(ladderLines.riskAppetite)}
-            onScrubValue={onScrubRiskAppetite}
+            onScrubValue={handleRiskAppetiteScrub}
           />
         </div>
       </section>
@@ -174,45 +235,26 @@ export function ScenarioDeltas({
 
         {/* Two lists with the colour on their names */}
         <div className="weather-switch gap-x-8 gap-y-6 [--col-min:14rem]">
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-semantic-tightening-fg">What to stop in this scenario</h4>
-            <ul className="space-y-2.5 text-xs text-slate-300">
-              {simulatedPlaybook.stopItems.map((item, idx) => {
-                const isNew = !liveStopSet.has(item);
-                return (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400" aria-hidden="true" />
-                    <div className="space-y-0.5">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className={isNew ? "text-slate-100 font-medium" : "text-slate-300"}>{item}</span>
-                        {isNew ? <Tag tone="amber">Added in scenario</Tag> : null}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-semantic-easing-fg">What to start in this scenario</h4>
-            <ul className="space-y-2.5 text-xs text-slate-300">
-              {simulatedPlaybook.startItems.map((item, idx) => {
-                const isNew = !liveStartSet.has(item);
-                return (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true" />
-                    <div className="space-y-0.5">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className={isNew ? "text-slate-100 font-medium" : "text-slate-300"}>{item}</span>
-                        {isNew ? <Tag tone="emerald">Unblocks in scenario</Tag> : null}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          <PlaybookDiffList
+            title="What to stop in this scenario"
+            titleColorClass="text-semantic-tightening-fg"
+            items={simulatedPlaybook.stopItems}
+            liveSet={liveStopSet}
+            diffTagText="Added in scenario"
+            diffTagTone="amber"
+            glyph={<CloseIcon className="h-3 w-3" />}
+            glyphClass="border-rose-500/30 bg-rose-500/15 text-rose-300"
+          />
+          <PlaybookDiffList
+            title="What to start in this scenario"
+            titleColorClass="text-semantic-easing-fg"
+            items={simulatedPlaybook.startItems}
+            liveSet={liveStartSet}
+            diffTagText="Unblocks in scenario"
+            diffTagTone="emerald"
+            glyph={<CheckIcon className="h-3 w-3" />}
+            glyphClass="border-emerald-500/30 bg-emerald-500/15 text-emerald-300"
+          />
         </div>
 
         {/* Operating Levers Matrix */}
@@ -268,26 +310,35 @@ export function ScenarioDeltas({
           </div>
 
           <div className="overflow-x-auto overscroll-x-contain">
-            <table className="w-full text-left text-xs text-slate-300 border-collapse">
+            <table className="w-full text-left text-xs text-slate-300 border-collapse max-md:block md:min-w-[36rem]">
               <caption className="sr-only">Operating rules by business area comparing this week and this scenario</caption>
-              <thead>
+              <thead className="max-md:hidden">
                 <tr className="border-b border-slate-800 text-slate-400 font-medium">
-                  <th scope="col" className="py-2.5 pr-3 w-1/5">Area</th>
-                  <th scope="col" className="py-2.5 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.action.actionNow}</th>
-                  <th scope="col" className="py-2.5 pr-3 w-2/5">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
+                  <th scope="col" className="py-2.5 pr-3 w-48 shrink-0">Area</th>
+                  <th scope="col" className="py-2.5 pr-3">{DECISION_CONTRACT_LABELS.action.actionNow}</th>
+                  <th scope="col" className="py-2.5 pr-3">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
                   {showRestartLines ? (
-                    <th scope="col" className="py-2.5 pr-3 w-1/4 text-emerald-400/90">{DECISION_CONTRACT_LABELS.slot.reversal}</th>
+                    <th scope="col" className="py-2.5 pr-3 text-emerald-400/90">{DECISION_CONTRACT_LABELS.slot.reversal}</th>
                   ) : null}
                 </tr>
               </thead>
-              <tbody>
-                {displayedLevers.map((lever) => (
-                  <tr key={lever.lever} className="border-b border-slate-800/50 last:border-0 align-top">
-                    <td className="py-3 pr-3">
-                      <div className="font-semibold text-slate-200">{lever.label}</div>
-                      <div className="text-slate-400 text-fluid-nano mt-0.5">{lever.owner}</div>
-                    </td>
-                    <td className="py-3 pr-3 leading-relaxed">
+              <tbody className="max-md:block">
+                {displayedLevers.map((lever, index) => (
+                  /* A table from md up. Below it the four columns do not fit a
+                     phone, so each row restacks as a block and each cell names
+                     its column — the same phone pattern as `AreaTable`. */
+                  <tr key={lever.lever} className="border-b border-slate-800/50 last:border-0 align-top max-md:block max-md:space-y-3 max-md:py-4">
+                    <th scope="row" aria-label={lever.label} className="py-3 pr-3 text-left font-normal max-md:block max-md:p-0">
+                      <div className="flex items-start gap-2">
+                        <OrdinalMarker className="mt-0.5">{index + 1}</OrdinalMarker>
+                        <div>
+                          <div className="font-semibold text-slate-200">{lever.label}</div>
+                          <div className="text-slate-400 text-fluid-nano mt-0.5">{lever.owner}</div>
+                        </div>
+                      </div>
+                    </th>
+                    <td className="py-3 pr-3 leading-relaxed max-md:block max-md:p-0">
+                      <CellLabel>{DECISION_CONTRACT_LABELS.action.actionNow}</CellLabel>
                       {lever.actionFlipped ? (
                         <div className="space-y-1">
                           <div className="flex items-center gap-1.5">
@@ -307,7 +358,8 @@ export function ScenarioDeltas({
                         </div>
                       )}
                     </td>
-                    <td className="py-3 pr-3 text-amber-200/90 leading-relaxed">
+                    <td className="py-3 pr-3 text-amber-200/90 leading-relaxed max-md:block max-md:p-0">
+                      <CellLabel>{DECISION_CONTRACT_LABELS.threshold.pauseIf}</CellLabel>
                       <div>{lever.triggerThreshold}</div>
                       {lever.pauseLineChanged && lever.liveTriggerThreshold ? (
                         <div className="text-slate-400 text-fluid-nano line-through leading-normal mt-1">
@@ -316,7 +368,8 @@ export function ScenarioDeltas({
                       ) : null}
                     </td>
                     {showRestartLines ? (
-                      <td className="py-3 pr-3 text-emerald-200/90 leading-relaxed">
+                      <td className="py-3 pr-3 text-emerald-200/90 leading-relaxed max-md:block max-md:p-0">
+                        <CellLabel>{DECISION_CONTRACT_LABELS.slot.reversal}</CellLabel>
                         <div>{lever.reversalCondition}</div>
                         {lever.restartLineChanged && lever.liveReversalCondition ? (
                           <div className="text-slate-400 text-fluid-nano line-through leading-normal mt-1">

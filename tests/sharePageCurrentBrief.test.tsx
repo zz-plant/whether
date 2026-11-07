@@ -173,6 +173,23 @@ describe("/share current weekly artifact", () => {
 
   /* DD-041: the formats were stacked sections, about 5,700px on desktop with the Slack text drawn
      three times. One picker now, under one heading; the files and the embed keep their own. */
+  it("groups the formats by who receives them, in one reading order", async () => {
+    const { options } = await shareOptions();
+    const groups = [...new Set(options.map((option) => option.group))];
+    assert.deepEqual(groups, [
+      "Team and tickets",
+      "Leadership and board",
+      "Investors and portfolio",
+      "Citation and social",
+    ]);
+    for (const group of groups) {
+      assert.ok(options.some((option) => option.group === group), `${group} carries a format`);
+    }
+    const html = renderToStaticMarkup(await SharePage());
+    const positions = groups.map((group) => html.indexOf(group));
+    assert.deepEqual([...positions].sort((a, b) => a - b), positions, "the picker lists the groups in that order");
+  });
+
   it("draws one picker under one heading, and keeps the anchors other pages land on", async () => {
     const html = renderToStaticMarkup(await SharePage());
     const { options } = await shareOptions();

@@ -9,6 +9,8 @@ import { NOTHING_TO_RESUME, type LineState } from "../../../lib/report/operating
 import type { Route } from "../../../lib/navigation/routeType";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { AreaIcon, AreaLabel, LineStateBadge } from "./conceptIcons";
+import { OrdinalMarker } from "./ordinalMarker";
+import { CellLabel } from "./cellLabel";
 
 /**
  * The decision area as a stable row.
@@ -106,13 +108,6 @@ const SIDE_INK: Record<RuleSide, string> = {
 
 /* The column's name when its rows are on different sides; each cell then names its own. */
 const MIXED_SIDES_HEADER = "What changes it";
-
-/* The column names, repeated inside each cell for the stacked phone layout,
-   where the header row is not drawn. Hidden from md up, where the header is,
-   unless the header cannot name the cell (`fromMd`). */
-const CellLabel = ({ children, className = "", fromMd = false }: { children: ReactNode; className?: string; fromMd?: boolean }) => (
-  <span className={`mb-0.5 block text-xs font-medium ${fromMd ? "" : "md:hidden"} ${className}`.replace(/\s+/g, " ").trim()}>{children}</span>
-);
 
 const LineCell = ({
   value,
@@ -220,17 +215,20 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
               data-moved={row.moved ? "true" : undefined}
             >
               <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:col-span-2 max-md:p-0">
-                {row.href ? (
-                  <Link
-                    href={row.href}
-                    className="weather-hit inline-flex items-center gap-1.5 underline decoration-slate-600 underline-offset-4 hover:text-slate-50"
-                  >
-                    <AreaIcon area={row.area} />
-                    {row.hrefLabel ?? decisionAreaLabel(row.area)}
-                  </Link>
-                ) : (
-                  <AreaLabel area={row.area} />
-                )}
+                <span className="inline-flex items-center gap-1.5 align-middle">
+                  <OrdinalMarker>{orderIndex(row.area) + 1}</OrdinalMarker>
+                  {row.href ? (
+                    <Link
+                      href={row.href}
+                      className="weather-hit inline-flex items-center gap-1.5 underline decoration-slate-600 underline-offset-4 hover:text-slate-50"
+                    >
+                      <AreaIcon area={row.area} />
+                      {row.hrefLabel ?? decisionAreaLabel(row.area)}
+                    </Link>
+                  ) : (
+                    <AreaLabel area={row.area} />
+                  )}
+                </span>
                 {/* No "Lines set by Funding pressure & Risk appetite" under the area
                     (2026-10-27): the pause and restart lines beside it name their
                     scores, so every row said them twice. */}

@@ -188,7 +188,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
   return [
     {
       id: "slack-post",
-      group: "Chat",
+      group: "Team and tickets",
       label: "Slack post",
       hint: "The guidance and when each area pauses, in a short post people can skim.",
       kind: "text",
@@ -199,7 +199,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     },
     {
       id: "full-brief",
-      group: "Chat",
+      group: "Team and tickets",
       label: "Full brief",
       hint: "The weekly operator brief: every area's rule and lines, for a channel that wants the whole week.",
       kind: "text",
@@ -208,34 +208,19 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       commitment: "copied_slack",
       preview: "chat",
     },
-    ...SOCIAL_FORMATS.map(({ network, label, hint }): ShareFormatOption => {
-      const text = formatSocialPost(artifact.document, network, siteUrl);
-      return {
-        id: `${network}-post`,
-        group: "Social",
-        label,
-        hint,
-        kind: "text",
-        text,
-        copyLabel: `Copy ${label} text`,
-        commitment: "copied_social",
-        compose: { label: `Open in ${SOCIAL_NETWORK_NAMES[network]}`, href: buildSocialComposeUrl(network, text) },
-      };
-    }),
     {
-      id: "meeting-pack",
-      group: "Meetings",
-      label: "Meeting pack",
-      hint: "The brief, the Slack post, the board slide's bullets and the citation, in one paste for a meeting doc.",
+      id: "ticket-brief",
+      group: "Team and tickets",
+      label: "Ticket brief",
+      hint: "The guidance in Markdown for a Jira or Linear ticket, or a wiki page.",
       kind: "text",
-      text: artifact.meetingPack,
-      copyLabel: "Copy meeting pack",
-      commitment: "copied_meeting",
-      offersCalendar: true,
+      text: artifact.issueTrackerBrief,
+      copyLabel: "Copy ticket brief",
+      commitment: "copied_brief",
     },
     {
       id: "agenda",
-      group: "Meetings",
+      group: "Leadership and board",
       label: "Monday agenda",
       hint: "A three-minute Monday item for Notion, Docs or a meeting doc.",
       kind: "text",
@@ -246,7 +231,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     },
     {
       id: "slide-text",
-      group: "Meetings",
+      group: "Leadership and board",
       label: "Slide text",
       hint: "A Markdown callout for a deck, Notion or Docs. The slide as a file or a picture is under Files and images, below.",
       kind: "text",
@@ -255,8 +240,19 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       commitment: "copied_brief",
     },
     {
+      id: "meeting-pack",
+      group: "Leadership and board",
+      label: "Meeting pack",
+      hint: "The brief, the Slack post, the board slide's bullets and the citation, in one paste for a meeting doc.",
+      kind: "text",
+      text: artifact.meetingPack,
+      copyLabel: "Copy meeting pack",
+      commitment: "copied_meeting",
+      offersCalendar: true,
+    },
+    {
       id: "email",
-      group: "Docs and email",
+      group: "Leadership and board",
       label: "Email",
       hint: "The full brief with its source and permanent link, for a leadership note.",
       kind: "text",
@@ -267,7 +263,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     },
     {
       id: "investor-update",
-      group: "Docs and email",
+      group: "Investors and portfolio",
       label: "For your investors",
       hint: "Two paragraphs for a monthly letter: the conditions and how they moved since the end of last month, then the guidance and what your runway band means for it.",
       kind: "investor",
@@ -276,7 +272,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     },
     {
       id: "portfolio-note",
-      group: "Docs and email",
+      group: "Investors and portfolio",
       label: "For your portfolio",
       hint: "For an investor or accelerator writing to the companies it backs: each area's rule, a note on the week for every runway band, and a link for each company to set its own lines.",
       kind: "text",
@@ -286,7 +282,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     },
     {
       id: "citation",
-      group: "Docs and email",
+      group: "Citation and social",
       label: "Citation",
       hint: "A dated reference with a link to the permanent record.",
       kind: "text",
@@ -294,16 +290,20 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       copyLabel: "Copy citation",
       commitment: "copied_brief",
     },
-    {
-      id: "ticket-brief",
-      group: "Tickets",
-      label: "Ticket brief",
-      hint: "The guidance in Markdown for a Jira or Linear ticket, or a wiki page.",
-      kind: "text",
-      text: artifact.issueTrackerBrief,
-      copyLabel: "Copy ticket brief",
-      commitment: "copied_brief",
-    },
+    ...SOCIAL_FORMATS.map(({ network, label, hint }): ShareFormatOption => {
+      const text = formatSocialPost(artifact.document, network, siteUrl);
+      return {
+        id: `${network}-post`,
+        group: "Citation and social" as const,
+        label,
+        hint,
+        kind: "text",
+        text,
+        copyLabel: `Copy ${label} text`,
+        commitment: "copied_social",
+        compose: { label: `Open in ${SOCIAL_NETWORK_NAMES[network]}`, href: buildSocialComposeUrl(network, text) },
+      };
+    }),
   ];
 };
 

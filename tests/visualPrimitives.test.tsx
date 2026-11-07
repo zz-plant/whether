@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { ScoreLadder, buildLadderLines, describeLadderPosition, layoutLadderLabels, nearestLadderLine, type LadderLine } from "../app/components/ui/scoreLadder";
 import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell";
 import { AreaTable } from "../app/components/ui/areaTable";
+import { OrdinalMarker } from "../app/components/ui/ordinalMarker";
 import { TrustStrip } from "../app/components/trustStrip";
 import { TermDefinitionLayer } from "../app/components/ui/definedTerm";
 import { MonthStrip, describeCurrentRun } from "../app/components/history/monthStrip";
@@ -207,6 +208,16 @@ describe("ScoreCell", () => {
   });
 });
 
+describe("OrdinalMarker", () => {
+  it("draws a list position as a figure, never as the row's name", () => {
+    const html = renderToStaticMarkup(<OrdinalMarker>{3}</OrdinalMarker>);
+    assert.match(html, /aria-hidden="true"/, "the row's own label is the accessible name");
+    assert.match(html, /tabular-nums/);
+    assert.match(html, /rounded-md/, "the Data tier, not the 2px stamp");
+    assert.match(html, /data-ordinal=""[^>]*>3</);
+  });
+});
+
 describe("AreaTable", () => {
   it("keeps the canonical order whatever order the rows arrive in", () => {
     const html = renderToStaticMarkup(
@@ -223,6 +234,12 @@ describe("AreaTable", () => {
     assert.deepEqual([...positions].sort((a, b) => a - b), positions);
     assert.equal(decisionAreaOrder[0], "hiring");
     assert.match(html, /—/, "an empty slot renders a dash, not a reflow");
+    /* The marker is the area's slot in the same fixed order, so a reader can
+       say "the third area" and both the table and the brief mean it. */
+    const markers = [...html.matchAll(/data-ordinal=""[^>]*>(\d+)</g)].map(([, value]) => Number(value));
+    assert.deepEqual(markers, [...markers].sort((a, b) => a - b), "markers ascend with the rows");
+    assert.equal(markers[0], 1);
+    assert.equal(new Set(markers).size, markers.length);
   });
 
   it("labels the condition cells in every row, for the stacked phone layout", () => {
