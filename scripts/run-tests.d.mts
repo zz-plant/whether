@@ -10,3 +10,9 @@ export function parseShardSummary(output: string): {
   tests: number;
   files: number;
 };
+
+/** The shard count a run should use: one process when the caller names files or tests. */
+export function resolveShardCount(args: string[], requestedShards: number): number;
+
+/** The flag arguments a shard inherits, with each value flag's value attached. */
+export function collectFlagArgs(args: string[]): string[];

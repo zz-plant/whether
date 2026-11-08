@@ -84,6 +84,43 @@ function hasPathFilter(args) {
   return false;
 }
 
+/**
+ * A name filter (`-t`) is a filter on tests, not on files, so every shard still receives
+ * files where nothing matches. Bun exits non-zero for a file with no matching test, which
+ * turned `bun run test -t "<name>"` into a red run under the default shard count. Keep it
+ * one process, like a path filter: the caller already named what they want.
+ */
+function hasNameFilter(args) {
+  return args.some((arg) => arg === '-t' || arg === '--test-name-pattern' || arg.startsWith('--test-name-pattern='));
+}
+
+/**
+ * The shard count a run should use. A caller who names files or tests gets one process;
+ * sharding only makes sense when the run covers the suite.
+ */
+export function resolveShardCount(args, requestedShards) {
+  return hasPathFilter(args) || hasNameFilter(args) ? 1 : requestedShards;
+}
+
+/**
+ * The flag arguments a shard inherits, with each value flag's value attached. Keeping only
+ * tokens that start with `-` dropped `-t`'s pattern, and bun then read the first test file
+ * as the pattern.
+ */
+export function collectFlagArgs(args) {
+  const kept = [];
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (!arg.startsWith('-')) continue;
+    kept.push(arg);
+    if (VALUE_FLAGS.has(arg) && i + 1 < args.length) {
+      kept.push(args[i + 1]);
+      i += 1;
+    }
+  }
+  return kept;
+}
+
 /*
  * tests/tools/ holds suites that drive interpreters the build image does not guarantee.
  * They run on every `bun run test`, `bun run check` and pre-push; they do not gate a deploy.
@@ -153,8 +190,8 @@ const quietArgs = inDeployGate || process.env.BUN_TEST_ONLY_FAILURES === '1' ? [
  *
  * Default: one shard per available core, capped at 3 — fixture suites spawn children
  * (the CLI suite alone spawns 62), and the cap keeps the total bounded. Override with
- * BUN_TEST_SHARDS; a run with a path filter stays one process, since the caller named
- * what they want.
+ * BUN_TEST_SHARDS; a run with a path or name filter stays one process, since the caller
+ * named what they want.
  *
  * Each shard prints its own `Ran N tests across M files` summary, and the shards interleave
  * on one terminal — the summary that happens to land last read as the suite total, and it
@@ -209,7 +246,7 @@ const collectShardSummary = (child) =>
   });
 
 
-const spawnShard = (shardSeed, files, shardIndex) => {
+const spawnShard = (shardSeed, files, shardIndex = 0) => {
   const orderArgs = buildOrderArgs(shardSeed);
   const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...quietArgs, ...files], {
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -235,7 +272,7 @@ const runSingleProcess = (shardSeed, args) => {
 const shardEnv = Number.parseInt(process.env.BUN_TEST_SHARDS ?? '', 10);
 const defaultShards = Math.min(3, Math.max(1, availableParallelism()));
 const requestedShards = Number.isFinite(shardEnv) && shardEnv > 0 ? shardEnv : defaultShards;
-const shardCount = hasPathFilter(extraArgs) ? 1 : requestedShards;
+const shardCount = resolveShardCount(extraArgs, requestedShards);
 
 // Top-level await is available in an .mjs script; the sharded path waits for every shard.
 const runSharded = async () => {
@@ -257,7 +294,7 @@ const runSharded = async () => {
     ? defaultTargets
     : collectTestFiles().map((file) => path.relative(process.cwd(), file));
   const seedBase = baseSeed ?? Math.floor(Math.random() * 2147483647);
-  const flagArgs = targetArgs.filter((arg) => arg.startsWith('-'));
+  const flagArgs = collectFlagArgs(targetArgs);
   console.log(`[test-runner] sharding ${files.length} file(s) across ${effectiveShards} processes (seed base ${seedBase}; override with BUN_TEST_SHARDS).`);
 
   /* Size-balanced assignment, not sequential chunks (2026-10-22). The CLI test
@@ -286,7 +323,7 @@ const runSharded = async () => {
   const shards = [];
   const shardOutputs = [];
   for (let index = 0; index < effectiveShards; index += 1) {
-    const child = spawnShard(String(seedBase + index), [...flagArgs, ...shardFiles[index]]);
+    const child = spawnShard(String(seedBase + index), [...flagArgs, ...shardFiles[index]], index);
     shardOutputs.push(collectShardSummary(child));
     shards.push(child);
   }
