@@ -7,6 +7,9 @@ export function typeAssertionLines(file: string, source: string): Promise<Set<nu
 /** The line numbers each file gains in a `git diff --unified=0`. */
 export function addedLinesByFile(diff: string): Map<string, Set<number>>;
 
+/** Whether a changed file is a decision surface that must move with a test change. */
+export function requiresTestCoverage(file: string): boolean;
+
 /**
  * The commit the working tree is compared with: an explicit ref, else the merge-base with
  * main when it is not HEAD itself, else `HEAD~1`, else `HEAD` in a repository with one commit.

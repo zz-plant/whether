@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   addedLinesByFile,
+  requiresTestCoverage,
   resolveDiffBase,
   typeAssertionLines,
 } from "../scripts/review-hotspot-preflight.mjs";
@@ -41,12 +42,46 @@ describe("the diff base", () => {
 });
 
 /*
+ * The files whose change can move the call. The old filename regex missed most of them:
+ * a `decisionKnobs.ts` change reported "Risk-tagged source files: 0" (2026-11-08).
+ */
+describe("decision surfaces", () => {
+  it("flags the canonical decision modules", () => {
+    for (const file of [
+      "app/page.tsx",
+      "app/components/DecisionHero.tsx",
+      "lib/report/decisionKnobs.ts",
+      "lib/report/homeBriefModel.ts",
+      "lib/report/operatingCalls.ts",
+      "lib/report/boundedDecisionRules.ts",
+      "lib/playbook.ts",
+      "lib/thresholds.ts",
+      "lib/regimeEngineCore.ts",
+      "lib/regimeStateMachine.ts",
+    ]) {
+      assert.equal(requiresTestCoverage(file), true, `${file} should require test coverage`);
+    }
+  });
+
+  it("does not flag copy, layout or docs", () => {
+    for (const file of [
+      "lib/report/reportCopy.ts",
+      "app/trust/page.tsx",
+      "app/components/TimelineBar.tsx",
+      "docs/agents/README.md",
+      "tests/homeBriefModel.test.ts",
+    ]) {
+      assert.equal(requiresTestCoverage(file), false, `${file} should not require test coverage`);
+    }
+  });
+});
+
+/*
  * The detector reads the syntax tree, so only an assertion can match. A regex over lines
  * flagged the prose "named as two" in a JSX comment on 2026-10-27, and "Download as CSV" in
  * JSX text, while missing `value as "brief"` and `value as [A, B]`.
  */
-describe("typeAssertionLines", () => {
-  const lines = async (source: string, file = "sample.tsx") => [...((await typeAssertionLines(file, source)) ?? [])];
+describe("typeAssertionLines", () => {  const lines = async (source: string, file = "sample.tsx") => [...((await typeAssertionLines(file, source)) ?? [])];
 
   it("finds a real assertion, whatever the type looks like", async () => {
     assert.deepEqual(await lines("const rows = JSON.parse(raw) as Row[];"), [1]);
@@ -189,7 +224,7 @@ describe("comment context with a named head", () => {
   const SCRIPT = join(process.cwd(), "scripts", "review-hotspot-preflight.mjs");
 
   /* Git hands a hook GIT_DIR and friends, and every git below would run against the
-     pushing repository instead of this scaffold (CLAUDE.md, the pre-push hook). */
+     pushing repository instead of this scaffold (docs/agents/toolchain.md, the pre-push hook). */
   const gitFreeEnv = () => {
     const env = { ...process.env };
     for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];

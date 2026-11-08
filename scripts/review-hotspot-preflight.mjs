@@ -168,8 +168,23 @@ async function addedTypeAssertions(base, head) {
   return offenders;
 }
 
-function requiresTestCoverage(file) {
-  return /^(src|lib|app)\/.+\.(ts|tsx)$/.test(file) && /(regime|policy|classif|score|indicator)/i.test(file);
+/**
+ * The files whose change can alter the call, a threshold or a pause line.
+ *
+ * This was a filename regex — `(regime|policy|classif|score|indicator)` — so on 2026-11-08
+ * it did not flag `decisionKnobs.ts`, `homeBriefModel.ts`, `playbook.ts`, `thresholds.ts`
+ * or `operatingCalls.ts`. The gate reported "Risk-tagged source files: 0" on changes that
+ * moved exactly those rules. A curated list is the fix; add a surface when it earns one.
+ */
+export const DECISION_SURFACES = [
+  /^app\/page\.tsx$/,
+  /^app\/components\/DecisionHero\.tsx$/,
+  /^lib\/report\/(homeBriefModel|reportData|decisionKnobs|operatingCalls|boundedDecisionRules|trustStatus|regimeDescription|briefDocument)\.ts$/,
+  /^lib\/(playbook|thresholds|regimeEngine|regimeEngineCore|regimeEngineScoring|regimeStateMachine|decisionDomainCatalog)\.ts$/,
+];
+
+export function requiresTestCoverage(file) {
+  return DECISION_SURFACES.some((pattern) => pattern.test(file));
 }
 
 function isTestFile(file) {
