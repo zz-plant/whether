@@ -149,8 +149,8 @@ export function ConfidenceRecordSummary() {
   return (
     <div className="space-y-1.5" data-confidence-record-summary>
       <p className="text-sm text-slate-200">
-        <span className="font-semibold text-slate-100">{warned} of {total}</span> changes in
-        conditions had advance warning before the line was crossed.
+        <span className="font-semibold text-slate-100">{warned} of {total}</span> shifts had
+        advance warning before the line was crossed.
       </p>
       <p className="text-xs text-slate-400">
         {missed} changes had no advance warning when scores moved across the line in a single month.

@@ -82,7 +82,7 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
             Guidance for leadership discussions and one-decision worksheets that apply to {role.label}.
           </p>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="weather-switch gap-6 [--col-min:18rem]">
           {leadershipGuidance ? (
             <div className="space-y-2">
               <h3 className="type-eyebrow text-slate-300">Leadership guidance</h3>
