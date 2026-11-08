@@ -218,7 +218,7 @@ Open [http://localhost:3000](http://localhost:3000). Without network access the 
 | `bun run build` | The production Worker bundle | — |
 | `bun run check` | Lint, types, tests, assets, audit and landmark checks, concurrently | ~50s |
 
-`check` also runs on `git push` through `.husky/pre-push`, and that hook is the gate: the GitHub workflows run only by hand. [CLAUDE.md](CLAUDE.md) lists every command and what each costs; [AGENTS.md](AGENTS.md) holds the rules a change has to meet.
+`check` also runs on `git push` through `.husky/pre-push`, and that hook is the gate: the GitHub workflows run only by hand. [docs/agents/toolchain.md](docs/agents/toolchain.md) lists every command and what each costs; [AGENTS.md](AGENTS.md) holds the rules a change has to meet.
 
 ---
 

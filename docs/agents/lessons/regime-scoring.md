@@ -1,6 +1,6 @@
 # Regime scoring: what the numbers do and do not claim
 
-Moved out of `CLAUDE.md`. Read before touching `lib/regimeEngineCore.ts`, confidence, or anything that prints a score or delta.
+Moved out of the mechanics doc ([toolchain.md](../toolchain.md)). Read before touching `lib/regimeEngineCore.ts`, confidence, or anything that prints a score or delta.
 
 The constants in `lib/regimeEngineCore.ts` are annotated; this is the behaviour that comes out
 of them, which is less obvious.
@@ -107,7 +107,7 @@ of them, which is less obvious.
   the alert-rule gate in `lib/signalOps.ts` and the band stored on transition events. `lib/summary/*`
   printed it until 2026-10-06, in the `summary` block of `/api/weekly` and `/api/monthly` and in the
   generated archives; the builders read `resolveSummaryConfidence` now, and the archives switch on
-  their next regeneration (55 of 176 monthly entries change; `docs/feature-specs-current.md` §6.9).
+  their next regeneration (55 of 176 monthly entries change; `docs/decisions/feature-log/06-apis.md` §6.9).
 
   Still open, and its own change: the published confidence ignores the shock downgrade. The engine
   sets its gate band to LOW on a shock crossing so the flip is not dressed as confirmed, but
@@ -174,7 +174,7 @@ and 11 from startup-market inputs the earlier score never had, and the "pause li
 (43 against 44) was those inputs, not the market moving. Before printing or acting on a difference between two
 readings, ask whether the readings share their inputs; if they do not, say which part of the difference is
 the inputs. `explainScoreMovement` (`lib/report/scoreMovement.ts`) does that for the two scores, and
-`docs/feature-specs-current.md` §1.1.27 has the numbers and the like-for-like question it leaves open.
+`docs/decisions/feature-log/01-product-surfaces.md` §1.1.27 has the numbers and the like-for-like question it leaves open.
 
 ## The engine decides; `lib/report/` says it (2026-10-06)
 

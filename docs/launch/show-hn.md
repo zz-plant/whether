@@ -132,7 +132,7 @@ None right now. It's free and open source; it started as scratching my own Monda
 **"Stack?"**
 Bun, React server components on Cloudflare Workers (edge SSR, 300s revalidate), KV for
 materialized weekly read models with a 92-day history window, cron-driven ingest that never
-self-fetches over HTTP. ~1,900 tests. The repo's AGENTS.md/CLAUDE.md are public too if you want
+self-fetches over HTTP. ~1,900 tests. The repo's AGENTS.md and docs/agents/ are public too if you want
 to see how the agent-assisted workflow is set up.
 
 ## Pre-launch checklist

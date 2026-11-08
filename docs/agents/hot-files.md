@@ -1,14 +1,13 @@
 # Hot files
 
 The files most often edited since 2026-08-01, so a first read of the repo starts from where the
-work actually lands. Counts are commits touching the file (excluding `tests/`, `docs/`,
-`CLAUDE.md`). Regenerate with:
+work actually lands. Counts are commits touching the file (excluding `tests/` and `docs/`).
+Regenerate with:
 
 ```bash
 git log --since=<date> --pretty=format: --name-only | rg -v '^$' \
-  | rg -v '^(tests|docs)/|CLAUDE.md' | sort | uniq -c | sort -rn | head -20
+  | rg -v '^(tests|docs)/' | sort | uniq -c | sort -rn | head -20
 ```
-
 | File | Commits | What it owns | Read first |
 | --- | --- | --- | --- |
 | `app/page.tsx` | 93 | The homepage route and its data boundary. Suspends offline, so assertions about it stay source-level. | `app/components/home/AGENTS.md` |

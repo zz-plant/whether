@@ -1,6 +1,6 @@
 # Unshipped features, invented fields, and what surfaces claim
 
-Moved out of `CLAUDE.md`. Read before adding a module, an API field, share/SEO metadata, a cache, or a warning banner.
+Moved out of the mechanics doc ([toolchain.md](../toolchain.md)). Read before adding a module, an API field, share/SEO metadata, a cache, or a warning banner.
 
 ## Features that shipped without shipping (2026-09-16)
 
@@ -371,7 +371,7 @@ A word for a period ("last week", "this month", "since Monday") is only as true 
 figure, so it comes from them: `ReportDynamics.comparedWith` carries the earlier reading's date and
 `comparisonBasis` (`lib/report/comparisonBasis.ts`) is the one place it becomes words. A new surface that
 prints a comparison takes its label from there. Where a source has no date the wording stays "last week"
-rather than inventing one, which is also how a test can tell the two paths apart. Full account: `docs/feature-specs-current.md` §1.1.26.
+rather than inventing one, which is also how a test can tell the two paths apart. Full account: `docs/decisions/feature-log/01-product-surfaces.md` §1.1.26.
 
 ## A list written five times drifts, and a set an endpoint does not know is not an empty one (2026-09-29)
 
@@ -401,11 +401,11 @@ input the server had not understood, which is worse than an error: it reads as a
   conditions change?") was the one call defaults made trivial, and it reported a crossing within a week on a
   read where both scores were moving deeper into their regime. The function behind it ignores direction and
   also drives a Slack alert; the tool now asks a direction-aware one (`projectRegimeFromPace`), and the alert
-  is left for the owner (`docs/feature-specs-current.md` §6.9).
+  is left for the owner (`docs/decisions/feature-log/06-apis.md` §6.9).
 - **A field that reads the wrong thing under the right name stays wrong on every surface that copies it.**
   `summary.confidence` was the engine's confirmation gate, not the published confidence, and three routes
   carried it. `/api/weekly` and `/api/monthly` kept it until 2026-10-06, when the summary builders moved to
-  the published label; the archives follow on their next regeneration (`docs/feature-specs-current.md` §6.9).
+  the published label; the archives follow on their next regeneration (`docs/decisions/feature-log/06-apis.md` §6.9).
 
 ## A "what changed" sentence is a claim about the decisions, and it needs the lines to make one (2026-09-29)
 

@@ -13,12 +13,14 @@
 - Run lint checks: `bun run lint`
 - Run type checks: `bun run typecheck`
 - Run tests: `bun run test`
+- Run the tests that own your changed files: `bun run test:changed`
 - Run tests in watch mode: `bun run test:watch`
 - Test runtime contract: `bun run test` delegates to Bun's native test runner over `./tests` with recursive `.test.ts`/`.test.tsx` discovery; `node:test` and `node:assert/strict` imports are supported via Bun Node compatibility.
 - Run Whether MCP server (stdio): `bun run mcp:whether`
 - Refresh checked-in fallback snapshots: `bun run data:refresh-fallbacks`
 - Agent preflight doctor: `bun run agent:doctor`
 - Agent task router: `bun run agent:route -- "<task>"`
+- Agent docs freshness: `bun run check:agent-docs`
 - Subagent handoff packet generator: `bun run agent:handoff -- --job "<job>"`
 - Agent repo index builder: `bun run agent:index`
 

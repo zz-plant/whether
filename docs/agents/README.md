@@ -14,7 +14,8 @@ Start here when you want the fastest correct repo orientation:
 2. read this file
 3. open exactly one task-specific guide from the router below
 4. find the canonical module or doc before broad search
-5. run the smallest meaningful validation for the touched surface
+5. run the smallest meaningful validation for the touched surface (`bun run test:changed` is
+   usually it)
 
 If you will delegate work to a subagent, also read the delegation packet in `mcp-and-skills-playbook.md` before handing work off.
 
@@ -25,8 +26,10 @@ files most work lands in. Open the one that matches the task.
 Useful helpers:
 - `bun run agent:doctor`
 - `bun run agent:route -- "<task>"`
+- `bun run agent:route -- --changed` — route the working tree, not a description
 - `bun run agent:handoff -- --job "<job>"`
 - `bun run agent:index`
+- `bun run agent:worktrees` — stale checkouts, and which are safe to prune
 
 ## Fast start
 
@@ -77,7 +80,7 @@ Read:
 
 Usually also inspect:
 - `../one-screen-weekly-brief-spec.md`
-- `../feature-specs-current.md`
+- one entry from `../decisions/feature-log/`: run `rg -n '^### ' ../decisions/feature-log/` and read the matching entry, not the log
 
 ### Data, provenance, or trust changes
 
@@ -89,7 +92,7 @@ Read:
 
 Usually also inspect:
 - `../architecture.md`
-- `../feature-specs-current.md`
+- one entry from `../decisions/feature-log/` (search its headings; do not read it end to end)
 
 ### Docs-only or workflow changes
 
@@ -139,6 +142,7 @@ Do this before spawning or briefing a subagent:
 ## Guide index
 
 - `setup.md` — local setup commands, quality checks, and MCP baseline
+- `toolchain.md` — what each command costs, how the gates work, canonical modules, gotchas
 - `project-layout.md` — key directories and ownership boundaries
 - `engineering-principles.md` — coding conventions and implementation posture
 - `documentation.md` — doc lifecycle, source-of-truth ownership, and update triggers
@@ -147,6 +151,7 @@ Do this before spawning or briefing a subagent:
 - `ui-ux-standards.md` — accessibility, visual consistency, and interaction standards
 - `mcp-and-skills-playbook.md` — practical MCP + repo-skill workflows, including the canonical subagent handoff packet
 - `agent-interface.md` — HTTP and MCP entrypoints for agentic integrations
+- `lessons/README.md` — the dated post-mortems, indexed by the topic they explain
 
 If you are using Roo, repo-scoped workspace modes live in `../../.roomodes` and route common Whether jobs to the matching repo-local skills.
 

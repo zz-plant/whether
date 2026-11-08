@@ -1,5 +1,42 @@
 # UI/UX standards
 
+## Read the section you need
+
+This file is long on purpose: each section records the reasoning behind a rule. Read the
+section that matches the change, not the file.
+
+| If the change is about… | Read |
+| --- | --- |
+| clicks, input latency, focus, scroll | §I Interaction physics & latency |
+| keyboard use, focus traps, touch targets, contrast | §II Strict accessibility |
+| forms, validation, destructive actions | §III Data integrity & form hygiene |
+| headings, landmarks, semantic HTML | §IV Semantic rigor |
+| URLs, query state, links, back/forward | §V URL & state determinism |
+| phone layout, hover, viewport | §VI Mobile hostility defense |
+| metrics with no tolerance | §VII Zero-tolerance metrics |
+| navigation rails, IA boundaries | §VIII IA boundary checklist |
+| homepage motion and the weekly brief | §IX Homepage weekly brief motion guardrails |
+| action links, buttons, shared primitives | §X Shared action-link primitives |
+| report shell, card hierarchy | §XI Report Shell Hierarchy |
+| what collapses, what stays open | §XII Disclosure |
+| depth, enclosure, layering | §XIII Depth and enclosure |
+| corners, borders, shape | §XIV Shape register |
+| numbers, figures, charts, lines | §XV Encoding a number |
+| colour, accents, regime colour | §XVI Colour that means something |
+| diagrams at different widths | §XVII Responsive diagrams |
+| type, fonts, headings, size | §XVIII Type register |
+| reading order, narrative flow | §XIX Reading order and narrative progression |
+| action placement vs. comprehension | §XX Action placement vs. comprehension |
+| margins, padding, gaps | §XXI Spacing ownership |
+| what the font files draw | §XXII What the font files draw |
+| motion a reader does not notice | §XXIII Motion a reader doesn't notice |
+| concept icons, glyphs | §XXIV Glyphs beside words |
+| decoration that encodes | §XXV Decoration that encodes something |
+| buttons, inputs, toggles, controls | §XXVI Controls as instrument parts |
+| display vs. control | §XXVII Display or control |
+| screenshots, frames, share cards | §XXVIII Every frame is a screenshot |
+| containers, wrapping, stacking | §XXIX How containers wrap and stack |
+
 ## I. Interaction physics & latency
 - MUST: Input latency < 100ms. Visual feedback (active state, spinner, ripple) must render within 100ms of input. Network requests can take longer; the UI response cannot.
 - MUST: No layout thrashing. Reading layout properties (offsetWidth, getBoundingClientRect) and writing style in the same synchronous block is banned.
@@ -154,7 +191,7 @@ Scope: every `<details>`, `Collapsible`, and `Accordion` in `app/`.
   series, the chart terminal, the per-signal breakdown. The reader has already been told the
   conclusion; the disclosure is there for the person who wants to check it. On `/trust` the check
   is the page's job, so its compact source board (one line per source) is open under the
-  derivation and the detail behind it folds (2026-10-07, `docs/feature-specs-current.md` §1.1.48).
+  derivation and the detail behind it folds (2026-10-07, `docs/decisions/feature-log/01-product-surfaces.md` §1.1.48).
 - NEVER: collapse **the claim itself**, or anything a reader needs in order to act this week. The
   weekly call, what to do now, the pause condition, and the reversal condition are always visible.
 - NEVER: collapse the only explanation of a term or number that appears above the fold. If a label
@@ -341,7 +378,7 @@ Scope: every surface that tints, rules, or labels itself by the week's regime, a
 the site, since 2026-10-09.
 
 The palette is Synoptic (`docs/design/palette-directions.md`, applied in
-`docs/feature-specs-current.md` §1.1.69). Colour carries two things and nothing else: the four
+`docs/decisions/feature-log/01-product-surfaces.md` §1.1.69). Colour carries two things and nothing else: the four
 conditions, and where a line stands. Everything else is ink.
 
 | Role | Token | Dark | Light |
@@ -484,7 +521,7 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 - **Draw each encoding once.** A fact already carried by position and a key does not also need a
   box, a hue and a case. When a block has a border *and* a coloured heading *and* capitals, pick
   one.
-- **Print each fact once per page** (2026-10-09, `docs/feature-specs-current.md` §1.1.63). A fact
+- **Print each fact once per page** (2026-10-09, `docs/decisions/feature-log/01-product-surfaces.md` §1.1.63). A fact
   restated in another element at the same level of detail is clutter: a sentence over the control
   that shows the same selection, a banner over the section that says it, a score in five places.
   Keep the richer form (a chart or bar over a sentence, a control over a sentence describing its
@@ -647,7 +684,7 @@ The components live in `app/components/ui/conceptIcons.tsx`.
 
 ## XXV. Decoration that encodes something
 
-Added 2026-10-09 with `docs/feature-specs-current.md` §1.1.65, after a design audit of the
+Added 2026-10-09 with `docs/decisions/feature-log/01-product-surfaces.md` §1.1.65, after a design audit of the
 patterns generated interfaces reach for by default. Structure and decoration must encode something
 true about the content. The site spends its boldness in one place, its signature: the conditions
 chart, the weather glyphs and the pause and play line states (§XXIV). Everything else stays quiet.
@@ -698,7 +735,7 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
 
 ## XXVI. Controls as instrument parts
 
-Added 2026-10-13 with `docs/feature-specs-current.md` §1.1.73. A control is drawn as a part of
+Added 2026-10-13 with `docs/decisions/feature-log/01-product-surfaces.md` §1.1.73. A control is drawn as a part of
 an instrument: what it is shaped like says how it works. The form is physical, the paint is not —
 §XXV's ban on gradients and specular on a control stands.
 
@@ -772,7 +809,7 @@ condition stamp, so these cues are the only way left to tell a control from a di
 
 ## XXVIII. Every frame is a screenshot
 
-Added 2026-10-27 with `docs/feature-specs-current.md` §1.1.87. A reader shares a page in one of two
+Added 2026-10-27 with `docs/decisions/feature-log/01-product-surfaces.md` §1.1.87. A reader shares a page in one of two
 ways. On a phone it is the whole screen, wherever they stopped scrolling. On a laptop it is a box
 dragged around one block. A page reads well as a screenshot only if both pictures name their source
 and hold their unit whole. `bun run ui:frames` (scripts/ui-frames.mjs) walks every live route at a

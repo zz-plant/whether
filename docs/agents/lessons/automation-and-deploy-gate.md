@@ -1,6 +1,6 @@
 # Scheduled automation and the deploy gate
 
-Moved out of `CLAUDE.md`. Read when a routine, the brief freeze, a send path, or a red Cloudflare build is the subject. Check what a job does on fallback, not only on error.
+Moved out of the mechanics doc ([toolchain.md](../toolchain.md)). Read when a routine, the brief freeze, a send path, or a red Cloudflare build is the subject. Check what a job does on fallback, not only on error.
 
 ## Scheduled automation
 

@@ -1,6 +1,6 @@
 # Toolchain notes and the check gates
 
-Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runner, suppressions, dead-export census, telemetry streams, an env flag or the gate. Dated entries are the reasoning behind each rule; the commands live in [CLAUDE.md](../../../CLAUDE.md).
+Moved out of the mechanics doc so it is read when a task touches lint, the suite runner, suppressions, dead-export census, telemetry streams, an env flag or the gate. Dated entries are the reasoning behind each rule; the commands live in [toolchain.md](../toolchain.md).
 
 ## Toolchain notes (2026-09-02)
 

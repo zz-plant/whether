@@ -1,6 +1,6 @@
 # Test honesty and reader-facing copy
 
-Moved out of `CLAUDE.md`. Read before writing reader-facing strings, source-reading tests, or page-vs-page claims.
+Moved out of the mechanics doc ([toolchain.md](../toolchain.md)). Read before writing reader-facing strings, source-reading tests, or page-vs-page claims.
 
 ## Tests that read source instead of behaviour
 
