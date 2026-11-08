@@ -116,7 +116,7 @@ describe("a push judged end to end", () => {
   const FEATURE = "refs/heads/feature";
 
   /* Git hands a hook GIT_DIR and friends, and every git below would run against the
-     pushing repository instead of this scaffold (CLAUDE.md, the pre-push hook). */
+     pushing repository instead of this scaffold (docs/agents/toolchain.md, the pre-push hook). */
   const gitFreeEnv = () => {
     const env = { ...process.env };
     for (const key of Object.keys(env)) {
