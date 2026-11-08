@@ -15,9 +15,9 @@ export function LineStateBand({ model }: { model: LineStateBandModel }) {
   return (
     <p
       data-line-state-band={model.state}
-      className="weather-line-band mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-2.5 text-fluid-nano"
+      className="weather-line-band mb-3 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 px-4 py-2.5 text-fluid-nano"
     >
-      <LineStateIcon state={model.state} className="self-center" />
+      <LineStateIcon state={model.state} className="mt-0.5" />
       <span className="font-medium">{model.text}</span>
     </p>
   );

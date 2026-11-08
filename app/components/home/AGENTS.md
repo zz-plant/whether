@@ -27,7 +27,7 @@ far can I trust it:
    verdict, then the five areas and whose stage and runway their lines are scaled to
 2. answer the plan: the areas' rules, what changed (delta before explanation, 2026-10-31), what the
    conditions are made of (the two readings, the excluded inputs, the capped score), what would
-   change the guidance, and how unusual this is
+   change the guidance, and how unusual this is. Link to Roles for sample conversations.
 3. offer the alert the day a line is crossed, then sharing
 
 On a quiet week (2026-11-03: live, compared, no area moved, conditions held, nothing close to

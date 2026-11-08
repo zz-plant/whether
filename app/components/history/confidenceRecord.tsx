@@ -7,6 +7,8 @@ import {
 import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift";
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
 import { CALL_CHANGE_RULE, describeCalibrationRescore } from "../../../lib/report/trackRecordCopy";
+import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
+import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
 
 /**
  * What the confidence percent has been worth, against the record.
@@ -133,14 +135,27 @@ const BaseRateSentence = ({ totals, baseRate }: Pick<NonNullable<ReturnType<type
   </>
 );
 
-/** The headline alone, for /history, which links to the study rather than reprinting it. */
+/**
+ * Advance warning summary for /history: leads with how many changes had advance warning
+ * and how many were missed, keeping the stability-by-distance calibration study on /calibration.
+ */
 export function ConfidenceRecordSummary() {
-  const record = loadRecord();
-  if (!record) return null;
+  const fullSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
+  const track = buildRegimeTrackRecord(fullSeries);
+  const total = track.transitions.length;
+  const warned = track.signaledCount;
+  const missed = total - warned;
+
   return (
-    <p className="text-sm text-slate-200" data-confidence-record-summary>
-      <BaseRateSentence totals={record.totals} baseRate={record.baseRate} />
-    </p>
+    <div className="space-y-1.5" data-confidence-record-summary>
+      <p className="text-sm text-slate-200">
+        <span className="font-semibold text-slate-100">{warned} of {total}</span> changes in
+        conditions had advance warning before the line was crossed.
+      </p>
+      <p className="text-xs text-slate-400">
+        {missed} changes had no advance warning when scores moved across the line in a single month.
+      </p>
+    </div>
   );
 }
 

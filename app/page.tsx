@@ -622,9 +622,7 @@ async function PageContent({
   const heroReading = {
     numbers: `Funding pressure ${Math.round(tightness)}, risk appetite ${Math.round(riskAppetite)}.`,
     whyHref: `#${HOME_SECTIONS.diagnosis.id}`,
-    /* The two facts the weather word stands for, each score against the record
-       (2026-11-03). Live readings only: an archived month is set against a record
-       that runs past it. */
+    /* Live scores against the record. An archived month would need a record ending at that month. */
     facts: historicalSelection ? null : describeConditionFacts({ series: recordSeries, regime, tightness, riskAppetite }),
   };
   const conditionsSince = historicalSelection || !isRegimeKey(regime)

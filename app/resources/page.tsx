@@ -14,7 +14,7 @@ import { buildHomeAreaRows, describePauseLineCount } from "../../lib/report/home
 import { describeAnswerStanding } from "../../lib/report/answerStanding";
 import { decisionAreaLabel, decisionAreaOrder } from "../../lib/report/boundedDecisionRules";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import { situationUseCaseDefinitions, toolkitDefinitions, useCaseRoles } from "../../lib/decisionDomainCatalog";
+import { situationUseCaseDefinitions, toolkitDefinitions } from "../../lib/decisionDomainCatalog";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
@@ -266,12 +266,19 @@ export default async function ResourcesHubPage({
           <GuidedTranslationPanels searchParams={resolvedSearchParams} />
           <details className="weather-auto-chevron weather-panel" open={hasToolSelection}>
             <summary className="select-none text-base font-semibold text-slate-100">
-              Browse by role, company stage, situation or toolkit
+              Browse by company stage, situation or toolkit
             </summary>
             <div className="mt-4 space-y-6">
               <section className="weather-switch gap-4 [--col-min:20rem]">
                 <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
-                  <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">By role or stage</h3>
+                  <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">Leadership guidance and stage</h3>
+                  <div className="rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5 text-xs text-slate-400">
+                    Looking for role-specific guidance? Visit{" "}
+                    <Link href="/roles" className="font-semibold text-[var(--accent-action)] underline underline-offset-4">
+                      Roles
+                    </Link>{" "}
+                    for role landing pages, leadership questions and worksheets.
+                  </div>
                   <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
                     {stakeholderGuides.map((guide) => (
                       <li key={guide.slug}>
@@ -304,12 +311,13 @@ export default async function ResourcesHubPage({
               <section className="weather-switch gap-4 [--col-min:20rem]">
                 <div className="space-y-3">
                   <h3 className="text-sm type-eyebrow text-slate-300">Help by role</h3>
+                  <p className="text-xs text-slate-400">
+                    Roles is the front door for role guidance. Each role has a dedicated landing page linking to leadership guidance and worksheets.
+                  </p>
                   <div className="flex flex-wrap gap-2">
-                    {useCaseRoles.map((role) => (
-                      <Link key={role.slug} href={`/resolve/${role.slug}`} className="weather-hub-chip">
-                        {role.title}
-                      </Link>
-                    ))}
+                    <ActionLink href="/roles" variant="pill">
+                      Explore roles on Roles &rarr;
+                    </ActionLink>
                   </div>
                 </div>
                 <div className="space-y-3">

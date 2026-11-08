@@ -1,45 +1,97 @@
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
-import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
 import { Fact, FactList } from "../../components/ui/factList";
 import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
-import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
+import {
+  decisionAreaLabel,
+  decisionAreaOrder,
+  ruleMetricLabel,
+  type RuleConditionMetric,
+} from "../../../lib/report/boundedDecisionRules";
+import { buildHomeAreaRows, describeAreaPauseStatus } from "../../../lib/report/home/homeSectionModel";
 import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
 import { BORROWING_PREMIUM_MEANING, ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
 import { describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
-
-type CompareSearchParams = {
-  yearA?: string;
-  monthA?: string;
-  yearB?: string;
-  monthB?: string;
-};
+import {
+  loadCompareData,
+  type CompareDataResult,
+  type CompareSearchParams,
+} from "../../../lib/report/compareDataLoader";
 
 export async function ComparePanel({
   searchParams,
+  initialResult,
 }: {
   searchParams?: Partial<CompareSearchParams>;
+  initialResult?: CompareDataResult;
 }) {
-  const resolvedSearchParams = searchParams;
+  const result = initialResult ?? (await loadCompareData(searchParams));
 
-  const yearA = resolvedSearchParams?.yearA ? Number(resolvedSearchParams.yearA) : undefined;
-  const monthA = resolvedSearchParams?.monthA ? Number(resolvedSearchParams.monthA) : undefined;
+  const governedRegimes = new Map(
+    getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER).map((entry) => [entry.recordDate, entry.regime]),
+  );
+  const snapshots = getTimeMachineSnapshots();
+  const dateOptions: DateOption[] = snapshots
+    .map((s) => {
+      const regime = governedRegimes.get(s.record_date) ?? evaluateRegime(s).regime;
+      return {
+        year: s.year,
+        month: s.month,
+        label: `${formatMonthLabel(s.year, s.month)} · ${getRegimePublicLabel(regime)}`,
+      };
+    })
+    .reverse();
 
-  const yearB = resolvedSearchParams?.yearB ? Number(resolvedSearchParams.yearB) : 2020;
-  const monthB = resolvedSearchParams?.monthB ? Number(resolvedSearchParams.monthB) : 3;
-
+  const yearA = result.yearA;
+  const monthA = result.monthA;
+  const yearB = result.yearB;
+  const monthB = result.monthB;
   const searchA = yearA && monthA ? { year: String(yearA), month: String(monthA) } : undefined;
-  const searchB = { year: String(yearB), month: String(monthB) };
 
-  const snapshotResultA = await loadWeeklyBriefSnapshot(searchA, { route: "/history/compare" });
-  const snapshotResultB = await loadWeeklyBriefSnapshot(searchB, { route: "/history/compare" });
+  const selectorBlock = (
+    <div id="compare-selectors" className="weather-panel weather-switch gap-6 [--col-min:16rem]">
+      <DateSelector
+        label="Period A"
+        paramPrefix="A"
+        options={dateOptions}
+        currentYear={searchA ? yearA : undefined}
+        currentMonth={searchA ? monthA : undefined}
+        currentWeekLabel="This week"
+      />
+      <DateSelector
+        label="Period B"
+        paramPrefix="B"
+        options={dateOptions}
+        currentYear={yearB}
+        currentMonth={monthB}
+      />
+    </div>
+  );
 
-  const { snapshot: snapA } = snapshotResultA;
-  const { snapshot: snapB } = snapshotResultB;
+  if (!result.ok) {
+    return (
+      <div className="space-y-6">
+        {selectorBlock}
+        <div
+          role="alert"
+          className="weather-panel space-y-2 border border-amber-600/40 bg-amber-950/20 p-6 text-slate-200"
+        >
+          <p className="type-eyebrow text-amber-400">Comparison unavailable</p>
+          <h2 className="type-section text-slate-100">Unable to load comparison</h2>
+          <p className="text-sm text-slate-300">
+            {result.error || "The selected periods could not be loaded. Please choose another month above."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const { snapshot: snapA } = result.snapshotResultA;
+  const { snapshot: snapB } = result.snapshotResultB;
 
   const reportA = snapA.reportData;
   const reportB = snapB.reportData;
@@ -71,48 +123,72 @@ export async function ComparePanel({
     ladderFor("riskAppetite", reportA.assessment.thresholds.riskAppetiteRegime),
   ];
 
-  const governedRegimes = new Map(
-    getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER).map((entry) => [entry.recordDate, entry.regime]),
-  );
-  const snapshots = getTimeMachineSnapshots();
-  const dateOptions: DateOption[] = snapshots
-    .map((s) => {
-      const regime = governedRegimes.get(s.record_date) ?? evaluateRegime(s).regime;
-      return {
-        year: s.year,
-        month: s.month,
-        label: `${formatMonthLabel(s.year, s.month)} · ${getRegimePublicLabel(regime)}`,
-      };
-    })
-    .reverse();
-
   const isFallback = isSavedCopy(reportA.treasury);
+
+  // Compute changed rules between Period A and Period B
+  const areaRowsA = buildHomeAreaRows({
+    actionStripItems: snapA.weeklyDecisionCardModel.decision.actionStripItems,
+    decisionRules: snapA.weeklyDecisionCardModel.decision.decisionRules ?? [],
+    movement: null,
+    scores: { tightness: reportA.assessment.scores.tightness, riskAppetite: reportA.assessment.scores.riskAppetite },
+  });
+  const areaRowsB = buildHomeAreaRows({
+    actionStripItems: snapB.weeklyDecisionCardModel.decision.actionStripItems,
+    decisionRules: snapB.weeklyDecisionCardModel.decision.decisionRules ?? [],
+    movement: null,
+    scores: { tightness: reportB.assessment.scores.tightness, riskAppetite: reportB.assessment.scores.riskAppetite },
+  });
+
+  type ChangedRule = {
+    label: string;
+    was: string;
+    became: string;
+  };
+
+  const changedRules: ChangedRule[] = [];
+
+  for (const area of decisionAreaOrder) {
+    const rowA = areaRowsA.find((candidate) => candidate.area === area);
+    const rowB = areaRowsB.find((candidate) => candidate.area === area);
+    const standingA = rowA ? describeAreaPauseStatus(rowA) : undefined;
+    const standingB = rowB ? describeAreaPauseStatus(rowB) : undefined;
+
+    if (standingA && standingB && (standingA.text !== standingB.text || standingA.state !== standingB.state)) {
+      changedRules.push({
+        label: decisionAreaLabel(area),
+        was: standingB.text,
+        became: standingA.text,
+      });
+    }
+  }
+
+  if (snapA.weeklyCall.actionNow !== snapB.weeklyCall.actionNow) {
+    changedRules.push({
+      label: "Action",
+      was: snapB.weeklyCall.actionNow,
+      became: snapA.weeklyCall.actionNow,
+    });
+  }
+
+  if (snapA.weeklyCall.pauseIf !== snapB.weeklyCall.pauseIf) {
+    changedRules.push({
+      label: "Pause threshold",
+      was: snapB.weeklyCall.pauseIf,
+      became: snapA.weeklyCall.pauseIf,
+    });
+  }
 
   return (
     <div className="space-y-6">
-      <div id="compare-selectors" className="weather-panel weather-switch gap-6 [--col-min:16rem]">
-        <DateSelector
-          label="Period A"
-          paramPrefix="A"
-          options={dateOptions}
-          currentYear={searchA ? yearA : undefined}
-          currentMonth={searchA ? monthA : undefined}
-          currentWeekLabel="This week"
-        />
-        <DateSelector
-          label="Period B"
-          paramPrefix="B"
-          options={dateOptions}
-          currentYear={yearB}
-          currentMonth={monthB}
-        />
-      </div>
+      {selectorBlock}
 
-      <section id="compare-key-deltas" className="weather-panel @container p-6">
-        <p className="type-label text-slate-400">Difference</p>
-        <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
+      <section id="compare-key-deltas" className="weather-panel @container p-6 space-y-4">
+        <div>
+          <p className="type-label text-slate-400">Difference</p>
+          <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
+        </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-panel)] p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-panel)] p-3">
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="font-semibold text-slate-300">Macro conditions:</span>
             <span className="rounded border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-100">
@@ -137,6 +213,29 @@ export async function ComparePanel({
           </div>
         </div>
 
+        {/* Leading with rules that changed between the two named dates */}
+        <div className="rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-4 space-y-2">
+          <h3 className="type-eyebrow text-slate-200">
+            Rules that changed between {reportB.recordDateLabel} and {reportA.recordDateLabel}
+          </h3>
+          {changedRules.length > 0 ? (
+            <ul className="space-y-2 text-sm text-slate-200">
+              {changedRules.map((rule) => (
+                <li key={rule.label} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="font-semibold text-slate-300">{rule.label}:</span>
+                  <span className="text-slate-400">was {rule.was} (Period B) &rarr;</span>
+                  <span className="font-medium text-slate-100">{rule.became} (Period A)</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-slate-300">
+              Operating area rules and pause thresholds were identical between these two dates.
+            </p>
+          )}
+        </div>
+
+        {/* Full readings below */}
         <div className="mt-4 grid gap-x-8 gap-y-4 @3xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_14rem]">
           {ladders.map((ladder) => (
             <ScoreLadder

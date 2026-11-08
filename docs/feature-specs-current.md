@@ -5699,3 +5699,41 @@ scores lead the evidence table; unchanged composites retain their visible bounde
 and raw inputs retain their current values in compact rows. Supporting histories are in a
 URL-carried disclosure (`inputs=1`), and the hero chart's scoring qualification is in its
 readings disclosure (`chart=1`). See `one-screen-weekly-brief-spec.md`, “Space allocation pass”.
+
+### Shorter paths to the weekly task (2026-11-07)
+
+The brief describes the current scores separately from the committed conditions.
+An area that newly pauses names its crossed line and the comparison date together.
+When conditions are awaiting confirmation, the trust line names the candidate and
+the crossed conditions line. Sample conversations about pause rules live on Roles,
+linked from the brief beside the decisions when an area is on hold.
+
+Plan and Evidence show the reading date and source exceptions in their intros.
+Trust opens on the source board and owns the calibration count and formula reference.
+Share leads with the format picker, copy action and preview. Its supplemental score
+references sit in a disclosure below the preview. Guides opens on the decision list
+with weekly area badges. History labels its latest archived month, and dated briefs
+offer a single link to current guidance alongside the dated record. Advice vs. market
+opens with its sample result, with the comparison figures in the table and the tagging
+rubric in the method.
+
+### Compare periods, calendar actions, role navigation, and warning track record (2026-11-08)
+
+Compare periods loads both periods through a single loader (`loadCompareData`), eliminating
+duplicate Period A loads between the page and panel, and renders a visible error state alongside
+selectors if a period fails to load. The comparison diff leads with the rules that changed
+between the two named dates (area pause lines and weekly call thresholds), putting the full score
+ladders and side-by-side readings below.
+
+Calendar actions are unified under one home with three clear labels: "Add one review" (single
+event for next Monday), "Schedule a weekly review" (recurring Monday hold), and "Subscribe to the
+weekly brief" (calendar feed). Recurring review times are formatted in the reader's local time
+zone rather than assuming a fixed UTC/Eastern time.
+
+Roles serves as the front door for role guidance. Each role has a single landing page linking to
+the corresponding leadership guidance and applicable worksheets. Guides retains situation-based
+tools and stage guidance, linking to Roles for role guidance.
+
+History leads its track record with how much advance warning the brief gave (the count of signaled
+changes and missed unannounced changes), while Calibration retains stability by distance, the
+complete month-to-month stability study, denominator, and method.
