@@ -11,12 +11,15 @@ import { fileURLToPath } from "node:url";
 import {
   CORE_SURFACES,
   DEFAULT_PROFILE,
+  DOC_SECTIONS,
   LESSONS_TABLE,
+  PATH_PROFILE_HINTS,
   SKILLS_DIRECTORY,
   TASK_PROFILES,
   TOOL_HINTS,
 } from "./agent-workflow.config.mjs";
 import { execOutput, execText, parseGitStatus } from "./exec.mjs";
+import { buildImportGraph, sourceToTestsMap, testsForChangedFiles } from "./test-changed.mjs";
 import { walkFiles } from "./walk-files.mjs";
 
 /** The checkout this library sits in: where the lessons table is read when no root is given. */
@@ -139,7 +142,7 @@ function splitTopics(cell) {
 }
 
 /**
- * The rows of CLAUDE.md's "Read before you touch" table: each row's topics and the file it
+ * The rows of the lessons table (`docs/agents/lessons/README.md`): each row's topics and the file it
  * links. Empty when the file or the heading is missing; the router then names no lessons.
  */
 function readLessonsTable(repoRoot) {
@@ -159,8 +162,15 @@ function readLessonsTable(repoRoot) {
     if (line.startsWith("#")) break;
     if (!line.startsWith("|")) continue;
     const [topics = "", read = ""] = line.split("|").slice(1, -1).map((cell) => cell.trim());
-    const file = /\]\(([^)\s]+)\)/.exec(read)?.[1];
-    if (file) rows.push({ topics: splitTopics(topics), file });
+    const link = /\]\(([^)\s]+)\)/.exec(read)?.[1];
+    if (!link || /^[a-z]+:/i.test(link)) continue;
+    // Links are written relative to the table's own file, so the route can print a path
+    // a reader can open from the repo root.
+    const file = link.startsWith("/")
+      ? link.slice(1)
+      : path.posix.normalize(path.posix.join(path.posix.dirname(LESSONS_TABLE.file), link));
+    if (file.startsWith("..")) continue;
+    rows.push({ topics: splitTopics(topics), file });
   }
   return rows;
 }
@@ -181,19 +191,95 @@ function matchTools(task) {
   );
 }
 
-export function classifyTask(task, { repoRoot = LIBRARY_REPO_ROOT } = {}) {
+/** The sections of a long doc a task's words point at, so it reads 40 lines, not 900. */
+function matchSections(task) {
+  const taskWords = new Set(splitWords(task).map(stem));
+  return DOC_SECTIONS.filter((entry) => entry.keywords.some((keyword) => phraseMatches(taskWords, keyword))).map(
+    ({ doc, section, title }) => ({ doc, section, title }),
+  );
+}
+
+/** Repo-relative, posix-normalized paths, dropping anything outside the repo. */
+function normalizeInputPaths(repoRoot, inputPaths) {
+  return unique((inputPaths ?? []).map((value) => String(value ?? "").trim()).filter(Boolean))
+    .map((value) => {
+      const absolute = path.resolve(repoRoot, value);
+      return isInsideRepo(repoRoot, absolute) ? relativeToRepo(repoRoot, absolute).replace(/\\/g, "/") : "";
+    })
+    .filter(Boolean);
+}
+
+/** The tests that own the given files, for a route that already knows what it will touch. */
+function testsForPaths(repoRoot, paths) {
+  if (paths.length === 0) return [];
+  // Direct importers: the route names what to run first, not every integration test that
+  // reaches the file through a route. `test:changed -- --deep` widens it when needed.
+  return testsForChangedFiles({ repoRoot, changedFiles: paths, graph: buildImportGraph({ repoRoot }), depth: 0 });
+}
+
+/** The profile whose path prefixes best match the files named; "" when none does. */
+function profileForPaths(paths) {
+  const counts = new Map();
+  for (const file of paths) {
+    const hint = PATH_PROFILE_HINTS.find(({ prefixes }) => prefixes.some((prefix) => file === prefix || file.startsWith(prefix)));
+    if (hint) counts.set(hint.profile, (counts.get(hint.profile) ?? 0) + 1);
+  }
+
+  let best = "";
+  let bestCount = 0;
+  for (const hint of PATH_PROFILE_HINTS) {
+    const count = counts.get(hint.profile) ?? 0;
+    if (count > bestCount) {
+      best = hint.profile;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
+/** A route built from a profile, with the task-specific findings attached. */
+function routeFromProfile(profile, { task, source, lessons, tools, owningTests, sections, agentGuides }) {
+  // A route that knows the files can name the one command that checks them.
+  const checks = owningTests.length > 0 ? unique(["bun run test:changed", ...profile.checks]) : profile.checks;
+  return {
+    id: profile.id,
+    label: profile.label,
+    rationale: profile.rationale,
+    docs: profile.docs,
+    targets: profile.targets,
+    skills: profile.skills,
+    checks,
+    matchedKeywords: [],
+    score: 0,
+    task,
+    source,
+    lessons,
+    tools,
+    owningTests,
+    sections,
+    agentGuides,
+  };
+}
+
+export function classifyTask(task, { repoRoot = LIBRARY_REPO_ROOT, inputPaths = [] } = {}) {
   const normalizedTask = normalizeText(task);
+  const paths = normalizeInputPaths(repoRoot, inputPaths);
+  const owningTests = testsForPaths(repoRoot, paths);
+  const sections = matchSections(task);
+  const agentGuides = paths.length > 0 ? findRelevantAgentFiles(repoRoot, paths) : [];
+  const pathProfile = profileForPaths(paths);
 
   if (!normalizedTask) {
-    return {
-      ...DEFAULT_PROFILE,
-      matchedKeywords: [],
-      score: 0,
+    const profile = TASK_PROFILES.find((entry) => entry.id === pathProfile) ?? DEFAULT_PROFILE;
+    return routeFromProfile(profile, {
       task: "",
-      source: "keyword-router",
+      source: pathProfile ? "path-router" : "keyword-router",
       lessons: [],
       tools: [],
-    };
+      owningTests,
+      sections,
+      agentGuides,
+    });
   }
 
   const lessons = matchLessons(task, repoRoot);
@@ -208,31 +294,35 @@ export function classifyTask(task, { repoRoot = LIBRARY_REPO_ROOT } = {}) {
   const winner = scored[0];
 
   if (!winner || winner.score === 0) {
-    return {
-      ...DEFAULT_PROFILE,
-      matchedKeywords: [],
-      score: 0,
+    const profile = TASK_PROFILES.find((entry) => entry.id === pathProfile) ?? DEFAULT_PROFILE;
+    return routeFromProfile(profile, {
       task,
-      source: "keyword-router",
+      source: pathProfile ? "path-router" : "keyword-router",
       lessons,
       tools,
-    };
+      owningTests,
+      sections,
+      agentGuides,
+    });
+  }
+
+  // A weak keyword match ("fix", "bug") should not outvote the files the task names:
+  // `agent:route --changed "fix a bug"` in lib/report/ is a product-UI change.
+  if (pathProfile && winner.score <= 2) {
+    const profile = TASK_PROFILES.find((entry) => entry.id === pathProfile);
+    if (profile && profile.id !== winner.profile.id) {
+      return {
+        ...routeFromProfile(profile, { task, source: "path-router", lessons, tools, owningTests, sections, agentGuides }),
+        matchedKeywords: winner.matchedKeywords,
+        score: winner.score,
+      };
+    }
   }
 
   return {
-    id: winner.profile.id,
-    label: winner.profile.label,
-    rationale: winner.profile.rationale,
-    docs: winner.profile.docs,
-    targets: winner.profile.targets,
-    skills: winner.profile.skills,
-    checks: winner.profile.checks,
+    ...routeFromProfile(winner.profile, { task, source: "keyword-router", lessons, tools, owningTests, sections, agentGuides }),
     matchedKeywords: winner.matchedKeywords,
     score: winner.score,
-    task,
-    source: "keyword-router",
-    lessons,
-    tools,
   };
 }
 
@@ -296,8 +386,8 @@ export function buildDoctorReport({
   // Untrimmed: the first entry's leading space is its status column (see scripts/exec.mjs).
   const statusOutput = safeShell(() => execOutput("git", ["status", "--porcelain"], cwd), "");
   const changedFiles = parseGitStatus(statusOutput).map(({ code, path: file }) => ({ status: code, file: file.trim() }));
-  const route = classifyTask(task, { repoRoot: cwd });
   const relevantPaths = inputPaths.length > 0 ? inputPaths : changedFiles.map((entry) => entry.file);
+  const route = classifyTask(task, { repoRoot: cwd, inputPaths: relevantPaths });
   const agentFiles = findRelevantAgentFiles(cwd, relevantPaths);
 
   return {
@@ -351,6 +441,7 @@ export function buildHandoffPacket({
   const mergedReadAnchors = unique([
     ...readAnchors,
     ...route.docs,
+    ...route.sections.map((section) => `${section.doc} ${section.section} ${section.title}`),
     ...route.lessons,
     ...route.targets.slice(0, 2),
     skillPath,
@@ -430,7 +521,8 @@ export function buildRepoIndex({ repoRoot } = {}) {
       totalFiles: files.length,
       agentGuides: files.filter((file) => file.endsWith("/AGENTS.md") || file === "AGENTS.md").length,
       scripts: files.filter((file) => file.startsWith("scripts/")).length,
-      tests: files.filter((file) => file.startsWith("tests/")).length,
+      // Test files the runner will execute, not every file that happens to sit under tests/.
+      tests: buildTestRecords(files).length,
       skills: files.filter(isSkillFile).length,
     },
     categories: categorizeFiles(files),
@@ -448,6 +540,12 @@ export function buildRepoIndex({ repoRoot } = {}) {
     generatedAt: fileMap.generatedAt,
     repoRoot: cwd,
     tests: buildTestRecords(files),
+    // Which tests import each source file, directly or one hop through another module.
+    // `test:changed` and `agent:route --path` answer the same question without the index.
+    sourceToTests: Object.fromEntries(
+      [...sourceToTestsMap({ graph: buildImportGraph({ repoRoot: cwd }) })]
+        .sort(([left], [right]) => byCodeUnit(left, right)),
+    ),
   };
 
   return { fileMap, skillsMap, testMap };
@@ -473,10 +571,12 @@ export function writeRepoIndex({ repoRoot, outDir } = {}) {
   return { outputDirectory, paths, index };
 }
 
-export function formatRouteReport(route) {
+export function formatRouteReport(route, { agentGuides = true } = {}) {
   const lines = [
     `Task profile: ${route.label} (${route.id})`,
-    `Why: ${route.rationale}`,
+    route.source === "path-router"
+      ? `Why: ${route.rationale} (inferred from the files you named)`
+      : `Why: ${route.rationale}`,
   ];
 
   if (route.matchedKeywords?.length) {
@@ -502,6 +602,20 @@ export function formatRouteReport(route) {
     }
   }
 
+  if (agentGuides && route.agentGuides?.length > 1) {
+    lines.push("", "Nested Guides:");
+    for (const guide of route.agentGuides.filter((entry) => entry !== ROOT_AGENTS)) {
+      lines.push(`- ${guide}`);
+    }
+  }
+
+  if (route.sections?.length > 0) {
+    lines.push("", "Sections:");
+    for (const section of route.sections) {
+      lines.push(`- ${section.doc} ${section.section} ${section.title}`);
+    }
+  }
+
   if (route.skills?.length > 0) {
     lines.push("", "Skills:");
     for (const skill of route.skills) {
@@ -513,6 +627,17 @@ export function formatRouteReport(route) {
     lines.push("", "Work Targets:");
     for (const target of route.targets) {
       lines.push(`- ${target}`);
+    }
+  }
+
+  if (route.owningTests?.length > 0) {
+    const shown = route.owningTests.slice(0, 12);
+    lines.push("", "Owning Tests:");
+    for (const test of shown) {
+      lines.push(`- ${test}`);
+    }
+    if (route.owningTests.length > shown.length) {
+      lines.push(`- … ${route.owningTests.length - shown.length} more (bun run test:changed)`);
     }
   }
 
@@ -555,7 +680,7 @@ export function formatDoctorReport(report) {
     lines.push(`- ${file}`);
   }
 
-  lines.push("", formatRouteReport(report.route));
+  lines.push("", formatRouteReport(report.route, { agentGuides: false }));
   return lines.join("\n");
 }
 
@@ -625,6 +750,7 @@ export function formatIndexReport(report) {
     `- agent guides: ${report.index.fileMap.counts.agentGuides}`,
     `- scripts: ${report.index.fileMap.counts.scripts}`,
     `- tests: ${report.index.fileMap.counts.tests}`,
+    `- source→test edges: ${Object.keys(report.index.testMap.sourceToTests).length}`,
     `- skills: ${report.index.fileMap.counts.skills}`,
   ];
 

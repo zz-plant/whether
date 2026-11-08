@@ -14,10 +14,37 @@ export const SKILLS_DIRECTORY = ".claude/skills";
 
 /**
  * The topic → lessons-file table the router reads instead of keeping its own copy.
- * CLAUDE.md's "Read before you touch" table is the one list; a row added there is routed
- * here with no second edit. `tests/agentWorkflow.test.ts` fails if the table stops parsing.
+ * `docs/agents/lessons/README.md` is the one list; a row added there is routed here with
+ * no second edit. `tests/agentWorkflow.test.ts` fails if the table stops parsing.
  */
-export const LESSONS_TABLE = { file: "CLAUDE.md", heading: "## Read before you touch" };
+export const LESSONS_TABLE = { file: "docs/agents/lessons/README.md", heading: "## Read before you touch" };
+
+/**
+ * The long docs a task can be pointed at, section by section. `ui-ux-standards.md` is 900+
+ * lines; naming the whole file made a spacing tweak read every section. A row here is
+ * matched against the task's words and printed by `agent:route`; the section title must
+ * still exist in the doc (`tests/agentWorkflow.test.ts` checks that).
+ */
+export const DOC_SECTIONS = [
+  { doc: "docs/agents/ui-ux-standards.md", section: "§I", title: "Interaction physics & latency", keywords: ["latency", "click", "scroll", "focus"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§II", title: "Strict accessibility", keywords: ["accessibility", "keyboard", "aria", "screen reader", "contrast", "touch target"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§IV", title: "Semantic rigor", keywords: ["semantics", "semantic", "heading", "landmark"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§V", title: "URL & state determinism", keywords: ["url", "query", "back button"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§VI", title: "Mobile hostility defense", keywords: ["mobile", "phone", "hover", "viewport"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§IX", title: "Homepage weekly brief motion guardrails", keywords: ["homepage motion", "brief motion"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§X", title: "Shared action-link primitives", keywords: ["action link", "link"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XI", title: "Report Shell Hierarchy", keywords: ["shell", "hierarchy", "report card"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XII", title: "Disclosure", keywords: ["disclosure", "collapse", "expand", "details"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XIV", title: "Shape register", keywords: ["shape", "radius", "corner", "border"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XV", title: "Encoding a number", keywords: ["figure", "chart", "axis"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XVI", title: "Colour that means something", keywords: ["colour", "color", "accent", "regime colour"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XVIII", title: "Type register", keywords: ["typography", "font", "heading size"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XXI", title: "Spacing ownership", keywords: ["spacing", "margin", "padding", "gap"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XXIII", title: "Motion a reader doesn't notice", keywords: ["motion", "animation", "transition"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XXVI", title: "Controls as instrument parts", keywords: ["control", "input", "toggle", "select"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XXVIII", title: "Every frame is a screenshot", keywords: ["screenshot", "frame", "share card"] },
+  { doc: "docs/agents/ui-ux-standards.md", section: "§XXIX", title: "How containers wrap and stack", keywords: ["container", "wrap", "stack", "responsive"] },
+];
 
 /**
  * Commands a task can need whatever profile it lands in: the advisory audits, censuses
@@ -152,6 +179,22 @@ export const CORE_SURFACES = [
   "lib/playbook.ts",
 ];
 
+/**
+ * When a task's words match no profile, the files it names can. Ordered: the first prefix
+ * that matches wins, so a specific path (app/styles/, docs/agents/mcp-...) comes before the
+ * broader one it sits under. Used by `agent:route --changed` and `agent:doctor`, where the
+ * working tree often says more than a one-line task description.
+ */
+export const PATH_PROFILE_HINTS = [
+  { profile: "skill-mcp", prefixes: ["scripts/agent-workflow", ".claude/skills/", "docs/agents/mcp-and-skills-playbook"] },
+  { profile: "visual-iteration", prefixes: ["app/styles/", "public/visual-assets/", "docs/assets/"] },
+  { profile: "playbook-decision", prefixes: ["lib/regimeEngine", "lib/playbook", "lib/thresholds", "lib/decisionDomainCatalog"] },
+  { profile: "data-trust", prefixes: ["lib/report/reportData", "lib/report/trustStatus", "lib/report/reportFormatting", "lib/runtime/", "lib/timeMachine/", "lib/operatingState/", "lib/marketData/", "lib/summary/"] },
+  { profile: "product-ui", prefixes: ["app/", "lib/report/", "lib/export/", "lib/navigation/"] },
+  { profile: "docs-workflow", prefixes: ["docs/", "AGENTS.md", "CLAUDE.md", "README.md"] },
+  { profile: "bugfix", prefixes: ["tests/"] },
+];
+
 export const TASK_PROFILES = [
   {
     id: "skill-mcp",
@@ -218,7 +261,7 @@ export const TASK_PROFILES = [
     ],
     skills: ["pr-hygiene"],
     checks: [
-      "Verify links, commands, and references manually.",
+      "bun run check:agent-docs",
       "git diff --check",
     ],
   },

@@ -13,9 +13,10 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 ## Repo essentials
 
 - Package manager `bun`. Install `bun install`; dev `bun run dev`; build `bun run build`.
-- Tests: `bun run test` — ~20s, sharded across processes (`BUN_TEST_SHARDS` overrides; a path filter runs one process). Runs offline: `bunfig.toml` preloads a network guard, so a test needing data serves it (a fixture fetcher or an assigned `globalThis.fetch`).
+- Tests: `bun run test` — ~35s, sharded across processes (`BUN_TEST_SHARDS` overrides; a path filter runs one process). Runs offline: `bunfig.toml` preloads a network guard, so a test needing data serves it (a fixture fetcher or an assigned `globalThis.fetch`).
 - Targeted: `bun run test tests/homeBriefModel.test.ts` (one file), `bun run test -t "reversal trigger"` (by name).
-- Iterate with a targeted test plus `bun run typecheck` (~1.5s incremental). `bun run check` (~50s, every task; the landmark audit is the long pole) is for pre-merge.
+- Changed files: `bun run test:changed` runs the tests that import what you edited (`-- --deep` adds one hop, `-- --list` prints them).
+- Iterate with a targeted test plus `bun run typecheck` (~2s incremental). `bun run check` (~35s, every task; the landmark audit is the long pole) is for pre-merge.
 - CI on GitHub is manual-only (`workflow_dispatch`); the real gates are `.husky/pre-push` and Cloudflare Workers Builds — see the gate invariant below.
 
 ## Architectural invariants
@@ -70,14 +71,14 @@ Three framings govern applying the guidance to one company:
 - Keep diffs focused; no opportunistic refactors unless they unblock the work.
 - Use `rg` for discovery; avoid `ls -R` and `grep -R`.
 - Update tests and docs when behavior or contracts change; if shared semantics change, update all consumers or document the drift.
-- Orient with `docs/agents/README.md` before non-trivial work — it indexes the guides (`setup`, `project-layout`, `engineering-principles`, `documentation`, `data-and-platform`, `quality-and-pr`, `ui-ux-standards`) and the product specs (one-screen brief, IA/navigation, trust/fallback, export/integration) that govern each area.
+- Orient with `docs/agents/README.md` before non-trivial work — it indexes the guides (`setup`, `toolchain`, `project-layout`, `engineering-principles`, `documentation`, `data-and-platform`, `quality-and-pr`, `ui-ux-standards`) and the product specs (one-screen brief, IA/navigation, trust/fallback, export/integration) that govern each area.
 
 ## Execution loop
 
 1. orient with `AGENTS.md`, `docs/agents/README.md`, and the one matching guide
 2. identify the canonical surface or module before broad search
 3. choose the smallest implementation that improves the product loop
-4. run the smallest meaningful verification for the changed behavior
+4. run the smallest meaningful verification for the changed behavior (`bun run test:changed`)
 5. update the canonical doc if workflow, semantics or contracts changed
 
 Do not spend major effort on repo-wide exploration before you know the target surface and validation path.

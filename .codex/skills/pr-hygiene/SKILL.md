@@ -47,8 +47,9 @@ Prepare a change for review by matching validation depth to scope and making the
 
 Start with:
 
+- `bun run test:changed` while iterating
+- `bun run test` before opening the PR
 - `bun run lint`
-- `bun run test`
 
 Escalate to `bun run check` for broad, high-risk, or cross-cutting changes.
 

@@ -10,15 +10,16 @@ import {
   formatRouteReport,
   writeRepoIndex,
 } from "./agent-workflow-lib.mjs";
+import { resolveChangedFiles } from "./test-changed.mjs";
 
-const BOOLEAN_FLAGS = new Set(["--help", "-h", "--json"]);
+const BOOLEAN_FLAGS = new Set(["--help", "-h", "--json", "--changed"]);
 
 function printHelp() {
   console.log(`Whether agent workflow helper
 
 Usage:
   node scripts/agent-workflow.mjs doctor [--task "<task>"] [--path <file>]... [--json]
-  node scripts/agent-workflow.mjs route [--task "<task>" | <task words...>] [--json]
+  node scripts/agent-workflow.mjs route [--task "<task>" | <task words...>] [--path <file>]... [--changed] [--json]
   node scripts/agent-workflow.mjs handoff --job "<job>" [--task "<task>"] [--why-now "..."] [--done-when "..."] [--skill <name>] [--write-scope <path>]... [--read-anchor <path>]... [--constraint "..."]... [--verify "<command>"]... [--out-of-scope "..."]... [--json]
   node scripts/agent-workflow.mjs index [--out-dir <dir>] [--json]
 `);
@@ -87,7 +88,11 @@ function main() {
   const wantsJson = parsed.has("--json");
 
   if (parsed.command === "route") {
-    const route = classifyTask(parsed.get("--task", parsed.positionals.join(" ")));
+    const changed = parsed.has("--changed") ? resolveChangedFiles({ repoRoot: process.cwd() }) ?? [] : [];
+    const route = classifyTask(parsed.get("--task", parsed.positionals.join(" ")), {
+      repoRoot: process.cwd(),
+      inputPaths: [...parsed.getAll("--path"), ...parsed.getAll("--paths"), ...changed],
+    });
     console.log(wantsJson ? JSON.stringify({ route }, null, 2) : formatRouteReport(route));
     return;
   }

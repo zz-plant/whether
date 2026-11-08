@@ -52,6 +52,18 @@
       }
     },
     {
+      "label": "test:changed",
+      "type": "shell",
+      "command": "bun run test:changed",
+      "detail": "Run only the tests that import your changed files.",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
       "label": "check",
       "type": "shell",
       "command": "bun run check",

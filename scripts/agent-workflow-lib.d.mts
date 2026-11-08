@@ -22,9 +22,15 @@ export type ToolHint = {
 
 /** A routed task: its profile, plus what the task matched outside it. */
 export type TaskRoute = TaskProfile & {
-  /** Files CLAUDE.md's "Read before you touch" table links for the task's topics. */
+  /** Files the lessons table links for the task's topics. */
   lessons: string[];
   tools: ToolHint[];
+  /** Tests that import the files the caller named, when it named any. */
+  owningTests: string[];
+  /** Sections of a long doc the task's words point at. */
+  sections: Array<{ doc: string; section: string; title: string }>;
+  /** The root and nested AGENTS.md files that govern the files the caller named. */
+  agentGuides: string[];
 };
 
 export type RepoIndex = {
@@ -60,6 +66,8 @@ export type RepoIndex = {
     generatedAt: string;
     repoRoot: string;
     tests: string[];
+    /** Source file → tests that import it, directly or one hop through another module. */
+    sourceToTests: Record<string, string[]>;
   };
 };
 
@@ -125,4 +133,4 @@ export function writeRepoIndex(args?: {
   index: RepoIndex;
 };
 
-export function classifyTask(task: string, options?: { repoRoot?: string }): TaskRoute;
+export function classifyTask(task: string, options?: { repoRoot?: string; inputPaths?: string[] }): TaskRoute;

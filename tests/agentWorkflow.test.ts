@@ -190,10 +190,10 @@ describe("agent workflow helpers", () => {
     const printed = spawnSync(NODE_BIN, [SCRIPT_PATH, "route", "is this telemetry stream dead"], { encoding: "utf8" });
     assert.equal(printed.status, 0);
     assert.match(printed.stdout, /Specialised Tools:\n- bun run telemetry:streams — /);
-    assert.match(printed.stdout, /Read Before You Touch \(CLAUDE\.md\):\n- docs\/agents\/lessons\/toolchain-and-gates\.md/);
+    assert.match(printed.stdout, /Read Before You Touch \(docs\/agents\/lessons\/README\.md\):\n- docs\/agents\/lessons\/toolchain-and-gates\.md/);
   });
 
-  it("routes topics to lessons files from CLAUDE.md's table, which it reads rather than copies", () => {
+  it("routes topics to lessons files from the lessons table, which it reads rather than copies", () => {
     const cases: Array<{ task: string; lesson: string }> = [
       { task: "is this telemetry stream dead", lesson: "docs/agents/lessons/toolchain-and-gates.md" },
       { task: "the Slack send failed on Monday", lesson: "docs/agents/lessons/automation-and-deploy-gate.md" },
@@ -208,26 +208,29 @@ describe("agent workflow helpers", () => {
     }
 
     // Every file the table links exists, so a route never sends a reader to a missing page.
-    const claude = fs.readFileSync("CLAUDE.md", "utf8");
-    const section = claude.slice(claude.indexOf("## Read before you touch"), claude.indexOf("### Rules that catch changes here"));
+    const lessonsIndex = fs.readFileSync("docs/agents/lessons/README.md", "utf8");
+    const section = lessonsIndex.slice(lessonsIndex.indexOf("## Read before you touch"));
     const linked = [...section.matchAll(/\]\(([^)\s]+)\)/g)].map((match) => match[1]);
     assert.ok(linked.length >= 7, `the lessons table no longer parses (${linked.length} links)`);
-    for (const file of linked) assert.ok(fs.existsSync(file ?? ""), `CLAUDE.md links a missing lessons file: ${file}`);
+    for (const file of linked) {
+      assert.ok(fs.existsSync(path.join("docs/agents/lessons", file ?? "")), `the lessons table links a missing file: ${file}`);
+    }
 
     // A row added to the table is routed with no second edit.
     const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-lessons-"));
     try {
+      fs.mkdirSync(path.join(temporaryRoot, "docs/agents/lessons"), { recursive: true });
       fs.writeFileSync(
-        path.join(temporaryRoot, "CLAUDE.md"),
+        path.join(temporaryRoot, "docs/agents/lessons/README.md"),
         [
           "## Read before you touch",
           "",
           "| Touching… | Read |",
           "| --- | --- |",
-          '| a widget cache, "left, right" | [widgets](docs/widgets.md) |',
+          '| a widget cache, "left, right" | [widgets](../../../docs/widgets.md) |',
           "",
           "### Next section",
-          "| a widget | [not-this](docs/other.md) |",
+          "| a widget | [not-this](../../../docs/other.md) |",
         ].join("\n"),
       );
       const lessonsFor = (task: string) => classifyTask(task, { repoRoot: temporaryRoot }).lessons;
@@ -277,6 +280,10 @@ describe("agent workflow helpers", () => {
       const index = buildRepoIndex({ repoRoot: process.cwd() });
       assert.ok(index.skillsMap.skills.some((skill) => skill.name === "subagent-handoff"));
       assert.ok(index.testMap.tests.includes("tests/agentWorkflow.test.ts"));
+      assert.ok(
+        index.testMap.sourceToTests["lib/report/homeBriefModel.ts"]?.includes("tests/homeBriefModel.test.ts"),
+        "the index does not map a source file to its tests",
+      );
 
       const written = writeRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
 
@@ -285,5 +292,55 @@ describe("agent workflow helpers", () => {
     } finally {
       fs.rmSync(temporaryRoot, { recursive: true, force: true });
     }
+  });
+
+  it("names the sections of a long doc a task needs, and they exist", () => {
+    const route = classifyTask("tighten spacing and alignment on the homepage card");
+    assert.ok(route.sections.some((section) => section.section === "§XXI"));
+    assert.ok(route.sections.some((section) => section.doc === "docs/agents/ui-ux-standards.md"));
+
+    const text = fs.readFileSync("docs/agents/ui-ux-standards.md", "utf8");
+    for (const section of route.sections.filter((entry) => entry.doc === "docs/agents/ui-ux-standards.md")) {
+      const heading = `## ${section.section.replace("§", "")}.`;
+      assert.ok(text.includes(heading), `ui-ux-standards.md has no heading ${heading}`);
+    }
+  });
+
+  it("names the tests that own the files a task will touch", () => {
+    const route = classifyTask("change the hero copy", { inputPaths: ["app/components/DecisionHero.tsx"] });
+
+    assert.ok(route.owningTests.length > 0);
+    assert.ok(route.owningTests.every((test) => test.startsWith("tests/")));
+    assert.equal(route.checks[0], "bun run test:changed");
+  });
+
+  it("infers the profile from the files when the task words do not", () => {
+    const cases: Array<{ path: string; profile: string }> = [
+      { path: "lib/report/homeBriefModel.ts", profile: "product-ui" },
+      { path: "lib/runtime/storeSelection.ts", profile: "data-trust" },
+      { path: "lib/regimeEngineCore.ts", profile: "playbook-decision" },
+      { path: "docs/agents/README.md", profile: "docs-workflow" },
+      { path: "scripts/agent-workflow.mjs", profile: "skill-mcp" },
+      { path: "app/styles/typography.css", profile: "visual-iteration" },
+    ];
+
+    for (const { path: file, profile } of cases) {
+      const route = classifyTask("", { inputPaths: [file] });
+      assert.equal(route.id, profile, `${file} should route to ${profile}`);
+      assert.equal(route.source, "path-router");
+    }
+  });
+
+  it("lets the files outvote a weak keyword match", () => {
+    const route = classifyTask("fix a bug", { inputPaths: ["lib/report/homeBriefModel.ts"] });
+    assert.equal(route.id, "product-ui");
+    assert.equal(route.source, "path-router");
+  });
+
+  it("names the nested AGENTS.md that governs a named file", () => {
+    const route = classifyTask("change the hero copy", { inputPaths: ["lib/report/homeBriefModel.ts"] });
+
+    assert.ok(route.agentGuides.includes("AGENTS.md"));
+    assert.ok(route.agentGuides.includes("lib/report/AGENTS.md"));
   });
 });
