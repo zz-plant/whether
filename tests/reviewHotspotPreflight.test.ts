@@ -10,6 +10,7 @@ import {
   resolveDiffBase,
   typeAssertionLines,
 } from "../scripts/review-hotspot-preflight.mjs";
+import { CORE_SURFACES } from "../scripts/agent-workflow.config.mjs";
 
 /*
  * One comparison: the working tree against a base. The base is the merge-base with main
@@ -72,6 +73,12 @@ describe("decision surfaces", () => {
       "tests/homeBriefModel.test.ts",
     ]) {
       assert.equal(requiresTestCoverage(file), false, `${file} should not require test coverage`);
+    }
+  });
+
+  it("covers every core surface the agent index calls out", () => {
+    for (const file of CORE_SURFACES) {
+      assert.equal(requiresTestCoverage(file), true, `${file} is a core surface but not a decision surface`);
     }
   });
 });
