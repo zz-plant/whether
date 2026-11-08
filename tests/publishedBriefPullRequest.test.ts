@@ -373,7 +373,7 @@ describe("assembleCurrentWeekBrief", () => {
 /*
  * A record frozen from 2026-10-07 stores what the engine scored, so that after an
  * ENGINE_VERSION bump next week scores it again instead of dropping to the
- * month-end (docs/feature-specs-current.md §1.1.53).
+ * month-end (docs/decisions/feature-log/01-product-surfaces.md §1.1.53).
  */
 describe("the inputs a record stores", () => {
   const recordDate = "2026-03-02";

@@ -21,7 +21,7 @@ import type { PublishedBrief } from "./publishedBriefs";
  * used to leave no brief to compare with for a week or two, until one frozen by
  * the new engine was five days old. Until 2026-10-07 every week compared with the
  * previous Time Machine snapshot, the last month-end, so each brief in a month
- * restated the same move (§1.1.26 and §1.1.28 of docs/feature-specs-current.md).
+ * restated the same move (§1.1.26 and §1.1.28 of docs/decisions/feature-log/01-product-surfaces.md).
  * The month-end is now the fallback, used only where no brief from the previous
  * one to two weeks can be compared with, and named by its date like any other
  * basis. The month-end is re-scored by the current engine on every load, so it is

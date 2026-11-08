@@ -16,7 +16,7 @@ import { assessment } from "./factories/exportFixtures";
  * holds while any area's pause line is met, and a week with nothing to compare states no
  * direction. The surfaces that name the week's direction beside the guidance read it, so
  * none says "loosened" or "Steady" over a headline that says otherwise
- * (docs/feature-specs-current.md §1.1.52).
+ * (docs/decisions/feature-log/01-product-surfaces.md §1.1.52).
  */
 const weekWith = (directionLabel: ReportDynamics["directionLabel"], tightness: number) => {
   const homeBriefModel = buildHomeBriefModel({

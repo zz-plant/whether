@@ -37,7 +37,7 @@ export function CopyMeetingSlideButton({
     /* The rich copy first, then plain text. "Copied" shows only after a write
        resolved: the fallback used to be fired without waiting and the button
        said "Copied the slide" whether or not anything reached the clipboard,
-       the defect `docs/feature-specs-current.md` 1.1.10 records for the other
+       the defect `docs/decisions/feature-log/01-product-surfaces.md` 1.1.10 records for the other
        copy controls. */
     const writeSlide = async () => {
       if (typeof navigator === "undefined" || !navigator.clipboard) return false;

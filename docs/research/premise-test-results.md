@@ -271,7 +271,7 @@ No candidate passes all four, so the current ramp stays.
    and loading a second copy evicts models other sessions are using. It was a cross-check, not
    the extractor.
 6. **The record gained the Chicago Fed index after the first run.** The archive began scoring
-   the Chicago Fed National Financial Conditions Index the same day (`docs/feature-specs-current.md`
+   the Chicago Fed National Financial Conditions Index the same day (`docs/decisions/feature-log/01-product-surfaces.md`
    §1.1.67), and this test replays the archive's inputs, so it was rerun on the new record. One
    signal quarter moved: 2020Q1's funding pressure went from 0 to 2. Its tight flag, every
    condition, P1, the candidate table and the decision rule are unchanged. P2 and the lead-lag
@@ -301,7 +301,7 @@ No candidate passes all four, so the current ramp stays.
 ## What happens next
 
 The candidates are scored beside every weekly reading from now on (`OperatingSnapshot.shadowRamps`,
-`docs/feature-specs-current.md` §1.1.68), the first record in which a candidate's reading exists
+`docs/decisions/feature-log/01-product-surfaces.md` §1.1.68), the first record in which a candidate's reading exists
 before its outcome. It is reviewed at eight quarter-ends with first-published outcomes. A
 candidate that failed here can be reconsidered then only through a new registration.
 

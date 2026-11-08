@@ -141,7 +141,7 @@ produced intent within noise of the ungated signal, the paywall should not ship.
 **Outcome (2026-10-14).** The reversal condition held. `/pricing` shipped on 2026-08-28, and the
 intent capture recorded two events from one visitor between 2026-08-21 and 2026-10-14, none from
 `/pricing`. The paid plans, the billing code and the intent capture were removed, and Whether is
-free (`docs/feature-specs-current.md` §1.1.78).
+free (`docs/decisions/feature-log/01-product-surfaces.md` §1.1.78).
 
 ---
 

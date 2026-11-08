@@ -26,7 +26,7 @@ type Outcome = "copied" | "shared" | "saved";
  * awaiting the render first spends that permission, so the write was refused
  * on every Safari click. Where the write is refused anyway, the card is saved
  * as a file and the button says "Saved", not "Copied", because "Copied" is
- * shown only after a write resolved (docs/feature-specs-current.md 1.1.10).
+ * shown only after a write resolved (docs/decisions/feature-log/01-product-surfaces.md 1.1.10).
  */
 export function CopyImageCardButton({
   className = "",

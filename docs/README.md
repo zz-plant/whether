@@ -7,7 +7,8 @@ Use this file to find the current source of truth without reading the whole `doc
 ### If you are changing product behavior
 
 - `one-screen-weekly-brief-spec.md` for the primary brief contract
-- `feature-specs-current.md` for shipped product intent
+- `feature-specs-current.md` for the short index by surface
+- `decisions/feature-log/` for the dated record behind it (search its headings; do not read it end to end)
 - `architecture.md` for system boundaries, data flows, and extension points
 - `use-cases/operator-playbooks.md` for concrete operator workflows and automation recipes
 
@@ -48,7 +49,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 
 - `one-screen-weekly-brief-spec.md` — primary weekly brief contract
 - `use-cases/operator-playbooks.md` — role-specific operator workflows, playbooks, and decision rules (canonical)
-- `feature-specs-current.md` — current product surface intent
+- `feature-specs-current.md` — short index by surface; the dated record is in `decisions/feature-log/`
 - `current-jtbd-click-paths.md` — current jobs-to-be-done inventory with click-level fulfillment paths
 - `editorial-guardrails.md` — copy, claims, and long-form guardrails
 - `claims-ledger.md` — each claim a week makes, the one function that builds it, and the surfaces that print it

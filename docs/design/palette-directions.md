@@ -1,7 +1,7 @@
 # Palette and type directions (decision record)
 
 Status: decided, 2026-10-09. The owner chose Synoptic, as recommended below: its colours with the
-shipped type, and dark kept as the default theme. `docs/feature-specs-current.md` §1.1.69 records
+shipped type, and dark kept as the default theme. `docs/decisions/feature-log/01-product-surfaces.md` §1.1.69 records
 what was applied, including the one set of condition fills used in both themes and the line
 states' own tokens. The mockup routes still 404 in production (`app/mockups/layout.tsx`); the
 preview lane and local dev keep them, and they now draw over the applied palette.

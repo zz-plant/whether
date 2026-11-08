@@ -213,7 +213,7 @@ answering a question the answer pages already answer.
   changes when it restarts, any other area when it pauses. A row, a paste and a score line print
   that side alone, with its number and distance ("restarts below 66 (24 pts away)", "Pause if:
   Risk appetite < 44 (9 pts away)"). Both sides print on `/operate`, where a reader sets rules of
-  their own. `docs/feature-specs-current.md` §1.1.101 has the before and after.
+  their own. `docs/decisions/feature-log/01-product-surfaces.md` §1.1.101 has the before and after.
 - **The guard reaches the content layer too** (2026-10-30). `tests/readerVocabulary.test.tsx`
   renders `app/` routes, so it never saw the article bodies, resource metadata or downloadable
   templates — and that is where the retired words survived longest: one public memo carried

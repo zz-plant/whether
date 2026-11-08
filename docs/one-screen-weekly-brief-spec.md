@@ -173,7 +173,7 @@ present-day and an archived regime must not borrow it.
 
 `/` takes no `?view=`. The URL-selected interpretation layers (`default`, `sector`, `company`,
 `financial`, `forecast`) were built by the home assembly and drawn by nothing after their panel
-went on 2026-08-14, and were removed on 2026-10-27 (`docs/feature-specs-current.md` §1.0).
+went on 2026-08-14, and were removed on 2026-10-27 (`docs/decisions/feature-log/01-product-surfaces.md` §1.0).
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
@@ -196,7 +196,7 @@ Implementation guardrails:
   - **Reversal** (displayed as “Flip condition” in some surfaces): what must recover/hold before loosening or re-opening.
   - Prefix normalization (`Pause ...`, `Resume ...`) is handled centrally; consumers should pass raw rule text and avoid custom string assembly.
 - Dynamic fallback copy must remain decision-complete. Do not emit placeholders such as `Stay the course`, `current track`, `standard guardrails`, or `trigger confirmation` without naming the held decision, measurable threshold, and reversal condition.
-- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition. Since 2026-09-29 the sentence is derived, not fixed: `Conditions held steady since <date>; no pause or restart line was crossed. Last week's guidance stands.` (`lib/report/decisionMovement.ts`, `docs/feature-specs-current.md` §1.1.28), followed on a quiet week by the nearest line. A week that crossed a line says which areas it moved and through which line, and never a figure in a unit of its own or an instruction the guidance does not carry.
+- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition. Since 2026-09-29 the sentence is derived, not fixed: `Conditions held steady since <date>; no pause or restart line was crossed. Last week's guidance stands.` (`lib/report/decisionMovement.ts`, `docs/decisions/feature-log/01-product-surfaces.md` §1.1.28), followed on a quiet week by the nearest line. A week that crossed a line says which areas it moved and through which line, and never a figure in a unit of its own or an instruction the guidance does not carry.
 - Boundary commentary must name the signal, current distance, threshold direction, and decision consequence. Qualitative watch language alone (`worth watching`, `next release`) does not satisfy the bounded-decision contract.
 - Trust readiness describes whether the current read can support this week's approvals; it must point operators back to the thresholds in the current call rather than independently declaring decisions safe.
 - Decision readiness and trust must use structured freshness state, not display copy. Consumers should gate on machine-readable staleness (`fresh`, `stale`, `unknown`) and source mode (`live`, `cached`, `historical`) rather than inferring trust from a rendered timestamp string.
@@ -217,8 +217,8 @@ Implementation guardrails:
 - When every bounded rule clears on the same conditions, state that corridor once above the ledger (`sharedFlipCorridor`). The per-lane `Pause if` / `Clears when` logic stays — it is non-negotiable top-fold content — but the shared corridor tells the operator these lanes flip together, which no single row can. Suppress the line when the rules genuinely diverge.
 - The weekly call and the score that grades it must share the first viewport at 375px. The hero orders call → score → supporting detail when stacked, and restores the two-column grid at `sm` and above.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
-- "Could change next week" is one flag, `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`): a score inside the engine's near band, or a change held for its confirming reading. The trust strip reads it, and the home model's `transitionWatch` is computed from it for `/brief.md`'s trust line, the memo lines, the change-watch row and the exports. No surface derives its own (`docs/feature-specs-current.md` §1.1.31a).
-- `/brief.md` prints the `Decision readiness` verdict directly under its trust line: the home model's `decisionReadiness`, label then detail. `buildDecisionReadinessState` runs once, in the home brief builder, and `/trust` reads the same value. The provenance `Data caveat` stays about the data, so a live week close to a line reads `Hold` above a caveat of `None.` (`docs/feature-specs-current.md` §1.1.77). As of 2026-10-14 the homepage card does not draw the verdict that the rule above asks of it.
+- "Could change next week" is one flag, `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`): a score inside the engine's near band, or a change held for its confirming reading. The trust strip reads it, and the home model's `transitionWatch` is computed from it for `/brief.md`'s trust line, the memo lines, the change-watch row and the exports. No surface derives its own (`docs/decisions/feature-log/01-product-surfaces.md` §1.1.31a).
+- `/brief.md` prints the `Decision readiness` verdict directly under its trust line: the home model's `decisionReadiness`, label then detail. `buildDecisionReadinessState` runs once, in the home brief builder, and `/trust` reads the same value. The provenance `Data caveat` stays about the data, so a live week close to a line reads `Hold` above a caveat of `None.` (`docs/decisions/feature-log/01-product-surfaces.md` §1.1.77). As of 2026-10-14 the homepage card does not draw the verdict that the rule above asks of it.
 - Trust on `/` should remain compact: keep one inline verdict in the action lane and avoid duplicating trust as a separate summary card.
 - On `/`, the first scan should read as one dominant weekly decision card. Detailed per-area rules should stay available, but behind a closed-by-default disclosure instead of an always-open matrix.
 - On `/`, the share rail should default to one recommended artifact path first. Alternate artifact modes, shorter variants, and heavier packaging should live behind secondary disclosure UI.
@@ -503,7 +503,7 @@ As of 2026-10-29 the weekly call leads at every horizon: the selected horizon's 
 
 ### Declutter pass (2026-09-15)
 
-The sitewide pass recorded in `docs/feature-specs-current.md` §1.1.17. What it changes in this
+The sitewide pass recorded in `docs/decisions/feature-log/01-product-surfaces.md` §1.1.17. What it changes in this
 contract:
 
 - **One header band on every route.** The 2026-08-11 note above ("report sub-routes keep the

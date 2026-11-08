@@ -1,6 +1,6 @@
 # Toolkit pages rewrite vs enhancement audit
 
-> **⚠️ HISTORICAL** — `/toolkits` was retired as a standalone route and redirects to `/`. Toolkit components now live inside `/resolve` (`/answer` redirects there), and the `/toolkits/[slug]` pages remain. See `docs/feature-specs-current.md` §4.1.
+> **⚠️ HISTORICAL** — `/toolkits` was retired as a standalone route and redirects to `/`. Toolkit components now live inside `/resolve` (`/answer` redirects there), and the `/toolkits/[slug]` pages remain. See `docs/decisions/feature-log/04-decision-support-tooling.md` §4.1.
 
 Date: 2026-03-06
 

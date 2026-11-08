@@ -145,7 +145,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 
 ### DAU — event and state only, never cadence
 - [x] **Flash days are the honest DAU spikes** — `lib/alert/flashMoves.ts` fires on real market moves, irregularly; DAU rises on those days and cannot be scheduled.
-- [x] **Productize the quiet day** — Shipped: `buildQuietDayRead` (`lib/report/flipProximity.ts`) + `QuietDayRead` render a call-unchanged verdict with the nearest flip distance under the live call on `/`, from the same snapshot the hero draws; nothing on a week the call moved (2026-09-18). Since 2026-10-07 it says what would change the guidance through the contract's own line (`buildQuietDayRead` in `lib/report/decisionMovement.ts`: the nearer change line in points, or a held week's condition), not the nearest market move (`docs/feature-specs-current.md` §1.1.55).
+- [x] **Productize the quiet day** — Shipped: `buildQuietDayRead` (`lib/report/flipProximity.ts`) + `QuietDayRead` render a call-unchanged verdict with the nearest flip distance under the live call on `/`, from the same snapshot the hero draws; nothing on a week the call moved (2026-09-18). Since 2026-10-07 it says what would change the guidance through the contract's own line (`buildQuietDayRead` in `lib/report/decisionMovement.ts`: the nearer change line in points, or a held week's condition), not the nearest market move (`docs/decisions/feature-log/01-product-surfaces.md` §1.1.55).
 - [x] **Push only on real moves** — already the design (`sendRegimePush.ts`); preserve it, it is the guardrail that keeps push an accelerator instead of a churn driver.
 
 ### QAU — monthly/quarterly stakes as return reasons
@@ -288,7 +288,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 
 ## Milestone 13 — Company-Calibrated Decisions (Week 13)
 - [x] Dynamic runway-scaled guardrails (<6m, 12m, 24m+ cash bands) scaling stop/start/fence rules. Shipped: `lib/report/operatorRunway.ts` and `scaleAdjustmentToRunway` in `boundedDecisionRules.ts` (2026-09-17).
-- [x] Stage profile presets (Seed vs. Series A vs. Growth) adjusting hiring speed and burn tolerance. Shipped: `lib/report/operatorStage.ts` and the per-stage adjustments in `boundedDecisionRules.ts` (see `docs/feature-specs-current.md` §1.1.7, 2026-09-06).
+- [x] Stage profile presets (Seed vs. Series A vs. Growth) adjusting hiring speed and burn tolerance. Shipped: `lib/report/operatorStage.ts` and the per-stage adjustments in `boundedDecisionRules.ts` (see `docs/decisions/feature-log/01-product-surfaces.md` §1.1.7, 2026-09-06).
 - [ ] Sector overlays (B2B SaaS vs. Consumer vs. DeepTech / AI Infrastructure).
 - [x] Bootstrapped / profitable mode (decoupling VC fundraising assumptions, calibrating for pricing power and gross margin). Shipped: decoupled investor assumptions in Decision Shield, added gross margin calibration and buffer checks (2026-09-26).
 - [ ] ARR-per-employee and burn multiple efficiency benchmark thresholds.

@@ -127,7 +127,7 @@ describe("the reading a week compares with", () => {
  * Every ENGINE_VERSION bump used to leave no brief to compare with until one from
  * the new engine was five days old, so the week fell back to the month-end. A
  * record frozen with its inputs is scored again by the engine reading it
- * (§1.1.53 of docs/feature-specs-current.md).
+ * (§1.1.53 of docs/decisions/feature-log/01-product-surfaces.md).
  */
 describe("the one rule the loader and the stored snapshot choose by", () => {
   const monthEnd = {
