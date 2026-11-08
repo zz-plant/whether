@@ -86,16 +86,23 @@ export type HomeLoadReading = z.infer<typeof readingSchema>;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  words: 1428,
-  numbers: 264,
-  wordsBeforeAreas: 316,
+  /* 1428 → 1437, 264 → 266, 316 → 323 (2026-11-08): three quick-copy pills on the
+     brief's action row (1-line standup, 3-bullet exec summary, card as image) add
+     their labels ahead of the areas. Justified raise, said here. */
+  words: 1437,
+  numbers: 266,
+  wordsBeforeAreas: 323,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
      appetite, room before a change). A deliberate raise, said here and in its PR.
      11 → 16 with fields 26 → 21 (2026-11-03): the five area choices were radios and are
      the area names in the grouped rules now, which open as buttons. The same five
      controls, counted under another tag; the two move together, never one alone. */
-  buttons: 16,
+  /* 16 → 19 (2026-11-08): three quick-copy pills on the brief's action row
+     (1-line standup, 3-bullet exec summary, card as image), so a founder can
+     paste the artifact in under 10 seconds. Same three controls the brief's
+     transmission loop asks for; justified raise, said here. */
+  buttons: 19,
   fields: 21,
   fundingPressure: 34,
   riskAppetite: 37,

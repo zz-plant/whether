@@ -30,7 +30,7 @@ import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { describeMarketMoveScale, describeScoreMoveRanges } from "../lib/report/marketMoveScale";
-import { describeGuidanceChange, describeMovementCause } from "../lib/report/decisionMovement";
+import { describeGuidanceChange, describeMovementCause, buildStandupLine } from "../lib/report/decisionMovement";
 import { anyPauseLineMet } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -56,6 +56,9 @@ import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { ShareLinks } from "./components/home/ShareLinks";
 import { ShareBriefButton } from "./components/shareBriefButton";
+import { CopyStandupButton } from "./components/CopyStandupButton";
+import { CopyExecSummaryButton } from "./components/CopyExecSummaryButton";
+import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
   HOME_DECISION_PARAM,
   HOME_MONDAY_EMAIL_HASH,
@@ -653,6 +656,19 @@ async function PageContent({
     movement: decisionMovement,
     regimeChanged: homepage.weeklyDecisionCardModel.decision.reportDynamics.regimeChanged,
   });
+  /* The week's one-line standup, for the quick-copy pill: what the guidance did
+     this week and what would change it, in one pasteable line. */
+  const standupLine = buildStandupLine({
+    regime,
+    change: guidanceChange,
+    weeklyCall: homepage.weeklyCall,
+    assessment: reportData.assessment,
+  });
+  /* A three-bullet executive summary for a leadership email or Monday sync, from
+     the same brief lines the share panel copies. */
+  const execSummaryText = briefShareLines && briefShareLines.length > 0
+    ? briefShareLines.map((line) => `• ${line}`).join("\n")
+    : primaryCall;
   const quietWeek =
     !historicalSelection
     && !savedCopy
@@ -879,6 +895,9 @@ async function PageContent({
               <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">
                   <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} showLabel />
+                  <CopyStandupButton text={standupLine} />
+                  <CopyExecSummaryButton text={execSummaryText} />
+                  <CopyImageCardButton />
                   {/* The core loop, beside the artifact rather than 4,000px below
                       it: the alert is what a quiet week is for. */}
                   <PlainActionLink href={`#${HOME_MONDAY_EMAIL_HASH}`}>Email me Mondays →</PlainActionLink>

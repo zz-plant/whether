@@ -125,15 +125,33 @@ const LineCell = ({
      force" read as "error". */
   const inForce = kind === "pause" ? value.state === "crossed" : value.state !== undefined;
 
+  /* A thin proximity rail beside the distance: how close the score sits to the
+     line, at a glance, without decoding the number. Width and ink follow the
+     line state (crossed = at the line, near = close, clear = room). */
+  const railWidth = value.state === "crossed" ? "100%" : value.state === "near" ? "55%" : "25%";
+  const railInk =
+    value.state === "crossed"
+      ? "bg-line-crossed-border"
+      : value.state === "near"
+        ? "bg-amber-400/70"
+        : "bg-line-clear-border";
   return (
     <>
       {value.line}
       {value.distance ? (
         <span className={value.state ? "mt-1 block text-xs" : "block text-xs text-slate-400"}>
           {value.state ? (
-            <LineStateBadge state={value.state} stamp={inForce}>
-              {value.distance}
-            </LineStateBadge>
+            <span className="inline-flex items-center gap-2">
+              <LineStateBadge state={value.state} stamp={inForce}>
+                {value.distance}
+              </LineStateBadge>
+              <span
+                aria-hidden="true"
+                className="inline-block h-1 w-12 overflow-hidden rounded-full bg-[color:var(--border-faint)]"
+              >
+                <span className={`block h-full ${railInk}`} style={{ width: railWidth }} />
+              </span>
+            </span>
           ) : (
             value.distance
           )}
