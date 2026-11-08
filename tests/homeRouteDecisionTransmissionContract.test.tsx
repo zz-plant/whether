@@ -164,6 +164,7 @@ describe("home route render contract", () => {
   it("pastes the same artifact the share panel does, from the same formatter", () => {
     const railSource = readFileSync("app/components/shareRail.tsx", "utf8");
     const routeSource = readFileSync("app/page.tsx", "utf8");
+    const artifactSource = readFileSync("app/homePageArtifact.ts", "utf8");
     const buttonSource = readFileSync("app/components/shareBriefButton.tsx", "utf8");
 
     // Copy Brief assembled its own block: an undated title over
@@ -171,7 +172,10 @@ describe("home route render contract", () => {
     // The panel beside it copied `formatBriefArtifact` — dated, with the signal and
     // provenance lines, and linking the frozen record. Two pastes of one artifact,
     // and the one on the card was the only one that could not be cited (2026-11-02).
-    assert.ok(routeSource.includes(`formatBriefArtifact(briefArtifact, "slack", siteUrl)`), "the route formats the paste with the panel's own formatter");
+    assert.ok(
+      artifactSource.includes(`formatBriefArtifact(briefArtifact, "slack", siteUrl)`),
+      "the page's artifact builder formats the paste with the panel's own formatter",
+    );
     assert.ok(routeSource.includes("slackBlock={briefSlackBlock}"), "and hands it to the copy control");
     assert.ok(buttonSource.includes("slackBlock"), "the copy control accepts a whole-artifact block");
     const copyCall = routeSource.slice(routeSource.indexOf("<ShareBriefButton")).split("/>")[0] ?? "";

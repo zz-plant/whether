@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { BriefArtifactScript } from "./components/briefArtifactScript";
-import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
-import { formatBriefArtifact, SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
-import { siteUrl } from "../lib/siteUrl";
+import { deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
+import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
 import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
@@ -17,7 +16,7 @@ import { PeriodControl } from "./components/home/PeriodControl";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { QuietWeekFold } from "./components/home/QuietWeekFold";
-import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
+import type { CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { describeSavedCopyBanner, resolveDataStatusGuidance } from "../lib/report/trustStatus";
@@ -35,6 +34,8 @@ import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/o
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory, primeMonthlyRegimeHistoryForRead } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
+import { buildHomePageArtifact } from "./homePageArtifact";
+import { buildHomeHistoryModels } from "./homePageHistory";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -66,7 +67,6 @@ import {
   buildAreaGroups,
   buildHomeAreaRows,
   buildSignalChangeRows,
-  describeConditionsTrail,
   describeEarlierConditions,
   buildAreaStrip,
   describeLineStateBand,
@@ -75,7 +75,6 @@ import {
 } from "../lib/report/home/homeSectionModel";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
-import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs, publishedBriefWeekLabel, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
@@ -148,19 +147,6 @@ const HOME_CADENCE_HORIZONS: readonly CadenceCallHorizon[] = ["monthly", "quarte
 
 const resolveHomeCadence = (value: string | undefined): CadenceCallHorizon | "weekly" =>
   HOME_CADENCE_HORIZONS.find((horizon) => horizon === value) ?? "weekly";
-
-/** Month-ends on the conditions map's path: half a year, enough to show a direction without crowding the plane. */
-const CONDITIONS_TRAIL_MONTHS = 6;
-
-/** Raw inputs behind the scores, and the names a reader knows them by. */
-const INPUT_HISTORY_LABELS: Record<string, string> = {
-  CPI_YOY: "Inflation (CPI)",
-  UNEMPLOYMENT_RATE: "Unemployment",
-  HY_CREDIT_SPREAD: "High-yield spread",
-  BBB_CREDIT_SPREAD: "BBB spread",
-  VIX_INDEX: "Volatility (VIX)",
-  CHICAGO_FCI: "Financial conditions",
-};
 
 async function PageContent({
   searchParams,
@@ -270,22 +256,6 @@ async function PageContent({
   const tightnessDelta = previousScores ? reportData.assessment.scores.tightness - previousScores.tightness : 0;
   const riskAppetiteDelta = previousScores ? reportData.assessment.scores.riskAppetite - previousScores.riskAppetite : 0;
 
-  // Built here rather than fetched: the previous card awaited the whole agent-interface
-  // payload behind Suspense and swallowed its failure, which is why every cadence tab
-  // rendered the same page. Everything it needs is already loaded and in hand.
-  const cadenceCall =
-    activeCadence === "weekly"
-      ? null
-      : buildCadenceCallModel({
-          horizon: activeCadence,
-          assessment: reportData.assessment,
-          recordDate: reportData.treasury.record_date,
-          recordDateLabel: homepage.reportShell.recordDateLabel,
-          regimeHistory: alignedRegimeHistory,
-          planHref: operateHref,
-          previousScores,
-        });
-
   const tightness = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightness;
   const tightnessPressure = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightnessPressure;
   const tightnessSaturated = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightnessSaturated;
@@ -358,33 +328,17 @@ async function PageContent({
       }
     : undefined;
 
-  /* The selected horizon, named once. The weekly call is the page's lead at
-   * every horizon, so this names the horizon where it is the artifact's
-   * identity: the copied brief's title, and an archived view's caption when
-   * one is selected. */
-  const cadenceTitle = cadenceCall
-    ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
-    : null;
-
-  /* Published for the globally-mounted share panel and the presentation
-   * frames, which sit outside this route's props — and for `/share`, which
-   * builds the same object from the same builder. */
-  const briefArtifact = buildBriefArtifact({
+  /* The selected horizon, the artifact every share format renders, and the one Slack
+     paste. The builders live in `homePageArtifact.ts` so this route does not decide the
+     artifact's shape a second time. */
+  const { cadenceCall, cadenceTitle, briefArtifact, briefSlackBlock } = buildHomePageArtifact({
     homepage,
-    recordDate: reportData.treasury.record_date,
-    title: cadenceTitle ?? "Whether Weekly Brief",
+    reportData,
+    activeCadence,
+    alignedRegimeHistory,
+    operateHref,
+    previousScores,
   });
-
-  /* The one Slack paste, from the one formatter (2026-11-02). Copy Brief under
-     the card built its own shape — an undated title over `window.location.href`
-     — while the share panel copied `formatBriefArtifact`: dated, with the
-     signal and provenance lines, and pointing at the frozen record. Two pastes
-     of one artifact, and the one on the card was the only one that could not be
-     cited. It now copies the panel's string, so the artifact that travels and
-     the artifact on the page are the same document. `siteUrl`, not the request
-     host: a paste is read later, from somewhere else, and a preview host does
-     not outlive it. */
-  const briefSlackBlock = formatBriefArtifact(briefArtifact, "slack", siteUrl);
 
   /* The five sections' data, built once here and drawn by the components under
      app/components/home. The lines every score is judged against are the same
@@ -507,46 +461,7 @@ async function PageContent({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
   }));
-  /* The conditions map's path: the month-end readings before this reading's
-     month, oldest first. The month in progress is left out, because the cron
-     writes it from the same week the current point already draws. */
-  const currentMonthKey = reportData.treasury.record_date.slice(0, 7);
-  const conditionsTrailEntries = alignedRegimeHistory
-    .filter((entry) => entry.record_date.slice(0, 7) < currentMonthKey)
-    .flatMap((entry) =>
-      typeof entry.tightness === "number" && typeof entry.riskAppetite === "number"
-        ? [{ recordDate: entry.record_date, tightness: entry.tightness, riskAppetite: entry.riskAppetite }]
-        : [],
-    )
-    .slice(-CONDITIONS_TRAIL_MONTHS);
-  /* The path is month-ends whichever reading the week compares with, so its
-     like-for-like note reads the month-end split and is dated by the month-end. */
-  const conditionsTrail = {
-    points: conditionsTrailEntries.map((entry) => ({
-      tightness: entry.tightness,
-      riskAppetite: entry.riskAppetite,
-      label: formatDateUTC(entry.recordDate),
-    })),
-    caption: describeConditionsTrail(conditionsTrailEntries.map((entry) => entry.recordDate)),
-    caveat: describeScoreMovementCaveat(
-      reportData.monthEndComparison?.movement,
-      comparisonBasis(reportData.monthEndComparison?.comparedWith),
-    ),
-  };
-  /* Trailing history of the raw inputs behind the scores, from the macro series
-     the report already loaded (no extra read). Null values are dropped; series
-     with fewer than three readings render nothing. */
-  const inputHistory = reportData.macroSeries
-    .filter((series) => series.id in INPUT_HISTORY_LABELS)
-    .map((series) => ({
-      key: series.id,
-      label: INPUT_HISTORY_LABELS[series.id],
-      points: (series.history ?? [])
-        .filter((point): point is { date: string; value: number } =>
-          typeof point.value === "number" && Number.isFinite(point.value))
-        .map((point) => ({ label: formatDateUTC(point.date), value: point.value })),
-    }))
-    .filter((series) => series.points.length >= 3);
+  const { conditionsTrail, inputHistory } = buildHomeHistoryModels({ reportData, alignedRegimeHistory });
   /* On a reading whose conditions differ from the earlier one, the card's stamp
      line says what they were, dated by the comparison's own basis. */
   const earlierConditions =

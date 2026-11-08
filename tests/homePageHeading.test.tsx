@@ -87,8 +87,9 @@ describe("homepage heading contract", () => {
      this once asserted `: "Weekly Brief"` and so failed when the ternary became a
      `??` against a shared cadence label, with the rendered heading unchanged. */
   it("still names the horizon on the copied artifact", () => {
-    assert.match(page, /title: cadenceTitle \?\? "Whether Weekly Brief"/);
-    assert.match(page, /cadenceCall\.cadenceLabel, cadenceCall\.periodLabel/);
+    const artifact = readFileSync(new URL("../app/homePageArtifact.ts", import.meta.url), "utf8");
+    assert.match(artifact, /title: cadenceTitle \?\? "Whether Weekly Brief"/);
+    assert.match(artifact, /cadenceCall\.cadenceLabel, cadenceCall\.periodLabel/);
   });
 
   it("keeps the hero's h1 at every horizon; the cadence card takes an h2 below it", () => {
