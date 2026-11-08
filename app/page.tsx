@@ -8,13 +8,12 @@ import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
-import { StickyCallStrip } from "./components/StickyCallStrip";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
 import { ConditionsLegend } from "./components/home/ConditionsLegend";
-import { WeekStepper } from "./components/home/WeekStepper";
+import { PeriodControl } from "./components/home/PeriodControl";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { QuietWeekFold } from "./components/home/QuietWeekFold";
@@ -83,7 +82,7 @@ import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs,
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries, getTimeMachineYieldCurveSeries } from "../lib/timeMachine/timeMachineCache";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
-import { JsonLdScript } from "./components/jsonLdScript";
+import { HomePageTail } from "./components/home/HomePageTail";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
 import { frameFactsAttributes } from "../lib/navigation/runningHead";
@@ -680,17 +679,14 @@ async function PageContent({
     && lineStateBand?.state !== "near";
 
   const periodControl = (
-    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
-            <WeekStepper
-              previousHref={prevWeekHref}
-              nextHref={nextWeekHref}
-              previousLabel="Previous month"
-              nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
-              currentDateLabel={periodLabel}
-              isHistorical={Boolean(historicalSelection)}
-              history={regimeHistory}
-            />
-    </div>
+    <PeriodControl
+      previousHref={prevWeekHref}
+      nextHref={nextWeekHref}
+      nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
+      currentDateLabel={periodLabel}
+      isHistorical={Boolean(historicalSelection)}
+      history={regimeHistory}
+    />
   );
 
   return (
@@ -1064,9 +1060,8 @@ async function PageContent({
         * the headline and posture labels, and this was the only JSON-LD call site
         * in the repo that skipped the escaper written for exactly that.
         */}
-      <JsonLdScript data={homepage.reportShell.structuredData} />
-
-      <StickyCallStrip
+      <HomePageTail
+        structuredData={homepage.reportShell.structuredData}
         call={primaryCall}
         direction={signalDirection}
         weatherWord={publicRegimeLabel}

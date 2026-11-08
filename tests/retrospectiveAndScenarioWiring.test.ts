@@ -41,9 +41,12 @@ describe("weekly retrospective recording", () => {
 describe("period picker coverage", () => {
   it("receives the unfiltered regime history, not the aligned chart series", () => {
     const page = stripComments(read("app/page.tsx"));
-    // The picker is mounted through the week stepper, which passes these props straight on.
-    const pickerCall = page.slice(page.indexOf("<WeekStepper"));
-    assert.match(pickerCall, /history=\{regimeHistory\}/);
-    assert.doesNotMatch(pickerCall, /history=\{alignedRegimeHistory\}/);
+    const control = stripComments(read("app/components/home/PeriodControl.tsx"));
+    // The page hands the stepper the unfiltered series; the stepper's own component passes
+    // its props straight to the picker. The extraction moved the mount, not the rule.
+    assert.match(page, /<PeriodControl[\s\S]*history=\{regimeHistory\}/);
+    assert.doesNotMatch(page, /history=\{alignedRegimeHistory\}/);
+    assert.match(control, /<WeekStepper[\s\S]*history=\{history\}/);
+    assert.doesNotMatch(control, /alignedRegimeHistory/);
   });
 });
