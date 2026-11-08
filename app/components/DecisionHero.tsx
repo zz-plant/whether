@@ -80,7 +80,7 @@ type Props = {
     numbers: string;
     whyHref: string;
     /**
-     * The two plain facts the weather word stands for, each score set against the
+     * The two current scores, each set against the
      * record (`describeConditionFacts`, 2026-11-03). When present it is the whole
      * meaning line, in place of the regime's rationale and the bare numbers.
      */
@@ -140,8 +140,8 @@ const SCORE_TERMS = [
 ] as const;
 
 const withDefinedScores = (facts: string): ReactNode[] =>
-  facts.split(/(funding pressure|risk appetite)/).map((part, index) => {
-    const match = SCORE_TERMS.find((candidate) => candidate.name === part);
+  facts.split(/(funding pressure|risk appetite)/i).map((part, index) => {
+    const match = SCORE_TERMS.find((candidate) => candidate.name === part.toLowerCase());
     return match ? (
       <DefinedTerm key={index} term={match.term}>
         {part}

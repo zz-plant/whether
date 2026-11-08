@@ -184,7 +184,7 @@ describe("/history prints each record fact once", () => {
     assert.doesNotMatch(visible, /Record starts|Fixed historical snapshot/);
 
     const margin = visible.slice(visible.indexOf("How often a close call held"));
-    assert.match(margin, /^How often a close call held Across \d+ month-to-month comparisons, conditions were the same the following month \d+ times, or \d+%\./);
+    assert.match(margin, /^How often a close call held \d+ of \d+ shifts had advance warning before the line was crossed\./);
     assert.doesNotMatch(html, /Points from the line/, "the band table is /calibration's");
     assert.match(html, /href="\/calibration"/);
   });

@@ -1,18 +1,11 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
-import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
+import { loadCompareData, type CompareSearchParams } from "../../../lib/report/compareDataLoader";
 import { ComparePanel } from "./ComparePanel";
 
 export const runtime = "edge";
-
-type CompareSearchParams = {
-  yearA?: string;
-  monthA?: string;
-  yearB?: string;
-  monthB?: string;
-};
 
 export async function generateMetadata({
   searchParams: _searchParams,
@@ -33,22 +26,23 @@ export default async function HistoryComparePage({
   searchParams?: Promise<Partial<CompareSearchParams>>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const snapshotResultA = await loadWeeklyBriefSnapshot(
-    resolvedSearchParams?.yearA && resolvedSearchParams?.monthA
-      ? { year: resolvedSearchParams.yearA, month: resolvedSearchParams.monthA }
-      : undefined,
-    { route: "/history/compare" },
-  );
-  const isFallback = isSavedCopy(snapshotResultA.snapshot.reportData.treasury);
-  const compareContent = await ComparePanel({ searchParams: resolvedSearchParams });
+  const compareResult = await loadCompareData(resolvedSearchParams);
+
+  const snapshotA = compareResult.ok ? compareResult.snapshotResultA.snapshot : undefined;
+  const isFallback = snapshotA ? isSavedCopy(snapshotA.reportData.treasury) : false;
+
+  const compareContent = await ComparePanel({
+    searchParams: resolvedSearchParams,
+    initialResult: compareResult,
+  });
 
   return (
     <ReportShell
       model={{
         status: {
           statusLabel: "",
-          recordDateLabel: snapshotResultA.snapshot.reportData.recordDateLabel,
-          fetchedAtLabel: snapshotResultA.snapshot.reportData.fetchedAtLabel,
+          recordDateLabel: snapshotA?.reportData.recordDateLabel ?? "",
+          fetchedAtLabel: snapshotA?.reportData.fetchedAtLabel ?? "",
         },
         page: {
           pageTitle: "Compare two periods",
@@ -61,8 +55,8 @@ export default async function HistoryComparePage({
           currentPath: "/history/compare",
         },
         trust: {
-          trustStatusTone: snapshotResultA.snapshot.trustStatus.trustStatusTone,
-          showOfflineBadge: isFallback && !snapshotResultA.snapshot.reportData.historicalSelection,
+          trustStatusTone: snapshotA?.trustStatus.trustStatusTone ?? "historical",
+          showOfflineBadge: isFallback && !snapshotA?.reportData.historicalSelection,
         },
       }}
     >

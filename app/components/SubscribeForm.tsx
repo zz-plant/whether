@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Check, Calendar } from "lucide-react";
+import { Check } from "lucide-react";
 import { requestSubscription, requestSlackSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { HOME_MONDAY_EMAIL_HASH } from "../../lib/report/home/homeSectionModel";
 import { locationHashSource, useBrowserSource } from "./browserSource";
-import { buildMondayCalendarUrl } from "./calendarButton";
+import { CalendarReviewActions } from "./CalendarReviewActions";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 import { useOperatorStage } from "./useOperatorStage";
 import { useOperatorRunway } from "./useOperatorRunway";
@@ -289,15 +289,7 @@ export function SubscribeForm({
                 : "Prefer calendar holds over email?"}
         </span>
         {alertsOnly ? null : (
-          <a
-            href={buildMondayCalendarUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="weather-hit inline-flex items-center gap-1.5 font-medium text-sky-400 hover:text-sky-300 transition-colors"
-          >
-            <Calendar className="size-3" aria-hidden="true" />
-            <span>Add a Monday calendar hold (9:00 AM)</span>
-          </a>
+          <CalendarReviewActions variant="compact" />
         )}
       </div>
     </div>

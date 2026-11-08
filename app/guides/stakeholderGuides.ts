@@ -362,13 +362,8 @@ export const findStakeholderGuide = (slug: string) =>
   stakeholderGuides.find((guide) => guide.slug === slug);
 
 /**
- * The questions this week's crossed lines invite, for the homepage.
- *
- * One per area, in the order the areas print, then one per group and one per
- * speaker: two bubbles headed "Finance" in the same card read as one voice
- * asking twice. A question about the whole set of lines (a plan, a pack, a
- * quarter) carries no `area` and is never selected here — the homepage shows
- * what this week's crossed lines bring and says nothing on a week none are.
+ * Sample conversations about the requested operating areas, in decision order.
+ * The picker chooses at most one exchange per area, group and speaker.
  */
 export const selectHearingForAreas = (
   crossedAreas: readonly DecisionArea[],

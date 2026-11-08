@@ -8,12 +8,13 @@ import {
 } from "../../lib/export/investorUpdateSnippet";
 import { BriefPreview } from "../components/briefFormatPicker";
 import { ChatPreview } from "./chatPreview";
-import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
+import { locationHashSource, useBrowserSource } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { ActionLink } from "../components/ui/actionLink";
 import { OrdinalMarker } from "../components/ui/ordinalMarker";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import { useOperatorRunway } from "../components/useOperatorRunway";
+import { CalendarReviewActions } from "../components/CalendarReviewActions";
 
 /**
  * Every format on `/share`, behind one picker: pick a format, read exactly what
@@ -102,38 +103,6 @@ const LEGACY_HASHES: Readonly<Record<string, string>> = {
 const resolveShareFormat = (options: readonly ShareFormatOption[], hash: string): ShareFormatOption | undefined =>
   options.find((option) => option.id === (LEGACY_HASHES[hash] ?? hash)) ?? options[0];
 
-const nextMondayIsoDate = () => {
-  const date = new Date();
-  const daysUntilMonday = (1 + 7 - date.getDay()) % 7 || 7;
-  date.setDate(date.getDate() + daysUntilMonday);
-  return date.toISOString().split("T")[0];
-};
-
-/* Built in the browser only. The date is the reader's next Monday, which the
-   server cannot know; computing it during server render is what made this link
-   the page's one hydration mismatch. */
-const CalendarLink = ({ title, details }: { title: string; details: string }) => {
-  const hydrated = useHydrated();
-  if (!hydrated) return null;
-  const date = nextMondayIsoDate().replaceAll("-", "");
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: title,
-    dates: `${date}T140000Z/${date}T143000Z`,
-    details,
-  });
-  return (
-    <a
-      href={`https://calendar.google.com/calendar/render?${params.toString()}`}
-      target="_blank"
-      rel="noreferrer"
-      className="weather-hit text-fluid-sm text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
-    >
-      Add a Monday review to your calendar
-    </a>
-  );
-};
-
 /* The subscribed feed (`/calendar.ics`): every Monday carries its own week's
    guidance. webcal:// opens Apple Calendar and Outlook; Google takes the same
    address through its add-by-URL page. Offered beside the meeting formats and,
@@ -142,7 +111,7 @@ const CalendarLink = ({ title, details }: { title: string; details: string }) =>
    picked a meeting pack and by no one else. */
 export const CalendarSubscribeLinks = ({
   feedUrl,
-  lead = "Subscribe to each week's guidance",
+  lead = "Subscribe to the weekly brief",
 }: {
   feedUrl: string;
   /** The words before the two links. */
@@ -304,16 +273,19 @@ export function SharePageFormats({
                 </ActionLink>
               ) : null}
               {selected.offersCalendar ? (
-                <>
-                  <CalendarLink title={calendar.title} details={calendar.details} />
-                  <CalendarSubscribeLinks feedUrl={calendar.feedUrl} />
-                </>
+                <div className="w-full">
+                  <CalendarReviewActions
+                    title={calendar.title}
+                    details={calendar.details}
+                    feedUrl={calendar.feedUrl}
+                  />
+                </div>
               ) : null}
             </div>
           ) : null}
           {scoreReferences.length > 0 ? (
             <details className="weather-auto-chevron">
-              <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-medium text-slate-300">
+              <summary className="w-fit text-fluid-sm font-medium text-slate-300">
                 This week&apos;s readings
               </summary>
               <ul className="max-w-3xl space-y-1.5 border-l-2 border-[color:var(--border-subtle)] pl-3 text-fluid-sm leading-5 tabular-nums text-slate-300">

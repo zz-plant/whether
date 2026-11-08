@@ -16,6 +16,7 @@ import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { LeadershipQuestionsSection } from "../leadershipQuestionsSection";
 import { ConditionQuestionsSection, WorkSituationsSection } from "../workQuestionsSections";
+import { getRoleResources } from "../../../lib/report/roleResources";
 
 type Params = { role: string };
 
@@ -46,6 +47,7 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
   const { conditions, regime, rules } = await loadWeekConditions();
   const path = `/roles/${role.slug}` as const;
   const roleQuestion = conditionQuestionForRole(role.slug, regime);
+  const { leadershipGuidance, toolkits } = getRoleResources(role.slug);
   return (
     <ContentPageShell data-content-measurement-root={path}>
       <ContentMeasurementTracker pagePath={path} cluster="authority" intent="vp-product" />
@@ -73,6 +75,42 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
       <ConditionQuestionsSection regime={regime} questions={roleQuestion ? [roleQuestion] : []} pagePath={path} />
       <WorkSituationsSection situations={workSituationsForRole(role.slug)} pagePath={path} />
       <LeadershipQuestionsSection role={role} pagePath={path} />
+      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-100">Leadership guidance and worksheets</h2>
+          <p className="text-sm text-slate-300">
+            Guidance for leadership discussions and one-decision worksheets that apply to {role.label}.
+          </p>
+        </div>
+        <div className="weather-switch gap-6 [--col-min:18rem]">
+          {leadershipGuidance ? (
+            <div className="space-y-2">
+              <h3 className="type-eyebrow text-slate-300">Leadership guidance</h3>
+              <p className="text-xs text-slate-400">
+                {leadershipGuidance.tagline}
+              </p>
+              <ActionLink href={`/resources?stakeholder=${leadershipGuidance.stakeholderSlug}`} variant="pill">
+                {leadershipGuidance.stakeholderTitle} &rarr;
+              </ActionLink>
+            </div>
+          ) : null}
+          {toolkits.length > 0 ? (
+            <div className="space-y-2">
+              <h3 className="type-eyebrow text-slate-300">Applicable worksheets</h3>
+              <p className="text-xs text-slate-400">
+                Worksheets for decisions {role.label} face under current conditions:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {toolkits.map((toolkit) => (
+                  <ActionLink key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} variant="pill">
+                    {toolkit.title.replace(/ Toolkit$/, "")}
+                  </ActionLink>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
