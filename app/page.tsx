@@ -487,10 +487,7 @@ async function PageContent({
         }),
   });
 
-  /* The score nearer its change line, on its ladder, for the phone card: the same
-     score the trust strip's margin names, so the drawing and the sentence agree. */
   const nearestMargin = trustStripProps.margin ?? null;
-  const nearestLadder = nearestMargin ? scoreLadders.find((ladder) => ladder.metric === nearestMargin.signal) ?? null : null;
   /* The running head's tension, in the margin's own number: "2 pts from Freezing". */
   const nearestChange = historicalSelection ? null : formatNearestChange(nearestMargin, regime);
 
@@ -742,6 +739,7 @@ async function PageContent({
               <DecisionHero
                 periodControl={historicalSelection ? undefined : periodControl}
                 location={readingLocation}
+                briefNumber={citableBrief ? { label: citableBrief.slug.toUpperCase(), href: buildPublishedBriefPath(citableBrief.slug) } : undefined}
                 reading={heroReading}
                 weeklyCall={cardCall.action}
                 callDetail={historicalSelection || unmovedLine || pauseCauseOnBand ? undefined : whyLine}
@@ -755,24 +753,9 @@ async function PageContent({
                    conditions map this column held is in "What would change our
                    mind", where the change lines are the subject. */
                 aside={
-                  <div className="space-y-7" data-hero-scores>
+                  <div className="space-y-8" data-hero-scores>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder
-                        key={ladder.metric}
-                        figure
-                        label={ladder.label}
-                        value={ladder.value}
-                        previous={comparisonUnavailable ? null : ladder.previous}
-                        previousLabel={basis.label}
-                        lines={ladder.lines}
-                        monthRange={moveRanges?.[ladder.metric]}
-                        travel={Boolean(weekMove)}
-                        feelsLike={
-                          countedReading && countedReading[ladder.metric] !== ladder.value
-                            ? { value: countedReading[ladder.metric], regime: countedReading.regime }
-                            : null
-                        }
-                      />
+                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} />
                     ))}
                   </div>
                 }
@@ -781,28 +764,28 @@ async function PageContent({
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
-                areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} earlier={weekMove?.areas} /> : undefined}
+                areaStrip={
+                  areaStripModel ? (
+                    <AreaStrip
+                      model={areaStripModel}
+                      earlier={weekMove?.areas}
+                      /* Each area's action beside its standing, from `lg` up, where the row has
+                         the width; "Your decisions this week" gives the sentence up there. */
+                      rules={Object.fromEntries(homeAreaRows.map((row) => [row.area, row.rule]))}
+                    />
+                  ) : undefined
+                }
                 move={weekMove}
                 feelsLike={countedReading ? { regime: countedReading.regime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
+                /* Both scores on a phone too, side by side under the areas: the number and
+                   where it stands. The ruled line is the margin's, from `md` up. */
                 phoneFigure={
-                  nearestLadder && !historicalSelection ? (
-                    <ScoreLadder
-                      figure
-                      label={nearestLadder.label}
-                      value={nearestLadder.value}
-                      previous={comparisonUnavailable ? null : nearestLadder.previous}
-                      previousLabel={basis.label}
-                      lines={nearestLadder.lines}
-                      monthRange={moveRanges?.[nearestLadder.metric]}
-                      travel={Boolean(weekMove)}
-                      feelsLike={
-                        countedReading && countedReading[nearestLadder.metric] !== nearestLadder.value
-                          ? { value: countedReading[nearestLadder.metric], regime: countedReading.regime }
-                          : null
-                      }
-                    />
-                  ) : undefined
+                  <div className="grid grid-cols-2 gap-x-4" data-hero-scores-compact>
+                    {scoreLadders.map((ladder) => (
+                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                    ))}
+                  </div>
                 }
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
@@ -867,6 +850,7 @@ async function PageContent({
               activeRunway={activeRunway}
               savedReadingDate={savedReadingDate}
               isHistorical={Boolean(historicalSelection)}
+              rulesAbove={Boolean(areaStripModel)}
               groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
                 comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
                 /* An archived month's record would have to end at that month. */

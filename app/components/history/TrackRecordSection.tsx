@@ -100,7 +100,9 @@ export function TrackRecordSection({
                   <td className="py-2.5 pr-4 text-slate-200">
                     {label(transition.from)} → {label(transition.to)}
                   </td>
-                  <td className={`py-2.5 ${transition.signaled ? "text-emerald-300/90" : "text-amber-300/90"}`}>
+                  {/* A change with no advance signal is a miss, set in the caveat's ink with its
+                      mark (2026-11-10). It was the crossed red, which means a pause line. */}
+                  <td className={`py-2.5 ${transition.signaled ? "text-slate-200" : "weather-caveat-mark text-caveat-fg"}`}>
                     {transition.signaled
                       ? `within ${record.nearBandPts} pts of its line ${transition.leadMonths} mo before`
                       : shockByDate.get(transition.atDate)

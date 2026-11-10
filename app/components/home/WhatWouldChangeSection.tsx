@@ -94,7 +94,7 @@ export function WhatWouldChangeSection({
   flipConditions?: readonly string[];
   callChangeLines: { tightness: number; riskAppetite: number };
   regime?: string;
-  /** The month-end path, its domain and its like-for-like note; when passed, the card above draws the quadrant from `md` up. */
+  /** The month-end path, its domain and its like-for-like note, for the map this section draws at every width. */
   conditionsTrail?: {
     points: ReadonlyArray<{ tightness: number; riskAppetite: number }>;
     caption: string | null;

@@ -123,11 +123,15 @@ export function CommandCenterNavBlock({
             {/* No kicker. "Weekly brief" above every H1 restated the route the
                 header tab, the sidebar and the bottom bar already name, and it
                 made distinct pages read as variations of one landing page. */}
-            {/* The condition leads, the page title follows. A phone shows the
-                route name in the bottom bar already, and the week's word —
-                Freezing, Sunny — is the fact the reader came for. The word
-                prints in the regime ink at the reading's own size; the trust
-                headline and the record date stay micro under it. */}
+            <h1
+              style={{ viewTransitionName: "page-title" }}
+              className="max-w-3xl font-bold text-slate-100 text-fluid-2xl"
+            >
+              {pageTitle}
+            </h1>
+            {/* The page's title leads and the condition and date follow as a line of
+                facts (2026-11-10). The condition sat above the title, a label over a
+                heading, on every report route. The word prints in the condition's ink. */}
             {statusLabel ? (
               <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
                 {statusPrefix ? (
@@ -135,7 +139,7 @@ export function CommandCenterNavBlock({
                 ) : null}
                 {/* The week's word in the stamp's shape, the same placard the
                     hero's tag and the sticky strip print. */}
-                <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-sm font-semibold">{statusLabel}</span>
+                <span className="type-stamp weather-tag-placard text-fluid-base">{statusLabel}</span>
                 {introMetaRest ? (
                   <span className="text-fluid-sm font-medium text-slate-400">{introMetaRest}</span>
                 ) : null}
@@ -143,12 +147,6 @@ export function CommandCenterNavBlock({
             ) : introMetaRest ? (
               <p className="text-fluid-sm font-medium leading-4 text-slate-400">{introMetaRest}</p>
             ) : null}
-            <h1
-              style={{ viewTransitionName: "page-title" }}
-              className="max-w-3xl font-semibold text-slate-100 text-fluid-2xl"
-            >
-              {pageTitle}
-            </h1>
             {/* On a phone a route with a strip drops the summary: the bottom bar
                 already names the page, and the strip is the line a reader
                 needs before the first task block. */}

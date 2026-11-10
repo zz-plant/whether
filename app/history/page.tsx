@@ -219,20 +219,19 @@ export default async function HistoryPage({
               screens from the strip that draws the same months. */}
           <div className="space-y-2">
             <h3 className="type-eyebrow">By year</h3>
-            {/* Two even columns on a phone: fourteen chips of three widths
-                wrapped into a ragged stack. From `sm` they flow. */}
-            <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            {/* A line of links, not fourteen boxed chips (2026-11-10). */}
+            <ul className="flex flex-wrap gap-x-5 gap-y-1 text-fluid-sm">
               {postureArchiveYears.map((year) => {
                 const yearRegime = regimeKeyFromLabel(year.operatorLabel);
                 return (
                   <li key={year.slug}>
-                    <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill" className="max-sm:w-full">
+                    <Link href={buildPostureArchivePath(year.slug)} className="weather-hit inline-flex items-center gap-1.5 py-1.5 tabular-nums text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
                       {year.title}
-                      <span className="ml-2 inline-flex items-center gap-1 text-slate-400">
+                      <span className="inline-flex items-center gap-1 text-slate-400">
                         {yearRegime ? <ConditionIcon regime={yearRegime} /> : null}
                         {toWeatherLabel(year.operatorLabel)}
                       </span>
-                    </ActionLink>
+                    </Link>
                   </li>
                 );
               })}
@@ -292,24 +291,27 @@ export default async function HistoryPage({
               2026", then "Oct 6, 2026", then a FREEZING stamp, and four weeks of the
               same two sentences took four cards. The run links its newest week and
               lists every week under it, since each still has its own page. */}
-          <ul className="weather-grid gap-3">
+          {/* Ruled rows, not cards (2026-11-10): the week, the conditions as published,
+              and the guidance, with each week of a run linked under it. */}
+          <ul className="@container border-t border-[color:var(--border-default)]">
             {groupPublishedBriefRuns(publishedBriefs).map((run) => {
               const [newest] = run;
+              if (!newest) return null;
               return (
-                <li key={newest.slug} data-frame-block="" className="flex flex-col gap-1.5">
-                  {/* `minHeight: 0` beats the card's `min-height: 100%` (an unlayered class a
-                      utility cannot override): at the item's full height it pushed a run's week
-                      links out of the item and onto the next card. */}
-                  <Link href={buildPublishedBriefPath(newest.slug)} className="weather-hub-link-card flex-1 text-slate-100" style={{ minHeight: 0 }}>
-                    <p className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold tabular-nums text-slate-100">{publishedBriefRunLabel(run)}</span>
-                      {/* The conditions stamp every page draws: glyph, word and hue. */}
-                      <Tag regime={newest.regime}>{getRegimePublicLabel(newest.regime)}</Tag>
-                    </p>
-                    <p className="text-fluid-sm text-slate-400 line-clamp-2">{newest.summary}</p>
-                  </Link>
+                <li key={newest.slug} data-frame-block="" className="max-w-none border-b border-[color:var(--border-default)] py-3">
+                  {/* The week is the link; the conditions and the guidance are what it said. */}
+                  <div className="grid gap-x-5 gap-y-1 @[40rem]:grid-cols-[12.5rem_6.5rem_minmax(0,1fr)] @[40rem]:items-baseline">
+                    <Link
+                      href={buildPublishedBriefPath(newest.slug)}
+                      className="weather-hit text-sm font-semibold tabular-nums text-slate-100 underline decoration-slate-600 underline-offset-4"
+                    >
+                      {publishedBriefRunLabel(run)}
+                    </Link>
+                    <Tag regime={newest.regime}>{getRegimePublicLabel(newest.regime)}</Tag>
+                    <p className="max-w-[64ch] text-fluid-sm leading-snug text-slate-300">{newest.summary}</p>
+                  </div>
                   {run.length > 1 ? (
-                    <p className="flex flex-wrap gap-x-3 px-1 text-fluid-sm text-slate-400" data-brief-run-weeks>
+                    <p className="mt-1.5 flex flex-wrap gap-x-3 text-fluid-sm text-slate-400" data-brief-run-weeks>
                       <span>Each week:</span>
                       {run.map((brief) => (
                         <Link key={brief.slug} href={buildPublishedBriefPath(brief.slug)} className="weather-hit tabular-nums underline decoration-slate-600 underline-offset-4 hover:text-slate-200">

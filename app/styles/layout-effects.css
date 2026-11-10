@@ -63,7 +63,7 @@
      already print in. */
   [class*="text-rose-200"], [class*="text-rose-300"],
   [class*="text-amber-200"], [class*="text-amber-300"] {
-    color: #b4232a !important;
+    color: #b81f27 !important;
   }
 
   [data-page-section] {

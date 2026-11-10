@@ -95,6 +95,43 @@ body:has([data-record-plate]) .record-band-plate {
   .record-band-label { display: block; }
 }
 
+/* A field's own name, on History only, where the band is tall enough to carry it. */
+.record-band-field-label {
+  position: absolute;
+  bottom: 0.625rem;
+  padding-left: 0.625rem;
+  font-size: var(--fs-nano);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  display: none;
+}
+.record-band-field-label.is-light { color: var(--band-line-on-light); }
+.record-band-field-label.is-dense { color: var(--band-line-on-dense); }
+@container (min-width: 46rem) {
+  body:has([data-record-plate]) .record-band-field-label { display: block; }
+}
+
+/* A week's cell on History (publishedWeeks.tsx): the condition's fill and, as on the
+   band, a line pattern of its own, so the row reads in one ink and in a greyscale
+   print. Plain for Sunny, ruled for Stormy, hatched for Cloudy, cross-hatched for
+   Freezing. */
+.record-week-cell {
+  background-color: var(--regime-accent);
+}
+.record-week-cell[data-regime="VOLATILE"] {
+  background-image: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-light) 55%, transparent) 4px 5px);
+}
+.record-week-cell[data-regime="DEFENSIVE"] {
+  background-image: repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 4px 5px);
+}
+.record-week-cell[data-regime="SCARCITY"] {
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 5px 6px),
+    repeating-linear-gradient(-45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 5px 6px);
+}
+
 .record-band-cursor {
   position: absolute;
   top: 0;
@@ -161,6 +198,11 @@ body:has([data-record-plate]) .record-band-plate {
   color: var(--app-text-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.record-band-caption-long { display: none; }
+@container (min-width: 46rem) {
+  .record-band-caption-long { display: inline; }
 }
 
 .record-band-link {

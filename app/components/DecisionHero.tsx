@@ -27,6 +27,12 @@ type Props = {
    * choice is visible without scrolling.
    */
   location?: { label: string; href: string; hint: string };
+  /**
+   * This week's published brief, by its number ("2026-W45"), beside the week control
+   * (docs/design/rebuild-covenant.md): the brief is a dated, numbered statement, and
+   * the number is what a reader cites. Absent where no brief is published for the week.
+   */
+  briefNumber?: { label: string; href: string };
   /** The longer sentence behind the call; printed only when it says more than the call does. */
   callDetail?: string;
   regime: string;
@@ -108,12 +114,10 @@ type Props = {
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
   /**
-   * The nearer score on its ladder, drawn on a phone only, above the trust strip
-   * (2026-10-27). From `md` the conditions map beside the call draws where the
-   * reading sits; below it the map is hidden, and a phone screenshot of the card
-   * was text alone, with the week's one tension, how near the line it is, stated
-   * in 13px type in the strip. The site's rule is to draw a threshold claim where
-   * it is made (ui-ux-standards §XV); this is that drawing.
+   * The two scores as compact figures, on a phone only, under the areas (2026-11-10):
+   * the number and where it stands against its pause line. From `md` the margin
+   * draws both on their ruled lines (`aside`). It was the nearer score's ladder
+   * alone (2026-10-27), so the score holding four areas could be the one left out.
    */
   phoneFigure?: ReactNode;
   /**
@@ -169,6 +173,7 @@ export function DecisionHero({
   weeklyCall,
   periodControl,
   location,
+  briefNumber,
   callDetail,
   regime,
   direction,
@@ -195,6 +200,18 @@ export function DecisionHero({
   const turnStyle: (CSSProperties & { "--week-move-cross": number }) | undefined = move?.conditions
     ? { "--week-move-cross": move.conditions.at }
     : undefined;
+
+  /* Freshness and confidence, once, where every reading route puts them. */
+  const trustStrip = trust ? (
+    <TrustStrip
+      {...trust}
+      regime={regime}
+      href="/trust"
+      phoneLayout="line"
+      compactLabels={Boolean(periodControl)}
+      className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4"
+    />
+  ) : null;
 
   return (
     /*
@@ -224,7 +241,20 @@ export function DecisionHero({
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           {/* The week on a row of its own: a control, above the statement it selects. */}
-          {periodControl ? <div className="weather-hero-period basis-full">{periodControl}</div> : null}
+          {periodControl || briefNumber ? (
+            <div className="weather-hero-period flex basis-full flex-wrap items-center gap-x-3 gap-y-1">
+              {periodControl}
+              {briefNumber ? (
+                <Link
+                  href={briefNumber.href}
+                  data-brief-number
+                  className="weather-hit text-fluid-sm tabular-nums text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                >
+                  <span className="sr-only">Published brief </span>No. {briefNumber.label}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
           <span className="relative inline-flex">
             {/* The earlier conditions' stamp, over this week's until the reading
                 crosses the change line (week-move.css). Its word is printed from
@@ -249,29 +279,13 @@ export function DecisionHero({
             </span>
           </span>
 
-          {/* The reader's place, beside the weather: a chip rather than a line,
-              because it is a control (it opens the stage and runway selectors)
-              and the stamp row is the card's chrome. No glyph — §XXIV gives
-              each mark a meaning, and "your company" has none yet. So the
-              affordance is the word (2026-11-02): beside a filled placard that
-              is not a control, a bordered chip with no other mark read as a
-              second badge, and its only hint was a `title` that a touch screen
-              never shows. It now carries the same "change" the disclosure below
-              it is labelled with, so the control that rescales every rule on
-              the page can be found without hovering. */}
-          {location ? (
-            <Link
-              href={location.href}
-              title={location.hint}
-              data-reading-location
-              className="weather-hit inline-flex items-center gap-1.5 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2.5 py-1 text-fluid-sm font-medium text-slate-200 hover:border-[color:var(--border-strong)] hover:text-slate-100"
-            >
-              <span>{location.label}</span>
-              <span aria-hidden="true" className="text-slate-500">·</span>
-              <span className="text-slate-400 underline decoration-slate-600 underline-offset-2">
-                change<span className="sr-only"> stage and runway</span>
-              </span>
-            </Link>
+          {/* What the word means for money, beside it, where the line under the guidance
+              carries the two scores instead (2026-11-10): a returning reader met "Cloudy"
+              with no gloss on the first screen once the facts took that line. */}
+          {regimeKey && reading?.facts ? (
+            <span className="text-fluid-base leading-snug text-slate-300" data-regime-gloss>
+              {REGIME_WEATHER_RATIONALES[regimeKey]}
+            </span>
           ) : null}
 
           {since || direction || earlier ? (
@@ -299,13 +313,11 @@ export function DecisionHero({
             <Link
               href={feelsLike.href}
               data-feels-like
-              className="weather-hit text-fluid-sm font-medium text-slate-200 underline decoration-slate-600 underline-offset-4"
+              className="weather-hit weather-caveat-mark text-fluid-sm font-medium text-caveat-fg underline decoration-slate-600 underline-offset-4"
             >
-              Feels like{" "}
-              <span data-regime={feelsLike.regime} className="font-semibold" style={{ color: "var(--regime-ink)" }}>
-                <ConditionIcon regime={feelsLike.regime} className="mr-1 inline align-text-bottom" />
-                {REGIME_LABELS[feelsLike.regime]}
-              </span>
+              {/* A caveat about the reading, so the caveat's ink and mark. It was drawn in the
+                  other condition's colour, a second condition's hue beside this week's. */}
+              Feels like <span className="font-semibold">{REGIME_LABELS[feelsLike.regime]}</span>
             </Link>
           ) : null}
 
@@ -362,6 +374,27 @@ export function DecisionHero({
 
         {areaStrip}
 
+        {/* Whose rules these are, under the areas they scale (2026-11-10). It was a boxed
+            chip beside the condition word, a second box on the line that names the week.
+            Still the control that opens stage and runway, and it still says so in words. */}
+        {location ? (
+          <p className="text-fluid-sm leading-snug text-slate-400">
+            Rules for{" "}
+            <Link
+              href={location.href}
+              title={location.hint}
+              data-reading-location
+              className="weather-hit font-medium text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+            >
+              <span>{location.label}</span>
+              <span aria-hidden="true" className="text-slate-500"> · </span>
+              <span>
+                change<span className="sr-only"> stage and runway</span>
+              </span>
+            </Link>
+          </p>
+        ) : null}
+
         {published ? (
           <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
             {published.text}{" "}
@@ -388,23 +421,19 @@ export function DecisionHero({
           </div>
         ) : null}
 
-        {/* Freshness and confidence, once, where every reading route puts them:
-            directly under the call. The chip-and-popover in the meta row and the
-            trust line at the foot of the card both said this; neither said it
-            where a reader deciding whether to act would look first. */}
         {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
-        {trust ? (
-          <TrustStrip
-            {...trust}
-            regime={regime}
-            href="/trust"
-            phoneLayout="line"
-            compactLabels={Boolean(periodControl)}
-            className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
-          />
-        ) : null}
+        {/* With no margin (the answer pages), the trust facts close the column as before. */}
+        {trust && !aside ? trustStrip : null}
         </div>
-        {aside ? <div className="weather-hero-aside max-md:hidden">{aside}</div> : null}
+        {/* The margin (docs/design/rebuild-covenant.md): from `md` up the two scores, then
+            the trust facts under them. On a phone the scores are the figures above and the
+            trust facts follow the column. */}
+        {aside ? (
+          <div className="weather-hero-aside flex flex-col gap-6 max-md:mt-3">
+            <div className="max-md:hidden">{aside}</div>
+            {trust ? trustStrip : null}
+          </div>
+        ) : null}
         </div>
 
         {/* The card is the block people screenshot and crop, so it names its

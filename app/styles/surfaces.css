@@ -7,12 +7,14 @@
    because the ladder was never written down, and were removed once they hit
    zero call sites.
 
-     .weather-surface  outermost. rounded-2xl, --border-strong, elev-3,
-                       16px blur, container-type. No padding: callers set it,
-                       because this tier wraps grids as often as prose.
-     .weather-card     one step in. rounded-xl, --border-default, elev-2,
-                       12px blur, padding baked in. For a self-contained item
-                       in a list or grid.
+     .weather-surface  outermost. rounded-2xl, a hairline, a step of tone,
+                       container-type. No padding: callers set it, because
+                       this tier wraps grids as often as prose.
+     .weather-card     one step in. rounded-xl, a hairline, padding baked in.
+                       For a self-contained item in a list or grid.
+
+   No tier casts a shadow since 2026-11-10 (docs/design/rebuild-covenant.md):
+   paper has no depth, and only what floats over the page does.
      .weather-panel    layout tier. Padding only; appearance comes from the
                        shell. For a page section that shouldn't read as a
                        floating object.
@@ -64,6 +66,25 @@
    (docs/design/rebuild-covenant.md): the number first, its ladder under it. */
 .weather-hero-aside [data-ladder-figure] {
   font-size: 5.75rem;
+}
+
+/* The week control above the guidance is a line of text with its two steps, not a
+   boxed well with a boxed key inside it: the first thing in the reading column was
+   two nested boxes. Elsewhere the stepper keeps its well. */
+.weather-hero-period .weather-segment-track {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  gap: 0.125rem;
+}
+.weather-hero-period .weather-step-key {
+  border-color: transparent;
+  background: none;
+  box-shadow: none;
+}
+.weather-hero-period .weather-step-key:is(a):hover {
+  border-color: var(--border-strong);
 }
 
 .weather-hero-card {
@@ -334,7 +355,7 @@ button .weather-chip:active,
   .text-amber-400,
   .text-rose-300,
   .text-rose-400 {
-    color: #b4232a !important;
+    color: #b81f27 !important;
   }
 }
 

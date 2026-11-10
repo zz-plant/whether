@@ -33,7 +33,8 @@
  * serves /fonts/ cache-first as immutable, so a changed file must be a new URL
  * (tests/fontAssets.test.ts).
  *
- * Why these (2026-10-05). The site read as a forecast in IBM's design-system
+ * Why Archivo and Chivo Mono (2026-10-05; the display voice below has been Besley
+ * since 2026-11-10, and Archivo sets at normal width only). The site read as a forecast in IBM's design-system
  * face: Plex Sans for text, Plex Serif 600 for every h1 and h2, and the one
  * line that matters — the weekly call — in the sans, so the lesser headings
  * spoke in the stronger voice. One grotesque now carries every voice, and

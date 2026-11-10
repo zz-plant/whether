@@ -41,7 +41,7 @@ export function PublishedWeeks({ briefs }: { briefs: readonly PublishedBrief[] }
                 href={buildPublishedBriefPath(cell.brief.slug)}
                 data-regime={cell.brief.regime}
                 title={`Week of ${publishedBriefWeekLabel(cell.brief)}: ${getRegimePublicLabel(cell.brief.regime)}`}
-                className="block h-7 bg-[var(--regime-accent)] hover:outline-2 hover:outline-offset-1 hover:outline-[color:var(--app-text)]"
+                className="record-week-cell block h-7 hover:outline-2 hover:outline-offset-1 hover:outline-[color:var(--app-text)]"
               >
                 <span className="sr-only">
                   Week of {publishedBriefWeekLabel(cell.brief)}: {getRegimePublicLabel(cell.brief.regime)}

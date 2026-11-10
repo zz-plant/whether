@@ -41,12 +41,15 @@ bun run ui:iterate -- --dev-script dev
 bun run ui:iterate -- --no-dev
 ```
 
-`--theme light` captures the light theme. The app reads its theme from localStorage in a
-bootstrap script that runs before first paint, so the capture seeds the same key from a page
-init script and the page renders light from the first frame. Light captures land as
+`--theme light` captures the light theme. The app picks its theme in a bootstrap script that
+runs before first paint: a choice stored in localStorage wins, and with none the page follows
+the device setting (2026-11-10). The capture therefore always seeds that key from a page init
+script, dark on the default run and light with `--theme light`, so the page renders the asked
+theme from the first frame whatever the capture browser's own setting is. Light captures land as
 `<id>-light.png` with their own `index-light.html` and `manifest-light.json`, so a light set sits
 beside the dark one it is compared against instead of overwriting it. The default is dark.
-Review both before calling a visual change done — the harness could only capture dark until
+Review both before calling a visual change done, the light set first: light is the site's
+identity since 2026-11-10 and dark is the second theme. The harness could only capture dark until
 2026-09-15, and the light theme accumulated defects nobody had seen.
 
 `--visitor returning` captures the homepage a reader sees after their first visit. Since

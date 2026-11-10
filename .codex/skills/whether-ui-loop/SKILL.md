@@ -27,7 +27,7 @@ After layout work, also run `bun run ui:frames -- --base-url http://localhost:<p
 
 Before calling the change done, run `bun run ci:screenshot-smoke` against the same server (`UI_CAPTURE_BASE_URL`, default `http://127.0.0.1:3000`). It loads `/` and `/signals` at a phone and a desktop and fails on any console error or uncaught exception (§VII). `.github/workflows/ci.yml` is its only other caller, and that workflow is manual-only, so this is the one place it runs.
 
-Capture **both themes**. The default is dark; `--theme light` seeds the theme key the layout bootstrap reads and writes `<id>-light.png` beside the dark set, with its own `index-light.html` and `manifest-light.json`:
+Capture **both themes**, and treat the light set as primary: light is the site's identity since 2026-11-10 and dark is the second theme. The harness's default run is still dark; `--theme light` writes `<id>-light.png` beside the dark set, with its own `index-light.html` and `manifest-light.json`. Either run seeds the theme key the layout bootstrap reads, because an unseeded page follows the capture browser's device setting:
 
 ```bash
 bun run ui:iterate -- --theme light --only home-mobile,home-desktop
@@ -62,7 +62,7 @@ Full details on the harness — how it detects a stale dev server, port fallback
 
 ## When the work is aesthetic direction rather than correction
 
-If the task is to give a surface a distinctive point of view rather than fix defects in an existing one, load the `frontend-design` skill alongside this one. It covers palette, typographic personality, and taking a defensible aesthetic risk. Note the tension worth resolving deliberately: Whether already has a committed visual identity in `tokens.css` (the light theme is the `html[data-theme="light"]` block of the same file), so the goal is usually sharpening that identity, not replacing it. A redesign that abandons the semantic posture colors breaks the product's visual vocabulary, since operators read `--color-semantic-tightening-*` and `--color-semantic-easing-*` as meaning, not decoration.
+If the task is to give a surface a distinctive point of view rather than fix defects in an existing one, load the `frontend-design` skill alongside this one. It covers palette, typographic personality, and taking a defensible aesthetic risk. Note the tension worth resolving deliberately: Whether already has a committed visual identity in `tokens.css` (Covenant, since 2026-11-10; `docs/design/rebuild-covenant.md` says what is built and what is not yet; the light theme is the `html[data-theme="light"]` block of the same file), so the goal is usually sharpening that identity, not replacing it. A redesign that abandons the semantic posture colors breaks the product's visual vocabulary, since operators read `--color-semantic-tightening-*` and `--color-semantic-easing-*` as meaning, not decoration.
 
 ## Known debt
 

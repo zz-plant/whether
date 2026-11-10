@@ -175,7 +175,7 @@ describe("AreaGroups", () => {
     for (const area of ["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"]) {
       assert.equal((html.match(new RegExp(`id="area-${area}"`, "g")) ?? []).length, 1, area);
     }
-    assert.match(html, /<span class="[^"]*">Roadmap\.<\/span> Ship what is committed\./);
+    assert.match(html, /<span class="[^"]*">Roadmap\.<\/span> <span data-area-group-rule="true">Ship what is committed\.<\/span>/);
     assert.equal((html.match(/No restart until funding pressure falls below 66/g) ?? []).length, 1, "the shared condition, once");
   });
 
@@ -198,7 +198,8 @@ describe("AreaGroups", () => {
        header, which holds both, and not the detail under it, whose links must work. */
     const row = opened.slice(opened.indexOf('id="area-hiring"'), opened.indexOf('id="area-capital-raising"'));
     const header = row.slice(row.indexOf('<div class="col-span-2 grid grid-cols-subgrid group relative">'), row.indexOf("data-detail"));
-    assert.match(header, /^<div class="col-span-2 grid grid-cols-subgrid group relative"><svg[^>]*data-concept-icon="area"/, "the glyph is inside the header");
+    /* The area's number since 2026-11-10, as the rows under the guidance give it; it was a stock stroke icon. */
+    assert.match(header, /^<div class="col-span-2 grid grid-cols-subgrid group relative"><span aria-hidden="true"[^>]*>1<\/span>/, "the number is inside the header");
     assert.match(header, /<button[^>]*class="[^"]*after:absolute after:inset-0[^"]*"/);
     assert.ok(header.indexOf("Rule for hiring") > 0 && header.indexOf("Rule for hiring") < header.lastIndexOf("</div>"), "and so is the rule");
     assert.doesNotMatch(header, /weather-hit/, "a positioned button would pin the ::after to itself");

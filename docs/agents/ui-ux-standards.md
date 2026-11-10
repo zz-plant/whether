@@ -36,6 +36,7 @@ section that matches the change, not the file.
 | display vs. control | §XXVII Display or control |
 | screenshots, frames, share cards | §XXVIII Every frame is a screenshot |
 | containers, wrapping, stacking | §XXIX How containers wrap and stack |
+| the record band under the header | §XXX The record band |
 
 ## I. Interaction physics & latency
 - MUST: Input latency < 100ms. Visual feedback (active state, spinner, ripple) must render within 100ms of input. Network requests can take longer; the UI response cannot.
@@ -92,6 +93,7 @@ section that matches the change, not the file.
 ## VI. Mobile hostility defense
 - MUST: Prevent zoom-on-focus. All inputs on mobile must have font-size: 16px. If the design calls for smaller text, use `transform: scale()` to shrink it visually while keeping the computed font size at 16px.
 - MUST: Touch action manipulation. Add `touch-action: manipulation` to all interactive elements to eliminate the 300ms tap delay on legacy WebKit.
+- A track a reader drags sideways sets `touch-action: pan-y`, so a vertical swipe that starts on it still scrolls the page: the score ladder's track (`none` until 2026-11-10, which swallowed the swipe on the phone brief's first screen) and the record band (§XXX). The history timeline and the conditions map still set `none`.
 - MUST: Overscroll containment. Any element with its own scrollbar (modals, sidebars) MUST have `overscroll-behavior: contain` to prevent the body from scrolling when the element hits the edge.
 - Compact shared controls (36px) require both a fine pointer and hover support; a wide touch screen keeps the 44px floor. Native text fields keep at least 16px text on coarse pointers, including tablets and landscape phones.
 - The desktop header keeps all six loop tabs from `md`; Search stays an icon until `xl` to leave room for the wordmark and navigation. Below `md`, the bottom bar owns Search.
@@ -168,10 +170,10 @@ section that matches the change, not the file.
 - MUST: give the mobile index row a scroll affordance. `MobileSectionChips` fades whichever edge
   has content beyond it; a row that silently clips its overflow reads as broken labels, not as
   something you can scroll. The fades are state, tracked on scroll, not decoration.
-- MUST: make the page intro state the week, not the route (2026-09-25). The status word (the
-  regime label) leads, in the regime ink at the reading's own size; the trust headline and record
-  date follow in the meta half of the same line; the H1 is secondary below `lg` — the bottom tab
-  bar owns the route name on a phone. No kicker: "Weekly brief" above every H1 restated the route
+- MUST: make the page intro state the week as well as the route. The page title leads; under it,
+  as one line of facts, come the condition word in the regime ink, the trust headline and the
+  record date (2026-11-10). From 2026-09-25 until then the condition word led and the H1 followed,
+  a label over a heading on every report route. No kicker: "Weekly brief" above every H1 restated the route
   the header, the sidebar and the tab bar already name. No emblem beside it either (§XXV): the
   operating-loop glyph that sat there, and later on `/about`, is deleted.
 - NEVER: give the hero an action that targets the block directly beneath it, or a button to a route
@@ -234,6 +236,12 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   grouping. The ladder at the end of `app/styles/surfaces.css` enforces this for boxes made from a
   `weather-*` class; it cannot reach one written as Tailwind utilities, so that case is on the
   author.
+- MUST: tell a surface from the page by its hairline and a step of tone, not by a shadow. Since
+  2026-11-10 `.weather-surface`, `.weather-card`, `.weather-surface-secondary`, the hub section and
+  the hub link card set `box-shadow: none` (`app/styles/surfaces.css`,
+  `app/styles/layout-shells.css`); until then each cast a step of the `--elev-*` ladder. What
+  floats over the page still casts one: a menu, a dialog, the toast, the sticky strip. A raised
+  key keeps `--elev-1` (§XXVI).
 - An offset shadow is elevation. A zero-offset coloured halo is emphasis, and is fine at depth —
   `DecisionHero`'s reconsideration panel tints one by line state (the front red or the clear ink), which carries meaning
   rather than lifting the box.
@@ -258,8 +266,9 @@ chip, control, or container under `app/`.
 Whether runs two shape registers at once, and the balance between them is a role assignment, not
 a slider. **Sharp asserts**: anything that states a fact or a call — a status or verdict stamp, a
 data tile, a rule segment, a control the operator presses. **Soft holds**: the furniture around
-it — cards, surfaces, sheets, dialogs — together with the voice (the semi-condensed display
-width, the shadow ladder, the ease-out motion). Sharpness carries information only while it is the
+it — cards, surfaces, sheets, dialogs — together with the ease-out motion. Until 2026-11-10 the
+soft voice also counted the semi-condensed display width and a shadow under every surface; both
+are gone (§XVIII, §XIII). Sharpness carries information only while it is the
 exception, so the soft tier must be visibly softer than the sharp one, and neither register may
 take the other's job.
 
@@ -267,12 +276,16 @@ take the other's job.
 
   | Tier | Token | How it is applied | What lives here |
   | --- | --- | --- | --- |
-  | Stamp | `--radius-sm` (2px) | `rounded-sm`, `.weather-tag`, `.weather-chip`, `.weather-hub-chip` | status, verdict, regime, confidence and analog badges; chips; tags |
-  | Data | `--radius-md` (4px) | `rounded-md`, `rounded` | stat tiles, rule segments, trust lanes, loading stages |
-  | Control | `--radius-lg` (6px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-cta`, `.weather-input`, `.weather-control`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, select, disclosure trigger, toast action |
-  | Card | `--radius-xl` (10px) | `rounded-xl`, `.weather-card`, the hub hero/section/card shells, page section shells | a self-contained item or section |
-  | Surface | `--radius-2xl` (16px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
+  | Stamp | `--radius-sm` (2px) | `rounded-sm`, `.weather-tag`, `.weather-chip`, `.weather-hub-chip` | status, verdict, confidence and analog badges; chips; tags |
+  | Data | `--radius-md` (3px) | `rounded-md`, `rounded` | stat tiles, rule segments, trust lanes, loading stages |
+  | Control | `--radius-lg` (4px) | inherited from `.weather-button`, `.weather-button-primary`, `.weather-pill`, `.weather-cta`, `.weather-input`, `.weather-control`; `rounded-lg` on a control that has no class | every button, link-button, tab, input, select, disclosure trigger, toast action |
+  | Card | `--radius-xl` (6px) | `rounded-xl`, `.weather-card`, the hub hero/section/card shells, page section shells | a self-contained item or section |
+  | Surface | `--radius-2xl` (8px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
   | Round | `--radius-full` | `rounded-full` | dots, markers, spinners, switches, progress bars, icon wells, seals |
+
+  The scale shrank on 2026-11-10; it was 2, 4, 6, 10 and 16px. The condition word left the stamp
+  tier the same day: it is a boxless word in the condition's ink (§XXV), except the answer pages'
+  standing stamp (`app/resources/components/answerStandingStamp.tsx`), which keeps its frame.
 
 - MUST: one meaning per mark. Small marks are a vocabulary, and a shape that means two things on
   one page means neither (added 2026-10-14, when the trust strip's caveat ring sat one section
@@ -291,9 +304,10 @@ take the other's job.
   and its colour is the caveat ink, never the crossed red. A new kind of mark gets a row here
   before it ships.
 - MUST: a caveat that takes a whole band (cached or late data, an archived month, offline,
-  guidance held back) is `.weather-caveat-band` (`app/styles/feedback.css`: the 4px caveat rule,
-  the caveat fill and ink) with the diamond on its first line, as `HistoricalBanner` draws it. The
-  heavy rule and the mark set it apart from an ordinary band. Padding and type size belong to the
+  guidance held back) is `.weather-caveat-band` (`app/styles/feedback.css`: a 2px top rule in the
+  caveat ink since 2026-11-10, a 4px left rule before; the caveat fill and ink) with the diamond
+  on its first line, as `HistoricalBanner` draws it. The
+  rule and the mark set it apart from an ordinary band. Padding and type size belong to the
   use. Until 2026-10-27 the chain was copied into nine components and two had drifted to a 2px
   rule; `tests/craftDetails.test.ts` now rejects a component that spells it again. Never the `amber-*` or `rose-*` utilities: both resolve to the crossed red, and
   until 2026-10-21 the homepage's late-data line and `/operate`'s cached-data alert drew in them,
@@ -311,8 +325,8 @@ take the other's job.
 - NEVER: a named container on the control radius, and never a `rounded-*` utility on one. The
   classes that own a card or surface radius are `.weather-card`, `.weather-surface`, and the hub
   section, card and link-card shells; they are `xl` or
-  `2xl`, and a shell at 6px reads as a giant button and stops separating the furniture from the
-  controls inside it. `.weather-panel` is a layout tier and owns no radius, so a panel that draws
+  `2xl`, and a shell on the control radius (`lg`) reads as a giant button and stops separating the
+  furniture from the controls inside it. `.weather-panel` is a layout tier and owns no radius, so a panel that draws
   a border takes `rounded-xl` itself. Inner segments inside a card may sit at `md` or `lg`.
 - MUST: keep `app/styles/tokens.css` the only place a radius is a number. Stylesheets reference
   `var(--radius-*)` (`inherit` and `50%` excepted). `tests/shapeRegister.test.ts` checks the
@@ -347,6 +361,14 @@ Scope: any surface that states a reading, a threshold, or the distance between t
 - NEVER: render the same figure in two faces. The boldness score was mono in `StickyCallStrip`
   and sans in `DecisionHero`, which read as two quantities on one screen. One number, one face,
   across every surface it appears on.
+- A score set as a figure is `.type-figure` (`app/styles/typography.css`, 2026-11-10): Besley at
+  weight 800 with `tabular-nums`, sized by the caller. `ScoreLadder`'s `figure` prop draws a
+  score that way: the number, one sentence of where it stands against its pause line and, unless
+  `"compact"`, a ruled line with its lines named where they sit. The brief states its two
+  published scores so, in the guidance block's right-hand column from `md` and side by side on a
+  phone. The
+  working ladder, with its key, ranges and scrub, keeps the plain caption. It is the one place a
+  number takes the display face.
 
 ### Encode the claim, don't only state it
 
@@ -378,23 +400,26 @@ Scope: any surface that states a reading, a threshold, or the distance between t
 Scope: every surface that tints, rules, or labels itself by the week's regime, and every colour on
 the site, since 2026-10-09.
 
-The palette is Synoptic (`docs/design/palette-directions.md`, applied in
-`docs/decisions/feature-log/01-product-surfaces.md` §1.1.69). Colour carries two things and nothing else: the four
-conditions, and where a line stands. Everything else is ink.
+The palette's rule is Synoptic's, from 2026-10-09 (`docs/design/palette-directions.md`, applied in
+`docs/decisions/feature-log/01-product-surfaces.md` §1.1.69): colour carries two things and nothing else, the four
+conditions and where a line stands. Everything else is ink. Its values are Covenant's since
+2026-11-10 (`docs/design/rebuild-covenant.md`). Light is the site's identity and dark the second
+theme; with no stored choice a page follows the device setting, and a stored choice wins (the
+bootstrap script in `app/layout.tsx`, `app/components/themeToggleButton.tsx`).
 
 | Role | Token | Dark | Light |
 | --- | --- | --- | --- |
-| Ground (night chart / chart paper) | `--bg-body` | `#0f1316` | `#f1f4f3` |
-| Panel | `--bg-panel` | `#171c20` | `#ffffff` |
-| Ink, and the action colour with no regime (§XXVII) | `--app-text`, `--accent-action` | `#edf0ee` | `#121719` |
-| Secondary ink | `--app-text-secondary` | `#cdd3d1` | `#384145` |
-| Muted ink | `--app-text-muted` | `#a0a9a7` | `#525c60` |
-| A line crossed or close (front red) | `--line-crossed-ink` / `--line-crossed` | `#f2685c` / `#e5484d` | `#b4232a` / `#d13b37` |
+| Ground (night ground / paper) | `--bg-body` | `#0c1511` | `#ecf0e8` |
+| Panel | `--bg-panel` | `#111b16` | `#f4f7f1` |
+| Ink, and the action colour (§XXVII) | `--app-text`, `--accent-action` | `#e6ece2` | `#10201a` |
+| Secondary ink | `--app-text-secondary` | `#c5d0c7` | `#2b3b33` |
+| Muted ink | `--app-text-muted` | `#a3b2a9` | `#40524a` |
+| A line crossed or close (front red) | `--line-crossed-ink` / `--line-crossed` | `#f0666a` / `#e5484d` | `#b81f27` / `#c4242b` |
 | A line clear | `--line-clear-ink` | the ink | the ink |
-| Sunny (Sun) | `--color-condition-sunny` / `-ink` | `#d9a82c` / `#f5cf5a` | `#d9a82c` / `#7a5800` |
-| Cloudy (Haze) | `--color-condition-cloudy` / `-ink` | `#9d7a4a` / `#d6b98a` | `#9d7a4a` / `#74552a` |
-| Stormy (Lightning) | `--color-condition-stormy` / `-ink` | `#8f96e0` / `#b9bfff` | `#8f96e0` / `#4a4fc0` |
-| Freezing (Frost) | `--color-condition-freezing` / `-ink` | `#3a6fa3` / `#8cc0ec` | `#3a6fa3` / `#1d5585` |
+| Sunny (Sun) | `--color-condition-sunny` / `-ink` | `#e0a81c` / `#f0c95a` | `#e0a81c` / `#765600` |
+| Cloudy (Haze) | `--color-condition-cloudy` / `-ink` | `#9a5b1e` / `#dba463` | `#9a5b1e` / `#8a4f16` |
+| Stormy (Lightning) | `--color-condition-stormy` / `-ink` | `#8f9be0` / `#b9c1ff` | `#8f9be0` / `#3f47b5` |
+| Freezing (Frost) | `--color-condition-freezing` / `-ink` | `#2a4fa8` / `#93b2f5` | `#2a4fa8` / `#1f3f8f` |
 
 - MUST: draw a condition from the condition tokens and a line state from the line-state tokens,
   never one from the other. Warm is risk appetite on (Sunny, Cloudy), cool is off (Stormy,
@@ -418,36 +443,43 @@ conditions, and where a line stands. Everything else is ink.
   the section eyebrows and rules to read the week, and until 2026-09-15 no report page fed it, so
   every shell rendered slate under a call its own intro line named. `/history/compare` is the one
   deliberate exception: two weeks on one page, and keying it to either would mislead.
-- SHOULD: keep the regime ink for the marks that name the week: the stamp, a report intro's status
-  word, and `.type-eyebrow-section` on the label of a reading (`SignalReadingPanel`). The
+- SHOULD: keep the regime ink for the condition word: beside the guidance, a report intro's status
+  word, the running head, a `Tag regime` in a list. Chrome takes the ink since 2026-11-10:
+  `.type-eyebrow-section` on the label of a reading (`SignalReadingPanel`) drew in the regime ink
+  until then and is the secondary ink now, and the section tabs and section chips mark the
+  current item in `--app-text`, not the week's fill. The
   `ReportSection` eyebrow and its gradient rule, which carried it on every section, are gone
   (2026-10-09, §XXV). A card's own label inside a section is neutral (`.type-eyebrow` alone);
   `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
   hierarchy.
-- MUST: keep a fixed fifth hue off the action colour. With no regime, links, buttons and focus
-  rings draw in the ink (`--accent-action`); under a shell that knows its regime they draw in the
-  week's ink (`--accent-action: var(--regime-ink)`, 2026-10-14). Either way there is no hue that
-  means "click": sky meant that until 2026-10-09, forced Stormy off blue, and under a Stormy call
-  made the regime and the controls one colour. Because the action colour can now be the
-  condition's own ink, hue no longer tells a control from the condition stamp; form does (§XXVII).
-  Links keep their underline; the primary button is the action colour as a fill with the ground
-  as its label (`--cta-fill`, `--cta-ink`). `tests/regimeColourContract.test.tsx` holds both.
-- MUST: keep a focus ring visible in both themes. It is the ink, 16:1 on the dark ground and 18:1
-  on the light one, with the soft halo (`--focus-halo`) behind it.
+- MUST: keep the action colour the ink, in every week. Links, buttons and focus rings draw in
+  `--accent-action`, which no `data-regime` rule may repoint. From 2026-10-14 to 2026-11-10 a
+  shell that knew its regime drew them in the week's ink (`--accent-action: var(--regime-ink)`),
+  so "Cloudy" and "click" shared one colour across the first screen and the controls changed with
+  the weather. There is no hue that means "click" either: sky meant that until 2026-10-09, forced
+  Stormy off blue, and under a Stormy call made the regime and the controls one colour. A
+  condition's colour names the condition and nothing else; form tells a control from a display
+  (§XXVII). Links keep their underline; the primary button is the action colour as a fill with
+  the ground as its label (`--cta-fill`, `--cta-ink`). `tests/regimeColourContract.test.tsx`
+  holds both.
+- MUST: keep a focus ring visible in both themes. It is the ink, 15.4:1 on the dark ground and
+  14.6:1 on the light one, with the soft halo (`--focus-halo`) behind it.
 - MUST: tell data series apart by ink and dash, not by a hue, when they are neither a condition
   nor a line state. The rates chart on `/signals` draws its four terms as muted dotted, muted
   solid, ink dashed and ink solid, and its key draws the same lines.
 - MUST: paint the page atmosphere from `--regime-atmosphere`, via `.weather-regime-ground`, on
   both shells. The brief's container and the report backdrop each held a regime → tint table of
   their own — the report one had Sunny in teal and never faded, so the ground under every card on
-  every report route was lifted to a grey and the depth ladder lost half its separation.
+  every report route was lifted to a grey and the depth ladder lost half its separation. The four
+  washes are transparent since 2026-11-10: the record band is the one place colour commits at
+  page scale (§XXX). The token and the class stay, so a shell still paints nothing of its own.
 - MUST: print the report intro's status word (`CommandCenterNavBlock`) in `--regime-ink`, and give
   the intro card no other hue. From 2026-09-16 to 2026-10-09 the card also carried the hero's wash,
   border tint and 3px top rule (`.weather-page-intro`, now deleted): a second and third drawing of
-  the fact the word states (§XXV). The brief's hero keeps its rule, because it is the card people
-  crop and share.
-- NEVER: print text in `--regime-accent`. At 12–13px on the light ground it sits near 3:1; the
-  section eyebrows did this until 2026-09-15.
+  the fact the word states (§XXV). The brief's hero kept its rule until 2026-11-10; it has no box
+  now, and the record band above it carries the week's colour.
+- NEVER: print text in `--regime-accent`. On the light ground Sunny's fill is 1.9:1 and Stormy's
+  2.3:1; the section eyebrows did this until 2026-09-15.
 - MUST: key a surface's colour to the regime the copy on it states, from the same source. The
   hero used to be fixed teal — the stripe's colour for Sunny — under every call, and the page
   atmosphere was keyed to the last month-end in the regime history while the hero stated the
@@ -470,7 +502,8 @@ conditions, and where a line stands. Everything else is ink.
 - MUST: review a visual change in both themes. `bun run ui:iterate -- --theme light` captures
   the light set beside the dark one; until 2026-09-15 the harness could not, and the light theme
   carried a hard-edged artwork rectangle, invisible tags, and a grey slab behind `/pricing` that
-  no capture had shown.
+  no capture had shown. Since 2026-11-10 light is the site's identity, so the light captures are
+  the primary set; the harness's default run is still dark.
 
 ## XVII. Responsive diagrams
 
@@ -490,21 +523,30 @@ conditions, and where a line stands. Everything else is ink.
 
 Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 
-- **One family, three widths** (since 2026-10-05; `app/styles/fonts.css`). Archivo sets every
-  word. Width is what separates the voices, through the tokens and never by hand:
-  normal width for text, tables and controls; `--font-stretch-display` (semi-condensed) for the
-  call, `h1`/`h2`, `.type-section` and the secondary titles; `--font-stretch-stamp` (expanded)
-  for `.type-stamp`, which is the regime word and nothing else — the hero's tag, a report
-  route's status word, the sticky strip, the cards' chip. A width the role does not assign
-  (`font-stretch` or `font-variation-settings` at a call site) is a fourth voice. NEVER: add a
-  serif or a second sans; the serif headings were the stronger voice set on the weaker lines.
-- **Chivo Mono is the one monospace** (`--font-mono`), from the same foundry, for the figures
-  §XV assigns it and for the paste previews. Satori's cards use static instances of the same
-  widths (`scripts/generate-og-fonts.mjs`, `lib/image/ogFonts.ts`); re-measure
-  `lib/image/textFit.ts` when a face changes.
+- **Two voices** (since 2026-11-10; `app/styles/fonts.css`). Besley, a Clarendon, is the display
+  voice (`--font-display`): the guidance (`.text-display`), `h1`/`h2`, `.type-section`, the
+  secondary titles, the condition word (`.type-stamp`) and a score set as a figure
+  (`.type-figure`, §XV). Archivo (`--font-sans`) sets everything else: text, tables, controls and
+  labels. The face separates the voices, and it reaches the page through those rules. Three call
+  sites name the token themselves (`font-[family-name:var(--font-display)]`): the wordmark in the
+  header and the footer, and the area names in `AreaStrip`. `.type-stamp` is the condition word
+  and nothing else, in sentence case: beside the guidance, a report route's status word, the
+  running head, a `Tag regime`. From 2026-10-05 to 2026-11-10 Archivo set every word and width
+  separated the voices (a semi-condensed display, an expanded capitals stamp);
+  `--font-stretch-display` and `--font-stretch-stamp` are 100% now, kept so the rules that read
+  them needed no edit. NEVER: add another family, or set a width at a call site (`font-stretch`,
+  `font-variation-settings`). Before 2026-10-05 a serif set the headings while the weekly call
+  stayed in the sans, so the lesser lines spoke in the stronger voice; Besley sets the guidance
+  as well.
+- **Chivo Mono is the one monospace** (`--font-mono`), from Archivo's foundry, for the figures
+  §XV assigns it and for the paste previews. Satori's cards still draw Archivo alone, in static
+  instances at its semi-condensed, normal and expanded widths (`scripts/generate-og-fonts.mjs`,
+  `lib/image/ogFonts.ts`); Besley has not reached them. Re-measure `lib/image/textFit.ts` when a
+  face changes.
 - **Capitals are for stamps.** A stamp is a short, fixed status mark that is not read as a sentence:
-  `.type-badge`, the regime tag in the hero, the sticky strip's call, timeline badges, the
-  historical banner, a `<kbd>`. Every other label — section eyebrows, field names, table headers,
+  `.type-badge`, timeline badges, the historical banner, a `<kbd>`. The condition word is not
+  one: it was expanded capitals until 2026-11-10 and is a name in sentence case now. Every other
+  label — section eyebrows, field names, table headers,
   `<dt>`s — is sentence case through `.type-eyebrow`. A page where every label shouts has no way
   left to mark the one that should.
 - **Tracking goes with the capitals.** `0.08em`–`0.2em` is spacing for caps; on lowercase it reads
@@ -516,8 +558,8 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
   made once in the stylesheet misses nine call sites.
 - **Monospace is for figures that must align** — columns of numbers, a code sample. A control
   label ("Workstream:") in the mono face is decoration borrowing the register of data.
-- **Colour marks state, not labels.** The regime ink marks a section (§XVI); caution, easing and
-  the accent mark lines and states. Three labels in three hues say "these three are different
+- **Colour marks state, not labels.** The regime ink marks the condition word (§XVI); the crossed
+  red and the clear ink mark lines and states. Three labels in three hues say "these three are different
   kinds of thing" when they are three rows of one list.
 - **Draw each encoding once.** A fact already carried by position and a key does not also need a
   box, a hue and a case. When a block has a border *and* a coloured heading *and* capitals, pick
@@ -569,9 +611,10 @@ Added 2026-09-24 with DD-033 (`docs/design-debt-prioritized.md`).
 Added 2026-10-07 with DD-060 (`docs/design-debt-prioritized.md`). The habit is a type designer's
 and font engineer's: Wei Huang (Work Sans, Fragment Mono) and the foundries that circle works
 with. A page can only set what the font file contains, so read the file, not the font's name.
-The shipped files are `public/fonts/*.woff2`. Before relying on a glyph or a feature, list the
-file's characters and features with fontTools, the same Python `scripts/generate-og-fonts.mjs`
-needs:
+The shipped files are `public/fonts/*.woff2`: Archivo, Chivo Mono and, since 2026-11-10, Besley.
+Before relying on a glyph or a feature, list the file's characters and features with fontTools,
+the same Python `scripts/generate-og-fonts.mjs` needs (swap the glob for `besley-variable` or
+`chivo-mono-variable` to read another face):
 
 ```
 python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob('public/fonts/archivo-variable.*.woff2')[0]); print(''.join(sorted(chr(c) for c in f.getBestCmap() if c > 0xFF))); print(sorted({r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord}))"
@@ -583,25 +626,31 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   - **What the files draw.** Since 2026-10-07 (DD-060) the files are subset to the site's text,
     and `app/styles/fonts.css` records the build. Archivo draws → ← ↑ ↓ ↔ ≤ ≥ ≈ ≠ Δ ‰ −. Chivo
     Mono draws the same less the arrows, and `--font-mono` falls back to Archivo for those.
+    Besley draws the same less the arrows and ™, and `--font-display` lists Archivo behind it for
+    those.
   - **What they don't draw.** ▾ ✓ ✕ ⌘, or any other symbol. In chrome, draw the mark with the
     icon set (`app/components/uiIcons.tsx`). The disclosure chevron is a masked SVG
     (`app/styles/controls.css`), never a triangle glyph. `tests/craftDetails.test.ts` rejects
     ▾ ▸ ↗ ✓ ✔ ✕ ✗ under `app/`.
   - **When the copy needs a new symbol, fix the file, not the copy.** Add the codepoint to the
     subset command and the `unicode-range` in `fonts.css`, and ship the file under its new hashed
-    name. `tests/fontAssets.test.ts` checks that each face draws the symbols the copy uses, that
-    the stylesheet routes them to it, and that each file is named by its SHA-256, since
+    name. `tests/fontAssets.test.ts` checks that Archivo and Chivo Mono draw the symbols the copy
+    uses, that the stylesheet routes them there, that the two preloads are the Archivo and Besley
+    files, and that each file is named by its SHA-256, since
     `public/sw.js` never refetches a `/fonts/` URL. Then run `scripts/generate-og-fonts.mjs` so
     the share cards draw it too. In copy, a word still beats a symbol where it reads as well
     ("at or below").
-- **No style the files don't ship.** Both faces are upright only, so `italic` makes the browser
+- **No style the files don't ship.** All three faces are upright only, so `italic` makes the browser
   slant the roman: a faux oblique that reads as a rendering fault. Mark a quotation with quotation
   marks, and a prompt with the muted ink. The one exception is the chat preview's `<em>`
   (`app/share/chatPreview.tsx`), which shows how a chat client renders `_text_`. The test rejects
   the `italic` utility and `font-style: italic` elsewhere.
-- **No feature the files lack.** The files keep `tnum`, `pnum`, `frac`, `liga`, `kern`, `case`
-  and `zero`. `case` is on for the stamps (`.type-badge`, `.type-stamp`), where it lifts the
-  hyphen to sit between capitals. The files have no small capitals or old-style figures, so
+- **No feature the files lack.** Archivo keeps `tnum`, `pnum`, `frac`, `liga`, `kern`, `case`
+  and `zero`; Chivo Mono the same less `case` and `kern`. Besley keeps `tnum`, `liga` and `kern`
+  only, so `frac`, `zero` and `case` do nothing in the display face, and its one axis is weight,
+  400 to 900. `case` is on for `.type-badge`, where it lifts the hyphen to sit between capitals;
+  `.type-stamp` carried it while the condition word was capitals (until 2026-11-10). The files
+  have no small capitals or old-style figures, so
   `font-variant-caps: small-caps` would synthesize scaled capitals, lighter than the real ones
   beside them. Capitals stay full size and tracked (§XVIII).
 - **The figure register absorbs the sign.** In Archivo the hyphen is 333 units wide and `+` is
@@ -613,7 +662,8 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   container): the swap reflowed the decision chips at 430px, 0.108 by the layout-shift formula
   over element rects (0.044 in the one run Chrome's `layout-shift` observer attributed it; it
   reported 0 on the rest), and 0.008 at 1280px. `"Archivo Fallback"` in `fonts.css` (Arial or
-  Liberation Sans at `size-adjust: 98.81%`, and Arial Bold at 88.1% for the 87.5% display width)
+  Liberation Sans at `size-adjust: 98.81%`; the Arial Bold face at 88.1% that stood in for the
+  semi-condensed display went with that voice on 2026-11-10)
   sets the page's copy within about 1% of Archivo. After: 0.0001 at 430px and 0.009 at 1280px
   (observer 0.0000 and 0.0001). The 1280px remainder is a `max-w-[64ch]` paragraph: `ch` is
   measured on "0", which no override matches. Semibold and bold at normal width have their own
@@ -622,6 +672,13 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   20px line measures −0.2% (600) and −0.3% (700) in headless Chromium. Every weight a page sets
   needs a real face here, not only the ones measured on `/`. Re-measure when a face or
   `--font-sans` changes.
+- **Besley has stand-ins of its own** (2026-11-10): `"Besley Fallback"` in `fonts.css`, second in
+  `--font-display`. Georgia at `size-adjust: 113.85%` covers weights 400 to 600 and Georgia Bold
+  at 106.33% covers 700 to 900, sized to 700, where the guidance is set. `fonts.css` records
+  that at 800 (the condition word, the score figures) the stand-in sets about 4% narrower, and
+  that Android, which has no Georgia, draws a heading in Archivo until the swap. The layout-shift
+  figures above were taken with Archivo as the display face; `fonts.css` records none for the
+  Besley swap.
 
 ## XXIII. Motion a reader doesn't notice
 
@@ -655,7 +712,7 @@ decision areas, and where an area stands against its pause line. Everything else
 | --- | --- | --- | --- |
 | Conditions | Sunny `Sun`, Cloudy `Cloud`, Stormy `CloudLightning`, Freezing `Snowflake` | `REGIME_ICONS` (`lib/regimePresentation.ts`) | `ConditionIcon`, `ConditionLabel`, and `Tag regime` |
 | Areas | Hiring `Users`, Roadmap `Route`, Fundraising `Landmark`, Spending `Wallet`, New bets `Sprout` | `DECISION_AREA_ICONS` (`lib/report/boundedDecisionRules.ts`) | `AreaIcon`, `AreaLabel`, `GovernedAreas` |
-| Line state | crossed `Pause`, close `CircleDashed`, clear or resume met `Play` | `LINE_STATE_ICONS` (`lib/report/operatingCalls.ts`), state from `resolveLineState` | `LineStateBadge`, `LineStateIcon` |
+| Line state | crossed `Pause`, close `CircleDashed`, clear or restart met `Play` | `LINE_STATE_ICONS` (`lib/report/operatingCalls.ts`), state from `resolveLineState` | `LineStateBadge`, `LineStateIcon` |
 
 The components live in `app/components/ui/conceptIcons.tsx`.
 
@@ -687,8 +744,9 @@ The components live in `app/components/ui/conceptIcons.tsx`.
 
 Added 2026-10-09 with `docs/decisions/feature-log/01-product-surfaces.md` §1.1.65, after a design audit of the
 patterns generated interfaces reach for by default. Structure and decoration must encode something
-true about the content. The site spends its boldness in one place, its signature: the conditions
-chart, the weather glyphs and the pause and play line states (§XXIV). Everything else stays quiet.
+true about the content. The site spends its boldness in one place, its signature: the record band
+(§XXX), the conditions chart, the weather glyphs and the pause and play line states (§XXIV).
+Everything else stays quiet.
 
 - NEVER: an emblem beside a page heading. Seven pages drew one (a calibration curve, the operating
   loop, an editorial desk, a search radar, a decision shield, a toolkit playbook, valuation
@@ -707,7 +765,8 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
   not repeated at the foot of the page. An action only that page knows is an inline link in its
   last section.
 - MUST: headings and whitespace before boxes. A reading page keeps at most one boxed artifact; on
-  `/` it is the call card, the block people crop. A card inside a card is a list: set it as
+  `/` it was the call card until 2026-11-10, when the guidance block lost its box
+  (`.weather-hero-card` draws no border, fill or shadow). A card inside a card is a list: set it as
   columns under headings. On `/operate` each step is a section under an h2 with a rule between
   them; the steps a reader acts on this week are open with no toggle, and only secondary content
   folds (§XII).
@@ -720,17 +779,20 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
 - MUST: decoration only where it encodes meaning. No wash over the page ground, no gradient or
   specular on a control (controls fill from `--bg-raised` and `--bg-nested`, the primary from
   `--cta-fill`), no halo on hover, no coloured stripe across the top of a card, no accent discs on
-  a slide. Condition colour stays where a condition is named: the stamp, a report intro's status
-  word and the chart.
+  a slide. Condition colour stays where a condition is named: the condition word, the conditions
+  chart and the record band.
 - What stays, and why. Focus rings: they mark where the keyboard is. The skeleton shimmer: it says
   something is loading. The backdrop blur on the sticky strip, the phone tab bar and the command
-  palette: it keeps their text legible over a scrolling page. The call card's regime rule and the
-  site's name inside it, on `/` and on a published week: that card is the one people crop and
-  share, the rule names the week in a crop, and every other page's header names the site already.
-- The week's word as a placard (2026-10-21). The call card's stamp and the report intro's status
-  word print in the condition's solid fill with `--regime-on-accent` ink (`.weather-tag-placard`),
-  so the week's condition is the one solid block of colour on a page. Lists of past weeks keep the
-  tinted `.weather-tag-regime`. The conditions chart lights the week's quadrant and dims the other
+  palette: it keeps their text legible over a scrolling page. The site's name inside the guidance
+  block, on `/` and on a published week: that block is the one people crop and share, and every
+  other page's header names the site already. Its regime rule went with its box on 2026-11-10;
+  the condition word beside the guidance names the week in a crop.
+- The week's word (2026-11-10). Beside the guidance and on a report intro the condition word is
+  a boxless word in the condition's ink (`.weather-tag-placard`), set in Besley (`.type-stamp`,
+  §XVIII). A list of past weeks prints it the same way through `.weather-tag-regime`. From
+  2026-10-21 to 2026-11-10 it was a placard: capitals on the condition's solid fill, in
+  `--regime-on-accent` ink. The record band carries the solid condition colour on every page now
+  (§XXX). The conditions chart lights the week's quadrant and dims the other
   three, so its colour field says which weather it is before the eye finds the dot.
 
 
@@ -760,7 +822,10 @@ an instrument: what it is shaped like says how it works. The form is physical, t
 - Motion is the press only: 120ms on the transform, and none under reduced motion.
 - MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
   well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end
-  with nothing beyond it sinks flat and unlit rather than drawing a faded copy of a key. A toggle
+  with nothing beyond it sinks flat and unlit rather than drawing a faded copy of a key. Above the
+  guidance the week stepper has drawn without its well or its keys' frames since 2026-11-10
+  (`.weather-hero-period` in `app/styles/surfaces.css`): two nested boxes were the first thing in
+  the reading column. A toggle
   button whose state is `aria-pressed` is a `.weather-key` (the calendar's months). An option in a
   picker's list carries the lamp (`.weather-choice-item`), not a check over an action-ink wash.
 - NEVER: a translucent popup with nothing blurred behind it. At 95% the page's text read through
@@ -772,13 +837,14 @@ an instrument: what it is shaped like says how it works. The form is physical, t
 Added 2026-10-21. A **control** changes what the page shows or takes the reader somewhere: a
 link, a button, a disclosure, a picker, a segment, a key, a field. A **display** states a fact and
 does nothing when pressed: a stamp, a delta, a figure, a mark, a label, a callout, a chart. Each
-cue below belongs to one side, and a reader learns the split from the first page they use. Since
-2026-10-14 the action colour is the week's ink under a regime shell (§XVI), the same hue as the
-condition stamp, so these cues are the only way left to tell a control from a display.
+cue below belongs to one side, and a reader learns the split from the first page they use. The
+action colour is the ink (§XVI), which most displays are drawn in too, so these cues are what
+tells a control from a display. From 2026-10-14 to 2026-11-10 it was the week's ink under a
+regime shell, the same hue as the condition word.
 
 | Cue | Belongs to | Notes |
 | --- | --- | --- |
-| The action colour: `--accent-action`, and the `sky-*` / `cyan-*` utilities folded onto it | controls | A display that names the condition takes `--regime-ink` from its own token (the stamp, the intro's status word, `.type-eyebrow-section`), never through the action aliases |
+| The action colour: `--accent-action`, and the `sky-*` / `cyan-*` utilities folded onto it | controls | A display that names the condition takes `--regime-ink` from its own token (the condition word beside the guidance, the intro's status word, the running head), never through the action aliases |
 | An underline | links | A term with a definition is a link to it, or plain text with the gloss beside it |
 | The control radius (`--radius-lg`) with a frame | controls | §XIV: a framed display is a stamp at `--radius-sm`, a data tile at `--radius-md`, or unframed |
 | A lift (`--elev-1`) or a press (`translateY`) | controls | |
@@ -791,8 +857,8 @@ condition stamp, so these cues are the only way left to tell a control from a di
 - MUST: draw a display in the ink roles (`--app-text`, `-secondary`, `-muted`, the `slate-*`
   utilities folded onto them), a condition ink, a line-state ink or the caveat ink. A callout
   that wants to stand apart takes a neutral frame (`border-slate-700/70` on a `slate-900/40`
-  fill), not a tint of the action colour: under a Cloudy week a sky-tinted note drew as a tan box
-  beside the tan stamp and the tan Copy button, three different jobs in one hue.
+  fill), not a tint of the action colour: under a Cloudy week before 2026-11-10 a sky-tinted note
+  drew as a tan box beside the tan stamp and the tan Copy button, three different jobs in one hue.
 - MUST: draw a data series, a marker line or a progress bar in ink (§XVI's ink-and-dash rule).
   A scatter in the action colour reads as a selection.
 - A control's own state marks take the action colour: the current tab's rule, a picker's chosen
@@ -858,10 +924,14 @@ and shows them where to look. What the research on images people engage with say
   running head prints the same fact in four words (`formatNearestChange`), in the caveat ink when
   the call could change next week. A small, specific gap ("2 points from Freezing") is what
   provokes curiosity; a state ("Cloudy") does not. Screens only: pastes keep `formatMargin`.
-- MUST: draw the claim the frame leads with. The brief's card on a phone draws the nearer score's
-  `ScoreLadder` above the trust strip (`DecisionHero`'s `phoneFigure`): from `md` the conditions
-  map does it, and below it a phone screenshot of the card was text alone. The ladder carries last
-  week's dot too, so the card shows a move toward a line, not only a position.
+- MUST: draw the claim the frame leads with. The brief's guidance block on a phone draws both
+  scores as figures above the trust strip (`DecisionHero`'s `phoneFigure`): each number and where
+  it stands against its pause line. Without a figure there a phone screenshot of the block was
+  text alone. From `md` the block's right-hand column holds both scores, each over a ruled line
+  with its lines named in place (`DecisionHero`'s `aside`, `ScoreLadder`'s `figure`, 2026-11-10).
+  The conditions map held that column until then; it is in "What would change our mind"
+  (`WhatWouldChangeSection`) at every width now. Last week's dot, which shows a move toward a
+  line, is on the working ladder in "What changed this week".
 - MUST: lead a section with its answer, before its evidence. `HomeSection`'s `lead` is the
   finding, set at `text-fluid-lg` between body and heading: a reader's eye reaches a frame's title
   first and keeps its claim. "Has this happened before?" leads with this spell beside the earlier ones
@@ -942,3 +1012,47 @@ width it is given:
 - The shapes live in `@layer components`, so a gap or `items-start` on the same element wins. The
   one exception is the sidebar's `--main-min`, which is `!important`, because a `min-w-0` on the
   main column would otherwise cancel the stacking.
+
+## XXX. The record band
+
+Added 2026-11-10 with the Covenant rebuild (`docs/design/rebuild-covenant.md`). The record band is
+the strip under the header of every route: every month-end reading since the record began, drawn
+once. It is the one place colour commits at page scale (§XVI, §XXV).
+
+Its parts are `app/components/recordBand.tsx` (the server drawing), `lib/report/recordBand.ts`
+(its model), `lib/report/recordBandCodec.ts` (the month tokens and the line geometry),
+`app/components/recordBandReadout.tsx` (the month readout), `app/styles/record-band.css` and, on
+`/history`, `app/history/recordPlateCanvas.tsx`. `tests/recordBand.test.ts` holds the drawing and
+the frame.
+
+- MUST: mount it once, in `app/layout.tsx`, directly under `GlobalHeader`. A route never mounts a
+  second one; `/history` changes the one it has.
+- MUST: make every mark a reading. A field is a stretch of conditions, filled from `data-regime`
+  through `--regime-accent`. Two bundles of fine lines cross the fields, risk appetite above and
+  funding pressure below, so easier is up, as on every other drawing. The band carries no
+  decoration.
+- MUST: give a condition a line pattern as well as a fill, so a stretch reads without its colour:
+  plain for Sunny, a slow wave for Stormy, a tight ripple for Cloudy, a zigzag for Freezing. Where
+  the band is narrower than 46rem every line is plain: at two pixels a month a pattern aliases
+  into noise.
+- MUST: keep the two line inks the same in both themes, as the fills are: `--band-line-on-light`
+  on Sunny and Stormy, `--band-line-on-dense` on Cloudy and Freezing.
+- MUST: keep the two records apart. The fields and lines are the month-end readings, scored with
+  today's formula. The marks under the band are the briefs as published, one each, from a dashed
+  line where publication began; a week with no brief has no mark. The caption counts each record
+  under its own name. Where a brief and its month-end name different conditions,
+  `findRecordDifferences` states both facts and claims no cause.
+- MUST: draw the still band on the server from the bundled month-end series, with no request and
+  no script. The two client pieces read the band's own `data-months` attribute and take their
+  geometry from `recordBandCodec.ts`, never from `recordBand.ts`, `timeMachineCache` or
+  `publishedBriefs`: a client component that reaches a data module ships the data.
+- The month readout makes the band a slider once the page is live. The caption names the month
+  under the pointer, its conditions and its two scores. Arrow keys step a month, or a year with
+  Shift; Home and End go to the ends; a click or Enter opens the brief as it read that month;
+  Escape, leaving or blurring restores the caption. The strip sets `touch-action: pan-y` (§VI).
+- The drawn strip is 5.25rem tall where the band is narrower than 46rem and 9.375rem from there.
+  On `/history` it opens to `clamp(9rem, 21vw, 18.75rem)`: `RecordPlateCanvas` renders the
+  `data-record-plate` marker
+  the stylesheet keys on, so the height is in the first paint, then lays a canvas over the same
+  fields with a denser engraving that opens under the pointer. The canvas stays out below 736px
+  and draws one still frame under reduced motion.

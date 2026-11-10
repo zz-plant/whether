@@ -74,6 +74,7 @@ export function DecisionPicker({
   activeRunway,
   savedReadingDate,
   isHistorical = false,
+  rulesAbove = false,
   children,
 }: {
   options: readonly DecisionPickerOption[];
@@ -91,6 +92,8 @@ export function DecisionPicker({
   savedReadingDate?: string;
   /** An archived month: no runway notes, no restart emails, since both read today. */
   isHistorical?: boolean;
+  /** The guidance block prints each area's action from `lg` up, so the groups give theirs up there (AreaGroups). */
+  rulesAbove?: boolean;
   /** What follows the groups inside the section: the fold behind the rules, and the plan link. */
   children?: ReactNode;
 }) {
@@ -240,6 +243,7 @@ export function DecisionPicker({
             condition reads. */}
         <AreaGroups
           groups={groups}
+          rulesAbove={rulesAbove}
           selected={selected}
           onToggle={(area) => {
             const next = area === selected ? undefined : area;

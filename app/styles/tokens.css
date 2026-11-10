@@ -96,9 +96,9 @@
 
   /* Text role tokens */
   /* Display sizes the weekly-call headline (its only consumer, DecisionHero),
-     set semi-condensed bold (--font-stretch-display). The narrow width is what
-     lets it grow past the old 36px cap and still hold two lines on a phone and
-     on desktop. It was 54px in a serif once, a magazine cover line; the cap
+     set in Besley bold since 2026-11-10 (it was semi-condensed Archivo, whose
+     narrow width let it grow past the old 36px cap). Besley sets wider, so the
+     same sizes hold four lines on a desktop and five on a phone. It was 54px in a serif once, a magazine cover line; the cap
      stays because a 7vw ceiling wrapped it to seven lines and pushed the brief
      below the fold. The ceiling rose from 2.5rem to 3.25rem on 2026-10-08,
      with the floor moved only 2px: the call is the one thing the card is
@@ -198,8 +198,9 @@
      Sharp asserts: anything that states a fact or a call — status and verdict
      stamps (sm), data tiles and rule segments (md), controls (lg). Soft holds:
      the furniture around it — cards (xl), surfaces, sheets and dialogs (2xl).
-     The scale steps geometrically instead of the old 2/4/6/8/12 ramp so the
-     two registers are tellable apart: a card is never on the control radius
+     The steps were made small on 2026-11-10 (2, 3, 4, 6, 8: Covenant's
+     surfaces are ruled sheets, not rounded cards), and the two registers stay
+     tellable apart: a card is never on the control radius
      and a stamp is never on the card radius. `full` is for things that are
      round — dots, markers, spinners, switches, progress bars, icon wells —
      never for a text-bearing element; a pill beside a 2px chip was two badge
@@ -431,7 +432,7 @@
   /* CTA button: the action colour as a fill, flat. It was a stock sky/cyan
      gradient, then a flat steel blue (#2b6c8c) under light ink, until
      2026-10-09; the action colour is the ink now, so the fill is the ink and
-     the label is the ground (--cta-ink), 16:1 on the dark theme and 18:1 on
+     the label is the ground (--cta-ink), 15.4:1 on the dark theme and 14.6:1 on
      the light one. */
   --cta-fill: var(--accent-action);
   --cta-ink: var(--bg-body);

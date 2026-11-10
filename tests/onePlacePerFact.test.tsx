@@ -69,7 +69,7 @@ describe("/ draws the two scores once at each width", () => {
   );
 
   it("on the guidance block's two ladders from md up, and on the changes table's below md", () => {
-    assert.match(hero, /<div class="weather-hero-aside max-md:hidden"><div data-hero-scores="true">[\s\S]*?data-ladder-figure[\s\S]*?>90<[\s\S]*?data-ladder-figure[\s\S]*?>49</);
+    assert.match(hero, /<div class="weather-hero-aside [^"]*"><div class="max-md:hidden"><div data-hero-scores="true">[\s\S]*?data-ladder-figure[\s\S]*?>90<[\s\S]*?data-ladder-figure[\s\S]*?>49</);
     assert.match(route, /<WhatChangedSection[\s\S]*?drawnAbove/, "the changes table is told the block draws the two scores");
     assert.match(
       readFileSync("app/components/home/WhatChangedSection.tsx", "utf8"),

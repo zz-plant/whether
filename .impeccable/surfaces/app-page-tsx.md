@@ -26,3 +26,9 @@ FIRST VIEWPORT: Navigation, then the band (150px desktop, 84px phone) drawn from
 FORM: Credit agreement and security printing (Covenant), third of seven grounded candidates; seed key 2b9b0296. Signature interaction: moving along the band reads out that month. Motion grammar: nothing on a quiet week; on a week that moved, the band gains its slot, the changed standing is struck and re-set, the score counts from last week.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Records
+
+- Build path: code-led. No comp was approved. The renders in `.impeccable/mocks/covenant/` and `docs/design/rebuild-covenant/` are references drawn while writing the brief, not approved pictures; the owner chose the direction by name ("Covenant") from the decision round.
+- Seed: the direction roll printed key `2b9b0296` (scope direction, mode read, seven candidates, assigned index 3). The decision page for that hand was served under question key `f747439f`.
+- Finish review, round 1 (2026-11-10): disposition fix, eight material items. Applied in one batch: both scores on a phone; area rows with the action; the score figure with one sentence and a ruled line named in place; the week line with the brief's number, the gloss and the stage line; title-first report intros and no side stripe; History's rows, field names, patterned week cells and misses in the caveat's ink. Not applied: one frame across report routes.

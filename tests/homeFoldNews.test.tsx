@@ -84,7 +84,9 @@ describe("the map in the card", () => {
   });
 
   /* The trail's caption is the map's own (2026-10-09). It sat under the trust row in
-     the left column, a column away from the dots it describes. */
+     the left column, a column away from the dots it describes. The margin holds the
+     scores since 2026-11-10, and the trust facts under them at every width; only the
+     scores are hidden below md, where the phone figures carry them. */
   it("draws the aside from md up only, and leaves cards without one unchanged", () => {
     const withMap = renderToStaticMarkup(
       <DecisionHero
@@ -93,7 +95,7 @@ describe("the map in the card", () => {
         aside={<figure data-testid="map" />}
       />,
     );
-    assert.match(withMap, /<div class="weather-hero-aside max-md:hidden"><figure data-testid="map"/);
+    assert.match(withMap, /<div class="weather-hero-aside [^"]*"><div class="max-md:hidden"><figure data-testid="map"/);
     assert.doesNotMatch(withMap, /data-aside-note/);
 
     const plain = renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="SCARCITY" />);

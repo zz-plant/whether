@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { RECORD_BAND_HEIGHT, buildRecordBand } from "../../lib/report/recordBand";
+import { isLightField } from "../../lib/report/recordBandCodec";
+import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { RecordBandReadout } from "./recordBandReadout";
@@ -34,8 +36,10 @@ export function RecordBand() {
   const firstLabel = monthLabel(model.firstDate);
   const lastLabel = monthLabel(model.lastDate);
   const briefCount = model.marks.length;
-  const summary = `${model.months} month-end readings since ${firstLabel}, scored with today’s formula`;
-  const published = briefCount > 0 ? `${briefCount} ${briefCount === 1 ? "brief" : "briefs"}, published as written` : null;
+  const readings = `${model.months} month-end readings since ${firstLabel}`;
+  const summary = `${readings}, scored with today’s formula`;
+  const briefsCounted = briefCount > 0 ? `${briefCount} ${briefCount === 1 ? "brief" : "briefs"}` : null;
+  const published = briefsCounted ? `${briefsCounted}, published as written` : null;
   return (
     <aside className="record-band" aria-label="The record" data-record-band data-first={model.firstDate} data-months={model.encoded}>
       <p className="sr-only">
@@ -96,6 +100,22 @@ export function RecordBand() {
         {/* The two bundles named where they run, in the first field: no key to decode. */}
         <span className="record-band-label record-band-label-risk" aria-hidden="true">Risk appetite</span>
         <span className="record-band-label record-band-label-pressure" aria-hidden="true">Funding pressure</span>
+        {/* Each stretch named in its own field, where the band is the page's figure
+            (History): the condition, and how long it held where the field has the room. */}
+        {model.runs.map((run) => {
+          const share = run.length / model.months;
+          return share >= 0.035 ? (
+            <span
+              key={run.start}
+              aria-hidden="true"
+              className={`record-band-field-label ${isLightField(run.regime) ? "is-light" : "is-dense"}`}
+              style={{ left: `${(run.start / model.months) * 100}%` }}
+            >
+              {REGIME_LABELS[run.regime]}
+              {share >= 0.12 ? ` · ${run.length} months` : null}
+            </span>
+          ) : null;
+        })}
         <span className="record-band-cursor" data-record-band-cursor hidden />
         <div className="record-band-overlay" data-record-band-overlay />
       </div>
@@ -111,8 +131,16 @@ export function RecordBand() {
       </div>
       <p className="record-band-caption">
         <span data-record-band-readout data-default={published ? `${summary} · ${published}` : summary}>
-          {summary}
-          {published ? <> &middot; {published}</> : null}
+          {/* The qualifiers give way on a phone, where the caption would take two lines. */}
+          {readings}
+          <span className="record-band-caption-long">, scored with today&rsquo;s formula</span>
+          {briefsCounted ? (
+            <>
+              {" "}
+              &middot; {briefsCounted}
+              <span className="record-band-caption-long">, published as written</span>
+            </>
+          ) : null}
         </span>
         <span aria-hidden="true"> &middot; </span>
         <Link href="/history" className="record-band-link">

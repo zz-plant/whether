@@ -258,9 +258,7 @@ html[data-focus-mode] [data-home-shell-main] {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   background: var(--bg-surface);
-  box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  box-shadow: none;
 }
 
 .weather-legal-content :where(section:not(:first-of-type)) {
@@ -268,9 +266,7 @@ html[data-focus-mode] [data-home-shell-main] {
   border-radius: var(--radius-xl);
   padding: clamp(0.95rem, 0.82rem + 0.6vw, 1.35rem);
   background: var(--bg-surface);
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  box-shadow: none;
 }
 
 .weather-legal-content :where(h2, h3) {
