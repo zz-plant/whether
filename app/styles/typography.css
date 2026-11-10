@@ -64,14 +64,14 @@
   font-stretch: 100%;
 }
 
-/* Section-level eyebrow: the mark above a page section's title, in the week's
-   ink (ui-ux-standards §XVI). ReportSection sets it; a hand-rolled section
-   adds it beside .type-eyebrow. A card's own eyebrow inside a section stays on
-   the plain primitive — the ink says "this is a section of the page", and it
-   only says that if cards do not also wear it. Declared after .type-eyebrow so
-   it wins at equal specificity; the light ink is resolved by the token. */
+/* Section-level eyebrow: the mark above a page section's title. ReportSection
+   sets it; a hand-rolled section adds it beside .type-eyebrow. It was drawn in
+   the week's ink until 2026-11-10; a condition's colour now names the
+   condition and nothing else, so a section's eyebrow is the text ink, one step
+   stronger than a card's own. Declared after .type-eyebrow so it wins at equal
+   specificity. */
 .type-eyebrow-section {
-  color: var(--regime-ink);
+  color: var(--app-text-secondary);
 }
 
 /* SVG <text> sizes itself from the fontSize presentation attribute, which a CSS

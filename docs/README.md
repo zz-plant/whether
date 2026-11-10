@@ -89,7 +89,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 Use these when shaping follow-on work, not as sole implementation truth:
 
 - `design-debt-prioritized.md` — the one UI/UX and IA design-debt tracker: shipped rows and open ones
-- `design/rebuild-covenant.md` — working brief for the visual rebuild (Covenant): direction chosen 2026-11-10, first-screen sketches attached, nothing built
+- `design/rebuild-covenant.md` — working brief for the visual rebuild (Covenant): direction chosen and first build landed 2026-11-10; lists what is built and what is not yet
 - `implementation-status.md` — implementation status and milestone tracker
 - `roadmap-prioritized-spec.md` — prioritized, detailed specs for open roadmap items
 - `product-marketing-review-2026-08-29.md` — PMM review and launch checks

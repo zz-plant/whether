@@ -34,7 +34,7 @@ export function RecordBand() {
   const firstLabel = monthLabel(model.firstDate);
   const lastLabel = monthLabel(model.lastDate);
   const briefCount = model.marks.length;
-  const summary = `${model.months} month-ends since ${firstLabel}, scored with today’s formula`;
+  const summary = `${model.months} month-end readings since ${firstLabel}, scored with today’s formula`;
   const published = briefCount > 0 ? `${briefCount} ${briefCount === 1 ? "brief" : "briefs"}, published as written` : null;
   return (
     <aside className="record-band" aria-label="The record" data-record-band data-first={model.firstDate} data-months={model.encoded}>

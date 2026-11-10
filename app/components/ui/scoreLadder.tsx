@@ -659,12 +659,12 @@ export function ScoreLadder({
           <>
             <span
               data-ladder-scrub-move
-              className="absolute top-[13px] h-1 rounded-full bg-[color:var(--regime-ink)] opacity-75"
+              className="absolute top-[13px] h-1 rounded-full bg-[color:var(--app-text)] opacity-75"
               style={{ left: `${scrubMove.left}%`, width: `${scrubMove.width}%` }}
             />
             <span
               data-ladder-scrub-thumb
-              className="absolute top-1.5 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-[color:var(--regime-ink)] bg-[color:var(--bg-body)]"
+              className="absolute top-1.5 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-[color:var(--app-text)] bg-[color:var(--bg-body)]"
               style={{ left: `${at(scrub.value)}%` }}
             />
           </>

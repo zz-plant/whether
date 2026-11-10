@@ -284,7 +284,7 @@ export default function RootLayout({
               <div className="space-y-3">
                 <div className="space-y-2">
                   {/* The wordmark goes home, as one at the foot of a page is expected to (2026-11-03). */}
-                  <p className="text-sm font-semibold tracking-[0.08em] text-white">
+                  <p className="font-[family-name:var(--font-display)] text-[1.0625rem] font-extrabold leading-none tracking-[-0.01em] text-white">
                     <Link href="/" className="weather-hit no-underline hover:text-slate-200">
                       Whether
                     </Link>

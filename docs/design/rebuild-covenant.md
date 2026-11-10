@@ -1,12 +1,12 @@
 # Rebuild direction: Covenant (working brief)
 
-Status: working, 2026-11-10. The owner chose the direction; nothing here is built. This brief
-replaces the visual world of the site and keeps the product: the same guidance, lines, routes and
-copy rules. Build from it only after the open decisions at the end are settled.
+Status: working, 2026-11-10. The owner chose the direction and the first build landed the same
+day: the tokens, the type, the record band on every route, the first screen of the brief and
+History. "What is built" below says exactly what, and what is not yet.
 
-Read this if you are prototyping or building the rebuild. `DESIGN.md` still describes the shipped
-site and stays the reference for it until the rebuild lands and `DESIGN.md` is rewritten from the
-built result.
+This brief replaces the visual world of the site and keeps the product: the same guidance, lines,
+routes and copy rules. Read it before extending the rebuild. `DESIGN.md` describes the site as
+built; where the two differ, `DESIGN.md` is what shipped and this is what was intended.
 
 ## What the owner decided
 
@@ -16,6 +16,10 @@ built result.
 | Whose respect to win, beyond founders and their operators | Engineers arriving from Hacker News or GitHub, investors and accelerators, designers and product peers. |
 | What would make a polished result wrong | Reading as a SaaS landing page, a trading terminal or a newspaper pastiche; spectacle that slows the Monday read. |
 | Direction | Covenant, picked from the hand in the appendix. |
+| How it lands | One pull request for the whole site. |
+| How far the band goes | The vector band with a month readout on every route, and a canvas rendering on History. |
+| What History says where the two records differ | The two facts, with no cause. |
+| The theme on arrival | The device setting, unless the reader has stored a choice. |
 
 The goal in the owner's words: the site should instil awe and reliability in the readers and in
 the people whose respect or collaboration Whether wants.
@@ -34,6 +38,40 @@ come from the model.
 | History, desktop | [history-desktop.webp](rebuild-covenant/history-desktop.webp) |
 
 ![This week, desktop](rebuild-covenant/home-desktop.webp)
+
+## What is built
+
+As of 2026-11-10, on every route unless a line says otherwise:
+
+- **Tokens.** Both themes' ground, ink, borders and line red; the four condition fills and their
+  text inks; smaller radii; no shadow on a surface. The action colour is the ink.
+- **Type.** Besley, self-hosted with Georgia stand-ins, for headings, the guidance, the condition
+  word, area names and score figures. The condition word is a word in its ink, not a placard.
+- **The record band,** under the navigation: fields, the two line bundles with a pattern per
+  condition, a mark for each published brief, a yearly axis, and the month readout with keyboard
+  and touch. On History it opens to the page's figure and a canvas redraws it denser.
+- **This week.** The guidance block without its card; the two scores as figures on their ladders
+  in the margin from `md` up, and the nearer one on a phone; the conditions map in "What would
+  change our mind"; the five areas numbered.
+- **History.** A cell for each week since the first brief, empty where none was published, and
+  a note of both facts where a brief and its month-end name different conditions.
+- **Theme.** The device setting picks it when nothing is stored.
+- **Palette copies.** Share images, emails, the badge, the web manifest and the brand kit.
+
+Not built yet:
+
+- The action sentence beside each area on the first screen. The areas are numbered and state
+  their standing; each action is still in "Your decisions this week", directly below.
+- One copy control on the first screen. The four copy buttons remain.
+- Numbered section openers and the contents list in the margin.
+- The trust facts in the margin. The trust strip is still under the areas.
+- Share images, emails and print redrawn with the band and Besley. They took the palette only,
+  and are still drawn dark.
+- The week's move redrawn for the band. It keeps its existing choreography on the ladders and
+  the condition word.
+- The moments in "Moments worth authoring": a crossed line citing the brief that set it, brief
+  numbers on the page, and a copy confirmation that names the brief.
+- `/trust`, `/operate`, `/signals` and the answer pages beyond the frame, tokens and type.
 
 ## Why rebuild: what the reviews found
 
@@ -319,19 +357,18 @@ Small PRs based on `main`, none stacked.
 
 ## 11. Open decisions
 
-1. **Besley against an alternate.** Test it on the hardest strings before committing: a
-   101-character guidance at 390px, the numerals 0 to 100, and the five area names at 20px on a
-   low-density Windows display. Hepta Slab is the alternate.
-2. **How far the band goes.** Three levels: the vector band with a readout (recommended); a
-   canvas rendering with denser line work that responds to the pointer, on History only; or the
-   same effort spent on print and share output. The first and third fit the Monday read.
-3. **Why the two records differ in Sep and Oct 2026.** History notes a re-score on Oct 9, 2026.
-   Whether that explains the four Freezing briefs needs the owner's confirmation before the page
-   says so.
-4. **Per-area history.** A strip of held and clear months for each area would suit History. It
-   needs a model function and the same "scored today" caveat, so it waits for the core.
-5. **The dark theme's standing.** Light becomes the default in this brief. Returning readers
-   know the dark page; decide whether the stored theme preference migrates or resets.
+Settled on 2026-11-10: how far the band goes, what History says where the records differ, and
+the theme on arrival (the table at the top). Still open:
+
+1. **Besley against an alternate.** Besley is built. The test on the hardest strings was not
+   run: a 101-character guidance at 390px, the numerals 0 to 100, and the five area names at
+   20px on a low-density Windows display. Hepta Slab is the alternate if it fails there.
+2. **Per-area history.** A strip of held and clear months for each area would suit History. It
+   needs a model function and the same "scored today" caveat.
+3. **The condition fills on the other ground.** Sunny and Stormy are under 3:1 against the
+   paper, and Freezing against the dark ground. Fields in the band are separated by a seam and
+   a pattern; a small mark in one of those colours on its weak ground needs an outline or the
+   condition's text ink.
 
 ## Appendix: the hand
 
