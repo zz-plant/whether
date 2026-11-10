@@ -24,6 +24,19 @@ import {
   type CompareSearchParams,
 } from "../../../lib/report/compareDataLoader";
 
+/** One score's move from Period B to Period A, in ink: the signed points and
+ *  the side it moved to. Nothing when the score did not move. */
+const ScoreMoveChip = ({ label, delta, higherIsEasier }: { label: string; delta: number; higherIsEasier: boolean }) => {
+  if (delta === 0) return null;
+  const easier = delta > 0 === higherIsEasier;
+  return (
+    <li className="rounded-sm border border-[color:var(--border-default)] px-2 py-0.5 text-slate-200">
+      {label} <span className="font-semibold tabular-nums text-slate-100">{delta > 0 ? "+" : "\u2212"}{Math.abs(delta)} pts</span>
+      <span className="text-slate-400">, {easier ? "easier" : "harder"}</span>
+    </li>
+  );
+};
+
 export async function ComparePanel({
   searchParams,
   initialResult,
@@ -80,13 +93,15 @@ export async function ComparePanel({
         {selectorBlock}
         <div
           role="alert"
-          className="weather-panel space-y-2 border border-amber-600/40 bg-amber-950/20 p-6 text-slate-200"
+          className="weather-caveat-band space-y-2 p-6"
         >
           {/* A written sentence, not `result.error`: that is the text of whatever the
               loader threw, and it printed as the explanation. No eyebrow either; it
               said "Comparison unavailable" over a heading that said so again. */}
-          <h2 className="type-section text-slate-100">These two periods did not load</h2>
-          <p className="text-sm text-slate-300">
+          {/* The caveat's ink and diamond (2026-11-10): a load failure is a reading
+              to treat with care, not a crossed line, so it does not take the red. */}
+          <h2 className="type-section weather-caveat-mark">These two periods did not load</h2>
+          <p className="text-sm">
             Choose another month above, or reload the page to try the same two again.
           </p>
         </div>
@@ -204,18 +219,16 @@ export async function ComparePanel({
               <ConditionWord regime={reportB.assessment.regime}>{getRegimePublicLabel(reportB.assessment.regime)}</ConditionWord> (Period B)
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-fluid-nano font-mono">
-            {reportA.assessment.scores.tightness !== reportB.assessment.scores.tightness ? (
-              <span className={`rounded border px-2 py-0.5 ${reportA.assessment.scores.tightness > reportB.assessment.scores.tightness ? "border-amber-700/40 bg-amber-950/30 text-amber-300" : "border-emerald-700/40 bg-emerald-950/30 text-emerald-300"}`}>
-                Funding pressure: {reportA.assessment.scores.tightness - reportB.assessment.scores.tightness > 0 ? "+" : ""}{reportA.assessment.scores.tightness - reportB.assessment.scores.tightness} pts
-              </span>
-            ) : null}
-            {reportA.assessment.scores.riskAppetite !== reportB.assessment.scores.riskAppetite ? (
-              <span className={`rounded border px-2 py-0.5 ${reportA.assessment.scores.riskAppetite > reportB.assessment.scores.riskAppetite ? "border-emerald-700/40 bg-emerald-950/30 text-emerald-300" : "border-amber-700/40 bg-amber-950/30 text-amber-300"}`}>
-                Risk appetite: {reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite > 0 ? "+" : ""}{reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite} pts
-              </span>
-            ) : null}
-          </div>
+          {/* Each move in ink, with the side it moved to as a word (2026-11-10). They
+              were red for worse and green for better, a third and fourth meaning for
+              colour, which says a condition or a crossed line and nothing else. */}
+          {reportA.assessment.scores.tightness !== reportB.assessment.scores.tightness ||
+          reportA.assessment.scores.riskAppetite !== reportB.assessment.scores.riskAppetite ? (
+          <ul className="flex flex-wrap items-center gap-2 text-fluid-nano" aria-label="Score moves from Period B to Period A">
+            <ScoreMoveChip label="Funding pressure" delta={reportA.assessment.scores.tightness - reportB.assessment.scores.tightness} higherIsEasier={false} />
+            <ScoreMoveChip label="Risk appetite" delta={reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite} higherIsEasier />
+          </ul>
+          ) : null}
         </div>
 
         {/* Leading with rules that changed between the two named dates */}
