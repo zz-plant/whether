@@ -65,8 +65,9 @@ export function TrackRecordSection({
           unit={`in the last ${counts?.readings ?? record.observations} months`}
         />
         <Fact label="Warned a month ahead" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        {/* Says what lasted (2026-11-10): "Typical length" named no noun. */}
         <Fact
-          label="Typical length"
+          label="Conditions typically held"
           value={record.medianHoldMonths ?? "—"}
           unit={record.medianHoldMonths != null ? "mo" : undefined}
         />
@@ -80,7 +81,7 @@ export function TrackRecordSection({
               <tr className="border-b border-[color:var(--border-subtle)] text-left type-eyebrow">
                 <th className="pb-2 pr-4">When</th>
                 <th className="pb-2 pr-4">Change</th>
-                <th className="pb-2">Advance signal</th>
+                <th className="pb-2">Advance warning</th>
               </tr>
             </thead>
             <tbody>
@@ -116,13 +117,15 @@ export function TrackRecordSection({
         </div>
       ) : currentSpell ? (
         <p className="text-fluid-sm text-slate-300">
-          No changes in conditions in this window — {label(currentSpell.regime)} has held all{" "}
+          No changes in conditions in this window. {label(currentSpell.regime)} has held all{" "}
           {currentSpell.months} months.
         </p>
       ) : null}
 
+      {/* Defines the column's own words (2026-11-10). It glossed "Signaled", which
+          nothing on the page printed, under a column headed "Advance signal". */}
       <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400">
-        &ldquo;Signaled&rdquo; means the score that crossed was within {record.nearBandPts} pts of its line, on
+        &ldquo;Advance warning&rdquo; means the score that crossed was within {record.nearBandPts} pts of its line, on
         either side, for at least a month first. Changes with no warning are listed too.
       </p>
       {recordChanges !== undefined ? (

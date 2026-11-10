@@ -22,10 +22,11 @@ export const websiteName = "Whether — Weekly Operating Guidance for Startup Le
  * as the opening promised news the weekly reading rarely has; the use that fits
  * is a pause-or-resume answer checked weekly and an email the day it changes.
  * "The day a line is crossed" (until 2026-11-03) named the mechanism on every
- * page; the reader's question is the answer, not the line.
+ * page; the reader's question is the answer, not the line. "Restart", not "resume"
+ * (2026-11-10): the restart line's verb, as every row and email says it since 2026-10-30.
  */
 export const canonicalPositioningLine =
-  "We read interest rates and credit markets and tell you when to pause or resume hiring, spending and fundraising. Updated every Monday, with an email the day that changes.";
+  "We read interest rates and credit markets and tell you when to pause or restart hiring, spending and fundraising. Updated every Monday, with an email the day that changes.";
 /*
  * The category line as the homepage's first-visit orientation: whom it is for,
  * then the line itself. The page opens on the week's guidance, which says what

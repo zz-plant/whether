@@ -130,7 +130,10 @@ describe("Guides prints each answer's standing", async () => {
     const stamps = html.match(/<span data-answer-standing="[^"]+"[^>]* class="[^"]*"/g) ?? [];
     assert.ok(stamps.length >= 2, "the area stamps and the climate stamp");
     for (const stamp of stamps) {
-      assert.match(stamp, /\brounded-sm\b/);
+      /* The climate stamp is the condition word in its ink with no frame (2026-11-10,
+         DESIGN.md "Chips and tags"); an area's state badge keeps its sharp frame. */
+      if (/data-answer-standing="conditions"/.test(stamp)) assert.doesNotMatch(stamp, /\brounded-|\bborder\b/);
+      else assert.match(stamp, /\brounded-sm\b/);
       assert.doesNotMatch(stamp, /rounded-(full|lg|xl|2xl)/);
     }
     const moreTools = html.slice(html.indexOf('id="more-tools"'));

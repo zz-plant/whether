@@ -258,13 +258,15 @@ export default async function ResourcesHubPage({
               <Fragment key={toolkit.slug}>
                 {index > 0 ? <span aria-hidden="true"> · </span> : null}
                 <Link href={`/toolkits/${toolkit.slug}`} className="text-[var(--accent-action)] underline underline-offset-4">
-                  {toolkit.title.replace(/ Toolkit$/, "")}
+                  {toolkit.title.replace(/ toolkit$/i, "")}
                 </Link>
               </Fragment>
             ))}
           </p>
           <GuidedTranslationPanels searchParams={resolvedSearchParams} />
-          <details className="weather-auto-chevron weather-panel" open={hasToolSelection}>
+          {/* No side inset (2026-11-10): the panel's default 24px put this row's title
+              right of every heading on the page. */}
+          <details className="weather-auto-chevron weather-panel px-0 py-4" open={hasToolSelection}>
             <summary className="select-none text-base font-semibold text-slate-100">
               Browse by company stage, situation or toolkit
             </summary>
@@ -311,12 +313,9 @@ export default async function ResourcesHubPage({
               <section className="weather-switch gap-4 [--col-min:20rem]">
                 <div className="space-y-3">
                   <h3 className="text-sm type-eyebrow text-slate-300">Help by role</h3>
-                  <p className="text-xs text-slate-400">
-                    Roles is the front door for role guidance. Each role has a dedicated landing page linking to leadership guidance and worksheets.
-                  </p>
                   <div className="flex flex-wrap gap-2">
                     <ActionLink href="/roles" variant="pill">
-                      Explore roles on Roles &rarr;
+                      Open Roles &rarr;
                     </ActionLink>
                   </div>
                 </div>

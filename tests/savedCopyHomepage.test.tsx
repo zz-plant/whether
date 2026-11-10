@@ -134,7 +134,7 @@ describe("the saved-copy homepage", () => {
     for (const { areas, condition } of areaGroups) {
       assert.match(condition, /^(Pauses if|No restart until) /, `${areas.join(", ")}: ${condition}`);
       // No restart line on an area with nothing to restart, and no pause line it is already past.
-      assert.doesNotMatch(condition, /nothing to resume|in effect/, `${areas.join(", ")}: ${condition}`);
+      assert.doesNotMatch(condition, /nothing to restart|in effect/, `${areas.join(", ")}: ${condition}`);
     }
   });
 
@@ -188,10 +188,10 @@ describe("a saved copy's lines are the reading's", () => {
   };
   const hiring = (rows: ReturnType<typeof rowsAt>) => rows.find((row) => row.area === "hiring");
 
-  it("prints a restart line between the two lines as nothing to resume, and a held one as a distance", () => {
+  it("prints a restart line between the two lines as nothing to restart, and a held one as a distance", () => {
     const between = hiring(rowsAt(52));
     assert.equal(between?.pause?.met, false);
-    assert.equal(between?.resume?.distance, "nothing to resume");
+    assert.equal(between?.resume?.distance, "nothing to restart");
     assert.equal(between?.resume?.points, 2, "the distance stays a fact of the row");
     const held = hiring(rowsAt(40));
     assert.equal(held?.pause?.met, true);

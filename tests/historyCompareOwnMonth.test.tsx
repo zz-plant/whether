@@ -148,7 +148,7 @@ describe("/history/compare draws each period from its own month", () => {
   it("names each period as labelled, and does not call a past month 'this week'", async () => {
     const { text, columnB } = await renderCompare({ yearB: "2020", monthB: "3" });
 
-    for (const heading of ["Rules in Period A", "Signals in Period A", "Rules in Period B", "Signals in Period B"]) {
+    for (const heading of ["Rules in Period A", "Scores and rates in Period A", "Rules in Period B", "Scores and rates in Period B"]) {
       assert.ok(text.includes(heading), `${heading} renders`);
     }
     assert.doesNotMatch(text, /\bperiod [ab]\b/, "the label kept its case");

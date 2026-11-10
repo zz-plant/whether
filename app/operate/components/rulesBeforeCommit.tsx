@@ -67,7 +67,9 @@ export function RulesBeforeCommit({
      a coloured label, so one fact (which list this is) was drawn three times,
      and the boxes sat inside the step's own card. */
   const lists = [
-    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), labelClassName: "text-semantic-tightening-fg" },
+    /* Stop in the ink since 2026-11-10: red is a crossed line's colour and nothing
+       else's (DESIGN.md, "The Two Meanings Rule"), and the list's name says "stop". */
+    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), labelClassName: "text-slate-200" },
     { key: "start", label: "Start", items: visible(startItems, isExpanded), labelClassName: "text-semantic-easing-fg" },
     { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), labelClassName: "text-slate-200" },
   ];

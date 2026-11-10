@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export interface DateOption {
@@ -55,13 +56,17 @@ export function DateSelector({
   };
 
   const val = currentYear && currentMonth ? `${currentYear}-${currentMonth}` : "";
+  /* The label names its select (2026-11-10): it was a bare <label> beside it, so a
+     screen reader announced each picker as an unnamed combo box. */
+  const selectId = useId();
 
   return (
     <div className="flex flex-col gap-1.5 w-full">
-      <label className="type-eyebrow">
+      <label className="type-eyebrow" htmlFor={selectId}>
         {label}
       </label>
       <select
+        id={selectId}
         value={val}
         onChange={handleChange}
         style={{ colorScheme: "light dark" }}

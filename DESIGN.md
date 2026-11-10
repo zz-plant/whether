@@ -196,8 +196,7 @@ the dark `:root` block.
 - Every drawing puts the easier side up or to the right.
 - A quiet week has no motion.
 
-**Open.** Known gaps (controls, report intros, share images and print still in the earlier
-world) and the open decisions (Besley against Hepta Slab, per-area history, condition fills on
+**Open.** Known gaps (share images, print and `/history/compare` still in the earlier world) and the open decisions (Besley against Hepta Slab, per-area history, condition fills on
 their weak ground) live in `docs/design/rebuild-covenant.md`, not here.
 
 ## Colors

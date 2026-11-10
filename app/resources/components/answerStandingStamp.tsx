@@ -31,7 +31,9 @@ export const AnswerStandingStamp = ({
       <span
         data-answer-standing="conditions"
         data-regime={regime}
-        className={`type-stamp inline-flex items-center gap-1 rounded-sm border border-[var(--border-default)] px-1.5 py-0.5 font-semibold text-[color:var(--regime-ink)] ${STAMP_CLASS} ${className}`}
+        /* No box (2026-11-10): a condition is its word in its ink beside its glyph, never
+           a framed chip (DESIGN.md, "Chips and tags"). */
+        className={`type-stamp inline-flex items-center gap-1 font-semibold text-[color:var(--regime-ink)] ${STAMP_CLASS} ${className}`}
       >
         <ConditionIcon regime={regime} />
         {standing.text}

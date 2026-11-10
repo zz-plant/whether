@@ -23,8 +23,8 @@ describe("RegimeRadar", () => {
   it("names the weather word, the scores and the regime in the accessible name", () => {
     const html = renderToStaticMarkup(<RegimeRadar {...base} />);
 
-    assert.match(html, /aria-label="Conditions radar: freezing, funding pressure 75, risk appetite 30"/);
-    assert.match(html, /Funding pressure 75 vs risk appetite 30 \(freezing\)/);
+    assert.match(html, /aria-label="Conditions map: Freezing, funding pressure 75, risk appetite 30"/);
+    assert.match(html, /Funding pressure 75 vs risk appetite 30 \(Freezing\)/);
   });
 
   it("passes an unmodelled regime through instead of rendering a blank label", () => {
@@ -32,7 +32,7 @@ describe("RegimeRadar", () => {
     // something a reader can act on, not an empty pair of parentheses.
     const html = renderToStaticMarkup(<RegimeRadar {...base} currentRegime="SOMETHING_ELSE" />);
 
-    assert.match(html, /\(something_else\)/);
+    assert.match(html, /\(SOMETHING_ELSE\)/);
   });
 
   it("lights the week's quadrant and dims the other three", () => {
@@ -97,7 +97,7 @@ describe("RegimeRadar", () => {
 
     assert.match(html, /<title>Funding pressure change line at 60<\/title>/);
     assert.match(html, /<title>Risk appetite change line at 45<\/title>/);
-    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(Freezing\)<\/title>/);
   });
 
   /* The scenario studio draws this map with a hypothetical as the filled dot
@@ -109,7 +109,7 @@ describe("RegimeRadar", () => {
       <RegimeRadar {...base} previousTightness={55} previousRiskAppetite={35} primaryLabel="Simulated reading" previousLabel="This week" />,
     );
 
-    assert.match(html, /<title>Simulated reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+    assert.match(html, /<title>Simulated reading: Funding pressure 75, Risk appetite 30 \(Freezing\)<\/title>/);
     assert.match(html, /<title>This week: Funding pressure 55, Risk appetite 35<\/title>/);
   });
 
@@ -118,7 +118,7 @@ describe("RegimeRadar", () => {
       <RegimeRadar {...base} previousTightness={55} previousRiskAppetite={35} />,
     );
 
-    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(Freezing\)<\/title>/);
   });
 });
 

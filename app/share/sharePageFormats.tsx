@@ -286,7 +286,7 @@ export function SharePageFormats({
           {scoreReferences.length > 0 ? (
             <details className="weather-auto-chevron">
               <summary className="w-fit text-fluid-sm font-medium text-slate-300">
-                This week&apos;s readings
+                This week&apos;s scores
               </summary>
               <ul className="max-w-3xl space-y-1.5 border-l-2 border-[color:var(--border-subtle)] pl-3 text-fluid-sm leading-5 tabular-nums text-slate-300">
                 {scoreReferences.map((line) => <li key={line}>{line}</li>)}

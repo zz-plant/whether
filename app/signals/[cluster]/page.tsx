@@ -161,7 +161,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
       {signalScenarioRoutes.some((route) => route.signalSlug === cluster) ? (
         <nav aria-labelledby="signal-decisions-heading" className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 id="signal-decisions-heading" className="text-lg font-semibold text-slate-100">
-            What this signal means for each decision
+            What this signal means for each decision area
           </h2>
           <ul className="weather-grid gap-2 [--grid-max:2]">
             {decisionScenarioDefinitions.map((scenario) => (

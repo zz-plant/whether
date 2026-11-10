@@ -12,7 +12,7 @@ import { RecordPlateCanvas } from "./recordPlateCanvas";
 import { findRecordDifferences } from "../../lib/report/recordBand";
 import { TrackRecordTable, TrackRecordTiles } from "../components/history/TrackRecord";
 import { TrackRecordSection } from "../components/history/TrackRecordSection";
-import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordSummary } from "../components/history/confidenceRecord";
+import { ConfidenceRecordSummary } from "../components/history/confidenceRecord";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
@@ -238,7 +238,7 @@ export default async function HistoryPage({
             </ul>
           </div>
           <p className="max-w-prose text-sm text-slate-300">
-            These months are scored today, with the current model. They don&rsquo;t show what we said at
+            These months are scored with today&rsquo;s formula. They don&rsquo;t show what we said at
             the time or what any company did. For what we published, use the dated briefs below.
           </p>
           {/* One link (2026-10-27). "Compare funding conditions across periods" and "Read
@@ -292,13 +292,15 @@ export default async function HistoryPage({
               same two sentences took four cards. The run links its newest week and
               lists every week under it, since each still has its own page. */}
           {/* Ruled rows, not cards (2026-11-10): the week, the conditions as published,
-              and the guidance, with each week of a run linked under it. */}
+              and the guidance, with each week of a run linked under it. The last row
+              drops its hairline: the section's own divider sits 24px under it, and the
+              two read as a double rule over Track record. */}
           <ul className="@container border-t border-[color:var(--border-default)]">
             {groupPublishedBriefRuns(publishedBriefs).map((run) => {
               const [newest] = run;
               if (!newest) return null;
               return (
-                <li key={newest.slug} data-frame-block="" className="max-w-none border-b border-[color:var(--border-default)] py-3">
+                <li key={newest.slug} data-frame-block="" className="max-w-none border-b border-[color:var(--border-default)] py-3 last:border-b-0">
                   {/* The week is the link; the conditions and the guidance are what it said. */}
                   <div className="grid gap-x-5 gap-y-1 @[40rem]:grid-cols-[12.5rem_6.5rem_minmax(0,1fr)] @[40rem]:items-baseline">
                     <Link
@@ -340,7 +342,10 @@ export default async function HistoryPage({
           action={trackRecord ? <ExportBoardAnnexButton record={trackRecord} /> : null}
           aside={
             <div className="space-y-3">
-              <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
+              {/* Named for what the summary counts (2026-11-10). It carried the margin
+                  study's title, "How often conditions held near a change", over a count of changes
+                  that had advance warning; the study keeps that title on /calibration. */}
+              <h3 className="type-eyebrow">Advance warning</h3>
               <ConfidenceRecordSummary />
               <p className="text-fluid-sm text-slate-400">
                 <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
@@ -391,7 +396,7 @@ export default async function HistoryPage({
         initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
         className="weather-auto-chevron weather-panel px-5 py-4"
         summaryClassName="cursor-pointer select-none text-fluid-sm font-medium text-white/70"
-        summary={<span>Explore past months and signal trends</span>}
+        summary={<span>Explore past months and score trends</span>}
       >
         <div className="mt-4 space-y-5">
           {/* The whole record, not the trailing 24 months `regimeSeries` holds

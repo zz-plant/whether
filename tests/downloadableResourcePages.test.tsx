@@ -24,8 +24,8 @@ describe("downloadable resource pages", () => {
       assert.match(html, new RegExp(config.metadata.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
       assert.match(html, new RegExp(`href="${config.downloadCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
       assert.match(html, new RegExp(`href="${config.secondaryCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
-      assert.match(html, /Guide: capital discipline/);
-      assert.match(html, /The board framework/);
+      assert.match(html, /Capital discipline for venture-backed companies/);
+      assert.match(html, /Board-level capital discipline framework/);
     }
   });
 

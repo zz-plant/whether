@@ -21,7 +21,7 @@ const decisionConversations = decisionAreaOrder.flatMap((area) =>
 );
 
 const title = "What each role can ask for this week";
-const description = "What each role can ask for this week at any tech company: what to ask leadership, the general rules, and the questions that come up.";
+const description = "What each role can ask for this week at any tech company: the questions to ask leadership, the general rules, and the conversations that come up.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { stale } = await loadWeekConditions();

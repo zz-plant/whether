@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { atCompanies } = stageForWorkers(stage);
   const metadata = buildPageMetadata({
     title: titleFor(role.title, atCompanies),
-    description: `Is now a good time for ${role.label} at ${atCompanies} to ask for a raise or more headcount? What this week's conditions mean, the rule at this stage, and questions to ask leadership.`,
+    description: `Is now a good time for ${role.label} at ${atCompanies} to ask for a raise or more headcount? This week's conditions, the rule at this stage, and questions to ask leadership.`,
     path: `/roles/${role.slug}/${stage}`,
     imageAlt: titleFor(role.title, atCompanies),
   });

@@ -359,7 +359,7 @@ export function RunwayPlannerPanel({
             How is this calculated?
           </summary>
           <p className="rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
-            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions. Growth compounds monthly. Burn is compared with monthly revenue: monthly burn divided by monthly revenue, read as 4x with no revenue and never above 4x, so earning something never scores worse than earning nothing.
+            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions. Growth compounds monthly. Burn is compared with revenue as monthly burn divided by monthly revenue. That ratio reads 4x with no revenue and never goes above 4x, so earning something never scores worse than earning nothing.
           </p>
         </details>
       </div>
@@ -448,7 +448,7 @@ export function RunwayPlannerPanel({
           <OperatorProfileNumberField
             field="monthlyGrowthPct"
             label="Monthly revenue growth (%)"
-            hint="Monthly growth. Leave it blank for no growth."
+            hint="Leave it blank for no growth."
             placeholder="e.g. 6"
             value={profile.monthlyGrowthPct}
             onCommit={(value) => commitProfileField("monthlyGrowthPct", value)}
@@ -512,7 +512,7 @@ export function RunwayPlannerPanel({
                   : describeMissingRunwayInputs(resolution.missing)}
             </p>
             <span className="rounded bg-[color:var(--bg-panel)] px-2 py-0.5 text-fluid-nano text-slate-400">
-              Runway Sizing Cockpit
+              Runway analysis
             </span>
           </div>
 
@@ -523,8 +523,10 @@ export function RunwayPlannerPanel({
             <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 ${typeof profile.monthlyBurnUsd === "number" ? "border border-emerald-500/30 bg-emerald-950/20 text-emerald-300" : "border border-amber-500/30 bg-amber-950/20 text-amber-300"}`}>
               {typeof profile.monthlyBurnUsd === "number" ? "Monthly spend set" : "Needed: monthly spend"}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-1 text-slate-400">
-              {typeof profile.monthlyRevenueUsd === "number" ? `Revenue: $${(profile.monthlyRevenueUsd / 1000).toFixed(0)}k/mo` : "Revenue: optional"}
+            {/* Needed, not optional: the planner waits for revenue (`resolveRunwayPlannerRequest`),
+                and the line above asked for it while this chip said "Revenue: optional". 0 counts. */}
+            <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 ${typeof profile.monthlyRevenueUsd === "number" ? "border border-emerald-500/30 bg-emerald-950/20 text-emerald-300" : "border border-amber-500/30 bg-amber-950/20 text-amber-300"}`}>
+              {typeof profile.monthlyRevenueUsd === "number" ? `Revenue: $${(profile.monthlyRevenueUsd / 1000).toFixed(0)}k/mo` : "Needed: monthly revenue, or 0"}
             </span>
           </div>
 
@@ -729,9 +731,9 @@ export function RunwayPlannerPanel({
           </details>
 
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-slate-400">Copy this block into Slack or a note.</p>
+            <p className="text-xs text-slate-400">A short version of this plan, for Slack or a note.</p>
             <ClipboardActionRow
-              label="Copy block"
+              label="Copy plan summary"
               state={clipboardState}
               onClick={() => {
                 void copyToClipboard(shareBlock, "runway-plan");

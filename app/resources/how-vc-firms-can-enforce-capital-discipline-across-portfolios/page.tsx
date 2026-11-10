@@ -19,7 +19,7 @@ export const metadata: Metadata = buildPageMetadata({
   title,
   description,
   path,
-  imageAlt: "VC portfolio capital discipline authority page",
+  imageAlt: "VC portfolio capital discipline",
   imageParams,
 });
 
@@ -79,7 +79,7 @@ export default async function Page() {
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Portfolio-wide framework</h2>
         <ol className="space-y-2 text-sm text-slate-200">
-          <li>1. Standardize SAFE / RISKY / DANGEROUS commitment classes across every company.</li>
+          <li>1. Standardize Safe / Risky / Dangerous commitment classes across every company.</li>
           <li>2. Require one monthly memo format: the current guidance, the thresholds breached, the action taken, and the steps that can still be undone.</li>
           <li>3. Use one escalation rule: a threshold still breached at the second monthly check-in gets a written addendum to the board pack, with an owner, an action and a rollback date.</li>
           <li>4. Normalize reversibility language so rollback windows, owners, and communication sequencing are explicit.</li>
@@ -96,7 +96,7 @@ export default async function Page() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Board-forwardable artifact block</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Summary to forward</h2>
         <div className="rounded-lg border border-slate-700/70 bg-slate-900/40 p-4 text-sm text-slate-100">
           <p>Portfolio recommendation: keep one governance vocabulary for two quarters before changing any threshold.</p>
           <p className="mt-2">Control rule: any breach lasting two checkpoints requires a board addendum with owner, action, and rollback timeline.</p>
@@ -106,13 +106,13 @@ export default async function Page() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Supporting links</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Related pages</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li><Link href="/resources/capital-discipline-venture-backed-companies" className="text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link></li>
-          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline underline-offset-4">Board-level capital framework</Link></li>
+          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline underline-offset-4">Board-level capital discipline framework</Link></li>
         </ul>
         <div className="flex flex-wrap gap-3 pt-2">
-          <Link href="/resources/capital-posture-template" className="weather-button inline-flex items-center justify-center" data-conversion-event="download">Download the Capital Planning Template</Link>
+          <Link href="/resources/capital-posture-template" className="weather-button inline-flex items-center justify-center" data-conversion-event="download">Download the capital planning template</Link>
           <ActionLink href="/operate#ops-export-briefs" variant="pill" data-conversion-event="request">Open board-pack exports</ActionLink>
         </div>
       </section>

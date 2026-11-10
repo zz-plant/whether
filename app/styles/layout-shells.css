@@ -175,8 +175,13 @@
   padding-block: var(--layout-content-gap);
 }
 /* Unboxed sections align with the column. The row owns their outer space;
-   nested framed cards still keep their own padding. */
+   nested framed cards still keep their own padding. A section behind an anchor
+   wrapper (`[data-page-section]`, the tabIndex target an "On this page" link
+   focuses) is the row's section too: until 2026-11-10 it kept its px-5, so
+   Track record, the scores' explainer and Monthly readings on /history sat 20px
+   right of the sections between them. */
 .weather-report-section-row > .weather-panel,
+.weather-report-section-row > [data-page-section] > .weather-panel,
 .weather-page-stack > .weather-panel {
   padding: 0;
 }
@@ -471,7 +476,10 @@ a.weather-hub-link-card:hover {
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   padding: 0.2rem 0.6rem;
-  font-size: 0.62rem;
+  /* The label step, 12–13px (2026-11-10). 0.62rem drew a plain tag ("Not this week's
+     data" on Scenarios) at 10px, under the 12px floor for a word; a regime tag's
+     type-stamp sets its own size over this. */
+  font-size: var(--text-fluid-nano);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;

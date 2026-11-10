@@ -203,7 +203,7 @@ describe("/share current weekly artifact", () => {
     assert.doesNotMatch(html, /Ready to paste/);
     const copy = html.indexOf("Copy Slack post");
     const preview = html.indexOf("data-chat-preview");
-    const readings = html.indexOf("This week&#x27;s readings");
+    const readings = html.indexOf("This week&#x27;s scores");
     assert.ok(copy > 0 && copy < preview && preview < readings, "copy is beside the preview heading, with readings below the preview");
     for (const id of ["formats", "image-artifacts", "embed"]) assert.match(html, new RegExp(`id="${id}"`));
     // The stacked page's anchors, and the formats folded on 2026-11-03, open the format that carries them.

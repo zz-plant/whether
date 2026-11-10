@@ -229,7 +229,8 @@ export function FormulaReference({
    * one definition. */
   const plainLanguageTier = (
         <div className="weather-surface mb-3 space-y-3 px-4 py-4">
-          <p className="type-eyebrow">In plain language</p>
+          {/* Folded, the summary above already says "In plain language". */}
+          {plainLanguageFolded ? null : <p className="type-eyebrow">In plain language</p>}
           <ol className="space-y-2 text-sm text-slate-200">
             <li>
               <span className="font-semibold text-slate-100">1. Read two things off public U.S.
@@ -259,8 +260,8 @@ export function FormulaReference({
               <span className="font-semibold text-slate-100">3. Count only what the record can test.</span>{" "}
               <span className="text-slate-300">
                 {upperFirst(joinAnd(recordBasis.counted))} move the scores. The record holds each of them
-                at every month-end since 2012, so the history on the Record and the calibration study
-                test the same score that sets the guidance.
+                at every month-end since 2012, so the history page and the calibration study test the
+                same score that sets the guidance.
                 {recordBasis.shownBecause.length > 0
                   ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. We score and show each of them, but none of them moves the scores.`
                   : null}
@@ -470,7 +471,7 @@ export function FormulaReference({
           </ul>
         </FormulaCard>
 
-        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, margin`}>
+        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, ${MARGIN_LABEL.toLowerCase()}`}>
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <span className="text-slate-400">Conditions:</span>
@@ -478,9 +479,9 @@ export function FormulaReference({
               <span className="mt-1 block text-xs text-slate-400">
                 {/* A rule, not a record (2026-11-03): the state machine holds conditions while
                     the margin is at its lowest band and lets only a shock crossing through. */}
-                At the narrowest margin conditions cannot change, unless one reading moves a score{" "}
-                {SHOCK_CROSSING_POINTS} points or more, from more than {REGIME_CONFIDENCE_NEAR_THRESHOLD} away, past
-                where conditions change.
+                With little {MARGIN_LABEL.toLowerCase()}, conditions hold unless one reading moves a score{" "}
+                {SHOCK_CROSSING_POINTS} points or more past the line where conditions change, from more than{" "}
+                {REGIME_CONFIDENCE_NEAR_THRESHOLD} points away.
               </span>
             </li>
             <li>

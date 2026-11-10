@@ -13,7 +13,7 @@ import { SAAS_BASKET } from "../../lib/saasMultiples";
    `openGraph` this page previewed as the homepage when its link was shared. */
 export const metadata: Metadata = {
   ...buildPageMetadata({
-    title: "API & Agent Tools",
+    title: "API and agent tools",
     description: "The weekly brief, the monthly record, SaaS multiples and the decision rules, programmatically: an MCP server, REST endpoints, a CLI and an embeddable widget.",
     path: "/api-docs",
     imageAlt: "Whether API and agent tools",
@@ -37,7 +37,8 @@ function Endpoint({ signature, children, tryHref, tryLabel, tryAriaLabel }: Endp
       {tryHref ? (
         <a
           href={tryHref}
-          aria-label={tryAriaLabel}
+          /* Twenty links read "Try it": the endpoint tells them apart out of context. */
+          aria-label={tryAriaLabel ?? `${tryLabel}: ${signature}`}
           className="inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600"
         >
           {tryLabel} →
@@ -86,12 +87,12 @@ export default function ApiDocsPage() {
 
         <section className="space-y-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="type-eyebrow">Connect Claude, Cursor & AI Agents (MCP)</h2>
+            <h2 className="type-eyebrow">Connect Claude, Cursor and AI agents (MCP)</h2>
             <span className="text-fluid-nano font-mono text-emerald-400">Streamable HTTP • No auth required</span>
           </div>
           <p className="text-xs text-slate-300">
-            <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
-            streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, each score's distance from its line, and a scenario's result while it reasons.
+            <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a streamable-HTTP Model
+            Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, each score's distance from its line, and a scenario's result while it reasons.
           </p>
           <div className="flex flex-wrap items-center gap-2" aria-label="Install the MCP server">
             <a href={cursorInstallHref} className="weather-button inline-flex items-center text-fluid-sm">
@@ -112,14 +113,6 @@ export default function ApiDocsPage() {
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-fluid-nano text-slate-400">
-              <span>Claude Code, one line from any directory:</span>
-            </div>
-            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
-              claude mcp add --transport http whether {siteUrl}/api/mcp
-            </pre>
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-fluid-nano text-slate-400">
               <span>Claude Desktop (<code className="font-mono text-slate-300">claude_desktop_config.json</code>) or Cursor Settings → MCP:</span>
             </div>
             <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
@@ -127,7 +120,7 @@ export default function ApiDocsPage() {
             </pre>
           </div>
           <p className="text-xs text-slate-300">
-            Start with <span className="font-mono text-slate-100">get_state</span>: one small answer with the conditions and the margin from their change lines, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
+            Start with <span className="font-mono text-slate-100">get_state</span>: one small answer with the conditions and the room before they change, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
             {toolNames.map((name, index) => (
               <Fragment key={name}>
                 {index > 0 ? ", " : ""}
@@ -167,7 +160,7 @@ export default function ApiDocsPage() {
               The compact state to decide from: the answer <code className="font-mono">/api/agent?view=state</code> gives.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_brief">
-              A summary: current conditions, action, margin (the <code className="font-mono">confidence</code> field), record date. Optional weekly, monthly, quarterly or
+              A summary: current conditions, action, room before a change (the <code className="font-mono">confidence</code> field), record date. Optional weekly, monthly, quarterly or
               yearly view. The MCP tool of the same name returns the full brief.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_context&amp;regime=DEFENSIVE">
@@ -209,14 +202,14 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
             >
               Stable JSON endpoint for the current guidance. Returns the conditions, funding pressure, direction,
-              margin (<code className="font-mono">confidence</code>), week, summary, url, and version. Type contract at lib/types.ts.
+              room before a change (<code className="font-mono">confidence</code>), week, summary, url, and version. Type contract at lib/types.ts.
             </Endpoint>
             <Endpoint
               signature="GET /api/agent?view=state"
               tryHref="/api/agent?view=state"
               tryLabel="Try it"
             >
-              The state to decide from, about a tenth the size of the full brief: the conditions and the margin from their change lines, the data's freshness (<code className="font-mono">automation.ready</code>), each score against its pause, resume and change lines with the moves behind it, and the guidance. Weekly only. Check{" "}
+              The state to decide from, about a tenth the size of the full brief: the conditions and the room before they change, the data's freshness (<code className="font-mono">automation.ready</code>), each score against its pause, restart and change lines with the moves behind it, and the guidance. Weekly only. Check{" "}
               <code className="font-mono">automation.ready</code> before acting without a person looking.
             </Endpoint>
             <Endpoint
@@ -334,7 +327,7 @@ export default function ApiDocsPage() {
               signature="GET /api/image/brief?layout=landscape|square|portrait&theme=light"
               tryHref="/api/image/brief"
               tryLabel="View image"
-              tryAriaLabel="View the brief as an image"
+              tryAriaLabel="View image: the brief as a PNG card"
             >
               The brief as a PNG card for decks and threads, 1200×800 by default.{" "}
               <code className="font-mono">layout</code> draws it <code className="font-mono">landscape</code>{" "}
@@ -357,7 +350,7 @@ export default function ApiDocsPage() {
               signature="GET /api/badge"
               tryHref="/api/badge"
               tryLabel="View badge"
-              tryAriaLabel="View this week's conditions as a badge"
+              tryAriaLabel="View badge: this week's conditions as an SVG badge"
             >
               This week&apos;s conditions as an SVG badge for a README, a data room or an investor page, in the
               conditions&apos; color. It says so when the reading is a saved copy.
@@ -366,7 +359,7 @@ export default function ApiDocsPage() {
               signature="GET /api/image/slide?stage=seed"
               tryHref="/api/image/slide?stage=seed"
               tryLabel="View slide"
-              tryAriaLabel="View the brief as a meeting slide"
+              tryAriaLabel="View slide: the guidance as a meeting slide"
             >
               The guidance as a widescreen meeting slide. It is hand-written SVG, so it stays sharp at projector
               size and the labels are still editable text in Figma or Keynote. Accepts seed,
@@ -376,12 +369,12 @@ export default function ApiDocsPage() {
               signature="GET /api/export/board-slide?format=pptx|pdf&stage=seed&week=2026-w41"
               tryHref="/api/export/board-slide?format=pptx&stage=seed"
               tryLabel="Download PPTX"
-              tryAriaLabel="Download the board slide as a PowerPoint file"
+              tryAriaLabel="Download PPTX: the board slide as a PowerPoint file"
             >
               The same slide as a file: a one-slide native PPTX with every box editable, or a
               one-page widescreen PDF for a pre-read. Served as an attachment. Takes the same stage
-              values as the SVG. With `week`, the slide is the frozen brief as published — no
-              stage, and a brief from before scores were stored prints no scores.
+              values as the SVG. With <code className="font-mono">week</code>, the slide is the frozen brief as
+              published. It takes no stage, and a brief from before scores were stored prints no scores.
             </Endpoint>
             <Endpoint
               signature="GET /api/embed?format=html|text|json|page&mode=call-strip"
@@ -401,7 +394,7 @@ export default function ApiDocsPage() {
               signature="GET /brief.md"
               tryHref="/brief.md"
               tryLabel="View brief.md"
-              tryAriaLabel="View Markdown brief"
+              tryAriaLabel="View brief.md: the current brief in Markdown"
             >
               The current brief in Markdown format. Instant, structured, cacheable.
             </Endpoint>
@@ -409,7 +402,7 @@ export default function ApiDocsPage() {
               signature="GET /llms.txt"
               tryHref="/llms.txt"
               tryLabel="View llms.txt"
-              tryAriaLabel="View LLMs discovery document"
+              tryAriaLabel="View llms.txt: the agent discovery document"
             >
               Agent discovery document. Linked from &lt;link rel=&quot;llm&quot;&gt; in the page head.
             </Endpoint>
@@ -417,7 +410,7 @@ export default function ApiDocsPage() {
               signature="GET /llms-full.txt"
               tryHref="/llms-full.txt"
               tryLabel="View llms-full.txt"
-              tryAriaLabel="View the answer pages, guides and terms as one Markdown file"
+              tryAriaLabel="View llms-full.txt: the answer pages, guides and terms in one Markdown file"
             >
               The answer pages, guides and terms in one Markdown file, for a model that reads the site&apos;s
               text in one fetch.
@@ -426,7 +419,7 @@ export default function ApiDocsPage() {
               signature="GET /feed.xml"
               tryHref="/feed.xml"
               tryLabel="View feed.xml"
-              tryAriaLabel="View RSS feed"
+              tryAriaLabel="View feed.xml: the RSS feed"
             >
               RSS feed for the weekly brief. Subscribe in any RSS reader.
             </Endpoint>
@@ -434,7 +427,7 @@ export default function ApiDocsPage() {
               signature="GET /calendar.ics"
               tryHref="/calendar.ics"
               tryLabel="View calendar.ics"
-              tryAriaLabel="View the calendar feed"
+              tryAriaLabel="View calendar.ics: the calendar feed"
             >
               The same weeks as a calendar to subscribe to: each Monday of the last six months is an all-day
               event with that week&apos;s conditions and guidance. Subscribe by URL in any calendar app.
@@ -483,7 +476,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
             >
               One row per month-end, newest first, going back <code className="font-mono">weeks</code> weeks (at
-              most 52, the default). Each row carries that month-end&apos;s own margin and trend.
+              most 52, the default). Each row carries that month-end&apos;s own trend and room before a change.
             </Endpoint>
             <Endpoint
               signature="GET /api/cli/scenario?tightness=74&risk-appetite=32"

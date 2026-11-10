@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { stale } = await loadWeekConditions();
   const metadata = buildPageMetadata({
     title: titleFor(role.title),
-    description: `Is now a good time for ${role.label} to ask for a raise, more headcount or a slower roadmap? What this week's conditions mean at any tech company, the general rules, and questions to ask leadership.`,
+    description: `Is now a good time for ${role.label} to ask for a raise, more headcount or a slower roadmap? This week's conditions at any tech company, the general rules, and questions to ask leadership.`,
     path: `/roles/${role.slug}`,
     imageAlt: titleFor(role.title),
   });
@@ -76,16 +76,11 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
       <WorkSituationsSection situations={workSituationsForRole(role.slug)} pagePath={path} />
       <LeadershipQuestionsSection role={role} pagePath={path} />
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-100">Leadership guidance and worksheets</h2>
-          <p className="text-sm text-slate-300">
-            Guidance for leadership discussions and one-decision worksheets that apply to {role.label}.
-          </p>
-        </div>
+        <h2 className="text-lg font-semibold text-slate-100">Leadership guides and worksheets</h2>
         <div className="weather-switch gap-6 [--col-min:18rem]">
           {leadershipGuidance ? (
             <div className="space-y-2">
-              <h3 className="type-eyebrow text-slate-300">Leadership guidance</h3>
+              <h3 className="type-eyebrow text-slate-300">Leadership guide</h3>
               <p className="text-xs text-slate-400">
                 {leadershipGuidance.tagline}
               </p>
@@ -96,14 +91,14 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
           ) : null}
           {toolkits.length > 0 ? (
             <div className="space-y-2">
-              <h3 className="type-eyebrow text-slate-300">Applicable worksheets</h3>
+              <h3 className="type-eyebrow text-slate-300">Worksheets</h3>
               <p className="text-xs text-slate-400">
                 Worksheets for decisions {role.label} face under current conditions:
               </p>
               <div className="flex flex-wrap gap-2">
                 {toolkits.map((toolkit) => (
                   <ActionLink key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} variant="pill">
-                    {toolkit.title.replace(/ Toolkit$/, "")}
+                    {toolkit.title.replace(/ toolkit$/i, "")}
                   </ActionLink>
                 ))}
               </div>

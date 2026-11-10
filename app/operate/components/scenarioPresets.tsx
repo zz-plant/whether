@@ -28,7 +28,7 @@ export function ScenarioPresets({
             Presets
           </h3>
           <p className="mt-1 text-xs text-slate-300">
-            Four preset scenarios. Each sets the short-term borrowing rate and the recession warning gauge (10-year minus 2-year rate).
+            Each sets the short-term borrowing rate and the recession warning gauge (10-year minus 2-year rate).
           </p>
         </div>
         {/* Rendered only once the values differ from this week's: at the

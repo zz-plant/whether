@@ -95,7 +95,7 @@ export const SignalsWhatChangedSection = ({
           (2026-09-30 attention pass). A phone that arrives on a filtered link
           still sees them, so it can get back to every row. */}
       <nav
-        aria-label="Start with these checks"
+        aria-label="Filter the signals"
         className={`flex flex-wrap gap-2 ${activeFocus === "all" ? "max-sm:hidden" : ""}`}
       >
         {focusTabs.map((focus) => {

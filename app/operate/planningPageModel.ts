@@ -68,7 +68,7 @@ export async function buildPlanningPageModel(
   const structuredData = graph([
     {
       "@type": "WebPage",
-      name: "This Week's Plan: Hiring, Spending and Runway Rules",
+      name: "This week's plan: hiring, spending and runway rules",
       url: buildCanonicalUrl("/operate"),
       description:
         "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
@@ -316,8 +316,8 @@ export async function buildPlanningPageModel(
                 // Resolve's direct answers live on Guides since 2026-10-08, grouped
                 // by decision area with this week's standing beside each.
                 h("p", { className: "text-xs leading-5 text-slate-400" },
-                  h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Guides"),
-                  " answers the most common decisions and says where each stands this week.",
+                  h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Answers by decision area"),
+                  " covers the most common decisions and says where each stands this week.",
                 ),
               ),
             }),
@@ -372,7 +372,7 @@ export async function buildPlanningPageModel(
         ? h("section", { id: "ops-failure-patterns", className: "space-y-3 border-t border-[color:var(--border-default)] pt-8", "aria-labelledby": "ops-failure-patterns-title" },
           h("div", { className: "space-y-1" },
             h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
-            h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it."),
+            h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and the check for it."),
           ),
           h("ul", { className: "weather-grid gap-x-8 gap-y-4 [--col-min:20rem] [--grid-max:2]" },
             failureModes.map((warning) => h("li", { key: warning.id },

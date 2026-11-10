@@ -21,7 +21,7 @@
     {
       "slug": "capital-regime",
       "term": "Capital regime",
-      "definition": "The current operating guidance for capital allocation defined by cost of capital, demand reliability, and financing optionality rather than optimism bias.",
+      "definition": "The current operating guidance for capital allocation defined by cost of capital, demand reliability, and financing optionality.",
       "boardPrompt": "Given this capital regime, which commitments are mandatory, optional, deferred, or prohibited this quarter?"
     }
   ],
@@ -29,19 +29,19 @@
   "resourceSupportingPages": {
     "decisionShieldOverview": {
       "path": "/resources/decision-shield-overview",
-      "title": "Decision Shield Overview"
+      "title": "Decision Shield overview"
     },
     "capitalPostureTemplate": {
       "path": "/resources/capital-posture-template",
-      "title": "Capital Planning Template"
+      "title": "Capital planning template"
     },
     "reversalTriggerChecklist": {
       "path": "/resources/reversal-trigger-checklist",
-      "title": "Pause Line Checklist"
+      "title": "Pause line checklist"
     },
     "quarterlyCapitalPostureMemoExample": {
       "path": "/resources/quarterly-capital-posture-memo-example",
-      "title": "Quarterly Capital Planning Memo Example"
+      "title": "Quarterly capital planning memo example"
     }
   }
 }

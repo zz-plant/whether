@@ -110,7 +110,7 @@ export function EmbedBuilder() {
               {/* Client-side only: the server HTML is what a crawler indexes, and a
                   "Loading…" sentence there is not part of the page. */}
               <div className="px-3 py-3 text-fluid-nano text-slate-400">
-                {hydrated ? `Loading the live ${embedMode === "call-strip" ? "call strip" : "brief"}${stage ? ` (${stage})` : ""}…` : null}
+                {hydrated ? `Loading the live ${embedMode === "call-strip" ? "one-line strip" : "brief"}${stage ? ` (${stage})` : ""}…` : null}
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@ export function EmbedBuilder() {
 
           <p className="text-fluid-nano leading-relaxed text-slate-400">
             Paste this into any HTML newsletter or webpage: the brief renders live, updates every
-            week with no API key, and carries a small &ldquo;Macro brief by Whether&rdquo; footer
+            week with no API key, and carries a small &ldquo;Whether Weekly Brief&rdquo; footer
             linking back here.
           </p>
         </div>

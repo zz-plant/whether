@@ -11,7 +11,7 @@ export const revalidate = 21600;
 export const metadata: Metadata = buildPageMetadata({
   title: "Would this plan hold up?",
   description:
-    "Decision Shield checks a plan against this week's guidance and returns Safe, Risky or Dangerous — with the pause line to hold and the restart line that would change the guidance.",
+    "Decision Shield checks a plan against this week's guidance and returns Safe, Risky or Dangerous, with the pause line to hold and the restart line that would change the guidance.",
   path: "/resources/decision-shield-overview",
   imageAlt: "Would this plan hold up?",
 });
@@ -28,9 +28,9 @@ export default async function DecisionShieldOverviewPage() {
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">Would this plan hold up?</h1>
         <p className="text-sm text-slate-200">
-          Decision Shield checks a plan against this week&apos;s guidance and returns one verdict —
-          Safe, Risky or Dangerous — with the pause line to hold and the restart line that would
-          change the guidance. It records what you decided.
+          Decision Shield checks a plan against this week&apos;s guidance and returns one verdict:
+          Safe, Risky or Dangerous. It names the pause line to hold and the restart line that would
+          change the guidance, and it records what you decided.
         </p>
         <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p className="type-eyebrow">This week</p>
@@ -58,7 +58,7 @@ export default async function DecisionShieldOverviewPage() {
             <span aria-hidden="true" className="text-slate-500">•</span>
             <span>
               <span className="font-semibold text-slate-100">A pause line.</span> The condition to
-              hold while you proceed — phase hiring in tranches, ship milestones, cap the discount
+              hold while you proceed: phase hiring in tranches, ship milestones, cap the discount
               window.
             </span>
           </li>
@@ -80,21 +80,21 @@ export default async function DecisionShieldOverviewPage() {
             <span aria-hidden="true" className="text-slate-500">•</span>
             <span>
               <span className="font-semibold text-slate-100">Safe.</span> The move fits this
-              week&apos;s conditions. Proceed with the guardrail.
+              week&apos;s conditions. Proceed and hold the pause line.
             </span>
           </li>
           <li className="flex gap-2">
             <span aria-hidden="true" className="text-slate-500">•</span>
             <span>
               <span className="font-semibold text-slate-100">Risky.</span> The move cuts against
-              conditions somewhere. Reduce its size or stage it, and hold the guardrail.
+              conditions somewhere. Reduce its size or stage it, and hold the pause line.
             </span>
           </li>
           <li className="flex gap-2">
             <span aria-hidden="true" className="text-slate-500">•</span>
             <span>
               <span className="font-semibold text-slate-100">Dangerous.</span> The move works
-              against the conditions. Wait for the reversal, or find a smaller version.
+              against the conditions. Wait for the restart line, or find a smaller version.
             </span>
           </li>
         </ul>

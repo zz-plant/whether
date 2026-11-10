@@ -44,7 +44,7 @@ export const revalidate = 300;
    title, its description and its URL. The live card is the right one here: the
    page exists to hand this week's brief to someone else. */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Share the Current Weekly Brief",
+  title: "Share this week's guidance",
   description:
     "Copy this week's Whether guidance for Slack, a slide, or a citation; add a meeting pack or calendar hold; or embed a live brief in a newsletter or wiki.",
   path: "/share",
@@ -201,7 +201,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "full-brief",
       group: "Team and tickets",
       label: "Full brief",
-      hint: "The weekly operator brief: every area's rule and lines, for a channel that wants the whole week.",
+      hint: "Every area's rule and lines, for a channel that wants the whole week.",
       kind: "text",
       text: artifact.fullBrief,
       copyLabel: "Copy full brief",
@@ -379,7 +379,7 @@ export default async function SharePage() {
           scoreReferences={artifact.scoreReferences}
           options={buildShareOptions(artifact)}
           calendar={{
-            title: `Whether weekly brief review — ${artifact.recordDate}`,
+            title: `Whether Weekly Brief review — ${artifact.recordDate}`,
             details: artifact.calendarDetails,
             feedUrl: `${siteUrl}${CALENDAR_FEED_PATH}`,
           }}
@@ -402,7 +402,8 @@ export default async function SharePage() {
             Ask an assistant what this week means for your company:{" "}
             {artifact.assistantLinks.map((link, index) => (
               <Fragment key={link.name}>
-                {index > 0 ? " · " : null}
+                {/* NBSP before the dot, so a wrap never opens a line on "· Perplexity". */}
+                {index > 0 ? "\u00A0· " : null}
                 <ActionLink href={link.href} variant="inline" target="_blank" rel="noreferrer">
                   {link.name}
                 </ActionLink>

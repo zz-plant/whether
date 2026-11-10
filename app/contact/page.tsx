@@ -47,7 +47,7 @@ export default function ContactPage() {
         <div className="space-y-2 max-w-xl">
           <h1 className="text-fluid-2xl font-semibold text-slate-100">Contact</h1>
           <p className="text-sm text-slate-300">
-            Whether is written and maintained by {publisherAuthor.name} — {publisherAuthor.role}.
+            Whether is written and maintained by {publisherAuthor.name}, its editor.
           </p>
           <p className="text-sm text-slate-300">
             Email:{" "}

@@ -86,7 +86,7 @@ describe("ScenarioStudioSimulator", () => {
     assert.doesNotMatch(html, /font-mono/);
 
     // Presets say what they set, not a scenario name
-    assert.match(html, /Four preset scenarios/);
+    assert.match(html, /Each sets the short-term borrowing rate and the recession warning gauge/);
     assert.match(html, /Short-term borrowing rate 2\.00%, recession warning gauge \+1\.2%/);
     assert.match(html, /Short-term borrowing rate 6\.25%, recession warning gauge -0\.6%/);
     assert.match(html, /Short-term borrowing rate 5\.25%, recession warning gauge -1\.25%/);
@@ -130,8 +130,8 @@ describe("ScenarioStudioSimulator", () => {
     );
 
     assert.match(html, /Active scenario/);
-    assert.match(html, /Short rate 2\.00%/);
-    assert.match(html, /Gauge 1\.20%/);
+    assert.match(html, /Short-term borrowing rate 2\.00%/);
+    assert.match(html, /Recession warning gauge 1\.20%/);
     assert.match(html, /Active scenario[\s\S]{0,400}Sunny/, "the strip names the regime the scenario lands in");
     // The verdict belongs to the deltas panel, which has the transition to show it.
     assert.equal((html.match(/Conditions would change/g) ?? []).length, 1);

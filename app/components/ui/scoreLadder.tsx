@@ -8,6 +8,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
+import type { LadderLine, LadderLineKind } from "./ladderLines";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { ConditionIcon, LineStateIcon } from "./conceptIcons";
 import type { RegimeKey } from "../../../lib/types";
@@ -28,14 +29,6 @@ import { travelTimeAt } from "../../../lib/report/home/weekMove";
  *
  * Presentational: it takes numbers and knows nothing about the engine.
  */
-type LadderLineKind = "pause" | "resume" | "callChange";
-
-export type LadderLine = {
-  kind: LadderLineKind;
-  value: number;
-  /** Overrides the default label for the kind. */
-  label?: string;
-};
 
 type ScoreLadderProps = {
   label: ReactNode;
@@ -222,25 +215,6 @@ export const nearestLadderLine = (value: number, lines: readonly LadderLine[]) =
   return best;
 };
 
-/**
- * The three lines as a ladder takes them, from the numbers a surface has. The
- * pause and restart lines come from a rule's rails (`buildSharedCorridorRails`)
- * and are absent when the rule states none; the call-change line is the
- * threshold in force and is always drawn.
- */
-export const buildLadderLines = ({
-  pause,
-  resume,
-  callChange,
-}: {
-  pause?: number;
-  resume?: number;
-  callChange: number;
-}): LadderLine[] => [
-  ...(typeof pause === "number" ? [{ kind: "pause" as const, value: pause }] : []),
-  ...(typeof resume === "number" ? [{ kind: "resume" as const, value: resume }] : []),
-  { kind: "callChange" as const, value: callChange },
-];
 
 /*
  * The nearest line by its number, not its name ("5 pts above 50", until
@@ -248,9 +222,13 @@ export const buildLadderLines = ({
  * every tick, so the number finds the tick and the name said "line" again.
  */
 /**
- * Where a score stands against its pause line, as a figure states it: "14 pts past its
- * pause line. Restarts below 66." The pause line faces away from the restart line, so a
- * score that pauses above 76 restarts below 66, and one that pauses below 44 pauses "below".
+ * Where a score stands, as a figure states it: the verb and the number, "Paused above 76.
+ * Restarts below 66." or "Clear. Pauses below 44." Until 2026-11-10 it read "14 pts past
+ * its pause line", the mechanism the 2026-11-03 sweep took out of every other sentence
+ * (docs/editorial-guardrails.md, "Say the number or the verb"); the ladder under the
+ * figure draws the distance, and the area groups state it as a move. The pause line faces
+ * away from the restart line, so a score that pauses above 76 restarts below 66, and one
+ * that pauses below 44 pauses "below".
  */
 const describeFigureStanding = (value: number, lines: readonly LadderLine[]): { crossed: boolean; lead: string; rest: string } => {
   const pause = lines.find((line) => line.kind === "pause");
@@ -263,13 +241,15 @@ const describeFigureStanding = (value: number, lines: readonly LadderLine[]): { 
   }
   const pausesAbove = guardsAbove(pause, resume) ?? guardsAbove(pause, change) ?? true;
   const crossed = pausesAbove ? value > pause.value : value < pause.value;
-  const distance = Math.abs(value - pause.value);
-  const lead =
-    distance === 0 ? "At its pause line" : `${formatPoints(distance)} pts ${crossed ? "past" : "clear of"} its pause line`;
+  const pauseSide = pausesAbove ? "above" : "below";
   if (crossed) {
-    return { crossed, lead, rest: resume ? `Restarts ${pausesAbove ? "below" : "above"} ${formatPoints(resume.value)}.` : "" };
+    return {
+      crossed,
+      lead: `Paused ${pauseSide} ${formatPoints(pause.value)}`,
+      rest: resume ? `Restarts ${pausesAbove ? "below" : "above"} ${formatPoints(resume.value)}.` : "",
+    };
   }
-  return { crossed, lead, rest: `Pauses ${pausesAbove ? "above" : "below"} ${formatPoints(pause.value)}.` };
+  return { crossed, lead: "Clear", rest: `Pauses ${pauseSide} ${formatPoints(pause.value)}.` };
 };
 
 export const describeLadderPosition = (value: number, lines: readonly LadderLine[]) => {

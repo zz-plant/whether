@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ReportCta } from "../components/reportCta";
-import { buildLeadershipQuestionsCopy, leadershipQuestions, runwayAnswers, RUNWAY_QUESTION } from "../../lib/report/leadershipQuestions";
+import { buildLeadershipQuestionsCopy, leadershipQuestions, runwayAnswers } from "../../lib/report/leadershipQuestions";
 import type { CompanyRole } from "../../lib/report/companyRoles";
 import type { OperatorStage } from "../../lib/report/operatorStage";
 
@@ -34,8 +34,8 @@ export function LeadershipQuestionsSection({
         </p>
       ) : (
         <div id="runway-answers" className="space-y-1">
-          <h3 className="text-sm font-semibold text-slate-100">What the first answer means</h3>
-          <p className="text-xs text-slate-400">{RUNWAY_QUESTION}</p>
+          {/* Named as the stage pages' link names it; the question itself heads the list above. */}
+          <h3 className="text-sm font-semibold text-slate-100">What the runway answer means</h3>
           <ul className="space-y-1 text-sm text-slate-300">
             {runwayAnswers().map((answer) => (
               <li key={answer}>{answer}</li>

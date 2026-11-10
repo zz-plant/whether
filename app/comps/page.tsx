@@ -76,7 +76,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const month = comps.status === "ok" ? formatTitleMonth(comps.data.fetchedAt) : null;
   return buildPageMetadata({
     title: month ? `What a SaaS company is worth, ${month}` : "What is a SaaS company worth right now?",
-    description: `What public SaaS companies are worth right now: the median EV/Revenue multiple and revenue growth across ${SAAS_BASKET.length} companies, with the date of the read and this week's fundraising guidance.`,
+    description: `What public SaaS companies are worth right now: the median EV/revenue multiple and revenue growth across ${SAAS_BASKET.length} companies, with the date of the read and this week's fundraising guidance.`,
     path: "/comps",
     imageAlt: "What a SaaS company is worth right now",
   });
@@ -155,7 +155,7 @@ export default async function CompsPage() {
             The figures are missing, not zero; the basket is unchanged.
           </p>
         ) : (
-          <p className="text-sm text-slate-400">Unable to load data. Please try again later.</p>
+          <p className="text-sm text-slate-400">The multiples could not be loaded. Reload the page in a few minutes.</p>
         )}
 
         <section className="weather-surface space-y-2 px-4 py-4">
@@ -195,7 +195,7 @@ export default async function CompsPage() {
               fundraising discussion" below says in full (2026-10-09). */}
           {comps.status === "ok" && comps.data.medianEvToRevenue !== null ? null : (
             <p className="text-sm text-slate-300">
-              With no median available, the fundraising guidance still uses the brief&apos;s macro signals. The public valuation comparison is missing, not zero.
+              With no median available, the fundraising guidance still uses the brief&apos;s scores. The public valuation comparison is missing, not zero.
             </p>
           )}
           <ActionLink href="/" variant="pill">

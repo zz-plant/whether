@@ -370,7 +370,7 @@ export async function DecisionAnswerPageContent({
                   lines={[{ kind: "callChange", value: reading.line }]}
                 />
                 <SignalScaleNote signalKey={reading.key} />
-                <PlainEnglishScoreNote signalKey={reading.key} score={reading.score} lead="On this signal alone" />
+                <PlainEnglishScoreNote signalKey={reading.key} score={reading.score} lead="On this score alone" />
               </div>
             ))}
           </div>
@@ -417,7 +417,7 @@ export async function DecisionAnswerPageContent({
 
         <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
-          <p className="text-xs text-slate-400">Data date: <time dateTime={reportData.treasury.record_date}>{recordDateLabel}</time> · freshness: {fetchedAtLabel}.</p>
+          <p className="text-xs text-slate-400">Data as of <time dateTime={reportData.treasury.record_date}>{recordDateLabel}</time> · checked {fetchedAtLabel}.</p>
           {reviewedAt ? (
             <p className="text-xs text-slate-400">Answer last reviewed: {reviewedAt}.</p>
           ) : null}

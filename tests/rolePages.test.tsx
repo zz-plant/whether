@@ -153,7 +153,7 @@ describe("a role at a company stage", () => {
     const onStagePage = renderToStaticMarkup(
       <LeadershipQuestionsSection role={engineers} stage="seed" pagePath="/roles/software-engineers/seed" answersHref="/roles/software-engineers#runway-answers" />,
     );
-    assert.doesNotMatch(onStagePage, /What the first answer means/);
+    assert.doesNotMatch(onStagePage, /id="runway-answers"/, "the stage page links the runway answers rather than printing them");
     assert.match(onStagePage, /href="\/roles\/software-engineers#runway-answers"/);
     const onRolePage = renderToStaticMarkup(<LeadershipQuestionsSection role={engineers} pagePath="/roles/software-engineers" />);
     assert.match(onRolePage, /id="runway-answers"/);

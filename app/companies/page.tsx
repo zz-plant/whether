@@ -32,7 +32,7 @@ export default function CompaniesPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What public tech companies have filed, by role</h1>
         <p className="text-sm text-slate-300">
-          The conditions are the same for everyone. What differs is the decisions each role makes and what each company has filed.
+          The conditions are the same for everyone. What differs is the decisions each role makes and the figures each company has filed.
           Whether isn&apos;t affiliated with any of these companies. At a private company?{" "}
           <Link href="/roles" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
             Start with your role

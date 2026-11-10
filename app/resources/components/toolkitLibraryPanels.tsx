@@ -48,7 +48,6 @@ export function ToolkitLibraryPanels({
     closestToolkits,
     filteredToolkits,
     normalizedQuery,
-    routedShortlist,
   } = resolveToolkitLibraryState(query);
 
   return (
@@ -58,9 +57,16 @@ export function ToolkitLibraryPanels({
           {normalizedQuery ? "Tool results" : "Recommended tools"}
         </h2>
         <p className="text-sm text-slate-300">
-          {normalizedQuery
-            ? "Matched from search. Clear to see the full shortlist."
-            : "Each opens a one-decision worksheet. Search the site with ⌘K."}
+          {normalizedQuery ? (
+            <>
+              Matched from search.{" "}
+              <Link href={buildToolkitLibraryHref()} className="text-[var(--accent-action)] underline underline-offset-4">
+                Show the full shortlist
+              </Link>
+            </>
+          ) : (
+            "Each opens a one-decision worksheet. Search the site with ⌘K."
+          )}
         </p>
       </div>
 
@@ -75,16 +81,6 @@ export function ToolkitLibraryPanels({
         ))}
       </div>
 
-      {normalizedQuery ? (
-        <div className="rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">
-          Showing the tools that match your search.
-        </div>
-      ) : (
-        <div className="rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">
-          {routedShortlist.map((toolkit) => toolkit.title.replace(/ Toolkit$/, "")).join(", ")}.
-        </div>
-      )}
-
       {filteredToolkits.length > 0 ? (
         <div className="weather-page-grid-3">
           {filteredToolkits.map((toolkit) => (
@@ -96,7 +92,7 @@ export function ToolkitLibraryPanels({
         </div>
       ) : (
         <div className="space-y-3 rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-4 text-sm text-slate-200">
-          <p>No tool matched “{normalizedQuery}”. Try a broader task label, or one of the direct answers above.</p>
+          <p>No tool matched “{normalizedQuery}”. Try a broader word, or one of the direct answers above.</p>
           <div className="flex flex-wrap gap-2">
             <Link href="/resources#answers" className="weather-hub-chip">Try direct answers</Link>
           </div>

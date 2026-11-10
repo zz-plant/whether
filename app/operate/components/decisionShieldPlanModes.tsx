@@ -193,7 +193,8 @@ export function PlanStressTestMode({
                       ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
                       : "bg-rose-500/20 text-rose-300 border border-rose-500/40"
                   }`}>
-                    {stressTestResult.verdict}
+                    {/* Sentence case on screen (2026-11-10); the verdict code stays SAFE / RISKY / DANGEROUS. */}
+                    {`${stressTestResult.verdict.charAt(0)}${stressTestResult.verdict.slice(1).toLowerCase()}`}
                   </span>
                   <span className="text-fluid-sm text-slate-300 font-semibold">
                     Category: {stressTestResult.detectedCategory}

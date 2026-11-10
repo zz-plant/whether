@@ -76,7 +76,7 @@
       "Customer demand, available cash and the next evidence milestone for each bet.",
       "The market change and company result that would justify another review."
     ],
-    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [your pause line] is crossed; resume after [demand and cash evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [your pause line] is crossed; restart after [demand and cash evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Compare historical conditions",
@@ -159,7 +159,7 @@
       "Remaining cost and capacity for each initiative, including maintenance after launch.",
       "The next customer validation milestone and which work would be displaced."
     ],
-    "decisionNote": "Keep [core commitments] and defer [new scope]. Pause expansion if [capacity or cash limit] is crossed. Resume at [customer milestone] with [funded capacity]. Owner: [name]. Review: [date].",
+    "decisionNote": "Keep [core commitments] and defer [new scope]. Pause expansion if [capacity or cash limit] is crossed. Restart at [customer milestone] with [funded capacity]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Roadmap focus toolkit",
@@ -271,7 +271,7 @@
     "category": "decision",
     "shortAnswer": "Freeze hiring when your cash plan can't support new commitments, and decide on backfills and critical roles one by one.",
     "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence that would let you start hiring again.",
-    "audience": "Founders, VP Engineering, CFO",
+    "audience": "Founders, VPs of engineering and CFOs",
     "applyHeading": "Which open roles to keep",
     "mappedDecisionAreas": [
       "hiring",
@@ -311,7 +311,7 @@
     "category": "decision",
     "shortAnswer": "Add sales capacity when qualified demand exceeds current coverage and the cash plan can fund recruiting, ramp and the sales cycle.",
     "directAnswer": "Check whether the bottleneck is sales capacity or insufficient qualified demand. Add a small cohort of reps only after the existing team demonstrates repeatable conversion and the downside plan funds their ramp.",
-    "audience": "CRO, CEO, finance leaders",
+    "audience": "CROs, CEOs and finance leaders",
     "applyHeading": "When more sales hires pay off",
     "mappedDecisionAreas": [
       "hiring",
@@ -327,10 +327,10 @@
       "Recruiting cost, compensation, ramp duration and sales-cycle length.",
       "Gross margin, collections and cash remaining if the new cohort ramps slowly."
     ],
-    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp target] is missed. Resume after [conversion and cash evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp target] is missed. Restart after [conversion and cash evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Set the next growth spending step",
+        "label": "How fast should we scale go-to-market?",
         "href": "/answers/how-fast-should-we-scale-go-to-market"
       },
       {
@@ -351,7 +351,7 @@
     "category": "decision",
     "shortAnswer": "Delay a new product line when demand is unproven or its build and support costs would put the core business at risk.",
     "directAnswer": "Fund the smallest test that can establish demand before committing to a full product line. Set a customer milestone, a spending limit and an exit condition, including the ongoing support the product would require.",
-    "audience": "VP Product, CTO, strategy",
+    "audience": "VPs of product, CTOs and strategy leads",
     "applyHeading": "How to test a new product line first",
     "mappedDecisionAreas": [
       "product-tempo",
@@ -394,7 +394,7 @@
     ],
     "category": "decision",
     "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
-    "directAnswer": "Set the next spending increment against a proven customer segment or channel. Pause further increases when conversion, retention or payback misses the agreed range; resume after new cohort evidence supports the cash plan.",
+    "directAnswer": "Set the next spending increment against a proven customer segment or channel. Pause further increases when conversion, retention or payback misses the agreed range; restart after new cohort evidence supports the cash plan.",
     "audience": "Growth leaders, CROs and finance partners",
     "applyHeading": "How fast to add go-to-market spend",
     "mappedDecisionAreas": [
@@ -411,10 +411,10 @@
       "Retention, conversion and cash collection timing for the customers being added.",
       "The spending increment, test duration and cash buffer if results arrive late."
     ],
-    "decisionNote": "Increase [channel] spend by [amount] for [test period]. Pause the next increase if [conversion, retention or payback limit] is missed. Resume after [cohort evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Increase [channel] spend by [amount] for [test period]. Pause the next increase if [conversion, retention or payback limit] is missed. Restart after [cohort evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Sales headcount approval",
+        "label": "Should we expand sales headcount now?",
         "href": "/answers/should-we-expand-sales-headcount-now"
       },
       {
@@ -452,7 +452,7 @@
       "The company decision affected, its owner and the internal evidence supporting a change.",
       "The approval requested, review date and condition that would reverse the decision."
     ],
-    "decisionNote": "As of [date], [external change] affects [decision]. Our company evidence is [cash, customer or delivery result]. We propose [action] within [limit]. Revisit if [trigger]. Owner: [name]. Source: [dated link].",
+    "decisionNote": "As of [date], [external change] affects [decision]. Our company evidence is [cash, customer or delivery result]. We propose [action] within [limit]. Revisit if [condition]. Owner: [name]. Source: [dated link].",
     "supportingLinks": [
       {
         "label": "Published briefs and historical context",
@@ -477,7 +477,7 @@
     ],
     "category": "decision",
     "shortAnswer": "Size cash to the safe band for the current conditions: 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing. Open the raise while you are still above the band's floor.",
-    "directAnswer": "Enter cash, monthly spend and revenue in the runway planner, compare the result to the band your current conditions imply, and set the raise window the planner gives: months 4 through 8 with comfortable coverage, 2 through 5 when coverage is thin, immediately when it is critical.",
+    "directAnswer": "Enter cash, monthly spend and revenue in the runway planner, and compare the result to the band your current conditions imply. Then set the raise window the planner gives: months 4 through 8 with comfortable coverage, 2 through 5 when coverage is thin, immediately when it is critical.",
     "audience": "Founders, CFOs and board members",
     "applyHeading": "Compare your runway to the band",
     "mappedDecisionAreas": [
@@ -486,7 +486,7 @@
     ],
     "thresholdFocus": "both",
     "contextHeading": "Why the band moves with conditions",
-    "context": "The band is the runway planner's model: it widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further: seed adds three months, Series A adds two. The band is a planning default. The record shows how conditions changed after each line, not what a particular round will fetch.",
+    "context": "The band is the runway planner's model. It widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further: seed adds three months, Series A adds two. The band is a planning default. The record shows how conditions changed after each line, not what a particular round will fetch.",
     "companyInputs": [
       "Cash in the bank and monthly spend, net of revenue.",
       "The months a raise consumes: preparation, partner meetings, diligence and a delayed close.",
@@ -516,9 +516,9 @@
     ],
     "category": "decision",
     "shortAnswer": "Work out now what pausing would mean for your company. The points where you would pause are already set, so getting ready means knowing your runway, burn and demand.",
-    "directAnswer": "Put cash, burn and demand numbers next to where hiring, roadmap and spend would pause, and write down for each what you would cut, defer or stop if it trips. A change in conditions then means a decision you already made.",
+    "directAnswer": "Put cash, burn and demand numbers next to where hiring, roadmap and spending would pause. For each area, write down what you would cut, defer or stop when it pauses. A change in conditions then means a decision you already made.",
     "audience": "Founders, COOs and CFOs",
-    "applyHeading": "Decide now what a tripped line means",
+    "applyHeading": "Decide now what each pause would cut",
     "mappedDecisionAreas": [
       "hiring",
       "product-tempo",
@@ -526,7 +526,7 @@
     ],
     "thresholdFocus": "both",
     "contextHeading": "Why the lines are written in advance",
-    "context": "Each pause line sits six points past the line where conditions change, and each restart line four points inside it, so one noisy reading cannot reverse a decision and restart it. The margin study found the published margin measures distance from that line, not probability. What the record cannot tell you is your own demand: the company inputs below are yours to fill in.",
+    "context": "Each pause line sits six points past the line where conditions change, and each restart line four points inside it. The gap means one noisy reading cannot reverse a decision and restart it. The calibration record found that the published room before a change measures distance from that line, not probability. What the record cannot tell you is your own demand: the company inputs below are yours to fill in.",
     "companyInputs": [
       "Runway in months against the safe band for the current conditions.",
       "Which commitments stop, defer or survive a pause in each area.",
@@ -536,7 +536,7 @@
     "supportingLinks": [
       {
         "href": "/calibration",
-        "label": "The margin study: what distance from the line is worth"
+        "label": "How often the guidance held up: what distance from the line is worth"
       },
       {
         "href": "/history/compare",
@@ -558,7 +558,7 @@
       "when to hire the first salesperson"
     ],
     "category": "decision",
-    "shortAnswer": "Treat the first sales hire as an expansion bet: fund it one stage at a time with the stage gates written down, and size it against the risk appetite line like every other new bet.",
+    "shortAnswer": "Treat the first sales hire as a new bet. Fund it one stage at a time with the stage gates written down, and hold it to the same risk appetite pause line as every other new bet.",
     "directAnswer": "Make the hire when founder-led sales shows repeatable evidence (the same segment, the same pitch, closed deals) and the fully loaded cost is in the cash plan with a written stop condition attached.",
     "audience": "Founders, CEOs and heads of sales",
     "applyHeading": "Gate the hire like a bet",
@@ -567,7 +567,7 @@
     ],
     "thresholdFocus": "risk",
     "contextHeading": "What the record can and cannot tell you",
-    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use: when risk appetite falls below its pause line, new commitments stop. A first salesperson who arrives just before that line is a bet made on the edge.",
+    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use. When risk appetite falls below its pause line, new commitments stop. A first salesperson who arrives just before that line is a bet made on the edge.",
     "companyInputs": [
       "Closed deals from founder-led sales: count, segment and cycle length.",
       "The fully loaded cost of the rep and the cash plan that carries it.",
@@ -617,7 +617,7 @@
     "decisionNote": "Raise prices for [segment] by [amount] starting [date]. Watch [churn and win rate]. Roll back if [pause line] is crossed. Hold the base price for [segment] until [milestone]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Pricing change toolkit",
+        "label": "Claims & positioning toolkit",
         "href": "/toolkits/claims"
       },
       {
@@ -682,7 +682,7 @@
         "href": "/operate"
       },
       {
-        "label": "Runway planning",
+        "label": "How much runway should we have before we raise?",
         "href": "/answers/how-much-runway-should-we-have-before-we-raise"
       }
     ],
@@ -741,7 +741,7 @@
         "href": "/operate"
       },
       {
-        "label": "Roadmap focus",
+        "label": "Should startups slow roadmap expansion?",
         "href": "/answers/should-startups-slow-roadmap-expansion"
       }
     ],
@@ -797,7 +797,7 @@
     "decisionNote": "Take the bridge only if it reaches [milestone] with [months] of runway. Otherwise cut burn to [target] and revisit in [weeks]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Runway planning",
+        "label": "How much runway should we have before we raise?",
         "href": "/answers/how-much-runway-should-we-have-before-we-raise"
       },
       {
@@ -861,7 +861,7 @@
         "href": "/operate"
       },
       {
-        "label": "Headcount planning",
+        "label": "Should startups do layoffs now?",
         "href": "/answers/should-startups-do-layoffs-now"
       }
     ],
@@ -919,7 +919,7 @@
         "href": "/operate"
       },
       {
-        "label": "New bets",
+        "label": "Should we delay new product lines?",
         "href": "/answers/should-we-delay-new-product-lines"
       }
     ],
@@ -976,7 +976,7 @@
         "href": "/operate"
       },
       {
-        "label": "Burn planning",
+        "label": "When should startups cut burn?",
         "href": "/answers/when-should-startups-cut-burn"
       }
     ],
@@ -1032,11 +1032,11 @@
     "decisionNote": "Take the loan only if we can make every payment with the next round [months] late. Amount: [amount]. Condition to watch: [condition]. Otherwise cut burn to [target]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Bridge rounds",
+        "label": "Should startups raise a bridge round now?",
         "href": "/answers/should-startups-raise-a-bridge-round-now"
       },
       {
-        "label": "Runway planning",
+        "label": "How much runway should we have before we raise?",
         "href": "/answers/how-much-runway-should-we-have-before-we-raise"
       }
     ],

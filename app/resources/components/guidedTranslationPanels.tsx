@@ -291,7 +291,7 @@ export function GuidedTranslationPanels({
                   href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: selectedStakeholder?.slug })}
                   className="weather-hit inline-flex items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
                 >
-                  Open stage view
+                  Open {stage.title} view
                 </Link>
               </article>
             ))}

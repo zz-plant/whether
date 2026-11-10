@@ -36,9 +36,9 @@ export function PremiseOutcomeScatterChart({
   return (
     <figure data-premise-outcome-chart className={`weather-surface space-y-2 p-4 ${className}`.trim()}>
       <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
-        <span className="font-semibold text-slate-200">Forward 4Q venture deal value growth</span>
+        <span className="font-semibold text-slate-200">Venture deal value growth over the next four quarters</span>
         <span className="tabular-nums text-slate-400">
-          51 signal quarters (2012–2024)
+          51 quarters (2012–2024)
         </span>
       </figcaption>
 
@@ -104,7 +104,7 @@ export function PremiseOutcomeScatterChart({
                 stroke="var(--bg-panel)"
                 strokeWidth="1"
               >
-                <title>{`${q.quarter}: FP ${q.fundingPressure}, Forward 4Q deal value ${percent(q.forwardValue)}`}</title>
+                <title>{`${q.quarter}: funding pressure ${q.fundingPressure}, deal value over the next four quarters ${percent(q.forwardValue)}`}</title>
               </circle>
             );
           })}
@@ -114,14 +114,14 @@ export function PremiseOutcomeScatterChart({
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-fluid-nano text-slate-400 border-t border-[color:var(--border-faint)] pt-2">
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-1 w-3 bg-[var(--line-crossed)]" />
-          <span>Tight (pressure &gt; 70) median: {percent(tightDistribution.medianForwardValue)}</span>
+          <span>Tight (funding pressure &gt; 70) median: {percent(tightDistribution.medianForwardValue)}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-1 w-3 bg-[var(--color-condition-sunny)]" />
-          <span>Calm (pressure &le; 70) median: {percent(calmDistribution.medianForwardValue)}</span>
+          <span>Calm (funding pressure &le; 70) median: {percent(calmDistribution.medianForwardValue)}</span>
         </span>
       </div>
-      <ScreenshotCaption detail="NVCA deal volume backtest across 51 quarters (data/research)" />
+      <ScreenshotCaption detail="NVCA venture deal value, 51 quarters, 2012–2024" />
     </figure>
   );
 }

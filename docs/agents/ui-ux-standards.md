@@ -240,8 +240,8 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   2026-11-10 `.weather-surface`, `.weather-card`, `.weather-surface-secondary`, the hub section and
   the hub link card set `box-shadow: none` (`app/styles/surfaces.css`,
   `app/styles/layout-shells.css`); until then each cast a step of the `--elev-*` ladder. What
-  floats over the page still casts one: a menu, a dialog, the toast, the sticky strip. A raised
-  key keeps `--elev-1` (§XXVI).
+  floats over the page still casts one: a menu, a dialog, the toast, the sticky strip. Controls
+  followed the same day (§XXVI): a pill, a button, a field, a key and the segmented well are flat.
 - An offset shadow is elevation. A zero-offset coloured halo is emphasis, and is fine at depth —
   `DecisionHero`'s reconsideration panel tints one by line state (the front red or the clear ink), which carries meaning
   rather than lifting the box.
@@ -802,9 +802,11 @@ Added 2026-10-13 with `docs/decisions/feature-log/01-product-surfaces.md` §1.1.
 an instrument: what it is shaped like says how it works. The form is physical, the paint is not —
 §XXV's ban on gradients and specular on a control stands.
 
-- MUST: a segmented control is a well with keys in it. The track is recessed (`--bg-nested`,
-  `--well-inset`); the chosen key stands proud of it (`--bg-raised`, `--elev-1`, a strong border);
-  a key sinks while pressed (`translateY(1px)`, `--key-pressed`). All of it lives on
+- MUST: a segmented control is a well with keys in it. The track is a tone below the card
+  (`--bg-nested`); the chosen key takes the raised fill and a strong border (`--bg-raised`);
+  a key sinks while pressed (`translateY(1px)`). No part of it casts or insets a shadow
+  (2026-11-10, DESIGN.md "Elevation & Depth"): until then the well was `--well-inset` and the
+  chosen key `--elev-1`, the last depth on the paper. All of it lives on
   `.weather-segment-track` and `.weather-segment-option` in `app/styles/controls.css`, driven by
   the native radio's `:checked`, `:hover` and `:active`; `ui/segmentedControl.tsx` only lays the
   parts out. A tint was the whole selected state until now, and at 15% of the ink it barely
@@ -816,9 +818,8 @@ an instrument: what it is shaped like says how it works. The form is physical, t
   `ordinal`: a rule along the foot of the well with a tick under each key and a pointer under the
   chosen one. An option off that scale passes `apart` and stands after a divider with no tick:
   Bootstrapped is not a stage after Series B+.
-- NEVER: a gradient, a specular edge, a texture or a coloured glow to make a control look
-  physical. Depth is shadow geometry from the tokens, which flips colour with the theme and keeps
-  one height in both.
+- NEVER: a gradient, a specular edge, a texture, a shadow or a coloured glow to make a control
+  look physical. Its form is its border, its fill, the lamp and the 1px press.
 - Motion is the press only: 120ms on the transform, and none under reduced motion.
 - MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
   well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end
@@ -847,7 +848,7 @@ regime shell, the same hue as the condition word.
 | The action colour: `--accent-action`, and the `sky-*` / `cyan-*` utilities folded onto it | controls | A display that names the condition takes `--regime-ink` from its own token (the condition word beside the guidance, the intro's status word, the running head), never through the action aliases |
 | An underline | links | A term with a definition is a link to it, or plain text with the gloss beside it |
 | The control radius (`--radius-lg`) with a frame | controls | §XIV: a framed display is a stamp at `--radius-sm`, a data tile at `--radius-md`, or unframed |
-| A lift (`--elev-1`) or a press (`translateY`) | controls | |
+| A 1px rise under a fine pointer, or a press (`translateY`) | controls | |
 | A chevron | disclosures and pickers | §XII |
 | `cursor: pointer`, or any `hover:` change | controls | A row or a run that brightens under the pointer promises a click it does not answer |
 | A lamp (a filled dot in a key) | controls, for the chosen option | A filled dot outside a key is a data mark (§XIV's mark table), drawn in ink or its condition's ink |

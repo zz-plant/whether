@@ -96,7 +96,7 @@ export default async function DecideDetailPage({
                 <Link key={slugItem} href={`/toolkits/${slugItem}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
                   <p className="font-semibold">{toolkit.title}</p>
                   <p className="text-xs text-slate-300">{toolkit.decisionThisSession}</p>
-                  <p className="text-xs text-slate-300">Artifact: {toolkit.decisionArtifact}</p>
+                  <p className="text-xs text-slate-300">You leave with: {toolkit.decisionArtifact}</p>
                 </Link>
               );
             })}
@@ -118,7 +118,6 @@ export default async function DecideDetailPage({
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">{situationUseCase?.title || titleCase(slug)}</h1>
-        <p className="text-sm text-slate-300">The strongest paths for this decision.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Recommended tools</h2>
@@ -131,7 +130,7 @@ export default async function DecideDetailPage({
               <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
                 <p className="font-semibold">{toolkit.title}</p>
                 <p className="text-xs text-slate-300">{toolkit.decisionThisSession}</p>
-                <p className="text-xs text-slate-300">Artifact: {toolkit.decisionArtifact}</p>
+                <p className="text-xs text-slate-300">You leave with: {toolkit.decisionArtifact}</p>
               </Link>
             );
           })}

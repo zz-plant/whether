@@ -313,7 +313,7 @@ export const formatPointsToLine = (
 };
 
 /** A restart line met on an area that is not on hold: there is no hold to lift, so not "already met". */
-export const NOTHING_TO_RESUME = "nothing to resume";
+export const NOTHING_TO_RESUME = "nothing to restart";
 
 /**
  * How near counts as close to a line: 5 points. It is the distance the margin

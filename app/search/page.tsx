@@ -9,7 +9,7 @@ import { Breadcrumbs } from "../components/ui/breadcrumbs";
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Search Whether Guidance",
+  title: "Search Whether guidance",
   description:
     "Find the page that answers a question: the evidence, the plan, a toolkit, or the method behind the guidance.",
   path: "/search",
@@ -45,7 +45,7 @@ export default async function SearchPage({
         <header className="space-y-2 max-w-2xl">
           <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>
           <p className="text-sm text-slate-300">
-            Find the page that answers it: the evidence, the pause lines, a toolkit, or the method behind the guidance.
+            Find the page that answers your question: the evidence, the pause lines, a toolkit, or the method behind the guidance.
           </p>
         </header>
 

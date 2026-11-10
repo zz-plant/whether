@@ -136,6 +136,6 @@ export const buildCompanySituation = (
       .filter((filing) => Date.parse(filing.filedOn) >= yearAgo)
       .map((filing) => ({ filedOn: formatDateUTC(filing.filedOn), url: filing.url })),
     current: (now.getTime() - Date.parse(figures.periodEnd)) / MS_PER_DAY <= STALE_PERIOD_DAYS,
-    disclaimer: `Figures are from ${company.name}'s SEC filings. Whether isn't affiliated with ${company.name}, and knows nothing of its internal plans, budgets or priorities. This is general guidance, not advice about the company or its stock.`,
+    disclaimer: `Whether isn't affiliated with ${company.name}, and knows nothing of its internal plans, budgets or priorities. This is general guidance, not advice about the company or its stock.`,
   };
 };

@@ -100,7 +100,7 @@ describe("signalOps", () => {
             thresholdLabel: "Spending pause line",
             thresholdValue: 76,
             confidence: "MEDIUM",
-            reversalText: "Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
+            reversalText: "Restart new spend when funding pressure falls below 66 and the payback figures still hold.",
             gate: "pass",
             severe: false,
           },
@@ -148,7 +148,7 @@ describe("signalOps", () => {
           {
             code: "tightness-downshift",
             decisionArea: "spend",
-            actionText: "Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
+            actionText: "Restart new spend when funding pressure falls below 66 and the payback figures still hold.",
             triggerValue: 65,
             thresholdLabel: "Spending restart line",
             thresholdValue: 66,
@@ -205,7 +205,7 @@ describe("signalOps", () => {
     const spend = deltas.find((delta) => delta.code === "tightness-upshift");
     assert.equal(spend?.thresholdValue, 76);
     assert.equal(spend?.action, "Pause new discretionary spend if funding pressure is above 76. Funding pressure is 90 now.");
-    assert.equal(spend?.reversal, "Resume new spend when funding pressure falls below 66 and the payback figures still hold.");
+    assert.equal(spend?.reversal, "Restart new spend when funding pressure falls below 66 and the payback figures still hold.");
     assert.equal(
       deltas.some((delta) => delta.decisionArea === "hiring"),
       false,
@@ -326,7 +326,7 @@ describe("signalOps", () => {
     const spend = payload.reasons.find((reason) => reason.code === "tightness-upshift");
     assert.equal(
       spend?.message,
-      "RECONSIDER SPENDING. Pause new discretionary spend if funding pressure is above 76. Funding pressure 90 crossed the Spending pause line at 76. Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
+      "RECONSIDER SPENDING. Pause new discretionary spend if funding pressure is above 76. Funding pressure 90 crossed the Spending pause line at 76. Restart new spend when funding pressure falls below 66 and the payback figures still hold.",
     );
     const change = payload.reasons.find((reason) => reason.code === "regime-change");
     assert.equal(

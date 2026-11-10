@@ -418,8 +418,10 @@ export const formatDecisionReversal = (value: string, fallback = boundedDecision
   compactDecisionCondition({
     value,
     fallback,
-    verbPrefix: /^Resume\s+/i,
-    conditionPrefix: /^Resume\s+(?:[^.;]*?\s+)?(?:when|once|after|if)\s+/i,
+    /* "Restart" since 2026-11-10, the restart line's verb; "Resume" stays matched for the
+       published briefs, which stored it and are never edited. */
+    verbPrefix: /^(?:Restart|Resume)\s+/i,
+    conditionPrefix: /^(?:Restart|Resume)\s+(?:[^.;]*?\s+)?(?:when|once|after|if)\s+/i,
   });
 
 export const formatDecisionTriplet = ({

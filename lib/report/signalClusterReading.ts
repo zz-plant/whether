@@ -168,7 +168,10 @@ export const describeSignalDirection = (
     return { label: basis.date ? `Unchanged ${basis.since}.` : `Unchanged from last week.`, tone: "unchanged" };
   }
 
-  const moved = `${formatter.format(delta)}${unitWord}`;
+  /* "+1 points since Oct 26" on /signals (2026-11-10), the slip describeDistance fixed below. */
+  const amount = formatter.format(delta);
+  const unit = unitWord === " points" && /^[+−-]?1$/.test(amount) ? " point" : unitWord;
+  const moved = `${amount}${unit}`;
   const towardComfort = betterWhen === "higher" ? delta > 0 : delta < 0;
   return {
     label: `${moved} ${basis.since}.`,

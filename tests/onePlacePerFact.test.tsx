@@ -201,8 +201,8 @@ describe("/history prints each record fact once", () => {
     assert.ok(!visible.includes(`${readings} month-end readings`), "the reading count is its tile's");
     assert.doesNotMatch(visible, /Record starts|Fixed historical snapshot/);
 
-    const margin = visible.slice(visible.indexOf("How often a close call held"));
-    assert.match(margin, /^How often a close call held \d+ of \d+ shifts had advance warning before the line was crossed\./);
+    const margin = visible.slice(visible.indexOf("Advance warning"));
+    assert.match(margin, /^Advance warning \d+ of \d+ changes had advance warning\./);
     assert.doesNotMatch(html, /Points from the line/, "the band table is /calibration's");
     assert.match(html, /href="\/calibration"/);
   });

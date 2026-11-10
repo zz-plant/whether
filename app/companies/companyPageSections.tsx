@@ -127,7 +127,7 @@ export function RoleDecisionsSection({
         return (
           <div key={rule.area} className="space-y-1 border-t border-[color:var(--border-faint)] pt-3 text-sm text-slate-200">
             <h3 className="font-semibold text-slate-100">The general {decisionAreaLabel(rule.area).toLowerCase()} rule this week</h3>
-            <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.action.actionNow}:</span> {formatBoundedDecisionAction(rule)}</p>
+            <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.action.doNow}:</span> {formatBoundedDecisionAction(rule)}</p>
             <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {formatBoundedDecisionThreshold(rule)}</p>
             <p><span className="font-medium text-slate-100">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatBoundedDecisionReverse(rule)}</p>
             {answer && isIndexableAnswerSlug(answer.slug) ? (
@@ -154,11 +154,14 @@ export function CompanyNextLinks({ company, role }: { company: CompanyEntry; rol
       <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
       <div className="flex flex-wrap gap-2 text-xs font-semibold">
         <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
-        {COMPANY_ROLES.filter((other) => other.slug !== role?.slug).map((other) => (
-          <ActionLink key={other.slug} href={`/companies/${company.slug}/${other.slug}`} variant="pill">
-            {other.title} at {company.name}
-          </ActionLink>
-        ))}
+        {/* The overview's heading block already links every role here. */}
+        {role
+          ? COMPANY_ROLES.filter((other) => other.slug !== role.slug).map((other) => (
+              <ActionLink key={other.slug} href={`/companies/${company.slug}/${other.slug}`} variant="pill">
+                {other.title} at {company.name}
+              </ActionLink>
+            ))
+          : null}
         {role ? <ActionLink href={`/companies/${company.slug}`} variant="pill">{company.name} overview</ActionLink> : null}
         {neighbours(company, 3).map((other) => (
           <ActionLink key={other.slug} href={role ? `/companies/${other.slug}/${role.slug}` : `/companies/${other.slug}`} variant="pill">

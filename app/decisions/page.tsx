@@ -58,7 +58,7 @@ export default async function DecisionsPage() {
           said what the first section's description says in full. */}
       <SecondaryPageHeader
         title="Your decision record"
-        description="Every decision you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed, and some of those have moved."
+        description="Every decision you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed."
       />
       <SecondaryPageSection
         title="Recorded from this browser"

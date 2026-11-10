@@ -48,7 +48,7 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
       <JsonLdScript
         data={buildCompanyPageStructuredData({
           path: `/companies/${company.slug}`,
-          title: `${company.name}: this week's conditions and what it has filed`,
+          title: `${company.name}: this week's conditions and its latest filings`,
           description: companyDescription(company),
           company: company.name,
           ticker: company.ticker,
@@ -68,7 +68,7 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
         )}
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">{company.name}: this week&apos;s conditions and what it has filed</h1>
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">{company.name}: this week&apos;s conditions and its latest filings</h1>
         <ul className="space-y-1 text-sm">
           {COMPANY_ROLES.map((role) => (
             <li key={role.slug}>
