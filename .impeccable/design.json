@@ -1,0 +1,812 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T17:16:09.320Z",
+  "title": "Design System: Whether",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Safety paper",
+        "canonical": "oklch(95.0% 0.011 128.6)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#232620",
+          "#40433d",
+          "#5f635c",
+          "#80847d",
+          "#a3a69f",
+          "#c7cbc3",
+          "#ecf0e8"
+        ]
+      },
+      "paper-sheet": {
+        "role": "neutral",
+        "displayName": "Sheet",
+        "canonical": "oklch(97.2% 0.009 128.6)",
+        "tonalRamp": [
+          "#0a0c08",
+          "#242622",
+          "#41433e",
+          "#60625d",
+          "#81837e",
+          "#a3a6a0",
+          "#c7cac4",
+          "#edf0ea"
+        ]
+      },
+      "paper-raised": {
+        "role": "neutral",
+        "displayName": "Raised sheet",
+        "canonical": "oklch(98.8% 0.006 128.5)",
+        "tonalRamp": [
+          "#0a0c09",
+          "#242623",
+          "#41433f",
+          "#60625e",
+          "#81837f",
+          "#a4a6a2",
+          "#c8cac6",
+          "#edefeb"
+        ]
+      },
+      "paper-nested": {
+        "role": "neutral",
+        "displayName": "Nested paper",
+        "canonical": "oklch(92.0% 0.017 128.7)",
+        "tonalRamp": [
+          "#090d05",
+          "#22271e",
+          "#3f443a",
+          "#5e6359",
+          "#7f847a",
+          "#a2a79c",
+          "#c6cbc0",
+          "#ebf1e5"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Green-black ink",
+        "canonical": "oklch(22.7% 0.025 168.3)",
+        "tonalRamp": [
+          "#020e09",
+          "#192923",
+          "#35463f",
+          "#54665f",
+          "#75877f",
+          "#97aaa2",
+          "#bacfc6",
+          "#dff4eb"
+        ]
+      },
+      "ink-secondary": {
+        "role": "primary",
+        "displayName": "Secondary ink",
+        "canonical": "oklch(33.5% 0.025 163.0)",
+        "tonalRamp": [
+          "#020e08",
+          "#1a2921",
+          "#36463e",
+          "#55665d",
+          "#75877e",
+          "#98aaa0",
+          "#bbcfc4",
+          "#e0f4ea"
+        ]
+      },
+      "ink-muted": {
+        "role": "primary",
+        "displayName": "Muted ink",
+        "canonical": "oklch(42.1% 0.026 166.3)",
+        "tonalRamp": [
+          "#020f09",
+          "#182922",
+          "#35473f",
+          "#54665e",
+          "#74887f",
+          "#96aba1",
+          "#bacfc5",
+          "#dff4eb"
+        ]
+      },
+      "crossed-ink": {
+        "role": "tertiary",
+        "displayName": "Front red (text)",
+        "canonical": "oklch(50.6% 0.187 25.1)",
+        "tonalRamp": [
+          "#200000",
+          "#4d0005",
+          "#800111",
+          "#b31823",
+          "#dc4645",
+          "#ff736c",
+          "#ffb2ab",
+          "#ffe9e6"
+        ]
+      },
+      "crossed": {
+        "role": "tertiary",
+        "displayName": "Front red (mark)",
+        "canonical": "oklch(53.2% 0.194 25.2)",
+        "tonalRamp": [
+          "#210000",
+          "#4d0005",
+          "#81000f",
+          "#b60d1f",
+          "#df4241",
+          "#ff736c",
+          "#ffb3ab",
+          "#ffe9e6"
+        ]
+      },
+      "crossed-tint": {
+        "role": "tertiary",
+        "displayName": "Front red tint",
+        "canonical": "oklch(92.8% 0.022 27.8)",
+        "tonalRamp": [
+          "#130806",
+          "#2f211f",
+          "#4d3e3b",
+          "#6e5d5a",
+          "#8f7e7b",
+          "#b3a09d",
+          "#d7c4c1",
+          "#fde9e6"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night ground",
+        "canonical": "oklch(18.5% 0.016 165.5)",
+        "tonalRamp": [
+          "#050d0a",
+          "#1e2823",
+          "#3a4540",
+          "#59645f",
+          "#7a8580",
+          "#9ca8a3",
+          "#c0cdc7",
+          "#e5f2ec"
+        ]
+      },
+      "night-sheet": {
+        "role": "neutral",
+        "displayName": "Night sheet",
+        "canonical": "oklch(21.0% 0.018 162.7)",
+        "tonalRamp": [
+          "#050d09",
+          "#1d2823",
+          "#3a453f",
+          "#59655e",
+          "#79867f",
+          "#9ca9a2",
+          "#c0cdc6",
+          "#e5f2eb"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Night raised",
+        "canonical": "oklch(25.8% 0.023 157.3)",
+        "tonalRamp": [
+          "#040e07",
+          "#1c2921",
+          "#38463d",
+          "#57655c",
+          "#77877d",
+          "#9aaa9f",
+          "#bdcec3",
+          "#e2f4e8"
+        ]
+      },
+      "night-nested": {
+        "role": "neutral",
+        "displayName": "Night nested",
+        "canonical": "oklch(16.8% 0.015 162.6)",
+        "tonalRamp": [
+          "#060d09",
+          "#1f2723",
+          "#3b4540",
+          "#5a645f",
+          "#7b8580",
+          "#9da8a2",
+          "#c1ccc6",
+          "#e6f2eb"
+        ]
+      },
+      "night-ink": {
+        "role": "primary",
+        "displayName": "Night ink",
+        "canonical": "oklch(93.6% 0.015 132.5)",
+        "tonalRamp": [
+          "#090d06",
+          "#22271f",
+          "#3f443c",
+          "#5e635b",
+          "#7f847b",
+          "#a1a79e",
+          "#c5cbc2",
+          "#ebf1e7"
+        ]
+      },
+      "night-ink-secondary": {
+        "role": "primary",
+        "displayName": "Night secondary ink",
+        "canonical": "oklch(84.7% 0.017 151.1)",
+        "tonalRamp": [
+          "#060d08",
+          "#1f2821",
+          "#3c453d",
+          "#5a645c",
+          "#7b857d",
+          "#9ea8a0",
+          "#c2ccc4",
+          "#e7f2e9"
+        ]
+      },
+      "night-ink-muted": {
+        "role": "primary",
+        "displayName": "Night muted ink",
+        "canonical": "oklch(74.9% 0.021 159.6)",
+        "tonalRamp": [
+          "#040e08",
+          "#1c2821",
+          "#39463e",
+          "#57655d",
+          "#78867e",
+          "#9aa9a0",
+          "#becec4",
+          "#e3f3ea"
+        ]
+      },
+      "night-crossed-ink": {
+        "role": "tertiary",
+        "displayName": "Night front red (text)",
+        "canonical": "oklch(68.3% 0.171 21.0)",
+        "tonalRamp": [
+          "#200002",
+          "#4d000b",
+          "#80001b",
+          "#ad2634",
+          "#d54d54",
+          "#fe7275",
+          "#ffb2b0",
+          "#ffe8e7"
+        ]
+      },
+      "night-crossed": {
+        "role": "tertiary",
+        "displayName": "Night front red (mark)",
+        "canonical": "oklch(62.6% 0.193 23.0)",
+        "tonalRamp": [
+          "#200001",
+          "#4d0009",
+          "#800016",
+          "#b60d26",
+          "#de4148",
+          "#fe7371",
+          "#feb3ae",
+          "#fee9e7"
+        ]
+      },
+      "night-crossed-tint": {
+        "role": "tertiary",
+        "displayName": "Night front red tint",
+        "canonical": "oklch(23.1% 0.031 12.9)",
+        "tonalRamp": [
+          "#160608",
+          "#321f21",
+          "#513b3d",
+          "#725a5c",
+          "#947b7d",
+          "#b89e9f",
+          "#ddc1c3",
+          "#ffe8ea"
+        ]
+      },
+      "sunny": {
+        "role": "secondary",
+        "displayName": "Sunny gold",
+        "canonical": "oklch(76.4% 0.151 83.4)",
+        "tonalRamp": [
+          "#130900",
+          "#322200",
+          "#563d01",
+          "#7d5b00",
+          "#a57a07",
+          "#d19b06",
+          "#f8bf40",
+          "#ffecca"
+        ]
+      },
+      "cloudy": {
+        "role": "secondary",
+        "displayName": "Cloudy sienna",
+        "canonical": "oklch(53.2% 0.110 60.0)",
+        "tonalRamp": [
+          "#170600",
+          "#3b1c00",
+          "#633401",
+          "#8d500d",
+          "#b27137",
+          "#d8945b",
+          "#feb87e",
+          "#feeadb"
+        ]
+      },
+      "stormy": {
+        "role": "secondary",
+        "displayName": "Stormy periwinkle",
+        "canonical": "oklch(70.7% 0.102 275.9)",
+        "tonalRamp": [
+          "#070034",
+          "#1a1b55",
+          "#343b77",
+          "#525b9a",
+          "#727cbf",
+          "#93a0e5",
+          "#bac5ff",
+          "#eaeefe"
+        ]
+      },
+      "freezing": {
+        "role": "secondary",
+        "displayName": "Freezing deep blue",
+        "canonical": "oklch(45.3% 0.150 264.2)",
+        "tonalRamp": [
+          "#000038",
+          "#01146c",
+          "#173990",
+          "#345bb5",
+          "#547edb",
+          "#77a2ff",
+          "#afc9fe",
+          "#e7efff"
+        ]
+      },
+      "sunny-ink": {
+        "role": "secondary",
+        "displayName": "Sunny ink",
+        "canonical": "oklch(47.4% 0.097 83.5)",
+        "tonalRamp": [
+          "#130900",
+          "#322200",
+          "#563d01",
+          "#7c5b0b",
+          "#9e7d36",
+          "#c2a05a",
+          "#e8c47e",
+          "#ffecca"
+        ]
+      },
+      "cloudy-ink": {
+        "role": "secondary",
+        "displayName": "Cloudy ink",
+        "canonical": "oklch(48.7% 0.104 59.2)",
+        "tonalRamp": [
+          "#170600",
+          "#3b1c00",
+          "#643400",
+          "#8c5118",
+          "#b0723d",
+          "#d59560",
+          "#fcb983",
+          "#ffeadb"
+        ]
+      },
+      "stormy-ink": {
+        "role": "secondary",
+        "displayName": "Stormy ink",
+        "canonical": "oklch(45.9% 0.172 274.3)",
+        "tonalRamp": [
+          "#060034",
+          "#180074",
+          "#2d2d9a",
+          "#4751c0",
+          "#6575e7",
+          "#8a9cfe",
+          "#b8c6ff",
+          "#e9eeff"
+        ]
+      },
+      "freezing-ink": {
+        "role": "secondary",
+        "displayName": "Freezing ink",
+        "canonical": "oklch(39.4% 0.138 264.4)",
+        "tonalRamp": [
+          "#000037",
+          "#031866",
+          "#1b3a8a",
+          "#395caf",
+          "#587fd5",
+          "#79a2fb",
+          "#afc9fe",
+          "#e7effe"
+        ]
+      },
+      "night-sunny-ink": {
+        "role": "secondary",
+        "displayName": "Night Sunny ink",
+        "canonical": "oklch(84.9% 0.136 89.8)",
+        "tonalRamp": [
+          "#110a00",
+          "#302300",
+          "#523f00",
+          "#775e03",
+          "#9f7e02",
+          "#c6a029",
+          "#ecc555",
+          "#ffedc0"
+        ]
+      },
+      "night-cloudy-ink": {
+        "role": "secondary",
+        "displayName": "Night Cloudy ink",
+        "canonical": "oklch(75.7% 0.105 69.7)",
+        "tonalRamp": [
+          "#150800",
+          "#371f00",
+          "#5e3900",
+          "#875505",
+          "#aa7634",
+          "#cf9958",
+          "#f5bd7c",
+          "#feebd6"
+        ]
+      },
+      "night-stormy-ink": {
+        "role": "secondary",
+        "displayName": "Night Stormy ink",
+        "canonical": "oklch(82.7% 0.088 278.6)",
+        "tonalRamp": [
+          "#08012e",
+          "#1d1d4e",
+          "#383c6f",
+          "#565b92",
+          "#767db6",
+          "#98a0dc",
+          "#bdc4fe",
+          "#eaedff"
+        ]
+      },
+      "night-freezing-ink": {
+        "role": "secondary",
+        "displayName": "Night Freezing ink",
+        "canonical": "oklch(76.6% 0.103 265.0)",
+        "tonalRamp": [
+          "#010035",
+          "#0b1f56",
+          "#273e78",
+          "#445f9b",
+          "#6481c0",
+          "#85a4e6",
+          "#b0c9ff",
+          "#e7effe"
+        ]
+      },
+      "band-line-on-light": {
+        "role": "neutral",
+        "displayName": "Band line on a light field",
+        "canonical": "oklch(22.7% 0.025 168.3)",
+        "tonalRamp": [
+          "#020e09",
+          "#192923",
+          "#35463f",
+          "#54665f",
+          "#75877f",
+          "#97aaa2",
+          "#bacfc6",
+          "#dff4eb"
+        ]
+      },
+      "band-line-on-dense": {
+        "role": "neutral",
+        "displayName": "Band line on a dense field",
+        "canonical": "oklch(95.0% 0.011 128.6)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#232620",
+          "#40433d",
+          "#5f635c",
+          "#80847d",
+          "#a3a69f",
+          "#c7cbc3",
+          "#ecf0e8"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "guidance": {
+        "displayName": "Guidance",
+        "purpose": "The week's guidance, the only h1 on /. From md: clamp(2.5rem, 3.5vw, 3.25rem), line-height 1.02, tracking -0.03em."
+      },
+      "figure": {
+        "displayName": "Score figure",
+        "purpose": "The two published scores: 92px in the margin, 46px on a phone (.type-figure)."
+      },
+      "condition": {
+        "displayName": "Condition word",
+        "purpose": "Sunny, Cloudy, Stormy or Freezing in its own ink; 27px on a phone, 34px from sm (.type-stamp)."
+      },
+      "page-title": {
+        "displayName": "Page title",
+        "purpose": "A report route's h1."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "A page's h2 and a panel's title (.type-section)."
+      },
+      "area-name": {
+        "displayName": "Area name",
+        "purpose": "The five area rows."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "A card's own heading, h3 and below, in Archivo."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose, capped at 60ch."
+      },
+      "secondary": {
+        "displayName": "Secondary",
+        "purpose": "Supporting prose, captions, labels."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata, band labels, axis years, badges; the 12px floor."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Only where figures align with each other."
+      }
+    },
+    "shadows": [
+      {
+        "name": "elev-1",
+        "value": "0 calc(1 * var(--sh)) calc(2 * var(--sh)) calc(-1 * var(--sh)) var(--shadow-color-soft), 0 calc(2 * var(--sh)) calc(6 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-faint)",
+        "purpose": "Floating elements only. Containers carry none (The Flat Paper Rule)."
+      },
+      {
+        "name": "elev-2",
+        "value": "0 calc(2 * var(--sh)) calc(4 * var(--sh)) calc(-2 * var(--sh)) var(--shadow-color-soft), 0 calc(8 * var(--sh)) calc(18 * var(--sh)) calc(-10 * var(--sh)) var(--shadow-color-faint)",
+        "purpose": "Floating elements only."
+      },
+      {
+        "name": "elev-3",
+        "value": "0 calc(3 * var(--sh)) calc(6 * var(--sh)) calc(-3 * var(--sh)) var(--shadow-color-soft), 0 calc(16 * var(--sh)) calc(32 * var(--sh)) calc(-16 * var(--sh)) var(--shadow-color-mid)",
+        "purpose": "Menus and dialogs."
+      },
+      {
+        "name": "elev-4",
+        "value": "0 calc(4 * var(--sh)) calc(9 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-soft), 0 calc(24 * var(--sh)) calc(48 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-mid)",
+        "purpose": "The highest floating layer."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 calc(4 * var(--sh)) var(--accent-border-soft)",
+        "purpose": "The soft second ring behind the 2px ink focus outline."
+      }
+    ],
+    "motion": [
+      {
+        "name": "press",
+        "value": "120ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "A key or button sinking 1px."
+      },
+      {
+        "name": "transition-fast",
+        "value": "200ms ease",
+        "purpose": "Chip and control state changes."
+      },
+      {
+        "name": "transition-base",
+        "value": "240ms ease",
+        "purpose": "Buttons and link cards."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default easing for state transitions."
+      },
+      {
+        "name": "page-cross-fade",
+        "value": "100ms out, 220ms in, cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "View transitions between routes; the title morphs in place."
+      },
+      {
+        "name": "week-move-travel",
+        "value": "760ms cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "The week's move: a reading travelling to this week's score, once, on a week something moved."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      },
+      {
+        "name": "band-wide (container)",
+        "value": "46rem"
+      },
+      {
+        "name": "band-every-year (container)",
+        "value": "80rem"
+      },
+      {
+        "name": "history-canvas",
+        "value": "736px"
+      },
+      {
+        "name": "root-step",
+        "value": "1800px, 2400px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid control: an ink fill with the paper as its label. Copy brief, subscribe.",
+      "html": "<button class=\"ds-btn-primary\">Copy brief</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0.55rem 1.05rem; border: 1px solid #10201a; border-radius: 4px; background: #10201a; color: #ecf0e8; font: 600 0.8125rem/1.25 Archivo, 'Archivo Fallback', system-ui, sans-serif; box-shadow: none; cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { transform: translateY(-1px); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(16, 32, 26, 0.14); }"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "An outlined control in the ink: the other copy formats, secondary actions.",
+      "html": "<button class=\"ds-btn-secondary\">Copy 1-line standup</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; min-height: 46px; padding: 0 1.05rem; border: 1px solid rgba(16, 32, 26, 0.50); border-radius: 4px; background: #f4f7f1; color: #10201a; font: 500 0.9375rem/1.25 Archivo, 'Archivo Fallback', system-ui, sans-serif; cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), border-color 240ms ease; } .ds-btn-secondary:hover { transform: translateY(-1px); border-color: rgba(16, 32, 26, 0.34); } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(16, 32, 26, 0.14); }"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A field on the sheet, ruled in the strong border; 16px text so a phone does not zoom.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"you@company.com\"></label>",
+      "css": ".ds-field { display: grid; gap: 0.375rem; max-width: 22rem; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-field-label { font-size: 0.875rem; font-weight: 500; color: #2b3b33; } .ds-input { min-height: 44px; padding: 0.625rem 0.875rem; border: 1px solid rgba(16, 32, 26, 0.50); border-radius: 4px; background: #f4f7f1; color: #10201a; font: 400 16px/1.4 inherit; } .ds-input::placeholder { color: #40524a; opacity: 0.85; } .ds-input:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(16, 32, 26, 0.14); }"
+    },
+    {
+      "name": "Global header",
+      "kind": "nav",
+      "description": "The Besley wordmark and four routes; the current one ruled in 2px ink.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-nav-mark\">Whether</span><a class=\"ds-nav-link\" aria-current=\"page\" href=\"#\">This week</a><a class=\"ds-nav-link\" href=\"#\">Plan</a><a class=\"ds-nav-link\" href=\"#\">History</a><a class=\"ds-nav-link\" href=\"#\">Guides</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 1.5rem; padding: 0.875rem 1rem; background: #ecf0e8; border-bottom: 1px solid rgba(16, 32, 26, 0.24); font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-nav-mark { font: 800 1.0625rem/1 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.01em; color: #10201a; } .ds-nav-link { position: relative; padding-block: 0.25rem; font-size: 0.9375rem; color: #2b3b33; text-decoration: none; } .ds-nav-link:hover { color: #10201a; } .ds-nav-link[aria-current=\"page\"] { color: #10201a; font-weight: 600; } .ds-nav-link[aria-current=\"page\"]::after { content: \"\"; position: absolute; left: 0; right: 0; bottom: -0.875rem; height: 2px; background: #10201a; } .ds-nav-link:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Record band",
+      "kind": "custom",
+      "refersTo": "record-band-wide",
+      "description": "The signature: condition fields crossed by two bundles of fine lines, risk appetite above and funding pressure below, a mark per published brief, a caption that counts both records.",
+      "html": "<aside class=\"ds-band\" aria-label=\"The record\"><div class=\"ds-band-plate\"><svg viewBox=\"0 0 100 1000\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><rect x=\"0\" width=\"48\" height=\"1000\" fill=\"#e0a81c\"/><rect x=\"48\" width=\"16\" height=\"1000\" fill=\"#8f9be0\"/><rect x=\"64\" width=\"24\" height=\"1000\" fill=\"#2a4fa8\"/><rect x=\"88\" width=\"12\" height=\"1000\" fill=\"#9a5b1e\"/><g fill=\"none\" stroke-width=\"1\" vector-effect=\"non-scaling-stroke\"><path d=\"M0 180 L48 190\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M0 200 L48 210\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M48 190 Q52 170 56 190 T64 190\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M64 260 L67 240 L70 260 L73 240 L76 260 L79 240 L82 260 L85 240 L88 260\" stroke=\"#ecf0e8\" stroke-opacity=\"0.86\"/><path d=\"M0 600 L48 600\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M0 620 L48 620\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M64 800 L67 780 L70 800 L73 780 L76 800 L79 780 L82 800 L85 780 L88 800\" stroke=\"#ecf0e8\" stroke-opacity=\"0.86\"/><path d=\"M88 780 L89 770 L90 780 L91 770 L92 780 L93 770 L94 780 L95 770 L96 780 L97 770 L98 780 L99 770 L100 780\" stroke=\"#ecf0e8\" stroke-opacity=\"0.86\"/></g><g stroke=\"#ecf0e8\" stroke-width=\"1\" vector-effect=\"non-scaling-stroke\"><line x1=\"48\" x2=\"48\" y1=\"0\" y2=\"1000\"/><line x1=\"64\" x2=\"64\" y1=\"0\" y2=\"1000\"/><line x1=\"88\" x2=\"88\" y1=\"0\" y2=\"1000\"/><line x1=\"94\" x2=\"94\" y1=\"0\" y2=\"1000\" stroke-dasharray=\"3 3\" stroke-width=\"1.5\"/></g></svg><span class=\"ds-band-label\" style=\"top:16%\">Risk appetite</span><span class=\"ds-band-label\" style=\"top:58%\">Funding pressure</span></div><div class=\"ds-band-axis\"><span style=\"left:0%\">2012</span><span style=\"left:48%\">2019</span><span style=\"left:64%\">2022</span><i style=\"left:95%\"></i><i style=\"left:97%\"></i><i style=\"left:99%\"></i></div><p class=\"ds-band-caption\">178 month-end readings since Jan 2012, scored with today’s formula · 7 briefs, published as written · <a href=\"#\">History</a></p></aside>",
+      "css": ".ds-band { background: #ecf0e8; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-band-plate { position: relative; height: 150px; border-block: 1px solid rgba(16, 32, 26, 0.24); cursor: crosshair; touch-action: pan-y; } .ds-band-plate svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; } .ds-band-plate:focus-visible { outline: 2px solid #10201a; outline-offset: -3px; } .ds-band-label { position: absolute; left: 0.75rem; font-size: 0.75rem; font-weight: 600; line-height: 1; color: #10201a; pointer-events: none; } .ds-band-axis { position: relative; height: 1.25rem; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: #40524a; } .ds-band-axis span { position: absolute; top: 0; padding: 0.3rem 0 0 0.3rem; line-height: 1; border-left: 1px solid rgba(16, 32, 26, 0.50); } .ds-band-axis i { position: absolute; top: 0; width: 2px; height: 0.5rem; margin-left: -1px; background: #10201a; } .ds-band-caption { margin: 0; padding: 0.125rem 1rem 0; font-size: 0.75rem; line-height: 1.4; color: #40524a; text-align: right; font-variant-numeric: tabular-nums; } .ds-band-caption a { color: #10201a; font-weight: 600; text-underline-offset: 0.2em; } .ds-band-caption a:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Guidance block",
+      "kind": "custom",
+      "refersTo": "guidance",
+      "description": "The document's opening, with no box: brief number, the condition word in its ink with its gloss, the guidance as the h1, the facts line.",
+      "html": "<section class=\"ds-guidance\"><p class=\"ds-guidance-week\">Week of Nov 2, 2026 <a href=\"#\">No. 2026-W45</a></p><p class=\"ds-guidance-stamp\"><span class=\"ds-condition\">Cloudy</span><span class=\"ds-gloss\">Money is available but pricey.</span></p><h1 class=\"ds-guidance-call\">Protect the revenue you already have, and hold off on new bets until money gets cheaper.</h1><p class=\"ds-guidance-facts\">Funding pressure is 90, higher than most months since 2012. Risk appetite is 54, lower than most months. <a href=\"#\">Why</a></p></section>",
+      "css": ".ds-guidance { display: grid; gap: 0.75rem; max-width: 50rem; color: #10201a; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-guidance-week { margin: 0; font-size: 0.9375rem; color: #2b3b33; } .ds-guidance-week a { margin-left: 1rem; color: #40524a; text-underline-offset: 4px; } .ds-guidance-stamp { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem; } .ds-condition { font: 800 2.125rem/1 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.01em; color: #8a4f16; } .ds-gloss { font-size: 1.0625rem; color: #2b3b33; } .ds-guidance-call { margin: 0; font: 700 clamp(2.5rem, 3.5vw, 3.25rem)/1.02 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.03em; text-wrap: pretty; } .ds-guidance-facts { margin: 0; max-width: 36rem; font-size: 1.0625rem; line-height: 1.375; color: #2b3b33; } .ds-guidance a { color: #10201a; } .ds-guidance a:hover { text-decoration-thickness: 2px; } .ds-guidance a:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Area rows",
+      "kind": "custom",
+      "refersTo": "area-row",
+      "description": "Five numbered rows under a 2px ink rule: number, area in Besley, standing with its glyph, the action.",
+      "html": "<ol class=\"ds-areas\"><li><a href=\"#\"><span class=\"ds-n\">1</span><span class=\"ds-area\">Hiring</span><span class=\"ds-held\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/></svg>On hold</span><span class=\"ds-rule\">Only replace people who leave.</span></a></li><li><a href=\"#\"><span class=\"ds-n\">2</span><span class=\"ds-area\">Roadmap</span><span class=\"ds-clear\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg>Clear</span><span class=\"ds-rule\">Keep the core roadmap on schedule.</span></a></li></ol>",
+      "css": ".ds-areas { list-style: none; margin: 0; padding: 0; border-top: 2px solid #10201a; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-areas li { border-bottom: 1px solid rgba(16, 32, 26, 0.24); } .ds-areas a { display: grid; grid-template-columns: 1.25rem 8.5rem 6.5rem minmax(0, 1fr); align-items: baseline; gap: 0.75rem; min-height: 44px; padding-block: 0.375rem; color: #10201a; text-decoration: none; font-size: 0.9375rem; line-height: 1.25; } .ds-n { font-size: 0.8125rem; color: #40524a; font-variant-numeric: tabular-nums; } .ds-area { font: 700 1.25rem/1 Besley, 'Besley Fallback', Georgia, serif; } .ds-areas a:hover .ds-area { text-decoration: underline; text-underline-offset: 4px; } .ds-held, .ds-clear { display: inline-flex; align-items: center; gap: 0.375rem; font-weight: 500; } .ds-held { color: #b81f27; } .ds-clear { color: #10201a; } .ds-rule { color: #2b3b33; } .ds-areas a:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Score figure",
+      "kind": "custom",
+      "refersTo": "score-figure",
+      "description": "A published score as a figure: the number in Besley 800, one sentence of standing, a 2px ink rule with the pause range in red and each line named in place.",
+      "html": "<figure class=\"ds-figure\"><figcaption><span class=\"ds-figure-n\">90</span><span class=\"ds-figure-label\">Funding pressure <span>(higher is worse)</span></span><span class=\"ds-figure-standing\"><b>14 pts past its pause line.</b> Restarts below 66.</span></figcaption><div class=\"ds-figure-rule\"><span class=\"ds-line\"></span><span class=\"ds-zone\" style=\"left:0;width:24%\"></span><span class=\"ds-tick ds-tick-pause\" style=\"left:24%\"></span><span class=\"ds-tick\" style=\"left:34%\"></span><span class=\"ds-reading\" style=\"left:10%\"></span><span class=\"ds-name ds-name-pause\" style=\"right:76%\">pause 76</span><span class=\"ds-name\" style=\"left:34%\">restart 66</span></div></figure>",
+      "css": ".ds-figure { margin: 0; max-width: 22rem; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; color: #10201a; } .ds-figure figcaption { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; column-gap: 0.75rem; } .ds-figure-n { grid-row: span 2; font: 800 5.75rem/0.9 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.03em; font-variant-numeric: tabular-nums lining-nums; } .ds-figure-label { font-size: 0.8125rem; font-weight: 500; color: #2b3b33; } .ds-figure-label span { margin-left: 0.375rem; font-weight: 400; color: #40524a; } .ds-figure-standing { font-size: 0.9375rem; line-height: 1.375; color: #2b3b33; } .ds-figure-standing b { color: #b81f27; } .ds-figure-rule { position: relative; height: 2.5rem; margin-top: 0.75rem; } .ds-line { position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: #10201a; } .ds-zone { position: absolute; top: 6px; height: 8px; background: #c4242b; } .ds-tick { position: absolute; top: 2px; width: 2px; height: 18px; transform: translateX(-50%); background: #10201a; } .ds-tick-pause { width: 3px; background: #c4242b; } .ds-reading { position: absolute; top: 2px; width: 18px; height: 18px; transform: translateX(-50%); border: 3px solid #10201a; border-radius: 9999px; background: #ecf0e8; box-sizing: border-box; } .ds-name { position: absolute; top: 24px; padding-left: 0.375rem; font-size: 12px; line-height: 1; white-space: nowrap; color: #2b3b33; font-variant-numeric: tabular-nums; } .ds-name-pause { padding: 0 0.375rem 0 0; color: #b81f27; }"
+    },
+    {
+      "name": "Published weeks",
+      "kind": "custom",
+      "description": "History's week cells: a condition's fill with its own pattern where a brief was published, an empty dashed cell where none was.",
+      "html": "<ol class=\"ds-weeks\"><li class=\"ds-wk ds-sunny\" title=\"Sunny\"></li><li class=\"ds-wk ds-empty\" title=\"No brief\"></li><li class=\"ds-wk ds-stormy\" title=\"Stormy\"></li><li class=\"ds-wk ds-freezing\" title=\"Freezing\"></li><li class=\"ds-wk ds-freezing\" title=\"Freezing\"></li><li class=\"ds-wk ds-empty\" title=\"No brief\"></li><li class=\"ds-wk ds-cloudy\" title=\"Cloudy\"></li></ol>",
+      "css": ".ds-weeks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; max-width: 28rem; } .ds-wk { height: 28px; } .ds-sunny { background: #e0a81c; } .ds-stormy { background-color: #8f9be0; background-image: repeating-linear-gradient(0deg, transparent 0 4px, rgba(16, 32, 26, 0.55) 4px 5px); } .ds-cloudy { background-color: #9a5b1e; background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(236, 240, 232, 0.7) 4px 5px); } .ds-freezing { background-color: #2a4fa8; background-image: repeating-linear-gradient(45deg, transparent 0 5px, rgba(236, 240, 232, 0.7) 5px 6px), repeating-linear-gradient(-45deg, transparent 0 5px, rgba(236, 240, 232, 0.7) 5px 6px); } .ds-empty { border: 1px dashed rgba(16, 32, 26, 0.50); box-sizing: border-box; } .ds-wk:not(.ds-empty):hover { outline: 2px solid #10201a; outline-offset: 1px; }"
+    },
+    {
+      "name": "Caveat band",
+      "kind": "card",
+      "refersTo": "caveat-band",
+      "description": "Read this reading with care: ink on the raised tier, a 2px ink top rule, an outlined diamond. Never red.",
+      "html": "<p class=\"ds-caveat\">4 briefs published in Sep and Oct 2026 read Freezing. Scored today, those month-ends read Cloudy. The briefs stay as written.</p>",
+      "css": ".ds-caveat { margin: 0; max-width: 40rem; padding: 0.75rem 1rem; border: 1px solid #40524a; border-top: 2px solid #10201a; border-radius: 2px; background: #fafcf8; color: #10201a; font: 400 0.9375rem/1.5 Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-caveat::before { content: \"\"; display: inline-block; width: 0.4375rem; height: 0.4375rem; margin-right: 0.5rem; border: 1.5px solid currentColor; transform: rotate(45deg); vertical-align: 0.0625rem; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Covenant",
+    "overview": "The lines are a policy agreed in advance, and the weekly brief is the dated statement of where each one stands. The page is that statement, printed on pale green-grey safety paper in a green-black ink, and its one ornament is the record itself: a full-bleed engraved band under the navigation of every route, drawn from every month-end reading since January 2012. Everything below the band is a document, read top to bottom: the guidance, the five areas, the two scores, then the sections that explain them.\n\nThe world borrows the discipline of credit agreements and security printing: structure is the only ornament, every engraved line is drawn from data, each line and tick names itself where it sits, and nothing decorative is added. It refuses the dark data panel with glowing accents, and its opposite, the cream editorial page with an italic serif masthead. \"Covenant\" names the world for contributors; it never appears in reader copy, and no reader term was minted for it.\n\nLight is the identity; dark is the second theme, the same paper with the lights off. With no stored choice the device setting picks the theme, and a stored choice wins (`app/layout.tsx`, the theme bootstrap). With scripts off, the stylesheet's base draws, which is the dark `:root` block.",
+    "keyCharacteristics": [
+      "One field of colour at page scale: the record band. Everything else is ink on paper.",
+      "Two voices: Besley binds, Archivo explains.",
+      "Ruled sheets, not cards: hairlines, a 2px ink rule over a list, small radii.",
+      "No surface casts a shadow.",
+      "Every drawing puts the easier side up or to the right.",
+      "A quiet week has no motion."
+    ],
+    "rules": [
+      {
+        "name": "The Two Meanings Rule",
+        "body": "A hue on the page is a condition or a crossed line. Anything else is ink. A caveat (cached sources, a scoring note, an archived week, guidance held back) is ink with an outlined diamond, never red: shape carries the state where hue cannot.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Is the Action Rule",
+        "body": "Links, buttons, focus rings, the selected pill and the caret are the ink in every week. A condition's colour means the condition and nothing else.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Field Rule",
+        "body": "Colour commits at page scale in one place, the record band. The condition word beside the guidance is the only other coloured element on the first screen. The regime atmosphere wash is off (`--atmosphere-*: transparent`), because a wash would tint the paper the band is printed on.",
+        "section": "colors"
+      },
+      {
+        "name": "The Binding Voice Rule",
+        "body": "Besley sets what the page commits to: the guidance, the condition word, area names, score figures, headings and the wordmark. Archivo sets everything that explains. The voice reaches the page through real rules only (`:where(h1, h2)`, `.type-section`, `.text-display`, `.type-stamp`, `.type-figure`); there is no `font-display` utility.",
+        "section": "typography"
+      },
+      {
+        "name": "The Type Step Rule",
+        "body": "Every step is at least 1.125x the one below it at both ends of the range (`tests/typeSteps.test.tsx`). Two sizes closer than that read as one job set twice.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Number, One Face Rule",
+        "body": "A figure in a sentence or beside its label stays in its voice with `tabular-nums`. Mono is for a column, a before/after pair or a rail's own labels. A figure that appears on more than one surface is the same figure everywhere.",
+        "section": "typography"
+      },
+      {
+        "name": "The Measure Rule",
+        "body": "Prose stops at 60ch, about 75 characters in Archivo, from a base-layer rule on `p` and on list items holding text; a utility on the element overrides it, and a flex or grid row is exempt.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Paper Rule",
+        "body": "A container is a ruled sheet. If it needs a shadow to separate, it needs a hairline instead.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do name a condition with `data-regime` and read `--regime-accent` or `--regime-ink`; never type a condition hex at the call site.",
+      "Do draw links, buttons and focus rings in the ink, with links underlined.",
+      "Do set the guidance, condition word, area names, score figures, headings and wordmark in Besley, and everything that explains in Archivo.",
+      "Do separate sheets with a hairline and a step of tone, and lists with a 2px ink rule over hairline rows.",
+      "Do give every condition a pattern as well as a fill wherever it fills an area, so the drawing survives greyscale and colour-vision deficiency.",
+      "Do label each line and tick where it sits, and keep the easier side up or to the right.",
+      "Do keep red for a crossed line, always with a glyph and a word.",
+      "Do keep the record band's two records apart: fields are month-end readings scored today; marks are briefs as published."
+    ],
+    "donts": [
+      "Don't put a shadow on a container, or a card inside a card.",
+      "Don't use a condition's colour for a control, a section label or a page wash.",
+      "Don't add a hue that is neither a condition nor a crossed line; a caveat is ink with a diamond.",
+      "Don't add a legend where a label in place will do.",
+      "Don't add a decorative mark the record did not draw.",
+      "Don't set Chivo Mono for a figure that does not align with another.",
+      "Don't set a word under 12px, set italics, or type capitals outside a badge.",
+      "Don't hand-pick a z-index that can meet a global layer."
+    ]
+  }
+}
