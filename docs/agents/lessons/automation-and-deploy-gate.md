@@ -295,6 +295,22 @@ published every week; writing retroactive `publishedAt` stamps for weeks that we
 would fabricate exactly the cadence it exists to prove, and `/history` now shows those numbers to
 visitors.
 
+**The local gate does not rerun what passed on the same tree (2026-11-09).** The old stance:
+the pre-push hook runs every task on every push, whatever ran before it. Measured over three
+months of agent sessions, 202 of 421 pushes came within six turns of a passing
+`bun run check`, so half of all pushes ran lint, types, the suite and the landmark audit twice
+on an unchanged tree, a median of 38s each. The new stance: `run-checks.mjs` records each pass
+against the tree git would write from the files on disk, and the hook (`--reuse`) skips a task
+with a pass recorded for that exact tree in the last hour. What keeps it the same verdict: the
+tree is content, so one changed byte from any session is a different tree; a pass is recorded
+only if the tree is unchanged when the run ends; `hotspot-preflight` judges a push range and
+always runs; and the hour bounds the few tests that read the calendar
+(`tests/summaryDerivedHistory.test.ts` turned red on a date, with no diff). What it gives up: a
+task that would fail on a second run of identical bytes, which is a flaky task and was never
+caught reliably by running it once more. The remote gate is untouched: Workers Builds records
+nothing, reuses nothing and runs every task on every push. `CHECK_NO_REUSE=1` restores the
+old behaviour for one push. `tests/deployGateWorktree.test.ts` holds each of those conditions.
+
 Cloudflare's build is the remote gate, and it gates **production too**. The build command
 configured in Workers Builds is `bun run check:vinext`, and since 2026-09-02 that script *is* the
 deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck test assets suppressions`, then

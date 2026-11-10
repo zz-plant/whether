@@ -10,6 +10,7 @@
  *   bun scripts/run-checks.mjs --preset pre-push   # what .husky/pre-push runs
  *   bun scripts/run-checks.mjs --preset deploy     # the deploy gate (`check:vinext`)
  *   bun scripts/run-checks.mjs --serial            # fail-fast sequencing
+ *   bun scripts/run-checks.mjs --preset pre-push --reuse  # skip what already passed on this tree
  *
  * Why the gate refuses a drifted tree, bounds each task, and repeats failures at the end:
  * docs/agents/lessons/automation-and-deploy-gate.md.
@@ -18,7 +19,8 @@ import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 
-import { resolveCheckPlan } from "./check-tasks.mjs";
+import { openReuse } from "./check-reuse.mjs";
+import { REUSABLE_TASKS, resolveCheckPlan } from "./check-tasks.mjs";
 import { withDeployGate } from "./deploy-gate.mjs";
 import { restoreTrackedFromHead, worktreeDrift } from "./exec.mjs";
 
@@ -29,6 +31,14 @@ try {
   process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
   process.exit(2);
 }
+
+/*
+ * `--reuse`, which the pre-push hook passes, skips a task that already passed on this exact
+ * tree within the hour; scripts/check-reuse.mjs holds the argument for why that is the same
+ * verdict. CHECK_NO_REUSE=1 runs everything anyway. Every run outside the deploy gate records
+ * its passes, with or without the flag, so a `bun run check` is what a later push reuses.
+ */
+const reuseRequested = process.argv.includes("--reuse") && process.env.CHECK_NO_REUSE !== "1";
 
 /*
  * Gate-only: a run that claims to test the commit it will deploy must be running against
@@ -179,6 +189,7 @@ const FAILURE_LINE_PATTERN = /\(fail\)|^\s*✗|AssertionError|error: |Error: |^\
 const FAILURE_MARKED_LINES = 20;
 
 const formatDuration = (ms) => `${(ms / 1000).toFixed(1)}s`;
+const formatAge = (ms) => (ms < 60_000 ? `${Math.round(ms / 1000)}s` : `${Math.round(ms / 60_000)}m`);
 
 /** CHECK_VERBOSE=1 prints every passing task's output in full, as this runner used to. */
 const VERBOSE = process.env.CHECK_VERBOSE === "1";
@@ -227,7 +238,12 @@ const collapseRepeats = (output) => {
   return kept.join("\n");
 };
 
-const report = ({ task, ok, output, ms }) => {
+const report = ({ task, ok, output, ms, reusedAgeMs }) => {
+  if (reusedAgeMs !== undefined) {
+    process.stdout.write(`\n✅ ${task.name} (not run again: passed on this exact tree ${formatAge(reusedAgeMs)} ago)\n`);
+    return;
+  }
+
   process.stdout.write(`\n${ok ? "✅" : "❌"} ${task.name} (${formatDuration(ms)})\n`);
   const trimmed = output.trim();
   if (!trimmed) return;
@@ -253,9 +269,17 @@ const runStage = async (selected) => {
   const startedAt = Date.now();
   const results = [];
 
+  // Read before anything runs: the fingerprint has to be of the tree the tasks will judge.
+  const reuse = plan.deployGate ? null : openReuse();
+  const isReusable = (task) => REUSABLE_TASKS.includes(task.name);
+  const runOrReuse = (task) => {
+    const age = reuseRequested && reuse && isReusable(task) ? reuse.ageOf(task.name) : null;
+    return age === null ? runTask(task) : Promise.resolve({ task, ok: true, output: "", ms: 0, reusedAgeMs: age });
+  };
+
   if (plan.serial) {
     for (const task of selected) {
-      const result = await runTask(task);
+      const result = await runOrReuse(task);
       results.push(result);
       report(result);
       if (!result.ok) break;
@@ -268,7 +292,7 @@ const runStage = async (selected) => {
     for (const task of selected) {
       while (pending.size < limit && queue.length > 0) {
         const next = queue.shift();
-        pending.set(next, runTask(next));
+        pending.set(next, runOrReuse(next));
       }
 
       const result = await pending.get(task);
@@ -282,6 +306,17 @@ const runStage = async (selected) => {
 
   const failed = results.filter((result) => !result.ok);
   const notRun = selected.length - results.length;
+
+  if (reuse) {
+    const ran = results.filter((result) => result.ok && result.reusedAgeMs === undefined && isReusable(result.task));
+    if (!reuse.record(ran.map((result) => result.task.name))) {
+      process.stdout.write("\n[run-checks] the tree changed while the checks ran, so no pass was recorded for a later push to reuse.\n");
+    }
+  }
+  const reused = results.filter((result) => result.reusedAgeMs !== undefined).length;
+  if (reused > 0) {
+    process.stdout.write(`\n[run-checks] ${reused} task(s) not run again: each passed on this exact tree within the hour. CHECK_NO_REUSE=1 runs them.\n`);
+  }
 
   process.stdout.write(
     `\n${failed.length === 0 ? "All checks passed" : `${failed.length} check(s) failed: ${failed.map((r) => r.task.name).join(", ")}`}` +
