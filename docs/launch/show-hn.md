@@ -132,7 +132,7 @@ regime is a quadrant, and a flip needs two consecutive reads within 12 score poi
 cannot happen closer than 6 unless one reading jumps a score 25 points or more across it.
 
 **"What data, exactly? Is it fresh?"**
-FRED daily CSV endpoints (DFF, DGS1MO, DGS3MO, DGS2, DGS10) plus the macro series above. No
+FRED daily CSV endpoints (DGS1MO, DGS3MO, DGS2, DGS10) plus the macro series above. No
 API keys anywhere in the pipeline. Freshness, per-source health, and degraded-state behavior
 are on /trust — when a source is down it says so and serves the last canonical snapshot
 instead of silently pretending.
