@@ -103,6 +103,19 @@ export function resolveShardCount(args, requestedShards) {
 }
 
 /**
+ * Whether a run hides the app's own console output (the preload does the hiding; see
+ * scripts/test-network-guard.ts). A run that covers the suite does: on 2026-11-09 it
+ * printed 740 KB, 95.6% of it three fallback warnings repeated 8,259 times against the
+ * network guard, with the one failing test at line 8,914 of 9,206. A run that names files
+ * or tests keeps the output, since the caller is reading that file. So does the deploy
+ * gate, where rerunning one file costs a push, and `WHETHER_TEST_LOGS=1` anywhere.
+ */
+export function shouldQuietAppLogs(args, env = process.env, deployGate = isDeployGate(env)) {
+  if (env.WHETHER_TEST_LOGS === '1' || deployGate) return false;
+  return !hasPathFilter(args) && !hasNameFilter(args);
+}
+
+/**
  * The flag arguments a shard inherits, with each value flag's value attached. Keeping only
  * tokens that start with `-` dropped `-t`'s pattern, and bun then read the first test file
  * as the pattern.
@@ -168,6 +181,10 @@ for (const key of [
 ]) {
   delete childEnv[key];
 }
+// Decided here, never inherited: a test that starts this runner must not pass its own verdict on.
+const quietAppLogs = shouldQuietAppLogs(extraArgs, process.env, inDeployGate);
+if (quietAppLogs) childEnv.WHETHER_TEST_QUIET = '1';
+else delete childEnv.WHETHER_TEST_QUIET;
 
 // One process runs every file of a shard, so module state still leaks within it; the gate
 // shuffles and bun prints the seed, which BUN_TEST_SEED replays (shard i gets base seed + i).
@@ -359,6 +376,12 @@ const runSharded = async () => {
 
   const failed = results.filter((result) => (result.code ?? 1) !== 0).length;
   console.log(`[test-runner] ${effectiveShards} shard(s) finished, ${failed} failed.`);
+  if (failed > 0 && quietAppLogs) {
+    console.log(
+      '[test-runner] app console output was hidden for this full run. Rerun a failing file ' +
+        '(`bun run test <path>`) to see it, or set WHETHER_TEST_LOGS=1.',
+    );
+  }
   process.exit(failed > 0 ? 1 : 0);
 };
 

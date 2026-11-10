@@ -31,3 +31,19 @@ const ingestionDir = mkdtempSync(join(tmpdir(), "whether-test-ingestion-"));
 process.env.WHETHER_INGESTION_DIR = ingestionDir;
 // A preload's afterAll runs once, after the last file; bun test never fires process "exit".
 afterAll(() => rmSync(ingestionDir, { recursive: true, force: true }));
+
+/*
+ * A full-suite run hides the app's own console output; scripts/run-tests.mjs decides and
+ * sets the variable (`shouldQuietAppLogs`). Bun's reporter does not write through
+ * `console`, so a failing test still prints its error, code frame and `(fail)` line. A
+ * test that asserts on console output assigns or spies on the method, which replaces
+ * these.
+ */
+if (process.env.WHETHER_TEST_QUIET === "1") {
+  const silent = () => {};
+  console.log = silent;
+  console.info = silent;
+  console.debug = silent;
+  console.warn = silent;
+  console.error = silent;
+}

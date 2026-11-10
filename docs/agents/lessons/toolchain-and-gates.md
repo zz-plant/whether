@@ -216,6 +216,26 @@ Moved out of the mechanics doc so it is read when a task touches lint, the suite
   suite read it back, and `tests/jev.test.ts` and `tests/homeMetadata.test.ts` failed on a clean diff
   until the directory was deleted. The preload now points `WHETHER_INGESTION_DIR` at a fresh
   directory for every run (removed in a preload `afterAll`; bun test never fires process `exit`).
+- **A full-suite run hides the app's console output (2026-11-09).** An unfiltered
+  `bun run test` printed 740 KB, about 185,000 tokens. 95.6% of it was three `console.warn`
+  calls (`lib/ingestion/families.ts`, `lib/macroSnapshot.ts`) firing 8,259 times against the
+  network guard, and the one failing test sat at line 8,914 of 9,206. Agents had adapted by
+  piping: across 206 session transcripts, 96% of 1,745 test runs went through `tail`, `head`
+  or `grep`, and 1,528 of those had no `pipefail`, so a red run reported exit code 0. The
+  runner now sets `WHETHER_TEST_QUIET=1` for a run with no path or name filter, and the
+  preload replaces the `console` methods with no-ops; bun's reporter does not write through
+  `console`, so the error, code frame and `(fail)` line still print. The same run is now 37
+  lines. A run that names a file keeps its output, because that reader wants it; the deploy
+  gate keeps it, because rerunning one file there costs a push; `WHETHER_TEST_LOGS=1` keeps it
+  anywhere. `tests/buildLogNoise.test.ts` and `tests/testRunnerArgs.test.ts` hold both halves.
+- **`bun run verify` is the edit loop (2026-11-09).** The same transcripts show lint, typecheck
+  and a test run issued as separate back-to-back commands about 200 times. A command's cost
+  to an agent is mostly the conversation it re-reads to issue the next one (268,000 tokens on
+  the average turn here), not what the command prints, so three small commands cost three
+  times one. `verify` is a `run-checks` preset: lint, typecheck and `test:changed` together.
+  It prints a failure once, where a gate prints it again at the end for a log window that
+  keeps only its last lines. `test:changed` is an on-demand task, so `bun run check` does
+  not run the changed files' tests twice.
 - **`--max-concurrency` was never a worker count.** The runner used to pass 8 locally and 2 in the
   gate and call it "fewer workers". It bounds `test.concurrent` tests, this suite declares none,
   and bun runs every file in one process regardless: the same 20 files took 8.26s at 1 and 8.10s
@@ -317,6 +337,7 @@ Each of these was findable only by reading the file that reads it. Leave them un
 | --- | --- | --- |
 | `CHECK_SERIAL=1` | `scripts/check-tasks.mjs` | Same as `--serial`: a `bun run check` stage runs fail-fast, one task at a time. |
 | `BUN_TEST_ONLY_FAILURES=1` | `scripts/run-tests.mjs` | Prints failing tests only, as the deploy gate always does. |
+| `WHETHER_TEST_LOGS=1` | `scripts/run-tests.mjs` | Keeps the app's console output on a full-suite run, which hides it by default. A run that names files or tests always keeps it. |
 | `BUN_TEST_TIMEOUT_MS=<ms>` | `scripts/run-tests.mjs` | Per-test ceiling; defaults to 60000, or 120000 in the deploy gate. |
 | `RATCHET_REPORT=1` | `tests/uiPrimitiveRatchet.test.ts`, `tests/themeRawPaletteRatchet.test.ts` | Prints the current counts, so a migration that lowers one knows the baseline to write. |
 | `WHETHER_VOCABULARY_REPORT=1` | `tests/readerVocabulary.test.tsx` | Prints each ratcheted word's count per surface. |

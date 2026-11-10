@@ -290,12 +290,14 @@ const runStage = async (selected) => {
 
   /*
    * Repeat each failure at the end with the lines that named it and the tail of its output:
-   * a bounded log viewer keeps the end, so the end has to carry enough to act on.
+   * a bounded log viewer keeps the end, so the end has to carry enough to act on. A plan
+   * that turns the repeat off (`verify`) is read whole, and there the repeat only prints
+   * every failure twice.
    */
   if (failed.length > 0) {
     process.stdout.write(`\n[run-checks] ran on bun ${Bun.version}${engineMismatch() ?? ""}\n`);
 
-    for (const result of failed) {
+    for (const result of plan.repeatFailures ? failed : []) {
       const lines = collapseRepeats(result.output).split("\n");
       const tail = lines.slice(-FAILURE_TAIL_LINES);
       process.stdout.write(`\n───── ${result.task.name} failed (\`bun run ${result.task.script}\`) ─────\n`);
