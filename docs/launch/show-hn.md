@@ -15,6 +15,14 @@ experience currently converts a spike into a flat retention curve. Four things g
 | The share loop returns a reader to the product | Done — permalink line on every artifact |
 | The site says what it costs | Done — `/about` says "Whether is free." (2026-10-14; the unsold paid plans and `/pricing` are gone) |
 
+**Update 2026-11-10.** The four gates are closed and the repository is public, so the hold above
+no longer has an open gate behind it. Two things still stand between this kit and a post, and
+both need the author: the live checks in the pre-launch checklist (not run since August; the
+session that made this update could not reach whether.work), and the first sentence of the post
+text, which says "I run product at an early-stage company" and should say whatever is true on the
+day. The post text and prepared answers were brought in line with the README the same day: the
+inputs that move the scores, the premise test, and the test count.
+
 All four closed on 2026-08-29. The reason the fourth gated a *launch* and not just a funnel: the
 strongest thing this product can say on HN is "it is free, here is the scoring, here is the API" —
 and that claim is only credible in writing, on a page, before the traffic arrives. Saying it in a
@@ -62,8 +70,8 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 > skim the Fed news, skim a macro newsletter, and try to translate "conditions are tightening"
 > into whether we should actually approve the two open reqs.
 >
-> Whether automates that translation. It pulls public series from FRED (fed funds, 2Y/10Y
-> yields, high-yield spreads, Chicago Fed financial conditions, VIX) and compresses them into
+> Whether automates that translation. It pulls public series from FRED (Treasury bill and note
+> yields, the Chicago Fed financial conditions index) and the VIX, and compresses them into
 > weekly operating guidance — e.g. "conditions tightening — freeze new commitments" — plus the
 > part I actually care about: the exact thresholds that would flip the call, and the reversal
 > condition for every rule.
@@ -81,6 +89,10 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 >   https://whether.work/history scores the archive against what happened next, including the
 >   changes in conditions it gave no warning of. https://whether.work/calibration shows the
 >   confidence figure measures distance from a line, not probability, and the page says so.
+> - **It tested its own premise and published the miss.** A preregistered test of whether tight
+>   readings predict venture declines two to four quarters out came back "not supported": the
+>   scores move with deal count in the same quarter and lead nothing reliably.
+>   https://github.com/zz-plant/whether/blob/main/docs/research/premise-test-results.md
 > - **No signup, no trackers.** The whole product is on the front page.
 > - **Free API, no key**: `curl https://whether.work/api/agent?cadence=weekly`. There's also an
 >   MCP endpoint and llms.txt if you want your agent to read it instead of you.
@@ -111,8 +123,9 @@ on the exec team read that morning.
 **"How is the score computed?"**
 Full derivation with the engine's actual constants: /trust#formula-reference. Short version:
 funding pressure ramps 0→90 as the one-month bill rate passes 3.5%→4.0%, plus up to 25 for curve inversion;
-risk appetite maps the 10Y−2Y slope linearly from −1% to +1.5%; stress reads (HY spreads, FCI,
-VIX, funding velocity, layoffs) apply capped adjustments; regime is a quadrant with a
+risk appetite maps the 10Y−2Y slope linearly from −1% to +1.5%; stress reads (FCI, VIX,
+funding velocity) apply capped adjustments; inflation, labor, the high-yield spread and
+startup-market inputs are shown beside the scores and move nothing; regime is a quadrant with a
 two-consecutive-reads confirmation gate near boundaries.
 
 **"What data, exactly? Is it fresh?"**
@@ -120,6 +133,15 @@ FRED daily CSV endpoints (DFF, DGS1MO, DGS3MO, DGS2, DGS10) plus the macro serie
 API keys anywhere in the pipeline. Freshness, per-source health, and degraded-state behavior
 are on /trust — when a source is down it says so and serves the last canonical snapshot
 instead of silently pretending.
+
+**"Does it predict anything?"**
+Not on the evidence so far, and the repo says so. The preregistered premise test
+(`docs/research/premise-test-results.md`) found no support for tight readings predicting venture
+declines two to four quarters ahead; the scores track fundraising as it happens. The month-end
+record since 2012 is a reconstruction, not guidance anyone read: conditions were the same a month
+later in 169 of 176 comparisons (96%), which is also what "no change" every month would score,
+and 2 of the 5 changes were warned a month ahead. It is a shared default with published lines,
+not a forecast.
 
 **"Why not just read the FOMC minutes / a newsletter?"**
 Those explain; they don't decide. The output here is an artifact you can paste into Slack or
@@ -132,12 +154,12 @@ None right now. It's free and open source; it started as scratching my own Monda
 **"Stack?"**
 Bun, React server components on Cloudflare Workers (edge SSR, 300s revalidate), KV for
 materialized weekly read models with a 92-day history window, cron-driven ingest that never
-self-fetches over HTTP. ~1,900 tests. The repo's AGENTS.md and docs/agents/ are public too if you want
+self-fetches over HTTP. 3,800+ tests. The repo's AGENTS.md and docs/agents/ are public too if you want
 to see how the agent-assisted workflow is set up.
 
 ## Pre-launch checklist
 
-- [ ] **Make the repo public.** As of 2026-08-10, github.com/zz-plant/whether is PRIVATE, so
+- [x] **Make the repo public.** Public as of 2026-11-10 (GitHub API). As of 2026-08-10, github.com/zz-plant/whether is PRIVATE, so
       every "open source" claim above — plus the GitHub links now in the footer, homepage
       explainer, formula reference, and the pre-existing doc deep-links in /operate — 404s for
       visitors. The repo already reads as public (MIT LICENSE, CONTRIBUTING, README with demo
