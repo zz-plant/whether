@@ -28,6 +28,7 @@ const RUN_HISTORY_WINDOW_DAYS = 30;
 const RUN_HISTORY_CACHE_MS = 15 * 60 * 1000;
 const RUN_HISTORY_TIMEOUT_MS = 2_500;
 const ROW_LIMIT = 5_000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Operator-facing names for the step labels `runCronStep` writes. Unknown steps show their raw label. */
 const CRON_STEP_LABELS: Record<string, string> = {
@@ -71,7 +72,16 @@ type CronStepSummary = {
    * whole of what a reader deciding whether to trust the brief can act on.
    */
   lastError: string | null;
+  /**
+   * Runs and failures per UTC day across the window, oldest first, the last entry being
+   * the day of `generatedAt`. The trust page draws it as a strip, so a reader sees when a
+   * job broke and whether it recovered without comparing two timestamps. Optional so a
+   * summary written before 2026-11-10 still renders, without the strip.
+   */
+  days?: CronStepDay[];
 };
+
+type CronStepDay = { runs: number; failures: number };
 
 export type CronRunHistory =
   | {
@@ -111,6 +121,9 @@ export const summarizeCronSteps = (
   options: { windowDays?: number; now?: Date } = {},
 ): Extract<CronRunHistory, { status: "ok" }> => {
   const summaries = new Map<string, CronStepSummary>();
+  const windowDays = options.windowDays ?? RUN_HISTORY_WINDOW_DAYS;
+  const now = options.now ?? new Date();
+  const lastDay = Math.floor(now.getTime() / DAY_MS);
 
   for (const row of rows) {
     if (!row.blob2) continue;
@@ -134,8 +147,16 @@ export const summarizeCronSteps = (
       lastOkAt: null,
       lastFailedAt: null,
       lastError: null,
+      days: Array.from({ length: windowDays }, () => ({ runs: 0, failures: 0 })),
     };
     summary.runs += 1;
+    /* A row outside the window (clock skew, a query bound wider than the window) still
+       counts in the totals; it only has no day to sit on. */
+    const day = summary.days?.[windowDays - 1 - (lastDay - Math.floor(Date.parse(at) / DAY_MS))];
+    if (day) {
+      day.runs += 1;
+      if (!event.ok) day.failures += 1;
+    }
     if (at > summary.lastRunAt) summary.lastRunAt = at;
     if (event.ok) {
       if (!summary.lastOkAt || at > summary.lastOkAt) summary.lastOkAt = at;
@@ -156,8 +177,8 @@ export const summarizeCronSteps = (
   const steps = [...summaries.values()].sort((a, b) => b.lastRunAt.localeCompare(a.lastRunAt));
   return {
     status: "ok",
-    windowDays: options.windowDays ?? RUN_HISTORY_WINDOW_DAYS,
-    generatedAt: (options.now ?? new Date()).toISOString(),
+    windowDays,
+    generatedAt: now.toISOString(),
     steps,
     totalRuns: steps.reduce((sum, step) => sum + step.runs, 0),
     totalFailures: steps.reduce((sum, step) => sum + step.failures, 0),

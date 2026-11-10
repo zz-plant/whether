@@ -78,3 +78,20 @@ describe("run history panel copy", () => {
     assert.equal(render({ status: "unconfigured" }), "");
   });
 });
+
+describe("run history day strip", () => {
+  it("draws one mark per day in place of the last-success stamp, and labels the strip in words", () => {
+    const days = Array.from({ length: 30 }, (_, index) =>
+      index === 27 ? { runs: 1, failures: 1 } : index % 7 === 0 ? { runs: 1, failures: 0 } : { runs: 0, failures: 0 },
+    );
+    const markup = render({ ...okHistory, steps: okHistory.steps.map((step) => ({ ...step, days })) });
+
+    assert.equal((markup.match(/data-run-day=/g) ?? []).length, 30);
+    assert.equal((markup.match(/data-run-day="failed"/g) ?? []).length, 1);
+    assert.match(markup, /Last 30 days/);
+    assert.ok(!markup.includes("Last success"), "the stamp column stayed beside the strip");
+    assert.match(markup, /aria-label="Ran on 6 of the last 30 days, with a failure on 1\."/);
+    // The last failure keeps its date: the strip says which day, the stamp says when.
+    assert.match(markup, /Sep 14, 14:00 UTC/);
+  });
+});

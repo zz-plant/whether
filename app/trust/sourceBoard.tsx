@@ -28,6 +28,38 @@ const sourceLinkClass =
  * from, not a second verdict. The id stays: `dataCurrencyNotice` sends readers
  * to `/trust#source-board` to check the source dates.
  */
+/*
+ * How far a source is through its update window, drawn beside the date it last answered
+ * (2026-11-10). The date alone left the reader to hold "Daily rates" against "Updated Nov 9,
+ * 02:00 UTC" and work out whether that is current; the bar does that sum. Muted while
+ * inside the window, full and in the caveat ink once past it, the same moment the state
+ * word turns "Stale". Not the crossed red: a stale source is a caveat, and red means a line.
+ * Fixed width, so the rows compare at a glance.
+ */
+function WindowBar({ used }: { used: number }) {
+  const overdue = used >= 1;
+  const label = overdue
+    ? "Past the window it is expected to update in"
+    : `${Math.round(used * 100)}% of the way through the window it is expected to update in`;
+  return (
+    <svg
+      viewBox="0 0 40 6"
+      width={40}
+      height={6}
+      aria-label={label}
+      data-window-used={overdue ? "overdue" : "inside"}
+      className="block shrink-0"
+    >
+      <rect width={40} height={6} className="fill-[color:var(--border-default)]" />
+      <rect
+        width={Math.min(used, 1) * 40}
+        height={6}
+        className={overdue ? "fill-[color:var(--color-caveat-fg)]" : "fill-[color:var(--app-text-muted)]"}
+      />
+    </svg>
+  );
+}
+
 export function SourceBoard({
   rows,
   treasurySourceUrl,
@@ -61,7 +93,10 @@ export function SourceBoard({
             <span className="col-span-2 text-xs text-slate-400 @3xl:contents @3xl:text-sm">
               <span>{row.cadenceLabel}</span>
               <span aria-hidden="true" className="@3xl:hidden"> · </span>
-              <span className="tabular-nums">{row.updatedLabel}</span>
+              <span className="inline-flex items-center gap-2 tabular-nums">
+                {row.windowUsed === null ? null : <WindowBar used={row.windowUsed} />}
+                {row.updatedLabel}
+              </span>
             </span>
           </li>
         ))}

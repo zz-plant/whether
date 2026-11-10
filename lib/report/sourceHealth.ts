@@ -367,6 +367,13 @@ export type SourceBoardRow = {
   asIntended: boolean;
   /** When it last answered, in UTC, or the absence in words. */
   updatedLabel: string;
+  /**
+   * How much of its update window has passed since it last answered: 0 just after an
+   * update, 1 at the edge of the window, above 1 when overdue. Null with no update on
+   * record. The board draws it as a bar beside the date (2026-11-10), so a reader sees
+   * how current a source is without holding its cadence against a timestamp.
+   */
+  windowUsed: number | null;
 };
 
 /*
@@ -388,7 +395,7 @@ const sourceBoardState = (row: SourceHealthRow): string => {
  * degraded rows above are the subset the strip counts; this is the whole set,
  * so a healthy week shows what "All sources live" was judged from.
  */
-export const buildSourceBoardRows = (rows: SourceHealthRow[]): SourceBoardRow[] =>
+export const buildSourceBoardRows = (rows: SourceHealthRow[], now: Date = new Date()): SourceBoardRow[] =>
   rows.map((row) => ({
     sourceName: row.sourceName,
     cadenceLabel: row.cadenceLabel,
@@ -398,7 +405,25 @@ export const buildSourceBoardRows = (rows: SourceHealthRow[]): SourceBoardRow[] 
     updatedLabel: row.lastSuccessfulFetchAt
       ? `Updated ${formatTimestampUTC(row.lastSuccessfulFetchAt)}`
       : "No update on record",
+    windowUsed: windowUsedSince(row, now),
   }));
+
+/*
+ * Held to the state word, which is the verdict: a source the word calls fresh never draws
+ * past its window, and a stale one always does. The two can disagree otherwise, because
+ * the word counts business days for the weekday-only series (a Monday-morning labor read
+ * is 60 hours old and on time) and was judged a moment earlier than this.
+ */
+const windowUsedSince = (row: SourceHealthRow, now: Date): number | null => {
+  if (!row.lastSuccessfulFetchAt || row.freshnessStatus === "unknown" || !(row.freshnessSlaHours > 0)) return null;
+  const at = Date.parse(row.lastSuccessfulFetchAt);
+  if (!Number.isFinite(at)) return null;
+  const used = Math.max(0, (now.getTime() - at) / (row.freshnessSlaHours * 60 * 60 * 1000));
+  return row.freshnessStatus === "stale" ? Math.max(used, 1) : Math.min(used, FRESH_WINDOW_CAP);
+};
+
+/* A fresh source's bar stops short of the end, so "full" only ever means overdue. */
+const FRESH_WINDOW_CAP = 0.95;
 
 export const formatSourceModeLabel = (mode: SourceModeStatus) => {
   if (mode === "live") return "Live";
