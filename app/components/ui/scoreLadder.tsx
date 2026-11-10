@@ -72,12 +72,22 @@ type ScoreLadderProps = {
    * Only inside a card that replays the move; everywhere else the ladder is still.
    */
   travel?: boolean;
+  /**
+   * The score as a figure (docs/design/rebuild-covenant.md): the number in the binding
+   * voice, one sentence of where it stands, and a ruled line with the pause and restart
+   * lines named where they sit. No key and no scrub: this is the brief's statement of
+   * the two scores, and the working ladder with its ranges is in "What changed".
+   * "compact" drops the ruled line, for two figures side by side on a phone.
+   */
+  figure?: boolean | "compact";
   className?: string;
 };
 
 const LINE_LABELS: Record<LadderLineKind, string> = {
   pause: "Pause",
-  resume: "Resume",
+  /* "Restart", the one word for this line (docs/editorial-guardrails.md, Decision
+     vocabulary). The key said "Resume" beside prose that said "restart". */
+  resume: "Restart",
   callChange: DECISION_CONTRACT_LABELS.watch.changeLine,
 };
 
@@ -237,6 +247,31 @@ export const buildLadderLines = ({
  * 2026-11-03 "5 pts above the change line"): the ladder under the caption labels
  * every tick, so the number finds the tick and the name said "line" again.
  */
+/**
+ * Where a score stands against its pause line, as a figure states it: "14 pts past its
+ * pause line. Restarts below 66." The pause line faces away from the restart line, so a
+ * score that pauses above 76 restarts below 66, and one that pauses below 44 pauses "below".
+ */
+const describeFigureStanding = (value: number, lines: readonly LadderLine[]): { crossed: boolean; lead: string; rest: string } => {
+  const pause = lines.find((line) => line.kind === "pause");
+  const resume = lines.find((line) => line.kind === "resume");
+  const change = lines.find((line) => line.kind === "callChange");
+  if (!pause) {
+    if (!change) return { crossed: false, lead: "", rest: "" };
+    const distance = Math.abs(value - change.value);
+    return { crossed: false, lead: distance === 0 ? "At the change line" : `${formatPoints(distance)} pts from the change line`, rest: "" };
+  }
+  const pausesAbove = guardsAbove(pause, resume) ?? guardsAbove(pause, change) ?? true;
+  const crossed = pausesAbove ? value > pause.value : value < pause.value;
+  const distance = Math.abs(value - pause.value);
+  const lead =
+    distance === 0 ? "At its pause line" : `${formatPoints(distance)} pts ${crossed ? "past" : "clear of"} its pause line`;
+  if (crossed) {
+    return { crossed, lead, rest: resume ? `Restarts ${pausesAbove ? "below" : "above"} ${formatPoints(resume.value)}.` : "" };
+  }
+  return { crossed, lead, rest: `Pauses ${pausesAbove ? "above" : "below"} ${formatPoints(pause.value)}.` };
+};
+
 export const describeLadderPosition = (value: number, lines: readonly LadderLine[]) => {
   const nearest = nearestLadderLine(value, lines);
   if (!nearest) return `${formatPoints(value)} of 100`;
@@ -284,6 +319,7 @@ export function ScoreLadder({
   feelsLike,
   onScrubValue,
   travel = false,
+  figure = false,
   className = "",
 }: ScoreLadderProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -505,10 +541,88 @@ export function ScoreLadder({
   const trackStyle: TrackStyle = {
     "--ladder-rows": maxRow("row"),
     "--ladder-rows-wide": maxRow("wideRow"),
-    touchAction: "none",
+    /* A vertical swipe that starts on the track still scrolls the page (2026-11-10):
+       `none` swallowed it, and the phone brief carries a ladder on its first screen. */
+    touchAction: "pan-y",
     userSelect: "none",
     cursor: isScrubbing ? "grabbing" : "ew-resize",
   };
+  if (figure) {
+    const pause = lines.find((line) => line.kind === "pause");
+    const resume = lines.find((line) => line.kind === "resume");
+    const change = lines.find((line) => line.kind === "callChange");
+    const pauseZone = zones.find((zone) => zone.kind === "pause");
+    const standing = describeFigureStanding(value, lines);
+    /* A line's name reads away from the other line, so the two never meet. */
+    const pauseReadsLeft = pause && resume ? at(pause.value) <= at(resume.value) : true;
+    const named = (line: LadderLine, readsLeft: boolean, text: string, ink: string) => (
+      <span
+        className={`absolute top-[24px] whitespace-nowrap text-[12px] leading-none tabular-nums ${ink} ${readsLeft ? "pr-1.5" : "pl-1.5"}`}
+        style={readsLeft ? { right: `${roundPercent(100 - at(line.value))}%` } : { left: `${at(line.value)}%` }}
+      >
+        {text}
+      </span>
+    );
+    return (
+      <figure className={`@container ${className}`.trim()} data-score-ladder data-ladder-display="figure">
+        <figcaption className="grid grid-cols-[auto_minmax(0,1fr)] items-end gap-x-3">
+          <span data-ladder-figure aria-hidden="true" className="type-figure row-span-2 text-[2.875rem] text-slate-50">
+            {formatPoints(value)}
+          </span>
+          <span className="text-xs font-medium leading-snug text-slate-300">
+            {label}
+            {worse ? (
+              /* In the compact pair the direction is for a screen reader: beside a 46px
+                 figure in half a phone's width it wrapped the label to three lines. */
+              <span className={figure === "compact" ? "sr-only" : "ml-1.5 font-normal text-slate-400"} data-ladder-direction={worse}>
+                {worse === "higher" ? "(higher is worse)" : "(higher is better)"}
+              </span>
+            ) : null}
+          </span>
+          <span className={`${figure === "compact" ? "text-[0.8125rem]" : "text-fluid-sm"} leading-snug text-slate-300`} data-ladder-caption>
+            <span className="sr-only">
+              {formatPoints(value)} of {formatPoints(max)}.{" "}
+            </span>
+            <span className={`font-semibold ${standing.crossed ? "text-line-crossed-fg" : "text-slate-100"}`}>
+              <LineStateIcon state={standing.crossed ? "crossed" : "clear"} className="mr-1.5 inline align-[-0.15em]" />
+              {standing.lead}
+              {standing.rest ? "." : null}
+            </span>
+            {standing.rest ? <> {standing.rest}</> : null}
+          </span>
+        </figcaption>
+        {figure === "compact" ? null : (
+          <div className="relative mt-3 h-10" aria-hidden="true" data-ladder-rule>
+            <span className="absolute inset-x-0 top-[9px] h-0.5 bg-[color:var(--app-text)]" />
+            {pauseZone ? (
+              <span
+                data-ladder-zone="pause"
+                className="absolute top-[6px] h-2 bg-[color:var(--line-crossed)]"
+                style={{ left: `${pauseZone.left}%`, width: `${pauseZone.width}%` }}
+              />
+            ) : null}
+            {lines.map((line) => (
+              <span
+                key={`${line.kind}-${line.value}`}
+                data-ladder-tick
+                className={`absolute top-0.5 h-[18px] -translate-x-1/2 ${line.kind === "pause" ? "w-[3px] bg-[color:var(--line-crossed)]" : "w-0.5 bg-[color:var(--app-text)]"}`}
+                style={{ left: `${at(line.value)}%` }}
+              />
+            ))}
+            <span
+              data-ladder-reading
+              className="absolute top-0.5 h-[18px] w-[18px] -translate-x-1/2 rounded-full border-[3px] border-[color:var(--app-text)] bg-[var(--bg-body)]"
+              style={{ left: `${at(value)}%` }}
+            />
+            {pause ? named(pause, pauseReadsLeft, `pause ${formatPoints(pause.value)}`, "text-line-crossed-fg") : null}
+            {resume ? named(resume, !pauseReadsLeft, `restart ${formatPoints(resume.value)}`, "text-slate-300") : null}
+            {!pause && !resume && change ? named(change, at(change.value) > 50, `change line ${formatPoints(change.value)}`, "text-slate-300") : null}
+          </div>
+        )}
+      </figure>
+    );
+  }
+
   return (
     <figure
       className={`@container space-y-1.5 ${className}`.trim()}
@@ -633,12 +747,12 @@ export function ScoreLadder({
           <>
             <span
               data-ladder-scrub-move
-              className="absolute top-[13px] h-1 rounded-full bg-[color:var(--regime-ink)] opacity-75"
+              className="absolute top-[13px] h-1 rounded-full bg-[color:var(--app-text)] opacity-75"
               style={{ left: `${scrubMove.left}%`, width: `${scrubMove.width}%` }}
             />
             <span
               data-ladder-scrub-thumb
-              className="absolute top-1.5 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-[color:var(--regime-ink)] bg-[color:var(--bg-body)]"
+              className="absolute top-1.5 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-[color:var(--app-text)] bg-[color:var(--bg-body)]"
               style={{ left: `${at(scrub.value)}%` }}
             />
           </>

@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     if (confirmed.stage) homeParams.set("stage", confirmed.stage);
     if (confirmed.runwayBand) homeParams.set("runway", confirmed.runwayBand);
     const homeHref = homeParams.size > 0 ? `/?${homeParams.toString()}` : "/";
-    const returnLink = `<a href='${homeHref}' style='display:inline-block;margin-top:16px;padding:8px 16px;border-radius:6px;background:#121719;color:#fff;text-decoration:none;font-size:0.9rem;'>Return to Whether</a>`;
+    const returnLink = `<a href='${homeHref}' style='display:inline-block;margin-top:16px;padding:8px 16px;border-radius:6px;background:#10201a;color:#fff;text-decoration:none;font-size:0.9rem;'>Return to Whether</a>`;
     return actionPage("Confirmed", actionParagraph(`${standing} Every email carries a link to unsubscribe.`) + returnLink);
   } catch {
     return actionPage("Something went wrong", actionParagraph("The confirmation did not go through. Try the link again in a minute.") + ACTION_HOME_LINK, 500);

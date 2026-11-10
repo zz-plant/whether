@@ -266,14 +266,14 @@ const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_P
 /* Mirrors the light overrides in app/styles/tokens.css. Generated images cannot
    resolve CSS variables, so the same roles are supplied as actual colours. */
 const LIGHT_PALETTE = {
-  background: "#f1f4f3",
-  panel: "#ffffff",
-  border: "rgba(18, 23, 25, 0.14)",
-  text: "#121719",
-  secondary: "#384145",
-  muted: "#525c60",
-  crossed: "#b4232a",
-  conditionInk: { EXPANSION: "#7a5800", DEFENSIVE: "#74552a", VOLATILE: "#4a4fc0", SCARCITY: "#1d5585" },
+  background: "#ecf0e8",
+  panel: "#f4f7f1",
+  border: "rgba(16, 32, 26, 0.24)",
+  text: "#10201a",
+  secondary: "#2b3b33",
+  muted: "#40524a",
+  crossed: "#b81f27",
+  conditionInk: { EXPANSION: "#765600", DEFENSIVE: "#8a4f16", VOLATILE: "#3f47b5", SCARCITY: "#1f3f8f" },
 };
 const DARK_PALETTE = {
   background: OG_BG, panel: OG_PANEL, border: OG_BORDER, text: OG_TEXT,

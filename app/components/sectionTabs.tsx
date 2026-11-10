@@ -45,7 +45,7 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
           aria-current={link.isActive ? "page" : undefined}
           className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-sm font-medium no-underline transition-colors ${
             link.isActive
-              ? "border-[var(--regime-accent)] text-slate-100"
+              ? "border-[var(--app-text)] text-slate-100"
               : "border-transparent text-slate-400 hover:border-slate-600 hover:text-slate-200"
           }`}
         >
@@ -61,7 +61,7 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
               aria-current={link.isActive ? "page" : undefined}
               className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-fluid-sm no-underline transition-colors ${
                 link.isActive
-                  ? "border-[var(--regime-accent)] font-medium text-slate-100"
+                  ? "border-[var(--app-text)] font-medium text-slate-100"
                   : "border-transparent text-slate-500 hover:border-slate-600 hover:text-slate-300"
               }`}
             >

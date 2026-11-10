@@ -16,6 +16,7 @@ mockAny.module("next/navigation", () => ({
 
 import { DecisionHero } from "../app/components/DecisionHero";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
+import { ScoreLadder } from "../app/components/ui/scoreLadder";
 import { WhatWouldChangeSection } from "../app/components/home/WhatWouldChangeSection";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
@@ -52,16 +53,35 @@ const ladders = [
 const trail = { points: [{ tightness: 60, riskAppetite: 60 }, { tightness: 75, riskAppetite: 55 }], caption: "Trail: month-ends Aug–Sep 2026, then this week.", caveat: null };
 
 describe("/ draws the two scores once at each width", () => {
-  const radar = <RegimeRadar tightness={90} riskAppetite={49} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" trail={trail.points} />;
-  const hero = renderToStaticMarkup(<DecisionHero weeklyCall="Freeze." regime="SCARCITY" aside={radar} />);
+  /* The guidance block's margin since 2026-11-10 (docs/design/rebuild-covenant.md): each
+     score as a figure on its ladder. The conditions map it held is in "What would change
+     our mind", where the change lines are the subject. */
+  const figures = (
+    <div data-hero-scores>
+      {ladders.map((ladder) => (
+        <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} previous={ladder.previous} lines={ladder.lines} />
+      ))}
+    </div>
+  );
+  const hero = renderToStaticMarkup(<DecisionHero weeklyCall="Freeze." regime="SCARCITY" aside={figures} />);
   const watch = renderToStaticMarkup(
     <WhatWouldChangeSection ladders={ladders} flipProximity={[]} callChangeLines={lines} regime="SCARCITY" conditionsTrail={trail} />,
   );
 
-  it("on the card's map from md up, and on the section's map below md", () => {
-    assert.match(hero, /<div class="weather-hero-aside max-md:hidden"><figure[\s\S]*?Funding pressure 90 · Risk appetite 49/);
-    assert.match(watch, /<figure class="[^"]*\bmd:hidden\b[^"]*"[\s\S]*?Funding pressure 90 · Risk appetite 49/);
-    assert.match(route, /<WhatWouldChangeSection[\s\S]*?conditionsTrail=\{conditionsTrail\}/, "the route hands the section the trail, which moves its map below md");
+  it("on the guidance block's two ladders from md up, and on the changes table's below md", () => {
+    assert.match(hero, /<div class="weather-hero-aside [^"]*"><div class="max-md:hidden"><div data-hero-scores="true">[\s\S]*?data-ladder-figure[\s\S]*?>90<[\s\S]*?data-ladder-figure[\s\S]*?>49</);
+    assert.match(route, /<WhatChangedSection[\s\S]*?drawnAbove/, "the changes table is told the block draws the two scores");
+    assert.match(
+      readFileSync("app/components/home/WhatChangedSection.tsx", "utf8"),
+      /drawnAbove && \(row\.key === "tightness" \|\| row\.key === "riskAppetite"\) \? "space-y-2 md:\[&>a\]:hidden"/,
+      "and gives its two ladders up from md",
+    );
+  });
+
+  it("with the conditions map in 'What would change our mind' at every width, and none beside the guidance", () => {
+    assert.doesNotMatch(watch, /<figure class="[^"]*\bmd:hidden\b/);
+    assert.match(watch, /Funding pressure 90 · Risk appetite 49/);
+    assert.doesNotMatch(route, /<RegimeRadar/);
   });
 
   it("with no 'This week's scores' list under the areas", () => {
@@ -69,19 +89,17 @@ describe("/ draws the two scores once at each width", () => {
     assert.doesNotMatch(route, /<DecisionPicker[^>]*scores=/);
   });
 
-  it("with the trail's caption under the map it describes, not in the card's left column", () => {
-    assert.match(route, /trailCaption=\{conditionsTrail\.caption\}/);
+  it("with the trail's caption under the map it describes, not in the guidance block", () => {
+    assert.match(readFileSync("app/components/home/WhatWouldChangeSection.tsx", "utf8"), /trailCaption=\{conditionsTrail\?\.caption\}/);
     assert.doesNotMatch(route, /asideNote=/);
   });
 });
 
 describe("/ defines the four conditions once at each width", () => {
-  it("as the one-line legend below md, where the card has no map", () => {
+  it("as the one-line legend at every width, now the guidance block has no map", () => {
     const html = renderToStaticMarkup(<ConditionsLegend thresholds={changeLines} currentRegime="SCARCITY" />);
-    assert.match(html, /<section[^>]*class="[^"]*\bmd:hidden\b/);
-    assert.match(html, /<span class="md:hidden" data-conditions-definitions="true">/);
-    const shared = renderToStaticMarkup(<ConditionsLegend thresholds={changeLines} arrival="share" />);
-    assert.doesNotMatch(/<section[^>]*>/.exec(shared)?.[0] ?? "", /md:hidden/, "the share greeting is not a definition and shows at every width");
+    assert.doesNotMatch(/<section[^>]*>/.exec(html)?.[0] ?? "", /md:hidden/);
+    assert.match(html, /<span data-conditions-definitions="true">/);
   });
 
   it("as the map from md up, with each line's value at the line", () => {

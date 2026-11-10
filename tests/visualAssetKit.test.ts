@@ -59,7 +59,7 @@ describe("downloadable visual asset kit", () => {
         assert.match(asset.svg, /Risk appetite/);
       }
       if (asset.group === "areas" || asset.group === "status") {
-        assert.doesNotMatch(asset.svg, /#d9a82c|#9d7a4a|#8f96e0|#3a6fa3|#f2685c|#b4232a/);
+        assert.doesNotMatch(asset.svg, /#e0a81c|#9a5b1e|#8f9be0|#2a4fa8|#f0666a|#b81f27/);
       }
     }
   });

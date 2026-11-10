@@ -56,10 +56,10 @@ import { regimeSignalLabel } from "./report/signalTranslations";
  * themes; as text, each condition has its own ink per theme in tokens.css.
  */
 export const REGIME_HEX_COLORS: Record<RegimeKey, string> = {
-  EXPANSION: "#d9a82c", // Sun: warm, clear
-  DEFENSIVE: "#9d7a4a", // Haze: warm, dense
-  VOLATILE: "#8f96e0", // Lightning: cool, clear
-  SCARCITY: "#3a6fa3", // Frost: cool, dense
+  EXPANSION: "#e0a81c", // Sun: warm, clear
+  DEFENSIVE: "#9a5b1e", // Haze: warm, dense
+  VOLATILE: "#8f9be0", // Lightning: cool, clear
+  SCARCITY: "#2a4fa8", // Frost: cool, dense
 };
 
 /** Score at which `tightness` stops distinguishing between expensive and very

@@ -119,9 +119,9 @@ describe("the card draws the earlier state and writes only this week's", () => {
     assert.match(html, /aria-label="Replay the move since Oct 26"/);
     /* The earlier stamp is hidden from assistive tech and carries its word as an attribute. */
     assert.match(html, /aria-hidden="true"[^>]*data-regime="DEFENSIVE"[^>]*data-week-move-stamp/);
-    assert.match(html, /data-text="CLOUDY"/);
-    assert.equal(html.split(">CLOUDY<").length, 1, "the earlier conditions' word is in no text node");
-    assert.equal(html.split(">FREEZING<").length, 2);
+    assert.match(html, /data-text="Cloudy"/);
+    assert.equal(html.split(">Cloudy<").length, 1, "the earlier conditions' word is in no text node");
+    assert.equal(html.split(">Freezing<").length, 2);
   });
 
   it("is the plain card on a week nothing moved", () => {

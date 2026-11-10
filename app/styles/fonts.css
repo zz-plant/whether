@@ -1,9 +1,19 @@
 /*
- * Self-hosted web fonts: two variable files, subset to the site's text, Archivo
- * preloaded in app/layout.tsx. Both are SIL Open Font License 1.1, from Omnibus-Type:
+ * Self-hosted web fonts: three variable files, subset to the site's text, Archivo
+ * and Besley preloaded in app/layout.tsx. All are SIL Open Font License 1.1:
  *   Archivo     — Copyright 2020 The Archivo Project Authors (github.com/Omnibus-Type/Archivo)
  *   Chivo Mono  — Copyright 2018 The Chivo Project Authors (github.com/Omnibus-Type/Chivo)
+ *   Besley      — Copyright 2020 The Besley Project Authors (github.com/indestructible-type/Besley)
  * License: https://openfontlicense.org (the full text is in each file's name table).
+ *
+ * Besley (2026-11-10, docs/design/rebuild-covenant.md) is the binding voice: the
+ * guidance, the condition word, area names, score numerals and titles. A Clarendon,
+ * the face of engraved securities and public notices; it reads sturdy and calm at
+ * display sizes where the semi-condensed bold it replaces read urgent. Built from
+ * google/fonts ofl/besley/Besley[wght].ttf, version 2.001, with the pyftsubset
+ * command below minus --flavor, then packed with wawoff2 (the fontTools here has no
+ * Brotli module). It draws no arrows and no trademark sign, so its unicode-range is
+ * what the file covers and --font-display lists Archivo behind it for the rest.
  *
  * Built 2026-10-07 from the google/fonts sources, Archivo 2.001
  * (ofl/archivo/Archivo[wdth,wght].ttf) and Chivo Mono 1.008
@@ -23,7 +33,8 @@
  * serves /fonts/ cache-first as immutable, so a changed file must be a new URL
  * (tests/fontAssets.test.ts).
  *
- * Why these (2026-10-05). The site read as a forecast in IBM's design-system
+ * Why Archivo and Chivo Mono (2026-10-05; the display voice below has been Besley
+ * since 2026-11-10, and Archivo sets at normal width only). The site read as a forecast in IBM's design-system
  * face: Plex Sans for text, Plex Serif 600 for every h1 and h2, and the one
  * line that matters — the weekly call — in the sans, so the lesser headings
  * spoke in the stronger voice. One grotesque now carries every voice, and
@@ -73,9 +84,9 @@
  *   text, wdth 100 wght 400       0.4509em over Arial 0.4563em      = 98.81%
  *   semibold, wdth 100 wght 600   0.4691em over Arial Bold 0.4937em = 95.02%
  *   bold, wdth 100 wght 700       0.4857em over Arial Bold 0.4937em = 98.39%
- *   display, wdth 87.5 wght 700   0.4349em over Arial Bold 0.4937em = 88.10%
- * The display face answers font-stretch 87.5% (--font-stretch-display) with
- * real Arial Bold, the call's weight. At normal width, 600 and 700-900 take
+ * The semi-condensed display stand-in went with the display voice it stood in
+ * for (2026-11-10): the guidance and headings are Besley now, with their own
+ * stand-ins at the foot of this file. At normal width, 600 and 700-900 take
  * their own Arial Bold faces: with only the regular face they were drawn as
  * synthetic bold, which does not widen the glyphs, so until the swap semibold
  * set 3-4.5% and bold 6.5-8% narrower than Archivo (headless Chromium against
@@ -95,21 +106,6 @@
   size-adjust: 98.81%;
   ascent-override: 88.86%;
   descent-override: 21.25%;
-  line-gap-override: 0%;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
-    U+2215, U+2248, U+2260, U+2264-2265, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "Archivo Fallback";
-  font-style: normal;
-  font-weight: 100 900;
-  font-stretch: 87.5%;
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
-  size-adjust: 88.1%;
-  ascent-override: 99.66%;
-  descent-override: 23.84%;
   line-gap-override: 0%;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
     U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
@@ -154,4 +150,62 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
     U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2212, U+2215, U+2248,
     U+2260, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+/*
+ * Besley, the binding voice. One variable file, weight 400 to 900, 37 KB.
+ * The range is exactly what the file draws: no arrows, no trademark sign.
+ */
+@font-face {
+  font-family: "Besley";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/fonts/besley-variable.b9cc4b63.woff2") format("woff2-variations"),
+    url("/fonts/besley-variable.b9cc4b63.woff2") format("woff2");
+  unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0394, U+2000-200B, U+2010-2015, U+2018-201A,
+    U+201C-201E, U+2020-2022, U+2026, U+2030-2031, U+2039-203A, U+203E, U+2044, U+20AC,
+    U+2212, U+2215, U+2248, U+2260, U+2264-2265;
+}
+
+/*
+ * Stand-ins while Besley is in flight, measured the way the Archivo ones are: the
+ * same letter-frequency string, Besley's average advance over Georgia's, and
+ * Besley's own vertical metrics (ascender 2500, descender 850, of 2000) divided by
+ * the result. Georgia ships on Windows, macOS and iOS; Android has none and draws
+ * the heading in Archivo until the swap.
+ *   text, wght 400      0.5161em over Georgia 0.4533em      = 113.85%
+ *   display, wght 700   0.5621em over Georgia Bold 0.5286em = 106.33%
+ * The guidance is set at 700, so the bold face is sized to that weight; at 800
+ * (the condition word, the score numerals) it sets about 4% narrower until the swap.
+ */
+@font-face {
+  font-family: "Besley Fallback";
+  font-style: normal;
+  font-weight: 400 600;
+  src: local("Georgia");
+  size-adjust: 113.85%;
+  ascent-override: 109.8%;
+  descent-override: 37.33%;
+  line-gap-override: 0%;
+  unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0394, U+2000-200B, U+2010-2015, U+2018-201A,
+    U+201C-201E, U+2020-2022, U+2026, U+2030-2031, U+2039-203A, U+203E, U+2044, U+20AC,
+    U+2212, U+2215, U+2248, U+2260, U+2264-2265;
+}
+
+@font-face {
+  font-family: "Besley Fallback";
+  font-style: normal;
+  font-weight: 700 900;
+  src: local("Georgia Bold"), local("Georgia-Bold");
+  size-adjust: 106.33%;
+  ascent-override: 117.55%;
+  descent-override: 39.97%;
+  line-gap-override: 0%;
+  unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0394, U+2000-200B, U+2010-2015, U+2018-201A,
+    U+201C-201E, U+2020-2022, U+2026, U+2030-2031, U+2039-203A, U+203E, U+2044, U+20AC,
+    U+2212, U+2215, U+2248, U+2260, U+2264-2265;
 }

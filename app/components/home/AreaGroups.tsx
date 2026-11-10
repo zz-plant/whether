@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
-import { AreaIcon, LineStateIcon } from "../ui/conceptIcons";
+import { LineStateIcon } from "../ui/conceptIcons";
 import { ActionLink } from "../ui/actionLink";
-import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { decisionAreaOrder, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import type { AreaGroup } from "../../../lib/report/home/homeSectionModel";
 import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigation";
 
@@ -47,6 +47,7 @@ export function AreaGroups({
   detail,
   note,
   alerts = false,
+  rulesAbove = false,
 }: {
   groups: readonly AreaGroup[];
   /** The area whose detail is open. */
@@ -59,6 +60,13 @@ export function AreaGroups({
   note?: (area: DecisionArea) => ReactNode;
   /** Offer an email when a held group restarts. Live briefs only: plan lines watch today's reading. */
   alerts?: boolean;
+  /**
+   * The guidance block above prints each area's action beside its standing from `lg` up
+   * (AreaStrip). This list then gives its own sentence up at that width, so the action is
+   * said once: it keeps the group's line, which states the condition the areas wait on,
+   * each area's name and what opens under it.
+   */
+  rulesAbove?: boolean;
 }) {
   if (groups.length === 0) return null;
   return (
@@ -100,7 +108,10 @@ export function AreaGroups({
                         this header, not the detail under it, so the detail's own links work. */}
                     <div className={`col-span-2 grid grid-cols-subgrid ${onToggle ? "group relative" : ""}`}>
                       {/* Centred on the bordered name when it is a button, on the first line of text when not. */}
-                      <AreaIcon area={entry.area} className={`shrink-0 text-slate-400 ${onToggle ? "mt-1.5" : "mt-1"}`} />
+                      {/* The area's number, as the rows under the guidance give it. */}
+                      <span aria-hidden="true" className={`w-3 shrink-0 text-xs tabular-nums text-slate-400 ${onToggle ? "mt-2" : "mt-1.5"}`}>
+                        {decisionAreaOrder.indexOf(entry.area) + 1}
+                      </span>
                       <p>
                         {onToggle ? (
                           <button
@@ -119,7 +130,7 @@ export function AreaGroups({
                         ) : (
                           <span className="font-semibold text-slate-50">{entry.label}.</span>
                         )}{" "}
-                        {sentence(entry.rule)}
+                        <span className={rulesAbove ? "lg:hidden" : undefined} data-area-group-rule>{sentence(entry.rule)}</span>
                       </p>
                     </div>
                     {entry.changed ? <p className="col-start-2 text-fluid-sm text-slate-400">{entry.changed}</p> : null}

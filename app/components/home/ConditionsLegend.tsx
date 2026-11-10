@@ -130,7 +130,7 @@ export function ConditionsLegend({
       aria-label="The four conditions"
       data-testid="conditions-legend"
       suppressHydrationWarning
-      className={`${compact ? "" : "mb-3 border-b border-[color:var(--border-subtle)] pb-3"} flex items-start justify-between gap-4 text-fluid-sm text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
+      className={`${compact ? "" : "mb-3 border-b border-[color:var(--border-subtle)] pb-3"} flex items-start justify-between gap-4 text-fluid-sm text-slate-300`.trim()}
     >
       <div className="min-w-0 flex-1">
         <p className="min-w-0 leading-relaxed">
@@ -139,7 +139,7 @@ export function ConditionsLegend({
         {/* A block for the eye, a space for a copy or a screen reader, which would
             otherwise read "…and raise.Cloudy this week". */}
         {orientation ? <><span className="block text-slate-100 md:text-fluid-sm" data-orientation-line>{compact ? "Weekly operating guidance for startup leaders." : orientation}</span>{" "}</> : null}
-        {!compact ? <span className="md:hidden" data-conditions-definitions>
+        {!compact ? <span data-conditions-definitions>
           {/* The first entry names both scores; the rest keep the same order, so
               the line stays short enough to read as one. */}
           {/* On a live week, this week's condition only (2026-10-14): the four

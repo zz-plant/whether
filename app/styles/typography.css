@@ -16,11 +16,11 @@
    title 26–34, h2 22–26, h3 18–20, body 16–17.
    Ink is set here and may be overridden by a caller that has a reason. */
 .type-section {
-  @apply font-semibold leading-tight text-slate-100;
+  @apply font-bold leading-tight text-slate-100;
   font-size: var(--text-fluid-xl);
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.012em;
 }
 
 /* Unified label primitive — use for all section/section-header metadata labels.
@@ -64,14 +64,14 @@
   font-stretch: 100%;
 }
 
-/* Section-level eyebrow: the mark above a page section's title, in the week's
-   ink (ui-ux-standards §XVI). ReportSection sets it; a hand-rolled section
-   adds it beside .type-eyebrow. A card's own eyebrow inside a section stays on
-   the plain primitive — the ink says "this is a section of the page", and it
-   only says that if cards do not also wear it. Declared after .type-eyebrow so
-   it wins at equal specificity; the light ink is resolved by the token. */
+/* Section-level eyebrow: the mark above a page section's title. ReportSection
+   sets it; a hand-rolled section adds it beside .type-eyebrow. It was drawn in
+   the week's ink until 2026-11-10; a condition's colour now names the
+   condition and nothing else, so a section's eyebrow is the text ink, one step
+   stronger than a card's own. Declared after .type-eyebrow so it wins at equal
+   specificity. */
 .type-eyebrow-section {
-  color: var(--regime-ink);
+  color: var(--app-text-secondary);
 }
 
 /* SVG <text> sizes itself from the fontSize presentation attribute, which a CSS
@@ -97,19 +97,30 @@ svg :where(.type-eyebrow, .type-badge) {
   font-feature-settings: "case";
 }
 
-/* The regime stamp: the week's word (Freezing, Sunny, Stormy, Cloudy) set in
-   expanded capitals wherever it prints — the hero's tag, a report route's
-   status word, the sticky strip. It is the only expanded text on the page, so
-   the word reads as a placard rather than a label, and a reader learns to find
-   it in the same shape on every surface and in every screenshot. Typography
-   only; the regime ink comes from the caller. */
+/* The condition word: the week's word (Freezing, Sunny, Stormy, Cloudy) set in
+   the binding voice wherever it prints: beside the guidance, a report route's
+   status word, the sticky strip, a row of past weeks. It was expanded capitals
+   on a filled placard until 2026-11-10; the word is now printed in the
+   condition's own ink, as a name, so a reader finds it in the same shape on
+   every surface and in every screenshot. Typography only; the ink comes from
+   the caller. */
 .type-stamp {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-stretch: var(--font-stretch-stamp);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-feature-settings: "case";
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+
+/* A score as a figure: the two published numbers, and any reading set beside its
+   line. The binding voice at its heaviest, with fixed-width digits so a value that
+   changes does not move what follows it. Size comes from the caller. */
+.type-figure {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
 }
 
 .type-data {
@@ -176,7 +187,7 @@ svg :where(.type-eyebrow, .type-badge) {
      the 400 Tailwind's preflight leaves, which set those titles thin. In the
      base layer so a font-* utility on the element still wins. */
   :where(h1, h2) {
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 

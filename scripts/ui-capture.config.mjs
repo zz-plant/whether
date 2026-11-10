@@ -44,7 +44,9 @@ export const isoWeekSlug = (date) => {
  * page, without the conditions legend.
  */
 export const captureStorageSeeds = ({ theme, visitor, now = Date.now() }) => [
-  ...(theme === "light" ? [[THEME_STORAGE_KEY, "light"]] : []),
+  /* Always seeded (2026-11-10): with no stored choice the page follows the device
+     setting, which is the capture browser's, so a "dark" run must say so. */
+  [THEME_STORAGE_KEY, theme === "light" ? "light" : "dark"],
   ...(visitor === "returning"
     ? [[ACTIVATION_LAST_WEEK_STORAGE_KEY, isoWeekSlug(new Date(now - 7 * 86400000))]]
     : []),

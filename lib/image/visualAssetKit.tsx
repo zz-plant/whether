@@ -33,8 +33,8 @@ type Palette = {
 export const VISUAL_ASSET_THEMES: Record<AssetTheme, Palette> = {
   dark: { bg: OG_BG, panel: OG_PANEL, ink: OG_TEXT, secondary: OG_TEXT_SECONDARY, muted: OG_TEXT_MUTED, rule: OG_BORDER, line: OG_LINE_CROSSED, lineMark: OG_LINE_CROSSED_MARK, conditionInk: OG_CONDITION_INK },
   light: {
-    bg: "#f1f4f3", panel: "#ffffff", ink: "#121719", secondary: "#384145", muted: "#525c60", rule: "rgba(18, 23, 25, 0.10)", line: "#b4232a", lineMark: "#d13b37",
-    conditionInk: { EXPANSION: "#7a5800", DEFENSIVE: "#74552a", VOLATILE: "#4a4fc0", SCARCITY: "#1d5585" },
+    bg: "#ecf0e8", panel: "#f4f7f1", ink: "#10201a", secondary: "#2b3b33", muted: "#40524a", rule: "rgba(16, 32, 26, 0.16)", line: "#b81f27", lineMark: "#c4242b",
+    conditionInk: { EXPANSION: "#765600", DEFENSIVE: "#8a4f16", VOLATILE: "#3f47b5", SCARCITY: "#1f3f8f" },
   },
 };
 

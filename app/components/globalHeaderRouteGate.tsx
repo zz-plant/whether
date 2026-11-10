@@ -76,7 +76,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
               <circle cx="19" cy="11" r="1.5" fill="currentColor" />
             </svg>
             <div className="flex min-w-0 flex-col leading-tight">
-              <span className="text-sm font-bold tracking-tight text-white">Whether</span>
+              <span className="font-[family-name:var(--font-display)] text-[1.0625rem] font-extrabold leading-none tracking-[-0.01em] text-white">Whether</span>
               <span className={`truncate text-fluid-nano font-medium text-slate-400 ${fallbackRouteLabel ? "" : "md:hidden"}`}>
                 {sublabel}
               </span>

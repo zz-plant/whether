@@ -20,7 +20,7 @@
   /* Paper takes the light theme's values as literals (surfaces.css says which). */
   body {
     background: white !important;
-    color: #121719 !important;
+    color: #10201a !important;
     font-size: 11pt;
     line-height: 1.5;
   }
@@ -31,11 +31,11 @@
   }
 
   h1, h2, h3, [class*="text-slate-100"], [class*="text-slate-50"] {
-    color: #121719 !important;
+    color: #10201a !important;
   }
 
   [class*="text-slate-300"], [class*="text-slate-400"] {
-    color: #525c60 !important;
+    color: #40524a !important;
   }
 
   [class*="text-slate-200"], [class*="text-semantic-easing-fg"] {
@@ -43,7 +43,7 @@
   }
 
   [class*="text-slate-500"] {
-    color: #525c60 !important;
+    color: #40524a !important;
   }
 
   [class*="bg-slate-950"], [class*="bg-slate-900"], [class*="bg-slate-800"] {
@@ -56,14 +56,14 @@
   }
 
   [class*="text-slate-50"] {
-    color: #121719 !important;
+    color: #10201a !important;
   }
 
   /* The crossed red. Emerald and sky are the ink, which h1-h3 and body
      already print in. */
   [class*="text-rose-200"], [class*="text-rose-300"],
   [class*="text-amber-200"], [class*="text-amber-300"] {
-    color: #b4232a !important;
+    color: #b81f27 !important;
   }
 
   [data-page-section] {

@@ -82,13 +82,13 @@ describe("ScoreLadder", () => {
       return names.map((name) => key.indexOf(`>${name}<`));
     };
     /* Funding pressure is drawn high to low (2026-11-03), so its key reads pause first. */
-    const order = keyOrder(html, ["Pause", "Change line", "Resume"]);
+    const order = keyOrder(html, ["Pause", "Change line", "Restart"]);
     assert.ok(order.every((index) => index > 0), "the key names every line");
     assert.deepEqual([...order].sort((a, b) => a - b), order, "the key reads in tick order");
     const appetite = renderToStaticMarkup(
       <ScoreLadder label="Risk appetite" value={48} lines={[{ kind: "pause", value: 44 }, { kind: "callChange", value: 50 }, { kind: "resume", value: 54 }]} />,
     );
-    const appetiteOrder = keyOrder(appetite, ["Pause", "Change line", "Resume"]);
+    const appetiteOrder = keyOrder(appetite, ["Pause", "Change line", "Restart"]);
     assert.deepEqual([...appetiteOrder].sort((a, b) => a - b), appetiteOrder, "risk appetite also reads pause, change, resume: worse on the left");
   });
 

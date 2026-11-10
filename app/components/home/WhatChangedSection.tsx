@@ -129,7 +129,10 @@ export function WhatChangedSection({
   inputHistory,
   compact = false,
   historyOpen = false,
+  drawnAbove = false,
 }: {
+  /** The guidance block above draws both scores on their ladders from `md` up; this table keeps its ladders for a phone, where the block draws one. */
+  drawnAbove?: boolean;
   /** How far the record's months moved each score, for its ladder. */
   moveRanges?: ScoreMoveRanges | null;
   /** The reading with the left-out inputs counted, where its conditions differ. */
@@ -263,7 +266,7 @@ export function WhatChangedSection({
                 </th>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
-                    <div className="space-y-2">
+                    <div className={drawnAbove && (row.key === "tightness" || row.key === "riskAppetite") ? "space-y-2 md:[&>a]:hidden" : "space-y-2"}>
                       {/* The ladder opens what the name beside it opens (2026-11-03): a
                           bar reads as something to press. Out of the tab order, since
                           the name is the same link. */}

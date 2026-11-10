@@ -42,7 +42,9 @@ export function RecordSection({
       {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
       {record && record.length > 0 ? (
         <>
-          <MonthStrip entries={record} />
+          {/* The count under each condition; the band itself is the frame's now, under the
+              navigation, and a second strip here drew the record twice (2026-11-10). */}
+          <MonthStrip entries={record} band={false} />
           {/* Two sampling conventions on one page: the headline is this week's
               reading, the record behind this band is month-end readings. Said
               once, under the band, because a reader comparing the two would

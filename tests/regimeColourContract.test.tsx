@@ -132,18 +132,15 @@ describe("regime colour contract", () => {
     }
   });
 
-  it("draws the action colour in the week's ink under a regime shell", () => {
-    // 2026-10-14: the page read as monochrome with links, buttons and focus in
-    // the text ink. Under [data-regime] the action colour is --regime-ink, and
-    // the tokens derived from it are declared again there, since a custom
-    // property resolves where it is declared and would otherwise keep :root's.
+  it("draws the action colour in the ink, whatever the week's condition", () => {
+    // 2026-11-10 (docs/design/rebuild-covenant.md). From 2026-10-14 a shell that knew
+    // its regime drew links, buttons and focus rings in --regime-ink, so "Cloudy" and
+    // "click" were one colour across the first screen and the controls changed with
+    // the weather. A condition's colour now names the condition and nothing else.
     const tokens = readRepoFile("app/styles/tokens.css");
-    const scoped = tokens.match(/\n\[data-regime\]\s*\{([^}]*)\}/)?.[1] ?? "";
-    assert.match(scoped, /--accent-action:\s*var\(--regime-ink\)/, "the action colour is the week's ink");
-    for (const derived of ["--accent-border", "--accent-border-soft", "--focus-halo", "--cta-fill"]) {
-      assert.match(scoped, new RegExp(`${derived}:`), `${derived} re-resolves under the regime`);
-    }
-    assert.match(tokens, /:root,\s*\[data-regime\]\s*\{[^}]*--color-sky-400:\s*var\(--accent-action\)/, "the sky aliases follow the scoped action colour");
+    assert.doesNotMatch(tokens, /--accent-action:\s*var\(--regime-ink\)/, "no shell points the action colour at the week's ink");
+    assert.doesNotMatch(tokens, /\n\[data-regime\]\s*\{[^}]*--cta-fill/, "nor the filled button");
+    assert.match(tokens, /:root,\s*\[data-regime\]\s*\{[^}]*--color-sky-400:\s*var\(--accent-action\)/, "the sky aliases still follow the action colour");
   });
 
   it("keeps the crossed red for lines, and gives caveats their own role", () => {

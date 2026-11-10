@@ -76,7 +76,6 @@ import {
 import { buildWeekMove } from "../lib/report/home/weekMove";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
-import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs, publishedBriefWeekLabel, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
@@ -488,10 +487,7 @@ async function PageContent({
         }),
   });
 
-  /* The score nearer its change line, on its ladder, for the phone card: the same
-     score the trust strip's margin names, so the drawing and the sentence agree. */
   const nearestMargin = trustStripProps.margin ?? null;
-  const nearestLadder = nearestMargin ? scoreLadders.find((ladder) => ladder.metric === nearestMargin.signal) ?? null : null;
   /* The running head's tension, in the margin's own number: "2 pts from Freezing". */
   const nearestChange = historicalSelection ? null : formatNearestChange(nearestMargin, regime);
 
@@ -743,6 +739,7 @@ async function PageContent({
               <DecisionHero
                 periodControl={historicalSelection ? undefined : periodControl}
                 location={readingLocation}
+                briefNumber={citableBrief ? { label: citableBrief.slug.toUpperCase(), href: buildPublishedBriefPath(citableBrief.slug) } : undefined}
                 reading={heroReading}
                 weeklyCall={cardCall.action}
                 callDetail={historicalSelection || unmovedLine || pauseCauseOnBand ? undefined : whyLine}
@@ -750,56 +747,45 @@ async function PageContent({
                 direction={historicalSelection ? undefined : unmovedLine ?? cardCall.directionLabel}
                 earlier={earlierConditions}
                 since={conditionsSince}
-                /* The map from `md` up, where it is the one definition of the four
-                   conditions: each change line's value at its end, the path's
-                   domain as its caption, and the link to how the lines are set.
-                   Below `md` the conditions legend above the week defines them. */
+                /* The two scores from `md` up, each as a figure on its ladder
+                   (docs/design/rebuild-covenant.md): the number, where it stands
+                   against its lines, and the lines named where they sit. The
+                   conditions map this column held is in "What would change our
+                   mind", where the change lines are the subject. */
                 aside={
-                  <RegimeRadar
-                    tightness={tightness}
-                    riskAppetite={riskAppetite}
-                    previousTightness={previousScores?.tightness ?? null}
-                    previousRiskAppetite={previousScores?.riskAppetite ?? null}
-                    tightnessThreshold={callChangeLines.tightness}
-                    riskAppetiteThreshold={callChangeLines.riskAppetite}
-                    currentRegime={regime}
-                    trail={conditionsTrail.points}
-                    trailCaption={conditionsTrail.caption}
-                    caveat={conditionsTrail.caveat}
-                    feelsLike={countedReading}
-                    compact
-                    detailsOpen={searchParams?.chart === "1"}
-                    readingsId="conditions-map-readings"
-                    travelFrom={weekMove?.from}
-                    className="ml-auto w-full max-w-[18rem]"
-                  />
+                  <div className="space-y-8" data-hero-scores>
+                    {scoreLadders.map((ladder) => (
+                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                    ))}
+                  </div>
                 }
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
-                areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} earlier={weekMove?.areas} /> : undefined}
+                areaStrip={
+                  areaStripModel ? (
+                    <AreaStrip
+                      model={areaStripModel}
+                      earlier={weekMove?.areas}
+                      /* Each area's action beside its standing, from `lg` up, where the row has
+                         the width; "Your decisions this week" gives the sentence up there. */
+                      rules={Object.fromEntries(homeAreaRows.map((row) => [row.area, row.rule]))}
+                    />
+                  ) : undefined
+                }
                 move={weekMove}
                 feelsLike={countedReading ? { regime: countedReading.regime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
+                /* Both scores on a phone too, side by side under the areas: the number and
+                   where it stands. The ruled line is the margin's, from `md` up. */
                 phoneFigure={
-                  nearestLadder && !historicalSelection ? (
-                    <ScoreLadder
-                      label={nearestLadder.label}
-                      value={nearestLadder.value}
-                      previous={comparisonUnavailable ? null : nearestLadder.previous}
-                      previousLabel={basis.label}
-                      lines={nearestLadder.lines}
-                      monthRange={moveRanges?.[nearestLadder.metric]}
-                      travel={Boolean(weekMove)}
-                      feelsLike={
-                        countedReading && countedReading[nearestLadder.metric] !== nearestLadder.value
-                          ? { value: countedReading[nearestLadder.metric], regime: countedReading.regime }
-                          : null
-                      }
-                    />
-                  ) : undefined
+                  <div className="grid grid-cols-2 gap-x-4" data-hero-scores-compact>
+                    {scoreLadders.map((ladder) => (
+                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                    ))}
+                  </div>
                 }
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
@@ -864,6 +850,7 @@ async function PageContent({
               activeRunway={activeRunway}
               savedReadingDate={savedReadingDate}
               isHistorical={Boolean(historicalSelection)}
+              rulesAbove={Boolean(areaStripModel)}
               groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
                 comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
                 /* An archived month's record would have to end at that month. */
@@ -921,6 +908,7 @@ async function PageContent({
             <QuietWeekFold quiet={quietWeek} regimeLabel={publicRegimeLabel}>
               <WhatChangedSection
                 compact
+                drawnAbove
                 historyOpen={searchParams?.inputs === "1"}
                 heading={`What changed ${basis.since}`}
                 rows={signalChangeRows}
