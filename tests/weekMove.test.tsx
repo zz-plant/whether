@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { AreaStrip } from "../app/components/home/AreaStrip";
 import { DecisionHero } from "../app/components/DecisionHero";
 import { ScoreLadder } from "../app/components/ui/scoreLadder";
+import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import type { AreaStripModel } from "../lib/report/home/homeSectionModel";
 import { buildWeekMove, travelTimeAt } from "../lib/report/home/weekMove";
 
@@ -21,9 +22,14 @@ import { buildWeekMove, travelTimeAt } from "../lib/report/home/weekMove";
 
 const thresholds = { tightness: 70, riskAppetite: 50 };
 
-const strip = (states: Record<string, AreaStripModel["cells"][number]["state"]>): AreaStripModel => ({
-  cells: Object.entries(states).map(([area, state]) => ({
-    area: area as AreaStripModel["cells"][number]["area"],
+type Cell = AreaStripModel["cells"][number];
+
+const strip = (states: Partial<Record<Cell["area"], Cell["state"]>>): AreaStripModel => ({
+  cells: decisionAreaOrder.flatMap((area) => {
+    const state = states[area];
+    return state ? [{ area, state }] : [];
+  }).map(({ area, state }) => ({
+    area,
     state,
     label: state === "crossed" ? "On hold" : state === "near" ? "Close to pausing" : "Clear",
     href: `#area-${area}`,
