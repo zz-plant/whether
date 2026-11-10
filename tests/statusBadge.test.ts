@@ -8,7 +8,7 @@ describe("status badge", () => {
     const svg = renderStatusBadge({ regime: "EXPANSION", conditions: "Sunny", savedCopy: false });
     assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="\d+" height="20" role="img"/);
     assert.ok(svg.includes(">Sunny</text>"));
-    assert.ok(svg.includes('fill="#d9a82c"'));
+    assert.ok(svg.includes('fill="#e0a81c"'));
     assert.ok(svg.includes('aria-label="Startup operating conditions this week: Sunny. Whether weekly guidance."'));
   });
 
@@ -18,7 +18,7 @@ describe("status badge", () => {
   });
 
   it("reads light fills in dark ink and dark fills in white", () => {
-    assert.ok(renderStatusBadge({ regime: "EXPANSION", conditions: "Sunny", savedCopy: false }).includes('fill="#111517" font-weight="bold"'));
+    assert.ok(renderStatusBadge({ regime: "EXPANSION", conditions: "Sunny", savedCopy: false }).includes('fill="#10201a" font-weight="bold"'));
     assert.ok(renderStatusBadge({ regime: "SCARCITY", conditions: "Freezing", savedCopy: false }).includes('fill="#ffffff" font-weight="bold"'));
   });
 

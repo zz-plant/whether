@@ -49,6 +49,12 @@ type MonthStripProps = {
   markers?: readonly MonthStripMarker[];
   /** What a diamond is, printed under the band when there are any. The caller's words; the strip has none. */
   markersLegend?: string | null;
+  /**
+   * Draw the band itself. /history passes false: the record band above the page is
+   * the same months, opened to the page's main figure, and a second strip under it
+   * drew the record twice. The count of months under each condition stays.
+   */
+  band?: boolean;
   className?: string;
 };
 
@@ -81,7 +87,7 @@ const stripRuns = (sorted: readonly MonthStripEntry[]) => {
   return runs;
 };
 
-export function MonthStrip({ entries, markers, markersLegend, className = "" }: MonthStripProps) {
+export function MonthStrip({ entries, markers, markersLegend, band = true, className = "" }: MonthStripProps) {
   const sorted = [...entries].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
   const run = describeCurrentRun(sorted);
   if (!run) return null;
@@ -129,7 +135,7 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
           ? ` ${placedMarkers.length} ${placedMarkers.length === 1 ? "event is" : "events are"} marked against the months they were recorded in.`
           : null}
       </p>
-      <div className="relative" aria-hidden="true">
+      {band ? <div className="relative" aria-hidden="true">
         {placedMarkers.map((marker, index) => (
           <span
             key={`${marker.recordDate}-${index}`}
@@ -176,7 +182,7 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
             />
           ) : null;
         })}
-      </div>
+      </div> : null}
       <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300" aria-label="Months under each condition">
         {legend.map(([regime, months]) => (
           <li key={regime} className="flex items-center gap-1.5">
@@ -205,7 +211,7 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
           </span>
         ) : null}
       </figcaption>
-      <ScreenshotCaption />
+      {band ? <ScreenshotCaption /> : null}
     </figure>
   );
 }

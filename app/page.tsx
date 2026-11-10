@@ -76,7 +76,6 @@ import {
 import { buildWeekMove } from "../lib/report/home/weekMove";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
-import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs, publishedBriefWeekLabel, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
@@ -750,29 +749,32 @@ async function PageContent({
                 direction={historicalSelection ? undefined : unmovedLine ?? cardCall.directionLabel}
                 earlier={earlierConditions}
                 since={conditionsSince}
-                /* The map from `md` up, where it is the one definition of the four
-                   conditions: each change line's value at its end, the path's
-                   domain as its caption, and the link to how the lines are set.
-                   Below `md` the conditions legend above the week defines them. */
+                /* The two scores from `md` up, each as a figure on its ladder
+                   (docs/design/rebuild-covenant.md): the number, where it stands
+                   against its lines, and the lines named where they sit. The
+                   conditions map this column held is in "What would change our
+                   mind", where the change lines are the subject. */
                 aside={
-                  <RegimeRadar
-                    tightness={tightness}
-                    riskAppetite={riskAppetite}
-                    previousTightness={previousScores?.tightness ?? null}
-                    previousRiskAppetite={previousScores?.riskAppetite ?? null}
-                    tightnessThreshold={callChangeLines.tightness}
-                    riskAppetiteThreshold={callChangeLines.riskAppetite}
-                    currentRegime={regime}
-                    trail={conditionsTrail.points}
-                    trailCaption={conditionsTrail.caption}
-                    caveat={conditionsTrail.caveat}
-                    feelsLike={countedReading}
-                    compact
-                    detailsOpen={searchParams?.chart === "1"}
-                    readingsId="conditions-map-readings"
-                    travelFrom={weekMove?.from}
-                    className="ml-auto w-full max-w-[18rem]"
-                  />
+                  <div className="space-y-7" data-hero-scores>
+                    {scoreLadders.map((ladder) => (
+                      <ScoreLadder
+                        key={ladder.metric}
+                        figure
+                        label={ladder.label}
+                        value={ladder.value}
+                        previous={comparisonUnavailable ? null : ladder.previous}
+                        previousLabel={basis.label}
+                        lines={ladder.lines}
+                        monthRange={moveRanges?.[ladder.metric]}
+                        travel={Boolean(weekMove)}
+                        feelsLike={
+                          countedReading && countedReading[ladder.metric] !== ladder.value
+                            ? { value: countedReading[ladder.metric], regime: countedReading.regime }
+                            : null
+                        }
+                      />
+                    ))}
+                  </div>
                 }
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
@@ -786,6 +788,7 @@ async function PageContent({
                 phoneFigure={
                   nearestLadder && !historicalSelection ? (
                     <ScoreLadder
+                      figure
                       label={nearestLadder.label}
                       value={nearestLadder.value}
                       previous={comparisonUnavailable ? null : nearestLadder.previous}
@@ -921,6 +924,7 @@ async function PageContent({
             <QuietWeekFold quiet={quietWeek} regimeLabel={publicRegimeLabel}>
               <WhatChangedSection
                 compact
+                drawnAbove
                 historyOpen={searchParams?.inputs === "1"}
                 heading={`What changed ${basis.since}`}
                 rows={signalChangeRows}

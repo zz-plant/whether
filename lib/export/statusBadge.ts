@@ -21,7 +21,7 @@ const CHAR_WIDTH = 6.5;
 
 const textWidth = (text: string) => Math.round(text.length * CHAR_WIDTH) + PADDING * 2;
 
-const DARK_INK = "#111517";
+const DARK_INK = "#10201a";
 const LIGHT_INK = "#ffffff";
 
 /* WCAG relative luminance (§1.4.3), for picking the ink with more contrast. */

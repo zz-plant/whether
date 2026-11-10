@@ -148,8 +148,10 @@ const SCORE_TERMS = [
   { name: "risk appetite", term: "risk-appetite" },
 ] as const;
 
+/* The condition word, in the binding voice and the condition's own ink (typography.css,
+   layout-shells.css). It was an expanded-capitals placard until 2026-11-10. */
 const STAMP_CLASS =
-  "type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold";
+  "type-stamp weather-tag-placard inline-flex items-center gap-2 text-[1.6875rem] leading-none sm:text-[2.125rem]";
 
 const withDefinedScores = (facts: string): ReactNode[] =>
   facts.split(/(funding pressure|risk appetite)/i).map((part, index) => {
@@ -186,7 +188,7 @@ export function DecisionHero({
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
-  const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
+  const regimeWeatherLabel = regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay;
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
   const detail = callDetail && callDetail.trim() !== call.trim() ? callDetail : undefined;
   /* When the stamp turns, as a share of the travel (week-move.css reads it). */
@@ -203,7 +205,7 @@ export function DecisionHero({
      */
     <section
       id="share-ready-artifact"
-      className="weather-card weather-hero-card weather-inset relative overflow-hidden weather-editorial-hero"
+      className="weather-hero-card relative weather-editorial-hero"
       aria-labelledby="weekly-call-title"
       data-regime={regimeKey ?? undefined}
       data-week-move={move ? "arrival" : undefined}
@@ -213,15 +215,16 @@ export function DecisionHero({
         {/* With a graphic beside it, the left column stretches to the graphic's
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
-        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-8" : undefined}>
+        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-10 lg:gap-14" : undefined}>
         <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">
         {/* The kicker: the regime stamp, then what the week did — its direction
             and, on a week conditions moved, what they were. The regime's
             meaning is the line under the call, not this one: on the eyebrow it
             ran four facts together ("hard to raise · Tightening this week ·
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          {periodControl ? <div className="weather-hero-period">{periodControl}</div> : null}
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+          {/* The week on a row of its own: a control, above the statement it selects. */}
+          {periodControl ? <div className="weather-hero-period basis-full">{periodControl}</div> : null}
           <span className="relative inline-flex">
             {/* The earlier conditions' stamp, over this week's until the reading
                 crosses the change line (week-move.css). Its word is printed from
@@ -234,7 +237,7 @@ export function DecisionHero({
                 className={`week-move-old week-move-stamp-old ${STAMP_CLASS}`}
               >
                 <ConditionIcon regime={move.conditions.from} />
-                <span className="week-move-attr" data-text={REGIME_LABELS[move.conditions.from].toUpperCase()} />
+                <span className="week-move-attr" data-text={REGIME_LABELS[move.conditions.from]} />
               </span>
             ) : null}
             <span className={`${STAMP_CLASS} ${move?.conditions ? "week-move-stamp-new" : ""}`}>
@@ -324,7 +327,7 @@ export function DecisionHero({
             >
               {question}
             </h1>
-            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
+            <p className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
               {call}
             </p>
           </>
@@ -332,7 +335,7 @@ export function DecisionHero({
           <h1
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
+            className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
           >
             {call}
           </h1>

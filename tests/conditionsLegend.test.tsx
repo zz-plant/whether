@@ -85,9 +85,9 @@ describe("conditions legend", () => {
     const html = render({ currentRegime: "DEFENSIVE", orientation });
     assert.match(text(html), /^For startup leaders: the interest-rate and credit lines .* Cloudy this week: pricey money, willing investors/);
     assert.doesNotMatch(html.match(/<section[^>]*>/)?.[0] ?? "", /md:hidden/, "the section shows from md up");
-    assert.match(html, /<span class="md:hidden" data-conditions-definitions/, "the definitions still give way to the chart");
+    assert.match(html, /<span data-conditions-definitions/, "the definitions show at every width: the block beside the guidance draws the scores, not the map");
     assert.match(html, /aria-label="Dismiss this introduction"/);
-    assert.match(render().match(/<section[^>]*>/)?.[0] ?? "", /md:hidden/, "without it, the legend stays phone-only");
+    assert.doesNotMatch(render().match(/<section[^>]*>/)?.[0] ?? "", /md:hidden/, "without it, the legend still shows at every width");
   });
 
   it("keeps the dismiss control and the attribute the layout hides it by", () => {

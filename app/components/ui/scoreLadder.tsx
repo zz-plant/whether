@@ -72,12 +72,20 @@ type ScoreLadderProps = {
    * Only inside a card that replays the move; everywhere else the ladder is still.
    */
   travel?: boolean;
+  /**
+   * Print the value as a figure beside the label (docs/design/rebuild-covenant.md): the
+   * two published scores, in the binding voice, where the brief states them. A ladder in
+   * a table or a comparison keeps the plain caption.
+   */
+  figure?: boolean;
   className?: string;
 };
 
 const LINE_LABELS: Record<LadderLineKind, string> = {
   pause: "Pause",
-  resume: "Resume",
+  /* "Restart", the one word for this line (docs/editorial-guardrails.md, Decision
+     vocabulary). The key said "Resume" beside prose that said "restart". */
+  resume: "Restart",
   callChange: DECISION_CONTRACT_LABELS.watch.changeLine,
 };
 
@@ -284,6 +292,7 @@ export function ScoreLadder({
   feelsLike,
   onScrubValue,
   travel = false,
+  figure = false,
   className = "",
 }: ScoreLadderProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -505,7 +514,9 @@ export function ScoreLadder({
   const trackStyle: TrackStyle = {
     "--ladder-rows": maxRow("row"),
     "--ladder-rows-wide": maxRow("wideRow"),
-    touchAction: "none",
+    /* A vertical swipe that starts on the track still scrolls the page (2026-11-10):
+       `none` swallowed it, and the phone brief carries a ladder on its first screen. */
+    touchAction: "pan-y",
     userSelect: "none",
     cursor: isScrubbing ? "grabbing" : "ew-resize",
   };
@@ -515,7 +526,22 @@ export function ScoreLadder({
       data-score-ladder
       data-scrubbing={isScrubbing ? "" : undefined}
     >
-      <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs">
+      <figcaption
+        className={
+          figure
+            ? "grid grid-cols-[auto_minmax(0,1fr)] items-end gap-x-3 gap-y-0.5 text-xs [&>span:not([data-ladder-figure])]:col-start-2"
+            : "flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs"
+        }
+      >
+        {figure ? (
+          <span
+            data-ladder-figure
+            aria-hidden="true"
+            className="type-figure row-span-2 text-[3rem] text-slate-50 @[22rem]:text-[5.75rem]"
+          >
+            {formatPoints(scrubbedRounded)}
+          </span>
+        ) : null}
         <span className="font-medium text-slate-200">
           {label}
           {worse ? (

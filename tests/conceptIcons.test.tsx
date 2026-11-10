@@ -255,7 +255,7 @@ describe("a glyph sits beside its words and is hidden from assistive tech", () =
     );
     assertGlyphsBesideTheirWords(html, "brief and record");
     const key = html.slice(html.indexOf("data-ladder-key"));
-    assert.match(key, /lucide-play[\s\S]*?<\/svg><span[^>]*>Resume<\/span>/, "play beside Resume");
+    assert.match(key, /lucide-play[\s\S]*?<\/svg><span[^>]*>Restart<\/span>/, "play beside Restart");
     assert.match(key, /lucide-pause[\s\S]*?<\/svg><span[^>]*>Pause<\/span>/, "pause beside Pause");
     assert.match(key, /<span aria-hidden="true" class="inline-block h-2 w-0.5[^"]*"><\/span><span[^>]*>Change line<\/span>/, "the change line keeps its plain tick");
   });
@@ -298,7 +298,9 @@ describe("a glyph sits beside its words and is hidden from assistive tech", () =
       assert.ok(glyphs.length > 0, `${path} draws no glyph`);
     }
     assert.doesNotMatch(pages["/resources"], /Governance Pillars|viewBox="0 0 48 48"/, "the Guides emblem is gone");
-    assert.match(pages["/history"], /data-strip-run-glyph/, "the band's long runs carry their glyph");
+    /* The band is the frame's since 2026-11-10 (app/components/recordBand.tsx), where each
+       stretch is told by its line pattern; /history marks itself so the band opens there. */
+    assert.match(pages["/history"], /data-record-plate/, "/history opens the record band into its main figure");
   });
 });
 

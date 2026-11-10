@@ -11,7 +11,7 @@
   @apply rounded-lg border;
   border-color: var(--border-default);
   background: var(--bg-raised);
-  box-shadow: var(--elev-1);
+  box-shadow: none;
 }
 
 .weather-panel-static {
@@ -198,7 +198,7 @@ html[data-focus-mode] [data-home-shell-main] {
    measure was a hand-typed `max-w-[64rem]` literal twice over, beside a
    registry it never joined (DD-046). */
 .weather-brief-measure {
-  max-width: 64rem;
+  max-width: 72rem;
 }
 
 .weather-page-shell-standard {
@@ -241,9 +241,7 @@ html[data-focus-mode] [data-home-shell-main] {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   background: var(--bg-surface);
-  box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  box-shadow: none;
 }
 
 .weather-hub-card {
@@ -290,7 +288,7 @@ html[data-focus-mode] [data-home-shell-main] {
   text-decoration: none;
   color: inherit;
   background: var(--bg-raised);
-  box-shadow: var(--elev-2);
+  box-shadow: none;
   transition:
     transform var(--transition-base) var(--ease-out),
     border-color var(--transition-base) var(--ease-out),
@@ -302,9 +300,8 @@ html[data-focus-mode] [data-home-shell-main] {
    element rule in decision-flow.css — this used to carry a yellow one of its
    own, the only control on the site not drawn in --accent-action. */
 a.weather-hub-link-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent-border);
-  box-shadow: var(--elev-4);
+  transform: translateY(-2px);
+  border-color: var(--app-text);
 }
 
 .weather-hub-chip {
@@ -510,28 +507,30 @@ a.weather-hub-link-card:hover {
   color: var(--app-text-secondary);
 }
 
-/* The four conditions as a stamp, in their own hue: wash, edge and ink come
-   from the data-regime tokens (ui-ux-standards §XVI), so a tag keyed to a
-   regime cannot drift from the hero's stamp or pick a hue at the call site.
-   The ink token is per theme, so there is no light override. Pair it with
-   `.type-stamp`, the regime word's face; the size is the metadata floor. */
+/* A condition named in a list: the word in its own ink, from the data-regime
+   tokens (ui-ux-standards §XVI), so a tag keyed to a regime cannot pick a hue
+   at the call site. No box since 2026-11-10: the word is set in the binding
+   voice (.type-stamp) and its ink is the whole mark. The ink token is per
+   theme, so there is no light override. */
 .weather-tag-regime {
-  border-color: color-mix(in srgb, var(--regime-accent) 40%, transparent);
-  background: color-mix(in srgb, var(--regime-accent) 14%, transparent);
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  background: none;
   color: var(--regime-ink);
-  font-size: var(--text-fluid-nano);
+  font-size: var(--text-fluid-base);
 }
 
-/* The week's word as a placard (2026-10-21): the condition's solid fill with
-   its on-accent ink, as a weather service prints a warning level. Only the
-   two places that state this week's condition wear it, the call card's stamp
-   and the report intro's status word (§XXV keeps condition colour to where a
-   condition is named). Lists of past weeks keep the tinted .weather-tag-regime,
-   so the placard stays the one solid block of colour on a page. */
+/* This week's condition, beside the guidance and on a report route's intro.
+   It was a solid placard (2026-10-21 to 2026-11-10); the record band is the one
+   solid field of condition colour now, and the word is printed in the
+   condition's ink at heading size. */
 .weather-tag-placard {
-  border-color: var(--regime-accent);
-  background: var(--regime-accent);
-  color: var(--regime-on-accent);
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--regime-ink);
 }
 
 .weather-panel,

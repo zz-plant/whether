@@ -1,0 +1,175 @@
+/* The record band (app/components/recordBand.tsx, docs/design/rebuild-covenant.md).
+   Full-bleed under the navigation of every route: a field per stretch of conditions,
+   two bundles of fine lines across it, a mark under it for each published brief.
+
+   The fills come from the data-regime map, the same hexes as every other drawing.
+   The two line inks are constants of the plate (tokens.css, --band-line-*): the band
+   is one print, the same in both themes, the way the condition fills are. */
+
+.record-band {
+  position: relative;
+  container-type: inline-size;
+  background: var(--bg-body);
+}
+
+.record-band-plate {
+  position: relative;
+  height: 5.25rem;
+  /* A vertical swipe that starts on the band still scrolls the page. */
+  touch-action: pan-y;
+  cursor: crosshair;
+  /* The dense fills sit close to the dark ground, and the light ones to the paper. */
+  border-block: 1px solid var(--border-default);
+}
+
+.record-band-plate:focus-visible {
+  outline-offset: -3px;
+}
+
+@container (min-width: 46rem) {
+  .record-band-plate { height: 9.375rem; }
+}
+
+/* History opens the band into the page's main figure (app/history/page.tsx marks itself). */
+body:has([data-record-plate]) .record-band-plate {
+  height: clamp(9rem, 21vw, 18.75rem);
+}
+
+.record-band-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.record-band-field {
+  fill: var(--regime-accent);
+}
+
+.record-band-lines path {
+  fill: none;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.record-band-lines .is-light { stroke: var(--band-line-on-light); stroke-opacity: 0.62; }
+.record-band-lines .is-dense { stroke: var(--band-line-on-dense); stroke-opacity: 0.86; }
+
+.record-band-seam {
+  stroke: var(--band-line-on-dense);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.record-band-published-from {
+  stroke: var(--band-line-on-dense);
+  stroke-width: 1.5px;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+/* A phone draws the plain lines: at two pixels a month the patterns alias into noise. */
+.record-band-wide { display: none; }
+/* History's canvas draws the engraving itself, denser (app/history/recordPlateCanvas.tsx). */
+.record-band[data-plate-canvas="on"] :is(.record-band-wide, .record-band-lines-narrow) { visibility: hidden; }
+@container (min-width: 46rem) {
+  .record-band-wide { display: block; }
+  .record-band-lines-narrow { display: none; }
+}
+
+.record-band-label {
+  position: absolute;
+  left: max(0.75rem, var(--weather-shell-pad-inline));
+  font-size: var(--fs-nano);
+  font-weight: 600;
+  line-height: 1;
+  /* Both labels sit in the first field, which is a light one: the dark line ink. */
+  color: var(--band-line-on-light);
+  pointer-events: none;
+  display: none;
+}
+.record-band-label-risk { top: 33%; }
+.record-band-label-pressure { top: 46%; }
+@container (min-width: 46rem) {
+  .record-band-label { display: block; }
+}
+
+.record-band-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--app-text);
+  box-shadow: 0 0 0 1px var(--bg-body);
+  pointer-events: none;
+}
+
+.record-band-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.record-band-overlay > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.record-band-axis {
+  position: relative;
+  height: 1.25rem;
+  overflow: hidden;
+  font-size: var(--fs-nano);
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text-muted);
+}
+
+.record-band-year {
+  position: absolute;
+  top: 0;
+  padding: 0.3rem 0 0 0.3rem;
+  line-height: 1;
+  border-left: 1px solid var(--border-strong);
+  display: none;
+}
+.record-band-year[data-step="4"] { display: block; }
+@container (min-width: 46rem) {
+  .record-band-year[data-step="2"] { display: block; }
+}
+@container (min-width: 80rem) {
+  .record-band-year[data-step="1"] { display: block; }
+}
+
+/* One mark for each published brief; a week with none has none. */
+.record-band-brief {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 0.5rem;
+  margin-left: -1px;
+  background: var(--app-text);
+}
+
+.record-band-caption {
+  max-width: none;
+  margin: 0;
+  padding: 0.125rem var(--weather-shell-pad-inline) 0;
+  font-size: var(--fs-nano);
+  line-height: 1.4;
+  color: var(--app-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-band-link {
+  color: var(--app-text);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+
+@media print {
+  .record-band-plate { cursor: auto; }
+  .record-band-field, .record-band-lines path { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

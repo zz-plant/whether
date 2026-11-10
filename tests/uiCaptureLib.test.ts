@@ -51,9 +51,11 @@ describe("ui capture helpers", () => {
     }
   });
 
-  it("seeds the theme and the returning visitor's last week, in that order, and nothing by default", () => {
+  it("seeds the theme, then the returning visitor's last week", () => {
     const now = Date.UTC(2026, 9, 6, 12);
-    assert.deepEqual(captureStorageSeeds({ theme: "dark", visitor: "first", now }), []);
+    /* Always the theme (2026-11-10): with no stored choice the page follows the device
+       setting, which is the capture browser's. */
+    assert.deepEqual(captureStorageSeeds({ theme: "dark", visitor: "first", now }), [["whether-theme", "dark"]]);
     assert.deepEqual(captureStorageSeeds({ theme: "light", visitor: "returning", now }), [
       ["whether-theme", "light"],
       ["whether.activation.lastWeek", "2026-w40"],

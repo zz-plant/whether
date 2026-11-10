@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
+import { RecordBand } from "./components/recordBand";
 import { STORAGE_KEYS } from "../lib/storage/keys";
 import { navigationGroups, pagesInGroup, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
@@ -41,8 +42,12 @@ const buildThemeBootstrapScript = () => `
 (() => {
   try {
     const root = document.documentElement;
-    const theme = window.localStorage.getItem(${JSON.stringify(themeStorageKey)});
-    const nextTheme = theme === "light" ? "light" : "dark";
+    const stored = window.localStorage.getItem(${JSON.stringify(themeStorageKey)});
+    // A stored choice wins. Without one the device setting picks, and light is the
+    // answer when it states no preference (docs/design/rebuild-covenant.md).
+    const nextTheme = stored === "light" || stored === "dark"
+      ? stored
+      : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     root.dataset.theme = nextTheme;
     root.style.colorScheme = nextTheme;
   } catch {
@@ -173,8 +178,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0f1316" },
-    { media: "(prefers-color-scheme: light)", color: "#f1f4f3" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c1511" },
+    { media: "(prefers-color-scheme: light)", color: "#ecf0e8" },
   ],
 };
 
@@ -184,9 +189,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    /* No `data-theme` here. React keeps <html> as a singleton and re-applies its props
+       on the client, so an attribute set in this JSX overwrote the one the bootstrap
+       script had just written from the reader's stored choice (2026-11-10). The script
+       is the only writer; with scripts off the page draws the stylesheet's base theme. */
     <html lang="en" suppressHydrationWarning className="font-sans">
       <head>
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#121719" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#10201a" />
         {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
             so there is no fonts.googleapis.com stylesheet in the critical path
             and no preconnect to a third-party host. Archivo is one variable file
@@ -194,6 +203,8 @@ export default function RootLayout({
             is the one preload. Chivo Mono sets aligned figures and paste previews,
             all below the fold; it loads when the stylesheet first asks for it. */}
         <link rel="preload" href="/fonts/archivo-variable.55ade54a.woff2" as="font" type="font/woff2" crossOrigin="" />
+        {/* Besley sets the guidance, which is the largest paint on the brief. */}
+        <link rel="preload" href="/fonts/besley-variable.b9cc4b63.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         {/* The two routes a reader is most likely to walk next are prefetched by
             address, unconditionally, as they were before (a cached /operate is
@@ -251,6 +262,7 @@ export default function RootLayout({
             Skip to content
           </a>
           <GlobalHeader />
+          <RecordBand />
           <RunningHead />
           <GlobalCommandPalette />
           <ServiceWorkerRegistrar />

@@ -7,6 +7,9 @@ import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { MonthStrip } from "../components/history/monthStrip";
+import { PublishedWeeks } from "../components/history/publishedWeeks";
+import { RecordPlateCanvas } from "./recordPlateCanvas";
+import { findRecordDifferences } from "../../lib/report/recordBand";
 import { TrackRecordTable, TrackRecordTiles } from "../components/history/TrackRecord";
 import { TrackRecordSection } from "../components/history/TrackRecordSection";
 import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordSummary } from "../components/history/confidenceRecord";
@@ -46,6 +49,21 @@ export const metadata: Metadata = buildPageMetadata({
 
 type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string; compare?: string; yearA?: string; monthA?: string; yearB?: string; monthB?: string };
 
+/** "Sep and Oct 2026", or "Dec 2025 and Jan 2026" across a year's end. */
+const formatMonthList = (months: readonly string[]) => {
+  const parts = months.map((month) => {
+    const date = new Date(`${month}-01T00:00:00Z`);
+    return {
+      month: date.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }),
+      year: date.getUTCFullYear(),
+    };
+  });
+  const firstYear = parts.at(0)?.year;
+  const sameYear = parts.every((part) => part.year === firstYear);
+  const labels = parts.map((part, index) => (sameYear && index < parts.length - 1 ? part.month : `${part.month} ${part.year}`));
+  return labels.length <= 1 ? (labels[0] ?? "") : `${labels.slice(0, -1).join(", ")} and ${labels.at(-1) ?? ""}`;
+};
+
 /** The phase map's window rides in the URL, so its links have to preserve the
  *  other params on the page — a reader who has the raw-conditions disclosure open
  *  and the year picker set should not lose either by changing the window. */
@@ -77,6 +95,7 @@ export default async function HistoryPage({
   const riskAppetiteTrend = regimeSeries.slice(-13).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
   const trackRecord = buildTrackRecord(fullSeries);
+  const recordDifferences = findRecordDifferences(fullSeries, publishedBriefs);
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
   /* The month strip ends at the last month-end, and its "held since" line was
@@ -167,6 +186,9 @@ export default async function HistoryPage({
           call, the changes marked, the current run named. The page used to open
           with the phase map, which a first-time reader has to learn before it
           says anything; the map is drawn below, as the explanation. */}
+      {/* The record band above this page opens into its main figure here, and the
+          canvas redraws its engraving denser (docs/design/rebuild-covenant.md). */}
+      <RecordPlateCanvas />
       {fullSeries.length > 0 ? (
         <section
           id="call-by-month"
@@ -191,7 +213,7 @@ export default async function HistoryPage({
               </Link>
             </p>
           ) : null}
-          <MonthStrip entries={fullSeries} />
+          <MonthStrip entries={fullSeries} band={false} />
           {/* Each closed year, under the strip it summarises. "Conditions by
               year" was a section of its own near the foot of the page, ten
               screens from the strip that draws the same months. */}
@@ -250,6 +272,17 @@ export default async function HistoryPage({
                 : `${publishedBriefs.length} weekly briefs, next to the monthly readings. We never edit a brief after it's published.`}
             </p>
           </div>
+          <PublishedWeeks briefs={publishedBriefs} />
+          {/* Where the two records name different conditions for one month: both facts,
+              beside the briefs they concern, and no cause (2026-11-10). The page showed
+              Freezing stamps here and Cloudy on the band above with nothing between them. */}
+          {recordDifferences.map((difference) => (
+            <p key={`${difference.published}-${difference.recorded}`} className="weather-caveat-mark max-w-[60ch] text-sm leading-relaxed text-caveat-fg" data-record-difference>
+              {difference.briefs} {difference.briefs === 1 ? "brief" : "briefs"} published in {formatMonthList(difference.months)} read{" "}
+              {getRegimePublicLabel(difference.published)}. Scored today, {difference.months.length === 1 ? "that month-end reads" : "those month-ends read"}{" "}
+              {getRegimePublicLabel(difference.recorded)}. The {difference.briefs === 1 ? "brief stays" : "briefs stay"} as written.
+            </p>
+          ))}
           {/* A link card, not a pill coerced into one: the `pill` variant is a
               control, and it was carrying a border, a fill and a column layout
               it does not own. The title is the anchor's first paragraph, which

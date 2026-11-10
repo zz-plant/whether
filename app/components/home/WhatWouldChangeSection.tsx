@@ -129,9 +129,7 @@ export function WhatWouldChangeSection({
         className={
           ladders.length === 0
             ? "space-y-4"
-            : conditionsTrail
-              ? "grid gap-6"
-              : "grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-start"
+            : "grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-start"
         }
       >
         {ladders.length > 0 ? (
@@ -150,7 +148,7 @@ export function WhatWouldChangeSection({
             readingsId="conditions-chart-readings"
             /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
                and line numbers drew at 8–10px with empty ground either side. */
-            className={`w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[240px] shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}
+            className="w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[280px] shrink-0"
           />
         ) : null}
         {/* Side by side wherever the column holds two at 20rem (2026-10-27, by the

@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { decisionAreaLabel } from "../../../lib/report/boundedDecisionRules";
 import type { AreaStripModel } from "../../../lib/report/home/homeSectionModel";
 import type { WeekMove } from "../../../lib/report/home/weekMove";
-import { AreaIcon, LineStateIcon } from "../ui/conceptIcons";
+import { LineStateIcon } from "../ui/conceptIcons";
 
 /**
  * The five areas across the card, read the way a weather app's forecast row is read
@@ -24,24 +24,26 @@ export function AreaStrip({
 }) {
   const movedAreas = model.cells.filter((cell) => earlier?.[cell.area]).map((cell) => cell.area);
   return (
-    <div data-area-strip className="border-t border-[color:var(--border-faint)] pt-2">
-      <ul className="grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-x-1 gap-y-1">
-        {model.cells.map((cell) => (
+    <div data-area-strip className="border-t-2 border-[color:var(--app-text)] pt-1">
+      {/* Numbered in the one order the areas are always given, so "area 3" can be cited.
+          The area's name is set in the binding voice; its standing carries the glyph. */}
+      <ol className="grid grid-cols-2 gap-x-3 gap-y-0 @[34rem]:grid-cols-[repeat(5,max-content)] @[34rem]:justify-between">
+        {model.cells.map((cell, index) => (
           <li key={cell.area} className="min-w-0">
             <Link
               href={cell.href}
               data-line-state={cell.state}
-              className="group flex min-h-11 flex-col justify-center gap-0.5 rounded-lg text-sm leading-tight"
+              className="group flex min-h-11 flex-col justify-center gap-0.5 rounded-lg py-1.5 text-sm leading-tight no-underline"
             >
-              <span className="inline-flex items-center gap-1.5 font-medium text-slate-100 group-hover:underline group-hover:underline-offset-4">
-                <AreaIcon area={cell.area} />
+              <span className="inline-flex items-baseline gap-2 font-[family-name:var(--font-display)] text-[1.1875rem] font-bold leading-none text-slate-100 group-hover:underline group-hover:underline-offset-4">
+                <span aria-hidden="true" className="font-sans text-xs font-normal tabular-nums text-slate-400">{index + 1}</span>
                 {decisionAreaLabel(cell.area)}
               </span>
               <AreaStanding cell={cell} was={earlier?.[cell.area]} order={movedAreas.indexOf(cell.area)} />
             </Link>
           </li>
         ))}
-      </ul>
+      </ol>
       {model.restart ? <p className="mt-1 text-sm leading-snug text-slate-300">{model.restart}</p> : null}
     </div>
   );

@@ -60,7 +60,7 @@ describe("what conditions were", () => {
     const html = renderToStaticMarkup(
       <DecisionHero weeklyCall="Freeze new commitments and protect runway." regime="SCARCITY" earlier="Was Sunny on Aug 31" />,
     );
-    const stamp = html.indexOf("FREEZING");
+    const stamp = html.indexOf("Freezing");
     const earlier = html.indexOf("Was Sunny on Aug 31");
     assert.ok(stamp >= 0 && earlier > stamp, "the earlier conditions follow the stamp");
     assert.ok(earlier < html.indexOf("Freeze new commitments"), "and come before the call");

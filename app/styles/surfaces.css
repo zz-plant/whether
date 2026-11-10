@@ -23,10 +23,13 @@
 
 .weather-surface {
   @apply rounded-2xl border;
-  border-color: var(--border-strong);
+  border-color: var(--border-default);
   background: var(--bg-surface);
-  box-shadow: var(--elev-2);
-  transition: border-color 250ms ease, box-shadow 250ms ease;
+  /* Paper has no depth (Covenant, 2026-11-10): a sheet is told from the ground by
+     its hairline and a step of tone, and only what floats over the page (menus,
+     dialogs, the toast) casts a shadow. */
+  box-shadow: none;
+  transition: border-color 250ms ease;
   container-type: inline-size;
 }
 
@@ -43,43 +46,33 @@
 .weather-card {
   @apply rounded-xl border px-4 py-3.5 sm:px-5 sm:py-4;
   border-color: var(--border-default);
-  transition: border-color 250ms ease, box-shadow 250ms ease;
+  transition: border-color 250ms ease;
   background: var(--bg-panel);
-  box-shadow: var(--elev-1);
+  box-shadow: none;
 }
 
 /* No hover on a container. A stat card that lifts and glows under the pointer
    promises an action it does not have; only links and buttons move on hover
    (controls.css, layout-shells.css). */
 
-/* Hero card. The one surface whose colour is allowed to say something: its
-   top-edge rule and border come from --regime-accent, which the hero sets on
-   itself from the week's regime (data-regime), so the card is gold in a Sunny
-   week, frost blue in a Freezing one, and cannot disagree with the stamp
-   inside it. The rule is a status mark, not a side-tab stripe: it carries the
-   week's condition through a crop or a re-encode, which a wash does not. The
-   fill stays the flat panel, so the call, not the box, is what reads first,
-   and there is no outer glow — the depth ladder already gives the hero the
-   brief's only elevation. */
-.weather-hero-card {
-  position: relative;
-  background:
-    radial-gradient(ellipse 80% 45% at 50% -5%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 75%),
-    var(--bg-panel);
-  border-color: color-mix(in srgb, var(--regime-accent) 20%, var(--border-strong));
-  box-shadow:
-    var(--elev-2),
-    inset 0 3px 0 var(--regime-accent);
+/* The guidance block. It was a card with a top rule and a wash in the week's
+   colour until 2026-11-10. It is the document's opening now, with no box: the
+   record band above it carries the week's colour, and the condition word
+   beside the guidance names it. The class stays because the block is still the
+   thing people screenshot and the week's move is keyed on it. */
+/* The two scores in the block's margin, at the size the brief gives a figure
+   (docs/design/rebuild-covenant.md): the number first, its ladder under it. */
+.weather-hero-aside [data-ladder-figure] {
+  font-size: 5.75rem;
 }
 
-html[data-theme="light"] .weather-hero-card {
-  background:
-    radial-gradient(ellipse 80% 45% at 50% -5%, color-mix(in srgb, var(--regime-accent) 8%, transparent), transparent 75%),
-    var(--bg-panel, #ffffff);
-  border-color: color-mix(in srgb, var(--regime-accent) 18%, var(--border-strong));
-  box-shadow:
-    var(--elev-1),
-    inset 0 3px 0 var(--regime-accent);
+.weather-hero-card {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 /* The regime's atmosphere. One wash for both shells: the brief's container
@@ -106,10 +99,7 @@ html[data-theme="light"] .weather-hero-card {
 :where(.weather-hub-section > .weather-hub-card, .weather-hub-section > .weather-panel, .weather-hub-section > .weather-surface, .weather-secondary-section > .weather-panel, .weather-secondary-section > .weather-surface) {
   border-color: var(--border-subtle);
   background: var(--bg-nested);
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint),
-    inset 0 0 0 1px var(--bg-nested-light);
+  box-shadow: none;
 }
 
 /* Depth de-escalation ---------------------------------------------------
@@ -280,11 +270,11 @@ button .weather-chip:active,
 /* Print & PDF optimization --------------------------------------------- */
 @media print {
   /* Print commits to paper, so these are the light theme's values as
-     literals: Synoptic's ink (#121719), muted ink (#525c60), the ink at 21%
+     literals: the light theme's ink (#10201a), muted ink (#40524a), the ink at 21%
      on white for a border, and the light front red for a crossed line. */
   body {
     background: #ffffff !important;
-    color: #121719 !important;
+    color: #10201a !important;
     font-size: 11pt !important;
   }
 
@@ -309,7 +299,7 @@ button .weather-chip:active,
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    color: #121719 !important;
+    color: #10201a !important;
   }
 
   /* A card fits on a page and reads better whole. A panel or a section may not: told
@@ -331,13 +321,13 @@ button .weather-chip:active,
   .type-eyebrow,
   .type-data,
   h1, h2, h3, h4, p, span, dt, dd {
-    color: #121719 !important;
+    color: #10201a !important;
   }
 
   .text-slate-400,
   .text-slate-500,
   .text-slate-300 {
-    color: #525c60 !important;
+    color: #40524a !important;
   }
 
   .text-amber-300,
