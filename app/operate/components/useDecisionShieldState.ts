@@ -255,8 +255,7 @@ export const useDecisionShieldState = ({
     if (status === "copied") {
       if (copiedTarget === "verdict") {
         add({
-          title: "Decision Shield copied",
-          description: "The verdict is ready to paste.",
+          title: "Verdict copied",
           type: "success",
         });
       }
@@ -277,10 +276,10 @@ export const useDecisionShieldState = ({
         description: onLink
           ? isBlocked
             ? "Copy the URL from your browser address bar."
-            : "Clipboard access failed. Try copying the URL manually."
+            : "The link was not copied. Copy the URL from your browser address bar."
           : isBlocked
-            ? "Select the verdict text to share it manually."
-            : "Clipboard access failed. Try copying manually.",
+            ? "The verdict is in a text box on the page. Select it there and copy it."
+            : "The verdict was not copied. It is in a text box on the page to select and copy.",
         type: "error",
       });
     }

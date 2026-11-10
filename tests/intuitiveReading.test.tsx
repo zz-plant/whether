@@ -87,13 +87,13 @@ describe("the ladder and the map draw the weather's own devices", () => {
     const html = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={53} lines={lines} monthRange={{ common: 5, unusual: 13 }} />);
     assert.match(html, /data-ladder-month-range="common"[^>]*left:48%;width:10%/);
     assert.match(html, /data-ladder-month-range="unusual"[^>]*left:40%;width:26%/);
-    assert.ok(html.includes("Common month") && html.includes("Unusual month"));
+    assert.ok(html.includes("Common move") && html.includes("Unusual move"));
   });
 
   it("draws no band for a move most months do not make", () => {
     const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} lines={lines} monthRange={{ common: 0, unusual: 3 }} />);
     assert.doesNotMatch(html, /data-ladder-month-range="common"/);
-    assert.ok(html.includes("Unusual month") && !html.includes("Common month"));
+    assert.ok(html.includes("Unusual move") && !html.includes("Common move"));
   });
 
   it("plots what it feels like in that condition's glyph, on the ladder and the map", () => {

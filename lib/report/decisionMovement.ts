@@ -378,13 +378,16 @@ export const describeGuidanceChange = ({
 export const describeMovementCause = (movement: Pick<DecisionMovement, "groups" | "comparedWith">): string => {
   const crossings = uniqueLines(movement.groups.flatMap((group) => group.crossed)).map(describeCrossing);
   if (crossings.length > 0) return `${upperFirst(joinAnd(crossings))}.`;
-  /* "No area changed", not "No line" (2026-11-01, reworded 2026-11-03): this
+  /* The two verbs, not "changed" (2026-11-09): an area can draw close to its pause
+     line in a week nothing paused, and "No area changed" then sat under a strip
+     showing Roadmap newly close to pausing.
+     "No area", not "No line" (2026-11-01, reworded 2026-11-03): this
      prints on the card directly under "On hold: Hiring, Fundraising, Spending and
      New bets", and "No line was crossed" read as a contradiction. The four areas
      paused before the earlier reading, and this sentence is about the week since. */
   return movement.comparedWith
-    ? `No area changed since ${movement.comparedWith}.`
-    : "No area changed this week.";
+    ? `No area paused or restarted since ${movement.comparedWith}.`
+    : "No area paused or restarted this week.";
 };
 
 export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>

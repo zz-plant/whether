@@ -106,7 +106,7 @@ describe("CadenceCallCard", () => {
     const monthly = render("monthly");
 
     assert.match(monthly, /aria-label="Copy monthly guidance"/);
-    assert.doesNotMatch(monthly, /aria-label="Copy Brief"/);
+    assert.doesNotMatch(monthly, /aria-label="Copy brief"/i);
     assert.match(render("quarterly"), /aria-label="Copy quarterly guidance"/);
   });
 

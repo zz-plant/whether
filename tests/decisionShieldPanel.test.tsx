@@ -64,10 +64,10 @@ describe("DecisionShieldPresetsSection markup", () => {
       })
     );
 
-    assert.ok(markup.includes("Saved scenarios"));
-    assert.ok(markup.includes("Max 8 presets"));
+    assert.ok(markup.includes("Saved presets"));
+    assert.ok(markup.includes("Keeps the 8 newest presets"));
     assert.ok(markup.includes("No presets yet. Save one to come back to this decision."));
-    assert.ok(markup.includes("Or load a starter scenario:"));
+    assert.ok(markup.includes("Or start from an example:"));
     assert.ok(markup.includes("Procurement: Vendor discount vs yield"));
     assert.ok(markup.includes("Engineering: Tech debt refactor window"));
     assert.ok(markup.includes("Talent: Strategic senior hire"));
@@ -174,9 +174,9 @@ describe("DecisionShieldPlanModes markup", () => {
     // No "Compare two plans" heading: the mode switch above it carries that name.
     assert.ok(markup.includes("Describe two plans."));
     assert.ok(markup.includes("Compare common tradeoffs:"));
-    assert.ok(markup.includes("Vendor Prepay vs. Monthly Flex"));
-    assert.ok(markup.includes("Full-Time Hire vs. Contractor"));
-    assert.ok(markup.includes("Speculative Feature vs. Tech Debt"));
+    assert.ok(markup.includes("Vendor prepay vs. monthly flex"));
+    assert.ok(markup.includes("Full-time hire vs. contractor"));
+    assert.ok(markup.includes("Speculative feature vs. tech debt"));
     // Nothing typed, so no recommendation box asking for both plans.
     assert.ok(!markup.includes("Describe both plans to compare them."));
   });
@@ -197,7 +197,7 @@ describe("DecisionShieldPanel markup", () => {
     assert.ok(!markup.includes("Decision verdict"));
     assert.ok(!markup.includes("Copy verdict"), "no verdict, so nothing to copy");
     assert.ok(!markup.includes("Copy link"));
-    assert.ok(!markup.includes("Saved scenarios"), "dropdown presets section should not render in plan mode");
+    assert.ok(!markup.includes("Saved presets"), "dropdown presets section should not render in plan mode");
   });
 
   it("puts the copy and record actions after the verdict they act on", () => {
@@ -252,7 +252,7 @@ describe("DecisionShieldPanel markup", () => {
       mockSearchParams = new URLSearchParams({ planMode: "dropdown" });
 
       const markup = renderPanel();
-      assert.ok(markup.includes("Saved scenarios"), "dropdown presets render in dropdown mode");
+      assert.ok(markup.includes("Saved presets"), "dropdown presets render in dropdown mode");
     });
   });
 

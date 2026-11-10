@@ -73,6 +73,7 @@ import {
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
+import { buildWeekMove } from "../lib/report/home/weekMove";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { RegimeRadar } from "./components/home/RegimeRadar";
@@ -526,6 +527,31 @@ async function PageContent({
      and the areas below are dated to the reading. "No area is on hold." sat under
      "hold new hires, spend and vendor contracts" (2026-11-02). */
   const areaStripModel = historicalSelection || savedCopy ? null : buildAreaStrip(decisionPickerOptions);
+  /* The week's move, for the card to replay once on arrival: live, compared readings
+     only, and null on a week the conditions held and no area changed standing. The
+     earlier strip is the same rules read at the earlier scores. */
+  const weekMove =
+    historicalSelection || savedCopy || isDegraded || comparisonUnavailable || !isRegimeKey(regime)
+      ? null
+      : buildWeekMove({
+          since: basis.label,
+          previous: previousScores,
+          current: { tightness, riskAppetite },
+          previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
+          regime,
+          thresholds: callChangeLines,
+          strip: areaStripModel,
+          previousStrip: previousScores
+            ? buildAreaStrip(
+                buildHomeAreaRows({
+                  actionStripItems: homepage.weeklyDecisionCardModel.decision.actionStripItems,
+                  decisionRules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+                  movement: null,
+                  scores: previousScores,
+                }),
+              )
+            : null,
+        });
   /* The week's exception, above the call: null on a calm week, so the page's
      silhouette changes with the weather rather than being drawn the same way
      whatever the reading says. */
@@ -744,6 +770,7 @@ async function PageContent({
                     compact
                     detailsOpen={searchParams?.chart === "1"}
                     readingsId="conditions-map-readings"
+                    travelFrom={weekMove?.from}
                     className="ml-auto w-full max-w-[18rem]"
                   />
                 }
@@ -752,7 +779,8 @@ async function PageContent({
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
-                areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} /> : undefined}
+                areaStrip={areaStripModel ? <AreaStrip model={areaStripModel} earlier={weekMove?.areas} /> : undefined}
+                move={weekMove}
                 feelsLike={countedReading ? { regime: countedReading.regime, href: `#${HOME_SECTIONS.diagnosis.id}` } : undefined}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={
@@ -764,6 +792,7 @@ async function PageContent({
                       previousLabel={basis.label}
                       lines={nearestLadder.lines}
                       monthRange={moveRanges?.[nearestLadder.metric]}
+                      travel={Boolean(weekMove)}
                       feelsLike={
                         countedReading && countedReading[nearestLadder.metric] !== nearestLadder.value
                           ? { value: countedReading[nearestLadder.metric], regime: countedReading.regime }

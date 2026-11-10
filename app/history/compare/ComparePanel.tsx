@@ -80,10 +80,12 @@ export async function ComparePanel({
           role="alert"
           className="weather-panel space-y-2 border border-amber-600/40 bg-amber-950/20 p-6 text-slate-200"
         >
-          <p className="type-eyebrow text-amber-400">Comparison unavailable</p>
-          <h2 className="type-section text-slate-100">Unable to load comparison</h2>
+          {/* A written sentence, not `result.error`: that is the text of whatever the
+              loader threw, and it printed as the explanation. No eyebrow either; it
+              said "Comparison unavailable" over a heading that said so again. */}
+          <h2 className="type-section text-slate-100">These two periods did not load</h2>
           <p className="text-sm text-slate-300">
-            {result.error || "The selected periods could not be loaded. Please choose another month above."}
+            Choose another month above, or reload the page to try the same two again.
           </p>
         </div>
       </div>

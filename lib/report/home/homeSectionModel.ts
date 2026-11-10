@@ -315,6 +315,18 @@ export const formatPoints = (points: number) =>
 const describeSlotDistance = (slot: Pick<HomeAreaLineSlot, "metric" | "points">): string =>
   describeScoreMoveBand(slot.metric, slot.points) ?? formatPoints(slot.points);
 
+/**
+ * The exception band's sentence for an area close to its pause line: the size of
+ * the move, the score that would make it, and what it does ("A common risk-appetite
+ * move would pause Roadmap."). It read "Roadmap — a common move from pausing.", a
+ * fragment that named neither the score nor who moves (2026-11-09). The points,
+ * where the record cannot size the move.
+ */
+const describeNearPause = (area: string, pause: Pick<HomeAreaLineSlot, "metric" | "points">): string => {
+  const move = describeScoreMoveBand(pause.metric, pause.points, { named: true });
+  return move ? `${capitalize(move)} would pause ${area}.` : `${area} is ${formatPoints(pause.points)} from pausing.`;
+};
+
 const capitalize = (text: string) => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
 
 /**
@@ -431,7 +443,7 @@ export const describeLineStateBand = (
     "near",
     binding,
     pause && pause.points > 0
-      ? `${decisionAreaLabel(binding.area)} — ${describeSlotDistance(pause)} from pausing.`
+      ? describeNearPause(decisionAreaLabel(binding.area), pause)
       : `${decisionAreaLabel(binding.area)} is on the edge of pausing.`,
   );
 };

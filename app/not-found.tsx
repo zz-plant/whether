@@ -10,7 +10,7 @@ export default function NotFound() {
     <ContentPageShell measure="content">
       <SecondaryPageHeader
         title="Page not found"
-        description="That older link no longer works, but the weekly brief and the pages behind it are still here."
+        description="There is no page at this address. The weekly brief and the pages behind it are still here."
         actions={(
           <>
             {navigationGroups.map((group, index) => (

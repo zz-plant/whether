@@ -218,6 +218,15 @@ Motion is functional and short: 150–300ms, `ease-[cubic-bezier(0.22,1,0.36,1)]
 under `prefers-reduced-motion`. Press feedback is a 1–2% scale, not a bounce. Nothing animates on
 scroll, and nothing loops.
 
+One authored exception, **the week's move** (2026-11-09): on a week the conditions changed or an
+area changed standing, the card replays it once on arrival. The reading travels from the earlier
+scores to this week's on the map and the phone ladder (760ms, ease-in-out, because a thing that
+travels accelerates and settles), the stamp turns as the reading crosses the change line, and each
+moved area ticks from its earlier standing in the row's order. It is CSS keyed on the card's
+`data-week-move` (`app/styles/week-move.css`), so it is in the first paint and never rewinds a
+finished page; transform and opacity only; under two seconds; still under reduced motion, print
+and screenshot mode. A week nothing moved has no motion at all, which is most weeks.
+
 ## Voice & Content
 
 Copy is part of the design system and is governed by `docs/editorial-guardrails.md`: one name per

@@ -39,7 +39,7 @@ describe("the band states the week's exception, or nothing", () => {
   it("names the area and how big a move would pause it when a line is close", () => {
     const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 3) }]);
     assert.equal(model?.state, "near");
-    assert.equal(model?.text, "Hiring — an unusual move from pausing.");
+    assert.equal(model?.text, "An unusual funding-pressure move would pause Hiring.");
     assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 0) }])?.text, "Hiring is on the edge of pausing.");
   });
 
@@ -99,10 +99,10 @@ describe("the band states the week's exception, or nothing", () => {
 describe("the band is drawn in the line state's ink", () => {
   it("prints the sentence and leaves the way to the areas to the card", () => {
     const html = renderToStaticMarkup(
-      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — a common move from pausing." }} />,
+      <LineStateBand model={{ state: "near", area: "hiring", text: "A common risk-appetite move would pause Hiring." }} />,
     );
     assert.match(html, /data-line-state-band="near"/);
-    assert.ok(html.includes("Hiring — a common move from pausing."));
+    assert.ok(html.includes("A common risk-appetite move would pause Hiring."));
     assert.doesNotMatch(html, /href=/);
   });
 

@@ -53,7 +53,7 @@ export function CalendarButton({ title, description, date }: { title: string; de
       rel="noopener noreferrer"
       className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 py-1.5 text-fluid-sm font-semibold tracking-[0.04em]"
     >
-      Add to Calendar
+      Add to calendar
     </a>
   );
 }

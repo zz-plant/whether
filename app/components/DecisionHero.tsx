@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
 import type { RegimeKey } from "../../lib/types";
 import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
@@ -7,6 +7,8 @@ import { TrustStrip, type TrustStripProps } from "./trustStrip";
 import { ScreenshotCaption } from "./screenshotCaption";
 import { ConditionIcon } from "./ui/conceptIcons";
 import { DefinedTerm } from "./ui/definedTerm";
+import { ReplayMoveButton } from "./home/ReplayMoveButton";
+import type { WeekMove } from "../../lib/report/home/weekMove";
 
 type Props = {
   /** The call, as the page's heading. Absent on a read that produced no live call. */
@@ -114,6 +116,13 @@ type Props = {
    * it is made (ui-ux-standards §XV); this is that drawing.
    */
   phoneFigure?: ReactNode;
+  /**
+   * The week's move, on a week the conditions changed or an area changed standing
+   * (`buildWeekMove`): the card replays it once on arrival, and the stamp line carries
+   * the control that plays it again. The stamp turns here; the map, the ladder and the
+   * area strip are passed the same model and move themselves.
+   */
+  move?: WeekMove | null;
 };
 
 /**
@@ -138,6 +147,9 @@ const SCORE_TERMS = [
   { name: "funding pressure", term: "tightness" },
   { name: "risk appetite", term: "risk-appetite" },
 ] as const;
+
+const STAMP_CLASS =
+  "type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold";
 
 const withDefinedScores = (facts: string): ReactNode[] =>
   facts.split(/(funding pressure|risk appetite)/i).map((part, index) => {
@@ -170,12 +182,17 @@ export function DecisionHero({
   feelsLike,
   reading,
   phoneFigure,
+  move,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
   const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
   const detail = callDetail && callDetail.trim() !== call.trim() ? callDetail : undefined;
+  /* When the stamp turns, as a share of the travel (week-move.css reads it). */
+  const turnStyle: (CSSProperties & { "--week-move-cross": number }) | undefined = move?.conditions
+    ? { "--week-move-cross": move.conditions.at }
+    : undefined;
 
   return (
     /*
@@ -189,6 +206,8 @@ export function DecisionHero({
       className="weather-card weather-hero-card weather-inset relative overflow-hidden weather-editorial-hero"
       aria-labelledby="weekly-call-title"
       data-regime={regimeKey ?? undefined}
+      data-week-move={move ? "arrival" : undefined}
+      style={turnStyle}
     >
       <div className="relative z-10 min-w-0 space-y-3">
         {/* With a graphic beside it, the left column stretches to the graphic's
@@ -203,12 +222,28 @@ export function DecisionHero({
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           {periodControl ? <div className="weather-hero-period">{periodControl}</div> : null}
-          <span className="type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold">
-            {/* The weather the word names, beside it. An unknown regime prints
-                its word alone: the sun it used to fall back to claimed a
-                condition nobody had read. */}
-            {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
-            <span>{regimeWeatherLabel}</span>
+          <span className="relative inline-flex">
+            {/* The earlier conditions' stamp, over this week's until the reading
+                crosses the change line (week-move.css). Its word is printed from
+                an attribute, so the page's text names this week's conditions once. */}
+            {move?.conditions ? (
+              <span
+                aria-hidden="true"
+                data-regime={move.conditions.from}
+                data-week-move-stamp
+                className={`week-move-old week-move-stamp-old ${STAMP_CLASS}`}
+              >
+                <ConditionIcon regime={move.conditions.from} />
+                <span className="week-move-attr" data-text={REGIME_LABELS[move.conditions.from].toUpperCase()} />
+              </span>
+            ) : null}
+            <span className={`${STAMP_CLASS} ${move?.conditions ? "week-move-stamp-new" : ""}`}>
+              {/* The weather the word names, beside it. An unknown regime prints
+                  its word alone: the sun it used to fall back to claimed a
+                  condition nobody had read. */}
+              {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
+              <span>{regimeWeatherLabel}</span>
+            </span>
           </span>
 
           {/* The reader's place, beside the weather: a chip rather than a line,
@@ -251,6 +286,9 @@ export function DecisionHero({
                   {direction ? " · " : null}<span className="whitespace-nowrap">{earlier}</span>
                 </span>
               ) : null}
+              {/* In the sentence, not beside it: as a flex item it took a row of its
+                  own on a phone, above the call. */}
+              {move ? <> <ReplayMoveButton since={move.since} /></> : null}
             </span>
           ) : null}
 
@@ -267,6 +305,8 @@ export function DecisionHero({
               </span>
             </Link>
           ) : null}
+
+          {move && !(since || direction || earlier) ? <ReplayMoveButton since={move.since} /> : null}
         </div>
 
         {/* The homepage's `h1`. It was an `h2` under a visually hidden `h1`

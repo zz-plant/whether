@@ -4,6 +4,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
@@ -60,6 +61,12 @@ type RegimeRadarProps = {
    * the scrubbed coordinates rather than springing back to the live reading.
    */
   onScrubScores?: (scores: { tightness: number; riskAppetite: number }) => void;
+  /**
+   * The earlier reading's scores, on a card that replays the week's move
+   * (week-move.css): the marker travels from there to the current reading and the
+   * path it took fades once it lands. Not the trail, which is month-ends.
+   */
+  travelFrom?: { tightness: number; riskAppetite: number } | null;
   className?: string;
 };
 
@@ -125,6 +132,7 @@ export function RegimeRadar({
   previousLabel,
   feelsLike,
   onScrubScores,
+  travelFrom,
   className = "",
 }: RegimeRadarProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -303,6 +311,17 @@ export function RegimeRadar({
   const boundaryY = yFor(tightnessThreshold);
   const currentX = xFor(riskAppetite);
   const currentY = yFor(tightness);
+  /* How far back, in the drawing's units, the earlier reading sits from this one. */
+  const travelOffset =
+    travelFrom && (travelFrom.tightness !== tightness || travelFrom.riskAppetite !== riskAppetite)
+      ? {
+          dx: Number((xFor(travelFrom.riskAppetite) - currentX).toFixed(2)),
+          dy: Number((yFor(travelFrom.tightness) - currentY).toFixed(2)),
+        }
+      : null;
+  const travelStyle: (CSSProperties & { "--week-move-dx": number; "--week-move-dy": number }) | undefined = travelOffset
+    ? { "--week-move-dx": travelOffset.dx, "--week-move-dy": travelOffset.dy }
+    : undefined;
 
   const isScrubbing = scrub !== null;
   const scrubTightness = scrub ? Math.round(scrub.tightness) : tightness;
@@ -714,8 +733,29 @@ export function RegimeRadar({
           </g>
         ) : null}
 
+        {/* The week's move: the straight path from the earlier reading, drawn as the
+            marker travels it and gone once it lands (week-move.css). */}
+        {travelOffset ? (
+          <line
+            data-radar-week-move
+            className="week-move-wake"
+            x1={currentX + travelOffset.dx}
+            y1={currentY + travelOffset.dy}
+            x2={currentX}
+            y2={currentY}
+            pathLength={1}
+            strokeDasharray="1"
+            stroke="var(--regime-accent)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        ) : null}
+
         {/* Current reading marker */}
-        <g>
+        <g
+          className={travelOffset ? "week-move-marker" : undefined}
+          style={travelStyle}
+        >
           <title>{`${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
           {/* Non-root SVG geometry scales from an origin of 0 0 unless told
               otherwise, so the ring would travel toward the bottom-right as it
