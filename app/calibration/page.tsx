@@ -123,8 +123,8 @@ export default function CalibrationPage() {
           </li>
         </ul>
         <p className="mt-4 text-base text-slate-300">
-          So the room before a change still measures distance, which it can do honestly, and this record
-          sits next to it instead of being folded in.
+          The room before a change still measures distance, which it can do honestly. This record sits
+          next to it.
         </p>
       </SecondaryPageSection>
 

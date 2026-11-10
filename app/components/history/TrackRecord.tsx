@@ -174,7 +174,7 @@ export function TrackRecordTiles({
           </FactList>
 
           <p className="text-fluid-sm text-slate-400">
-            {CALL_CHANGE_RULE} One noisy month can&rsquo;t change them, so most months nothing changes, and a
+            {CALL_CHANGE_RULE} One noisy month can&rsquo;t change them. Most months nothing changes, and a
             change is worth your attention.
           </p>
         </div>
