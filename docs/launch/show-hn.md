@@ -16,11 +16,11 @@ experience currently converts a spike into a flat retention curve. Four things g
 | The site says what it costs | Done — `/about` says "Whether is free." (2026-10-14; the unsold paid plans and `/pricing` are gone) |
 
 **Update 2026-11-10.** The four gates are closed and the repository is public, so the hold above
-no longer has an open gate behind it. Two things still stand between this kit and a post, and
-both need the author: the live checks in the pre-launch checklist (not run since August; the
-session that made this update could not reach whether.work), and the first sentence of the post
-text, which says "I run product at an early-stage company" and should say whatever is true on the
-day. The post text and prepared answers were brought in line with the README the same day: the
+no longer has an open gate behind it. One thing still stands between this kit and a post, and
+it needs the author: the live checks in the pre-launch checklist (not run since August; the
+session that made this update could not reach whether.work). The first sentence of the post text
+said "I run product at an early-stage company", in the present tense; it now says that in the past
+tense and that the author builds alone, which is what the author's own site says. The post text and prepared answers were brought in line with the README the same day: the
 inputs that move the scores, the premise test, and the test count.
 
 All four closed on 2026-08-29. The reason the fourth gated a *launch* and not just a funnel: the
@@ -66,9 +66,10 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 
 ## Post text (the URL field takes the site; this goes in the text box or first comment)
 
-> I run product at an early-stage company and kept losing the same 30 minutes every Monday:
+> I led product at early-stage companies for years and lost the same 30 minutes every Monday:
 > skim the Fed news, skim a macro newsletter, and try to translate "conditions are tightening"
-> into whether we should actually approve the two open reqs.
+> into whether we should actually approve the two open reqs. I build on my own now, and this is
+> the tool I wanted then.
 >
 > Whether automates that translation. It pulls public series from FRED (Treasury bill and note
 > yields, the Chicago Fed financial conditions index) and the VIX, and compresses them into
