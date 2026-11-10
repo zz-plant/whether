@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { passAge, REUSE_WINDOW_MS, reuseBlockedBy, withPasses } from "../scripts/check-reuse.mjs";
 import { buildCommit, restoreTrackedFromHead, worktreeDrift } from "../scripts/exec.mjs";
 
 /*
@@ -164,5 +165,166 @@ describe("deploy gate worktree check", () => {
     } finally {
       rmSync(repository, { recursive: true, force: true });
     }
+  });
+});
+
+/*
+ * `bun run check` and the pre-push hook run the same tasks, and half of all pushes followed
+ * a passing check on an unchanged tree. The hook passes `--reuse`, which skips a task whose
+ * pass is recorded for the exact tree on disk. scripts/check-reuse.mjs argues why that is the
+ * same verdict; these hold it to the argument: one changed byte, an hour, a failure or the
+ * deploy gate each mean the task runs.
+ */
+describe("a pass recorded on a tree", () => {
+  const PRE_PUSH_SCRIPTS = {
+    lint: "lint",
+    "lint:types": "lint:types",
+    typecheck: "typecheck",
+    test: "test",
+    "assets:check": "assets",
+    "check:suppressions": "suppressions",
+    "check:dead-exports": "dead-exports",
+    "review:hotspot-preflight": "hotspot-preflight",
+    "check:landmarks": "landmarks",
+  };
+  const ALL = Object.values(PRE_PUSH_SCRIPTS).sort();
+
+  /** A committed repository whose every pre-push script appends its task name to a log outside the tree. */
+  const taskRepository = () => {
+    const { repository, git } = gitRepository();
+    const log = `${repository}.ran.log`;
+    writeFileSync(
+      join(repository, "tick.mjs"),
+      [
+        'import { appendFileSync } from "node:fs";',
+        "const name = process.argv[2];",
+        "appendFileSync(process.env.TICK_LOG, `${name}\\n`);",
+        'process.exit((process.env.TICK_FAIL ?? "").split(",").includes(name) ? 1 : 0);',
+      ].join("\n"),
+    );
+    const scripts = Object.fromEntries(
+      Object.entries(PRE_PUSH_SCRIPTS).map(([script, task]) => [script, `bun tick.mjs ${task}`]),
+    );
+    writeFileSync(join(repository, "package.json"), JSON.stringify({ name: "check-reuse-fixture", scripts }));
+    git("add", "tick.mjs", "package.json");
+    git("commit", "--quiet", "-m", "tasks");
+
+    /** Runs the checks and returns the tasks that actually executed, sorted. */
+    const run = (args: string[], extraEnv: Record<string, string> = {}) => {
+      writeFileSync(log, "");
+      const result = spawnSync("bun", [join(process.cwd(), "scripts", "run-checks.mjs"), ...args], {
+        cwd: repository,
+        encoding: "utf8",
+        env: { ...gitFreeEnv(), CHECK_NO_REUSE: "", WHETHER_DEPLOY_GATE: "", TICK_LOG: log, ...extraEnv },
+      });
+      const ran = readFileSync(log, "utf8").split("\n").filter(Boolean).sort();
+      return { status: result.status, stdout: result.stdout, ran };
+    };
+    const cleanUp = () => {
+      rmSync(repository, { recursive: true, force: true });
+      rmSync(log, { force: true });
+    };
+    return { repository, git, run, cleanUp };
+  };
+
+  const PRE_PUSH = ["--preset", "pre-push", "--reuse"];
+  /* One task a pass can stand in for and the one it cannot: enough to tell reuse from a run. */
+  const PAIR = ["lint", "hotspot-preflight", "--reuse"];
+  const BOTH = ["hotspot-preflight", "lint"];
+  const RANGE_ONLY = ["hotspot-preflight"];
+
+  it("is not run again by the hook, and the range check always is", () => {
+    const { run, cleanUp } = taskRepository();
+    try {
+      const check = run(["lint", "typecheck", "test"]);
+      assert.equal(check.status, 0);
+      assert.deepEqual(check.ran, ["lint", "test", "typecheck"]);
+
+      const push = run(PRE_PUSH);
+      assert.equal(push.status, 0);
+      assert.deepEqual(
+        push.ran,
+        ALL.filter((task) => !["lint", "test", "typecheck"].includes(task)),
+        "the three that passed on this tree are skipped; the six that never ran do run",
+      );
+      assert.match(push.stdout, /✅ test \(not run again: passed on this exact tree \d+s ago\)/);
+      assert.match(push.stdout, /3 task\(s\) not run again/);
+
+      assert.deepEqual(run(PRE_PUSH).ran, RANGE_ONLY, "it judges a push range, not the tree");
+    } finally {
+      cleanUp();
+    }
+  });
+
+  it("stands for the bytes on disk: any change runs the task, and committing the same bytes does not", () => {
+    const { repository, git, run, cleanUp } = taskRepository();
+    try {
+      writeFileSync(join(repository, "tracked.txt"), "edited, not committed\n");
+      writeFileSync(join(repository, "new-module.ts"), "export {};\n");
+      assert.deepEqual(run(PAIR).ran, BOTH);
+      assert.deepEqual(run(PAIR).ran, RANGE_ONLY, "the same dirty tree");
+
+      /* The usual order is check, commit, push. The pass was for the content, not the sha. */
+      git("add", "--all");
+      git("commit", "--quiet", "-m", "the bytes that passed");
+      assert.deepEqual(run(PAIR).ran, RANGE_ONLY, "the commit holds exactly what passed");
+
+      writeFileSync(join(repository, "tracked.txt"), "edited by another session\n");
+      assert.deepEqual(run(PAIR).ran, BOTH, "a tracked edit");
+
+      git("checkout", "--quiet", "--", "tracked.txt");
+      writeFileSync(join(repository, "stray.ts"), "export {};\n");
+      assert.deepEqual(run(PAIR).ran, BOTH, "an untracked file a task may read");
+    } finally {
+      cleanUp();
+    }
+  });
+
+  it("is never recorded for a task that failed, and never asked for without the flag", () => {
+    const { run, cleanUp } = taskRepository();
+    try {
+      const failing = run(["lint", "typecheck", "--reuse"], { TICK_FAIL: "lint" });
+      assert.equal(failing.status, 1);
+      assert.deepEqual(failing.ran, ["lint", "typecheck"]);
+      assert.deepEqual(run(["lint", "typecheck", "--reuse"]).ran, ["lint"], "the failure runs again; the pass beside it stands");
+
+      assert.deepEqual(run(["lint", "typecheck"]).ran, ["lint", "typecheck"], "without --reuse every task runs");
+      assert.deepEqual(run(["lint", "typecheck", "--reuse"], { CHECK_NO_REUSE: "1" }).ran, ["lint", "typecheck"]);
+    } finally {
+      cleanUp();
+    }
+  });
+
+  it("is neither reused nor recorded by the deploy gate", () => {
+    const { run, cleanUp } = taskRepository();
+    const GATE = { WHETHER_DEPLOY_GATE: "1" };
+    try {
+      run(["lint"], GATE);
+      assert.deepEqual(run(["lint", "--reuse"]).ran, ["lint"], "a gate run leaves nothing for a push to reuse");
+      assert.deepEqual(run(["lint", "--reuse"], GATE).ran, ["lint"], "the gate runs a task that passed here a moment ago");
+
+      assert.equal(reuseBlockedBy(GATE), "WHETHER_DEPLOY_GATE");
+      assert.equal(reuseBlockedBy({ WHETHER_TEST_ALLOW_NETWORK: "1" }), "WHETHER_TEST_ALLOW_NETWORK");
+      assert.equal(reuseBlockedBy({ LANDMARKS_BASE_URL: "" }), null, "an empty variable is unset");
+    } finally {
+      cleanUp();
+    }
+  });
+
+  /* A few tests read the calendar, so a pass is not kept across a day. */
+  it("stands for an hour, on the tree it names", () => {
+    const now = 1_800_000_000_000;
+    const record = withPasses(null, "tree-a", ["test"], now);
+
+    assert.equal(passAge(record, "tree-a", "test", now + 5 * 60_000), 5 * 60_000);
+    assert.equal(passAge(record, "tree-a", "test", now + REUSE_WINDOW_MS + 1), null, "past the window");
+    assert.equal(passAge(record, "tree-a", "test", now - 1), null, "a pass dated in the future is a clock that moved");
+    assert.equal(passAge(record, "tree-b", "test", now), null, "another tree");
+    assert.equal(passAge(record, "tree-a", "lint", now), null, "a task that never passed here");
+    assert.equal(passAge(null, "tree-a", "test", now), null);
+
+    const moved = withPasses(record, "tree-b", ["lint"], now);
+    assert.deepEqual(moved.passes, { lint: now }, "a record for another tree is dropped, not merged");
+    assert.deepEqual(withPasses(record, "tree-a", ["lint"], now + 1).passes, { test: now, lint: now + 1 });
   });
 });

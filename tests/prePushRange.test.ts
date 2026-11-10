@@ -326,7 +326,7 @@ describe("a push judged end to end", () => {
       assert.deepEqual(JSON.parse(readFileSync(join(repository, "gate-env.json"), "utf8")), {
         REVIEW_HOTSPOT_BASE: mainTip,
         REVIEW_HOTSPOT_HEAD: head,
-        args: ["--preset", "pre-push"],
+        args: ["--preset", "pre-push", "--reuse"],
       });
     } finally {
       cleanup();

@@ -3,6 +3,9 @@ export type CheckTask = { name: string; script: string; onDemand?: boolean };
 /** Every task a preset runs, across its stages, in run order. Throws on an unknown preset. */
 export function presetTasks(name: string): string[];
 
+/** Tasks a pass recorded on this exact tree can stand in for (scripts/check-reuse.mjs). */
+export const REUSABLE_TASKS: string[];
+
 /**
  * What a `run-checks.mjs` invocation runs: stages of tasks (each stage only after the
  * previous one passed), whether to fail fast within a stage, whether the run is the

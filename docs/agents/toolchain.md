@@ -40,6 +40,15 @@ because this private repo's Actions minutes are billed and the account stopped p
 them. Skipping the hook means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or
 `git push --no-verify`.
 
+**The hook does not rerun what already passed on the same tree.** Every `bun run check`
+records which tasks passed against the tree git would write from the files on disk. The hook
+runs with `--reuse`: a task with a pass recorded for that exact tree in the last hour prints
+`not run again` and is skipped, so `bun run check`, commit, `git push` runs the suite once.
+Any changed byte, yours or another session's, is a different tree and runs everything.
+`hotspot-preflight` always runs, because it judges the push range. `CHECK_NO_REUSE=1 git push`
+runs every task. The deploy gate neither records nor reuses. The argument for why this is the
+same verdict is the header of `scripts/check-reuse.mjs`.
+
 **The hook clears git's exported environment before running the gate, and must keep doing so.**
 Git hands every hook `GIT_DIR`, `GIT_INDEX_FILE`, and friends, and every `git` the gate shells
 out to inherits them — which silently redirects those calls at the pushing repository.

@@ -122,7 +122,7 @@ describe("deploy gate test scope", () => {
   it("runs the pre-push preset from the hook, and lists no task inline", async () => {
     const hook = await readFile(".husky/pre-push", "utf8");
     const invocations = hook.split("\n").filter((line) => /^\s*bun scripts\/run-checks\.mjs\b/.test(line));
-    assert.deepEqual(invocations, ["bun scripts/run-checks.mjs --preset pre-push"]);
+    assert.deepEqual(invocations, ["bun scripts/run-checks.mjs --preset pre-push --reuse"]);
 
     assert.deepEqual(stageNames(["--preset", "pre-push"]), [
       ["lint", "lint:types", "typecheck", "test", "assets", "suppressions", "dead-exports", "hotspot-preflight", "landmarks"],

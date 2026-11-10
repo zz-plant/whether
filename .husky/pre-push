@@ -34,4 +34,6 @@ if [ ! -t 0 ]; then
   fi
 fi
 
-bun scripts/run-checks.mjs --preset pre-push
+# --reuse: a task that passed on this exact tree within the hour (a `bun run check` just
+# before the push) is not run again. CHECK_NO_REUSE=1 git push runs everything.
+bun scripts/run-checks.mjs --preset pre-push --reuse

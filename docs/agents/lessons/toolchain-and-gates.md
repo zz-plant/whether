@@ -336,6 +336,7 @@ Each of these was findable only by reading the file that reads it. Leave them un
 | Flag | Read by | Effect |
 | --- | --- | --- |
 | `CHECK_SERIAL=1` | `scripts/check-tasks.mjs` | Same as `--serial`: a `bun run check` stage runs fail-fast, one task at a time. |
+| `CHECK_NO_REUSE=1` | `scripts/run-checks.mjs` | The pre-push hook runs every task, including one that passed on this exact tree within the hour. |
 | `BUN_TEST_ONLY_FAILURES=1` | `scripts/run-tests.mjs` | Prints failing tests only, as the deploy gate always does. |
 | `WHETHER_TEST_LOGS=1` | `scripts/run-tests.mjs` | Keeps the app's console output on a full-suite run, which hides it by default. A run that names files or tests always keeps it. |
 | `BUN_TEST_TIMEOUT_MS=<ms>` | `scripts/run-tests.mjs` | Per-test ceiling; defaults to 60000, or 120000 in the deploy gate. |

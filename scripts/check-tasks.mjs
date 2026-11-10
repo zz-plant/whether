@@ -34,6 +34,23 @@ const CHECK_TASKS = [
 ];
 
 /**
+ * Tasks whose verdict depends on the working tree and nothing the gate would vary, so a
+ * pass on a tree stands for that tree for an hour (scripts/check-reuse.mjs). Left out:
+ * `hotspot-preflight` judges a push range, `audit` asks the network, and `curated-freshness`
+ * is a warning about today's date.
+ */
+export const REUSABLE_TASKS = [
+  "lint",
+  "lint:types",
+  "typecheck",
+  "test",
+  "assets",
+  "suppressions",
+  "dead-exports",
+  "landmarks",
+];
+
+/**
  * A preset is one or more stages. Tasks in a stage run together; a stage runs only
  * after every task in the one before it passed, the way `a && b` would.
  */
@@ -128,6 +145,7 @@ export function presetTasks(name) {
  *   <name>...           those tasks, one stage, in declaration order
  *   --preset <preset>   that preset's stages (also `--preset=<preset>`)
  *   --serial            fail-fast sequencing within a stage (or CHECK_SERIAL=1)
+ *   --reuse             read by run-checks.mjs, not here: skip a task already passed on this tree
  *
  * `deployGate` is true for a preset that is the deploy gate, or when the caller already
  * runs under the signal. `repeatFailures` is whether a failing task's output is printed
