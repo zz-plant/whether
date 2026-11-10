@@ -336,11 +336,26 @@ describe("the /trust source board", () => {
     );
   });
 
+  it("draws how much of each window has passed, agreeing with the state word", () => {
+    const health = healthRows({ treasuryLive: false, curatedAt: "2026-01-01T00:00:00.000Z", marketLive: false });
+    const rows = buildSourceBoardRows(health, now);
+    const byName = new Map(rows.map((row) => [row.sourceName, row]));
+    const stale = byName.get("Startup/private markets")?.windowUsed ?? 0;
+    assert.ok(stale >= 1, "a stale source draws past its window");
+    for (const row of rows.filter((candidate) => candidate.stateLabel !== `Stale · 2mo old`)) {
+      assert.ok(row.windowUsed !== null && row.windowUsed < 1, `${row.sourceName} is inside its window and draws so`);
+    }
+    // Long after the fact, a source the word still calls fresh stays short of full.
+    const later = buildSourceBoardRows(healthRows(), new Date(now.getTime() + 400 * 24 * 60 * 60 * 1000));
+    for (const row of later) assert.ok((row.windowUsed ?? 0) < 1);
+  });
+
   it("says when a source has never answered rather than printing a date", () => {
     const [treasury] = buildSourceBoardRows(buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: undefined }), macroSeries: [], now }));
     assert.equal(treasury?.stateLabel, "Not confirmed");
     assert.equal(treasury?.updatedLabel, "No update on record");
     assert.equal(treasury?.asIntended, false);
+    assert.equal(treasury?.windowUsed, null, "no update, no bar");
   });
 });
 

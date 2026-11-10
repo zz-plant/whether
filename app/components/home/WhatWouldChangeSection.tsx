@@ -213,7 +213,13 @@ export function WhatWouldChangeSection({
           {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
             <div className="space-y-0.5 text-fluid-sm">
               <p className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
-              <p className="text-slate-300">{flipConditions.join(" · ")}</p>
+              {/* A list rather than one line joined by dots (2026-11-10): each is its own
+                  condition, and a run-on line read as one long one. */}
+              <ul className="list-disc space-y-0.5 pl-5 text-slate-300 marker:text-slate-400">
+                {flipConditions.map((condition) => (
+                  <li key={condition}>{condition}</li>
+                ))}
+              </ul>
             </div>
           ) : null}
         </div>

@@ -173,3 +173,24 @@ describe("loadCronRunHistory", () => {
     if (timedOut.status === "unavailable") assert.match(timedOut.reason, /deadline/);
   });
 });
+
+describe("summarizeCronSteps day strip", () => {
+  it("puts each run on its UTC day, oldest first, ending on the day of now", () => {
+    const history = summarizeCronSteps(
+      [
+        { timestamp: "2026-09-16 01:00:00", blob2: JSON.stringify({ step: "refresh-operating-state", ok: true }) },
+        { timestamp: "2026-09-15 23:59:00", blob2: JSON.stringify({ step: "refresh-operating-state", ok: false, error: "x" }) },
+        { timestamp: "2026-09-15 02:00:00", blob2: JSON.stringify({ step: "refresh-operating-state", ok: true }) },
+        { timestamp: "2026-08-01 02:00:00", blob2: JSON.stringify({ step: "refresh-operating-state", ok: true }) },
+      ],
+      { windowDays: 30, now: new Date("2026-09-16T12:00:00Z") },
+    );
+    const days = history.steps[0]?.days ?? [];
+    assert.equal(days.length, 30);
+    assert.deepEqual(days[29], { runs: 1, failures: 0 });
+    assert.deepEqual(days[28], { runs: 2, failures: 1 });
+    assert.equal(days.slice(0, 28).every((day) => day.runs === 0), true);
+    // Outside the window: counted in the totals, drawn on no day.
+    assert.equal(history.steps[0]?.runs, 4);
+  });
+});
