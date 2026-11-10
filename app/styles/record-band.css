@@ -14,7 +14,8 @@
 
 .record-band-plate {
   position: relative;
-  height: 5.25rem;
+  /* 68px on a phone: at 84 the band and its axis took an eighth of the first screen. */
+  height: 4.25rem;
   /* A vertical swipe that starts on the band still scrolls the page. */
   touch-action: pan-y;
   cursor: crosshair;

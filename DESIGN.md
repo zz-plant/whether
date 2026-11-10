@@ -143,7 +143,7 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.figure}"
   record-band:
-    height: "84px"
+    height: "68px"
   record-band-wide:
     height: "150px"
   record-band-history:
@@ -284,10 +284,10 @@ All three are self-hosted variable files, subset to the site's text, with hashed
 
 ### Hierarchy
 
-- **Guidance** (Besley 700, 28 → 52px, line-height 1.06): the week's guidance, the only `h1`
-  on `/`. From `md` it sets at `clamp(2.5rem, 3.5vw, 3.25rem)`, line-height 1.02, tracking
-  -0.03em. At most 101 characters (`tests/heroCallAssumptions.test.ts`): five lines on a phone,
-  four on a desktop.
+- **Guidance** (Besley 700, 26 → 52px, line-height 1.06): the week's guidance, the only `h1`
+  on `/`. On a phone it sets at `clamp(1.625rem, 1.1rem + 2.2vw, 2rem)`; from `md` at
+  `clamp(2.375rem, 3.3vw, 3.25rem)`, line-height 1.02, tracking -0.03em. At most 101 characters
+  (`tests/heroCallAssumptions.test.ts`): four lines on a phone and on a desktop.
 - **Figure** (Besley 800, 92px in the margin, 46px on a phone, line-height 0.9, tabular lining
   digits): the two published scores. `.type-figure`; the size comes from the caller.
 - **Condition word** (Besley 800, 27px, 34px from `sm`): Sunny, Cloudy, Stormy or Freezing, in
@@ -335,10 +335,17 @@ document. The page gutter is `--weather-shell-pad-inline` (16px); the brief's me
 the wide report shell 84rem.
 
 On `/` from `md`, the guidance block is a reading column and a margin of up to 22rem, separated
-by a subtle hairline. The margin holds the two score figures on their ruled lines, then the
-trust facts. On a phone the column runs: the week and brief number, the condition word with its
-gloss and delta, the guidance, the five areas, the two scores side by side as compact figures,
-then the trust facts. The bottom tab bar and the running head stay.
+by one unbroken hairline. The margin opens with the week line and the brief's number, beside the
+condition word, then the two score figures on their ruled lines, then the trust facts. On a
+phone the column runs: the week and brief number, the condition word with its gloss and the
+delta, the guidance, the two scores side by side as compact figures with the link to why, the
+five areas, then the trust facts. The bottom tab bar and the running head stay.
+
+The first screen holds the week's statement whole: at 1440 by 900 and 1280 by 800, and on a
+390 by 844 phone above the tab bar, the guidance, both scores and all five areas, on a first
+visit as well as a returning one (measured 2026-11-10 with the bundled reading). A first phone
+visit has a pixel to spare, so a longer guidance or delta line can push the fifth area under
+the tab bar; `tests/homeFirstScreen.test.tsx` pins the order that makes the room, not the pixels.
 
 Spacing has one owner per distance: a page separates sections (`section-gap`, 24px, 32px from
 640px), a section groups its heading and body (`content-gap`, 16px, 24px from 640px), and a
@@ -440,7 +447,7 @@ image needs no script.
 - **Line pattern per condition** (`recordBandLineY`, `lib/report/recordBandCodec.ts`): plain for
   Sunny, a slow sine wave for Stormy (four-month wavelength), a tight triangle ripple for Cloudy
   (four-thirds of a month), a zigzag for Freezing (two months). The band reads in greyscale.
-- **Sizes.** 84px on a phone, drawn with four plain lines a bundle and no pattern, which would
+- **Sizes.** 68px on a phone, drawn with four plain lines a bundle and no pattern, which would
   alias at 2px a month. From a 46rem container, 150px with five patterned lines a bundle, the
   two bundles named in place in the first field, and a longer caption. On History the band is
   the page's figure, `clamp(9rem, 21vw, 18.75rem)` (capped at 300px), with each long stretch
@@ -475,11 +482,12 @@ its month-end name different conditions, a caveat note states both facts and no 
 ### The guidance block
 
 `app/components/DecisionHero.tsx`. No box: the document's opening. In order: the week control
-and the brief's number ("No. 2026-W45"); the condition word in its ink with a stroke icon and
-its gloss; since when and the week's direction; the guidance as the `h1`; a facts line with
-both scores and "Why"; the five area rows; whose rules these are ("Rules for … · change"); then
-the phone figures, and the margin from `md`. It names its regime with `data-regime`, and the
-week's move is keyed on it.
+and the brief's number ("No. 2026-W45"), which head the margin from `md`; the condition word in
+its ink with a stroke icon and its gloss; since when and the week's direction, with "Feels like"
+run in as a caveat; the guidance as the `h1`; on a phone, the two compact figures; a facts line
+with both scores and "Why", from `md` only where the phone figures are passed; the five area
+rows; whose rules these are ("Rules for … · change"); then the margin from `md`. It names its
+regime with `data-regime`, and the week's move is keyed on it.
 
 ### Area rows
 
@@ -496,8 +504,8 @@ line-state glyph (red and a pause glyph when on hold, ink and a play glyph when 
   "(higher is better)", one sentence of standing led by its glyph, and a 2px ink rule with the
   pause range as a red bar, a 3px red pause tick, 2px ink ticks, an 18px ink reading ring, and
   "pause 76" / "restart 66" named in place in 12px. The two names read away from each other.
-  `"compact"` drops the rule and moves the direction to screen readers, for two figures side by
-  side on a phone.
+  `"compact"` drops the rule, sets the number and its name on one row with the sentence under
+  both, and moves the direction to screen readers, for two figures side by side on a phone.
 - **Working ladder** (default): a 0–100 track with ticks for the change, pause and restart
   lines, a dot for the reading, the month range, and a scrub. Labels never overlap; the track
   is `aria-hidden` and the sentence beside it carries the meaning.

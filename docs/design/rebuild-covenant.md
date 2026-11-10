@@ -50,11 +50,14 @@ As of 2026-11-10, on every route unless a line says otherwise:
 - **The record band,** under the navigation: fields, the two line bundles with a pattern per
   condition, a mark for each published brief, a yearly axis, and the month readout with keyboard
   and touch. On History it opens to the page's figure and a canvas redraws it denser.
-- **This week.** The guidance block without its card. The week as a line with the brief's
-  number; the condition word with its gloss. The five areas as ruled rows with their standing,
+- **This week.** The guidance block without its card, and the week's statement on one screen:
+  at 1440 by 900, 1280 by 800 and on a 390 by 844 phone, the guidance, both scores and all five
+  areas, first visit and returning. The week line with the brief's number heads the margin from
+  `md`; the condition word carries its gloss. The five areas as ruled rows with their standing,
   and from `lg` up their action. The two scores as figures in the margin, each with one
   sentence and a ruled line named in place, and the trust facts under them; on a phone both
-  scores print under the areas. The conditions map in "What would change our mind".
+  scores follow the guidance as compact figures, in the facts line's place. The conditions map
+  in "What would change our mind".
 - **Report routes.** The page title leads and the condition and date follow as a facts line.
   Caveat and line bands have a ruled top edge.
 - **History.** The band opens to the page's figure with each stretch named in its field. A cell
@@ -66,10 +69,6 @@ As of 2026-11-10, on every route unless a line says otherwise:
 
 Not built yet:
 
-- **The first screen does not fit.** At 1440 by 900 the h1 starts at 453px and three of the
-  five areas show; on a 390 by 844 phone four show and the scores are on the second screen.
-  The height above the h1 is the band, the first-visit orientation line, the week line, and
-  a "since" line that wraps; each area's action wraps to two lines at 1440.
 - One frame on every route. Report routes keep their sidebar and widths, so the page's left
   edge moves between `/` and the rest.
 - One copy control on the first screen. The four copy buttons remain.

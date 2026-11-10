@@ -565,8 +565,21 @@ export function ScoreLadder({
     );
     return (
       <figure className={`@container ${className}`.trim()} data-score-ladder data-ladder-display="figure">
-        <figcaption className="grid grid-cols-[auto_minmax(0,1fr)] items-end gap-x-3">
-          <span data-ladder-figure aria-hidden="true" className="type-figure row-span-2 text-[2.875rem] text-slate-50">
+        {/* Compact, for two side by side on a phone: the number and its name on one row and
+            the sentence under both, so the sentence has the cell's whole width. Beside a
+            46px numeral it wrapped to four lines in half a phone (2026-11-10). */}
+        <figcaption
+          className={
+            figure === "compact"
+              ? "grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2 gap-y-1 [&>[data-ladder-caption]]:col-span-2"
+              : "grid grid-cols-[auto_minmax(0,1fr)] items-end gap-x-3"
+          }
+        >
+          <span
+            data-ladder-figure
+            aria-hidden="true"
+            className={`type-figure text-[2.875rem] text-slate-50 ${figure === "compact" ? "" : "row-span-2"}`.trim()}
+          >
             {formatPoints(value)}
           </span>
           <span className="text-xs font-medium leading-snug text-slate-300">

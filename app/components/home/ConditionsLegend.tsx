@@ -130,7 +130,9 @@ export function ConditionsLegend({
       aria-label="The four conditions"
       data-testid="conditions-legend"
       suppressHydrationWarning
-      className={`${compact ? "" : "mb-3 border-b border-[color:var(--border-subtle)] pb-3"} flex items-start justify-between gap-4 text-fluid-sm text-slate-300`.trim()}
+      /* The one-line orientation sits close to the brief it introduces: it is shown once,
+         and its full gap pushed the fifth area under a phone's tab bar on a first visit. */
+      className={`${compact ? "-mb-3" : "mb-3 border-b border-[color:var(--border-subtle)] pb-3"} flex items-start justify-between gap-4 text-fluid-sm text-slate-300`.trim()}
     >
       <div className="min-w-0 flex-1">
         <p className="min-w-0 leading-relaxed">
@@ -184,7 +186,8 @@ export function ConditionsLegend({
         type="button"
         onClick={handleDismiss}
         aria-label={orientation ? "Dismiss this introduction" : "Dismiss the conditions legend"}
-        className={`${CLOSE_CONTROL_CLASS} -mr-2 -mt-2`}
+        /* Its 44px target overhangs the line rather than setting the row's height. */
+        className={`${CLOSE_CONTROL_CLASS} -mr-2 -my-2.5`}
       >
         <CloseIcon />
       </button>

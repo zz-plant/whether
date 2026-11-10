@@ -169,3 +169,55 @@ describe("the card says where the reading is scaled to", () => {
     assert.ok(!html.includes("data-reading-location"));
   });
 });
+
+/*
+ * The first screen holds the week's statement whole (2026-11-10): at 1440 by 900 and on a
+ * 390 by 844 phone, the guidance, the two scores and all five areas, measured in a browser
+ * with the bundled reading. These pin the order that makes the room. The week line heads
+ * the margin from `md`, so the reading column starts on the condition word; on a phone the
+ * two scores follow the guidance and the facts line gives way to them; "Feels like" runs in
+ * the delta line instead of taking a row of its own.
+ */
+describe("the first screen keeps the week's statement on one screen", () => {
+  const props = {
+    weeklyCall: "Protect the revenue you already have.",
+    regime: "DEFENSIVE",
+    since: "Since Sep 2026",
+    direction: "No area paused or restarted since Oct 26",
+    periodControl: <span data-testid="week">Week of Nov 2, 2026</span>,
+    briefNumber: { label: "2026-W45", href: "/brief/2026-w45" },
+    reading: { numbers: "Funding pressure 90, risk appetite 54.", whyHref: "#why-conditions", facts: "Funding pressure is 90." },
+    feelsLike: { regime: "SCARCITY" as const, href: "#why-conditions" },
+  };
+  const withMargin = renderToStaticMarkup(
+    <DecisionHero {...props} aside={<div data-testid="scores" />} phoneFigure={<div data-testid="phone-scores" />} />,
+  );
+  const withoutMargin = renderToStaticMarkup(<DecisionHero {...props} />);
+
+  it("heads the margin with the week line and the brief's number when there is a margin", () => {
+    assert.match(withMargin, /class="weather-hero-period [^"]*weather-hero-margin-head[^"]*md:col-start-2 md:row-start-1/);
+    assert.match(withMargin, /data-brief-number[^>]*>[\s\S]*?No\. 2026-W45/);
+    assert.ok(withMargin.indexOf("weather-hero-margin-head") < withMargin.indexOf('id="weekly-call-title"'), "the week line comes first in the document");
+    assert.match(withMargin, /class="weather-hero-aside [^"]*md:col-start-2 md:row-start-2/);
+  });
+
+  it("keeps the week line on its own row above the condition word without one", () => {
+    assert.doesNotMatch(withoutMargin, /weather-hero-margin-head/);
+    assert.match(withoutMargin, /class="weather-hero-period [^"]*basis-full/);
+  });
+
+  it("puts the phone's two scores straight after the guidance, and the facts line from md up", () => {
+    const h1 = withMargin.indexOf('id="weekly-call-title"');
+    const phone = withMargin.indexOf("data-hero-phone-figure");
+    const meaning = withMargin.indexOf("data-regime-meaning");
+    assert.ok(h1 < phone && phone < meaning, "guidance, then the phone's scores, then the facts line");
+    assert.match(withMargin, /class="[^"]*max-md:hidden[^"]*" data-regime-meaning/);
+    assert.doesNotMatch(withoutMargin, /max-md:hidden[^"]*" data-regime-meaning/, "with no phone scores the facts line shows at every width");
+  });
+
+  it("runs 'Feels like' in the delta line, never as a row of its own", () => {
+    const delta = withMargin.slice(withMargin.indexOf("data-conditions-since"));
+    assert.match(delta.slice(0, delta.indexOf("weekly-call-title")), / · <a[^>]*data-feels-like/);
+    assert.equal((withMargin.match(/data-feels-like/g) ?? []).length, 1);
+  });
+});
