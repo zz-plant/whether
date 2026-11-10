@@ -87,6 +87,15 @@ describe("robots.txt against every document that advertises an API path", () => 
       assert.ok(!isAllowed(path), `${path} stays closed`);
     }
   });
+
+  it("closes the /signals query variants and keeps /signals and its watch pages open", () => {
+    for (const path of ["/signals?month=3&year=2025", "/signals?month=3&year=2025&focus=labor", "/signals?advanced=1"]) {
+      assert.ok(!isAllowed(path), `${path} is closed, so crawlers stop walking the month archive`);
+    }
+    for (const path of ["/signals", "/signals/capital-tightness-watch", "/signals/capital-tightness-watch/hiring"]) {
+      assert.ok(isAllowed(path), `${path} stays open`);
+    }
+  });
 });
 
 /*

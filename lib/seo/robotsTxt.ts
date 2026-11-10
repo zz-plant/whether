@@ -53,7 +53,22 @@ const ALLOWED_PATHS = [
  * open one: a route the cron calls with its secret, and the alert digest, which no
  * document advertises. `/api/health` and `/api/telemetry/*` need no line of their own.
  */
-const DISALLOWED_PATHS = ["/api/", "/api/brief/slack/deliver", "/api/decision-events", "/api/weekly-digest"];
+/*
+ * `/signals` renders any past month (`?month=&year=`) and any focus tab (`?focus=`), and each
+ * version links to more of them, all with the canonical set to `/signals`. Crawlers walked that
+ * tree: in the week to 2026-11-10, PetalBot sent 81% of its requests there and serpstatbot 98%.
+ * Closing the query variants ends the walk. Readers keep every variant, and crawlers keep
+ * `/signals` and the `/signals/<watch>` pages the sitemap lists.
+ */
+const CRAWL_LOOP_PATHS = ["/signals?"];
+
+const DISALLOWED_PATHS = [
+  "/api/",
+  "/api/brief/slack/deliver",
+  "/api/decision-events",
+  "/api/weekly-digest",
+  ...CRAWL_LOOP_PATHS,
+];
 
 /**
  * The crawlers that fetch a page to answer a question being asked right now,

@@ -113,7 +113,9 @@ Machine-discovery routes:
   `app/robots.txt/route.ts` — the line is not expressible in Next's `MetadataRoute.Robots`.
   Cloudflare's managed robots.txt (Bot Preference Sync) stays off: with every AI bot policy
   set to allow it publishes nothing, and set to block it would prepend Disallow rules for
-  exactly the crawlers the groups below serve.
+  exactly the crawlers the groups below serve. Every group closes `/signals?`: the month
+  archive and focus tabs link to each other, so crawlers walked thousands of URLs whose
+  canonical is `/signals`.
 - Markdown negotiation: `GET /` with `Accept: text/markdown` answers the Markdown brief
   (`/brief.md`) instead of HTML, and every HTML response carries `Link` headers naming the
   manifest, `/llms.txt` and `/brief.md` — the HTTP form of the alternates the root layout
