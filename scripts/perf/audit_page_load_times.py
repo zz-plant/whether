@@ -15,13 +15,13 @@ from typing import Any
 
 URLS = [
     "https://whether.work/",
-    "https://whether.work/evidence",
-    "https://whether.work/planning",
-    "https://whether.work/planning/decisions",
-    "https://whether.work/planning/briefings",
-    "https://whether.work/methodology",
-    "https://whether.work/guides",
-    "https://whether.work/solutions",
+    "https://whether.work/signals",
+    "https://whether.work/operate",
+    "https://whether.work/decisions",
+    "https://whether.work/trust",
+    "https://whether.work/history",
+    "https://whether.work/resources",
+    "https://whether.work/companies",
 ]
 RUNS_PER_URL = 7
 

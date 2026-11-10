@@ -41,7 +41,7 @@ Commands no gate runs and no other guide covers. None of them deploys or sends a
 | `bun run advice-corpus:extract` / `:prefilter` / `:classify` | The advice-corpus stages between `:discover` and `:validate`. They read the fetched archives (and `:classify` the local model) into an uncommitted cache. Protocol: `docs/research/advice-corpus-results.md`. |
 | `bun run advice-corpus:data` | Regenerates `data/advice-corpus/monthly.json` from `posts.json` (`-- --from-labels` rebuilds `posts.json` from the cache first); `advice-corpus:check` is its `--check`. |
 | `bun run reviewed-cases:list` | Lists the human labels `reviewed-cases:add` recorded; see `docs/developer/decision-models.md`. |
-| `python3 scripts/perf/audit_page_load_times.py` | curl timings (DNS, TLS, TTFB, total) for production routes, seven runs each, printed as JSON. No package script. Seven of its eight URLs (`/evidence`, `/planning/*`, `/methodology`, `/guides`, `/solutions`) are renamed routes that now redirect, and curl without `-L` times the redirect, so update `URLS` before trusting a number. |
+| `python3 scripts/perf/audit_page_load_times.py` | curl timings (DNS, TLS, TTFB, total) for production routes, seven runs each, printed as JSON. No package script. curl runs without `-L`, so a route that starts redirecting times the redirect: check each URL still answers 200 after a route rename. |
 
 ## IDE workspace defaults
 - Repo-local VS Code compatible workspace settings live under `.vscode/`.
