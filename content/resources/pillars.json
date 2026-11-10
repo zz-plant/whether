@@ -11,7 +11,7 @@
     "parentTopic": true,
     "cluster": "authority",
     "intent": "board",
-    "boardPackContext": "This is the parent guide. The framework and reversibility guides below build on it.",
+    "boardPackContext": "The framework and reversibility guides build on these principles.",
     "midpointCtaLabel": "Download the Capital Planning Template",
     "sections": [
       {
@@ -224,7 +224,7 @@
     "parentTopic": false,
     "cluster": "authority",
     "intent": "board",
-    "boardPackContext": "This guide turns the capital discipline principles into a framework and a monthly set of documents a board can run.",
+    "boardPackContext": "Built on the capital discipline principles, as a framework and a monthly set of documents a board can run.",
     "midpointCtaLabel": "Request a Board Pack Walkthrough",
     "sections": [
       {
@@ -400,7 +400,7 @@
     "parentTopic": false,
     "cluster": "authority",
     "intent": "board",
-    "boardPackContext": "This guide explains how a reversibility standard becomes a board control, tied to thresholds and escalation.",
+    "boardPackContext": "A reversibility standard becomes a board control once it is tied to thresholds and escalation.",
     "midpointCtaLabel": "Download Reversibility Governance Template",
     "sections": [
       {

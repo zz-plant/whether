@@ -41,10 +41,8 @@ export default function PrivacyPage() {
     <LegalPageShell title="Privacy" effectiveDate="10/14/2026">
       <section className="space-y-4">
         <p className={paragraph}>
-          Whether is weekly operating guidance built on public macroeconomic data. The guidance itself, the
-          API, the MCP endpoint, and embeds need no account, so most readers are never asked for
-          anything. This page lists what is stored when you do give something, where it lives, and
-          what it is used for.
+          The guidance is built on public macroeconomic data, and reading it needs no account. Neither do
+          the API, the MCP endpoint, or embeds, so most readers are never asked for anything.
         </p>
         <p className={paragraph}>
           It is written against the code rather than from a template. Where it names a store, that is
@@ -276,13 +274,13 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <h2 className={heading}>6. Changes</h2>
         <p className={paragraph}>
-          This site is open source, so changes to this page are visible in its history alongside the
+          The source is public, so changes to this policy are visible in its history alongside the
           code that made them necessary. Material changes will move the effective date above. Reach
           the editor through the{" "}
           <Link href={publisherContactPath} className="text-sky-300 underline-offset-2 hover:underline">
             contact page
           </Link>{" "}
-          with anything this page does not answer.
+          with anything this policy does not answer.
         </p>
       </section>
     </LegalPageShell>

@@ -111,6 +111,13 @@ const sentencesOf = (text: string) =>
     .map((sentence) => sentence.trim())
     .filter((sentence) => sentence.split(/\s+/).length >= 3);
 
+/* 3. A page narrating itself (2026-11-09). "This page lists what is stored…", "This guide explains
+ *    how…", "so this page tells you which of those have moved", "Here is what this week's
+ *    conditions say…": the sentence announces the content instead of being it. Not caught: "this
+ *    site" as the party a privacy policy is about ("this site does not store it"). */
+const SELF_NARRATION =
+  /(?:\bthis|^the) (?:page|guide|site|section) (?:is showing|(?:lists?|shows?|tells?|explains?|gives?|turns?|covers?|describes?|walks?|loads?|prints?|answers|summari[sz]es)\b)|\bhere (?:is|are) (?:what|how|why|the)\b/i;
+
 type Finding = { surface: string; sentence: string; why: string };
 
 const judge = (surface: string, text: string): Finding[] =>
@@ -119,6 +126,7 @@ const judge = (surface: string, text: string): Finding[] =>
     if (isStapled(sentence)) findings.push({ surface, sentence, why: "wh-clause stapled onto a list" });
     const gloss = repeatedGloss(sentence);
     if (gloss) findings.push({ surface, sentence, why: `gloss "(${gloss})" twice` });
+    if (SELF_NARRATION.test(sentence)) findings.push({ surface, sentence, why: "the page narrating itself" });
     return findings;
   });
 
@@ -159,7 +167,7 @@ describe("the detectors", () => {
   });
 });
 
-describe("reader copy carries no stapled wh-clause and no repeated gloss", () => {
+describe("reader copy carries no stapled wh-clause, no repeated gloss and no page narrating itself", () => {
   it("on the pages that render offline", async () => {
     const pages: Array<[string, () => Promise<string>]> = [
       ["/about", async () => textOf(renderToStaticMarkup((await import("../app/about/page")).default()))],

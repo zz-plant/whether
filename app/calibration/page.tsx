@@ -64,7 +64,7 @@ export default function CalibrationPage() {
           "Weekly brief" over their titles. */}
       <SecondaryPageHeader
         title="How often the guidance held up"
-        description={`We checked the room before a change that every page prints against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
+        description={`We checked the published room before a change against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
       />
 
       <ConfidenceRecordSection />

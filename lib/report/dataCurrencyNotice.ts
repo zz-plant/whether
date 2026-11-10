@@ -47,13 +47,13 @@ const summaryFor = (reason: DataCurrencyReason, recordDateLabel?: string): strin
   const dated = recordDateLabel ? ` The reading is from ${recordDateLabel}.` : "";
   switch (reason) {
     case "fallback-snapshot":
-      return `This page is running on the last saved snapshot rather than a live reading.${dated}`;
+      return `This is the last saved snapshot rather than a live reading.${dated}`;
     case "provenance-missing-or-degraded":
-      return `The source behind this page is not currently reporting live.${dated}`;
+      return `The source behind this reading is not currently reporting live.${dated}`;
     case "freshness-stale":
-      return `The data behind this page has not refreshed in the last few days.${dated}`;
+      return `The data behind this reading has not refreshed in the last few days.${dated}`;
     case "freshness-unknown":
-      return "How recently the data behind this page refreshed could not be confirmed.";
+      return "How recently the data behind this reading refreshed could not be confirmed.";
   }
 };
 

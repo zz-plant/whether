@@ -121,8 +121,7 @@ export function TrackRecordSection({
 
       <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400">
         &ldquo;Signaled&rdquo; means the score that crossed was within {record.nearBandPts} pts of its line, on
-        either side, for at least a month first. Changes with no warning are listed too; that&rsquo;s the
-        point of the table.
+        either side, for at least a month first. Changes with no warning are listed too.
       </p>
       {recordChanges !== undefined ? (
         <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400" data-record-rescore>

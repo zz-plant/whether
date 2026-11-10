@@ -62,7 +62,7 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} can ask for this week</h1>
         <p className="text-sm text-slate-300">
-          Is now a good time to ask for a raise, more headcount, or a slower roadmap? Here is what this week's conditions say for {role.label}, and what to ask leadership. It works for any tech company, public or private.
+          Is now a good time to ask for a raise, more headcount, or a slower roadmap? What this week's conditions say for {role.label} and what to ask leadership, at any tech company, public or private.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />

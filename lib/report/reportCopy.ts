@@ -225,7 +225,7 @@ export const NO_LIVE_READING_CALL = {
 export const describeMacroNotOnRecord = (period = "this month") => `Not on record for ${period}`;
 
 export const PRIMARY_AUDIENCE_SUMMARY =
-  "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
+  "The guidance is decision support, not an authority. It starts from U.S. rates, inflation, labor, credit, and funding conditions.";
 
 /**
  * Definitions for machine readers, not a page.

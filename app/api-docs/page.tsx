@@ -80,8 +80,8 @@ export default function ApiDocsPage() {
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
-          Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
-          scores behind it, and the pause and restart lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.
+          Read this week's guidance from an AI agent, a script, or a dashboard. The guidance, the two
+          scores behind it, and the pause and restart lines come through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. All of it is free, and the API needs no key.
         </p>
 
         <section className="space-y-4">
@@ -539,7 +539,7 @@ export default function ApiDocsPage() {
         </section>
 
         <p className="text-fluid-nano text-slate-400">
-          All endpoints listed here are free and need no key or account. Data is provided for
+          Every endpoint is free and needs no key or account. Data is provided for
           informational purposes.
         </p>
       </article>
