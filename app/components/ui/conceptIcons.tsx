@@ -61,7 +61,31 @@ export function ConditionIcon({ regime, size = "inline", className, ...props }: 
   );
 }
 
-/** The weather glyph and the weather word together; the word defaults to the condition's label. */
+/**
+ * The weather word as text, in its condition's ink (DESIGN.md: "As text, the
+ * condition word prints in its ink"). The one way a list, table or legend names
+ * a condition: until 2026-11-10 about three hundred words on /history, /signals
+ * and the compare page printed in the plain ink around them, so a column of 178
+ * months read as one grey and the record's stretches showed only in the band.
+ * The word already carries the meaning, so colour is never the only cue.
+ */
+export function ConditionWord({
+  regime,
+  children,
+  className,
+}: {
+  regime: RegimeKey;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span data-regime={regime} data-condition-word="" className={cn("text-[color:var(--regime-ink)]", className)}>
+      {children ?? REGIME_LABELS[regime]}
+    </span>
+  );
+}
+
+/** The weather glyph and the weather word together, both in the condition's ink; the word defaults to the condition's label. */
 export function ConditionLabel({
   regime,
   children,
@@ -76,7 +100,7 @@ export function ConditionLabel({
   return (
     <span className={cn("inline-flex items-center gap-1.5 align-middle", className)}>
       <ConditionIcon regime={regime} size={size} />
-      <span>{children ?? REGIME_LABELS[regime]}</span>
+      <ConditionWord regime={regime}>{children}</ConditionWord>
     </span>
   );
 }

@@ -31,7 +31,8 @@ import {
   ZOOM_ORDER,
   type ZoomPreset,
 } from "../../lib/timeMachine/timelineWindow";
-import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
+import { ConditionWord } from "./ui/conceptIcons";
 import { formatMonthShortUtc } from "../../lib/formatters";
 import { REGIME_COLORS } from "../viewModel";
 import { SignalReading } from "./ui/plainLanguage";
@@ -520,7 +521,10 @@ export function TimelineBar({
             <span className="font-semibold text-slate-100 tabular-nums">
               {selected.period}
             </span>
-            <span className="text-slate-400 font-normal">· {selected.regime}</span>
+            <span className="text-slate-400 font-normal">
+              ·{" "}
+              {selected.entry ? <ConditionWord regime={selected.entry.regime}>{selected.regime}</ConditionWord> : selected.regime}
+            </span>
             {isLive ? (
               <span
                 className="ml-1 rounded px-1 py-0.5 bg-emerald-500/20 text-emerald-300 font-mono text-fluid-nano uppercase tracking-wider"
@@ -775,7 +779,7 @@ export function TimelineBar({
               className="size-2 shrink-0 rounded-full"
               style={{ backgroundColor: hex, opacity: IDLE_SEGMENT_OPACITY }}
             />
-            {getRegimePublicLabel(regime)}
+            {isRegimeKey(regime) ? <ConditionWord regime={regime}>{getRegimePublicLabel(regime)}</ConditionWord> : getRegimePublicLabel(regime)}
           </li>
         ))}
       </ul>

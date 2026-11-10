@@ -15,6 +15,7 @@ import {
 import type { RegimeKey } from "../../../lib/types";
 import Link from "next/link";
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
+import { ConditionWord } from "../ui/conceptIcons";
 
 /**
  * The regime plane. Both scores on one pair of axes, with the classifier's two
@@ -453,7 +454,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                         className="size-2.5 shrink-0 self-center rounded-full"
                         style={{ background: REGIME_HEX_COLORS[current.regime] }}
                       />
-                      {current.regimeLabel}
+                      <ConditionWord regime={current.regime}>{current.regimeLabel}</ConditionWord>
                     </span>
                   }
                   unit={current.monthLabel}
@@ -510,7 +511,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               <ul className="mt-2 space-y-1.5">
                 {model.occupancy.map((row) => (
                   <li key={row.regime} className="grid grid-cols-[4.5rem_1fr_2.5rem] items-center gap-2 text-fluid-nano">
-                    <span className="truncate text-slate-300">{row.regimeLabel}</span>
+                    <ConditionWord regime={row.regime} className="truncate">{row.regimeLabel}</ConditionWord>
                     {/* `block`, not the default inline: an inline box ignores the
                         height and the child's percentage width resolves against a
                         shrink-to-fit line box, so every bar rendered full-length.
@@ -562,7 +563,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                   <tr key={point.recordDate} className="border-t border-[color:var(--border-faint)]">
                     <th scope="row" className="px-2.5 py-1 font-normal text-slate-400">{point.monthLabel}</th>
                     <td className="px-2.5 py-1">
-                      {point.regimeLabel}
+                      <ConditionWord regime={point.regime}>{point.regimeLabel}</ConditionWord>
                       {point.changed ? <span className="ml-1.5 text-slate-100">changed</span> : null}
                     </td>
                     <td className="px-2.5 py-1 text-right">

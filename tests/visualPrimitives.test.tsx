@@ -564,9 +564,11 @@ describe("MonthStrip", () => {
     const visible = html.replace(/<p class="sr-only">[\s\S]*?<\/p>/, "").replace(/<[^>]+>/g, " ");
     assert.doesNotMatch(visible, /change in conditions|held 3 months/, "no visible restatement of the tiles or the stamp");
     assert.doesNotMatch(visible, /EXPANSION|DEFENSIVE/, "the strip must not print engine keys (the data-regime attribute is how it gets its colour)");
-    /* Five month segments, one glyph per condition in the key, and one per run
-       long enough to carry it (both runs here), so the band reads in greyscale. */
-    assert.equal((html.match(/data-regime=/g) ?? []).length, 5 + 2 + 2);
+    /* Five month segments, one glyph per condition in the key, one per run
+       long enough to carry it (both runs here), so the band reads in greyscale,
+       and the key's word in its condition's ink (ConditionWord, 2026-11-10). */
+    assert.equal((html.match(/data-regime=/g) ?? []).length, 5 + 2 + 2 + 2);
+    assert.equal((html.match(/data-condition-word/g) ?? []).length, 2, "each key word prints in its condition's ink");
     assert.equal((html.match(/data-strip-run-glyph/g) ?? []).length, 2);
     assert.match(html, /lucide-sun[\s\S]*lucide-cloud/, "each run draws its own condition's glyph");
     assert.match(visible, /Sunny\s+2 months/, "the legend names each colour and its months");

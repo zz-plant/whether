@@ -2,7 +2,8 @@ import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachin
 import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
 import { countRecord } from "../../../lib/report/trackRecord";
 import { describeTrackRecordRescore } from "../../../lib/report/trackRecordCopy";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { getRegimePublicLabel, isRegimeKey } from "../../../lib/regimePresentation";
+import { ConditionWord } from "../ui/conceptIcons";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { Fact, FactList } from "../ui/factList";
 import { buildMonthBriefHref } from "../../../lib/timeMachine/monthFormatting";
@@ -32,7 +33,8 @@ export function TrackRecordSection({
   const windowLabel = counts
     ? `${formatMonthYearShortFromValue(counts.firstRecordDate)} to ${formatMonthYearShortFromValue(counts.latestRecordDate)}`
     : null;
-  const label = (regime: string) => getRegimePublicLabel(regime);
+  const label = (regime: string) =>
+    isRegimeKey(regime) ? <ConditionWord regime={regime}>{getRegimePublicLabel(regime)}</ConditionWord> : getRegimePublicLabel(regime);
   const recentTransitions = [...record.transitions].reverse().slice(0, 8);
   const currentSpell = record.spells[record.spells.length - 1];
   // Shock flags come from the replay walk itself: a flip that jumped its line

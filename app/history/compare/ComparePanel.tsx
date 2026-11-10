@@ -1,4 +1,5 @@
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { ConditionWord } from "../../components/ui/conceptIcons";
 import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
@@ -22,6 +23,19 @@ import {
   type CompareDataResult,
   type CompareSearchParams,
 } from "../../../lib/report/compareDataLoader";
+
+/** One score's move from Period B to Period A, in ink: the signed points and
+ *  the side it moved to. Nothing when the score did not move. */
+const ScoreMoveChip = ({ label, delta, higherIsEasier }: { label: string; delta: number; higherIsEasier: boolean }) => {
+  if (delta === 0) return null;
+  const easier = delta > 0 === higherIsEasier;
+  return (
+    <li className="rounded-sm border border-[color:var(--border-default)] px-2 py-0.5 text-slate-200">
+      {label} <span className="font-semibold tabular-nums text-slate-100">{delta > 0 ? "+" : "\u2212"}{Math.abs(delta)} pts</span>
+      <span className="text-slate-400">, {easier ? "easier" : "harder"}</span>
+    </li>
+  );
+};
 
 export async function ComparePanel({
   searchParams,
@@ -79,13 +93,15 @@ export async function ComparePanel({
         {selectorBlock}
         <div
           role="alert"
-          className="weather-panel space-y-2 border border-amber-600/40 bg-amber-950/20 p-6 text-slate-200"
+          className="weather-caveat-band space-y-2 p-6"
         >
           {/* A written sentence, not `result.error`: that is the text of whatever the
               loader threw, and it printed as the explanation. No eyebrow either; it
               said "Comparison unavailable" over a heading that said so again. */}
-          <h2 className="type-section text-slate-100">These two periods did not load</h2>
-          <p className="text-sm text-slate-300">
+          {/* The caveat's ink and diamond (2026-11-10): a load failure is a reading
+              to treat with care, not a crossed line, so it does not take the red. */}
+          <h2 className="type-section weather-caveat-mark">These two periods did not load</h2>
+          <p className="text-sm">
             Choose another month above, or reload the page to try the same two again.
           </p>
         </div>
@@ -196,25 +212,23 @@ export async function ComparePanel({
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="font-semibold text-slate-300">Conditions:</span>
             <span className="rounded border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-100">
-              {getRegimePublicLabel(reportA.assessment.regime)} (Period A)
+              <ConditionWord regime={reportA.assessment.regime}>{getRegimePublicLabel(reportA.assessment.regime)}</ConditionWord> (Period A)
             </span>
             <span className="text-slate-500">vs</span>
             <span className="rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-300">
-              {getRegimePublicLabel(reportB.assessment.regime)} (Period B)
+              <ConditionWord regime={reportB.assessment.regime}>{getRegimePublicLabel(reportB.assessment.regime)}</ConditionWord> (Period B)
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-fluid-nano font-mono">
-            {reportA.assessment.scores.tightness !== reportB.assessment.scores.tightness ? (
-              <span className={`rounded border px-2 py-0.5 ${reportA.assessment.scores.tightness > reportB.assessment.scores.tightness ? "border-amber-700/40 bg-amber-950/30 text-amber-300" : "border-emerald-700/40 bg-emerald-950/30 text-emerald-300"}`}>
-                Funding pressure: {reportA.assessment.scores.tightness - reportB.assessment.scores.tightness > 0 ? "+" : ""}{reportA.assessment.scores.tightness - reportB.assessment.scores.tightness} pts
-              </span>
-            ) : null}
-            {reportA.assessment.scores.riskAppetite !== reportB.assessment.scores.riskAppetite ? (
-              <span className={`rounded border px-2 py-0.5 ${reportA.assessment.scores.riskAppetite > reportB.assessment.scores.riskAppetite ? "border-emerald-700/40 bg-emerald-950/30 text-emerald-300" : "border-amber-700/40 bg-amber-950/30 text-amber-300"}`}>
-                Risk appetite: {reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite > 0 ? "+" : ""}{reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite} pts
-              </span>
-            ) : null}
-          </div>
+          {/* Each move in ink, with the side it moved to as a word (2026-11-10). They
+              were red for worse and green for better, a third and fourth meaning for
+              colour, which says a condition or a crossed line and nothing else. */}
+          {reportA.assessment.scores.tightness !== reportB.assessment.scores.tightness ||
+          reportA.assessment.scores.riskAppetite !== reportB.assessment.scores.riskAppetite ? (
+          <ul className="flex flex-wrap items-center gap-2 text-fluid-nano" aria-label="Score moves from Period B to Period A">
+            <ScoreMoveChip label="Funding pressure" delta={reportA.assessment.scores.tightness - reportB.assessment.scores.tightness} higherIsEasier={false} />
+            <ScoreMoveChip label="Risk appetite" delta={reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite} higherIsEasier />
+          </ul>
+          ) : null}
         </div>
 
         {/* Leading with rules that changed between the two named dates */}
@@ -272,12 +286,12 @@ export async function ComparePanel({
       <div className="sticky top-0 z-10 -mx-2 flex items-center justify-between gap-3 border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)]/95 px-2 py-2 text-xs backdrop-blur md:hidden">
         <span className="min-w-0 truncate">
           <span className="font-semibold text-slate-100">A</span>{" "}
-          {getRegimePublicLabel(reportA.assessment.regime)}
+          <ConditionWord regime={reportA.assessment.regime}>{getRegimePublicLabel(reportA.assessment.regime)}</ConditionWord>
           <span className="text-slate-400"> · {reportA.recordDateLabel}</span>
         </span>
         <span className="min-w-0 truncate text-right">
           <span className="font-semibold text-slate-100">B</span>{" "}
-          {getRegimePublicLabel(reportB.assessment.regime)}
+          <ConditionWord regime={reportB.assessment.regime}>{getRegimePublicLabel(reportB.assessment.regime)}</ConditionWord>
           <span className="text-slate-400"> · {reportB.recordDateLabel}</span>
         </span>
       </div>

@@ -23,7 +23,7 @@ import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
 import { formatDateUTC } from "../../lib/formatters";
 import { regimeKeyFromLabel, toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import { ConditionIcon } from "../components/ui/conceptIcons";
+import { ConditionIcon, ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
 import { ComparePanel } from "../history/compare/ComparePanel";
@@ -162,6 +162,9 @@ export default async function HistoryPage({
              calling something else. */
           statusLabel: trackRecord ? trackRecord.currentRegimeLabel : "Historical",
           statusPrefix: trackRecord ? "Latest archived month" : undefined,
+          /* The word alone takes the archive's condition ink (2026-11-10); the
+             page accent stays neutral, for the reason below. */
+          statusRegime: trackRecord?.currentRegime,
           /* Deliberately no regime. This field is only the page accent — the hue
              the whole chrome, every section rule and the mobile outline draw in
              — and it is the site saying "this is the weather". Fed the month-end
@@ -201,7 +204,7 @@ export default async function HistoryPage({
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
               Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
-              <span className="font-semibold text-white">{publishedBriefDisplay(weekAfterRecord).conditions}</span>.{" "}
+              <ConditionWord regime={weekAfterRecord.regime} className="font-semibold">{publishedBriefDisplay(weekAfterRecord).conditions}</ConditionWord>.{" "}
               {/* Inline with vertical padding, not the 44px inline-flex box: on a
                   phone the box wrapped onto its own line and opened the paragraph
                   to twice its leading. */}
@@ -229,7 +232,7 @@ export default async function HistoryPage({
                       {year.title}
                       <span className="inline-flex items-center gap-1 text-slate-400">
                         {yearRegime ? <ConditionIcon regime={yearRegime} /> : null}
-                        {toWeatherLabel(year.operatorLabel)}
+                        {yearRegime ? <ConditionWord regime={yearRegime}>{toWeatherLabel(year.operatorLabel)}</ConditionWord> : toWeatherLabel(year.operatorLabel)}
                       </span>
                     </Link>
                   </li>
@@ -278,8 +281,8 @@ export default async function HistoryPage({
           {recordDifferences.map((difference) => (
             <p key={`${difference.published}-${difference.recorded}`} className="weather-caveat-mark max-w-[60ch] text-sm leading-relaxed text-caveat-fg" data-record-difference>
               {difference.briefs} {difference.briefs === 1 ? "brief" : "briefs"} published in {formatMonthList(difference.months)} read{" "}
-              {getRegimePublicLabel(difference.published)}. Scored today, {difference.months.length === 1 ? "that month-end reads" : "those month-ends read"}{" "}
-              {getRegimePublicLabel(difference.recorded)}. The {difference.briefs === 1 ? "brief stays" : "briefs stay"} as written.
+              <ConditionWord regime={difference.published}>{getRegimePublicLabel(difference.published)}</ConditionWord>. Scored today, {difference.months.length === 1 ? "that month-end reads" : "those month-ends read"}{" "}
+              <ConditionWord regime={difference.recorded}>{getRegimePublicLabel(difference.recorded)}</ConditionWord>. The {difference.briefs === 1 ? "brief stays" : "briefs stay"} as written.
             </p>
           ))}
           {/* A link card, not a pill coerced into one: the `pill` variant is a

@@ -10,6 +10,7 @@ import { OPERATING_LATITUDE_RISK_WEIGHT } from "../../../lib/report/weeklyLeader
 import { CALL_CHANGE_RULE, describeLatitudeAgainstConditions } from "../../../lib/report/trackRecordCopy";
 import { Fact, FactList } from "../ui/factList";
 import { UrlDetails } from "../ui/urlDetails";
+import { ConditionWord } from "../ui/conceptIcons";
 
 /**
  * The record of what this product has called, framed as evidence rather than as
@@ -90,9 +91,9 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
                 "changed" badge ran past the conditions cell and into the
                 latitude column at 320px. */}
             <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-              <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
+              <ConditionWord regime={row.regime} className={row.changed ? "font-semibold" : undefined}>
                 {row.regimeLabel}
-              </span>
+              </ConditionWord>
               {row.changed ? (
                 <span className="type-badge text-fluid-nano rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
                   changed
