@@ -383,7 +383,7 @@
       "latestDate": "2012-01-31",
       "latestValue": 0.04
     },
-    "chicagoFci": -0.278,
+    "chicagoFci": -0.277,
     "chicagoFciHistory": [
       {
         "date": "2011-12-02",
@@ -415,12 +415,12 @@
       },
       {
         "date": "2012-01-20",
-        "value": -0.278
+        "value": -0.277
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -813,7 +813,7 @@
       "latestDate": "2012-02-29",
       "latestValue": 0.08
     },
-    "chicagoFci": -0.404,
+    "chicagoFci": -0.403,
     "chicagoFciHistory": [
       {
         "date": "2011-12-30",
@@ -829,7 +829,7 @@
       },
       {
         "date": "2012-01-20",
-        "value": -0.278
+        "value": -0.277
       },
       {
         "date": "2012-01-27",
@@ -837,24 +837,24 @@
       },
       {
         "date": "2012-02-03",
-        "value": -0.352
+        "value": -0.351
       },
       {
         "date": "2012-02-10",
-        "value": -0.376
+        "value": -0.375
       },
       {
         "date": "2012-02-17",
-        "value": -0.392
+        "value": -0.391
       },
       {
         "date": "2012-02-24",
-        "value": -0.404
+        "value": -0.403
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-02-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -1259,31 +1259,31 @@
       },
       {
         "date": "2012-02-03",
-        "value": -0.352
+        "value": -0.351
       },
       {
         "date": "2012-02-10",
-        "value": -0.376
+        "value": -0.375
       },
       {
         "date": "2012-02-17",
-        "value": -0.392
+        "value": -0.391
       },
       {
         "date": "2012-02-24",
-        "value": -0.404
+        "value": -0.403
       },
       {
         "date": "2012-03-02",
-        "value": -0.415
+        "value": -0.414
       },
       {
         "date": "2012-03-09",
-        "value": -0.423
+        "value": -0.422
       },
       {
         "date": "2012-03-16",
-        "value": -0.43
+        "value": -0.429
       },
       {
         "date": "2012-03-23",
@@ -1292,7 +1292,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-03-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -1689,15 +1689,15 @@
     "chicagoFciHistory": [
       {
         "date": "2012-03-02",
-        "value": -0.415
+        "value": -0.414
       },
       {
         "date": "2012-03-09",
-        "value": -0.423
+        "value": -0.422
       },
       {
         "date": "2012-03-16",
-        "value": -0.43
+        "value": -0.429
       },
       {
         "date": "2012-03-23",
@@ -1709,7 +1709,7 @@
       },
       {
         "date": "2012-04-06",
-        "value": -0.424
+        "value": -0.423
       },
       {
         "date": "2012-04-13",
@@ -1722,7 +1722,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -2127,7 +2127,7 @@
       },
       {
         "date": "2012-04-06",
-        "value": -0.424
+        "value": -0.423
       },
       {
         "date": "2012-04-13",
@@ -2160,7 +2160,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -3015,7 +3015,7 @@
       },
       {
         "date": "2012-07-06",
-        "value": -0.296
+        "value": -0.295
       },
       {
         "date": "2012-07-13",
@@ -3028,7 +3028,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -3437,7 +3437,7 @@
       },
       {
         "date": "2012-07-06",
-        "value": -0.296
+        "value": -0.295
       },
       {
         "date": "2012-07-13",
@@ -3449,7 +3449,7 @@
       },
       {
         "date": "2012-07-27",
-        "value": -0.365
+        "value": -0.364
       },
       {
         "date": "2012-08-03",
@@ -3470,7 +3470,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.09,
@@ -3867,7 +3867,7 @@
     "chicagoFciHistory": [
       {
         "date": "2012-07-27",
-        "value": -0.365
+        "value": -0.364
       },
       {
         "date": "2012-08-03",
@@ -3904,7 +3904,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-09-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.06,
@@ -4297,7 +4297,7 @@
       "latestDate": "2012-10-31",
       "latestValue": 0.09
     },
-    "chicagoFci": -0.548,
+    "chicagoFci": -0.547,
     "chicagoFciHistory": [
       {
         "date": "2012-08-31",
@@ -4317,28 +4317,28 @@
       },
       {
         "date": "2012-09-28",
-        "value": -0.526
+        "value": -0.525
       },
       {
         "date": "2012-10-05",
-        "value": -0.537
+        "value": -0.536
       },
       {
         "date": "2012-10-12",
-        "value": -0.544
+        "value": -0.543
       },
       {
         "date": "2012-10-19",
-        "value": -0.548
+        "value": -0.547
       },
       {
         "date": "2012-10-26",
-        "value": -0.548
+        "value": -0.547
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.09,
@@ -4743,23 +4743,23 @@
     "chicagoFciHistory": [
       {
         "date": "2012-09-28",
-        "value": -0.526
+        "value": -0.525
       },
       {
         "date": "2012-10-05",
-        "value": -0.537
+        "value": -0.536
       },
       {
         "date": "2012-10-12",
-        "value": -0.544
+        "value": -0.543
       },
       {
         "date": "2012-10-19",
-        "value": -0.548
+        "value": -0.547
       },
       {
         "date": "2012-10-26",
-        "value": -0.548
+        "value": -0.547
       },
       {
         "date": "2012-11-02",
@@ -4780,7 +4780,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2012-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.11,
@@ -5627,7 +5627,7 @@
       },
       {
         "date": "2012-12-28",
-        "value": -0.598
+        "value": -0.597
       },
       {
         "date": "2013-01-04",
@@ -5635,7 +5635,7 @@
       },
       {
         "date": "2013-01-11",
-        "value": -0.625
+        "value": -0.624
       },
       {
         "date": "2013-01-18",
@@ -5648,7 +5648,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -6049,7 +6049,7 @@
     "chicagoFciHistory": [
       {
         "date": "2012-12-28",
-        "value": -0.598
+        "value": -0.597
       },
       {
         "date": "2013-01-04",
@@ -6057,7 +6057,7 @@
       },
       {
         "date": "2013-01-11",
-        "value": -0.625
+        "value": -0.624
       },
       {
         "date": "2013-01-18",
@@ -6086,7 +6086,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -6941,7 +6941,7 @@
       },
       {
         "date": "2013-04-12",
-        "value": -0.679
+        "value": -0.678
       },
       {
         "date": "2013-04-19",
@@ -6950,7 +6950,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -7363,7 +7363,7 @@
       },
       {
         "date": "2013-04-12",
-        "value": -0.679
+        "value": -0.678
       },
       {
         "date": "2013-04-19",
@@ -7392,7 +7392,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -7817,7 +7817,7 @@
       },
       {
         "date": "2013-06-14",
-        "value": -0.65
+        "value": -0.649
       },
       {
         "date": "2013-06-21",
@@ -7826,7 +7826,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-06-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -8231,7 +8231,7 @@
       },
       {
         "date": "2013-06-14",
-        "value": -0.65
+        "value": -0.649
       },
       {
         "date": "2013-06-21",
@@ -8260,7 +8260,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -8681,11 +8681,11 @@
       },
       {
         "date": "2013-08-02",
-        "value": -0.666
+        "value": -0.665
       },
       {
         "date": "2013-08-09",
-        "value": -0.67
+        "value": -0.669
       },
       {
         "date": "2013-08-16",
@@ -8698,7 +8698,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-08-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -9091,15 +9091,15 @@
       "latestDate": "2013-09-30",
       "latestValue": 0.03
     },
-    "chicagoFci": -0.667,
+    "chicagoFci": -0.666,
     "chicagoFciHistory": [
       {
         "date": "2013-08-02",
-        "value": -0.666
+        "value": -0.665
       },
       {
         "date": "2013-08-09",
-        "value": -0.67
+        "value": -0.669
       },
       {
         "date": "2013-08-16",
@@ -9123,12 +9123,12 @@
       },
       {
         "date": "2013-09-20",
-        "value": -0.667
+        "value": -0.666
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -9525,7 +9525,7 @@
       "latestDate": "2013-10-31",
       "latestValue": 0.03
     },
-    "chicagoFci": -0.723,
+    "chicagoFci": -0.722,
     "chicagoFciHistory": [
       {
         "date": "2013-08-30",
@@ -9541,11 +9541,11 @@
       },
       {
         "date": "2013-09-20",
-        "value": -0.667
+        "value": -0.666
       },
       {
         "date": "2013-09-27",
-        "value": -0.674
+        "value": -0.673
       },
       {
         "date": "2013-10-04",
@@ -9561,12 +9561,12 @@
       },
       {
         "date": "2013-10-25",
-        "value": -0.723
+        "value": -0.722
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -9967,7 +9967,7 @@
     "chicagoFciHistory": [
       {
         "date": "2013-09-27",
-        "value": -0.674
+        "value": -0.673
       },
       {
         "date": "2013-10-04",
@@ -9983,11 +9983,11 @@
       },
       {
         "date": "2013-10-25",
-        "value": -0.723
+        "value": -0.722
       },
       {
         "date": "2013-11-01",
-        "value": -0.735
+        "value": -0.734
       },
       {
         "date": "2013-11-08",
@@ -10004,7 +10004,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-11-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -10397,11 +10397,11 @@
       "latestDate": "2013-12-31",
       "latestValue": 0.01
     },
-    "chicagoFci": -0.775,
+    "chicagoFci": -0.774,
     "chicagoFciHistory": [
       {
         "date": "2013-11-01",
-        "value": -0.735
+        "value": -0.734
       },
       {
         "date": "2013-11-08",
@@ -10417,7 +10417,7 @@
       },
       {
         "date": "2013-11-29",
-        "value": -0.767
+        "value": -0.766
       },
       {
         "date": "2013-12-06",
@@ -10429,12 +10429,12 @@
       },
       {
         "date": "2013-12-20",
-        "value": -0.775
+        "value": -0.774
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2013-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -10839,7 +10839,7 @@
     "chicagoFciHistory": [
       {
         "date": "2013-11-29",
-        "value": -0.767
+        "value": -0.766
       },
       {
         "date": "2013-12-06",
@@ -10851,7 +10851,7 @@
       },
       {
         "date": "2013-12-20",
-        "value": -0.775
+        "value": -0.774
       },
       {
         "date": "2013-12-27",
@@ -10863,11 +10863,11 @@
       },
       {
         "date": "2014-01-10",
-        "value": -0.771
+        "value": -0.77
       },
       {
         "date": "2014-01-17",
-        "value": -0.767
+        "value": -0.766
       },
       {
         "date": "2014-01-24",
@@ -10876,7 +10876,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -11277,7 +11277,7 @@
       "latestDate": "2014-02-28",
       "latestValue": 0.04
     },
-    "chicagoFci": -0.77,
+    "chicagoFci": -0.769,
     "chicagoFciHistory": [
       {
         "date": "2013-12-27",
@@ -11289,11 +11289,11 @@
       },
       {
         "date": "2014-01-10",
-        "value": -0.771
+        "value": -0.77
       },
       {
         "date": "2014-01-17",
-        "value": -0.767
+        "value": -0.766
       },
       {
         "date": "2014-01-24",
@@ -11301,11 +11301,11 @@
       },
       {
         "date": "2014-01-31",
-        "value": -0.761
+        "value": -0.76
       },
       {
         "date": "2014-02-07",
-        "value": -0.762
+        "value": -0.761
       },
       {
         "date": "2014-02-14",
@@ -11313,12 +11313,12 @@
       },
       {
         "date": "2014-02-21",
-        "value": -0.77
+        "value": -0.769
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -11715,11 +11715,11 @@
     "chicagoFciHistory": [
       {
         "date": "2014-01-31",
-        "value": -0.761
+        "value": -0.76
       },
       {
         "date": "2014-02-07",
-        "value": -0.762
+        "value": -0.761
       },
       {
         "date": "2014-02-14",
@@ -11727,7 +11727,7 @@
       },
       {
         "date": "2014-02-21",
-        "value": -0.77
+        "value": -0.769
       },
       {
         "date": "2014-02-28",
@@ -11735,7 +11735,7 @@
       },
       {
         "date": "2014-03-07",
-        "value": -0.777
+        "value": -0.776
       },
       {
         "date": "2014-03-14",
@@ -11748,7 +11748,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -12149,7 +12149,7 @@
       },
       {
         "date": "2014-03-07",
-        "value": -0.777
+        "value": -0.776
       },
       {
         "date": "2014-03-14",
@@ -12169,7 +12169,7 @@
       },
       {
         "date": "2014-04-11",
-        "value": -0.769
+        "value": -0.768
       },
       {
         "date": "2014-04-18",
@@ -12182,7 +12182,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -12591,7 +12591,7 @@
       },
       {
         "date": "2014-04-11",
-        "value": -0.769
+        "value": -0.768
       },
       {
         "date": "2014-04-18",
@@ -12603,11 +12603,11 @@
       },
       {
         "date": "2014-05-02",
-        "value": -0.768
+        "value": -0.767
       },
       {
         "date": "2014-05-09",
-        "value": -0.771
+        "value": -0.77
       },
       {
         "date": "2014-05-16",
@@ -12620,7 +12620,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-05-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -13013,15 +13013,15 @@
       "latestDate": "2014-06-30",
       "latestValue": 0.02
     },
-    "chicagoFci": -0.787,
+    "chicagoFci": -0.786,
     "chicagoFciHistory": [
       {
         "date": "2014-05-02",
-        "value": -0.768
+        "value": -0.767
       },
       {
         "date": "2014-05-09",
-        "value": -0.771
+        "value": -0.77
       },
       {
         "date": "2014-05-16",
@@ -13033,7 +13033,7 @@
       },
       {
         "date": "2014-05-30",
-        "value": -0.787
+        "value": -0.786
       },
       {
         "date": "2014-06-06",
@@ -13045,12 +13045,12 @@
       },
       {
         "date": "2014-06-20",
-        "value": -0.787
+        "value": -0.786
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -13451,7 +13451,7 @@
     "chicagoFciHistory": [
       {
         "date": "2014-05-30",
-        "value": -0.787
+        "value": -0.786
       },
       {
         "date": "2014-06-06",
@@ -13463,15 +13463,15 @@
       },
       {
         "date": "2014-06-20",
-        "value": -0.787
+        "value": -0.786
       },
       {
         "date": "2014-06-27",
-        "value": -0.78
+        "value": -0.779
       },
       {
         "date": "2014-07-04",
-        "value": -0.77
+        "value": -0.769
       },
       {
         "date": "2014-07-11",
@@ -13479,7 +13479,7 @@
       },
       {
         "date": "2014-07-18",
-        "value": -0.747
+        "value": -0.746
       },
       {
         "date": "2014-07-25",
@@ -13488,7 +13488,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -13885,11 +13885,11 @@
     "chicagoFciHistory": [
       {
         "date": "2014-06-27",
-        "value": -0.78
+        "value": -0.779
       },
       {
         "date": "2014-07-04",
-        "value": -0.77
+        "value": -0.769
       },
       {
         "date": "2014-07-11",
@@ -13897,7 +13897,7 @@
       },
       {
         "date": "2014-07-18",
-        "value": -0.747
+        "value": -0.746
       },
       {
         "date": "2014-07-25",
@@ -13922,7 +13922,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-08-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -14343,7 +14343,7 @@
       },
       {
         "date": "2014-09-12",
-        "value": -0.703
+        "value": -0.702
       },
       {
         "date": "2014-09-19",
@@ -14352,7 +14352,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -14765,7 +14765,7 @@
       },
       {
         "date": "2014-09-12",
-        "value": -0.703
+        "value": -0.702
       },
       {
         "date": "2014-09-19",
@@ -14794,7 +14794,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -15187,7 +15187,7 @@
       "latestDate": "2014-11-28",
       "latestValue": 0.04
     },
-    "chicagoFci": -0.654,
+    "chicagoFci": -0.653,
     "chicagoFciHistory": [
       {
         "date": "2014-09-26",
@@ -15223,12 +15223,12 @@
       },
       {
         "date": "2014-11-21",
-        "value": -0.654
+        "value": -0.653
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-11-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -15637,7 +15637,7 @@
       },
       {
         "date": "2014-11-21",
-        "value": -0.654
+        "value": -0.653
       },
       {
         "date": "2014-11-28",
@@ -15645,7 +15645,7 @@
       },
       {
         "date": "2014-12-05",
-        "value": -0.635
+        "value": -0.634
       },
       {
         "date": "2014-12-12",
@@ -15653,7 +15653,7 @@
       },
       {
         "date": "2014-12-19",
-        "value": -0.593
+        "value": -0.592
       },
       {
         "date": "2014-12-26",
@@ -15662,7 +15662,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2014-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -16067,7 +16067,7 @@
       },
       {
         "date": "2014-12-05",
-        "value": -0.635
+        "value": -0.634
       },
       {
         "date": "2014-12-12",
@@ -16075,7 +16075,7 @@
       },
       {
         "date": "2014-12-19",
-        "value": -0.593
+        "value": -0.592
       },
       {
         "date": "2014-12-26",
@@ -16083,7 +16083,7 @@
       },
       {
         "date": "2015-01-02",
-        "value": -0.549
+        "value": -0.548
       },
       {
         "date": "2015-01-09",
@@ -16091,7 +16091,7 @@
       },
       {
         "date": "2015-01-16",
-        "value": -0.516
+        "value": -0.515
       },
       {
         "date": "2015-01-23",
@@ -16100,7 +16100,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-01-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -16505,7 +16505,7 @@
       },
       {
         "date": "2015-01-02",
-        "value": -0.549
+        "value": -0.548
       },
       {
         "date": "2015-01-09",
@@ -16513,7 +16513,7 @@
       },
       {
         "date": "2015-01-16",
-        "value": -0.516
+        "value": -0.515
       },
       {
         "date": "2015-01-23",
@@ -16521,7 +16521,7 @@
       },
       {
         "date": "2015-01-30",
-        "value": -0.504
+        "value": -0.503
       },
       {
         "date": "2015-02-06",
@@ -16538,7 +16538,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-02-27",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -16935,7 +16935,7 @@
     "chicagoFciHistory": [
       {
         "date": "2015-01-30",
-        "value": -0.504
+        "value": -0.503
       },
       {
         "date": "2015-02-06",
@@ -16951,7 +16951,7 @@
       },
       {
         "date": "2015-02-27",
-        "value": -0.523
+        "value": -0.522
       },
       {
         "date": "2015-03-06",
@@ -16959,7 +16959,7 @@
       },
       {
         "date": "2015-03-13",
-        "value": -0.532
+        "value": -0.531
       },
       {
         "date": "2015-03-20",
@@ -16968,7 +16968,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -17369,7 +17369,7 @@
     "chicagoFciHistory": [
       {
         "date": "2015-02-27",
-        "value": -0.523
+        "value": -0.522
       },
       {
         "date": "2015-03-06",
@@ -17377,7 +17377,7 @@
       },
       {
         "date": "2015-03-13",
-        "value": -0.532
+        "value": -0.531
       },
       {
         "date": "2015-03-20",
@@ -17385,7 +17385,7 @@
       },
       {
         "date": "2015-03-27",
-        "value": -0.537
+        "value": -0.536
       },
       {
         "date": "2015-04-03",
@@ -17406,7 +17406,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -17799,11 +17799,11 @@
       "latestDate": "2015-05-29",
       "latestValue": 0.01
     },
-    "chicagoFci": -0.545,
+    "chicagoFci": -0.544,
     "chicagoFciHistory": [
       {
         "date": "2015-03-27",
-        "value": -0.537
+        "value": -0.536
       },
       {
         "date": "2015-04-03",
@@ -17827,7 +17827,7 @@
       },
       {
         "date": "2015-05-08",
-        "value": -0.544
+        "value": -0.543
       },
       {
         "date": "2015-05-15",
@@ -17835,12 +17835,12 @@
       },
       {
         "date": "2015-05-22",
-        "value": -0.545
+        "value": -0.544
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-05-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -18241,7 +18241,7 @@
       },
       {
         "date": "2015-05-08",
-        "value": -0.544
+        "value": -0.543
       },
       {
         "date": "2015-05-15",
@@ -18249,7 +18249,7 @@
       },
       {
         "date": "2015-05-22",
-        "value": -0.545
+        "value": -0.544
       },
       {
         "date": "2015-05-29",
@@ -18257,11 +18257,11 @@
       },
       {
         "date": "2015-06-05",
-        "value": -0.544
+        "value": -0.543
       },
       {
         "date": "2015-06-12",
-        "value": -0.543
+        "value": -0.542
       },
       {
         "date": "2015-06-19",
@@ -18270,7 +18270,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.02,
@@ -18679,11 +18679,11 @@
       },
       {
         "date": "2015-06-05",
-        "value": -0.544
+        "value": -0.543
       },
       {
         "date": "2015-06-12",
-        "value": -0.543
+        "value": -0.542
       },
       {
         "date": "2015-06-19",
@@ -18695,11 +18695,11 @@
       },
       {
         "date": "2015-07-03",
-        "value": -0.533
+        "value": -0.532
       },
       {
         "date": "2015-07-10",
-        "value": -0.528
+        "value": -0.527
       },
       {
         "date": "2015-07-17",
@@ -18712,7 +18712,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -19105,15 +19105,15 @@
       "latestDate": "2015-08-31",
       "latestValue": 0
     },
-    "chicagoFci": -0.436,
+    "chicagoFci": -0.435,
     "chicagoFciHistory": [
       {
         "date": "2015-07-03",
-        "value": -0.533
+        "value": -0.532
       },
       {
         "date": "2015-07-10",
-        "value": -0.528
+        "value": -0.527
       },
       {
         "date": "2015-07-17",
@@ -19125,7 +19125,7 @@
       },
       {
         "date": "2015-07-31",
-        "value": -0.498
+        "value": -0.497
       },
       {
         "date": "2015-08-07",
@@ -19133,16 +19133,16 @@
       },
       {
         "date": "2015-08-14",
-        "value": -0.458
+        "value": -0.457
       },
       {
         "date": "2015-08-21",
-        "value": -0.436
+        "value": -0.435
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -19539,7 +19539,7 @@
     "chicagoFciHistory": [
       {
         "date": "2015-07-31",
-        "value": -0.498
+        "value": -0.497
       },
       {
         "date": "2015-08-07",
@@ -19547,27 +19547,27 @@
       },
       {
         "date": "2015-08-14",
-        "value": -0.458
+        "value": -0.457
       },
       {
         "date": "2015-08-21",
-        "value": -0.436
+        "value": -0.435
       },
       {
         "date": "2015-08-28",
-        "value": -0.416
+        "value": -0.415
       },
       {
         "date": "2015-09-04",
-        "value": -0.403
+        "value": -0.402
       },
       {
         "date": "2015-09-11",
-        "value": -0.397
+        "value": -0.396
       },
       {
         "date": "2015-09-18",
-        "value": -0.397
+        "value": -0.396
       },
       {
         "date": "2015-09-25",
@@ -19576,7 +19576,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0,
@@ -19973,23 +19973,23 @@
       "latestDate": "2015-10-30",
       "latestValue": 0.01
     },
-    "chicagoFci": -0.455,
+    "chicagoFci": -0.454,
     "chicagoFciHistory": [
       {
         "date": "2015-08-28",
-        "value": -0.416
+        "value": -0.415
       },
       {
         "date": "2015-09-04",
-        "value": -0.403
+        "value": -0.402
       },
       {
         "date": "2015-09-11",
-        "value": -0.397
+        "value": -0.396
       },
       {
         "date": "2015-09-18",
-        "value": -0.397
+        "value": -0.396
       },
       {
         "date": "2015-09-25",
@@ -20009,12 +20009,12 @@
       },
       {
         "date": "2015-10-23",
-        "value": -0.455
+        "value": -0.454
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-10-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -20423,7 +20423,7 @@
       },
       {
         "date": "2015-10-23",
-        "value": -0.455
+        "value": -0.454
       },
       {
         "date": "2015-10-30",
@@ -20431,7 +20431,7 @@
       },
       {
         "date": "2015-11-06",
-        "value": -0.468
+        "value": -0.467
       },
       {
         "date": "2015-11-13",
@@ -20444,7 +20444,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.11,
@@ -20849,7 +20849,7 @@
       },
       {
         "date": "2015-11-06",
-        "value": -0.468
+        "value": -0.467
       },
       {
         "date": "2015-11-13",
@@ -20882,7 +20882,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2015-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.14,
@@ -21733,7 +21733,7 @@
       },
       {
         "date": "2016-02-05",
-        "value": -0.294
+        "value": -0.293
       },
       {
         "date": "2016-02-12",
@@ -21746,7 +21746,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-02-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.23,
@@ -22151,7 +22151,7 @@
       },
       {
         "date": "2016-02-05",
-        "value": -0.294
+        "value": -0.293
       },
       {
         "date": "2016-02-12",
@@ -22163,15 +22163,15 @@
       },
       {
         "date": "2016-02-26",
-        "value": -0.315
+        "value": -0.314
       },
       {
         "date": "2016-03-04",
-        "value": -0.33
+        "value": -0.329
       },
       {
         "date": "2016-03-11",
-        "value": -0.345
+        "value": -0.344
       },
       {
         "date": "2016-03-18",
@@ -22184,7 +22184,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.18,
@@ -22585,15 +22585,15 @@
     "chicagoFciHistory": [
       {
         "date": "2016-02-26",
-        "value": -0.315
+        "value": -0.314
       },
       {
         "date": "2016-03-04",
-        "value": -0.33
+        "value": -0.329
       },
       {
         "date": "2016-03-11",
-        "value": -0.345
+        "value": -0.344
       },
       {
         "date": "2016-03-18",
@@ -22609,11 +22609,11 @@
       },
       {
         "date": "2016-04-08",
-        "value": -0.379
+        "value": -0.378
       },
       {
         "date": "2016-04-15",
-        "value": -0.382
+        "value": -0.381
       },
       {
         "date": "2016-04-22",
@@ -22622,7 +22622,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-04-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.16,
@@ -23023,11 +23023,11 @@
       },
       {
         "date": "2016-04-08",
-        "value": -0.379
+        "value": -0.378
       },
       {
         "date": "2016-04-15",
-        "value": -0.382
+        "value": -0.381
       },
       {
         "date": "2016-04-22",
@@ -23039,11 +23039,11 @@
       },
       {
         "date": "2016-05-06",
-        "value": -0.382
+        "value": -0.381
       },
       {
         "date": "2016-05-13",
-        "value": -0.38
+        "value": -0.379
       },
       {
         "date": "2016-05-20",
@@ -23052,7 +23052,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.27,
@@ -23457,11 +23457,11 @@
       },
       {
         "date": "2016-05-06",
-        "value": -0.382
+        "value": -0.381
       },
       {
         "date": "2016-05-13",
-        "value": -0.38
+        "value": -0.379
       },
       {
         "date": "2016-05-20",
@@ -23490,7 +23490,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.2,
@@ -23883,7 +23883,7 @@
       "latestDate": "2016-07-29",
       "latestValue": 0.19
     },
-    "chicagoFci": -0.352,
+    "chicagoFci": -0.351,
     "chicagoFciHistory": [
       {
         "date": "2016-05-27",
@@ -23919,12 +23919,12 @@
       },
       {
         "date": "2016-07-22",
-        "value": -0.352
+        "value": -0.351
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-07-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.19,
@@ -24333,7 +24333,7 @@
       },
       {
         "date": "2016-07-22",
-        "value": -0.352
+        "value": -0.351
       },
       {
         "date": "2016-07-29",
@@ -24345,7 +24345,7 @@
       },
       {
         "date": "2016-08-12",
-        "value": -0.359
+        "value": -0.358
       },
       {
         "date": "2016-08-19",
@@ -24358,7 +24358,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.26,
@@ -24771,7 +24771,7 @@
       },
       {
         "date": "2016-08-12",
-        "value": -0.359
+        "value": -0.358
       },
       {
         "date": "2016-08-19",
@@ -24800,7 +24800,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.2,
@@ -25193,7 +25193,7 @@
       "latestDate": "2016-10-31",
       "latestValue": 0.2
     },
-    "chicagoFci": -0.364,
+    "chicagoFci": -0.363,
     "chicagoFciHistory": [
       {
         "date": "2016-09-02",
@@ -25225,12 +25225,12 @@
       },
       {
         "date": "2016-10-21",
-        "value": -0.364
+        "value": -0.363
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.2,
@@ -25639,7 +25639,7 @@
       },
       {
         "date": "2016-10-21",
-        "value": -0.364
+        "value": -0.363
       },
       {
         "date": "2016-10-28",
@@ -25664,7 +25664,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2016-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.38,
@@ -28701,7 +28701,7 @@
       },
       {
         "date": "2017-06-09",
-        "value": -0.557
+        "value": -0.556
       },
       {
         "date": "2017-06-16",
@@ -28714,7 +28714,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.84,
@@ -29107,7 +29107,7 @@
       "latestDate": "2017-07-31",
       "latestValue": 1
     },
-    "chicagoFci": -0.576,
+    "chicagoFci": -0.575,
     "chicagoFciHistory": [
       {
         "date": "2017-06-02",
@@ -29115,7 +29115,7 @@
       },
       {
         "date": "2017-06-09",
-        "value": -0.557
+        "value": -0.556
       },
       {
         "date": "2017-06-16",
@@ -29131,20 +29131,20 @@
       },
       {
         "date": "2017-07-07",
-        "value": -0.571
+        "value": -0.57
       },
       {
         "date": "2017-07-14",
-        "value": -0.574
+        "value": -0.573
       },
       {
         "date": "2017-07-21",
-        "value": -0.576
+        "value": -0.575
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1,
@@ -29549,15 +29549,15 @@
       },
       {
         "date": "2017-07-07",
-        "value": -0.571
+        "value": -0.57
       },
       {
         "date": "2017-07-14",
-        "value": -0.574
+        "value": -0.573
       },
       {
         "date": "2017-07-21",
-        "value": -0.576
+        "value": -0.575
       },
       {
         "date": "2017-07-28",
@@ -29582,7 +29582,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.95,
@@ -30871,7 +30871,7 @@
       },
       {
         "date": "2017-11-03",
-        "value": -0.598
+        "value": -0.597
       },
       {
         "date": "2017-11-10",
@@ -30888,7 +30888,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.14,
@@ -31289,7 +31289,7 @@
       },
       {
         "date": "2017-11-03",
-        "value": -0.598
+        "value": -0.597
       },
       {
         "date": "2017-11-10",
@@ -31322,7 +31322,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2017-12-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.28,
@@ -31747,7 +31747,7 @@
       },
       {
         "date": "2018-01-19",
-        "value": -0.614
+        "value": -0.613
       },
       {
         "date": "2018-01-26",
@@ -31756,7 +31756,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.43,
@@ -32165,7 +32165,7 @@
       },
       {
         "date": "2018-01-19",
-        "value": -0.614
+        "value": -0.613
       },
       {
         "date": "2018-01-26",
@@ -32190,7 +32190,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.5,
@@ -32611,7 +32611,7 @@
       },
       {
         "date": "2018-03-02",
-        "value": -0.529
+        "value": -0.528
       },
       {
         "date": "2018-03-09",
@@ -32619,7 +32619,7 @@
       },
       {
         "date": "2018-03-16",
-        "value": -0.505
+        "value": -0.504
       },
       {
         "date": "2018-03-23",
@@ -32628,7 +32628,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-03-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.63,
@@ -33025,7 +33025,7 @@
     "chicagoFciHistory": [
       {
         "date": "2018-03-02",
-        "value": -0.529
+        "value": -0.528
       },
       {
         "date": "2018-03-09",
@@ -33033,7 +33033,7 @@
       },
       {
         "date": "2018-03-16",
-        "value": -0.505
+        "value": -0.504
       },
       {
         "date": "2018-03-23",
@@ -33058,7 +33058,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.65,
@@ -36533,7 +36533,7 @@
       },
       {
         "date": "2018-12-07",
-        "value": -0.442
+        "value": -0.441
       },
       {
         "date": "2018-12-14",
@@ -36546,7 +36546,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2018-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.44,
@@ -36943,7 +36943,7 @@
       "latestDate": "2019-01-31",
       "latestValue": 2.42
     },
-    "chicagoFci": -0.506,
+    "chicagoFci": -0.505,
     "chicagoFciHistory": [
       {
         "date": "2018-11-30",
@@ -36951,7 +36951,7 @@
       },
       {
         "date": "2018-12-07",
-        "value": -0.442
+        "value": -0.441
       },
       {
         "date": "2018-12-14",
@@ -36979,12 +36979,12 @@
       },
       {
         "date": "2019-01-25",
-        "value": -0.506
+        "value": -0.505
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.42,
@@ -37401,7 +37401,7 @@
       },
       {
         "date": "2019-01-25",
-        "value": -0.506
+        "value": -0.505
       },
       {
         "date": "2019-02-01",
@@ -37422,7 +37422,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.44,
@@ -37819,7 +37819,7 @@
     "chicagoFciHistory": [
       {
         "date": "2019-01-25",
-        "value": -0.506
+        "value": -0.505
       },
       {
         "date": "2019-02-01",
@@ -37856,7 +37856,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-03-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.43,
@@ -38277,7 +38277,7 @@
       },
       {
         "date": "2019-04-12",
-        "value": -0.612
+        "value": -0.611
       },
       {
         "date": "2019-04-19",
@@ -38286,7 +38286,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.43,
@@ -38699,7 +38699,7 @@
       },
       {
         "date": "2019-04-12",
-        "value": -0.612
+        "value": -0.611
       },
       {
         "date": "2019-04-19",
@@ -38707,11 +38707,11 @@
       },
       {
         "date": "2019-04-26",
-        "value": -0.613
+        "value": -0.612
       },
       {
         "date": "2019-05-03",
-        "value": -0.61
+        "value": -0.609
       },
       {
         "date": "2019-05-10",
@@ -38728,7 +38728,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.35,
@@ -39125,11 +39125,11 @@
     "chicagoFciHistory": [
       {
         "date": "2019-04-26",
-        "value": -0.613
+        "value": -0.612
       },
       {
         "date": "2019-05-03",
-        "value": -0.61
+        "value": -0.609
       },
       {
         "date": "2019-05-10",
@@ -39162,7 +39162,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-06-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.18,
@@ -39579,7 +39579,7 @@
       },
       {
         "date": "2019-07-05",
-        "value": -0.578
+        "value": -0.577
       },
       {
         "date": "2019-07-12",
@@ -39596,7 +39596,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.01,
@@ -39993,7 +39993,7 @@
       "latestDate": "2019-08-30",
       "latestValue": 2.1
     },
-    "chicagoFci": -0.536,
+    "chicagoFci": -0.535,
     "chicagoFciHistory": [
       {
         "date": "2019-06-28",
@@ -40001,7 +40001,7 @@
       },
       {
         "date": "2019-07-05",
-        "value": -0.578
+        "value": -0.577
       },
       {
         "date": "2019-07-12",
@@ -40021,7 +40021,7 @@
       },
       {
         "date": "2019-08-09",
-        "value": -0.558
+        "value": -0.557
       },
       {
         "date": "2019-08-16",
@@ -40029,12 +40029,12 @@
       },
       {
         "date": "2019-08-23",
-        "value": -0.536
+        "value": -0.535
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-08-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.1,
@@ -40435,7 +40435,7 @@
       },
       {
         "date": "2019-08-09",
-        "value": -0.558
+        "value": -0.557
       },
       {
         "date": "2019-08-16",
@@ -40443,7 +40443,7 @@
       },
       {
         "date": "2019-08-23",
-        "value": -0.536
+        "value": -0.535
       },
       {
         "date": "2019-08-30",
@@ -40451,7 +40451,7 @@
       },
       {
         "date": "2019-09-06",
-        "value": -0.519
+        "value": -0.518
       },
       {
         "date": "2019-09-13",
@@ -40464,7 +40464,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.91,
@@ -40869,7 +40869,7 @@
       },
       {
         "date": "2019-09-06",
-        "value": -0.519
+        "value": -0.518
       },
       {
         "date": "2019-09-13",
@@ -40881,7 +40881,7 @@
       },
       {
         "date": "2019-09-27",
-        "value": -0.51
+        "value": -0.509
       },
       {
         "date": "2019-10-04",
@@ -40889,7 +40889,7 @@
       },
       {
         "date": "2019-10-11",
-        "value": -0.523
+        "value": -0.522
       },
       {
         "date": "2019-10-18",
@@ -40902,7 +40902,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.59,
@@ -41303,7 +41303,7 @@
     "chicagoFciHistory": [
       {
         "date": "2019-09-27",
-        "value": -0.51
+        "value": -0.509
       },
       {
         "date": "2019-10-04",
@@ -41311,7 +41311,7 @@
       },
       {
         "date": "2019-10-11",
-        "value": -0.523
+        "value": -0.522
       },
       {
         "date": "2019-10-18",
@@ -41340,7 +41340,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-11-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.62,
@@ -41761,7 +41761,7 @@
       },
       {
         "date": "2019-12-13",
-        "value": -0.552
+        "value": -0.551
       },
       {
         "date": "2019-12-20",
@@ -41770,7 +41770,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2019-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.48,
@@ -42183,7 +42183,7 @@
       },
       {
         "date": "2019-12-13",
-        "value": -0.552
+        "value": -0.551
       },
       {
         "date": "2019-12-20",
@@ -42212,7 +42212,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.56,
@@ -42641,7 +42641,7 @@
       },
       {
         "date": "2020-02-14",
-        "value": -0.533
+        "value": -0.532
       },
       {
         "date": "2020-02-21",
@@ -42650,7 +42650,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.45,
@@ -43043,7 +43043,7 @@
       "latestDate": "2020-03-31",
       "latestValue": 0.05
     },
-    "chicagoFci": 0.175,
+    "chicagoFci": 0.174,
     "chicagoFciHistory": [
       {
         "date": "2020-01-31",
@@ -43055,7 +43055,7 @@
       },
       {
         "date": "2020-02-14",
-        "value": -0.533
+        "value": -0.532
       },
       {
         "date": "2020-02-21",
@@ -43063,11 +43063,11 @@
       },
       {
         "date": "2020-02-28",
-        "value": -0.294
+        "value": -0.293
       },
       {
         "date": "2020-03-06",
-        "value": -0.134
+        "value": -0.133
       },
       {
         "date": "2020-03-13",
@@ -43075,12 +43075,12 @@
       },
       {
         "date": "2020-03-20",
-        "value": 0.175
+        "value": 0.174
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -43481,11 +43481,11 @@
     "chicagoFciHistory": [
       {
         "date": "2020-02-28",
-        "value": -0.294
+        "value": -0.293
       },
       {
         "date": "2020-03-06",
-        "value": -0.134
+        "value": -0.133
       },
       {
         "date": "2020-03-13",
@@ -43493,7 +43493,7 @@
       },
       {
         "date": "2020-03-20",
-        "value": 0.175
+        "value": 0.174
       },
       {
         "date": "2020-03-27",
@@ -43518,7 +43518,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.1,
@@ -43935,15 +43935,15 @@
       },
       {
         "date": "2020-05-01",
-        "value": 0.062
+        "value": 0.063
       },
       {
         "date": "2020-05-08",
-        "value": -0.037
+        "value": -0.036
       },
       {
         "date": "2020-05-15",
-        "value": -0.127
+        "value": -0.126
       },
       {
         "date": "2020-05-22",
@@ -43952,7 +43952,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-05-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.13,
@@ -44349,15 +44349,15 @@
     "chicagoFciHistory": [
       {
         "date": "2020-05-01",
-        "value": 0.062
+        "value": 0.063
       },
       {
         "date": "2020-05-08",
-        "value": -0.037
+        "value": -0.036
       },
       {
         "date": "2020-05-15",
-        "value": -0.127
+        "value": -0.126
       },
       {
         "date": "2020-05-22",
@@ -44382,7 +44382,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.13,
@@ -44811,7 +44811,7 @@
       },
       {
         "date": "2020-07-10",
-        "value": -0.42
+        "value": -0.419
       },
       {
         "date": "2020-07-17",
@@ -44824,7 +44824,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.09,
@@ -45225,7 +45225,7 @@
       },
       {
         "date": "2020-07-10",
-        "value": -0.42
+        "value": -0.419
       },
       {
         "date": "2020-07-17",
@@ -45245,7 +45245,7 @@
       },
       {
         "date": "2020-08-14",
-        "value": -0.499
+        "value": -0.498
       },
       {
         "date": "2020-08-21",
@@ -45254,7 +45254,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -45647,7 +45647,7 @@
       "latestDate": "2020-09-30",
       "latestValue": 0.08
     },
-    "chicagoFci": -0.492,
+    "chicagoFci": -0.491,
     "chicagoFciHistory": [
       {
         "date": "2020-07-31",
@@ -45659,7 +45659,7 @@
       },
       {
         "date": "2020-08-14",
-        "value": -0.499
+        "value": -0.498
       },
       {
         "date": "2020-08-21",
@@ -45683,12 +45683,12 @@
       },
       {
         "date": "2020-09-25",
-        "value": -0.492
+        "value": -0.491
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -46085,7 +46085,7 @@
       "latestDate": "2020-10-30",
       "latestValue": 0.08
     },
-    "chicagoFci": -0.498,
+    "chicagoFci": -0.497,
     "chicagoFciHistory": [
       {
         "date": "2020-08-28",
@@ -46105,11 +46105,11 @@
       },
       {
         "date": "2020-09-25",
-        "value": -0.492
+        "value": -0.491
       },
       {
         "date": "2020-10-02",
-        "value": -0.489
+        "value": -0.488
       },
       {
         "date": "2020-10-09",
@@ -46117,16 +46117,16 @@
       },
       {
         "date": "2020-10-16",
-        "value": -0.492
+        "value": -0.491
       },
       {
         "date": "2020-10-23",
-        "value": -0.498
+        "value": -0.497
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-10-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -46523,7 +46523,7 @@
     "chicagoFciHistory": [
       {
         "date": "2020-10-02",
-        "value": -0.489
+        "value": -0.488
       },
       {
         "date": "2020-10-09",
@@ -46531,15 +46531,15 @@
       },
       {
         "date": "2020-10-16",
-        "value": -0.492
+        "value": -0.491
       },
       {
         "date": "2020-10-23",
-        "value": -0.498
+        "value": -0.497
       },
       {
         "date": "2020-10-30",
-        "value": -0.507
+        "value": -0.506
       },
       {
         "date": "2020-11-06",
@@ -46556,7 +46556,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -46953,11 +46953,11 @@
       "latestDate": "2020-12-31",
       "latestValue": 0.08
     },
-    "chicagoFci": -0.604,
+    "chicagoFci": -0.603,
     "chicagoFciHistory": [
       {
         "date": "2020-10-30",
-        "value": -0.507
+        "value": -0.506
       },
       {
         "date": "2020-11-06",
@@ -46989,12 +46989,12 @@
       },
       {
         "date": "2020-12-25",
-        "value": -0.604
+        "value": -0.603
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2020-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.08,
@@ -47407,11 +47407,11 @@
       },
       {
         "date": "2020-12-25",
-        "value": -0.604
+        "value": -0.603
       },
       {
         "date": "2021-01-01",
-        "value": -0.609
+        "value": -0.608
       },
       {
         "date": "2021-01-08",
@@ -47419,7 +47419,7 @@
       },
       {
         "date": "2021-01-15",
-        "value": -0.616
+        "value": -0.615
       },
       {
         "date": "2021-01-22",
@@ -47428,7 +47428,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-01-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.07,
@@ -47825,11 +47825,11 @@
     "chicagoFciHistory": [
       {
         "date": "2020-12-25",
-        "value": -0.604
+        "value": -0.603
       },
       {
         "date": "2021-01-01",
-        "value": -0.609
+        "value": -0.608
       },
       {
         "date": "2021-01-08",
@@ -47837,7 +47837,7 @@
       },
       {
         "date": "2021-01-15",
-        "value": -0.616
+        "value": -0.615
       },
       {
         "date": "2021-01-22",
@@ -47862,7 +47862,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-02-26",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.04,
@@ -48275,7 +48275,7 @@
       },
       {
         "date": "2021-02-26",
-        "value": -0.627
+        "value": -0.626
       },
       {
         "date": "2021-03-05",
@@ -48287,7 +48287,7 @@
       },
       {
         "date": "2021-03-19",
-        "value": -0.642
+        "value": -0.641
       },
       {
         "date": "2021-03-26",
@@ -48296,7 +48296,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -48701,7 +48701,7 @@
     "chicagoFciHistory": [
       {
         "date": "2021-02-26",
-        "value": -0.627
+        "value": -0.626
       },
       {
         "date": "2021-03-05",
@@ -48713,7 +48713,7 @@
       },
       {
         "date": "2021-03-19",
-        "value": -0.642
+        "value": -0.641
       },
       {
         "date": "2021-03-26",
@@ -48738,7 +48738,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.01,
@@ -49585,7 +49585,7 @@
       },
       {
         "date": "2021-06-04",
-        "value": -0.695
+        "value": -0.694
       },
       {
         "date": "2021-06-11",
@@ -49602,7 +49602,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -50007,7 +50007,7 @@
       },
       {
         "date": "2021-06-04",
-        "value": -0.695
+        "value": -0.694
       },
       {
         "date": "2021-06-11",
@@ -50031,7 +50031,7 @@
       },
       {
         "date": "2021-07-16",
-        "value": -0.668
+        "value": -0.667
       },
       {
         "date": "2021-07-23",
@@ -50040,7 +50040,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-07-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.05,
@@ -50445,7 +50445,7 @@
       },
       {
         "date": "2021-07-16",
-        "value": -0.668
+        "value": -0.667
       },
       {
         "date": "2021-07-23",
@@ -50470,7 +50470,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2021-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.03,
@@ -53499,7 +53499,7 @@
       },
       {
         "date": "2022-03-11",
-        "value": -0.391
+        "value": -0.392
       },
       {
         "date": "2022-03-18",
@@ -53512,7 +53512,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.17,
@@ -53921,7 +53921,7 @@
       },
       {
         "date": "2022-03-11",
-        "value": -0.391
+        "value": -0.392
       },
       {
         "date": "2022-03-18",
@@ -53933,7 +53933,7 @@
       },
       {
         "date": "2022-04-01",
-        "value": -0.371
+        "value": -0.37
       },
       {
         "date": "2022-04-08",
@@ -53950,7 +53950,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-04-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.37,
@@ -54347,7 +54347,7 @@
     "chicagoFciHistory": [
       {
         "date": "2022-04-01",
-        "value": -0.371
+        "value": -0.37
       },
       {
         "date": "2022-04-08",
@@ -54363,7 +54363,7 @@
       },
       {
         "date": "2022-04-29",
-        "value": -0.336
+        "value": -0.337
       },
       {
         "date": "2022-05-06",
@@ -54380,7 +54380,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 0.73,
@@ -54781,7 +54781,7 @@
     "chicagoFciHistory": [
       {
         "date": "2022-04-29",
-        "value": -0.336
+        "value": -0.337
       },
       {
         "date": "2022-05-06",
@@ -54818,7 +54818,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 1.28,
@@ -55645,7 +55645,7 @@
       "latestDate": "2022-08-31",
       "latestValue": 2.4
     },
-    "chicagoFci": -0.225,
+    "chicagoFci": -0.224,
     "chicagoFciHistory": [
       {
         "date": "2022-07-01",
@@ -55681,12 +55681,12 @@
       },
       {
         "date": "2022-08-26",
-        "value": -0.225
+        "value": -0.224
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.4,
@@ -56107,7 +56107,7 @@
       },
       {
         "date": "2022-08-26",
-        "value": -0.225
+        "value": -0.224
       },
       {
         "date": "2022-09-02",
@@ -56128,7 +56128,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 2.79,
@@ -56951,7 +56951,7 @@
       "latestDate": "2022-11-30",
       "latestValue": 4.07
     },
-    "chicagoFci": -0.18,
+    "chicagoFci": -0.179,
     "chicagoFciHistory": [
       {
         "date": "2022-09-30",
@@ -56971,7 +56971,7 @@
       },
       {
         "date": "2022-10-28",
-        "value": -0.125
+        "value": -0.124
       },
       {
         "date": "2022-11-04",
@@ -56979,20 +56979,20 @@
       },
       {
         "date": "2022-11-11",
-        "value": -0.159
+        "value": -0.158
       },
       {
         "date": "2022-11-18",
-        "value": -0.172
+        "value": -0.171
       },
       {
         "date": "2022-11-25",
-        "value": -0.18
+        "value": -0.179
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.07,
@@ -57393,7 +57393,7 @@
     "chicagoFciHistory": [
       {
         "date": "2022-10-28",
-        "value": -0.125
+        "value": -0.124
       },
       {
         "date": "2022-11-04",
@@ -57401,19 +57401,19 @@
       },
       {
         "date": "2022-11-11",
-        "value": -0.159
+        "value": -0.158
       },
       {
         "date": "2022-11-18",
-        "value": -0.172
+        "value": -0.171
       },
       {
         "date": "2022-11-25",
-        "value": -0.18
+        "value": -0.179
       },
       {
         "date": "2022-12-02",
-        "value": -0.185
+        "value": -0.184
       },
       {
         "date": "2022-12-09",
@@ -57430,7 +57430,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2022-12-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.12,
@@ -57827,7 +57827,7 @@
     "chicagoFciHistory": [
       {
         "date": "2022-12-02",
-        "value": -0.185
+        "value": -0.184
       },
       {
         "date": "2022-12-09",
@@ -57860,7 +57860,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.58,
@@ -58277,11 +58277,11 @@
       },
       {
         "date": "2023-02-03",
-        "value": -0.314
+        "value": -0.313
       },
       {
         "date": "2023-02-10",
-        "value": -0.31
+        "value": -0.309
       },
       {
         "date": "2023-02-17",
@@ -58290,7 +58290,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.65,
@@ -58699,11 +58699,11 @@
       },
       {
         "date": "2023-02-03",
-        "value": -0.314
+        "value": -0.313
       },
       {
         "date": "2023-02-10",
-        "value": -0.31
+        "value": -0.309
       },
       {
         "date": "2023-02-17",
@@ -58711,7 +58711,7 @@
       },
       {
         "date": "2023-02-24",
-        "value": -0.27
+        "value": -0.269
       },
       {
         "date": "2023-03-03",
@@ -58719,7 +58719,7 @@
       },
       {
         "date": "2023-03-10",
-        "value": -0.207
+        "value": -0.206
       },
       {
         "date": "2023-03-17",
@@ -58732,7 +58732,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.74,
@@ -59125,11 +59125,11 @@
       "latestDate": "2023-04-28",
       "latestValue": 4.35
     },
-    "chicagoFci": -0.179,
+    "chicagoFci": -0.178,
     "chicagoFciHistory": [
       {
         "date": "2023-02-24",
-        "value": -0.27
+        "value": -0.269
       },
       {
         "date": "2023-03-03",
@@ -59137,7 +59137,7 @@
       },
       {
         "date": "2023-03-10",
-        "value": -0.207
+        "value": -0.206
       },
       {
         "date": "2023-03-17",
@@ -59149,11 +59149,11 @@
       },
       {
         "date": "2023-03-31",
-        "value": -0.152
+        "value": -0.151
       },
       {
         "date": "2023-04-07",
-        "value": -0.155
+        "value": -0.154
       },
       {
         "date": "2023-04-14",
@@ -59161,12 +59161,12 @@
       },
       {
         "date": "2023-04-21",
-        "value": -0.179
+        "value": -0.178
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-04-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.35,
@@ -59559,15 +59559,15 @@
       "latestDate": "2023-05-31",
       "latestValue": 5.28
     },
-    "chicagoFci": -0.213,
+    "chicagoFci": -0.212,
     "chicagoFciHistory": [
       {
         "date": "2023-03-31",
-        "value": -0.152
+        "value": -0.151
       },
       {
         "date": "2023-04-07",
-        "value": -0.155
+        "value": -0.154
       },
       {
         "date": "2023-04-14",
@@ -59575,32 +59575,32 @@
       },
       {
         "date": "2023-04-21",
-        "value": -0.179
+        "value": -0.178
       },
       {
         "date": "2023-04-28",
-        "value": -0.19
+        "value": -0.189
       },
       {
         "date": "2023-05-05",
-        "value": -0.199
+        "value": -0.198
       },
       {
         "date": "2023-05-12",
-        "value": -0.206
+        "value": -0.205
       },
       {
         "date": "2023-05-19",
-        "value": -0.211
+        "value": -0.21
       },
       {
         "date": "2023-05-26",
-        "value": -0.213
+        "value": -0.212
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.28,
@@ -60001,48 +60001,48 @@
       "latestDate": "2023-06-30",
       "latestValue": 5.24
     },
-    "chicagoFci": -0.222,
+    "chicagoFci": -0.221,
     "chicagoFciHistory": [
       {
         "date": "2023-04-28",
-        "value": -0.19
+        "value": -0.189
       },
       {
         "date": "2023-05-05",
-        "value": -0.199
+        "value": -0.198
       },
       {
         "date": "2023-05-12",
-        "value": -0.206
+        "value": -0.205
       },
       {
         "date": "2023-05-19",
-        "value": -0.211
+        "value": -0.21
       },
       {
         "date": "2023-05-26",
-        "value": -0.213
+        "value": -0.212
       },
       {
         "date": "2023-06-02",
-        "value": -0.215
+        "value": -0.214
       },
       {
         "date": "2023-06-09",
-        "value": -0.216
+        "value": -0.215
       },
       {
         "date": "2023-06-16",
-        "value": -0.218
+        "value": -0.217
       },
       {
         "date": "2023-06-23",
-        "value": -0.222
+        "value": -0.221
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.24,
@@ -60435,23 +60435,23 @@
       "latestDate": "2023-07-31",
       "latestValue": 5.48
     },
-    "chicagoFci": -0.264,
+    "chicagoFci": -0.263,
     "chicagoFciHistory": [
       {
         "date": "2023-06-02",
-        "value": -0.215
+        "value": -0.214
       },
       {
         "date": "2023-06-09",
-        "value": -0.216
+        "value": -0.215
       },
       {
         "date": "2023-06-16",
-        "value": -0.218
+        "value": -0.217
       },
       {
         "date": "2023-06-23",
-        "value": -0.222
+        "value": -0.221
       },
       {
         "date": "2023-06-30",
@@ -60463,16 +60463,16 @@
       },
       {
         "date": "2023-07-14",
-        "value": -0.249
+        "value": -0.248
       },
       {
         "date": "2023-07-21",
-        "value": -0.264
+        "value": -0.263
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.48,
@@ -60881,15 +60881,15 @@
       },
       {
         "date": "2023-07-14",
-        "value": -0.249
+        "value": -0.248
       },
       {
         "date": "2023-07-21",
-        "value": -0.264
+        "value": -0.263
       },
       {
         "date": "2023-07-28",
-        "value": -0.28
+        "value": -0.279
       },
       {
         "date": "2023-08-04",
@@ -60910,7 +60910,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.52,
@@ -61307,11 +61307,11 @@
       "latestDate": "2023-09-29",
       "latestValue": 5.55
     },
-    "chicagoFci": -0.325,
+    "chicagoFci": -0.324,
     "chicagoFciHistory": [
       {
         "date": "2023-07-28",
-        "value": -0.28
+        "value": -0.279
       },
       {
         "date": "2023-08-04",
@@ -61335,20 +61335,20 @@
       },
       {
         "date": "2023-09-08",
-        "value": -0.339
+        "value": -0.338
       },
       {
         "date": "2023-09-15",
-        "value": -0.334
+        "value": -0.333
       },
       {
         "date": "2023-09-22",
-        "value": -0.325
+        "value": -0.324
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-09-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.55,
@@ -61749,23 +61749,23 @@
       },
       {
         "date": "2023-09-08",
-        "value": -0.339
+        "value": -0.338
       },
       {
         "date": "2023-09-15",
-        "value": -0.334
+        "value": -0.333
       },
       {
         "date": "2023-09-22",
-        "value": -0.325
+        "value": -0.324
       },
       {
         "date": "2023-09-29",
-        "value": -0.313
+        "value": -0.312
       },
       {
         "date": "2023-10-06",
-        "value": -0.302
+        "value": -0.301
       },
       {
         "date": "2023-10-13",
@@ -61778,7 +61778,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.56,
@@ -62179,11 +62179,11 @@
     "chicagoFciHistory": [
       {
         "date": "2023-09-29",
-        "value": -0.313
+        "value": -0.312
       },
       {
         "date": "2023-10-06",
-        "value": -0.302
+        "value": -0.301
       },
       {
         "date": "2023-10-13",
@@ -62203,7 +62203,7 @@
       },
       {
         "date": "2023-11-10",
-        "value": -0.299
+        "value": -0.298
       },
       {
         "date": "2023-11-17",
@@ -62216,7 +62216,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-11-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.56,
@@ -62621,7 +62621,7 @@
       },
       {
         "date": "2023-11-10",
-        "value": -0.299
+        "value": -0.298
       },
       {
         "date": "2023-11-17",
@@ -62633,15 +62633,15 @@
       },
       {
         "date": "2023-12-01",
-        "value": -0.331
+        "value": -0.33
       },
       {
         "date": "2023-12-08",
-        "value": -0.34
+        "value": -0.339
       },
       {
         "date": "2023-12-15",
-        "value": -0.349
+        "value": -0.348
       },
       {
         "date": "2023-12-22",
@@ -62650,7 +62650,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2023-12-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.6,
@@ -63047,15 +63047,15 @@
     "chicagoFciHistory": [
       {
         "date": "2023-12-01",
-        "value": -0.331
+        "value": -0.33
       },
       {
         "date": "2023-12-08",
-        "value": -0.34
+        "value": -0.339
       },
       {
         "date": "2023-12-15",
-        "value": -0.349
+        "value": -0.348
       },
       {
         "date": "2023-12-22",
@@ -63063,19 +63063,19 @@
       },
       {
         "date": "2023-12-29",
-        "value": -0.366
+        "value": -0.365
       },
       {
         "date": "2024-01-05",
-        "value": -0.374
+        "value": -0.373
       },
       {
         "date": "2024-01-12",
-        "value": -0.382
+        "value": -0.381
       },
       {
         "date": "2024-01-19",
-        "value": -0.389
+        "value": -0.388
       },
       {
         "date": "2024-01-26",
@@ -63084,7 +63084,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.53,
@@ -63481,23 +63481,23 @@
       "latestDate": "2024-02-29",
       "latestValue": 5.53
     },
-    "chicagoFci": -0.426,
+    "chicagoFci": -0.425,
     "chicagoFciHistory": [
       {
         "date": "2023-12-29",
-        "value": -0.366
+        "value": -0.365
       },
       {
         "date": "2024-01-05",
-        "value": -0.374
+        "value": -0.373
       },
       {
         "date": "2024-01-12",
-        "value": -0.382
+        "value": -0.381
       },
       {
         "date": "2024-01-19",
-        "value": -0.389
+        "value": -0.388
       },
       {
         "date": "2024-01-26",
@@ -63517,12 +63517,12 @@
       },
       {
         "date": "2024-02-23",
-        "value": -0.426
+        "value": -0.425
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-02-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.53,
@@ -63935,7 +63935,7 @@
       },
       {
         "date": "2024-02-23",
-        "value": -0.426
+        "value": -0.425
       },
       {
         "date": "2024-03-01",
@@ -63956,7 +63956,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-03-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.49,
@@ -64369,7 +64369,7 @@
       },
       {
         "date": "2024-03-29",
-        "value": -0.431
+        "value": -0.43
       },
       {
         "date": "2024-04-05",
@@ -64386,7 +64386,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.48,
@@ -64787,11 +64787,11 @@
       "latestDate": "2024-05-31",
       "latestValue": 5.48
     },
-    "chicagoFci": -0.411,
+    "chicagoFci": -0.41,
     "chicagoFciHistory": [
       {
         "date": "2024-03-29",
-        "value": -0.431
+        "value": -0.43
       },
       {
         "date": "2024-04-05",
@@ -64807,7 +64807,7 @@
       },
       {
         "date": "2024-04-26",
-        "value": -0.412
+        "value": -0.411
       },
       {
         "date": "2024-05-03",
@@ -64815,7 +64815,7 @@
       },
       {
         "date": "2024-05-10",
-        "value": -0.412
+        "value": -0.411
       },
       {
         "date": "2024-05-17",
@@ -64823,12 +64823,12 @@
       },
       {
         "date": "2024-05-24",
-        "value": -0.411
+        "value": -0.41
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-05-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.48,
@@ -65221,11 +65221,11 @@
       "latestDate": "2024-06-28",
       "latestValue": 5.47
     },
-    "chicagoFci": -0.386,
+    "chicagoFci": -0.385,
     "chicagoFciHistory": [
       {
         "date": "2024-04-26",
-        "value": -0.412
+        "value": -0.411
       },
       {
         "date": "2024-05-03",
@@ -65233,7 +65233,7 @@
       },
       {
         "date": "2024-05-10",
-        "value": -0.412
+        "value": -0.411
       },
       {
         "date": "2024-05-17",
@@ -65241,28 +65241,28 @@
       },
       {
         "date": "2024-05-24",
-        "value": -0.411
+        "value": -0.41
       },
       {
         "date": "2024-05-31",
-        "value": -0.407
+        "value": -0.406
       },
       {
         "date": "2024-06-07",
-        "value": -0.401
+        "value": -0.4
       },
       {
         "date": "2024-06-14",
-        "value": -0.394
+        "value": -0.393
       },
       {
         "date": "2024-06-21",
-        "value": -0.386
+        "value": -0.385
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-06-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.47,
@@ -65655,31 +65655,31 @@
       "latestDate": "2024-07-31",
       "latestValue": 5.49
     },
-    "chicagoFci": -0.359,
+    "chicagoFci": -0.358,
     "chicagoFciHistory": [
       {
         "date": "2024-05-31",
-        "value": -0.407
+        "value": -0.406
       },
       {
         "date": "2024-06-07",
-        "value": -0.401
+        "value": -0.4
       },
       {
         "date": "2024-06-14",
-        "value": -0.394
+        "value": -0.393
       },
       {
         "date": "2024-06-21",
-        "value": -0.386
+        "value": -0.385
       },
       {
         "date": "2024-06-28",
-        "value": -0.379
+        "value": -0.378
       },
       {
         "date": "2024-07-05",
-        "value": -0.373
+        "value": -0.372
       },
       {
         "date": "2024-07-12",
@@ -65691,12 +65691,12 @@
       },
       {
         "date": "2024-07-26",
-        "value": -0.359
+        "value": -0.358
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.49,
@@ -66093,15 +66093,15 @@
       "latestDate": "2024-08-30",
       "latestValue": 5.41
     },
-    "chicagoFci": -0.378,
+    "chicagoFci": -0.377,
     "chicagoFciHistory": [
       {
         "date": "2024-06-28",
-        "value": -0.379
+        "value": -0.378
       },
       {
         "date": "2024-07-05",
-        "value": -0.373
+        "value": -0.372
       },
       {
         "date": "2024-07-12",
@@ -66113,7 +66113,7 @@
       },
       {
         "date": "2024-07-26",
-        "value": -0.359
+        "value": -0.358
       },
       {
         "date": "2024-08-02",
@@ -66121,7 +66121,7 @@
       },
       {
         "date": "2024-08-09",
-        "value": -0.359
+        "value": -0.358
       },
       {
         "date": "2024-08-16",
@@ -66129,12 +66129,12 @@
       },
       {
         "date": "2024-08-23",
-        "value": -0.378
+        "value": -0.377
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-08-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 5.41,
@@ -66527,7 +66527,7 @@
       "latestDate": "2024-09-30",
       "latestValue": 4.93
     },
-    "chicagoFci": -0.419,
+    "chicagoFci": -0.418,
     "chicagoFciHistory": [
       {
         "date": "2024-08-02",
@@ -66535,7 +66535,7 @@
       },
       {
         "date": "2024-08-09",
-        "value": -0.359
+        "value": -0.358
       },
       {
         "date": "2024-08-16",
@@ -66543,7 +66543,7 @@
       },
       {
         "date": "2024-08-23",
-        "value": -0.378
+        "value": -0.377
       },
       {
         "date": "2024-08-30",
@@ -66551,20 +66551,20 @@
       },
       {
         "date": "2024-09-06",
-        "value": -0.401
+        "value": -0.4
       },
       {
         "date": "2024-09-13",
-        "value": -0.411
+        "value": -0.41
       },
       {
         "date": "2024-09-20",
-        "value": -0.419
+        "value": -0.418
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.93,
@@ -66969,15 +66969,15 @@
       },
       {
         "date": "2024-09-06",
-        "value": -0.401
+        "value": -0.4
       },
       {
         "date": "2024-09-13",
-        "value": -0.411
+        "value": -0.41
       },
       {
         "date": "2024-09-20",
-        "value": -0.419
+        "value": -0.418
       },
       {
         "date": "2024-09-27",
@@ -66989,7 +66989,7 @@
       },
       {
         "date": "2024-10-11",
-        "value": -0.434
+        "value": -0.433
       },
       {
         "date": "2024-10-18",
@@ -67002,7 +67002,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.76,
@@ -67399,7 +67399,7 @@
       "latestDate": "2024-11-29",
       "latestValue": 4.76
     },
-    "chicagoFci": -0.47,
+    "chicagoFci": -0.469,
     "chicagoFciHistory": [
       {
         "date": "2024-09-27",
@@ -67411,7 +67411,7 @@
       },
       {
         "date": "2024-10-11",
-        "value": -0.434
+        "value": -0.433
       },
       {
         "date": "2024-10-18",
@@ -67423,7 +67423,7 @@
       },
       {
         "date": "2024-11-01",
-        "value": -0.45
+        "value": -0.449
       },
       {
         "date": "2024-11-08",
@@ -67431,16 +67431,16 @@
       },
       {
         "date": "2024-11-15",
-        "value": -0.465
+        "value": -0.464
       },
       {
         "date": "2024-11-22",
-        "value": -0.47
+        "value": -0.469
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-11-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.76,
@@ -67833,11 +67833,11 @@
       "latestDate": "2024-12-31",
       "latestValue": 4.4
     },
-    "chicagoFci": -0.479,
+    "chicagoFci": -0.478,
     "chicagoFciHistory": [
       {
         "date": "2024-11-01",
-        "value": -0.45
+        "value": -0.449
       },
       {
         "date": "2024-11-08",
@@ -67845,11 +67845,11 @@
       },
       {
         "date": "2024-11-15",
-        "value": -0.465
+        "value": -0.464
       },
       {
         "date": "2024-11-22",
-        "value": -0.47
+        "value": -0.469
       },
       {
         "date": "2024-11-29",
@@ -67857,7 +67857,7 @@
       },
       {
         "date": "2024-12-06",
-        "value": -0.476
+        "value": -0.475
       },
       {
         "date": "2024-12-13",
@@ -67865,12 +67865,12 @@
       },
       {
         "date": "2024-12-20",
-        "value": -0.479
+        "value": -0.478
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2024-12-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.4,
@@ -68271,7 +68271,7 @@
       "latestDate": "2025-01-31",
       "latestValue": 4.37
     },
-    "chicagoFci": -0.504,
+    "chicagoFci": -0.503,
     "chicagoFciHistory": [
       {
         "date": "2024-11-29",
@@ -68279,7 +68279,7 @@
       },
       {
         "date": "2024-12-06",
-        "value": -0.476
+        "value": -0.475
       },
       {
         "date": "2024-12-13",
@@ -68287,11 +68287,11 @@
       },
       {
         "date": "2024-12-20",
-        "value": -0.479
+        "value": -0.478
       },
       {
         "date": "2024-12-27",
-        "value": -0.483
+        "value": -0.482
       },
       {
         "date": "2025-01-03",
@@ -68303,16 +68303,16 @@
       },
       {
         "date": "2025-01-17",
-        "value": -0.499
+        "value": -0.498
       },
       {
         "date": "2025-01-24",
-        "value": -0.504
+        "value": -0.503
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-01-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.37,
@@ -68713,11 +68713,11 @@
       "latestDate": "2025-02-28",
       "latestValue": 4.38
     },
-    "chicagoFci": -0.492,
+    "chicagoFci": -0.491,
     "chicagoFciHistory": [
       {
         "date": "2024-12-27",
-        "value": -0.483
+        "value": -0.482
       },
       {
         "date": "2025-01-03",
@@ -68729,19 +68729,19 @@
       },
       {
         "date": "2025-01-17",
-        "value": -0.499
+        "value": -0.498
       },
       {
         "date": "2025-01-24",
-        "value": -0.504
+        "value": -0.503
       },
       {
         "date": "2025-01-31",
-        "value": -0.507
+        "value": -0.506
       },
       {
         "date": "2025-02-07",
-        "value": -0.506
+        "value": -0.505
       },
       {
         "date": "2025-02-14",
@@ -68749,12 +68749,12 @@
       },
       {
         "date": "2025-02-21",
-        "value": -0.492
+        "value": -0.491
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-02-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.38,
@@ -69147,15 +69147,15 @@
       "latestDate": "2025-03-31",
       "latestValue": 4.38
     },
-    "chicagoFci": -0.425,
+    "chicagoFci": -0.424,
     "chicagoFciHistory": [
       {
         "date": "2025-01-31",
-        "value": -0.507
+        "value": -0.506
       },
       {
         "date": "2025-02-07",
-        "value": -0.506
+        "value": -0.505
       },
       {
         "date": "2025-02-14",
@@ -69163,7 +69163,7 @@
       },
       {
         "date": "2025-02-21",
-        "value": -0.492
+        "value": -0.491
       },
       {
         "date": "2025-02-28",
@@ -69179,12 +69179,12 @@
       },
       {
         "date": "2025-03-21",
-        "value": -0.425
+        "value": -0.424
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.38,
@@ -69593,15 +69593,15 @@
       },
       {
         "date": "2025-03-21",
-        "value": -0.425
+        "value": -0.424
       },
       {
         "date": "2025-03-28",
-        "value": -0.408
+        "value": -0.407
       },
       {
         "date": "2025-04-04",
-        "value": -0.393
+        "value": -0.392
       },
       {
         "date": "2025-04-11",
@@ -69609,7 +69609,7 @@
       },
       {
         "date": "2025-04-18",
-        "value": -0.383
+        "value": -0.382
       },
       {
         "date": "2025-04-25",
@@ -69618,7 +69618,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.35,
@@ -70019,11 +70019,11 @@
     "chicagoFciHistory": [
       {
         "date": "2025-03-28",
-        "value": -0.408
+        "value": -0.407
       },
       {
         "date": "2025-04-04",
-        "value": -0.393
+        "value": -0.392
       },
       {
         "date": "2025-04-11",
@@ -70031,7 +70031,7 @@
       },
       {
         "date": "2025-04-18",
-        "value": -0.383
+        "value": -0.382
       },
       {
         "date": "2025-04-25",
@@ -70039,7 +70039,7 @@
       },
       {
         "date": "2025-05-02",
-        "value": -0.403
+        "value": -0.402
       },
       {
         "date": "2025-05-09",
@@ -70047,7 +70047,7 @@
       },
       {
         "date": "2025-05-16",
-        "value": -0.438
+        "value": -0.437
       },
       {
         "date": "2025-05-23",
@@ -70056,7 +70056,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-05-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.33,
@@ -70453,7 +70453,7 @@
     "chicagoFciHistory": [
       {
         "date": "2025-05-02",
-        "value": -0.403
+        "value": -0.402
       },
       {
         "date": "2025-05-09",
@@ -70461,7 +70461,7 @@
       },
       {
         "date": "2025-05-16",
-        "value": -0.438
+        "value": -0.437
       },
       {
         "date": "2025-05-23",
@@ -70469,7 +70469,7 @@
       },
       {
         "date": "2025-05-30",
-        "value": -0.465
+        "value": -0.464
       },
       {
         "date": "2025-06-06",
@@ -70486,7 +70486,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.28,
@@ -70887,7 +70887,7 @@
     "chicagoFciHistory": [
       {
         "date": "2025-05-30",
-        "value": -0.465
+        "value": -0.464
       },
       {
         "date": "2025-06-06",
@@ -70924,7 +70924,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.49,
@@ -71317,7 +71317,7 @@
       "latestDate": "2025-08-29",
       "latestValue": 4.41
     },
-    "chicagoFci": -0.525,
+    "chicagoFci": -0.524,
     "chicagoFciHistory": [
       {
         "date": "2025-06-27",
@@ -71349,16 +71349,16 @@
       },
       {
         "date": "2025-08-15",
-        "value": -0.524
+        "value": -0.523
       },
       {
         "date": "2025-08-22",
-        "value": -0.525
+        "value": -0.524
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-08-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.41,
@@ -71751,7 +71751,7 @@
       "latestDate": "2025-09-30",
       "latestValue": 4.2
     },
-    "chicagoFci": -0.525,
+    "chicagoFci": -0.524,
     "chicagoFciHistory": [
       {
         "date": "2025-08-01",
@@ -71763,11 +71763,11 @@
       },
       {
         "date": "2025-08-15",
-        "value": -0.524
+        "value": -0.523
       },
       {
         "date": "2025-08-22",
-        "value": -0.525
+        "value": -0.524
       },
       {
         "date": "2025-08-29",
@@ -71775,20 +71775,20 @@
       },
       {
         "date": "2025-09-05",
-        "value": -0.526
+        "value": -0.525
       },
       {
         "date": "2025-09-12",
-        "value": -0.526
+        "value": -0.525
       },
       {
         "date": "2025-09-19",
-        "value": -0.525
+        "value": -0.524
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.2,
@@ -72189,7 +72189,7 @@
       "latestDate": "2025-10-31",
       "latestValue": 4.06
     },
-    "chicagoFci": -0.515,
+    "chicagoFci": -0.514,
     "chicagoFciHistory": [
       {
         "date": "2025-08-29",
@@ -72197,23 +72197,23 @@
       },
       {
         "date": "2025-09-05",
-        "value": -0.526
-      },
-      {
-        "date": "2025-09-12",
-        "value": -0.526
-      },
-      {
-        "date": "2025-09-19",
         "value": -0.525
       },
       {
-        "date": "2025-09-26",
+        "date": "2025-09-12",
+        "value": -0.525
+      },
+      {
+        "date": "2025-09-19",
         "value": -0.524
       },
       {
-        "date": "2025-10-03",
+        "date": "2025-09-26",
         "value": -0.523
+      },
+      {
+        "date": "2025-10-03",
+        "value": -0.522
       },
       {
         "date": "2025-10-10",
@@ -72221,16 +72221,16 @@
       },
       {
         "date": "2025-10-17",
-        "value": -0.518
+        "value": -0.517
       },
       {
         "date": "2025-10-24",
-        "value": -0.515
+        "value": -0.514
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-10-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.06,
@@ -72627,11 +72627,11 @@
     "chicagoFciHistory": [
       {
         "date": "2025-09-26",
-        "value": -0.524
+        "value": -0.523
       },
       {
         "date": "2025-10-03",
-        "value": -0.523
+        "value": -0.522
       },
       {
         "date": "2025-10-10",
@@ -72639,11 +72639,11 @@
       },
       {
         "date": "2025-10-17",
-        "value": -0.518
+        "value": -0.517
       },
       {
         "date": "2025-10-24",
-        "value": -0.515
+        "value": -0.514
       },
       {
         "date": "2025-10-31",
@@ -72664,7 +72664,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2025-11-28",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.05,
@@ -73527,7 +73527,7 @@
       },
       {
         "date": "2026-01-16",
-        "value": -0.565
+        "value": -0.564
       },
       {
         "date": "2026-01-23",
@@ -73536,7 +73536,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-01-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
@@ -73949,7 +73949,7 @@
       },
       {
         "date": "2026-01-16",
-        "value": -0.565
+        "value": -0.564
       },
       {
         "date": "2026-01-23",
@@ -73974,7 +73974,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-02-27",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.74,
@@ -74391,7 +74391,7 @@
       },
       {
         "date": "2026-03-06",
-        "value": -0.488
+        "value": -0.487
       },
       {
         "date": "2026-03-13",
@@ -74404,7 +74404,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-03-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.74,
@@ -74809,7 +74809,7 @@
       },
       {
         "date": "2026-03-06",
-        "value": -0.488
+        "value": -0.487
       },
       {
         "date": "2026-03-13",
@@ -74825,11 +74825,11 @@
       },
       {
         "date": "2026-04-03",
-        "value": -0.464
+        "value": -0.463
       },
       {
         "date": "2026-04-10",
-        "value": -0.474
+        "value": -0.473
       },
       {
         "date": "2026-04-17",
@@ -74842,7 +74842,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-04-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
@@ -75243,11 +75243,11 @@
       },
       {
         "date": "2026-04-03",
-        "value": -0.464
+        "value": -0.463
       },
       {
         "date": "2026-04-10",
-        "value": -0.474
+        "value": -0.473
       },
       {
         "date": "2026-04-17",
@@ -75276,7 +75276,7 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-05-29",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.72,
@@ -75669,7 +75669,7 @@
       "latestDate": "2026-06-30",
       "latestValue": 3.7
     },
-    "chicagoFci": -0.507,
+    "chicagoFci": -0.506,
     "chicagoFciHistory": [
       {
         "date": "2026-05-01",
@@ -75697,16 +75697,16 @@
       },
       {
         "date": "2026-06-12",
-        "value": -0.505
+        "value": -0.504
       },
       {
         "date": "2026-06-19",
-        "value": -0.507
+        "value": -0.506
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-06-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.7,
@@ -76107,7 +76107,7 @@
       "latestDate": "2026-07-31",
       "latestValue": 3.78
     },
-    "chicagoFci": -0.535,
+    "chicagoFci": -0.533,
     "chicagoFciHistory": [
       {
         "date": "2026-05-29",
@@ -76119,36 +76119,36 @@
       },
       {
         "date": "2026-06-12",
-        "value": -0.505
+        "value": -0.504
       },
       {
         "date": "2026-06-19",
-        "value": -0.507
+        "value": -0.506
       },
       {
         "date": "2026-06-26",
-        "value": -0.51
+        "value": -0.509
       },
       {
         "date": "2026-07-03",
-        "value": -0.516
+        "value": -0.515
       },
       {
         "date": "2026-07-10",
-        "value": -0.522
+        "value": -0.521
       },
       {
         "date": "2026-07-17",
-        "value": -0.528
+        "value": -0.527
       },
       {
         "date": "2026-07-24",
-        "value": -0.535
+        "value": -0.533
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-07-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.78,
@@ -76541,44 +76541,44 @@
       "latestDate": "2026-08-31",
       "latestValue": 3.85
     },
-    "chicagoFci": -0.551,
+    "chicagoFci": -0.547,
     "chicagoFciHistory": [
       {
         "date": "2026-07-03",
-        "value": -0.516
+        "value": -0.515
       },
       {
         "date": "2026-07-10",
-        "value": -0.522
+        "value": -0.521
       },
       {
         "date": "2026-07-17",
-        "value": -0.528
+        "value": -0.527
       },
       {
         "date": "2026-07-24",
-        "value": -0.535
+        "value": -0.533
       },
       {
         "date": "2026-07-31",
-        "value": -0.54
+        "value": -0.538
       },
       {
         "date": "2026-08-07",
-        "value": -0.545
+        "value": -0.542
       },
       {
         "date": "2026-08-14",
-        "value": -0.549
+        "value": -0.546
       },
       {
         "date": "2026-08-21",
-        "value": -0.551
+        "value": -0.547
       }
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-08-31",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 3.85,
@@ -76975,35 +76975,35 @@
     "chicagoFciHistory": [
       {
         "date": "2026-07-31",
-        "value": -0.54
+        "value": -0.538
       },
       {
         "date": "2026-08-07",
-        "value": -0.545
+        "value": -0.542
       },
       {
         "date": "2026-08-14",
-        "value": -0.549
+        "value": -0.546
       },
       {
         "date": "2026-08-21",
-        "value": -0.551
+        "value": -0.547
       },
       {
         "date": "2026-08-28",
-        "value": -0.549
-      },
-      {
-        "date": "2026-09-04",
         "value": -0.545
       },
       {
+        "date": "2026-09-04",
+        "value": -0.54
+      },
+      {
         "date": "2026-09-11",
-        "value": -0.536
+        "value": -0.532
       },
       {
         "date": "2026-09-18",
-        "value": -0.524
+        "value": -0.522
       },
       {
         "date": "2026-09-25",
@@ -77012,13 +77012,451 @@
     ],
     "source": "https://fred.stlouisfed.org/series/DGS1MO",
     "record_date": "2026-09-30",
-    "fetched_at": "2026-10-09T18:29:37.440Z",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
     "isLive": false,
     "yields": {
       "oneMonth": 4.02,
       "threeMonth": 4.2,
       "twoYear": 4.88,
       "tenYear": 5.29
+    }
+  },
+  {
+    "year": 2026,
+    "month": 10,
+    "vix": 19.42,
+    "vixHistory": [
+      {
+        "date": "2026-06-23",
+        "value": 19.49
+      },
+      {
+        "date": "2026-06-24",
+        "value": 18.63
+      },
+      {
+        "date": "2026-06-25",
+        "value": 18.89
+      },
+      {
+        "date": "2026-06-26",
+        "value": 18.41
+      },
+      {
+        "date": "2026-06-29",
+        "value": 17.65
+      },
+      {
+        "date": "2026-06-30",
+        "value": 16.45
+      },
+      {
+        "date": "2026-07-01",
+        "value": 16.59
+      },
+      {
+        "date": "2026-07-02",
+        "value": 16.15
+      },
+      {
+        "date": "2026-07-03",
+        "value": 15.81
+      },
+      {
+        "date": "2026-07-06",
+        "value": 15.57
+      },
+      {
+        "date": "2026-07-07",
+        "value": 16.13
+      },
+      {
+        "date": "2026-07-08",
+        "value": 16.9
+      },
+      {
+        "date": "2026-07-09",
+        "value": 15.84
+      },
+      {
+        "date": "2026-07-10",
+        "value": 15.03
+      },
+      {
+        "date": "2026-07-13",
+        "value": 17.16
+      },
+      {
+        "date": "2026-07-14",
+        "value": 16.5
+      },
+      {
+        "date": "2026-07-15",
+        "value": 15.67
+      },
+      {
+        "date": "2026-07-16",
+        "value": 16.73
+      },
+      {
+        "date": "2026-07-17",
+        "value": 18.77
+      },
+      {
+        "date": "2026-07-20",
+        "value": 18.65
+      },
+      {
+        "date": "2026-07-21",
+        "value": 17.05
+      },
+      {
+        "date": "2026-07-22",
+        "value": 16.64
+      },
+      {
+        "date": "2026-07-23",
+        "value": 18.7
+      },
+      {
+        "date": "2026-07-24",
+        "value": 18.58
+      },
+      {
+        "date": "2026-07-27",
+        "value": 18.67
+      },
+      {
+        "date": "2026-07-28",
+        "value": 18.21
+      },
+      {
+        "date": "2026-07-29",
+        "value": 20.66
+      },
+      {
+        "date": "2026-07-30",
+        "value": 17.09
+      },
+      {
+        "date": "2026-07-31",
+        "value": 15.99
+      },
+      {
+        "date": "2026-08-03",
+        "value": 15.86
+      },
+      {
+        "date": "2026-08-04",
+        "value": 16.5
+      },
+      {
+        "date": "2026-08-05",
+        "value": 15.81
+      },
+      {
+        "date": "2026-08-06",
+        "value": 15.15
+      },
+      {
+        "date": "2026-08-07",
+        "value": 14.9
+      },
+      {
+        "date": "2026-08-10",
+        "value": 15.46
+      },
+      {
+        "date": "2026-08-11",
+        "value": 15.28
+      },
+      {
+        "date": "2026-08-12",
+        "value": 14.55
+      },
+      {
+        "date": "2026-08-13",
+        "value": 14.63
+      },
+      {
+        "date": "2026-08-14",
+        "value": 14.25
+      },
+      {
+        "date": "2026-08-17",
+        "value": 15.19
+      },
+      {
+        "date": "2026-08-18",
+        "value": 15.84
+      },
+      {
+        "date": "2026-08-19",
+        "value": 14.89
+      },
+      {
+        "date": "2026-08-20",
+        "value": 16.01
+      },
+      {
+        "date": "2026-08-21",
+        "value": 15.13
+      },
+      {
+        "date": "2026-08-24",
+        "value": 15.85
+      },
+      {
+        "date": "2026-08-25",
+        "value": 15.45
+      },
+      {
+        "date": "2026-08-26",
+        "value": 15.21
+      },
+      {
+        "date": "2026-08-27",
+        "value": 14.51
+      },
+      {
+        "date": "2026-08-28",
+        "value": 14.43
+      },
+      {
+        "date": "2026-08-31",
+        "value": 14.92
+      },
+      {
+        "date": "2026-09-01",
+        "value": 16.34
+      },
+      {
+        "date": "2026-09-02",
+        "value": 15.2
+      },
+      {
+        "date": "2026-09-03",
+        "value": 14.32
+      },
+      {
+        "date": "2026-09-04",
+        "value": 14.53
+      },
+      {
+        "date": "2026-09-07",
+        "value": 15.3
+      },
+      {
+        "date": "2026-09-08",
+        "value": 15.72
+      },
+      {
+        "date": "2026-09-09",
+        "value": 16.46
+      },
+      {
+        "date": "2026-09-10",
+        "value": 17.84
+      },
+      {
+        "date": "2026-09-11",
+        "value": 15.84
+      },
+      {
+        "date": "2026-09-14",
+        "value": 17.1
+      },
+      {
+        "date": "2026-09-15",
+        "value": 17.2
+      },
+      {
+        "date": "2026-09-16",
+        "value": 17.71
+      },
+      {
+        "date": "2026-09-17",
+        "value": 15.44
+      },
+      {
+        "date": "2026-09-18",
+        "value": 14.81
+      },
+      {
+        "date": "2026-09-21",
+        "value": 14.87
+      },
+      {
+        "date": "2026-09-22",
+        "value": 14.21
+      },
+      {
+        "date": "2026-09-23",
+        "value": 15.18
+      },
+      {
+        "date": "2026-09-24",
+        "value": 15.67
+      },
+      {
+        "date": "2026-09-25",
+        "value": 14.87
+      },
+      {
+        "date": "2026-09-28",
+        "value": 16.07
+      },
+      {
+        "date": "2026-09-29",
+        "value": 16.04
+      },
+      {
+        "date": "2026-09-30",
+        "value": 16.34
+      },
+      {
+        "date": "2026-10-01",
+        "value": 16.39
+      },
+      {
+        "date": "2026-10-02",
+        "value": 15.31
+      },
+      {
+        "date": "2026-10-05",
+        "value": 15.52
+      },
+      {
+        "date": "2026-10-06",
+        "value": 15.01
+      },
+      {
+        "date": "2026-10-07",
+        "value": 15.08
+      },
+      {
+        "date": "2026-10-08",
+        "value": 15.41
+      },
+      {
+        "date": "2026-10-09",
+        "value": 14.84
+      },
+      {
+        "date": "2026-10-12",
+        "value": 15.21
+      },
+      {
+        "date": "2026-10-13",
+        "value": 15.27
+      },
+      {
+        "date": "2026-10-14",
+        "value": 16.87
+      },
+      {
+        "date": "2026-10-15",
+        "value": 16.46
+      },
+      {
+        "date": "2026-10-16",
+        "value": 19.99
+      },
+      {
+        "date": "2026-10-19",
+        "value": 18.44
+      },
+      {
+        "date": "2026-10-20",
+        "value": 17.31
+      },
+      {
+        "date": "2026-10-21",
+        "value": 16.68
+      },
+      {
+        "date": "2026-10-22",
+        "value": 19.03
+      },
+      {
+        "date": "2026-10-23",
+        "value": 19.45
+      },
+      {
+        "date": "2026-10-26",
+        "value": 18.39
+      },
+      {
+        "date": "2026-10-27",
+        "value": 17.52
+      },
+      {
+        "date": "2026-10-28",
+        "value": 16.91
+      },
+      {
+        "date": "2026-10-29",
+        "value": 17.2
+      },
+      {
+        "date": "2026-10-30",
+        "value": 19.42
+      }
+    ],
+    "baseRateVelocityWindow": {
+      "compareDate": "2026-07-31",
+      "compareValue": 3.78,
+      "latestDate": "2026-10-30",
+      "latestValue": 4.06
+    },
+    "chicagoFci": -0.467,
+    "chicagoFciHistory": [
+      {
+        "date": "2026-08-28",
+        "value": -0.545
+      },
+      {
+        "date": "2026-09-04",
+        "value": -0.54
+      },
+      {
+        "date": "2026-09-11",
+        "value": -0.532
+      },
+      {
+        "date": "2026-09-18",
+        "value": -0.522
+      },
+      {
+        "date": "2026-09-25",
+        "value": -0.51
+      },
+      {
+        "date": "2026-10-02",
+        "value": -0.498
+      },
+      {
+        "date": "2026-10-09",
+        "value": -0.487
+      },
+      {
+        "date": "2026-10-16",
+        "value": -0.477
+      },
+      {
+        "date": "2026-10-23",
+        "value": -0.467
+      }
+    ],
+    "source": "https://fred.stlouisfed.org/series/DGS1MO",
+    "record_date": "2026-10-30",
+    "fetched_at": "2026-11-10T01:52:14.106Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.06,
+      "threeMonth": 4.16,
+      "twoYear": 4.56,
+      "tenYear": 4.94
     }
   }
 ]
