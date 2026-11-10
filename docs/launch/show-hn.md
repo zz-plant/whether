@@ -123,14 +123,16 @@ on the exec team read that morning.
 
 **"How is the score computed?"**
 Full derivation with the engine's actual constants: /trust#formula-reference. Short version:
-funding pressure ramps 0→90 as the one-month bill rate passes 3.5%→4.0%, plus up to 25 for curve inversion;
-risk appetite maps the 10Y−2Y slope linearly from −1% to +1.5%; stress reads (FCI, VIX,
-funding velocity) apply capped adjustments; inflation, labor, the high-yield spread and
-startup-market inputs are shown beside the scores and move nothing; regime is a quadrant with a
-two-consecutive-reads confirmation gate near boundaries.
+funding pressure ramps 0→90 as the one-month bill rate passes 3.5%→4.0%, plus up to 25 for curve inversion
+and up to 60 when the bill rate rose more than 0.4 points over 91 days;
+risk appetite maps the 10Y−2Y slope linearly from −1% to +1.5%; stress reads (Chicago Fed FCI,
+VIX) apply capped adjustments; inflation, labor, the high-yield spread and
+startup-market inputs (venture funding pace, layoffs) are shown beside the scores and move nothing;
+regime is a quadrant, and a flip needs two consecutive reads within 12 score points of a line and
+cannot happen closer than 6 unless one reading jumps a score 25 points or more across it.
 
 **"What data, exactly? Is it fresh?"**
-FRED daily CSV endpoints (DFF, DGS1MO, DGS3MO, DGS2, DGS10) plus the macro series above. No
+FRED daily CSV endpoints (DGS1MO, DGS3MO, DGS2, DGS10) plus the macro series above. No
 API keys anywhere in the pipeline. Freshness, per-source health, and degraded-state behavior
 are on /trust — when a source is down it says so and serves the last canonical snapshot
 instead of silently pretending.
