@@ -11,6 +11,7 @@ import {
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { ConditionIcon, LineStateIcon } from "./conceptIcons";
 import type { RegimeKey } from "../../../lib/types";
+import { travelTimeAt } from "../../../lib/report/home/weekMove";
 
 /**
  * A score drawn against its lines.
@@ -65,6 +66,12 @@ type ScoreLadderProps = {
    * the scrubbed score rather than springing back to `value`.
    */
   onScrubValue?: (nextValue: number) => void;
+  /**
+   * Draw the week's move as travel (week-move.css): the dot runs from the earlier
+   * reading to this one, and each line between them marks the moment it is passed.
+   * Only inside a card that replays the move; everywhere else the ladder is still.
+   */
+  travel?: boolean;
   className?: string;
 };
 
@@ -276,6 +283,7 @@ export function ScoreLadder({
   monthRange,
   feelsLike,
   onScrubValue,
+  travel = false,
   className = "",
 }: ScoreLadderProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -461,6 +469,24 @@ export function ScoreLadder({
           width: roundPercent(Math.abs(at(value) - at(previous))),
         }
       : null;
+  const travels = travel && hasPrevious;
+  /* When the travelling dot reaches a line, as a share of the travel's duration; null for
+     a line the move did not pass. */
+  const passedAt = (point: number): number | null => {
+    if (!travels || previous === null) return null;
+    const share = (point - previous) / (value - previous);
+    return share > 0 && share < 1 ? travelTimeAt(share) : null;
+  };
+  const travelStyle: CSSProperties & { "--week-move-dx": string } = {
+    "--week-move-dx": `${roundPercent(at(previous ?? value) - at(value))}%`,
+  };
+  const readingDot = (
+    <span
+      data-ladder-reading
+      className="absolute top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-[var(--bg-panel)] bg-slate-100"
+      style={{ left: `${at(value)}%` }}
+    />
+  );
   const scrubMove = isScrubbing
     ? {
         left: roundPercent(Math.min(at(value), at(scrub.value))),
@@ -546,8 +572,11 @@ export function ScoreLadder({
           <span
             key={`tick-${line.kind}-${line.value}`}
             data-ladder-tick
-            className={`absolute top-1.5 h-[calc(18px+var(--row)*13px)] w-0.5 -translate-x-1/2 @[28rem]:h-[calc(18px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[0]}`}
-            style={markStyle(at(line.value), row, wideRow)}
+            className={`absolute top-1.5 h-[calc(18px+var(--row)*13px)] w-0.5 -translate-x-1/2 @[28rem]:h-[calc(18px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[0]} ${passedAt(line.value) === null ? "" : "week-move-tick"}`}
+            style={{
+              ...markStyle(at(line.value), row, wideRow),
+              ...(passedAt(line.value) === null ? {} : { "--week-move-at": passedAt(line.value) }),
+            }}
           />
         ))}
         {laidOut.map(({ line, row, wideRow }) => (
@@ -564,8 +593,13 @@ export function ScoreLadder({
         {move ? (
           <span
             data-ladder-move
-            className="absolute top-[14px] h-0.5 bg-slate-300"
-            style={{ left: `${move.left}%`, width: `${move.width}%` }}
+            className={`absolute top-[14px] h-0.5 bg-slate-300 ${travels ? "week-move-bar" : ""}`}
+            style={{
+              left: `${move.left}%`,
+              width: `${move.width}%`,
+              /* Grows from the earlier reading's end. */
+              ...(travels && previous !== null ? { transformOrigin: at(previous) < at(value) ? "left" : "right" } : {}),
+            }}
           />
         ) : null}
         {hasPrevious ? (
@@ -583,10 +617,18 @@ export function ScoreLadder({
             data-ladder-feels-like
           />
         ) : null}
-        <span
-          className="absolute top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-[var(--bg-panel)] bg-slate-100"
-          style={{ left: `${at(value)}%` }}
-        />
+        {travels && previous !== null ? (
+          /* A rail as wide as the track, so the travel is a transform in the track's own
+             percentages and no layout property animates (ui-ux-standards §IX). */
+          <span
+            className="week-move-dot pointer-events-none absolute inset-x-0 top-0 h-0"
+            style={travelStyle}
+          >
+            {readingDot}
+          </span>
+        ) : (
+          readingDot
+        )}
         {isScrubbing && scrubMove ? (
           <>
             <span
@@ -626,7 +668,7 @@ export function ScoreLadder({
           {rangeBands.map((range) => (
             <span key={range.band} className="inline-flex items-center gap-1.5">
               <span aria-hidden="true" className={`inline-block h-2 w-3 rounded-full ${range.band === "common" ? "bg-slate-300/45" : "bg-slate-300/20"}`} />
-              {range.band === "common" ? "Common month" : "Unusual month"}
+              {range.band === "common" ? "Common move" : "Unusual move"}
             </span>
           ))}
           {feelsLike ? (

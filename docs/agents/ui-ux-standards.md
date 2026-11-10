@@ -119,6 +119,7 @@ section that matches the change, not the file.
 ## IX. Homepage weekly brief motion guardrails
 - Scope: `app/page.tsx` weekly brief modules and supporting components (reveal/stagger wrappers, decision chips, citation action controls).
 - Allowed reveal motion: `transform` + `opacity` only (e.g., `translateY` + fade). Do not animate layout properties (height, width, margin, padding, top/left).
+- The week's move (2026-11-09) is the one choreographed sequence on the card: `lib/report/home/weekMove.ts` builds it only for a week the conditions changed or an area changed standing, and `app/styles/week-move.css` plays it once from the first paint (reading travels, stamp turns at the change line, moved areas tick). Every element rests in this week's state and the keyframes only state where it came from, so no script, reduced motion, print and `?screenshot=1` draw the finished card. An earlier value is printed from a `data-text` attribute, never a text node, so the page's text says this week's value once. Do not add a second sequence, and do not play this one on a week nothing moved.
 - JS interaction rule: avoid JavaScript layout read/write loops (`getBoundingClientRect`, `offset*`, forced sync reflow) for reveal/chip transitions; use CSS transitions and IntersectionObserver-only visibility toggles.
 - Accessibility floor for interactive controls in dark cards:
   - keep minimum hit area at least 44x44 CSS px,
