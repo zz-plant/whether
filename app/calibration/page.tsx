@@ -83,7 +83,7 @@ export default function CalibrationPage() {
         <ul className="space-y-2 text-base text-slate-300">
           <li>
             <span className="text-slate-100">Sample.</span> Every monthly reading in the archive
-            that has a following month to compare against — {totals.months} of them.
+            that has a following month to compare against: {totals.months} of them.
             {record ? (
               <>
                 {" "}The record holds {record.readings} readings, {since} to{" "}

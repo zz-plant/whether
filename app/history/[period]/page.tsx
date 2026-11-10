@@ -291,7 +291,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
       {period.regimeMix.length ? (
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">How the period actually split</h2>
+          <h2 className="text-lg font-semibold text-slate-100">How the period split</h2>
           <p className="text-sm text-slate-300">
             Derived from {period.sampleCount} {cadenceNoun(period)} inside {period.title}.
           </p>

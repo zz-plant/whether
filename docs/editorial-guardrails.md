@@ -292,5 +292,13 @@ sites. `tests/readerClauseShapes.test.tsx` holds the first two rules; the rest a
   into its own sentence.
 - **One idea per sentence.** A ", which…" or ", where…" aside on the end, a ", meaning…" tail, a
   dash aside in the middle, or 30+ words carrying two ideas: split it.
+- **A contrast earns its negative half (2026-11-09).** "X, not Y", "rather than Y" and "instead of
+  Y" ran to 106 lines in 35,000 rendered words, seventeen of them in one guide. Keep the negative
+  only when a reader would otherwise assume Y: "a distance, not a probability", "shown, not
+  counted", "not guidance we published at the time". Where Y is a strawman ("evidence of control
+  rather than statements of intent", "a quarterly job, not a one-time setup task"), state X and
+  stop. The same pass cut "actually" as an intensifier and the em-dash aside in a prose sentence,
+  which is a colon, a full stop or parentheses. A dash stays in a label ("Layer one — market
+  conditions") and in a stored record.
 - **Not staccato.** Splitting stops at one idea per sentence; a page of five-word sentences is as
   hard to read as a page of clauses.

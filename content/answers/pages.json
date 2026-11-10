@@ -70,7 +70,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 11,
     "contextHeading": "Turn market changes into an operating review",
-    "context": "Whether’s forecast concerns movement between operating conditions, not an exact recession date, company revenue or investment return. After a rate or credit event, inspect the dated evidence before changing a plan. Historical comparisons show how the model reads past conditions, not how your company would have performed.",
+    "context": "Whether’s forecast concerns movement between operating conditions, not an exact recession date, company revenue or investment return. After a rate or credit event, inspect the dated evidence before changing a plan. Historical comparisons show how the model reads past conditions. They say nothing about how your company would have performed.",
     "companyInputs": [
       "The commitments that become harder to reverse as spending or hiring increases.",
       "Customer demand, available cash and the next evidence milestone for each bet.",
@@ -112,7 +112,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 2,
     "contextHeading": "Make the engineering hiring case",
-    "context": "A reliability hire may protect existing revenue without a directly attributable payback period. A growth hire needs evidence that capacity, rather than weak demand, limits results. Use different evidence for those cases instead of applying one payback cutoff to every engineering role.",
+    "context": "A reliability hire may protect existing revenue without a directly attributable payback period. A growth hire needs evidence that capacity, rather than weak demand, limits results. Use different evidence for each case; one payback cutoff does not fit every engineering role.",
     "companyInputs": [
       "The delivery backlog, incident load or customer commitment this role would address.",
       "Salary, benefits, recruiting and onboarding costs, including management capacity during ramp.",
@@ -153,7 +153,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 7,
     "contextHeading": "Prioritize the roadmap during a downturn",
-    "context": "A tighter budget should change the amount of work committed, not quietly lower the reliability of work already promised. Compare initiatives by customer consequence, remaining cost and time to evidence. Market guidance informs the review; it does not rank your backlog.",
+    "context": "A tighter budget should change the amount of work committed and leave the reliability of work already promised intact. Compare initiatives by customer consequence, remaining cost and time to evidence. Market guidance informs the review; it does not rank your backlog.",
     "companyInputs": [
       "Customer commitments, retention risks and reliability work already funded.",
       "Remaining cost and capacity for each initiative, including maintenance after launch.",
@@ -446,7 +446,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 9,
     "contextHeading": "A market-conditions note for an executive meeting",
-    "context": "Separate the external market reading from the cash, customer and delivery evidence behind management decisions. For a portfolio review, use the same questions across companies but keep each company’s runway and commitments separate. Historical reconstructions provide context; published weekly briefs document what was actually recorded.",
+    "context": "Separate the external market reading from the cash, customer and delivery evidence behind management decisions. For a portfolio review, use the same questions across companies but keep each company’s runway and commitments separate. Historical reconstructions provide context; published weekly briefs document what was recorded.",
     "companyInputs": [
       "The source date, the previous reading and any missing or fallback data.",
       "The company decision affected, its owner and the internal evidence supporting a change.",
@@ -476,7 +476,7 @@
       "how long will our money last"
     ],
     "category": "decision",
-    "shortAnswer": "Size cash to the safe band for the current conditions — 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing — and open the raise while you are still above the band's floor.",
+    "shortAnswer": "Size cash to the safe band for the current conditions: 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing. Open the raise while you are still above the band's floor.",
     "directAnswer": "Enter cash, monthly spend and revenue in the runway planner, compare the result to the band your current conditions imply, and set the raise window the planner gives: months 4 through 8 with comfortable coverage, 2 through 5 when coverage is thin, immediately when it is critical.",
     "audience": "Founders, CFOs and board members",
     "applyHeading": "Compare your runway to the band",
@@ -486,7 +486,7 @@
     ],
     "thresholdFocus": "both",
     "contextHeading": "Why the band moves with conditions",
-    "context": "The band is the runway planner's model: it widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further — seed adds three months, Series A adds two. The band is a planning default, not a forecast: the record shows how conditions changed after each line, not what a particular round will fetch.",
+    "context": "The band is the runway planner's model: it widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further: seed adds three months, Series A adds two. The band is a planning default. The record shows how conditions changed after each line, not what a particular round will fetch.",
     "companyInputs": [
       "Cash in the bank and monthly spend, net of revenue.",
       "The months a raise consumes: preparation, partner meetings, diligence and a delayed close.",
@@ -515,8 +515,8 @@
       "what if the economy slows down"
     ],
     "category": "decision",
-    "shortAnswer": "Work out now what pausing would mean for your company. The points where you would pause are already set, so getting ready means knowing your runway, burn and demand, not guessing when things turn.",
-    "directAnswer": "Put cash, burn and demand numbers next to where hiring, roadmap and spend would pause, and write down for each what you would cut, defer or stop if it trips — so a change in conditions means a decision you already made.",
+    "shortAnswer": "Work out now what pausing would mean for your company. The points where you would pause are already set, so getting ready means knowing your runway, burn and demand.",
+    "directAnswer": "Put cash, burn and demand numbers next to where hiring, roadmap and spend would pause, and write down for each what you would cut, defer or stop if it trips. A change in conditions then means a decision you already made.",
     "audience": "Founders, COOs and CFOs",
     "applyHeading": "Decide now what a tripped line means",
     "mappedDecisionAreas": [
@@ -559,7 +559,7 @@
     ],
     "category": "decision",
     "shortAnswer": "Treat the first sales hire as an expansion bet: fund it one stage at a time with the stage gates written down, and size it against the risk appetite line like every other new bet.",
-    "directAnswer": "Make the hire when founder-led sales shows repeatable evidence — the same segment, the same pitch, closed deals — and the fully loaded cost is in the cash plan with a written stop condition attached.",
+    "directAnswer": "Make the hire when founder-led sales shows repeatable evidence (the same segment, the same pitch, closed deals) and the fully loaded cost is in the cash plan with a written stop condition attached.",
     "audience": "Founders, CEOs and heads of sales",
     "applyHeading": "Gate the hire like a bet",
     "mappedDecisionAreas": [
@@ -567,7 +567,7 @@
     ],
     "thresholdFocus": "risk",
     "contextHeading": "What the record can and cannot tell you",
-    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use: when risk appetite falls below its pause line, new commitments stop — and a first salesperson who arrives just before that line is a bet made on the edge.",
+    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use: when risk appetite falls below its pause line, new commitments stop. A first salesperson who arrives just before that line is a bet made on the edge.",
     "companyInputs": [
       "Closed deals from founder-led sales: count, segment and cycle length.",
       "The fully loaded cost of the rep and the cash plan that carries it.",
@@ -669,7 +669,7 @@
     "thresholdFocus": "tightness",
     "featuredOrder": 13,
     "contextHeading": "Headcount during a tighter market",
-    "context": "Layoffs are a cash decision with a long shadow. They buy runway but cost trust, speed and institutional knowledge. Make them deliberate, not reactive.",
+    "context": "Layoffs are a cash decision with a long shadow. They buy runway but cost trust, speed and institutional knowledge. Make them deliberate.",
     "companyInputs": [
       "Current runway in months and the burn target needed to extend it.",
       "Which roles map directly to revenue or core delivery.",
@@ -694,7 +694,7 @@
     "faq": [
       {
         "question": "How much runway should a layoff buy?",
-        "answer": "Enough to reach a milestone that changes the next raise, not just a few extra weeks."
+        "answer": "Enough to reach a milestone that changes the next raise."
       },
       {
         "question": "Should we cut before or after a fundraise?",

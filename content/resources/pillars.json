@@ -25,7 +25,7 @@
           {
             "heading": "H3: Fund the next stage on evidence, not on the pitch",
             "paragraphs": [
-              "In board meetings, ask for evidence of control rather than statements of intent. Capital discipline does not cap ambition; it funds ambition one evidenced stage at a time. Replace the question ‘Can we fund this idea?’ with ‘What evidence would justify funding the next stage?’",
+              "In board meetings, ask for evidence of control. Capital discipline does not cap ambition; it funds ambition one evidenced stage at a time. Replace the question ‘Can we fund this idea?’ with ‘What evidence would justify funding the next stage?’",
               "Tying approval to evidence gates changes three things. Functional leaders know a persuasive deck will not get a budget approved. Investors can read the approval criteria and see them applied the same way each time. Teams learn faster because each assumption is written down early and checked against a stated number."
             ]
           },
@@ -43,7 +43,7 @@
         "paragraphs": [
           "The structure has to be specific, repeated every cycle, and checkable afterward. It has three parts: one standard decision packet, a stated confidence range for each major assumption, and a response agreed in advance for each threshold breach. Without that structure, whoever argues most urgently sets the decision.",
           "Use one packet structure for every strategic bet: the objective, the spend required, the leading indicators expected to move, the conditions that would reverse it, and the named owner. If each proposal argues in its own format, the board cannot compare them.",
-          "Then hold three kinds of review. Weekly reviews check which way the indicators are moving. Monthly reviews check whether a move has lasted 30 days. Quarterly board sessions decide irreversible commitments. Keeping to these three meetings is what turns data into decisions instead of commentary."
+          "Then hold three kinds of review. Weekly reviews check which way the indicators are moving. Monthly reviews check whether a move has lasted 30 days. Quarterly board sessions decide irreversible commitments. Keeping to these three meetings is what turns data into decisions."
         ],
         "subsections": [
           {
@@ -65,15 +65,15 @@
       {
         "heading": "Execution discipline: sequencing commitments in uncertain regimes",
         "paragraphs": [
-          "Most discipline failures are ordering failures: teams invest in the wrong sequence, not too much. Approve commitments that improve information before commitments that add fixed cost.",
+          "Most discipline failures are ordering failures: teams invest in the wrong sequence. Approve commitments that improve information before commitments that add fixed cost.",
           "Use this order: first moves that protect runway, then experiments that produce evidence, then commitments that scale. The order stops a team from scaling an assumption before it has tested it.",
-          "Turn each strategic goal into staged funding. Instead of approving a full year of spend for one thesis, release funds in stages, each tied to a milestone the board can observe."
+          "Turn each strategic goal into staged funding, with each stage tied to a milestone the board can observe."
         ],
         "subsections": [
           {
             "heading": "H3: Write a stop condition for every funding stage",
             "paragraphs": [
-              "Give every funding stage a stop condition alongside its success condition. The stop condition says in advance when continuing becomes a governance failure rather than perseverance, which keeps the team from spending more because it has already spent.",
+              "Give every funding stage a stop condition alongside its success condition. The stop condition says in advance when continuing becomes a governance failure, which keeps the team from spending more because it has already spent.",
               "Write both conditions in operating terms: customer behavior, cycle times, cash conversion, or reliability levels. Reject phrases such as ‘market feels weak’ or ‘momentum is mixed’; no one can act on them."
             ]
           },
@@ -113,8 +113,8 @@
       {
         "heading": "What exemplary boards do differently",
         "paragraphs": [
-          "Strong boards rely on reusable documents, one shared vocabulary, and named owners rather than on speeches. That lets governance keep working as the company grows.",
-          "They treat a reversal that meets a predefined threshold as governance working, not as failure. Removing the stigma from rollback makes teams report problems sooner and shortens the time to correct them.",
+          "Strong boards rely on reusable documents, one shared vocabulary, and named owners. That lets governance keep working as the company grows.",
+          "They treat a reversal that meets a predefined threshold as governance working. Removing the stigma from rollback makes teams report problems sooner and shortens the time to correct them.",
           "Instead of cutting every budget by the same share, they move money to the bets with evidence behind them, which keeps options open and keeps the team’s confidence."
         ],
         "subsections": [
@@ -140,8 +140,8 @@
           "Separate leading indicators from lagging ones, and note how far each can be trusted. Quarterly revenue growth is familiar and easy to present, but by the time a lagging number falls, the options have already narrowed. Add forward-looking measures: sales-cycle length, onboarding completion rate, and early cohort retention.",
           "Mark how reliable each metric is. If a metric is improving but rests on incomplete instrumentation, say so on the page, so the board will not commit more money on a fragile reading. Before approving an incremental commitment, ask whether the improvement would survive better data.",
           "Break metrics out by customer segment. A company-wide average can hide decline in high-value segments while low-value segments inflate top-line activity. With limited runway, that distortion steers spend toward traction that is not real.",
-          "Review cash conversion and decision speed together. If decisions take longer while burn stays flat, the company is paying for internal drag, not learning. Track spend against decision cycle time, and ask which approval steps slow decisions without producing information.",
-          "Add a variance note to each scorecard section. Finance, product, and sales and marketing often read the same movement differently; instead of forcing agreement, record each view with a confidence rating and the next check it calls for. The board sees the disagreement without the decision slowing down.",
+          "Review cash conversion and decision speed together. If decisions take longer while burn stays flat, the company is paying for internal drag. Track spend against decision cycle time, and ask which approval steps slow decisions without producing information.",
+          "Add a variance note to each scorecard section. Finance, product, and sales and marketing often read the same movement differently; record each view with a confidence rating and the next check it calls for. The board sees the disagreement without the decision slowing down.",
           "List on the scorecard every initiative paused or retired since the last meeting. Most board materials report the initiatives in motion and omit those paused or retired. Listing stops makes correction routine and, over time, returns more capital to better uses."
         ],
         "reference": true
@@ -149,10 +149,10 @@
       {
         "heading": "Board workshop agenda for capital discipline reset",
         "paragraphs": [
-          "Open with an inventory of current commitments, not with plans. Directors and executives list every fixed and semi-fixed obligation and mark how hard each is to undo: hiring commitments, vendor contracts, roadmap promises, and channel spend. The inventory shows where flexibility still exists and where it has quietly gone.",
+          "Open with an inventory of current commitments. Directors and executives list every fixed and semi-fixed obligation and mark how hard each is to undo: hiring commitments, vendor contracts, roadmap promises, and channel spend. The inventory shows where flexibility still exists and where it has gone.",
           "Second, test the assumptions. For each major commitment, ask which assumption does the most damage if wrong, which signal would confirm or disprove it, and how soon that signal can be seen. Putting each argument as a testable assumption replaces debate with a check.",
           "Third, rehearse an escalation. Pick two plausible bad scenarios and walk each through detecting the trigger, notifying the owner, preparing the board addendum, and acting. A rehearsal finds process gaps before real pressure does, and often shows that no one is sure who has authority.",
-          "Fourth, present each funding choice in stages rather than approve-or-reject: a base stage, the evidence gate, and the expansion stage. Work keeps moving while the downside stays capped.",
+          "Fourth, present each funding choice in stages: a base stage, the evidence gate, and the expansion stage. Work keeps moving while the downside stays capped.",
           "Fifth, agree how to describe uncertainty. Trust drops fast when what management tells the board differs from what it tells the company. Leave with shared words for uncertainty, confidence, and the reasons for a reversal, and use them in both places.",
           "Close by assigning owners and dates: who keeps the decision inventory, who reports on threshold status, and when retrospective findings change the process. Without named owners, the workshop changes nothing."
         ],
@@ -164,7 +164,7 @@
           "What evidence would make us commit more today, and what evidence would make us pause? Without this question, the case for expanding stays vague while the pull to continue stays strong. A good answer names the metrics, the confidence required, and the person who monitors them. Require it on every material proposal, so no team wins approval on narrative confidence alone.",
           "Where could this decision fail silently before lagging results show it? Silent failure shows up first in quality drift, rising support load, longer sales cycles, and fragile staffing. Name these channels early, and attach a leading indicator and an escalation rule to each before the damage compounds.",
           "Which assumptions depend on outside events, and which can we control? Give outside dependencies larger buffers and shorter review intervals. Give internal assumptions a named owner and dated checkpoints. The split shows the board where its scrutiny can change the outcome.",
-          "How does this proposal change our options 90 days from now? A strong proposal keeps or widens the company’s options while it gathers evidence; a weak one uses options up fast and teaches little. Asking this makes directors judge flexibility, not an isolated return-on-investment story.",
+          "How does this proposal change our options 90 days from now? A strong proposal keeps or widens the company’s options while it gathers evidence; a weak one uses options up fast and teaches little. Asking this makes directors judge flexibility.",
           "If a threshold is breached, what do we do in the first 48 hours? Strong teams set containment, communication, and the handoff of the decision in advance. Without a 48-hour plan, escalation turns into late triage and the damage spreads.",
           "Which decision from last quarter would we make differently with what we know now, and what have we changed so we will not repeat it? The answer should name a rule, threshold or document the board changed after last quarter’s retrospective."
         ],
@@ -203,10 +203,10 @@
           "Does the packet list which parts of the initiative can be undone and which cannot? A mostly flexible plan can hide one irreversible commitment.",
           "Is each escalation threshold measurable, time-bound, and tied to a named response? A metric with no consequence gives false comfort.",
           "Does the packet show the 30-day view: how long the move has lasted, how reliable the data is, and what spending change it could justify? Without it, teams overreact or underreact to short-term swings.",
-          "What is the first action if we are wrong? A strong proposal includes containment steps and the order of communications, not only the upside.",
+          "What is the first action if we are wrong? A strong proposal includes containment steps and the order of communications alongside the upside.",
           "Which past decision in our records is closest to this one, and which lesson from it is built into this proposal?",
           "If this initiative needs more capital than planned, what would we stop funding? A proposal that cannot answer has not weighed the trade-off.",
-          "Does the operating team actually use these documents? A framework nobody opens governs nothing."
+          "Does the operating team use these documents? A framework nobody opens governs nothing."
         ],
         "reference": true
       }
@@ -262,7 +262,7 @@
           {
             "heading": "H3: Layer one — market conditions",
             "paragraphs": [
-              "Read market signals for direction, not as forecasts. Use them to set how much to commit, not to claim certainty about what comes next.",
+              "Read market signals for direction, and use them to set how much to commit. They are not forecasts.",
               "Record how long each signal has lasted and how reliable it is. Do not change commitments sharply on one period’s movement unless other evidence agrees."
             ]
           },
@@ -277,7 +277,7 @@
             "heading": "H3: Layer three — decision rules",
             "paragraphs": [
               "Decision rules set how decisions move through the company at each level of commitment: who has authority, which thresholds trigger review, and which documents an approval requires.",
-              "This layer turns the board’s intent into what teams actually do. Without it, the framework is talk."
+              "This layer turns the board’s intent into what teams do. Without it, the framework is talk."
             ]
           }
         ]
@@ -325,7 +325,7 @@
             "heading": "H3: Keep a searchable decision log",
             "paragraphs": [
               "Keep every decision document in a searchable log that shows past assumptions, thresholds, and when the board intervened.",
-              "New decisions can then cite how reliable past signals were instead of re-arguing from scratch."
+              "New decisions can then cite how reliable past signals were."
             ]
           }
         ]
@@ -349,7 +349,7 @@
             "heading": "H3: Five questions to ask every meeting",
             "paragraphs": [
               "Ask the same five questions each meeting: What changed? What lasted 30 days? What did not? What did we stop? Which threshold is closest to a breach?",
-              "Asked every time, they keep the discussion on evidence rather than on the story."
+              "Asked every time, they keep the discussion on evidence."
             ]
           }
         ]
@@ -359,10 +359,10 @@
         "paragraphs": [
           "A working framework changes decisions and behavior in ways you can measure. Early signs: fewer exceptions, escalated issues closed faster, and spending that moves when confidence moves. If none of these appear, the framework exists on paper only.",
           "Count the board requests that management did not see coming. When management knows which documents will be required, surprise requests drop. Frequent surprises point to unclear limits or uneven enforcement.",
-          "Measure the quality of reversals, not only their number. A high count can mean healthy discipline or unstable planning. Score each reversal on four measures: time to detection, adherence to the notification rule, collateral impact, and a written lesson. Prefer a timely, open reversal to a delayed defense.",
+          "Measure the quality of reversals as well as their number. A high count can mean healthy discipline or unstable planning. Score each reversal on four measures: time to detection, adherence to the notification rule, collateral impact, and a written lesson. Prefer a timely, open reversal to a delayed defense.",
           "Watch where meeting time goes. Early on, most of it goes to arguing about data quality and who owns the process. Once the framework works, it goes to trade-offs and sequencing, a reliable sign the foundations are holding.",
           "Track decision speed by class. Delegated decisions should get faster while reserved decisions stay deliberate and evidence-heavy. If every class slows down, the process is too heavy. If reserved decisions speed up without more evidence, rigor is slipping.",
-          "Audit threshold settings every quarter. A threshold that never triggers may be too loose; one that triggers constantly may be too sensitive or tied to a metric no one can act on. Setting thresholds is a quarterly job, not a one-time setup task."
+          "Audit threshold settings every quarter. A threshold that never triggers may be too loose; one that triggers constantly may be too sensitive or tied to a metric no one can act on. Setting thresholds is a quarterly job."
         ],
         "reference": true
       },
@@ -406,7 +406,7 @@
       {
         "heading": "Why reversibility is a governance function, not an execution detail",
         "paragraphs": [
-          "Reversibility as governance means rating how hard a decision is to undo before the board approves it, not after. Most companies raise the question only once the decision is made, when the chance to govern it has passed. Give the rating the same weight as the decision’s expected upside.",
+          "Reversibility as governance means rating how hard a decision is to undo before the board approves it. Most companies raise the question only once the decision is made, when the chance to govern it has passed. Give the rating the same weight as the decision’s expected upside.",
           "Hold a decision that cannot be undone quickly to a higher evidence bar and tighter escalation rules. Let a reversible decision proceed on less certainty, because its downside is already contained. Small experiments then stay fast, and commitments the company could not recover from wait for evidence.",
           "When board packets leave out how hard each decision is to undo, directors cannot see options closing. Capital gets committed faster than it can be moved, and flexibility disappears just as uncertainty rises."
         ],
@@ -470,7 +470,7 @@
             "heading": "H3: What the board receives when a threshold is breached",
             "paragraphs": [
               "When a threshold is breached, the board receives four items: a summary of the breach, how reliable the data is, the recommended action, and the expected effect on other work.",
-              "Sending the same four items every time cuts noise and keeps directors on the decision instead of disputing the data."
+              "Sending the same four items every time cuts noise and keeps directors on the decision."
             ]
           }
         ]
@@ -511,7 +511,7 @@
             "heading": "H3: What executives do to make it stick",
             "paragraphs": [
               "Executives show the rollback plan before asking for approval, report threshold breaches without spin, and share what each reversal taught.",
-              "When executives do this, the documents get used rather than filed."
+              "When executives do this, the documents get used."
             ]
           },
           {
@@ -551,7 +551,7 @@
         "heading": "Closing note: why a board trusts a decision it can undo",
         "paragraphs": [
           "A written way to undo each decision lets the board approve experiments without losing control, and step in quickly without disrupting execution.",
-          "When the route to correction is clear, teams are more candid about uncertainty. That candor improves the data the board sees and keeps spending tied to what is happening, not to what the team hopes.",
+          "When the route to correction is clear, teams are more candid about uncertainty. That candor improves the data the board sees and keeps spending tied to what is happening.",
           "The result over time is not perfect forecasts. It is fewer surprise failures, faster recovery when assumptions break, and more trust between management and the board.",
           "Boards that keep this up over several cycles usually see better capital efficiency, clearer communication under pressure, and more confidence about when to accelerate and when to hold, reset, or reduce risk."
         ]

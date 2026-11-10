@@ -34,7 +34,7 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     whatItMeasures:
       "How hard or easy it is for U.S. companies to raise, borrow, and replace cash.",
     highMeans:
-      "Money is tight and capital is scarce — projects need fast cash payback. Conserve cash, extend runway, and prioritize work that pays back in under 90 days. Fundraising windows are narrow.",
+      "Money is tight and capital is scarce. Projects need fast cash payback. Conserve cash, extend runway, and prioritize work that pays back in under 90 days. Fundraising windows are narrow.",
     lowMeans:
       "Money is flowing and capital is available. You can invest in growth, hire ahead of revenue, and take on longer projects.",
     midMeans:
@@ -50,7 +50,7 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
     lowMeans:
       "Markets are risk-averse — buyers freeze extra budgets and demand clear return on investment. Focus on retention, profitability, and core product. Delay speculative launches.",
     midMeans:
-      "Markets are selectively open — buyers require clear customer proof before signing large contracts. Prove traction before scaling.",
+      "Markets are selectively open. Buyers require clear customer proof before signing large contracts. Prove traction before scaling.",
     jargonTerm: "Risk appetite",
   },
   baseRate: {
