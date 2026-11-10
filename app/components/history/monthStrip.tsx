@@ -2,7 +2,7 @@ import { ScreenshotCaption } from "../screenshotCaption";
 import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/regimePresentation";
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { countRecord } from "../../../lib/report/trackRecord";
-import { ConditionIcon } from "../ui/conceptIcons";
+import { ConditionIcon, ConditionWord } from "../ui/conceptIcons";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { buildMonthBriefHref } from "../../../lib/timeMachine/monthFormatting";
 
@@ -193,7 +193,7 @@ export function MonthStrip({ entries, markers, markersLegend, band = true, class
             ) : (
               <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-500" />
             )}
-            {isRegimeKey(regime) ? REGIME_LABELS[regime] : regime}
+            {isRegimeKey(regime) ? <ConditionWord regime={regime} /> : regime}
             <span className="tabular-nums text-slate-500">{months} {months === 1 ? "month" : "months"}</span>
           </li>
         ))}

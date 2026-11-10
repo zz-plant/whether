@@ -38,6 +38,7 @@ import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 import { SectionTabs } from "./sectionTabs";
 import type { Route } from "../../lib/navigation/routeType";
+import type { RegimeKey } from "../../lib/types";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
 import type { TrustStripProps } from "./trustStrip";
@@ -49,6 +50,9 @@ export type ReportShellModel = {
      *  month" on /history, so the word itself can keep the stamp's shape. */
     statusPrefix?: string;
     regime?: RegimeIconType;
+    /** The condition the status word names, where the page has no regime of its
+     *  own (/history's latest archived month): it inks the word and nothing else. */
+    statusRegime?: RegimeKey;
     recordDateLabel: string;
     fetchedAtLabel?: string;
   };
@@ -101,7 +105,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
-    status: { statusLabel, statusPrefix, regime, recordDateLabel, fetchedAtLabel = "" },
+    status: { statusLabel, statusPrefix, regime, statusRegime, recordDateLabel, fetchedAtLabel = "" },
     page: { pageTitle, pageSummary, sectionLinks, currentPath, tabsQuery },
     trust: {
       trustStatusTone,
@@ -177,6 +181,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             exportCta={exportCta}
             statusLabel={statusLabel}
             statusPrefix={statusPrefix}
+            statusRegime={statusRegime}
             trustStatusLabel={trustReadiness.headline}
             fetchedAtLabel={fetchedAtLabel}
             showOfflineBadge={showOfflineBadge}

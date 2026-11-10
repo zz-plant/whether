@@ -1,4 +1,5 @@
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { ConditionWord } from "../../components/ui/conceptIcons";
 import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
@@ -196,11 +197,11 @@ export async function ComparePanel({
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="font-semibold text-slate-300">Conditions:</span>
             <span className="rounded border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-100">
-              {getRegimePublicLabel(reportA.assessment.regime)} (Period A)
+              <ConditionWord regime={reportA.assessment.regime}>{getRegimePublicLabel(reportA.assessment.regime)}</ConditionWord> (Period A)
             </span>
             <span className="text-slate-500">vs</span>
             <span className="rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-300">
-              {getRegimePublicLabel(reportB.assessment.regime)} (Period B)
+              <ConditionWord regime={reportB.assessment.regime}>{getRegimePublicLabel(reportB.assessment.regime)}</ConditionWord> (Period B)
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-fluid-nano font-mono">
@@ -272,12 +273,12 @@ export async function ComparePanel({
       <div className="sticky top-0 z-10 -mx-2 flex items-center justify-between gap-3 border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)]/95 px-2 py-2 text-xs backdrop-blur md:hidden">
         <span className="min-w-0 truncate">
           <span className="font-semibold text-slate-100">A</span>{" "}
-          {getRegimePublicLabel(reportA.assessment.regime)}
+          <ConditionWord regime={reportA.assessment.regime}>{getRegimePublicLabel(reportA.assessment.regime)}</ConditionWord>
           <span className="text-slate-400"> · {reportA.recordDateLabel}</span>
         </span>
         <span className="min-w-0 truncate text-right">
           <span className="font-semibold text-slate-100">B</span>{" "}
-          {getRegimePublicLabel(reportB.assessment.regime)}
+          <ConditionWord regime={reportB.assessment.regime}>{getRegimePublicLabel(reportB.assessment.regime)}</ConditionWord>
           <span className="text-slate-400"> · {reportB.recordDateLabel}</span>
         </span>
       </div>

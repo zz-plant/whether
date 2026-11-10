@@ -3,6 +3,7 @@ import { frameFactsAttributes } from "../../../lib/navigation/runningHead";
 import { isRegimeKey } from "../../../lib/regimePresentation";
 import { formatNearestChange } from "../../../lib/report/reportFormatting";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
+import type { RegimeKey } from "../../../lib/types";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
 /**
@@ -24,6 +25,7 @@ export function CommandCenterNavBlock({
   exportCta,
   statusLabel,
   statusPrefix,
+  statusRegime,
   trustStatusLabel,
   fetchedAtLabel,
   showOfflineBadge,
@@ -38,6 +40,8 @@ export function CommandCenterNavBlock({
   exportCta?: ExportCtaProps | null;
   statusLabel: string;
   statusPrefix?: string;
+  /** The condition the status word names when the page shell has no regime; scoped to the word. */
+  statusRegime?: RegimeKey;
   trustStatusLabel: string;
   fetchedAtLabel: string;
   showOfflineBadge: boolean;
@@ -143,7 +147,7 @@ export function CommandCenterNavBlock({
                 ) : null}
                 {/* The week's word in the stamp's shape, the same placard the
                     hero's tag and the sticky strip print. */}
-                <span className="type-stamp weather-tag-placard text-fluid-base">{statusLabel}</span>
+                <span data-regime={statusRegime} className="type-stamp weather-tag-placard text-fluid-base">{statusLabel}</span>
                 {introMetaRest ? (
                   <span className="text-fluid-sm font-medium text-slate-400">{introMetaRest}</span>
                 ) : null}

@@ -233,7 +233,10 @@ component never picks a condition hue: it names its regime with `data-regime` an
 `--regime-accent` (the fill) or `--regime-ink` (the text ink).
 
 The fill appears as a field in the record band and History's week cells, as a quadrant wash on
-the conditions map, and nowhere else. As text, the condition word prints in its ink.
+the conditions map, and nowhere else. As text, the condition word prints in its ink, in every
+list, table, legend and caveat as well as beside the guidance: `ConditionWord`
+(`app/components/ui/conceptIcons.tsx`) sets it, and `ConditionLabel` adds the glyph. A column
+of months then reads as stretches in the inks the band draws as fields.
 
 ### Tertiary: a crossed line
 
@@ -560,6 +563,8 @@ and opacity only, under two seconds, still under reduced motion, print and scree
 
 - **Do** name a condition with `data-regime` and read `--regime-accent` or `--regime-ink`;
   never type a condition hex at the call site.
+- **Do** print a condition word through `ConditionWord` or `ConditionLabel`, never as a bare
+  label in the surrounding ink.
 - **Do** draw links, buttons and focus rings in the ink, with links underlined.
 - **Do** set the guidance, condition word, area names, score figures, headings and wordmark in
   Besley, and everything that explains in Archivo.
