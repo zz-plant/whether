@@ -30,7 +30,7 @@ import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
  */
 
 /* The margin is what the API calls `confidence` (2026-10-09); the study grades it under its display name. */
-export const CONFIDENCE_RECORD_TITLE = "How often a close call held";
+export const CONFIDENCE_RECORD_TITLE = "How often conditions held near a change";
 
 const percentFormat = (value: number) => `${Math.round(value)}%`;
 
@@ -149,8 +149,9 @@ export function ConfidenceRecordSummary() {
   return (
     <div className="space-y-1.5" data-confidence-record-summary>
       <p className="text-sm text-slate-200">
-        <span className="font-semibold text-slate-100">{warned} of {total}</span> shifts had
-        advance warning before the line was crossed.
+        {/* "Changes", the tiles' noun beside it; it said "shifts" (2026-11-10). */}
+        <span className="font-semibold text-slate-100">{warned} of {total}</span> changes had
+        advance warning.
       </p>
       <p className="text-xs text-slate-400">
         {missed} changes had no advance warning when scores moved across the line in a single month.

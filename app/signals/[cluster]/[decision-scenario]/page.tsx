@@ -8,6 +8,7 @@ import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayload
 import { shouldNoindexPayload } from "../../../../lib/seo/freshnessIndexation";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { publicDecisionLabels } from "../../../../lib/report/reportFormatting";
+import { pauseConditionOnly } from "../../../../lib/export/exportTerms";
 import {
   DATA_CURRENCY_ACTION,
   DATA_CURRENCY_ACTION_HREF,
@@ -48,7 +49,7 @@ const buildSignalDecisionBrief = ({
     `${signalTitle} — ${scenarioTitle}`,
     `${publicDecisionLabels.call}: ${payload.currentCall}`,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
-    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseConditionOnly(payload.triggerThreshold)}`,
     `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
     `Freshness: ${payload.freshness}`,
     `Trust: ${payload.trustSummary}`,
@@ -213,7 +214,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <ul className="space-y-2 text-sm text-slate-200">
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.call}:</span> {payload.currentCall}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.action}:</span> {payload.immediateAction}</li>
-          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {payload.triggerThreshold}</li>
+          <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.threshold}:</span> {pauseConditionOnly(payload.triggerThreshold)}</li>
           <li>• <span className="font-semibold text-slate-100">{publicDecisionLabels.reversal}:</span> {payload.reversalCondition}</li>
         </ul>
         {/* These lines are stated in score points, on a page most readers reach cold
@@ -249,9 +250,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         </p>
         <ReportCta
           href={pagePath}
-          label="Copy signal brief"
+          label="Copy decision brief"
           copyText={copyText}
-          copyTarget="Signal brief"
+          copyTarget="Decision brief"
           telemetryEvent={{
             pagePath,
             cluster: "authority",
@@ -264,13 +265,15 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2">
-          <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
-          <ActionLink href={`/signals/${cluster}`} variant="pill">The evidence</ActionLink>
+          {/* Each named for where it goes: "The evidence", "Full answer", "Decision tool" and
+              "What to do" meant nothing read alone, as a screen reader's link list reads them. */}
+          <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
+          <ActionLink href={`/signals/${cluster}`} variant="pill">{signal.title}</ActionLink>
           {leadAnswer ? (
-            <ActionLink href={`/answers/${leadAnswer.slug}`} variant="pill">Full answer</ActionLink>
+            <ActionLink href={`/answers/${leadAnswer.slug}`} variant="pill">{leadAnswer.title}</ActionLink>
           ) : null}
-          <ActionLink href="/resolve/ceo" variant="pill">Decision tool</ActionLink>
-          <ActionLink href="/operate#ops-monthly-action-summary" variant="pill">What to do</ActionLink>
+          <ActionLink href="/resolve/ceo" variant="pill">Guide for CEOs</ActionLink>
+          <ActionLink href="/operate#ops-monthly-action-summary" variant="pill">This week&apos;s rule for each area</ActionLink>
         </div>
       </section>
     </ContentPageShell>

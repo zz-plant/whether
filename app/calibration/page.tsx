@@ -38,7 +38,7 @@ export const runtime = "edge";
  * same study would compete with each other.
  */
 export const metadata: Metadata = buildPageMetadata({
-  title: "How Often the Guidance Held Up",
+  title: "How often the guidance held up",
   description:
     "How often the weekly guidance held, checked against every month since 2012, and how close conditions came to changing each time.",
   path: "/calibration",
@@ -70,16 +70,13 @@ export default function CalibrationPage() {
       <ConfidenceRecordSection />
 
       <SecondaryPageSection
-        title="What happened to venture fundraising after lines were crossed"
-        description="Across 51 quarters from 2012 to 2024, forward 4-quarter U.S. venture deal value growth when Funding Pressure was tight (> 70) vs. calm (≤ 70)."
+        title="What happened to venture fundraising when funding pressure was above 70"
+        description="Across 51 quarters from 2012 to 2024: U.S. venture deal value growth over the next four quarters, when funding pressure was tight (above 70) and when it was calm (70 or below)."
       >
         <PremiseOutcomeScatterChart model={premiseModel} className="max-w-xl" />
       </SecondaryPageSection>
 
-      <SecondaryPageSection
-        title="How it was measured"
-        description="Which readings we counted, how we scored the outcome, and how the distance bands work."
-      >
+      <SecondaryPageSection title="How it was measured">
         <ul className="space-y-2 text-base text-slate-300">
           <li>
             <span className="text-slate-100">Sample.</span> Every monthly reading in the archive
@@ -106,7 +103,7 @@ export default function CalibrationPage() {
 
       <SecondaryPageSection
         title="What it does not show"
-        description="These limits are why we didn't just re-fit the number."
+        description="These limits are why we did not re-fit the number."
       >
         <ul className="space-y-2 text-base text-slate-300">
           <li>

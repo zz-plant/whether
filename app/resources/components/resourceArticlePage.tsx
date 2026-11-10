@@ -201,7 +201,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             <div className="flex flex-wrap gap-2 text-sm">
               <Link href="/resources/decision-shield-overview" className="text-sky-200 underline underline-offset-4">Decision Shield</Link>
               <span className="text-slate-400">•</span>
-              <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital Planning Template</Link>
+              <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital planning template</Link>
             </div>
           </section>
 
@@ -273,13 +273,12 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
               {article.toolLink.label}
             </Link>
             <ActionLink href="/resources/decision-shield-overview" variant="pill" className="justify-center" data-conversion-event="request">
-              Open Decision Shield
+              Decision Shield overview
             </ActionLink>
             <div className="space-y-2 border-t border-slate-700/80 pt-3 text-xs text-slate-300">
               <p className="font-semibold text-slate-100">Related pages</p>
               <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link>
               <Link href={boardFrameworkPath} className="block text-sky-200 underline underline-offset-4">Board-level capital discipline framework</Link>
-              <Link href={article.toolLink.href} className="block text-sky-200 underline underline-offset-4">Tool page</Link>
             </div>
           </div>
         </aside>

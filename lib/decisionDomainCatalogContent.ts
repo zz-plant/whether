@@ -116,7 +116,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "ops-risk",
-      title: "Ops & Risk",
+      title: "Ops & risk",
       decisions: ["Who decides what", "How much compliance to take on", "Whether the team can take a shock"],
       failureModes: ["Governance theater", "Risk externalization"],
       postureShifts: ["When conditions say hold, add checkpoints", "Remove the extra controls once the readings have held for a month"],
@@ -127,19 +127,19 @@ export const rawDecisionDomainCatalog = {
     { slug: "measure-pmf", title: "Measure PMF", recommendedToolkitSlugs: ["pmf", "focus"] },
     {
       slug: "avoid-premature-scaling",
-      title: "Avoid Premature Scaling",
+      title: "Avoid premature scaling",
       recommendedToolkitSlugs: ["rollback", "launch-gates"],
     },
-    { slug: "roadmap-focus", title: "Roadmap Focus", recommendedToolkitSlugs: ["focus", "ops-capacity"] },
-    { slug: "pricing-change", title: "Pricing Change", recommendedToolkitSlugs: ["claims", "rollback"] },
-    { slug: "launch-gates", title: "Launch Gates", recommendedToolkitSlugs: ["launch-gates", "rollback"] },
+    { slug: "roadmap-focus", title: "Roadmap focus", recommendedToolkitSlugs: ["focus", "ops-capacity"] },
+    { slug: "pricing-change", title: "Pricing change", recommendedToolkitSlugs: ["claims", "rollback"] },
+    { slug: "launch-gates", title: "Launch gates", recommendedToolkitSlugs: ["launch-gates", "rollback"] },
     {
       slug: "decision-rights",
-      title: "Decision Rights",
+      title: "Decision rights",
       recommendedToolkitSlugs: ["decision-rights", "ops-capacity"],
     },
-    { slug: "ops-capacity", title: "Ops Capacity", recommendedToolkitSlugs: ["ops-capacity", "decision-rights"] },
-    { slug: "ai-claims", title: "AI Claims", recommendedToolkitSlugs: ["claims", "launch-gates"] },
+    { slug: "ops-capacity", title: "Ops capacity", recommendedToolkitSlugs: ["ops-capacity", "decision-rights"] },
+    { slug: "ai-claims", title: "AI claims", recommendedToolkitSlugs: ["claims", "launch-gates"] },
   ],
   situationRouting: {
     Hiring: "avoid-premature-scaling",
@@ -152,7 +152,7 @@ export const rawDecisionDomainCatalog = {
   toolkitDefinitions: [
     {
       slug: "pmf",
-      title: "PMF Toolkit",
+      title: "PMF toolkit",
       whenToUse: "For when you need proof of demand before adding cost.",
       byPosture: "When conditions say slow down, prove retention first; when they say speed up, push for repeatable growth.",
       operatingOutcome: "A go or hold decision backed by retention, not by top-line growth.",
@@ -210,7 +210,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "focus",
-      title: "Roadmap Focus Toolkit",
+      title: "Roadmap focus toolkit",
       whenToUse: "For when priorities are unclear.",
       byPosture: "When conditions say slow down, narrow the scope; when they say speed up, reopen adjacent options with a stop rule on each.",
       operatingOutcome: "A roadmap that fits the team you have, with the trade-offs and the paused work written down.",
@@ -272,7 +272,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "rollback",
-      title: "Commitment & Rollback Toolkit",
+      title: "Commitment & rollback toolkit",
       whenToUse: "For hiring, pricing, or architecture moves that are hard to undo.",
       byPosture: "When conditions say slow down, set the rollback conditions earlier; when they say speed up, widen what an experiment may try.",
       operatingOutcome: "A decision note that names the rollback condition before any money that cannot be recovered is spent.",
@@ -330,7 +330,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "decision-rights",
-      title: "Decision Rights Toolkit",
+      title: "Decision rights toolkit",
       whenToUse: "For when unclear ownership is slowing decisions.",
       byPosture: "When conditions say slow down, escalate more; when they say speed up, delegate more.",
       operatingOutcome: "Named decision owners, escalation paths, and a review slot each week for the critical calls.",
@@ -392,7 +392,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "launch-gates",
-      title: "Launch Gates Toolkit",
+      title: "Launch gates toolkit",
       whenToUse: "For a launch that needs a go or no-go bar set in advance.",
       byPosture: "When conditions say slow down, raise the quality bar; when they say speed up, launch sooner to learn faster.",
       operatingOutcome: "A launch decision made against numbers set in advance, with one person named to roll it back.",
@@ -451,7 +451,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "ops-capacity",
-      title: "Ops Capacity Toolkit",
+      title: "Ops capacity toolkit",
       whenToUse: "For when the team is carrying more than it can sustain.",
       byPosture: "When conditions say slow down, protect reliability capacity; when they say speed up, move spare capacity into growth work.",
       operatingOutcome: "A capacity plan that protects reliability and catches overload before it becomes an incident.",
@@ -515,7 +515,7 @@ export const rawDecisionDomainCatalog = {
     },
     {
       slug: "claims",
-      title: "Claims & Positioning Toolkit",
+      title: "Claims & positioning toolkit",
       whenToUse: "For when the marketing may promise more than the product delivers.",
       byPosture: "When conditions say slow down, claim only what you can prove; when they say speed up, make the bolder claims you can monitor.",
       operatingOutcome: "Public claims that are backed by evidence, watched after publishing, and cheap to withdraw.",
@@ -591,8 +591,8 @@ export const rawDecisionDomainCatalog = {
         "Write down what would change the decision, so teams know what evidence matters next.",
       ],
       linkedToolkits: [
-        { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
-        { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+        { label: "Decision rights toolkit", href: "/toolkits/decision-rights" },
+        { label: "Roadmap focus toolkit", href: "/toolkits/focus" },
       ],
       linkedConcepts: [{ label: "Decision routing", href: "/resources#more-tools" }],
     },
@@ -612,8 +612,8 @@ export const rawDecisionDomainCatalog = {
         "Reframe weekly reporting around quality of demand, not gross volume.",
       ],
       linkedToolkits: [
-        { label: "PMF Toolkit", href: "/toolkits/pmf" },
-        { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
+        { label: "PMF toolkit", href: "/toolkits/pmf" },
+        { label: "Launch gates toolkit", href: "/toolkits/launch-gates" },
       ],
       linkedConcepts: [{ label: "PMF decision routing", href: "/resources#more-tools" }],
     },
@@ -633,8 +633,8 @@ export const rawDecisionDomainCatalog = {
         "Shift near-term work toward reversible experiments that reduce uncertainty quickly.",
       ],
       linkedToolkits: [
-        { label: "Rollback Planner Toolkit", href: "/toolkits/rollback" },
-        { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
+        { label: "Rollback planner toolkit", href: "/toolkits/rollback" },
+        { label: "Launch gates toolkit", href: "/toolkits/launch-gates" },
       ],
       linkedConcepts: [{ label: "Decision quality routing", href: "/resources#more-tools" }],
     },
@@ -654,8 +654,8 @@ export const rawDecisionDomainCatalog = {
         "Audit the top dashboard metrics and retire those without outcome linkage.",
       ],
       linkedToolkits: [
-        { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
-        { label: "PMF Toolkit", href: "/toolkits/pmf" },
+        { label: "Roadmap focus toolkit", href: "/toolkits/focus" },
+        { label: "PMF toolkit", href: "/toolkits/pmf" },
       ],
       linkedConcepts: [{ label: "Measurement routing", href: "/resources#more-tools" }],
     },
@@ -675,8 +675,8 @@ export const rawDecisionDomainCatalog = {
         "Assign owners for stale data and set freshness expectations for every critical signal.",
       ],
       linkedToolkits: [
-        { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
-        { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+        { label: "Ops capacity toolkit", href: "/toolkits/ops-capacity" },
+        { label: "Roadmap focus toolkit", href: "/toolkits/focus" },
       ],
       linkedConcepts: [{ label: "Signal interpretation routing", href: "/resources#more-tools" }],
     },
@@ -696,8 +696,8 @@ export const rawDecisionDomainCatalog = {
         "Require clear evidence for introducing net-new priority streams.",
       ],
       linkedToolkits: [
-        { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
-        { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
+        { label: "Roadmap focus toolkit", href: "/toolkits/focus" },
+        { label: "Decision rights toolkit", href: "/toolkits/decision-rights" },
       ],
       linkedConcepts: [{ label: "Execution routing", href: "/resources#more-tools" }],
     },
@@ -717,8 +717,8 @@ export const rawDecisionDomainCatalog = {
         "Track unresolved decisions as operational risk, not administrative backlog.",
       ],
       linkedToolkits: [
-        { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
-        { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
+        { label: "Decision rights toolkit", href: "/toolkits/decision-rights" },
+        { label: "Ops capacity toolkit", href: "/toolkits/ops-capacity" },
       ],
       linkedConcepts: [{ label: "Governance routing", href: "/resources#more-tools" }],
     },
@@ -738,8 +738,8 @@ export const rawDecisionDomainCatalog = {
         "Define minimum operating standards that must hold before new launches proceed.",
       ],
       linkedToolkits: [
-        { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
-        { label: "Rollback Planner Toolkit", href: "/toolkits/rollback" },
+        { label: "Ops capacity toolkit", href: "/toolkits/ops-capacity" },
+        { label: "Rollback planner toolkit", href: "/toolkits/rollback" },
       ],
       linkedConcepts: [{ label: "Reliability routing", href: "/resources#more-tools" }],
     },
@@ -759,8 +759,8 @@ export const rawDecisionDomainCatalog = {
         "Set architecture rules that block new complexity without a plan to retire it.",
       ],
       linkedToolkits: [
-        { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
-        { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
+        { label: "Roadmap focus toolkit", href: "/toolkits/focus" },
+        { label: "Ops capacity toolkit", href: "/toolkits/ops-capacity" },
       ],
       linkedConcepts: [{ label: "Architecture and execution routing", href: "/resources#more-tools" }],
     },
@@ -780,8 +780,8 @@ export const rawDecisionDomainCatalog = {
         "Track the gap between what is promised and what is delivered as an operating risk in weekly reviews.",
       ],
       linkedToolkits: [
-        { label: "Claims Integrity Toolkit", href: "/toolkits/claims" },
-        { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
+        { label: "Claims integrity toolkit", href: "/toolkits/claims" },
+        { label: "Launch gates toolkit", href: "/toolkits/launch-gates" },
       ],
       linkedConcepts: [{ label: "Trust and risk routing", href: "/resources#more-tools" }],
     },

@@ -80,7 +80,7 @@ export default function AboutPage() {
             track record
           </Link>{" "}
           compares past guidance with what happened next, including where it fell short. Some changes in
-          conditions came with no warning, and the{" "}
+          conditions came with no warning. The{" "}
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
@@ -130,7 +130,7 @@ export default function AboutPage() {
               A single hire or purchase. The rules are a policy for a kind of decision, not a verdict on one.
             </li>
             <li>
-              Under six months of runway. At that point cash matters more than the market, so the guidance starts with cash.
+              A company with under six months of runway. At that point cash matters more than the market, so the guidance starts with cash.
             </li>
             <li>
               A company whose funding does not follow U.S. rates: one raising locally in a currency whose central bank
@@ -139,8 +139,8 @@ export default function AboutPage() {
               are its cost of capital.
             </li>
             <li>
-              Which product work matters most. Rates affect how much slow-payback work a team can afford, not what it
-              should build.
+              Deciding which product work matters most. Rates affect how much slow-payback work a team can afford, not
+              what it should build.
             </li>
           </ul>
         </div>
@@ -153,7 +153,7 @@ export default function AboutPage() {
         </p>
         <p className="text-base text-slate-300">{publisherAuthor.bio}</p>
         <p className="text-base text-slate-300">
-          The pause-and-resume structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products.
+          The pause-and-restart structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products.
           That work is listed at{" "}
           <a href={publisherAuthor.sameAs[0]} className={inlineLinkClass}>
             kanav.net

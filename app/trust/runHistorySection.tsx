@@ -51,17 +51,17 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
     <ReportSection
       id="run-history"
       title={`Scheduled runs, last ${windowDays} days`}
-      description="One row for each job that keeps this brief up to date, taken from the log each run writes."
+      description="The jobs that keep this brief up to date, read from the log each run writes."
     >
       {runHistory.status === "unavailable" ? (
         <p className="text-sm text-slate-300">
-          This panel could not be loaded right now. That is a fault in reading the record, not in
-          the brief above it — the freshness and source dates on this page are unaffected.
+          The run log could not be loaded right now. The fault is in reading the log, not in the
+          brief: the source dates on this page are unaffected.
         </p>
       ) : runHistory.steps.length === 0 ? (
         <p className="text-sm text-slate-300">
-          Nothing ran in this window. Every job records itself, so an empty table means they did
-          not run — treat the dates on this page as the last word on how current the brief is.
+          Nothing ran in this window. Every job records itself, so an empty log means none ran.
+          Treat the source dates on this page as the last word on how current the brief is.
         </p>
       ) : (
         <>

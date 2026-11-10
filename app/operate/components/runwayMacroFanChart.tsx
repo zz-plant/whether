@@ -50,16 +50,16 @@ export function RunwayMacroFanChart({
     ? effectiveCashOut >= benchmark.medianPastSpellMonths
       ? `Your ${effectiveCashOut}-month runway outlasts the median ${benchmark.regimeLabel} spell (${benchmark.medianPastSpellMonths} mo)${
           effectiveCashOut < benchmark.longestPastSpellMonths
-            ? `, but depletes before the longest past spell (${benchmark.longestPastSpellMonths} mo).`
+            ? `, but runs out before the longest past spell (${benchmark.longestPastSpellMonths} mo).`
             : " and outlasts the longest recorded spell."
         }`
-      : `Your ${effectiveCashOut}-month runway depletes ${benchmark.medianPastSpellMonths - effectiveCashOut} months before the median ${benchmark.regimeLabel} spell ends (${benchmark.medianPastSpellMonths} mo).`
+      : `Your ${effectiveCashOut}-month runway runs out ${benchmark.medianPastSpellMonths - effectiveCashOut} months before the median ${benchmark.regimeLabel} spell ends (${benchmark.medianPastSpellMonths} mo).`
     : null;
 
   return (
     <figure data-runway-macro-fan className={`weather-surface space-y-2 p-4 ${className}`.trim()}>
       <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
-        <span className="font-semibold text-slate-200">Runway depletion vs. cycle duration</span>
+        <span className="font-semibold text-slate-200">Runway against how long past conditions lasted</span>
         <span className="tabular-nums text-slate-400">
           {baselineCashOutMonth !== null ? `Cash-out: month ${baselineCashOutMonth}` : "Runway > 36 mo"}
           {committedCashOutMonth !== null && committedCashOutMonth !== baselineCashOutMonth
@@ -177,12 +177,12 @@ export function RunwayMacroFanChart({
           {benchmark ? (
             <span className="flex items-center gap-1.5">
               <span className="inline-block h-2 w-3 bg-[var(--phase-trace)] opacity-30" />
-              <span>{benchmark.regimeLabel} cycle duration (median {benchmark.medianPastSpellMonths} mo)</span>
+              <span>{benchmark.regimeLabel} spell length (median {benchmark.medianPastSpellMonths} mo)</span>
             </span>
           ) : null}
         </div>
       </div>
-      <ScreenshotCaption detail="Runway trajectory vs. historical macro cycles" />
+      <ScreenshotCaption detail="Runway against how long past conditions lasted" />
     </figure>
   );
 }

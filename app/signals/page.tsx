@@ -15,15 +15,15 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Interest Rates and Funding Data Behind This Week's Guidance",
+  title: "Interest rates and funding data behind this week's guidance",
   description:
     "The interest rates, yield curve and funding-market numbers behind this week's startup guidance, and each one's move since last time.",
   path: "/signals",
   imageAlt: "Why the weekly brief changed — evidence overview",
   imageParams: {
     template: "signals",
-    title: "Why the Weekly Brief Changed",
-    subtitle: "What moved, why it matters, and what would make the guidance change.",
+    title: "Why the weekly brief changed",
+    subtitle: "The evidence behind this week's guidance.",
   },
 });
 

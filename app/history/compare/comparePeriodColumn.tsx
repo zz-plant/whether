@@ -163,7 +163,8 @@ export function ComparePeriodColumn({
       </div>
 
       <div className="weather-panel p-6">
-        <h3 className="type-eyebrow mb-4">Signals in {label}</h3>
+        {/* "Signals in" until 2026-11-10: the two scores are scores, and "signal" is /signals' noun. */}
+        <h3 className="type-eyebrow mb-4">Scores and rates in {label}</h3>
         <table className="w-full text-left text-sm">
           <tbody>
             <ScoreRow signalKey="tightness" score={scores.tightness} />

@@ -71,7 +71,7 @@ export async function buildTrustPageModel() {
      section. */
   const revisitBullets: Array<{ label: string; detail?: string; href: string; linkLabel: string }> = [
     {
-      label: "What it would change",
+      label: "What a warning would put at risk",
       /* The guidance as the page and every paste print it. This was the loader's
          `actionNowShort`, the action the headline stopped leading with on 2026-10-09. */
       detail: formatGuidance(snapshot.weeklyCall),
@@ -79,7 +79,7 @@ export async function buildTrustPageModel() {
       linkLabel: "Check system status",
     },
     {
-      label: "How you'd know it cleared",
+      label: "How you'd know a warning cleared",
       detail: isFallback
         ? "One live refresh has landed from every source."
         : "The scores are clear of a change and conditions have held for a second reading.",

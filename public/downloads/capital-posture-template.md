@@ -1,4 +1,4 @@
-# Capital Discipline Template
+# Capital planning template
 
 ## 1) This quarter's guidance
 - Conditions:

@@ -13,8 +13,12 @@ const actionLinkVariantClasses: Record<ActionLinkVariant, string> = {
     "weather-pill weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-3 py-2 text-fluid-sm font-semibold tabular-nums text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100",
   ghost:
     "weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-fluid-sm font-semibold tabular-nums",
+  /* Text, not a box (2026-11-10): as a 44px inline-flex box a link inside a sentence
+     ("What would change our mind: each score's…") opened a 44px line in the paragraph and
+     could not wrap, so the text after it broke early onto a gapped second line.
+     `weather-hit` keeps the 44px target as an invisible pseudo-element. */
   inline:
-    "weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center text-fluid-sm font-semibold tabular-nums text-sky-300 transition-colors hover:text-sky-200",
+    "weather-hit weather-focus-ring weather-press-scale text-fluid-sm font-semibold tabular-nums text-sky-300 transition-colors hover:text-sky-200",
 };
 
 const joinClasses = (...values: Array<string | undefined>) => values.filter(Boolean).join(" ");

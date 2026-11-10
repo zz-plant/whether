@@ -34,7 +34,7 @@ describe("runway macro fan model & chart", () => {
 
     const html = renderToStaticMarkup(<RunwayMacroFanChart model={model} />);
     assert.match(html, /data-runway-macro-fan/);
-    assert.match(html, /Runway depletion vs\. cycle duration/);
+    assert.match(html, /Runway against how long past conditions lasted/);
     assert.match(html, /Cash-out: month 12/);
     assert.match(html, /with decision: month 8/);
     assert.match(html, /Past median \(\d+ mo\)/);

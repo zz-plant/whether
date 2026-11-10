@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ScoreLadder, buildLadderLines, describeLadderPosition, layoutLadderLabels, nearestLadderLine, type LadderLine } from "../app/components/ui/scoreLadder";
+import { ScoreLadder, describeLadderPosition, layoutLadderLabels, nearestLadderLine } from "../app/components/ui/scoreLadder";
+import { buildLadderLines, type LadderLine } from "../app/components/ui/ladderLines";
 import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell";
 import { AreaTable } from "../app/components/ui/areaTable";
 import { OrdinalMarker } from "../app/components/ui/ordinalMarker";
@@ -274,7 +275,7 @@ describe("AreaTable one side per row", () => {
     area: "product-tempo" as const,
     rule: "Keep the roadmap.",
     pause: { line: "Risk appetite < 44", distance: "11 pts away", state: "clear" as const },
-    resume: { line: "Risk appetite > 54", distance: "nothing to resume" },
+    resume: { line: "Risk appetite > 54", distance: "nothing to restart" },
   };
   const header = (html: string) => /<thead[\s\S]*?<\/thead>/.exec(html)?.[0] ?? "";
   const rowOf = (html: string, area: string) => html.split("data-area=").find((row) => row.startsWith(`"${area}"`)) ?? "";
@@ -288,7 +289,7 @@ describe("AreaTable one side per row", () => {
     const roadmap = rowOf(html, "product-tempo");
     assert.match(roadmap, /data-rule-side="pause"/);
     assert.ok(roadmap.includes("Risk appetite &lt; 44") && roadmap.includes("11 pts away"));
-    assert.doesNotMatch(roadmap, /Risk appetite &gt; 54|nothing to resume|Restart when/, "no restart line on an area with nothing to restart");
+    assert.doesNotMatch(roadmap, /Risk appetite &gt; 54|nothing to restart|Restart when/, "no restart line on an area with nothing to restart");
   });
 
   it("names the side in the header when every row shares it, and in each cell when they differ", () => {
@@ -376,7 +377,7 @@ describe("AreaTable moved rows", () => {
     assert.match(met[2], /lucide-play/);
     // An area that is not on hold has no hold to lift: its met restart line is
     // not a restart (2026-10-14).
-    assert.match(html, /Risk appetite &gt; 54<span class="block text-xs text-slate-400">nothing to resume<\/span>/);
+    assert.match(html, /Risk appetite &gt; 54<span class="block text-xs text-slate-400">nothing to restart<\/span>/);
     assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a restart line still to reach is plain text, with no glyph");
   });
 });

@@ -3,7 +3,6 @@ import { ActionLink } from "../components/ui/actionLink";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { UrlDetails } from "../components/ui/urlDetails";
-import { ChevronDownIcon } from "../components/uiIcons";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
 import { ShareOrEmbedLink } from "../components/shareOrEmbedLink";
@@ -26,7 +25,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "How much to trust this week's guidance",
   description:
-    "Check how fresh the sources are, how sure the reading is, and how the scores are built, before acting on anything you can't undo.",
+    "Check how fresh the sources are, how close conditions are to changing, and how the scores are built, before acting on anything you can't undo.",
   path: "/trust",
   imageAlt: "Whether trust hub",
   imageParams: { template: "method", eyebrow: "Trust" },
@@ -96,7 +95,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="The room before a change is how far the scores are from changing conditions. We check separately, across the whole archive, how often readings at that distance held."
+        description="We check, across the whole archive, how often conditions held at each room before a change."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -171,16 +170,12 @@ export default async function MethodPage({
         <UrlDetails
           queryKey="sources"
           initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "sources")}
-          className="group rounded-xl border border-[color:var(--border-default)] bg-slate-950/20 px-5 py-4"
-          summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
-          summary={
-            <>
-              <span>Limits and the lines that change the guidance</span>
-              <span aria-hidden="true" className="inline-flex rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-1.5 text-slate-400 transition group-open:rotate-180 motion-reduce:transition-none">
-                <ChevronDownIcon className="h-3.5 w-3.5" />
-              </span>
-            </>
-          }
+          /* A row with the site's own chevron between the page's section rules, like the two
+             disclosures above it (2026-11-10). It was the page's one filled, bordered box on
+             the card radius with a framed chevron key, which read as a control panel. */
+          className="weather-auto-chevron group py-2"
+          summaryClassName="flex min-h-11 cursor-pointer list-none items-center gap-2 text-base font-semibold text-slate-100 select-none"
+          summary="Limits and the lines that change the guidance"
         >
           <div className="mt-6 space-y-8">
             {secondaryContent}

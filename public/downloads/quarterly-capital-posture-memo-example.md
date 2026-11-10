@@ -1,13 +1,13 @@
-# Quarterly Capital Discipline Memo (Example)
+# Quarterly capital planning memo (example)
 
 > **This is a worked example, not a live reading.** The figures below are from an
 > illustrative quarter and were never a published reading. For this week's
 > guidance, the room before a change and the conditions that would change it, see
-> https://whether.work — and for the blank version of this document,
+> https://whether.work. The blank version of this document is
 > /downloads/capital-posture-template.md.
 
 **Quarter:** Q3 (Jul–Sep) · **Prepared for:** Board meeting, 8 Oct
-**Conditions at quarter end:** Freezing · **Room before a change:** within reach of the line
+**Conditions at quarter end:** Freezing · **Room before a change:** some
 **Source reading:** funding pressure 74/100 (line: 70) · risk appetite 41/100 (line: 50)
 
 ## Executive summary
@@ -36,15 +36,15 @@ The classification is the decision's reversibility, not its size. The compute
 reservation was the cheapest line on this list per unit and the only one with no
 way back, so it is the one we did not do.
 
-## Pause and resume conditions
+## Pause and restart conditions
 
 Each condition is a number, a duration, an owner, and what happens when it is
 met. A condition without all four is a note, not a condition.
 
-1. **Re-open the Series B process** — resume when funding pressure closes below
+1. **Re-open the Series B process** — restart when funding pressure closes below
    52 for two consecutive weekly reads. Owner: CEO. On breach: re-open the
    process at the next Monday reading, no board vote required.
-2. **Release the two held engineering reqs** — resume when risk appetite closes
+2. **Release the two held engineering reqs** — restart when risk appetite closes
    above 50 for two consecutive weekly reads *and* conditions are not Freezing.
    Owner: CTO. On breach: reqs go live within five working days.
 3. **Pause all discretionary spend above $25k** — pause when funding pressure

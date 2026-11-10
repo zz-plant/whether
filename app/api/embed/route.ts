@@ -62,7 +62,7 @@ export async function GET(request: Request) {
           recordDate: briefData.recordDate,
           use: buildUseConstraint(),
           attribution: {
-            text: "Macro brief by Whether",
+            text: "Whether Weekly Brief",
             url: briefData.attributionUrl,
           },
         });
@@ -106,7 +106,7 @@ export async function GET(request: Request) {
            reading the Acceptable Use Policy forbids (§3.4). */
         use: buildUseConstraint(),
         attribution: {
-          text: "Macro brief by Whether",
+          text: "Whether Weekly Brief",
           url: briefData.attributionUrl,
         },
       });

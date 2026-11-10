@@ -18,7 +18,7 @@ const BAND_MEANINGS: Record<RunwayBand, string> = {
   abundant: "the rules leave room to move against the cycle, at the same payback bar.",
 };
 
-export const RUNWAY_QUESTION = "How many months of runway do we have, or are we already covering our costs?";
+const RUNWAY_QUESTION = "How many months of runway do we have, or are we already covering our costs?";
 
 /** One line per band, from the band table, so a moved boundary moves these too. */
 export const runwayAnswers = (): string[] => [

@@ -158,9 +158,9 @@ export function ScenarioStudioSimulator({
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md border border-slate-800 bg-slate-900/60 px-4 py-2 text-xs text-slate-400">
           <span className="font-semibold text-slate-200">Active scenario</span>
           <span className="text-slate-600">›</span>
-          <span className="tabular-nums">Short rate {simulatedBaseRate.toFixed(2)}% ({formatScenarioDelta(baseRateDelta, "%")})</span>
+          <span className="tabular-nums">Short-term borrowing rate {simulatedBaseRate.toFixed(2)}% ({formatScenarioDelta(baseRateDelta, "%")})</span>
           <span className="text-slate-600">›</span>
-          <span className="tabular-nums">Gauge {simulatedCurveSlope.toFixed(2)}% ({formatScenarioDelta(curveSlopeDelta, "%")})</span>
+          <span className="tabular-nums">Recession warning gauge {simulatedCurveSlope.toFixed(2)}% ({formatScenarioDelta(curveSlopeDelta, "%")})</span>
           <span className="text-slate-600">›</span>
           <span className="font-semibold text-slate-100">{getRegimePublicLabel(simulatedAssessment.regime)}</span>
           {/* No verdict here: the deltas panel below states whether conditions

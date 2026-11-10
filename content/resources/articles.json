@@ -29,15 +29,15 @@
         "paragraphs": [
           "Safe roles protect current operations or revenue: production reliability, renewals support and finance controls for cash visibility. Keep them open with constrained approval.",
           "Risky roles support initiatives that have not shown repeatable demand. Approve one hire, set a 30-day evidence target and review the result before approving another.",
-          "Dangerous roles lack a clear owner, a validated market or measurable milestones. Pause them until the business case and resume conditions are explicit."
+          "Dangerous roles lack a clear owner, a validated market or measurable milestones. Pause them until the business case and restart conditions are explicit."
         ],
         "anchor": "safe-risky-dangerous-framework-for-hiring-decisions"
       },
       {
-        "heading": "When to resume hiring",
+        "heading": "When to restart hiring",
         "paragraphs": [
-          "Set resume conditions using burn multiple, pipeline conversion and cash remaining after committed spend. Review demand and delivery weekly; use monthly readings to decide whether to reopen hiring.",
-          "An example requires three conditions: stable win rates and churn for 30 days, shorter delivery cycles with fewer emergency escalations, and financing access that no longer requires immediate cuts.",
+          "Set restart conditions using burn multiple, pipeline conversion and cash remaining after committed spend. Review demand and delivery weekly; use monthly readings to decide whether to reopen hiring.",
+          "For example, require three conditions: stable win rates and churn for 30 days, shorter delivery cycles with fewer emergency escalations, and financing access that no longer requires immediate cuts.",
           "When all three hold, reopen safe roles first, a few at a time. Keep risky hires tied to milestones and dangerous roles paused until two monthly confirmations pass."
         ],
         "anchor": "reversal-trigger-logic-how-to-unfreeze-without-overcorrecting"
@@ -67,7 +67,7 @@
     ],
     "toolLink": {
       "href": "/resources/reversal-trigger-checklist",
-      "label": "Use the Pause Line Checklist"
+      "label": "Use the pause line checklist"
     }
   },
   {
@@ -138,7 +138,7 @@
     ],
     "toolLink": {
       "href": "/resources/capital-posture-template",
-      "label": "Download the Capital Planning Template"
+      "label": "Download the capital planning template"
     }
   }
 ]

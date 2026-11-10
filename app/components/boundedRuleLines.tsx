@@ -30,12 +30,6 @@ export const RuleLines = ({
   }
   return (
     <span className="flex flex-col gap-0.5">
-      {qualifier ? (
-        <span className="order-last text-slate-400">
-          {kind === "pause" ? "or " : "and "}
-          {qualifier}
-        </span>
-      ) : null}
       {conditions.map((condition) => {
         const isNearest = nearest && nearest.metric === condition.metric && nearest.value === condition.value;
         /* The distance as the state badge where the line has a state — a pause
@@ -61,6 +55,15 @@ export const RuleLines = ({
           </span>
         );
       })}
+      {/* After the conditions in the source as on screen (2026-11-10): it came first and
+          was moved last by `order-last`, so a screen reader heard "or two weekly readings
+          in a row come in weaker" before the line it qualifies. */}
+      {qualifier ? (
+        <span className="text-slate-400">
+          {kind === "pause" ? "or " : "and "}
+          {qualifier}
+        </span>
+      ) : null}
     </span>
   );
 };

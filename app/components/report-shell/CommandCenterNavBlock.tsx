@@ -89,9 +89,13 @@ export function CommandCenterNavBlock({
   // word that already prints in the regime ink: colour stays where the
   // condition is named, which here is that word. The brief's hero keeps its
   // rule, because that card is the one people crop and share.
+
+  // No box (2026-11-10): the intro is the document's opening, as the guidance block is on
+  // `/` (DESIGN.md, "Report intros"). As a raised sheet it inset the title 24px from the
+  // left edge of every section under it; a hairline under it now does the separating.
   return (
     <section
-      className="weather-surface-secondary weather-inset relative min-w-0"
+      className="relative min-w-0 border-b border-[color:var(--border-default)] pb-[var(--layout-content-gap)]"
       aria-label="Page introduction"
       /* The running head's facts, for every frame after this one (lib/navigation/runningHead.ts). */
       {...frameFactsAttributes({

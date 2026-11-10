@@ -3,7 +3,8 @@ import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../li
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
 import { Fact, FactList } from "../../components/ui/factList";
-import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
+import { ScoreLadder } from "../../components/ui/scoreLadder";
+import { buildLadderLines } from "../../components/ui/ladderLines";
 import {
   decisionAreaLabel,
   decisionAreaOrder,
@@ -15,7 +16,7 @@ import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
 import { BORROWING_PREMIUM_MEANING, ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
-import { describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
 import {
   loadCompareData,
   type CompareDataResult,
@@ -164,9 +165,10 @@ export async function ComparePanel({
     }
   }
 
+  /* The export slot nouns: "Pause threshold" printed a name retired on 2026-10-09. */
   if (snapA.weeklyCall.actionNow !== snapB.weeklyCall.actionNow) {
     changedRules.push({
-      label: "Action",
+      label: DECISION_CONTRACT_LABELS.slot.action,
       was: snapB.weeklyCall.actionNow,
       became: snapA.weeklyCall.actionNow,
     });
@@ -174,7 +176,7 @@ export async function ComparePanel({
 
   if (snapA.weeklyCall.pauseIf !== snapB.weeklyCall.pauseIf) {
     changedRules.push({
-      label: "Pause threshold",
+      label: DECISION_CONTRACT_LABELS.slot.threshold,
       was: snapB.weeklyCall.pauseIf,
       became: snapA.weeklyCall.pauseIf,
     });
@@ -192,7 +194,7 @@ export async function ComparePanel({
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-panel)] p-3">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-semibold text-slate-300">Macro conditions:</span>
+            <span className="font-semibold text-slate-300">Conditions:</span>
             <span className="rounded border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-100">
               {getRegimePublicLabel(reportA.assessment.regime)} (Period A)
             </span>
@@ -232,7 +234,7 @@ export async function ComparePanel({
             </ul>
           ) : (
             <p className="text-sm text-slate-300">
-              Operating area rules and pause thresholds were identical between these two dates.
+              Area rules and pause lines were identical on these two dates.
             </p>
           )}
         </div>
@@ -260,7 +262,7 @@ export async function ComparePanel({
           </div>
         </div>
         <p className="mt-2 text-fluid-sm text-slate-400">
-          Period A is the filled dot, period B the hollow one; the lines are the ones in force in period A.
+          Period A is the filled dot and Period B the hollow one. The lines are the ones in force in Period A.
         </p>
       </section>
 

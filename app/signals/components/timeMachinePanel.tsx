@@ -151,7 +151,7 @@ export const TimeMachinePanel = ({
 
   const handleSubmit = () => {
     if (isUnavailableSelection) {
-      setErrorMessage("That month is not available for the selected year.");
+      setErrorMessage("That month has no reading. Pick one within the months available below.");
       monthRef.current?.focus();
       return;
     }
@@ -295,7 +295,7 @@ export const TimeMachinePanel = ({
               onCalendarYearChange={setCalendarYear}
               onSelectMonth={handleMonthChange}
               onUnavailableSelection={() => {
-                setErrorMessage("That month is not available for the selected year.");
+                setErrorMessage("That month has no reading. Pick one within the months available below.");
               }}
             />
             <button

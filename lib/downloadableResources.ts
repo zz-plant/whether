@@ -3,23 +3,23 @@ import type { DownloadableResourcePageConfig } from "../app/resources/components
 export const downloadableResources = {
   "capital-posture-template": {
     metadata: {
-      title: "Capital Planning Template",
+      title: "Capital planning template",
       description:
         "Board-ready capital planning template with SAFE/RISKY/DANGEROUS classifications and pause line fields.",
       path: "/resources/capital-posture-template",
       imageAlt: "Capital planning template",
-      imageParams: { template: "guides", title: "Capital Planning Template" },
+      imageParams: { template: "guides", title: "Capital planning template" },
     },
     heroDescription:
       "Use this skimmable template for weekly leadership syncs and monthly board packets.",
     heroItems: [
-      "Guidance + margin + timestamp",
+      "Guidance, room before a change and effective date",
       "SAFE / RISKY / DANGEROUS decision map",
       "Pause lines with owners and escalation windows",
     ],
     downloadCta: {
       href: "/downloads/capital-posture-template.md",
-      label: "Download template artifact",
+      label: "Download the template",
       conversionEvent: "download",
     },
     secondaryCta: {
@@ -30,11 +30,11 @@ export const downloadableResources = {
     internalLinks: [
       {
         href: "/resources/capital-discipline-venture-backed-companies",
-        label: "Guide: capital discipline",
+        label: "Capital discipline for venture-backed companies",
       },
       {
         href: "/resources/board-level-capital-posture-framework",
-        label: "The board framework",
+        label: "Board-level capital discipline framework",
       },
     ],
     printModeClassNames: {
@@ -47,17 +47,17 @@ export const downloadableResources = {
   },
   "reversal-trigger-checklist": {
     metadata: {
-      title: "Pause Line Checklist",
+      title: "Pause line checklist",
       description:
         "A short checklist for the pause line on a capital decision the board will see: what number it sits at, how long a breach must last, who acts and how to roll back.",
       path: "/resources/reversal-trigger-checklist",
       imageAlt: "Pause line checklist",
-      imageParams: { template: "guides", title: "Pause Line Checklist" },
+      imageParams: { template: "guides", title: "Pause line checklist" },
     },
-    heroDescription: "Use before approving any RISKY commitment.",
+    heroDescription: "Use before approving any Risky commitment.",
     heroItems: [
       "Set the pause line's value and how long a breach must last.",
-      "Name owner + escalation recipient.",
+      "Name the owner and the escalation recipient.",
       "Document rollback path and execution window.",
       "Confirm data source quality and update cadence.",
       "Add board notification trigger language.",
@@ -65,7 +65,7 @@ export const downloadableResources = {
     heroItemsOrdered: true,
     downloadCta: {
       href: "/downloads/reversal-trigger-checklist.md",
-      label: "Download checklist artifact",
+      label: "Download the checklist",
       conversionEvent: "download",
     },
     secondaryCta: {
@@ -76,22 +76,22 @@ export const downloadableResources = {
     internalLinks: [
       {
         href: "/resources/capital-discipline-venture-backed-companies",
-        label: "Guide: capital discipline",
+        label: "Capital discipline for venture-backed companies",
       },
       {
         href: "/resources/board-level-capital-posture-framework",
-        label: "The board framework",
+        label: "Board-level capital discipline framework",
       },
     ],
   },
   "quarterly-capital-posture-memo-example": {
     metadata: {
-      title: "Quarterly Capital Planning Memo Example",
+      title: "Quarterly capital planning memo example",
       description:
         "Forward-ready memo example for board updates on capital conditions, risk classes, and pause line logic.",
       path: "/resources/quarterly-capital-posture-memo-example",
       imageAlt: "Quarterly capital planning memo example",
-      imageParams: { template: "guides", title: "Quarterly Capital Planning Memo Example" },
+      imageParams: { template: "guides", title: "Quarterly capital planning memo example" },
     },
     /* Worked, not blank. This was 310 bytes of empty headings — the same
        skeleton as the template beside it — while the word "example" is the
@@ -106,11 +106,11 @@ export const downloadableResources = {
       "SAFE / RISKY / DANGEROUS decisions classified by reversibility, not size",
       "Three pause lines, each with a number, a duration, an owner and a consequence",
       "Board approvals and guardrails requested",
-      "Illustrative figures throughout — not a published reading. The live guidance is on the home page.",
+      "Illustrative figures throughout, not a published reading. The live guidance is on the home page.",
     ],
     downloadCta: {
       href: "/downloads/quarterly-capital-posture-memo-example.md",
-      label: "Download memo artifact",
+      label: "Download the memo",
       conversionEvent: "download",
     },
     secondaryCta: {
@@ -121,11 +121,11 @@ export const downloadableResources = {
     internalLinks: [
       {
         href: "/resources/capital-discipline-venture-backed-companies",
-        label: "Guide: capital discipline",
+        label: "Capital discipline for venture-backed companies",
       },
       {
         href: "/resources/board-level-capital-posture-framework",
-        label: "The board framework",
+        label: "Board-level capital discipline framework",
       },
     ],
     printModeClassNames: {

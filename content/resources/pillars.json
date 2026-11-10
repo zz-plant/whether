@@ -4,15 +4,15 @@
     "publishedAt": "2026-03-03",
     "updatedAt": "2026-10-27",
     "keyword": "capital discipline venture backed companies",
-    "title": "Capital Discipline for Venture-Backed Companies",
+    "title": "Capital discipline for venture-backed companies",
     "description": "A monthly scorecard, a checklist for every major spending decision, a workshop agenda and a 90-day plan for keeping spend tied to proof in a venture-backed company.",
-    "h1": "Capital Discipline for Venture-Backed Companies",
+    "h1": "Capital discipline for venture-backed companies",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": true,
     "cluster": "authority",
     "intent": "board",
     "boardPackContext": "The framework and reversibility guides build on these principles.",
-    "midpointCtaLabel": "Download the Capital Planning Template",
+    "midpointCtaLabel": "Download the capital planning template",
     "sections": [
       {
         "heading": "Why capital discipline now defines board credibility",
@@ -49,8 +49,8 @@
           {
             "heading": "H3: Who decides what",
             "paragraphs": [
-              "The board does not need to approve every decision, but it must be able to see every material commitment. Sort decisions by the size of the downside and how easily they can be undone into three classes: delegated (management decides alone), supervised (management decides and the board sees it), and reserved (the board approves).",
-              "Agree the escalation rules in advance. When a threshold is breached, the team runs the agreed process instead of debating whether it applies, which takes the delay and the politics out of a decision made under pressure."
+              "The board does not need to approve every decision, but it must be able to see every material commitment. Sort decisions into three classes by the size of the downside and how easily they can be undone: delegated (management decides alone), supervised (management decides and the board sees it), and reserved (the board approves).",
+              "Agree the escalation rules in advance. When a threshold is breached, the team runs the agreed process instead of debating whether it applies. That takes the delay and the politics out of a decision made under pressure."
             ]
           },
           {
@@ -217,7 +217,7 @@
     "publishedAt": "2026-03-03",
     "updatedAt": "2026-10-27",
     "keyword": "board level capital discipline framework",
-    "title": "Board-Level Capital Discipline Framework",
+    "title": "Board-level capital discipline framework",
     "description": "A matrix that turns market signals and your company's own readiness into what the board approves, defers or stops. It lists the documents each approval needs and a quarter-by-quarter rollout.",
     "h1": "Board-level capital discipline framework",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
@@ -225,7 +225,7 @@
     "cluster": "authority",
     "intent": "board",
     "boardPackContext": "Built on the capital discipline principles, as a framework and a monthly set of documents a board can run.",
-    "midpointCtaLabel": "Request a Board Pack Walkthrough",
+    "midpointCtaLabel": "Download the capital planning template",
     "sections": [
       {
         "heading": "Defining board-level capital discipline in practical terms",
@@ -393,15 +393,15 @@
     "publishedAt": "2026-03-03",
     "updatedAt": "2026-10-27",
     "keyword": "reversibility as governance",
-    "title": "Reversibility as Governance for Board Decisions",
+    "title": "Reversibility as governance for board decisions",
     "description": "A way to sort decisions by how hard they are to undo, decide who can call a rollback and when, and rehearse the rollback. It comes with a 90-day plan to adopt it.",
-    "h1": "Reversibility as Governance",
+    "h1": "Reversibility as governance",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": false,
     "cluster": "authority",
     "intent": "board",
     "boardPackContext": "A reversibility standard becomes a board control once it is tied to thresholds and escalation.",
-    "midpointCtaLabel": "Download Reversibility Governance Template",
+    "midpointCtaLabel": "Download the capital planning template",
     "sections": [
       {
         "heading": "Why reversibility is a governance function, not an execution detail",

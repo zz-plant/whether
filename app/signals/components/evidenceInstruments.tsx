@@ -58,7 +58,7 @@ type TrendPoint = { label: string; value: number };
 /* No side inset on a phone, like the section title above the list
    (`px-5 max-sm:px-0`): the rows are unboxed, so their questions align with
    the page column, and an opened chart keeps the full width. */
-const DISCLOSURE_CLASS = "weather-auto-chevron weather-panel p-5 max-sm:px-0";
+const DISCLOSURE_CLASS = "weather-auto-chevron weather-panel px-0 py-5";
 const SUMMARY_CLASS = "cursor-pointer select-none text-base font-semibold text-slate-100";
 
 /* A score carries its scale ("72/100"); a bare "72" beside "3.50%" read as the same kind of number. */
@@ -189,17 +189,13 @@ export const SignalsInstrumentsSection = ({
   const trendsAnswer = describeScoreTrendSummary(scoreSeries);
   const pastMonthsAnswer = regimeSeries.length > 0 ? describeConditionChanges(summarizeConditionRuns(regimeSeries)) : null;
   return (
-  /* Ruled off from "What would change this guidance": its last line ran into
-     this heading closer than the gaps inside either section, so the evidence
-     appendix read as more of the guidance. */
-  <section id="instruments" aria-labelledby="instruments-heading" className="space-y-6 border-t border-[var(--border-subtle)] pt-8">
-    {/* The same inset as a ReportSection's header (px-5, none on a phone), so
-        this title lines up with every section title above it. */}
-    <div className="px-5 max-sm:px-0">
-      <h2 id="instruments-heading" className="type-section">
-        Charts, past months and checks
-      </h2>
-    </div>
+  /* Ruled off from "What would change this guidance" by the report rows' own divider.
+     It drew a second rule 24px under that one, and kept the 20px inset the report
+     sections dropped, so its title sat right of every title above it (2026-11-10). */
+  <section id="instruments" aria-labelledby="instruments-heading" className="space-y-6">
+    <h2 id="instruments-heading" className="type-section">
+      Charts, past months and checks
+    </h2>
 
     {/* One list, one rule between items. They used to be a disclosure, a heading
         block, two bare disclosure rows and a section with its own boxed toggle,

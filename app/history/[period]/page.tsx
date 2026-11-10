@@ -254,10 +254,10 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           {describeReconstructedPeriod(period.title, firstPublishedWeek)}
         </p>
         {headlineSentence ? <p className="text-sm font-semibold text-slate-100">{headlineSentence}</p> : null}
+        {/* The headline alone (2026-11-10). Every stored headline closes on "The job this
+            year is to {guidance}", and a "Guidance, by today's formula:" line under it
+            printed the same clause again, with the formula the notice above names. */}
         <p className="text-sm text-slate-300">{period.headline}</p>
-        <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">Guidance, by today&apos;s formula:</span> {period.guidance}
-        </p>
         {/* "Maintained by", not "By": the page is kept by its author today; it
             was not written in the period it describes. */}
         <p className="text-xs text-slate-400">
@@ -340,7 +340,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
       {period.rates.length ? (
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Signals of record</h2>
+          {/* "Signals of record" until 2026-11-10: "signal" is /signals' noun, and these
+              are the four rates at the period's closing reading. */}
+          <h2 className="text-lg font-semibold text-slate-100">Rates on {period.recordDateLabel}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.rates.map((rate) => (
               <li key={rate.label} className="flex flex-wrap items-baseline justify-between gap-2">

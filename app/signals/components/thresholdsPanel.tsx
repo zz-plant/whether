@@ -276,7 +276,7 @@ export const ThresholdsPanel = ({
   };
 
   const handleReset = () => {
-    if (!confirm("Reset every pause and restart line to its default? Your custom lines will be replaced.")) {
+    if (!confirm("Reset all three lines to the published defaults? Your custom lines will be replaced.")) {
       return;
     }
     const defaultDraft = buildDraft(appliedDefaults);
@@ -316,7 +316,7 @@ export const ThresholdsPanel = ({
           label="Change lines"
           title="Adjust when conditions change"
           titleId="thresholds-title"
-          description="These values decide when conditions change. They stay in the URL so shared links match."
+          description="Your lines stay in the URL, so a shared link opens with them."
           aside={
             /* A labelled value, not a control: it was set in `weather-pill`,
                which is the class the page's pill-shaped links press. */
@@ -331,9 +331,9 @@ export const ThresholdsPanel = ({
 
         <div className="mt-6 space-y-4">
           <div className="weather-surface p-4">
-            <p className="type-eyebrow">Quick presets</p>
+            <p className="type-eyebrow">Presets</p>
             <p className="mt-2 text-sm text-slate-300">
-              Start with one preset, then expand the detailed controls only if you need your own lines.
+              Start with a preset. Open &ldquo;Edit exact numbers&rdquo; only if you need lines of your own.
             </p>
             <div className="mt-3 weather-switch gap-3 [--col-min:12rem]">
               {thresholdPresets.map((preset) => (
@@ -363,7 +363,7 @@ export const ThresholdsPanel = ({
             <div className="pt-4">
               <Form onFormSubmit={handleSubmit} className="@container grid gap-4">
                 <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 @3xl:grid-cols-[1fr,1fr,1fr,auto]">
-                  <Fieldset.Legend className="sr-only">Set threshold guardrails</Fieldset.Legend>
+                  <Fieldset.Legend className="sr-only">Set your own lines</Fieldset.Legend>
                   <ThresholdNumberField
                     id="threshold-base-rate"
                     name={THRESHOLD_PARAM_KEYS.baseRate}
@@ -438,7 +438,7 @@ export const ThresholdsPanel = ({
 
         <div className="mt-6 weather-switch gap-4 [--col-min:18rem]">
           <div className="weather-surface p-4">
-            <p className="type-eyebrow">Applied thresholds</p>
+            <p className="type-eyebrow">Lines in use</p>
             <div className="mt-3 space-y-2 text-sm text-slate-300">
               <p>
                 Short-term borrowing rate line:{" "}
@@ -463,8 +463,7 @@ export const ThresholdsPanel = ({
               <summary className={DISCLOSURE_SUMMARY_CLASS}>How this works</summary>
               <div className="mt-3 space-y-3 text-xs text-slate-300">
                 <p className="text-slate-400">
-                  These lines decide when conditions change. Move them to match your own
-                  risk tolerance, then share this link.
+                  Move the lines to match your own risk tolerance, then share this link.
                 </p>
                 {/* The two scores cross their lines in opposite directions, so "lower
                     changes the call sooner" was true of funding pressure and backwards

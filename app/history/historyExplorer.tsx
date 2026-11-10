@@ -115,7 +115,7 @@ export function HistoryExplorer({
               onClick={clearSelection}
               className="inline-flex min-h-[44px] items-center text-fluid-nano text-sky-200 hover:text-sky-100 underline decoration-sky-600"
             >
-              Clear filter
+              Clear month
             </button>
           ) : null}
         </div>

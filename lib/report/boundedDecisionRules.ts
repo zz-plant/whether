@@ -328,7 +328,7 @@ export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "
   formatDecisionThreshold(rule.pauseTrigger, FALLBACK_PAUSE_THRESHOLD);
 
 export const formatBoundedDecisionReverse = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) =>
-  formatDecisionReversal(rule.resumeTrigger, "Resume only after the reading recovers");
+  formatDecisionReversal(rule.resumeTrigger, "Restart only after the reading recovers");
 
 export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation" | "pauseTrigger" | "resumeTrigger">) => {
   const triplet = formatDecisionTriplet({
@@ -338,7 +338,7 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
     fallbacks: {
       action: "Keep your current plan",
       threshold: FALLBACK_PAUSE_THRESHOLD,
-      reversal: "Resume only after the reading recovers",
+      reversal: "Restart only after the reading recovers",
     },
   });
 
@@ -416,7 +416,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     transmission:
       "When capital gets expensive, investors reward companies that generate revenue with lean headcount, and penalize adding payroll ahead of sales. Every new hire adds fixed monthly spend you can't easily undo if sales cycles drag.",
     whyLineMatters:
-      "Setting your pause line ahead of time protects the commitments you already carry, so a slow quarter never forces emergency cuts.",
+      "Deciding ahead of time when to pause protects the commitments you already carry, so a slow quarter never forces emergency cuts.",
     ruleOfThumb:
       "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
     startupMath:
@@ -523,7 +523,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         : ["Don't add roles for capacity you might need, or for work that pays back in more than a year."],
       scope: `Applies to all net-new headcount; current funding pressure ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
       pause: { verb: "Pause net-new hiring", join: "or", conditions: [tightnessPauseLine, riskPauseLine] },
-      resume: { verb: "Resume the held roles", join: "and", conditions: [tightnessResumeLine, riskResumeLine] },
+      resume: { verb: "Restart the held roles", join: "and", conditions: [tightnessResumeLine, riskResumeLine] },
       rationale: "Protect the work already under way, and don't add costs you can't cut later.",
     },
     "product-tempo": {
@@ -545,7 +545,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         qualifier: "two weekly readings in a row come in weaker",
       },
       resume: {
-        verb: "Resume the paused bets",
+        verb: "Restart the paused bets",
         join: "and",
         conditions: [riskResumeLine],
         qualifier: "the weekly reading holds or improves",
@@ -565,7 +565,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         : ["Don't take worse terms just to close faster."],
       scope: "When to start a raise, how fast to run it, and where to walk away on terms.",
       pause: { verb: "Pause the raise", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
-      resume: { verb: "Resume the full process", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
+      resume: { verb: "Restart the full process", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
       rationale: "Start while conditions are good and you choose the terms; start late and the market does.",
     },
     "burn-discipline": {
@@ -576,7 +576,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: "Hiring, vendor and marketing spend that commits you for more than one quarter.",
       pause: { verb: "Pause new discretionary spend", join: "or", conditions: [tightnessPauseLine] },
       resume: {
-        verb: "Resume new spend",
+        verb: "Restart new spend",
         join: "and",
         conditions: [tightnessResumeLine],
         qualifier: "the payback figures still hold",
@@ -596,7 +596,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         : ["Don't start a bet you can't undo until the scores improve."],
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
       pause: { verb: "Pause new bets", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
-      resume: { verb: "Resume one stage at a time", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
+      resume: { verb: "Restart one stage at a time", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
       rationale: "Grow new bets as the evidence grows, not ahead of it.",
     },
   };
@@ -690,7 +690,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't make several permanent hires before one milestone lands.",
         ],
         watchAdjustments: [
-          withReadingsNow(`Runway trigger: tighten if ${tightnessPauseLine.clause} for 2 readings in a row.`, "or", [tightnessPauseLine]),
+          withReadingsNow(`Runway: tighten if ${tightnessPauseLine.clause} for 2 readings in a row.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Protect runway first; fund one proof of demand at a time rather than breadth.",
         reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause} for two readings in a row and one shipped milestone shows traction.`, "or", [tightnessResumeLine]),

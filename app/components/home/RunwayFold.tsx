@@ -18,7 +18,7 @@ export function RunwayFold({
   return (
     <details className="weather-auto-chevron group" data-runway-fold>
       <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-        Your runway: what this means, and a test
+        Apply it to your runway
       </summary>
       <div className="mt-4 space-y-4">
         {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}

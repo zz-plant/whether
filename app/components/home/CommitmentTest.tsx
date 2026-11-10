@@ -112,7 +112,7 @@ export function CommitmentTest({
             className="weather-input mt-1 w-full px-3.5 py-2.5"
           />
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="text-fluid-nano text-slate-500">Quick:</span>
+            <span className="text-fluid-nano text-slate-500">Or pick:</span>
             {[
               { label: "+$15k", value: "$15k" },
               { label: "+$30k", value: "$30k" },

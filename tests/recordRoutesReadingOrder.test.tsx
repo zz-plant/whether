@@ -43,7 +43,7 @@ describe("/history leads with the record's answer", () => {
 
     const strip = headings.indexOf("Conditions by month");
     const record = headings.indexOf("Track record");
-    const confidence = headings.indexOf("How often a close call held");
+    const confidence = headings.indexOf("Advance warning");
     const map = headings.indexOf("How the two scores set conditions");
     const table = headings.indexOf("Monthly readings");
     const briefs = headings.indexOf("Published weekly briefs");

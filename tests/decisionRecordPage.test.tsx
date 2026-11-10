@@ -53,7 +53,7 @@ describe("decision record page", () => {
 
     const html = await render();
     assert.match(html, /Download as CSV/);
-    assert.match(html, /Download JSON \(one line per decision\)/);
+    assert.match(html, /Download as JSON/);
   });
 
   // The same rule the answer pages are held to: the engine's names stay in the engine.

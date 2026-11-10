@@ -408,7 +408,8 @@ export function RegimeRadar({
 
   // Any string: a known regime maps to its weather word, anything else passes
   // through, so an unmodelled label still reads instead of rendering blank.
-  const weatherLabel = getRegimePublicLabel(currentRegime).toLowerCase();
+  /* Capitalised: a condition name is a proper noun ("(Cloudy)"), as everywhere else on the site. */
+  const weatherLabel = getRegimePublicLabel(currentRegime);
 
   /* The week's quadrant lit, the other three dimmed (2026-10-21). At one
      strength each, the four washes read as a legend and the map said nothing
@@ -435,9 +436,12 @@ export function RegimeRadar({
     );
 
   return (
+    /* No frame (2026-11-10): the plot's quadrant washes bound it, and a bordered,
+       filled box on the control radius was a card inside the section (DESIGN.md,
+       "The Flat Paper Rule"). */
     <figure
-      className={`relative m-0 flex flex-col items-center justify-center rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 ${className}`.trim()}
-      aria-label={`Conditions radar: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}`}
+      className={`relative m-0 flex flex-col items-center justify-center ${className}`.trim()}
+      aria-label={`Conditions map: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}`}
       data-scrubbing={isScrubbing ? "" : undefined}
     >
       <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
@@ -455,7 +459,7 @@ export function RegimeRadar({
         {/* Not on the card (2026-11-03): the facts line beside the map states both scores. */}
         {isScrubbing ? (
           <span className="tabular-nums text-slate-200" data-radar-scrub-readout>
-            {`Pressure ${scrubTightness} (${formatSignedDelta(scrubTightness - tightness)}) · Appetite ${scrubRiskAppetite} (${formatSignedDelta(scrubRiskAppetite - riskAppetite)})`}
+            {`Funding pressure ${scrubTightness} (${formatSignedDelta(scrubTightness - tightness)}) · Risk appetite ${scrubRiskAppetite} (${formatSignedDelta(scrubRiskAppetite - riskAppetite)})`}
           </span>
         ) : compact ? null : (
           <span className="tabular-nums text-slate-400">
@@ -525,11 +529,13 @@ export function RegimeRadar({
 
         {/* Quadrant corner labels, each in its condition's ink. These read the
             line-state families until 2026-10-09 (Sunny in the clear ink,
-            Cloudy in the caution one), which tied a condition to a state. */}
+            Cloudy in the caution one), which tied a condition to a state. In
+            sentence case at 12px since 2026-11-10: capitals are for a badge, and
+            12px is the floor for a word (DESIGN.md, Typography). */}
         <text
           x={PLOT_X + 6}
           y={freezingUp ? boundaryY + 12 : PLOT_BOTTOM - 6}
-          className="text-[11px] font-bold uppercase tracking-wider"
+          className="text-[12px] font-semibold"
           fill="var(--color-condition-freezing-ink)"
         >
           Freezing
@@ -538,7 +544,7 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_BOTTOM - 6}
           textAnchor="end"
-          className="text-[11px] font-bold uppercase tracking-wider"
+          className="text-[12px] font-semibold"
           fill="var(--color-condition-cloudy-ink)"
         >
           Cloudy
@@ -546,7 +552,7 @@ export function RegimeRadar({
         <text
           x={PLOT_X + 6}
           y={PLOT_Y + 12}
-          className="text-[11px] font-bold uppercase tracking-wider"
+          className="text-[12px] font-semibold"
           fill="var(--color-condition-stormy-ink)"
         >
           Stormy
@@ -555,7 +561,7 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_Y + 12}
           textAnchor="end"
-          className="text-[11px] font-bold uppercase tracking-wider"
+          className="text-[12px] font-semibold"
           fill="var(--color-condition-sunny-ink)"
         >
           Sunny

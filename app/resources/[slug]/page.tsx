@@ -82,9 +82,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {
       ...buildPageMetadata({
         title: "Governance resource moved",
-        description: "This resource has been retired. The remaining guides are on the Resources page.",
+        description: "This resource has been retired. The remaining guides are on the Guides page.",
         path: "/resources",
-        imageAlt: "Whether resources",
+        imageAlt: "Whether guides",
       }),
       robots: noindexRobots,
     };
@@ -200,10 +200,10 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const isParentGuide = `/resources/${page.slug}` === canonicalCapitalDisciplinePath;
   const relatedPages = [
     { href: canonicalCapitalDisciplinePath, label: "Capital discipline for venture-backed companies" },
-    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital framework" },
+    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital discipline framework" },
     { href: "/resources/reversibility-as-governance", label: "Reversibility as governance" },
-    { href: resourceSupportingPages.decisionShieldOverview.path, label: "Decision Shield overview" },
-    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Planning Template" },
+    { href: resourceSupportingPages.decisionShieldOverview.path, label: resourceSupportingPages.decisionShieldOverview.title },
+    { href: resourceSupportingPages.capitalPostureTemplate.path, label: resourceSupportingPages.capitalPostureTemplate.title },
   ].filter((link) => link.href !== `/resources/${page.slug}`);
   const linkClass = "text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100";
   const lexiconByIndex = ["capital-regime", "escalation-thresholds", "reversibility", "30-day-confirmation-logic"] as const;
@@ -315,8 +315,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           </div>
           {isParentGuide ? null : (
             <p className="text-sm text-slate-300">
-              The board Q&amp;A, the anti-patterns, the 12-month cadence and the director checklist are in{" "}
-              <Link href={`${canonicalCapitalDisciplinePath}#reference`} className={linkClass}>the parent guide</Link>.
+              The board Q&amp;A, the anti-patterns, the 12-month cadence and the director checklist are in the reference section of{" "}
+              <Link href={`${canonicalCapitalDisciplinePath}#reference`} className={linkClass}>Capital discipline for venture-backed companies</Link>.
             </p>
           )}
         </section>
@@ -338,7 +338,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         body="Ask for a walkthrough of the board pack."
         keyword={page.keyword}
         sourceSlug={page.slug}
-        downloadLabel="Download Capital Planning Template"
+        downloadLabel="Download the capital planning template"
       />
     </ContentPageShell>
   );

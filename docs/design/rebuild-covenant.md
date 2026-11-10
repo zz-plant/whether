@@ -58,8 +58,10 @@ As of 2026-11-10, on every route unless a line says otherwise:
   sentence and a ruled line named in place, and the trust facts under them; on a phone both
   scores follow the guidance as compact figures, in the facts line's place. The conditions map
   in "What would change our mind".
-- **Report routes.** The page title leads and the condition and date follow as a facts line.
-  Caveat and line bands have a ruled top edge.
+- **Report routes.** The page title leads and the condition and date follow as a facts line,
+  with no box around the intro. Caveat and line bands have a ruled top edge.
+- **Controls.** Pills, buttons, fields, keys and the segmented well cast no shadow
+  (2026-11-10); a control is its border and fill, a 1px rise and a 1px press.
 - **History.** The band opens to the page's figure with each stretch named in its field. A cell
   for each week since the first brief, patterned by condition and empty where none was
   published; a note of both facts where a brief and its month-end name different conditions.
@@ -73,12 +75,13 @@ Not built yet:
   edge moves between `/` and the rest.
 - One copy control on the first screen. The four copy buttons remain.
 - Numbered section openers and the contents list in the margin.
-- The conditions map is still a boxed figure with capitalised labels, and the area icons
-  remain in "What changed" and on Plan.
+- The area icons remain in "What changed" and on Plan. (The conditions map lost its frame
+  and its capitalised labels on 2026-11-10.)
 - The scroll-progress rule is still mounted, and the "since you last read" mark is not yet on
   the band.
-- Controls (pills, buttons, fields, the segmented well) still carry their shadows, and the
-  report intro is still a boxed panel.
+- `/history/compare` is still in the earlier world: mono chips for the score deltas, a tinted
+  panel for the rules that changed, and "Pause if" in red as a label. It rendered no
+  comparison from 2026-11-07 to 2026-11-10 (a client-only module called on the server).
 - Share images, emails and print redrawn with the band and Besley. They took the palette only,
   and are still drawn dark.
 - The week's move redrawn for the band. It keeps its existing choreography on the ladders and

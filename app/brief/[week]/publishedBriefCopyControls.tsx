@@ -51,6 +51,8 @@ export function PublishedBriefCopyControls({
         ? emailUpdate
         : boardUpdate;
 
+  /* The clipboard target and the funnel's key, not display copy: the button and the
+     preview label below say the format in sentence case. */
   const formatLabel =
     activeFormat === "slack"
       ? "Slack update"
@@ -58,14 +60,34 @@ export function PublishedBriefCopyControls({
         ? "Email update"
         : "Board memo";
 
+  /* "Copy Email update" and "Copy Board memo" capitalised mid-sentence, and the
+     preview read "Email preview" over the board memo (2026-11-10). */
+  const copyLabel =
+    activeFormat === "slack"
+      ? "Copy Slack update"
+      : activeFormat === "email"
+        ? "Copy email update"
+        : "Copy board memo";
+  const previewLabel =
+    activeFormat === "slack"
+      ? "Slack preview"
+      : activeFormat === "email"
+        ? "Email preview"
+        : "Board memo preview";
+
+  /* The hook's error is not per target, so the failure shows on the button that
+     was pressed, with the way to get the text without the clipboard. */
+  const [lastTarget, setLastTarget] = useState<string | null>(null);
+
   const clipboardState = (target: string) =>
-    getClipboardUiState(target, { status, error, activeTarget, copiedTarget });
+    getClipboardUiState(target, { status, error, activeTarget, copiedTarget }, { includeError: lastTarget === target });
 
   const isCopyDisabled = (target: string) =>
     isClipboardTargetDisabled(target, { status, activeTarget });
 
   const handleCopy = async (text: string, label: string) => {
     if (status === "copying") return;
+    setLastTarget(label);
     await copyToClipboard(text, label);
   };
 
@@ -125,12 +147,13 @@ export function PublishedBriefCopyControls({
           label={
             <span className="inline-flex items-center gap-1.5">
               <CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              Copy {formatLabel}
+              {copyLabel}
             </span>
           }
           state={clipboardState(formatLabel)}
           disabled={isCopyDisabled(formatLabel)}
           onClick={() => void handleCopy(activeText, formatLabel)}
+          buttonLabels={{ error: "Copy failed — select the preview text" }}
           buttonVariant="primary"
         />
         <ClipboardActionRow
@@ -143,6 +166,7 @@ export function PublishedBriefCopyControls({
           state={clipboardState("Permanent link")}
           disabled={isCopyDisabled("Permanent link")}
           onClick={() => void handleCopy(permanentUrl, "Permanent link")}
+          buttonLabels={{ error: "Copy failed — use the address bar" }}
           buttonVariant="pill"
         />
         {slidePptxUrl ? (
@@ -157,9 +181,7 @@ export function PublishedBriefCopyControls({
       <div className="space-y-2">
         {/* The format alone (2026-10-09): the heading above names the week and
             the line under it says the copies are date-pinned. */}
-        <p className="text-xs text-slate-400">
-          {activeFormat === "slack" ? "Slack preview" : "Email preview"}
-        </p>
+        <p className="text-xs text-slate-400">{previewLabel}</p>
         {/* The clip needs to read as "there is more", not as a rendering fault.
             max-h-64 cuts horizontally through a line of glyphs, and macOS
             overlay scrollbars stay hidden until you scroll, so the block just

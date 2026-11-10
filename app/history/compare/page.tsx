@@ -46,7 +46,7 @@ export default async function HistoryComparePage({
         },
         page: {
           pageTitle: "Compare two periods",
-          pageSummary: "Signals and operating guidance for any two past months, side by side.",
+          pageSummary: "Scores, rates and guidance for any two past months, side by side.",
           sectionLinks: [
             { href: "#compare-selectors", label: "Period selection" },
             { href: "#compare-key-deltas", label: "What changed" },

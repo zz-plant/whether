@@ -406,9 +406,12 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                 </table>
               </div>
             ) : (
-              <ul className="space-y-4">
+              /* Ruled rows, as every list of the five areas is (DESIGN.md, Layout): a 2px ink
+                 rule over the list and a hairline under each area. Each area was a block
+                 behind a 2px left stripe until 2026-11-10. */
+              <ul className="border-t-2 border-[color:var(--app-text)]">
                 {brief.decisions.map((decision) => (
-                  <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">
+                  <li key={decision.area} className="space-y-1 border-b border-[color:var(--border-default)] py-3">
                     <p className="text-sm font-semibold text-slate-100">
                       <BriefAreaName area={decision.area} />
                     </p>
