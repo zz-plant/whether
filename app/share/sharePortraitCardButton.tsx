@@ -88,7 +88,7 @@ export function SharePortraitCardButton() {
         copied: <CheckIcon className="text-emerald-400" />,
       }}
       buttonLabels={{
-        copying: <span className="text-slate-300">Rendering…</span>,
+        copying: <span className="text-slate-300">Rendering image…</span>,
         copied: <span className="text-emerald-300">Shared</span>,
         error: <span className="text-rose-400">Card unavailable</span>,
       }}

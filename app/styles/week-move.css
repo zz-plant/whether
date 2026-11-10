@@ -1,0 +1,165 @@
+/*
+ * The week's move, replayed once on the card (lib/report/home/weekMove.ts).
+ *
+ * CSS, not script: the animation is in the first paint, so the card never shows this
+ * week's state and then rewinds. Every piece rests in this week's state; the keyframes
+ * only say where it came from, so no script, reduced motion, print and screenshot mode
+ * all draw the finished card.
+ *
+ * The one exception to the 150–300ms motion rule (DESIGN.md → Motion): a reading has to
+ * be seen to travel, and a line seen to be crossed. It runs once, under two seconds, and
+ * only on a week something moved. Transform and opacity only (ui-ux-standards §IX).
+ */
+
+/* An earlier value printed from an attribute: it is in no text node, so a crawler, a
+   paste and a screen reader read this week's value once. */
+.week-move-attr::after {
+  content: attr(data-text);
+  content: attr(data-text) / "";
+}
+
+.week-move-old {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.week-move-wake {
+  opacity: 0;
+}
+
+.week-move-replay {
+  display: none;
+}
+
+/* A 44px target around a 14px glyph (the word is hidden on a phone). */
+.week-move-replay.weather-hit::after {
+  inset: -15px -15px -15px -10px;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  html:not([data-screenshot="true"]) :is([data-week-move="arrival"], [data-week-move="again"]) {
+    --week-move-start: 450ms;
+    --week-move-travel: 760ms;
+    --week-move-ease: cubic-bezier(0.65, 0, 0.35, 1);
+    /* When the reading crosses into this week's conditions; what a line changes, changes then. */
+    --week-move-turn: calc(var(--week-move-start) + var(--week-move-cross, 0.6) * var(--week-move-travel));
+
+    .week-move-replay {
+      display: inline-flex;
+    }
+
+    /* The reading, from the earlier score to this week's: a ladder's dot… */
+    .week-move-dot {
+      animation: week-move-dot var(--week-move-travel) var(--week-move-ease) var(--week-move-start) both;
+    }
+
+    /* …the bar it leaves between the two readings… */
+    .week-move-bar {
+      animation: week-move-bar var(--week-move-travel) var(--week-move-ease) var(--week-move-start) both;
+    }
+
+    /* …each line it passes… */
+    .week-move-tick {
+      animation: week-move-tick 420ms var(--ease-out)
+        calc(var(--week-move-start) + var(--week-move-at, 0.5) * var(--week-move-travel)) both;
+    }
+
+    /* …and the map's marker, with the path it took, which fades once it lands. */
+    .week-move-marker {
+      animation: week-move-marker var(--week-move-travel) var(--week-move-ease) var(--week-move-start) both;
+    }
+
+    .week-move-wake {
+      animation: week-move-wake calc(var(--week-move-travel) * 2.4) var(--week-move-ease) var(--week-move-start) both;
+    }
+
+    /* The stamp turns as the reading crosses the change line. */
+    .week-move-stamp-old {
+      animation: week-move-out 280ms var(--ease-out) var(--week-move-turn) both;
+    }
+
+    .week-move-stamp-new {
+      animation: week-move-in 280ms var(--ease-out) var(--week-move-turn) both;
+    }
+
+    /* Each area that moved, in the row's order. */
+    .week-move-flip-old {
+      animation: week-move-out 260ms var(--ease-out) calc(var(--week-move-turn) + 120ms + var(--week-move-i, 0) * 80ms)
+        both;
+    }
+
+    .week-move-flip-new {
+      animation: week-move-in 260ms var(--ease-out) calc(var(--week-move-turn) + 120ms + var(--week-move-i, 0) * 80ms)
+        both;
+    }
+  }
+
+  /* A replay asked for starts at once. */
+  html:not([data-screenshot="true"]) [data-week-move="again"] {
+    --week-move-start: 80ms;
+  }
+}
+
+@keyframes week-move-dot {
+  from {
+    transform: translateX(var(--week-move-dx));
+  }
+}
+
+@keyframes week-move-bar {
+  from {
+    scale: 0 1;
+  }
+}
+
+@keyframes week-move-tick {
+  35% {
+    scale: 2 1.2;
+  }
+}
+
+@keyframes week-move-marker {
+  from {
+    transform: translate(calc(var(--week-move-dx) * 1px), calc(var(--week-move-dy) * 1px));
+  }
+}
+
+@keyframes week-move-wake {
+  from {
+    stroke-dashoffset: 1;
+    opacity: 0.75;
+  }
+
+  42% {
+    stroke-dashoffset: 0;
+    opacity: 0.75;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes week-move-out {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  to {
+    opacity: 0;
+    translate: 0 -55%;
+  }
+}
+
+@keyframes week-move-in {
+  from {
+    opacity: 0;
+    translate: 0 55%;
+  }
+}

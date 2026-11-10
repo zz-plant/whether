@@ -393,16 +393,16 @@ export const logDecisionSnapshotToLedger = async (
       });
 
       if (!response.ok) {
-        return { ok: false, reason: "That call was not recorded. Try again in a moment." };
+        return { ok: false, reason: "This week's guidance was not recorded. Try again in a moment." };
       }
 
       return { ok: true };
     } catch {
-      return { ok: false, reason: "That call was not recorded. Try again in a moment." };
+      return { ok: false, reason: "This week's guidance was not recorded. Try again in a moment." };
     }
   };
 
-  return withLedgerWriteLock(clientId, post, "That call was not recorded. Try again in a moment.");
+  return withLedgerWriteLock(clientId, post, "This week's guidance was not recorded. Try again in a moment.");
 };
 
 /**

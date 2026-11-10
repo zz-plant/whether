@@ -116,7 +116,7 @@ export function SubscribeForm({
         </p>
         {channel === "slack" ? (
           <p className="text-fluid-nano text-slate-400">
-            To stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.
+            To stop delivery, delete the webhook in Slack. Whether stops posting once it is gone.
           </p>
         ) : null}
         <button
@@ -145,7 +145,7 @@ export function SubscribeForm({
           {showTitle ? (
             <p className="text-fluid-sm font-medium text-slate-50">
               {channel === "slack"
-                ? "Automate Monday brief delivery directly to Slack"
+                ? "Get the Monday brief in a Slack channel"
                 : alertsOnly
                   ? "Tell me when the guidance changes"
                   : "Get the guidance every Monday, and a note the day it changes"}
@@ -170,7 +170,7 @@ export function SubscribeForm({
         </div>
         <p className="max-w-[60ch] text-fluid-sm text-slate-400">
           {channel === "slack"
-            ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
+            ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
             : alertsOnly
               ? <>
                   {condition ? <>Next change to watch: {condition} </> : null}
@@ -230,7 +230,7 @@ export function SubscribeForm({
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            <label htmlFor="slack-webhook-url" className="sr-only">Slack Incoming Webhook URL</label>
+            <label htmlFor="slack-webhook-url" className="sr-only">Slack incoming webhook URL</label>
             <input
               id="slack-webhook-url"
               name="slackWebhookUrl"
@@ -271,7 +271,7 @@ export function SubscribeForm({
       </form>
 
       {message && (
-        <p id="subscribe-message" aria-live="polite" className="text-fluid-nano text-rose-400">
+        <p id="subscribe-message" role="alert" className="text-fluid-nano text-rose-400">
           {message}
         </p>
       )}

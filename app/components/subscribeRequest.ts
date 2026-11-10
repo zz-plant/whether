@@ -32,8 +32,9 @@ type SubscribeOptions = {
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
 
 const INVALID_EMAIL_MESSAGE = "Enter a full email address, like you@company.com.";
-const VERIFY_MESSAGE = "Check your inbox. Nothing is sent until you click the link.";
-const FAILURE_MESSAGE = "That did not go through. Try again in a moment.";
+const VERIFY_MESSAGE = "Click the link in the confirmation email. Nothing else is sent until you do.";
+const FAILURE_MESSAGE = "The signup did not go through. Try again in a moment.";
+const RATE_LIMITED_MESSAGE = "Too many attempts from this connection. Try again in a minute.";
 const NETWORK_MESSAGE = "You are offline, or the connection dropped. Try again.";
 
 export async function requestSubscription(
@@ -65,11 +66,27 @@ export async function requestSubscription(
     if (res.ok && data?.ok) {
       return { ok: true, message: VERIFY_MESSAGE };
     }
-    return { ok: false, message: data?.error || FAILURE_MESSAGE };
+    return { ok: false, message: describeRejection(res.status, data?.error, FAILURE_MESSAGE) };
   } catch {
     return { ok: false, message: NETWORK_MESSAGE };
   }
 }
+
+/**
+ * What a refused request says. A 4xx carries a sentence the route wrote for the
+ * reader ("Valid email required."), so it is passed on. The rate limiter answers
+ * with the code `rate_limited` and a 5xx with the text of whatever threw, and
+ * neither was written to be read: both printed as the form's error (2026-11-09).
+ */
+const describeRejection = (status: number, serverError: string | undefined, fallback: string): string => {
+  if (status === 429) return RATE_LIMITED_MESSAGE;
+  if (status >= 500 || !serverError) return fallback;
+  return serverError;
+};
+
+const SLACK_INVALID_URL_MESSAGE = "Enter a Slack incoming webhook URL. It starts with https://hooks.slack.com/.";
+const SLACK_CONNECTED_MESSAGE = "A test message is in the channel now.";
+const SLACK_FAILURE_MESSAGE = "The channel was not connected. Check the webhook URL, then try again.";
 
 const SLACK_SUBSCRIBE_ENDPOINT = "/api/slack/subscribe";
 
@@ -81,7 +98,7 @@ export async function requestSlackSubscription(
 ): Promise<SlackSubscribeResult> {
   const trimmed = webhookUrl.trim();
   if (!trimmed || !trimmed.startsWith("https://hooks.slack.com/")) {
-    return { ok: false, message: "Please enter a valid Slack webhook URL (must begin with https://hooks.slack.com/)." };
+    return { ok: false, message: SLACK_INVALID_URL_MESSAGE };
   }
 
   try {
@@ -103,12 +120,12 @@ export async function requestSlackSubscription(
     if (res.ok && data?.ok) {
       return {
         ok: true,
-        message: data.message || "Connected to Slack! Check your channel for the confirmation ping.",
+        message: SLACK_CONNECTED_MESSAGE,
         channelName: data.channelName,
       };
     }
-    return { ok: false, message: data?.error || "Failed to connect Slack webhook. Please try again." };
+    return { ok: false, message: describeRejection(res.status, data?.error, SLACK_FAILURE_MESSAGE) };
   } catch {
-    return { ok: false, message: "A network error occurred. Please try again." };
+    return { ok: false, message: NETWORK_MESSAGE };
   }
 }

@@ -60,7 +60,7 @@ export function CalendarReviewActions({
     return (
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-nano text-slate-300">
         <a href={oneTimeUrl} target="_blank" rel="noreferrer" className={linkClass}>
-          Add one review
+          Add next Monday&rsquo;s review
         </a>
         <span aria-hidden="true" className="text-slate-600">·</span>
         <a href={recurringUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
@@ -68,7 +68,7 @@ export function CalendarReviewActions({
         </a>
         <span aria-hidden="true" className="text-slate-600">·</span>
         <span className="inline-flex items-center gap-1">
-          <span>Subscribe:</span>
+          <span>Calendar feed:</span>
           <a href={webcal} className={linkClass}>
             Apple/Outlook
           </a>
@@ -91,7 +91,7 @@ export function CalendarReviewActions({
       <p className="type-eyebrow text-slate-400">Calendar actions</p>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <a href={oneTimeUrl} target="_blank" rel="noreferrer" className={linkClass}>
-          Add one review
+          Add next Monday&rsquo;s review
         </a>
         <span aria-hidden="true" className="text-slate-600">·</span>
         <a href={recurringUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
@@ -99,7 +99,7 @@ export function CalendarReviewActions({
         </a>
         <span aria-hidden="true" className="text-slate-600">·</span>
         <span className="inline-flex items-center gap-1 text-slate-400">
-          <span>Subscribe to the weekly brief:</span>
+          <span>Each week&rsquo;s guidance as a calendar feed:</span>
           <a href={webcal} className={linkClass}>
             Apple or Outlook
           </a>

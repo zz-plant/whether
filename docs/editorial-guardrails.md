@@ -193,7 +193,7 @@ answering a question the answer pages already answer.
   "5 pts above the change line", "Clear of the line", a key to "what the three lines do", and
   "an email the day a line is crossed" under every page title. A reader asks what to do and
   what would change it, so a sentence says the area's verb ("Hiring — a rare move from restarting",
-  "No area changed since Sep 30") or the number ("risk appetite is 55, above 50"). "Pause
+  "No area paused or restarted since Sep 30") or the number ("risk appetite is 55, above 50"). "Pause
   line", "Restart line" and "Change line" stay as labels beside a number (a ladder tick, a
   table header in exports, a chart), and the method sections (/about#method, /trust) are where
   the lines are explained. A new sentence that needs "line" to make sense is a sign the number

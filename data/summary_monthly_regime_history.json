@@ -1060,5 +1060,11 @@
     "regime": "DEFENSIVE",
     "tightness": 90,
     "riskAppetite": 56
+  },
+  {
+    "record_date": "2026-10-30",
+    "regime": "DEFENSIVE",
+    "tightness": 90,
+    "riskAppetite": 55
   }
 ]

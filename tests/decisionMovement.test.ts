@@ -296,6 +296,6 @@ describe("describeMovementCause", () => {
   it("says no area changed, dated by the comparison, on a week that held", () => {
     const held = movement({ from: { tightness: 90, riskAppetite: 43 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
     assert.ok(held);
-    assert.equal(describeMovementCause(held), "No area changed since Aug 31.");
+    assert.equal(describeMovementCause(held), "No area paused or restarted since Aug 31.");
   });
 });
