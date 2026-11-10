@@ -52,6 +52,7 @@ import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
+import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { ShareLinks } from "./components/home/ShareLinks";
@@ -781,10 +782,14 @@ async function PageContent({
                 /* Both scores on a phone too, side by side under the areas: the number and
                    where it stands. The ruled line is the margin's, from `md` up. */
                 phoneFigure={
-                  <div className="grid grid-cols-2 gap-x-4" data-hero-scores-compact>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1" data-hero-scores-compact>
                     {scoreLadders.map((ladder) => (
                       <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} />
                     ))}
+                    {/* The facts line's one link to the basis, which it carries from md up. */}
+                    <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-slate-300 underline decoration-slate-600 underline-offset-4">
+                      Why conditions are {publicRegimeLabel}
+                    </Link>
                   </div>
                 }
               />

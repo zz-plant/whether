@@ -578,14 +578,23 @@ a.weather-hub-link-card:hover {
   background-color: var(--bg-raised);
 }
 
+/* A phone sets the guidance a step smaller, so the week's statement, the two scores and the
+   five areas share one screen (docs/design/rebuild-covenant.md). Still four lines at 390px. */
+@media (max-width: 767px) {
+  .weather-editorial-hero .text-display {
+    font-size: clamp(1.625rem, 1.1rem + 2.2vw, 2rem);
+  }
+}
+
 @media (min-width: 768px) {
   .weather-editorial-hero .text-display {
-    font-size: clamp(2.5rem, 3.5vw, 3.25rem);
+    font-size: clamp(2.375rem, 3.3vw, 3.25rem);
     line-height: 1.02;
     letter-spacing: -0.03em;
   }
 
-  .weather-hero-aside {
+  .weather-hero-aside,
+  .weather-hero-margin-head {
     border-inline-start: 1px solid var(--border-subtle);
     padding-inline-start: 1.25rem;
   }
@@ -608,6 +617,8 @@ a.weather-hub-link-card:hover {
 
 /* The week is part of the artifact header, close to the call it dates. */
 .weather-hero-period { flex-basis: 100%; margin-bottom: 0.25rem; }
+/* Heading the margin, it joins the scores' hairline below it with no gap. */
+.weather-hero-period.weather-hero-margin-head { margin-bottom: 0; }
 .weather-signal-table tr[data-input] th,
 .weather-signal-table tr[data-input] td { padding-block: 0.5rem; }
 @media (max-width: 767px) {

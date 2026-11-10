@@ -13,7 +13,9 @@ import { LineStateIcon } from "../ui/conceptIcons";
  *
  * It was a row of five columns, a name over a state (2026-11-05), read the way a forecast
  * row is. Numbered in the one order the areas are always given, so "area 3" can be cited.
- * Rows and no boxes: a card inside the block is a list (§XXV).
+ * Rows and no boxes: a card inside the block is a list (§XXV). The line the held areas
+ * wait on is not repeated under the rows: the funding-pressure figure beside them states
+ * it, and "Your decisions this week" states it with the size of the move (2026-11-10).
  */
 const STATE_INK = (state: AreaStripModel["cells"][number]["state"]) =>
   state === "clear" ? "text-line-clear-fg" : "text-line-crossed-fg";
@@ -44,7 +46,7 @@ export function AreaStrip({
               <Link
                 href={cell.href}
                 data-line-state={cell.state}
-                className="group grid min-h-11 grid-cols-[1.25rem_minmax(0,1fr)_auto] items-baseline gap-x-2 py-1.5 text-sm leading-tight no-underline @[34rem]:grid-cols-[1.25rem_8.5rem_6.5rem_minmax(0,1fr)] @[34rem]:gap-x-3"
+                className="group grid min-h-11 grid-cols-[1.25rem_minmax(0,1fr)_auto] items-baseline gap-x-2 py-0.5 text-sm leading-tight no-underline @[34rem]:grid-cols-[1.25rem_8.25rem_6.25rem_minmax(0,1fr)] @[34rem]:gap-x-3"
               >
                 <span aria-hidden="true" className="text-xs tabular-nums text-slate-400">{index + 1}</span>
                 <span className="font-[family-name:var(--font-display)] text-[1.25rem] font-bold leading-none text-slate-100 group-hover:underline group-hover:underline-offset-4">
@@ -52,7 +54,7 @@ export function AreaStrip({
                 </span>
                 <AreaStanding cell={cell} was={earlier?.[cell.area]} order={movedAreas.indexOf(cell.area)} />
                 {rule ? (
-                  <span className="col-span-full hidden text-sm leading-[1.3] text-slate-300 @[34rem]:col-span-1 lg:block" data-area-rule>
+                  <span className="col-span-full hidden text-sm leading-[1.2] text-slate-300 @[34rem]:col-span-1 lg:block" data-area-rule>
                     {rule}
                   </span>
                 ) : null}
@@ -61,7 +63,6 @@ export function AreaStrip({
           );
         })}
       </ol>
-      {model.restart ? <p className="mt-2 text-sm leading-snug text-slate-300">{model.restart}</p> : null}
     </div>
   );
 }

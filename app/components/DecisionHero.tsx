@@ -201,6 +201,35 @@ export function DecisionHero({
     ? { "--week-move-cross": move.conditions.at }
     : undefined;
 
+  /* "Feels like": a caveat about the reading, so the caveat's ink and mark. It was drawn
+     in the other condition's colour, a second condition's hue beside this week's. */
+  const feelsLikeLink = feelsLike ? (
+    <Link
+      href={feelsLike.href}
+      data-feels-like
+      className="weather-hit weather-caveat-mark text-fluid-sm font-medium text-caveat-fg underline decoration-slate-600 underline-offset-4"
+    >
+      Feels like <span className="font-semibold">{REGIME_LABELS[feelsLike.regime]}</span>
+    </Link>
+  ) : null;
+
+  /* The week control and the brief's number: a control, and the citation it selects. */
+  const weekLine = (placement: string) =>
+    periodControl || briefNumber ? (
+      <div className={`weather-hero-period flex flex-wrap items-center gap-x-3 gap-y-1 ${placement}`.trim()}>
+        {periodControl}
+        {briefNumber ? (
+          <Link
+            href={briefNumber.href}
+            data-brief-number
+            className="weather-hit text-fluid-sm tabular-nums text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+          >
+            <span className="sr-only">Published brief </span>No. {briefNumber.label}
+          </Link>
+        ) : null}
+      </div>
+    ) : null;
+
   /* Freshness and confidence, once, where every reading route puts them. */
   const trustStrip = trust ? (
     <TrustStrip
@@ -232,29 +261,20 @@ export function DecisionHero({
         {/* With a graphic beside it, the left column stretches to the graphic's
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
-        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-10 lg:gap-14" : undefined}>
-        <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">
+        {/* From `md` the week line heads the margin, beside the condition word, and the
+            reading column starts on the week's statement (2026-11-10): on its own row it put
+            the guidance 54px further down a laptop screen. On a phone it leads the column. */}
+        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:grid-rows-[auto_1fr] md:gap-x-10 md:gap-y-0 lg:gap-x-14" : undefined}>
+        {aside ? weekLine("weather-hero-margin-head max-md:mb-1 md:col-start-2 md:row-start-1 md:pb-5") : null}
+        <div className={`@container flex min-w-0 flex-col gap-2 sm:gap-3 ${aside ? "md:col-start-1 md:row-span-2 md:row-start-1" : ""}`.trim()}>
         {/* The kicker: the regime stamp, then what the week did — its direction
             and, on a week conditions moved, what they were. The regime's
             meaning is the line under the call, not this one: on the eyebrow it
             ran four facts together ("hard to raise · Tightening this week ·
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-          {/* The week on a row of its own: a control, above the statement it selects. */}
-          {periodControl || briefNumber ? (
-            <div className="weather-hero-period flex basis-full flex-wrap items-center gap-x-3 gap-y-1">
-              {periodControl}
-              {briefNumber ? (
-                <Link
-                  href={briefNumber.href}
-                  data-brief-number
-                  className="weather-hit text-fluid-sm tabular-nums text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
-                >
-                  <span className="sr-only">Published brief </span>No. {briefNumber.label}
-                </Link>
-              ) : null}
-            </div>
-          ) : null}
+          {/* With no margin, the week on a row of its own above the statement it selects. */}
+          {aside ? null : weekLine("basis-full")}
           <span className="relative inline-flex">
             {/* The earlier conditions' stamp, over this week's until the reading
                 crosses the change line (week-move.css). Its word is printed from
@@ -289,7 +309,7 @@ export function DecisionHero({
           ) : null}
 
           {since || direction || earlier ? (
-            <span className="text-fluid-sm font-medium leading-relaxed text-slate-200">
+            <span className="text-fluid-sm font-medium leading-snug text-slate-200">
               {since && !earlier ? (
                 <span data-conditions-since>
                   {since}
@@ -304,22 +324,14 @@ export function DecisionHero({
                 </span>
               ) : null}
               {/* In the sentence, not beside it: as a flex item it took a row of its
-                  own on a phone, above the call. */}
+                  own on a phone, above the call. "Feels like" too (2026-11-10), with a
+                  non-breaking space so a wrapped line never opens with the separator. */}
               {move ? <> <ReplayMoveButton since={move.since} /></> : null}
+              {feelsLike ? <>{"\u00a0· "}{feelsLikeLink}</> : null}
             </span>
           ) : null}
 
-          {feelsLike ? (
-            <Link
-              href={feelsLike.href}
-              data-feels-like
-              className="weather-hit weather-caveat-mark text-fluid-sm font-medium text-caveat-fg underline decoration-slate-600 underline-offset-4"
-            >
-              {/* A caveat about the reading, so the caveat's ink and mark. It was drawn in the
-                  other condition's colour, a second condition's hue beside this week's. */}
-              Feels like <span className="font-semibold">{REGIME_LABELS[feelsLike.regime]}</span>
-            </Link>
-          ) : null}
+          {feelsLike && !(since || direction || earlier) ? feelsLikeLink : null}
 
           {move && !(since || direction || earlier) ? <ReplayMoveButton since={move.since} /> : null}
         </div>
@@ -355,8 +367,13 @@ export function DecisionHero({
 
         {/* What the weather word means for money, as the line under the call:
             the stamp names the week, the call says what to do, this says why. */}
+        {/* On a phone the two scores follow the guidance as figures, the number and where it
+            stands, and the facts line gives way to them: both printed the same two numbers,
+            and together they pushed the fifth area under the tab bar (2026-11-10). */}
+        {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
+
         {regimeKey ? (
-          <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
+          <p className={`max-w-xl text-pretty text-fluid-base leading-snug text-slate-300 ${phoneFigure ? "max-md:hidden" : ""}`.trim()} data-regime-meaning>
             {reading?.facts ? null : REGIME_WEATHER_RATIONALES[regimeKey]}
             {reading ? (
               <>
@@ -421,7 +438,6 @@ export function DecisionHero({
           </div>
         ) : null}
 
-        {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
         {/* With no margin (the answer pages), the trust facts close the column as before. */}
         {trust && !aside ? trustStrip : null}
         </div>
@@ -429,7 +445,7 @@ export function DecisionHero({
             the trust facts under them. On a phone the scores are the figures above and the
             trust facts follow the column. */}
         {aside ? (
-          <div className="weather-hero-aside flex flex-col gap-6 max-md:mt-3">
+          <div className="weather-hero-aside flex flex-col gap-6 max-md:mt-3 md:col-start-2 md:row-start-2">
             <div className="max-md:hidden">{aside}</div>
             {trust ? trustStrip : null}
           </div>
