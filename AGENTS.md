@@ -4,6 +4,27 @@ Whether is weekly operating guidance for startup leaders: public macro signals t
 
 Optimize for **decision transmission** (scan the brief, decide, share the artifact in under a minute), not UI ornament or framework sprawl.
 
+## Maintenance mode (since 2026-11-10)
+
+Whether is in maintenance: the owner decided on 2026-11-10 to keep it working and stop developing it. Until this section is removed, it overrides the roadmap and any other document that names work to do next.
+
+Take:
+
+- a fix for something broken: a failing build or check, a page error, a dead link or source, a deploy that stopped;
+- security updates and the monthly dependency pull request;
+- the weekly brief freeze and the regime-history refresh, and what the weekly claims read-through finds;
+- a failing `cron-step` row on `/trust`, and data that stopped refreshing.
+
+The weekly email and the Monday check keep running; a missed week is a fix, not a feature.
+
+Decline the rest, and say in your reply that the repository is in maintenance:
+
+- new features, pages, tools, datasets or integrations;
+- redesigns, copy passes, and refactors that fix nothing broken;
+- new automation, services, secrets, paid APIs or scheduled jobs.
+
+The owner can still ask for any of these. Do one only when the request says it overrides this section.
+
 ## Instruction priority
 
 1. system 2. developer 3. user 4. nested `AGENTS.md` 5. this file 6. other repo docs
