@@ -50,21 +50,36 @@ As of 2026-11-10, on every route unless a line says otherwise:
 - **The record band,** under the navigation: fields, the two line bundles with a pattern per
   condition, a mark for each published brief, a yearly axis, and the month readout with keyboard
   and touch. On History it opens to the page's figure and a canvas redraws it denser.
-- **This week.** The guidance block without its card; the two scores as figures on their ladders
-  in the margin from `md` up, and the nearer one on a phone; the conditions map in "What would
-  change our mind"; the five areas numbered.
-- **History.** A cell for each week since the first brief, empty where none was published, and
-  a note of both facts where a brief and its month-end name different conditions.
+- **This week.** The guidance block without its card. The week as a line with the brief's
+  number; the condition word with its gloss. The five areas as ruled rows with their standing,
+  and from `lg` up their action. The two scores as figures in the margin, each with one
+  sentence and a ruled line named in place, and the trust facts under them; on a phone both
+  scores print under the areas. The conditions map in "What would change our mind".
+- **Report routes.** The page title leads and the condition and date follow as a facts line.
+  Caveat and line bands have a ruled top edge.
+- **History.** The band opens to the page's figure with each stretch named in its field. A cell
+  for each week since the first brief, patterned by condition and empty where none was
+  published; a note of both facts where a brief and its month-end name different conditions.
+  Briefs as ruled rows, years as a line of links, misses in the caveat's ink.
 - **Theme.** The device setting picks it when nothing is stored.
 - **Palette copies.** Share images, emails, the badge, the web manifest and the brand kit.
 
 Not built yet:
 
-- The action sentence beside each area on the first screen. The areas are numbered and state
-  their standing; each action is still in "Your decisions this week", directly below.
+- **The first screen does not fit.** At 1440 by 900 the h1 starts at 453px and three of the
+  five areas show; on a 390 by 844 phone four show and the scores are on the second screen.
+  The height above the h1 is the band, the first-visit orientation line, the week line, and
+  a "since" line that wraps; each area's action wraps to two lines at 1440.
+- One frame on every route. Report routes keep their sidebar and widths, so the page's left
+  edge moves between `/` and the rest.
 - One copy control on the first screen. The four copy buttons remain.
 - Numbered section openers and the contents list in the margin.
-- The trust facts in the margin. The trust strip is still under the areas.
+- The conditions map is still a boxed figure with capitalised labels, and the area icons
+  remain in "What changed" and on Plan.
+- The scroll-progress rule is still mounted, and the "since you last read" mark is not yet on
+  the band.
+- Controls (pills, buttons, fields, the segmented well) still carry their shadows, and the
+  report intro is still a boxed panel.
 - Share images, emails and print redrawn with the band and Besley. They took the palette only,
   and are still drawn dark.
 - The week's move redrawn for the band. It keeps its existing choreography on the ladders and
@@ -152,16 +167,17 @@ and a crossed line.
 | --- | --- | --- |
 | Paper (ground) | `#ecf0e8` | `#0c1511` |
 | Ink | `#10201a` | `#e6ece2` |
-| Secondary ink | `#40524a` | `#a3b2a9` |
+| Muted ink | `#40524a` | `#a3b2a9` |
 | Sunny fill | `#e0a81c` | same |
 | Cloudy fill | `#9a5b1e` | same |
 | Stormy fill | `#8f9be0` | same |
-| Freezing fill | `#1f3f8f` | same |
+| Freezing fill | `#2a4fa8` | same |
 | A line crossed | `#c4242b` | `#f0666a` |
 
-These are sketch values, measured once:
+The built values are in `DESIGN.md`; Freezing moved from the sketch's `#1f3f8f`, which is now
+its light-theme text ink. Measured once:
 
-- Text passes AA in both themes: ink 14.6:1 and 15.4:1, secondary ink 7.2:1 and 8.4:1, the red
+- Text passes AA in both themes: ink 14.6:1 and 15.4:1, muted ink 7.2:1 and 8.4:1, the red
   5.0:1 and 6.0:1.
 - The four fills keep the October rule (warm against cool, light against dense). Their closest
   pair is 23.7 apart in OKLab ×100 under simulated protanopia, where about 5 reads as one colour.
@@ -257,7 +273,7 @@ The signature, present under the navigation on every route.
 - **Contents.** The numbered sections of the page, in the margin on desktop.
 - **Controls.** One copy control and one subscribe control on the first screen; other formats
   live on Share. 2px radius, 44px targets, the shipped focus ring and press motion.
-- **Caveat.** The hollow ring, unchanged.
+- **Caveat.** The outlined diamond, unchanged.
 
 ### Motion
 
