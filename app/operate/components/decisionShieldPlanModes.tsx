@@ -265,17 +265,17 @@ type ComparePlansModeProps = {
 
 const COMPARISON_TEMPLATES = [
   {
-    label: "Vendor Prepay vs. Monthly Flex",
+    label: "Vendor prepay vs. monthly flex",
     planA: "Prepay annual SaaS vendor for $60k upfront to lock in 25% discount",
     planB: "Pay SaaS vendor $6k monthly on flexible rolling terms",
   },
   {
-    label: "Full-Time Hire vs. Contractor",
+    label: "Full-time hire vs. contractor",
     planA: "Hire 2 full-time senior engineers at $200k each",
     planB: "Engage 1 specialized contractor for 3 months at $15k/mo",
   },
   {
-    label: "Speculative Feature vs. Tech Debt",
+    label: "Speculative feature vs. tech debt",
     planA: "Hire 3 engineers to build speculative enterprise feature",
     planB: "Allocate 40% sprint capacity to tech debt refactor",
   },

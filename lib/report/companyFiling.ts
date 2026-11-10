@@ -44,7 +44,7 @@ const LOOKUP_FAILURE_MESSAGES: Record<CompanyFilingFailure, string> = {
   "financial-company": "This is a bank or insurer. Its cash is held against what it owes customers, so it isn't runway.",
   "no-recent-filing": "This company hasn't filed recently, so there's nothing current to read.",
   "incomplete-filing": "Its filings don't give a full year of cash flow and revenue. Enter its figures below.",
-  unavailable: "The SEC's data didn't answer. Try again shortly.",
+  unavailable: "The filing could not be fetched. Try again shortly.",
   "rate-limited": "That's a lot of lookups. Try again in a minute.",
 };
 

@@ -248,9 +248,9 @@ const resolveCountedReading = (notCounted: readonly NotCountedScore[], assessmen
 
 const describeConsequence = (notCounted: readonly NotCountedScore[], assessment: BasisAssessment): string | null => {
   const countedReading = resolveCountedReading(notCounted, assessment);
-  if (countedReading) return `Counted, conditions would be ${getRegimePublicLabel(countedReading.regime)}.`;
+  if (countedReading) return `With them counted, conditions would be ${getRegimePublicLabel(countedReading.regime)}.`;
   const areaChange = notCounted.flatMap((entry) => (entry.line?.includes(", where ") ? [entry.line.slice(entry.line.indexOf(", where ") + 8)] : [])).at(0);
-  return areaChange ? `Counted, ${areaChange}.` : null;
+  return areaChange ? `With them counted, ${areaChange}.` : null;
 };
 
 const describeCrossing = (entry: NotCountedScore & { line: string }) =>

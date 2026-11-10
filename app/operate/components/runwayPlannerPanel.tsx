@@ -518,10 +518,10 @@ export function RunwayPlannerPanel({
 
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 ${typeof profile.cashUsd === "number" || typeof profile.runwayMonths === "number" ? "border border-emerald-500/30 bg-emerald-950/20 text-emerald-300" : "border border-amber-500/30 bg-amber-950/20 text-amber-300"}`}>
-              {typeof profile.cashUsd === "number" || typeof profile.runwayMonths === "number" ? "Cash / Runway set" : "Required: Cash or Runway"}
+              {typeof profile.cashUsd === "number" || typeof profile.runwayMonths === "number" ? "Cash or runway set" : "Needed: cash or runway"}
             </span>
             <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 ${typeof profile.monthlyBurnUsd === "number" ? "border border-emerald-500/30 bg-emerald-950/20 text-emerald-300" : "border border-amber-500/30 bg-amber-950/20 text-amber-300"}`}>
-              {typeof profile.monthlyBurnUsd === "number" ? "Spend set" : "Required: Monthly spend"}
+              {typeof profile.monthlyBurnUsd === "number" ? "Monthly spend set" : "Needed: monthly spend"}
             </span>
             <span className="inline-flex items-center gap-1 rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-1 text-slate-400">
               {typeof profile.monthlyRevenueUsd === "number" ? `Revenue: $${(profile.monthlyRevenueUsd / 1000).toFixed(0)}k/mo` : "Revenue: optional"}

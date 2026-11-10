@@ -110,7 +110,7 @@ export const RegimeAlertToggle = () => {
 
         setState({ status: "ready", subscribed: true, publicKey });
       } catch {
-        setState({ status: "failed", reason: "That did not go through. Try again in a moment." });
+        setState({ status: "failed", reason: "Notifications were not turned on. Reload the page to try again." });
       }
     },
     [clientId],
@@ -135,7 +135,7 @@ export const RegimeAlertToggle = () => {
 
         setState({ status: "ready", subscribed: false, publicKey });
       } catch {
-        setState({ status: "failed", reason: "That did not go through. Try again in a moment." });
+        setState({ status: "failed", reason: "Notifications were not turned off. Reload the page to try again." });
       }
     },
     [clientId],
@@ -146,14 +146,14 @@ export const RegimeAlertToggle = () => {
   if (state.status === "denied") {
     return (
       <p className="text-sm leading-6 text-slate-400">
-        This browser is blocking notifications from this site. You can change that in its site settings — or
-        get the same alert by email from the weekly brief signup.
+        This browser is blocking notifications from this site. Allow them in the browser&rsquo;s site settings,
+        or get the same alert by email with the form above.
       </p>
     );
   }
 
   if (state.status === "failed") {
-    return <p className="text-sm leading-6 text-amber-200">{state.reason}</p>;
+    return <p role="alert" className="text-sm leading-6 text-amber-200">{state.reason}</p>;
   }
 
   const busy = state.status === "working";
@@ -168,7 +168,7 @@ export const RegimeAlertToggle = () => {
            tall, under the 44px a touch target needs, with the every-property transition. */
         className="weather-button inline-flex min-h-11 items-center px-4 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {busy ? "Working…" : state.subscribed ? "Stop notifying this browser" : "Notify this browser when conditions change"}
+        {busy ? (state.subscribed ? "Turning off…" : "Turning on…") : state.subscribed ? "Stop notifying this browser" : "Notify this browser when conditions change"}
       </button>
       <p className="text-sm leading-6 text-slate-400">
         {state.subscribed

@@ -123,13 +123,15 @@ export function CopyImageCardButton({
         copied: <CheckIcon className="text-emerald-400" />,
       }}
       buttonLabels={{
-        copying: <span className="text-slate-300">Rendering…</span>,
+        copying: <span className="text-slate-300">Rendering image…</span>,
         copied: (
           <span className="text-emerald-300">
-            {outcome === "saved" ? "Saved the image" : outcome === "shared" ? "Shared the image" : "Copied the image"}
+            {outcome === "saved" ? "Image saved" : outcome === "shared" ? "Image shared" : "Image copied"}
           </span>
         ),
-        error: <span className="text-rose-400">Copy failed</span>,
+        /* The only way here is the render failing: a refused clipboard write
+           falls through to the share sheet, then to a download. */
+        error: <span className="text-rose-400">Image did not render</span>,
       }}
       buttonProps={{
         title: "Copy this week's guidance as a 1200×800 PNG, to paste into Slack, a thread or a doc",

@@ -37,8 +37,8 @@ export function ShareBriefButton({
   slackBlock,
   className = "",
   showLabel = false,
-  label = "Copy Brief",
-  copiedLabel = "Brief Copied",
+  label = "Copy brief",
+  copiedLabel = "Brief copied",
 }: Props) {
   /*
    * The copy path was `void navigator.clipboard.writeText(text)` in a try/catch
@@ -67,7 +67,7 @@ export function ShareBriefButton({
     typeof navigator.canShare === "function" &&
     window.matchMedia("(pointer: coarse)").matches &&
     navigator.canShare(payload);
-  const actionLabel = offersShare ? "Share Brief" : label;
+  const actionLabel = offersShare ? "Share brief" : label;
 
   const handleClick = () => {
     // `title` names the artifact, so the pasted block has to use it. Hardcoding the
@@ -109,7 +109,7 @@ export function ShareBriefButton({
         error: showLabel ? <span className="text-amber-300">Copy failed</span> : <span className="sr-only">Copy failed</span>,
       }}
       buttonProps={{
-        title: offersShare ? "Share Brief — opens your device's share sheet" : `${label} — copies the brief for Slack`,
+        title: offersShare ? "Share brief — opens your device's share sheet" : `${label} — copies the brief for Slack`,
         "aria-label": actionLabel,
         // The `C` shortcut and the command palette target this id. It moved here
         // when the separate Slack copy button was retired; this button produces

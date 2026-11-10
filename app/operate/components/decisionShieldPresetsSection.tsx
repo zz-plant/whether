@@ -73,18 +73,18 @@ export const DecisionShieldPresetsSection = ({
     <div className="weather-surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="type-label text-slate-400">Saved scenarios</p>
+          <p className="type-label text-slate-400">Saved presets</p>
           <p className="mt-2 text-sm text-slate-300">
             Save these settings to come back to them.
           </p>
         </div>
         <p id={PRESET_HINT_ID} className="text-xs text-slate-400">
-          Max 8 presets
+          Keeps the 8 newest presets
         </p>
       </div>
       <Form onFormSubmit={handlePresetSave} className="mt-4">
         <Fieldset.Root className="flex min-w-0 flex-wrap items-start gap-3 border-0 p-0">
-          <Fieldset.Legend className="sr-only">Save a reusable Decision Shield preset</Fieldset.Legend>
+          <Fieldset.Legend className="sr-only">Save these settings as a preset</Fieldset.Legend>
           <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold text-slate-400 sm:max-w-xs">
             <Field.Label nativeLabel={false} render={<span />}>Preset name</Field.Label>
             <Input
@@ -110,7 +110,7 @@ export const DecisionShieldPresetsSection = ({
       </Form>
       <div className="mt-2 min-h-[20px]">
         {presetError ? (
-          <p id="preset-error" className="text-xs text-amber-200">
+          <p id="preset-error" role="alert" className="text-xs text-amber-200">
             {presetError}
           </p>
         ) : null}
@@ -125,7 +125,7 @@ export const DecisionShieldPresetsSection = ({
               No presets yet. Save one to come back to this decision.
             </p>
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-fluid-nano text-slate-400">Or load a starter scenario:</span>
+              <span className="text-fluid-nano text-slate-400">Or start from an example:</span>
               {STARTER_SCENARIOS.map((starter) => (
                 <button
                   key={starter.name}
@@ -162,7 +162,7 @@ export const DecisionShieldPresetsSection = ({
                   onClick={() => handlePresetDelete(preset.id)}
                   className="weather-pill inline-flex min-h-[44px] items-center justify-center !border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-200 transition-colors hover:!border-rose-300/70 hover:text-rose-100"
                 >
-                  Remove
+                  Delete
                 </button>
               </div>
             </div>

@@ -115,16 +115,16 @@ export const DecisionShieldPanel = ({
         {clipboardState.error && lastAttemptedTarget === "verdict" ? (
           <div className="mt-4 rounded-md border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
             <p className="text-xs font-semibold text-amber-200">
-              Clipboard blocked
+              The verdict was not copied
             </p>
             <p className="mt-2 text-amber-100/90">
-              Select and copy the verdict below to share it manually.
+              Select the text below and copy it.
             </p>
             <textarea
               readOnly
               value={shareText}
               rows={8}
-              aria-label="Copy-ready Decision Shield verdict"
+              aria-label="Verdict text to copy"
               className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
             />
           </div>

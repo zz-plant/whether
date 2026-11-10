@@ -298,7 +298,7 @@ const RecordSnapshotControl = ({ snapshot }: { snapshot: SnapshotContext }) => {
         disabled={state === "saving"}
         className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 items-center px-3 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {state === "saving" ? "Recording…" : "Record this week's call"}
+        {state === "saving" ? "Recording…" : "Record this week's guidance"}
       </button>
       {state === "failed" && error ? <p className="type-label text-amber-200">{error}</p> : null}
     </div>

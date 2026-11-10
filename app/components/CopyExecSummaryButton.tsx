@@ -35,7 +35,7 @@ export function CopyExecSummaryButton({ text, className = "" }: Props) {
         copied: <CheckIcon className="size-4 text-emerald-400" />,
       }}
       buttonLabels={{
-        copied: <span className="text-emerald-300">Copied summary</span>,
+        copied: <span className="text-emerald-300">Summary copied</span>,
         error: <span className="text-rose-400">Copy failed</span>,
       }}
       buttonProps={{

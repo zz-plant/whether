@@ -36,7 +36,7 @@ export function CopyStandupButton({ text, className = "" }: Props) {
         copied: <CheckIcon className="size-4 text-emerald-400" />,
       }}
       buttonLabels={{
-        copied: <span className="text-emerald-300">Copied standup</span>,
+        copied: <span className="text-emerald-300">Standup copied</span>,
         error: <span className="text-rose-400">Copy failed</span>,
       }}
       buttonProps={{
