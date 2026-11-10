@@ -218,7 +218,7 @@ export default async function HistoryPage({
           </div>
           <p className="max-w-prose text-sm text-slate-300">
             These months are scored today, with the current model. They don&rsquo;t show what we said at
-            the time or what any company did. For what we actually published, use the dated briefs below.
+            the time or what any company did. For what we published, use the dated briefs below.
           </p>
           {/* One link (2026-10-27). "Compare funding conditions across periods" and "Read
               the current weekly brief" sat beside it, both already in the page's own tabs

@@ -85,7 +85,7 @@ const rescoreLead = () => `We re-scored the record on ${LAST_RESCORE.dateLabel},
 export const describeCalibrationRescore = (now: { held: number; comparisons: number }): string => {
   const { before } = LAST_RESCORE;
   return now.held === before.held && now.comparisons === before.comparisons
-    ? `${rescoreLead()} No month's conditions changed, so the count above matches the one published before.`
+    ? `${rescoreLead()} No month's conditions changed, and the count above matches the one published before.`
     : `${rescoreLead()} Before it, ${before.held} of ${before.comparisons} comparisons held (${percent(before.held, before.comparisons)}).`;
 };
 
@@ -93,7 +93,7 @@ export const describeCalibrationRescore = (now: { held: number; comparisons: num
 export const describeTrackRecordRescore = (now: { changes: number; signaled: number; graded: number }): string => {
   const { before } = LAST_RESCORE;
   return now.changes === before.changes && now.signaled === before.signaled && now.graded === before.graded
-    ? `${rescoreLead()} No month's conditions changed, so the counts above match the ones published before.`
+    ? `${rescoreLead()} No month's conditions changed, and the counts above match the ones published before.`
     : `${rescoreLead()} Before it, the record showed ${before.changes} changes in conditions, and ${before.signaled} of the last ${before.graded} signaled in advance.`;
 };
 

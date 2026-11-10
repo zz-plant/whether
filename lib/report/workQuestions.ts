@@ -56,7 +56,7 @@ const CONDITION_QUESTIONS: Record<RegimeKey, readonly { seat: SeatKey; question:
   ],
   VOLATILE: [
     { seat: "founder", question: "Can we test this with the team we have before opening those roles?", tool: "reversible" },
-    { seat: "engineeringLead", question: "Can we stay monthly until we know what usage actually looks like?", tool: "reversible" },
+    { seat: "engineeringLead", question: "Can we stay monthly until we know what usage looks like?", tool: "reversible" },
     { seat: "productLead", question: "Could we try this with one customer first? What would we need to see before doing more?", tool: "reversible" },
     { seat: "financeLead", question: "If the round closes six months late, would we still choose to do this?", tool: "payback" },
     { seat: "chiefOfStaff", question: "What are we still waiting on to make this call? Who’s getting us the answer?" },
@@ -67,7 +67,7 @@ const CONDITION_QUESTIONS: Record<RegimeKey, readonly { seat: SeatKey; question:
     { seat: "productLead", question: "Sales says we need this for renewals. Which customers, and have we checked with them?" },
     { seat: "financeLead", question: "When you say it saves $200k, does that come out of the budget, or do people get time back?", tool: "payback" },
     { seat: "boardMember", question: "We approved this last quarter. Knowing what we know now, would we approve it again?", tool: "record" },
-    { seat: "technicalFounder", question: "Our numbers haven’t changed. What would we actually gain by slowing this down?" },
+    { seat: "technicalFounder", question: "Our numbers haven’t changed. What would we gain by slowing this down?" },
   ],
 };
 
@@ -122,7 +122,7 @@ export const WORK_SITUATIONS: readonly WorkSituation[] = [
   },
   {
     situation: "Setting realistic scope",
-    askingYourself: "What can we actually deliver with the team we have?",
+    askingYourself: "What can we deliver with the team we have?",
     beingAsked: "If we take this on, what slips?",
   },
   {
@@ -150,7 +150,7 @@ export const WORK_SITUATIONS: readonly WorkSituation[] = [
   },
   {
     situation: "Checking whether the work paid off",
-    askingYourself: "Did we actually remove the work we said we would?",
+    askingYourself: "Did we remove the work we said we would?",
     beingAsked: "We spent six weeks on this. What’s better now?",
   },
 ];

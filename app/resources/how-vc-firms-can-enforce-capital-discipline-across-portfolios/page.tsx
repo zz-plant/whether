@@ -64,7 +64,7 @@ export default async function Page() {
         </h1>
         <p className="text-sm text-slate-200">
           Portfolio governance breaks when each company uses different threshold language, board packet formats, and escalation clocks.
-          This guide gives VC firms one set of words, thresholds and formats to use across every portfolio company.
+          One set of words, thresholds and formats across every portfolio company fixes that.
         </p>
         <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p className="type-eyebrow">This week</p>

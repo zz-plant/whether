@@ -64,7 +64,7 @@ export default function CalibrationPage() {
           "Weekly brief" over their titles. */}
       <SecondaryPageHeader
         title="How often the guidance held up"
-        description={`We checked the room before a change that every page prints against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
+        description={`We checked the published room before a change against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
       />
 
       <ConfidenceRecordSection />
@@ -83,7 +83,7 @@ export default function CalibrationPage() {
         <ul className="space-y-2 text-base text-slate-300">
           <li>
             <span className="text-slate-100">Sample.</span> Every monthly reading in the archive
-            that has a following month to compare against — {totals.months} of them.
+            that has a following month to compare against: {totals.months} of them.
             {record ? (
               <>
                 {" "}The record holds {record.readings} readings, {since} to{" "}
@@ -123,8 +123,8 @@ export default function CalibrationPage() {
           </li>
         </ul>
         <p className="mt-4 text-base text-slate-300">
-          So the room before a change still measures distance, which it can do honestly, and this record
-          sits next to it instead of being folded in.
+          The room before a change still measures distance, which it can do honestly. This record sits
+          next to it.
         </p>
       </SecondaryPageSection>
 

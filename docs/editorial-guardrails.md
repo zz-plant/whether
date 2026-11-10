@@ -225,7 +225,7 @@ answering a question the answer pages already answer.
 ## Headings (h1–h4, eyebrows, section labels)
 
 Headings are the scan path: an operator reads the heading, decides whether the block matters
-this week, and moves on. Six rules, each written after a real drift found by the 2026-09-02
+this week, and moves on. Eight rules, each written after a real drift found by the 2026-09-02
 inventory of every heading in `app/`:
 
 - **A heading names what the reader gets, in the reader's words.** No codenames, framework
@@ -248,6 +248,15 @@ inventory of every heading in `app/`:
   matters, and what would change the guidance", which was the index as a sentence (found
   2026-10-04). Same rule for a caption narrating controls the rows already show: the `/share` tag
   table's caption pointed at its own copy buttons.
+- **A page does not announce itself.** "This page lists what is stored…", "This guide explains
+  how…", "so this page tells you which of those have moved", "Here is what this week's conditions
+  say…", "Whether serves the guidance through…": cut the announcement and print the content, with
+  the subject (the guidance, the reading, the record) as the subject. A status line drops the
+  narrator too: "Showing Mar 2020", not "This page is showing Mar 2020". Still fine: the publisher
+  speaking for its own practice on `/about`, `/trust`, `/calibration` and `/history` ("We re-scored
+  the record…"), "this site" as the party the privacy policy is about, and a pointer that carries
+  information ("the table below has every value"). `tests/readerClauseShapes.test.tsx` holds the
+  announcing verbs (found 2026-11-09).
 - **Sentence case everywhere.** Capitals only for proper nouns: Whether, Room to move, the
   weather regime names, FRED. No all-caps in source — `.type-eyebrow` uppercases in CSS — and no
   emoji in a heading or label.
@@ -283,5 +292,13 @@ sites. `tests/readerClauseShapes.test.tsx` holds the first two rules; the rest a
   into its own sentence.
 - **One idea per sentence.** A ", which…" or ", where…" aside on the end, a ", meaning…" tail, a
   dash aside in the middle, or 30+ words carrying two ideas: split it.
+- **A contrast earns its negative half (2026-11-09).** "X, not Y", "rather than Y" and "instead of
+  Y" ran to 106 lines in 35,000 rendered words, seventeen of them in one guide. Keep the negative
+  only when a reader would otherwise assume Y: "a distance, not a probability", "shown, not
+  counted", "not guidance we published at the time". Where Y is a strawman ("evidence of control
+  rather than statements of intent", "a quarterly job, not a one-time setup task"), state X and
+  stop. The same pass cut "actually" as an intensifier and the em-dash aside in a prose sentence,
+  which is a colon, a full stop or parentheses. A dash stays in a label ("Layer one — market
+  conditions") and in a stored record.
 - **Not staccato.** Splitting stops at one idea per sentence; a page of five-word sentences is as
   hard to read as a page of clauses.

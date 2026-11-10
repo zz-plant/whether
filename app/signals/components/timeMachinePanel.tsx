@@ -214,8 +214,7 @@ export const TimeMachinePanel = ({
           titleId="time-machine-title"
           description={
             <>
-              The page loads the last Treasury reading on or before it and shows that month&apos;s
-              guidance.
+              Loads the last Treasury reading on or before it, with that month&apos;s guidance.
             </>
           }
           aside={
@@ -241,13 +240,13 @@ export const TimeMachinePanel = ({
           <p className="type-data text-slate-300">
             {isHistorical ? (
               <>
-                This page is showing{" "}
+                Showing{" "}
                 <span className="font-semibold text-slate-100">{selectedLabel}</span>. This week&apos;s
                 reading is dated {latestRecordLabel}.
               </>
             ) : (
               <>
-                This page is showing this week ({latestRecordLabel}).
+                Showing this week ({latestRecordLabel}).
               </>
             )}
           </p>

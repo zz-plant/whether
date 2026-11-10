@@ -41,10 +41,8 @@ export default function PrivacyPage() {
     <LegalPageShell title="Privacy" effectiveDate="10/14/2026">
       <section className="space-y-4">
         <p className={paragraph}>
-          Whether is weekly operating guidance built on public macroeconomic data. The guidance itself, the
-          API, the MCP endpoint, and embeds need no account, so most readers are never asked for
-          anything. This page lists what is stored when you do give something, where it lives, and
-          what it is used for.
+          The guidance is built on public macroeconomic data, and reading it needs no account. Neither do
+          the API, the MCP endpoint, or embeds, so most readers are never asked for anything.
         </p>
         <p className={paragraph}>
           It is written against the code rather than from a template. Where it names a store, that is
@@ -60,7 +58,7 @@ export default function PrivacyPage() {
             such script on any page.
           </li>
           <li>
-            No web fonts fetched from anyone else. Fonts are served from this site, so loading a page
+            No web fonts fetched from anyone else. Fonts are served from this site. Loading a page
             tells no third party that you did.
           </li>
           <li>
@@ -70,8 +68,7 @@ export default function PrivacyPage() {
           <li>
             Text you type into the search box is never sent. The search measurement carries which
             kind of result the query routed to, how many things matched, and whether it matched
-            nothing. The record has no field that could hold the words, so it cannot carry them by
-            mistake.
+            nothing. The record has no field that could hold the words.
           </li>
           <li>Nothing here is sold, rented, or shared for advertising, and no profile is built across sites.</li>
         </ul>
@@ -94,7 +91,7 @@ export default function PrivacyPage() {
               figure. It is replaced or cleared with the lines. Finally, it stores a random token for the
               unsubscribe link and, while a request is waiting for you, a separate one-time code for its
               confirmation link. It keeps the times of any confirmation emails sent to your address in the
-              last day, so that no one can send it more than three in an hour or six in a day. It is held in
+              last day, to stop anyone sending it more than three in an hour or six in a day. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until you
               confirm. Any later request for your address changes nothing until you open the link it sends
               and press Confirm on the page that link shows. That holds for turning alerts or the Monday brief
@@ -142,7 +139,7 @@ export default function PrivacyPage() {
             <p className={paragraph}>
               Picking a company stage writes a cookie so the panels on a page agree with each other
               and the guidance is calibrated the same way everywhere. Picking a cash runway band writes a
-              second one for the same reason, with the day you picked it, so the guidance can allow for the
+              second one for the same reason, with the day you picked it, which lets the guidance allow for the
               months since. Each holds only the choice you made, never a cash figure.
               Picking a decision under &ldquo;What are you deciding?&rdquo; writes a third, holding only
               that area&rsquo;s name, so your next visit opens on the same answer. Each is read only by
@@ -177,7 +174,7 @@ export default function PrivacyPage() {
             <p className={paragraph}>
               What is written is the event and nothing around it: no IP address, no user-agent
               string, and none of the identifiers above. The intake refuses any record carrying a
-              field it does not expect, so a stream cannot quietly start carrying more than it says.
+              field it does not expect.
             </p>
           </div>
 
@@ -201,8 +198,8 @@ export default function PrivacyPage() {
               address, no reading, and no history of what was sent. It is used to wake this browser when conditions change (a handful of times a year), and for nothing else.
             </p>
             <p className={paragraph}>
-              The notification itself carries no content. What it says is fetched by your browser when it is
-              shown, so it cannot deliver a stale reading. Turning notifications off in the page removes the
+              The notification itself carries no content. Your browser fetches what it says when it is
+              shown, which keeps the reading current. Turning notifications off in the page removes the
               stored subscription; blocking them in your browser stops them arriving either way.
             </p>
           </div>
@@ -215,7 +212,7 @@ export default function PrivacyPage() {
               inside Cloudflare&apos;s rate limiter; this site does not store it.
             </p>
             <p className={paragraph}>
-              This site runs on Cloudflare, so Cloudflare processes every request to serve
+              This site runs on Cloudflare, which processes every request to serve
               it, and request-level logging and tracing are enabled for debugging. Cloudflare acts as
               our infrastructure provider and handles that data under its own terms.
             </p>
@@ -276,13 +273,13 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <h2 className={heading}>6. Changes</h2>
         <p className={paragraph}>
-          This site is open source, so changes to this page are visible in its history alongside the
+          The source is public, so changes to this policy are visible in its history alongside the
           code that made them necessary. Material changes will move the effective date above. Reach
           the editor through the{" "}
           <Link href={publisherContactPath} className="text-sky-300 underline-offset-2 hover:underline">
             contact page
           </Link>{" "}
-          with anything this page does not answer.
+          with anything this policy does not answer.
         </p>
       </section>
     </LegalPageShell>

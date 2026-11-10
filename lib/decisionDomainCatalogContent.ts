@@ -381,7 +381,7 @@ export const rawDecisionDomainCatalog = {
           phase: "Operate",
           objective: "Keep the weekly review so rights do not drift back to ad hoc decisions.",
           prompts: [
-            "What do we check each week to make sure decisions actually get done and looked at again?",
+            "What do we check each week to make sure decisions get done and looked at again?",
             "How would we notice decisions slipping back into meetings where no one owns them?",
           ],
           deliverable: "Weekly review checklist added to the leadership routine.",
@@ -545,7 +545,7 @@ export const rawDecisionDomainCatalog = {
           phase: "Evidence claims",
           objective: "Map each external claim to product behavior and proof source.",
           prompts: [
-            "What can we actually show today that backs up each headline claim?",
+            "What can we show today that backs up each headline claim?",
             "Which claims rely on things we haven't built yet?",
           ],
           deliverable: "Claims evidence table with confidence grade.",

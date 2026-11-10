@@ -232,7 +232,7 @@ describe("the record re-scored on the record basis", () => {
     assert.ok(totals.held >= 169, `the record lost held months: ${totals.held}`);
     assert.equal(
       describeCalibrationRescore({ held: 169, comparisons: 176 }),
-      "We re-scored the record on Oct 9, 2026, after adding the Chicago Fed's financial conditions index, so the record uses the same inputs that now set the guidance. No month's conditions changed, so the count above matches the one published before.",
+      "We re-scored the record on Oct 9, 2026, after adding the Chicago Fed's financial conditions index, so the record uses the same inputs that now set the guidance. No month's conditions changed, and the count above matches the one published before.",
     );
     assert.match(describeCalibrationRescore({ held: 170, comparisons: 177 }), /Before it, 169 of 176 comparisons held \(96%\)\.$/, "a count that moved prints the old one");
   });
@@ -244,7 +244,7 @@ describe("the record re-scored on the record basis", () => {
     assert.ok((changes ?? 0) >= 7, `the record lost changes: ${changes}`);
     assert.match(
       describeTrackRecordRescore({ changes: 7, signaled: 2, graded: 5 }),
-      /No month's conditions changed, so the counts above match the ones published before\.$/,
+      /No month's conditions changed, and the counts above match the ones published before\.$/,
     );
     assert.match(
       describeTrackRecordRescore({ changes: 8, signaled: 2, graded: 6 }),

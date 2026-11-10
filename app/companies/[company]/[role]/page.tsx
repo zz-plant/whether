@@ -83,7 +83,7 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {company.name} can ask for this week</h1>
         <p className="text-sm text-slate-300">
-          Is now a good time to ask for a raise or more headcount? Here is what this week&apos;s conditions say for {role.label} at {company.name}, and what the company has filed.
+          Is now a good time to ask for a raise or more headcount? What this week&apos;s conditions say for {role.label} at {company.name}, and what the company has filed.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />

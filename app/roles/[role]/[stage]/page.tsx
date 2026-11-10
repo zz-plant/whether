@@ -80,7 +80,7 @@ export default async function RoleStagePage({ params }: { params: Promise<Params
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {atCompanies} can ask for this week</h1>
         <p className="text-sm text-slate-300">
-          Is now a good time to ask for a raise or more headcount at this stage? Here is what changes for {role.label}, beside this week&apos;s conditions.
+          Is now a good time to ask for a raise or more headcount at this stage? What changes for {role.label}, beside this week&apos;s conditions.
         </p>
       </section>
       <ConditionsSection conditions={conditions} />

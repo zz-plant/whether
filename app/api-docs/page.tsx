@@ -80,8 +80,8 @@ export default function ApiDocsPage() {
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
-          Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
-          scores behind it, and the pause and restart lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.
+          Read this week's guidance from an AI agent, a script, or a dashboard. The guidance, the two
+          scores behind it, and the pause and restart lines come through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. All of it is free, and the API needs no key.
         </p>
 
         <section className="space-y-4">
@@ -310,7 +310,7 @@ export default function ApiDocsPage() {
               own before you send it.
             </Endpoint>
             <Endpoint signature="GET /api/decision-memory?format=records|csv">
-              Past guidance in NDJSON, shaped by the Revisable Delegation record schema — one
+              Past guidance in NDJSON, shaped by the Revisable Delegation record schema: one
               belief record per week of published guidance. <code className="font-mono">format=csv</code> returns
               the same entries as a spreadsheet. Scoped to the caller: it reads your own decision
               memory, so it needs an <span className="font-mono text-slate-100">x-whether-client-id</span> header
@@ -327,7 +327,7 @@ export default function ApiDocsPage() {
               tryHref="/api/brief/slack"
               tryLabel="Try it"
             >
-              The week&apos;s guidance preformatted for Slack — action, pause line, restart line.
+              The week&apos;s guidance preformatted for Slack: action, pause line, restart line.
               Post it to a channel without reformatting.
             </Endpoint>
             <Endpoint
@@ -368,7 +368,7 @@ export default function ApiDocsPage() {
               tryLabel="View slide"
               tryAriaLabel="View the brief as a meeting slide"
             >
-              The guidance as a widescreen meeting slide — hand-written SVG, so it stays sharp at projector
+              The guidance as a widescreen meeting slide. It is hand-written SVG, so it stays sharp at projector
               size and the labels are still editable text in Figma or Keynote. Accepts seed,
               series-a, series-b, or growth.
             </Endpoint>
@@ -539,7 +539,7 @@ export default function ApiDocsPage() {
         </section>
 
         <p className="text-fluid-nano text-slate-400">
-          All endpoints listed here are free and need no key or account. Data is provided for
+          Every endpoint is free and needs no key or account. Data is provided for
           informational purposes.
         </p>
       </article>

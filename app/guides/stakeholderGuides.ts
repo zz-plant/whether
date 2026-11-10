@@ -213,7 +213,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     tagline: "Get the leadership team working from the same reading before planning starts.",
     bullets: [
       "Open planning with this week's guidance, so trade-offs start from agreed limits.",
-      "Keep board and investor material consistent with what the company is actually doing.",
+      "Keep board and investor material consistent with what the company is doing.",
       "Note which decisions were made under which conditions, and revisit them when an area pauses or restarts.",
       "Spend less time settling whose view of the market wins.",
     ],

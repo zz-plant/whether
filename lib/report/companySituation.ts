@@ -127,7 +127,7 @@ export const buildCompanySituation = (
     reading: readable && capital !== null && freeCashFlow !== null
       ? [
           `Over the last year, cash from operations covered capital spending with ${formatCommitmentUsd(freeCashFlow)} left over. Capital spending took ${percent(capital / cashFlow)}% of it.`,
-          "So this week's conditions are more likely to reach you through budgets and priorities than through the company's cash.",
+          "That makes this week's conditions more likely to reach you through budgets and priorities than through the company's cash.",
           ...(figures.revenueGrowth === null || !peers ? [] : [growthSentence(figures.revenueGrowth, peers)]),
         ]
       : null,

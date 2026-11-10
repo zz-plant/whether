@@ -213,8 +213,7 @@ export default async function CompsPage() {
           <p className="text-sm text-slate-300">
             <Link href="/companies" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
               What public companies have filed, by role
-            </Link>{" "}
-            prints what public companies like these have filed.
+            </Link>
           </p>
         </section>
 
