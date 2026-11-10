@@ -19,6 +19,7 @@
     "test": "bun scripts/run-tests.mjs",
     "test:watch": "bun scripts/run-tests.mjs --watch",
     "test:changed": "node scripts/test-changed.mjs",
+    "verify": "bun scripts/run-checks.mjs --preset verify",
     "time-machine:update-summaries": "bun scripts/updateTimeMachineSummariesSince.mjs",
     "mcp:whether": "bun scripts/mcp/whether-mcp-server.ts",
     "deploy:cloudflare": "node scripts/cloudflare-run.mjs deploy --skip-build-if-current",

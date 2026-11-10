@@ -6,7 +6,7 @@ Run the smallest meaningful verification set for the scope and risk of your chan
 | Change profile | Minimum validation |
 | --- | --- |
 | Docs/copy-only | `bun run check:agent-docs`, then verify links, commands, and references manually |
-| Typical product/logic change | `bun run test:changed` + `bun run lint` while iterating; `bun run test` before commit |
+| Typical product/logic change | `bun run verify` while iterating; `bun run test` before commit |
 | Broad/refactor/high-risk logic change | `bun run check` + targeted regression coverage |
 
 Additional requirements:

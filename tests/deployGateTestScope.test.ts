@@ -171,6 +171,30 @@ describe("deploy gate test scope", () => {
     }
   });
 
+  /*
+   * The edit loop is one command, so iterating is one round trip instead of three.
+   * `test:changed` is on demand: `bun run check` already runs `test`, and running both
+   * would run the changed files' tests twice.
+   */
+  it("runs lint, typecheck and the changed-file tests from `bun run verify`, outside every gate", async () => {
+    const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
+    assert.equal(packageJson.scripts?.verify, "bun scripts/run-checks.mjs --preset verify");
+
+    assert.deepEqual(stageNames(["--preset", "verify"]), [["lint", "typecheck", "test:changed"]]);
+    assert.equal(resolveCheckPlan(["--preset", "verify"], {}).deployGate, false);
+    assert.equal(resolveCheckPlan(["--preset", "verify"], {}).repeatFailures, false, "its reader has the whole output");
+    assert.equal(resolveCheckPlan(["--preset", "pre-push"], {}).repeatFailures, true, "a gate's log may be cut off");
+    assert.equal(resolveCheckPlan([], {}).repeatFailures, true);
+
+    const [all] = stageNames([]);
+    assert.ok(all, "bun run check has a stage");
+    assert.ok(!all.includes("test:changed"), "bun run check runs the suite, not the changed-file subset as well");
+    for (const preset of ["pre-push", "deploy", "ci"]) {
+      assert.ok(!presetTasks(preset).includes("test:changed"), `the ${preset} gate runs the whole suite`);
+    }
+    assert.deepEqual(stageNames(["test:changed"]), [["test:changed"]], "still runnable by name");
+  });
+
   it("runs named tasks in declaration order, and refuses what it does not know", () => {
     assert.deepEqual(stageNames(["test", "lint"]), [["lint", "test"]]);
     assert.throws(() => resolveCheckPlan(["lnit"], {}), /Unknown check\(s\): lnit/);

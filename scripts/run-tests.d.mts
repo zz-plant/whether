@@ -16,3 +16,13 @@ export function resolveShardCount(args: string[], requestedShards: number): numb
 
 /** The flag arguments a shard inherits, with each value flag's value attached. */
 export function collectFlagArgs(args: string[]): string[];
+
+/**
+ * Whether a run hides the app's own console output: a run that covers the suite does,
+ * unless it is the deploy gate or `WHETHER_TEST_LOGS=1` asks for the output.
+ */
+export function shouldQuietAppLogs(
+  args: string[],
+  env?: Record<string, string | undefined>,
+  deployGate?: boolean,
+): boolean;

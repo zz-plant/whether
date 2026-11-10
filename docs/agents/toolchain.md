@@ -9,10 +9,11 @@ rules live in [AGENTS.md](../../AGENTS.md); the task router is
 
 | Command | Time | When |
 | --- | --- | --- |
-| `bun run test <path>` | ~0.5s | Default loop. Runs only that file. |
+| `bun run verify` | ~3–10s | Default loop. Lint, typecheck and `test:changed` together, one verdict per task, a failure printed once. Compares against HEAD, so run it before you commit. |
+| `bun run test <path>` | ~0.5s | Runs only that file, with the app's console output. |
 | `bun run test:changed` | ~1–8s | Runs the tests that import your changed files. `-- --path <file>` names them explicitly; `-- --deep` adds one hop; `-- --list` prints them; `-- --full` runs the suite. |
 | `bun run test -t "<name>"` | ~3s | Filter by test name. Stays one process: under sharding, a file with no matching test exits non-zero and the whole run reads as red. |
-| `bun run test` | ~35s | 3,800+ tests / 495+ files across 3 shards. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run test` | ~35s | 3,800+ tests / 495+ files across 3 shards. Before commit, not per-edit. Prints failures and totals only (about 40 lines when one test fails); `WHETHER_TEST_LOGS=1` adds the app's console output. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~2s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~2s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
 | `bun run lint:types` | ~3s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
@@ -26,8 +27,10 @@ rules live in [AGENTS.md](../../AGENTS.md); the task router is
 | `bun run check:production-edge` | ~3s | Production `/` and `/api/health`: names a Cloudflare challenge, a 403 or a DNS failure. `check:production-assets` probes every static asset and OG route. |
 | `bun run skills:sync` | <1s | After editing `.claude/skills/` or `.codex/skills-overlay/`: regenerates the `.codex/skills/` mirror. |
 
-Package manager is `bun`. Dev server: `bun run dev`. Prefer `test:changed`, a targeted test,
-and `typecheck` while iterating; save `bun run check` for pre-merge. `check` runs its tasks
+Package manager is `bun`. Dev server: `bun run dev`. Prefer `bun run verify` or a targeted
+test while iterating; save `bun run check` for pre-merge. Read these commands' output whole.
+Piping one through `tail` or `head` makes the shell report the pipe's exit status, so a
+failed run reads as exit code 0. `check` runs its tasks
 concurrently and reports every failure in one pass; add `--serial` (or set `CHECK_SERIAL=1`)
 for fail-fast sequencing when debugging it.
 

@@ -13,10 +13,10 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 ## Repo essentials
 
 - Package manager `bun`. Install `bun install`; dev `bun run dev`; build `bun run build`.
-- Tests: `bun run test` — ~35s, sharded across processes (`BUN_TEST_SHARDS` overrides; a path filter runs one process). Runs offline: `bunfig.toml` preloads a network guard, so a test needing data serves it (a fixture fetcher or an assigned `globalThis.fetch`).
+- Tests: `bun run test` — ~35s, sharded across processes (`BUN_TEST_SHARDS` overrides; a path filter runs one process). A full run prints failures and totals only, so read it whole and never pipe it through `tail`: the pipe swallows the exit status. Runs offline: `bunfig.toml` preloads a network guard, so a test needing data serves it (a fixture fetcher or an assigned `globalThis.fetch`).
 - Targeted: `bun run test tests/homeBriefModel.test.ts` (one file), `bun run test -t "reversal trigger"` (by name).
 - Changed files: `bun run test:changed` runs the tests that import what you edited (`-- --deep` adds one hop, `-- --list` prints them).
-- Iterate with a targeted test plus `bun run typecheck` (~2s incremental). `bun run check` (~35s, every task; the landmark audit is the long pole) is for pre-merge.
+- Iterate with `bun run verify`: lint, typecheck and the tests that import your uncommitted changes, in one command (a few seconds). `bun run check` (~35s, every task; the landmark audit is the long pole) is for pre-merge.
 - CI on GitHub is manual-only (`workflow_dispatch`); the real gates are `.husky/pre-push` and Cloudflare Workers Builds — see the gate invariant below.
 
 ## Architectural invariants
@@ -78,7 +78,7 @@ Three framings govern applying the guidance to one company:
 1. orient with `AGENTS.md`, `docs/agents/README.md`, and the one matching guide
 2. identify the canonical surface or module before broad search
 3. choose the smallest implementation that improves the product loop
-4. run the smallest meaningful verification for the changed behavior (`bun run test:changed`)
+4. run the smallest meaningful verification for the changed behavior (`bun run verify`)
 5. update the canonical doc if workflow, semantics or contracts changed
 
 Do not spend major effort on repo-wide exploration before you know the target surface and validation path.

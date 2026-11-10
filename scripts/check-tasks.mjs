@@ -17,6 +17,8 @@ const CHECK_TASKS = [
   { name: "lint:types", script: "lint:types" },
   { name: "typecheck", script: "typecheck" },
   { name: "test", script: "test" },
+  // The tests that import the changed files. On demand: `test` covers it wherever the suite runs.
+  { name: "test:changed", script: "test:changed", onDemand: true },
   { name: "assets", script: "assets:check" },
   // Counts the suppressions that could turn every other ratchet green without a fix.
   { name: "suppressions", script: "check:suppressions" },
@@ -94,9 +96,25 @@ const CHECK_PRESETS = {
     deployGate: false,
     stages: [["lint", "typecheck", "test", "assets", "audit", "landmarks"]],
   },
+  /*
+   * `bun run verify`, the edit loop in one command: lint, typecheck and the tests that
+   * import the files changed since HEAD, together, in a few seconds. From August to
+   * November 2026 agent sessions ran these as separate back-to-back commands about 200
+   * times, and each one re-read the whole conversation. Not a gate: the full suite, the
+   * censuses and the landmark audit are `bun run check`, before a push. A failure prints
+   * once: the end-of-run repeat exists for a build log that keeps only its last lines.
+   */
+  verify: {
+    deployGate: false,
+    repeatFailures: false,
+    stages: [["lint", "typecheck", "test:changed"]],
+  },
 };
 
 const taskNames = () => CHECK_TASKS.map((task) => task.name).join(", ");
+
+/** What a bare `bun run check` runs: every task except the on-demand ones. */
+const defaultTasks = () => CHECK_TASKS.filter((task) => !task.onDemand);
 
 /** The tasks named, in declaration order. Throws on a name that is not a task. */
 const selectTasks = (names) => {
@@ -123,14 +141,15 @@ export function presetTasks(name) {
 /**
  * What a `run-checks.mjs` invocation runs.
  *
- *   (no names)          every task, one stage
+ *   (no names)          every task but the on-demand ones, one stage
  *   <name>...           those tasks, one stage, in declaration order
  *   --preset <preset>   that preset's stages (also `--preset=<preset>`)
  *   --serial            fail-fast sequencing within a stage (or CHECK_SERIAL=1)
  *   --reuse             read by run-checks.mjs, not here: skip a task already passed on this tree
  *
  * `deployGate` is true for a preset that is the deploy gate, or when the caller already
- * runs under the signal. Any other flag is ignored. Throws on an unknown task or preset.
+ * runs under the signal. `repeatFailures` is whether a failing task's output is printed
+ * again at the end of the run. Any other flag is ignored. Throws on an unknown task or preset.
  */
 export function resolveCheckPlan(args, env = process.env) {
   let serial = env.CHECK_SERIAL === "1";
@@ -149,9 +168,10 @@ export function resolveCheckPlan(args, env = process.env) {
 
   if (presetName === null) {
     return {
-      stages: [names.length > 0 ? selectTasks(names) : [...CHECK_TASKS]],
+      stages: [names.length > 0 ? selectTasks(names) : defaultTasks()],
       serial,
       deployGate: isDeployGate(env),
+      repeatFailures: true,
     };
   }
 
@@ -164,5 +184,6 @@ export function resolveCheckPlan(args, env = process.env) {
     stages: preset.stages.map((stage) => selectTasks(stage)),
     serial,
     deployGate: preset.deployGate || isDeployGate(env),
+    repeatFailures: preset.repeatFailures ?? true,
   };
 }

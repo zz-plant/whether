@@ -90,4 +90,87 @@ describe("run-checks output", () => {
     assert.ok((trailer.match(/FRED circuit breaker open/g)?.length ?? 0) <= 1, "the end repeat collapses it too");
     assert.match(trailer, /the real failure/);
   });
+
+  /* The end-of-run repeat is for a log window that keeps only its last lines. `verify` is
+     read whole, in an edit loop where failing is the common case, so it prints a failure once. */
+  it("prints a failure once under the verify preset, and twice under a gate", () => {
+    const run = (args: string[]) => {
+      const root = mkdtempSync(join(tmpdir(), "run-checks-verify-"));
+      roots.push(root);
+      const ok = join(root, "ok.mjs");
+      const broken = join(root, "broken.mjs");
+      writeFileSync(ok, "process.exit(0);");
+      writeFileSync(broken, 'console.log("a.ts(1,1): error TS0000: the real failure"); process.exit(1);');
+      const scripts = { lint: `node ${ok}`, typecheck: `node ${broken}`, "test:changed": `node ${ok}` };
+      writeFileSync(join(root, "package.json"), JSON.stringify({ name: "run-checks-fixture", scripts }));
+      return spawnSync("bun", [join(REPO_ROOT, "scripts/run-checks.mjs"), ...args], {
+        cwd: root,
+        encoding: "utf8",
+        env: { ...process.env, CHECK_VERBOSE: "" },
+      });
+    };
+
+    const verify = run(["--preset", "verify"]);
+    assert.equal(verify.status, 1);
+    assert.match(verify.stdout, /1 check\(s\) failed: typecheck/);
+    assert.equal(verify.stdout.match(/the real failure/g)?.length, 1);
+    assert.doesNotMatch(verify.stdout, /───── typecheck failed/);
+
+    const named = run(["lint", "typecheck"]);
+    assert.equal(named.status, 1);
+    assert.equal(named.stdout.match(/the real failure/g)?.length, 2);
+    assert.match(named.stdout, /───── typecheck failed/);
+  });
+});
+
+/*
+ * `bun run test` with no filter is the same problem without run-checks in front of it. The
+ * runner asks the preload to hide the app's console output for that run (`shouldQuietAppLogs`
+ * in scripts/run-tests.mjs); this holds the preload to what that promises: the noise goes,
+ * and the failure, which bun's reporter prints without `console`, stays.
+ */
+describe("full-suite test output", () => {
+  const REPO_ROOT = process.cwd();
+
+  const runNoisyFailure = (quiet: string) => {
+    const root = mkdtempSync(join(tmpdir(), "suite-quiet-"));
+    try {
+      writeFileSync(
+        join(root, "noisy.test.ts"),
+        [
+          'import { expect, it } from "bun:test";',
+          'it("warns, then fails", () => {',
+          // Joined at run time: bun's code frame echoes this source, and must not match.
+          '  console.warn(["FRED", "circuit", "breaker", "open"].join("-"));',
+          '  console.error(["report", "dependency", "failure"].join("-"));',
+          '  expect("the real failure").toBe("something else");',
+          "});",
+        ].join("\n"),
+      );
+      const { status, stdout, stderr } = spawnSync(
+        "bun",
+        ["test", "--preload", join(REPO_ROOT, "scripts/test-network-guard.ts"), "noisy.test.ts"],
+        { cwd: root, encoding: "utf8", env: { ...process.env, WHETHER_TEST_QUIET: quiet } },
+      );
+      return { status, output: `${stdout}${stderr}` };
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  };
+
+  it("hides the app's console output and keeps the failure", () => {
+    const { status, output } = runNoisyFailure("1");
+    assert.equal(status, 1);
+    assert.doesNotMatch(output, /FRED-circuit-breaker-open/);
+    assert.doesNotMatch(output, /report-dependency-failure/);
+    assert.match(output, /the real failure/);
+    assert.match(output, /\(fail\) warns, then fails/);
+  });
+
+  it("prints the console output when the run did not ask for quiet", () => {
+    const { status, output } = runNoisyFailure("");
+    assert.equal(status, 1);
+    assert.match(output, /FRED-circuit-breaker-open/);
+    assert.match(output, /report-dependency-failure/);
+  });
 });

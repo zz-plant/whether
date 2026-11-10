@@ -14,7 +14,7 @@ Start here when you want the fastest correct repo orientation:
 2. read this file
 3. open exactly one task-specific guide from the router below
 4. find the canonical module or doc before broad search
-5. run the smallest meaningful validation for the touched surface (`bun run test:changed` is
+5. run the smallest meaningful validation for the touched surface (`bun run verify` is
    usually it)
 
 If you will delegate work to a subagent, also read the delegation packet in `mcp-and-skills-playbook.md` before handing work off.

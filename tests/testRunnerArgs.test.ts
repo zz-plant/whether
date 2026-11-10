@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { describe, it } from "bun:test";
-import { collectFlagArgs, resolveShardCount } from "../scripts/run-tests.mjs";
+import { collectFlagArgs, resolveShardCount, shouldQuietAppLogs } from "../scripts/run-tests.mjs";
 
 /**
  * The runner's argument handling. A name filter is not a file filter: every shard still
@@ -36,6 +36,22 @@ describe("test runner arguments", () => {
       "out.xml",
     ]);
     assert.deepEqual(collectFlagArgs(["--timeout=5000", "tests/a.test.ts"]), ["--timeout=5000"]);
+  });
+
+  /*
+   * On 2026-11-09 an unfiltered run printed 740 KB, 95.6% of it three fallback warnings.
+   * Across three months of agent sessions, 96% of test runs were piped through `tail` to
+   * survive that, and 1,528 of them lost the exit status to the pipe. The run that covers
+   * the suite is the one nobody reads line by line, so that is the one that goes quiet.
+   */
+  it("hides app console output only for a run that covers the suite", () => {
+    assert.equal(shouldQuietAppLogs([], {}, false), true);
+    assert.equal(shouldQuietAppLogs(["--only-failures"], {}, false), true);
+    assert.equal(shouldQuietAppLogs(["tests/homeBriefModel.test.ts"], {}, false), false, "a named file is being read");
+    assert.equal(shouldQuietAppLogs(["-t", "flags the ceilings"], {}, false), false, "so is a named test");
+    assert.equal(shouldQuietAppLogs([], { WHETHER_TEST_LOGS: "1" }, false), false, "the opt-out");
+    assert.equal(shouldQuietAppLogs([], {}, true), false, "the deploy gate, where rerunning one file costs a push");
+    assert.equal(shouldQuietAppLogs([], { WHETHER_DEPLOY_GATE: "1" }), false, "the gate signal, read from the environment");
   });
 
   it("labels a single-process run instead of printing NaN", () => {
