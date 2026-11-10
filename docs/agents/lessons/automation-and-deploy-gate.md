@@ -225,6 +225,28 @@ fixture supplies the missing print. The cost: a newer week's stored text is no l
 retired word in `lib/report/reportEvidence.ts` reaches the archive unnoticed. Rehearse both after
 changing anything they touch; a conditions change was not rehearsed.
 
+**A Tuesday run cannot land a month that ended Saturday to Monday, and October went red for it
+(2026-11-09).** From Nov 9 `tests/summaryDerivedHistory.test.ts` failed on every branch, with the
+newest month-end at Sep 30, until the archive was refreshed by hand (`92d76cae`, merged Nov 10
+02:00 UTC). No push to `main` fell inside those 26 hours, so no deploy was blocked. Neither writer
+could have delivered. The routine ran once after the month closed, Tuesday Nov 3 at 12:04 UTC, and
+FRED answered. FRED posts a day's Treasury print the following business afternoon, US time, so a
+Tuesday-morning run sees nothing newer than Friday, and `buildMonthlyArchive` skips a month whose
+calendar month-end is later than the newest print: the run wrote 177 months, the number it started
+with. It then failed its push on the pinned Chicago Fed value fixed the next day, was refused
+`SKIP_PREPUSH=1`, and ended on FAILED while the routine's own status reads SUCCEEDED. Its next
+run, Nov 10, is day 10. The Worker's daily rebuild would have seen October on Nov 4; all seven
+instances from Nov 4 to Nov 10 stopped in under a second on `GITHUB_TOKEN is not configured`. The
+test's grace day (8) assumes one scheduled run after a month closes is enough, which holds only
+when the first Tuesday is day 4 or later. A month ending on a Saturday or Sunday gets its second
+run on day 10 or 9, after the test has turned red; one ending on a Monday gets it on day 8, with
+about eleven hours to merge. November 2026 ends on a Monday, January and February 2027 on a
+Sunday. Until production has the token, refresh those months by hand once FRED has a print dated
+on or after the month's last day: the monthly, weekly and quarterly generators, then
+`bun run archive:index`. The routine's stored prompt still predates 2026-11-05: it names
+`data/monthly_summaries_2012_2025.json`, which no longer exists, and may commit two of the six
+files the hand refresh changed.
+
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
 Two more once the provider keys are set: `api.stlouisfed.org` (FRED API, `FRED_API_KEY`) and
