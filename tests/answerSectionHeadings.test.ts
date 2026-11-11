@@ -65,10 +65,9 @@ describe("answer section headings", () => {
     assert.equal(new Set(answerPages.map((page) => page.applyHeading)).size, answerPages.length);
   });
 
-  it("keeps the button, provenance and onward-link labels fixed, because they label the same thing everywhere", () => {
+  it("keeps the provenance and onward-link labels fixed, because they label the same thing everywhere", () => {
     for (const page of answerPages) {
       const headings = buildAnswerSectionHeadings(page);
-      assert.equal(headings.copy, "Copy this answer");
       assert.equal(headings.citation, "Citation");
       assert.equal(headings.next, "Related pages");
     }

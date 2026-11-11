@@ -115,9 +115,9 @@ those names.
   inside the browse controls. Invalid selections must not target an absent result.
 - **Sharing has one home.** `/share` holds every format, the slide and card clipboard buttons
   (moved from the brief), the meeting snippet (moved from `/trust`; folded into the agenda in §1.1.100) and the links to API & MCP and
-  RSS. The brief's Do and share and Trust each carry one "Share or embed this →" link
-  (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone, and its closing card to
-  `/share` went in §1.1.65. Trust's one-line citation
+  RSS. The brief and Trust carried one "Share or embed this →" link each until 2026-11-11, when
+  both went as repeats of the header's and the footer's; Decide's Share step is gone, and its
+  closing card to `/share` went in §1.1.65. Trust's one-line citation
   is served by `/share`'s Citation format. A frozen week keeps its date-pinned copy panel.
 - **Discoverability.** The sitemap drops `/resolve` and ranks `/resources` as a hub; `/llms.txt`
   carries a Site section built from the same groups.
@@ -144,12 +144,10 @@ line is crossed.
   manager", "Investors", "Budget owners", "Board"), never "your CFO". Every reply restates a
   published line and promises no outcome; `tests/guidedTranslationRouting.test.ts` holds both
   statements and questions, the non-empty reply, the speaker and the badge length.
-- **`area` is what the homepage selects on.** Every one of the five decision areas carries tagged
-  exchanges across the role guides; a question about the whole set of lines, a plan, a pack or a
-  quarter carries none and never appears on `/`. `selectHearingForAreas` takes one exchange per
-  crossed area, then one per role thread and one per speaker, capped at three. No pause line
-  crossed, no section. "By role →" links directly to an open role panel on `/resources`, which lists
-  the other five roles to switch between without repeating the role already on screen.
+- **`area` tags each exchange.** Every one of the five decision areas carries tagged exchanges
+  across the role guides. Neither `/` nor `/roles` prints a selection of them any more
+  (2026-11-11), so `selectHearingForAreas` is gone; the role panels on `/resources` print each
+  guide's exchanges and list the other five roles to switch between.
 - **Stage-only views keep no thread.** The hearing content is role-scoped, so `?stage=` alone
   renders the stage panel and its per-team guidance, not a thread.
 - **No mascot.** The product's one drawn vocabulary is the weather glyphs (`ConditionIcon`); a
@@ -263,24 +261,24 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    when a paused decision may resume (the pause line and the restart line, a chosen stage's else the
    lead area's). A sentence says a change in conditions is not permission to resume. Below `md` the
    conditions map draws here (no distance caption: the trust strip's margin states it).
-7. **What your team will ask** (`home/HearingSection.tsx`, `#what-you-may-hear`): the questions
-   this week's crossed pause lines invite, one per crossed area, group and speaker
-   (`selectHearingForAreas`, `app/guides/stakeholderGuides.ts`), each drawn as a chat pair — the
-   group asks, the published line answers (`app/components/ui/hearingBubbles.tsx`, the same pair
-   Guides' role panels print). It renders nothing on a week no pause line is crossed, so a calm
-   brief does not grow a section that repeats every week, and nothing on an archived week, whose
-   lines are a record rather than a present conversation. "By role →" opens Guides' role list.
+7. **What your team will ask**: retired. The section became one link beside the plan
+   ("Sample conversations about pause rules", `#what-you-may-hear`), which went on 2026-11-11: it
+   sent the founder to a page written for employees, beside the page's one primary action.
+   `/roles` dropped its own copy of the conversations the same day; the stakeholder guides on
+   `/resources` print them.
 8. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
    these conditions lasted before (§1.1.76); the last turns as links. On a live week the record is
    drawn above those sentences as `/history`'s month strip (every month-end since 2012 in its
-   weather, 2026-10-21), with one line separating the sampling conventions — the record is
-   month-end readings, the guidance above is this week's.
+   weather, 2026-10-21). The sampling note under it ("The band is the climate…") went on
+   2026-11-11: the record band's caption already names its fields as month-end readings.
 9. **Get notified when something changes** (`AlertSection`, `#subscribe`): the one subscribe form,
    starting on alerts only with the Monday email one choice away, and the push toggle.
-10. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
-   holds the slide and image copies and every other format since 2026-10-08, and the week's
-   published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
+10. **The closing line**: retired 2026-11-11. "Share or embed this →" repeated the header's and
+   the footer's link to `/share`, and "Published brief for the week of …" repeated the card's brief
+   number, which links the same page. The action row under the card keeps Copy brief, Copy as an
+   image and the Monday email; its standup and three-bullet copies went the same day, because the
+   bullets were Copy brief's own lines and formats are the header share panel's job (DD-005).
 
 There is no first-visit fold since 2026-10-09: the order puts the areas, the lines and the alert
 before the evidence for every reader, so the fold (§1.1.21, §1.1.42) and its "Show the full brief"

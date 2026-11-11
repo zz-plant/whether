@@ -1,5 +1,5 @@
 import { stageGuides } from "./stageGuides";
-import { decisionAreaOrder, type DecisionArea } from "../../lib/report/boundedDecisionRules";
+import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
 
 /*
  * Written for the person in the role, about what they would do differently this
@@ -360,33 +360,3 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
 
 export const findStakeholderGuide = (slug: string) =>
   stakeholderGuides.find((guide) => guide.slug === slug);
-
-/**
- * Sample conversations about the requested operating areas, in decision order.
- * The picker chooses at most one exchange per area, group and speaker.
- */
-export const selectHearingForAreas = (
-  crossedAreas: readonly DecisionArea[],
-  limit = 3,
-): { guide: StakeholderGuide; hearing: StakeholderHearing }[] => {
-  const crossed = new Set(crossedAreas);
-  const picks: { guide: StakeholderGuide; hearing: StakeholderHearing }[] = [];
-  const usedGroups = new Set<string>();
-  const usedSpeakers = new Set<string>();
-
-  for (const area of decisionAreaOrder) {
-    if (!crossed.has(area)) continue;
-    for (const guide of stakeholderGuides) {
-      if (usedGroups.has(guide.slug)) continue;
-      const hearing = guide.hearing.find((entry) => entry.area === area && !usedSpeakers.has(entry.from));
-      if (!hearing) continue;
-      picks.push({ guide, hearing });
-      usedGroups.add(guide.slug);
-      usedSpeakers.add(hearing.from);
-      break;
-    }
-    if (picks.length >= limit) break;
-  }
-
-  return picks;
-};

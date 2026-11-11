@@ -210,7 +210,8 @@ describe("questions that come with the work", () => {
       <ConditionQuestionsSection regime="SCARCITY" questions={conditionQuestions("SCARCITY")} pagePath="/roles" />,
     );
     assert.match(html, /What might come up in Freezing conditions/);
-    assert.match(html, /Money is expensive and hard to raise/);
+    /* The conditions lines under each page's heading say why; the section does not say it again. */
+    assert.doesNotMatch(html, /Money is expensive and hard to raise/);
     assert.match(html, /not quotes or survey results/);
     assert.match(html, /href="\/decisions"/);
     assert.equal(renderToStaticMarkup(<ConditionQuestionsSection regime="SCARCITY" questions={[]} pagePath="/roles" />), "");

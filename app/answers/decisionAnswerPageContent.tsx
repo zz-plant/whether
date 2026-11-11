@@ -188,10 +188,10 @@ export async function DecisionAnswerPageContent({
 
   /*
    * The first eleven pages shipped the same six section headings, so the outline a
-   * reader skims said nothing about which answer they were reading. Four of the
-   * six are built from this page's audience, decision areas and threshold
-   * focus; "Copy this answer" and "Citation" label a button and a provenance
-   * block, which are the same thing everywhere.
+   * reader skims said nothing about which answer they were reading. Three are
+   * built from this page's heading, decision areas and threshold focus;
+   * "Citation" and "Related pages" label a provenance block and the onward
+   * links, which are the same thing everywhere.
    */
   const headings = buildAnswerSectionHeadings(page);
 
@@ -252,9 +252,10 @@ export async function DecisionAnswerPageContent({
           </p>
         ) : null}
 
-        {/* The quick copy for a reader who knows what they want (§XX). The related
-            questions that sat beside it are the "Next" section's, which lists
-            the same ones and more (2026-10-09). */}
+        {/* The page's one copy action, under the answer it copies. A second copy of
+            this button closed a "Copy this answer" section further down; the
+            decision note it sat beside is under "What to check at your company"
+            now, whose inputs the note asks for (2026-11-11). */}
         <div className="flex flex-wrap items-center gap-2">
           <ReportCta
             href={pagePath}
@@ -310,6 +311,9 @@ export async function DecisionAnswerPageContent({
           <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-200">
             {answer.companyInputs.map((input) => <li key={input}>{input}</li>)}
           </ul>
+          <h3 className="mt-4 text-sm font-semibold text-slate-100">Decision note to complete</h3>
+          <p className="mt-2 text-sm text-slate-200">{answer.decisionNote}</p>
+          <p className="mt-2 text-sm text-slate-200">Fill in the company inputs before using it as an approval.</p>
           {answer.watchouts && answer.watchouts.length > 0 ? (
             <>
               <h3 className="mt-4 text-sm font-semibold text-slate-100">Common ways this goes wrong</h3>
@@ -392,29 +396,6 @@ export async function DecisionAnswerPageContent({
           ) : null}
         </SecondaryPageSection>
 
-        <SecondaryPageSection title={headings.copy}>
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-100">Decision note to complete</h3>
-            <p className="text-sm text-slate-200">{answer.decisionNote}</p>
-            <p className="text-sm text-slate-200">
-              Fill in the company inputs before using it as an approval.
-            </p>
-            <ReportCta
-              href={pagePath}
-              label="Copy decision brief"
-              copyText={copyText}
-              copyTarget="Decision brief"
-              telemetryEvent={{
-                pagePath,
-                cluster: measurement.cluster,
-                intent: measurement.intent,
-                ctaId: "copy_decision_brief",
-              }}
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
-            />
-          </div>
-        </SecondaryPageSection>
-
         <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
           <p className="text-xs text-slate-400">Data as of <time dateTime={reportData.treasury.record_date}>{recordDateLabel}</time> · checked {fetchedAtLabel}.</p>
@@ -445,10 +426,10 @@ export async function DecisionAnswerPageContent({
           <div className="mb-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-xs text-slate-300">
             <span className="font-medium text-slate-100">Company calibration:</span> Choose your stage and runway to scale this rule and its pause line to your cash in the <ActionLink href="/" variant="inline">weekly operating brief →</ActionLink>
           </div>
+          {/* The other answers only. "Weekly brief" repeated the link in the line above,
+              and "Plan the week" and "More direct answers" the header's Plan tab and
+              the breadcrumb's Guides (2026-11-11). */}
           <div className="flex flex-wrap gap-2">
-            <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
-            <ActionLink href="/operate" variant="pill">Plan the week</ActionLink>
-            <ActionLink href="/resources#answers" variant="pill">More direct answers</ActionLink>
             {relatedPages.map((related) => (
               <ActionLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ActionLink>
             ))}

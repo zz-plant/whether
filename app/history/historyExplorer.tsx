@@ -79,13 +79,9 @@ export function HistoryExplorer({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="type-section">Historical trends</h2>
-          <p className="text-sm text-slate-300">Conditions and funding pressure, month by month, since 2012.</p>
-        </div>
-        <ActionLink href="/history/compare" variant="pill">Compare two periods &rarr;</ActionLink>
-      </div>
+      {/* The heading alone (2026-11-11): a caption restated the fold's summary, and a
+          "Compare two periods" pill repeated the sub-tab beside History. */}
+      <h2 className="type-section">Historical trends</h2>
 
       {/* The bar carries its own gesture hints as `title`s; a sentence about how
           to drag it is not page content. No frame around it (2026-10-09): it

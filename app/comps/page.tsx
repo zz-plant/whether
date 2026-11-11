@@ -230,11 +230,6 @@ export default async function CompsPage() {
             that matter. Revisit the financing plan when actual investor feedback or the cash deadline changes.
           </p>
           <ActionLink href="/answers/should-startups-raise-capital-now" variant="inline">Decide when to prepare a raise</ActionLink>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            <Link href="/api-docs" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-              Fetch this by API
-            </Link>
-          </p>
         </section>
       </article>
     </PageShell>

@@ -39,14 +39,16 @@ describe("/trust says each thing once", () => {
    * same sentence, so a reader met it twice in a row before reaching anything
    * new.
    */
-  /* The method moved to /about beside "How it works", which already says what
-     the three parts are, so the section opens on them filled in. */
-  it("does not restate what /about's 'How it works' already says", async () => {
+  /* The method moved to /about under the intro, which already says what the
+     three parts are, so the section opens on them filled in. The intro's own
+     "How it works" h2 went on 2026-11-11: it repeated the h1 above it. */
+  it("does not restate what /about's intro already says", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
     assert.equal((html.match(/an action, a score at which to pause and a score at which to restart/g) ?? []).length, 1);
-    const explanation = html.indexOf("How it works");
-    assert.ok(explanation !== -1 && explanation < html.indexOf('id="method"'), "the method follows How it works");
+    assert.doesNotMatch(html, /How the three parts work|The commitment you will make this week/, "the parts are defined once");
+    const explanation = html.indexOf("an action, a score at which to pause");
+    assert.ok(explanation !== -1 && explanation < html.indexOf('id="method"'), "the method follows the explanation");
   });
 });
 
@@ -253,7 +255,7 @@ describe("the site gives one account of what is new and what the scores read", (
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
 
-    assert.match(html, /How it works/);
+    assert.match(html, /How Whether works/);
     assert.match(html, /href="\/history#track-record"/);
     assert.match(html, /href="\/calibration"/);
   });

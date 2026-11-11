@@ -347,17 +347,17 @@ describe("product canon: the list itself", () => {
     assert.doesNotMatch(strip.replace(/<[^>]+>/g, " "), /SCARCITY|DEFENSIVE|VOLATILE|EXPANSION/, "no engine keys in the key");
   });
 
-  /* Two ways into the rest of the site: each reading opens its year in the
-     archive, and "this week" opens the published brief it compares against. */
-  it("links readings to archive years that exist, and this week to its published brief", async () => {
+  /* Each reading opens its year in the archive. The "Written in conditions like
+     this week's" section, which also linked the latest published brief, went in
+     the 2026-11-11 distill pass: it was the base-rate table's row for this week's
+     conditions printed again as a list. */
+  it("links readings to archive years that exist", async () => {
     const { postureArchiveYears } = await import("../lib/summary/postureArchiveYears");
-    const { latestPublishedBrief } = await import("../lib/report/publishedBriefs");
     const html = await renderPage();
     const years = new Set(postureArchiveYears.map((year) => year.slug));
     const linked = [...html.matchAll(/href="\/history\/(\d{4})"/g)].map(([, year]) => year);
     assert.ok(linked.length > 0, "readings link into the archive");
     for (const year of linked) assert.ok(years.has(year), `/history/${year} is a real archive page`);
-    if (latestPublishedBrief) assert.ok(html.includes(`href="/brief/${latestPublishedBrief.slug}"`));
   });
 
   it("keeps the reading list and corpus framing out of the lead", async () => {

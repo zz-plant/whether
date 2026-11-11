@@ -7,7 +7,6 @@ import {
   SecondaryPageSection,
 } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
-import { ActionLink } from "../components/ui/actionLink";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
 import { PremiseOutcomeScatterChart } from "../components/history/premiseOutcomeScatterChart";
 import { loadPremiseTestBacktestModel } from "../../lib/research/premiseBacktestModel";
@@ -69,10 +68,9 @@ export default function CalibrationPage() {
 
       <ConfidenceRecordSection />
 
-      <SecondaryPageSection
-        title="What happened to venture fundraising when funding pressure was above 70"
-        description="Across 51 quarters from 2012 to 2024: U.S. venture deal value growth over the next four quarters, when funding pressure was tight (above 70) and when it was calm (70 or below)."
-      >
+      {/* No description (2026-11-11): the chart's own caption and key say what it
+          draws, over which quarters, and where the two groups split. */}
+      <SecondaryPageSection title="What happened to venture fundraising when funding pressure was above 70">
         <PremiseOutcomeScatterChart model={premiseModel} className="max-w-xl" />
       </SecondaryPageSection>
 
@@ -98,13 +96,26 @@ export default function CalibrationPage() {
             same way the room before a change converts it. The cut points were chosen before the outcomes
             were looked at.
           </li>
+          {/* The sources, as the last line of the method (2026-11-11). They were a
+              section of their own, beside a link to how the scores are computed that
+              the sub-tab row above already carries. */}
+          <li>
+            <span className="text-slate-100">Sources.</span> Rates from the{" "}
+            <a
+              href="https://fred.stlouisfed.org/"
+              className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+            >
+              St. Louis Fed (FRED) Treasury series
+            </a>{" "}
+            (DGS1MO, DGS3MO, DGS2, DGS10).
+          </li>
         </ul>
       </SecondaryPageSection>
 
-      <SecondaryPageSection
-        title="What it does not show"
-        description="These limits are why we did not re-fit the number."
-      >
+      {/* The limits alone (2026-11-11): a caption tying them to the decision not to
+          re-fit restated the first limit, and a closing line about reading the room as
+          a distance restated the study's own finding above. */}
+      <SecondaryPageSection title="What it does not show">
         <ul className="space-y-2 text-base text-slate-300">
           <li>
             {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is not enough to estimate a probability per band. A
@@ -117,32 +128,6 @@ export default function CalibrationPage() {
           <li>
             The archive is one model over one country&rsquo;s rates. It is evidence
             about this number, not about forecasting scores generally.
-          </li>
-        </ul>
-        <p className="mt-4 text-base text-slate-300">
-          The room before a change still measures distance, which it can do honestly. This record sits
-          next to it.
-        </p>
-      </SecondaryPageSection>
-
-      <SecondaryPageSection title="Sources">
-        <ul className="space-y-2 text-base text-slate-300">
-          <li>
-            Rates:{" "}
-            <a
-              href="https://fred.stlouisfed.org/"
-              className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
-            >
-              St. Louis Fed (FRED) Treasury series
-            </a>{" "}
-            (DGS1MO, DGS3MO, DGS2, DGS10).
-          </li>
-          <li>
-            Archive and method:{" "}
-            <ActionLink href="/trust" variant="inline">
-              how the scores are computed
-            </ActionLink>
-            .
           </li>
         </ul>
       </SecondaryPageSection>

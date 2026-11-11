@@ -15,24 +15,17 @@ const directionClassName: Record<SignalClusterReading["directionTone"], string> 
   unchanged: "text-slate-400",
 };
 
-export function SignalReadingPanel({
-  reading,
-  recordDateLabel,
-}: {
-  reading: SignalClusterReading;
-  recordDateLabel: string;
-}) {
+export function SignalReadingPanel({ reading }: { reading: SignalClusterReading }) {
   // `displayValue`, never `value` — see SignalClusterReading.displayValue.
   const hasValue = reading.displayValue !== null && reading.unavailableReason === null;
 
   return (
     <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="signal-reading-heading">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="signal-reading-heading" className="type-eyebrow type-eyebrow-section">
-          {reading.measure} · this week
-        </h2>
-        <p className="text-xs text-slate-500">Data as of {recordDateLabel}</p>
-      </div>
+      {/* Undated on purpose: the card above dates this reading in its trust strip
+          ("Data as of"), and a second date beside the heading said it again. */}
+      <h2 id="signal-reading-heading" className="type-eyebrow type-eyebrow-section">
+        {reading.measure} · this week
+      </h2>
 
       {hasValue ? (
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">

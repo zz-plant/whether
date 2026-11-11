@@ -10,7 +10,7 @@ import { JsonLdScript } from "../../../components/jsonLdScript";
 import { buildCompanyPageStructuredData } from "../../../../lib/seo/pageStructuredData";
 import { Breadcrumbs } from "../../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
-import { CompanyNextLinks, CompanyPositionSection, ConditionsSection, RoleDecisionsSection } from "../../companyPageSections";
+import { CompanyNextLinks, CompanyPositionSection, RoleDecisionsSection, WeekConditionsLines } from "../../companyPageSections";
 import { loadCompanyPage } from "../../loadCompanyPage";
 
 type Params = { company: string; role: string };
@@ -82,11 +82,11 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {company.name} can ask for this week</h1>
-        <p className="text-sm text-slate-300">
-          Is now a good time to ask for a raise or more headcount? What this week&apos;s conditions say for {role.label} at {company.name}, and what the company has filed.
-        </p>
+        {/* The question the page answers, then the week it answers it in. A second sentence
+            listed what the page goes on to show (2026-11-11). */}
+        <p className="text-sm text-slate-300">Is now a good time to ask for a raise or more headcount?</p>
+        <WeekConditionsLines conditions={conditions} />
       </section>
-      <ConditionsSection conditions={conditions} />
       <RoleDecisionsSection
         role={role}
         askFor={askForThisWeek(role, regime)}

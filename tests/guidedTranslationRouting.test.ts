@@ -7,8 +7,7 @@ import {
   GuidedTranslationPanels,
   resolveGuidedTranslationState,
 } from "../app/resources/components/guidedTranslationPanels";
-import { findStakeholderGuide, selectHearingForAreas, stakeholderGuides } from "../app/guides/stakeholderGuides";
-import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { findStakeholderGuide, stakeholderGuides } from "../app/guides/stakeholderGuides";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 
 describe("guided translation routing", () => {
@@ -102,31 +101,6 @@ describe("guided translation routing", () => {
 
     assert.ok(statementCount > 0, "includes pushback and competing takes, not only questions");
     assert.ok(questionCount > 0, "includes direct questions alongside pushback");
-  });
-
-  it("selects one exchange per crossed area, group and speaker for the homepage across all five areas", () => {
-    assert.deepEqual(selectHearingForAreas([]), [], "a week with no crossed line says nothing");
-
-    const hiring = selectHearingForAreas(["hiring"]);
-    assert.equal(hiring.length, 1);
-    assert.equal(hiring[0]?.hearing.area, "hiring");
-
-    const spending = selectHearingForAreas(["burn-discipline"]);
-    assert.ok(spending.length > 0);
-    const speakers = spending.map((pick) => pick.hearing.from);
-    assert.equal(new Set(speakers).size, speakers.length, "one bubble per speaker");
-
-    const groups = spending.map((pick) => pick.guide.slug);
-    assert.equal(new Set(groups).size, groups.length, "one bubble per role thread");
-
-    const both = selectHearingForAreas(["hiring", "burn-discipline"]);
-    assert.ok(both.length >= 2);
-    assert.ok(both.length <= 3, "the section stays compact");
-    assert.ok(both.every((pick) => pick.hearing.area !== undefined), "only area-tagged exchanges are selected");
-
-    for (const area of decisionAreaOrder) {
-      assert.ok(selectHearingForAreas([area]).length > 0, `${area} selects an exchange`);
-    }
   });
 
   it("renders the thread inside the role panel, excludes the active role from the switcher, and omits the thread on a stage-only view", () => {

@@ -294,11 +294,9 @@ export function FormulaReference({
   );
 
   return (
-    <ReportSection
-      id="formula-reference"
-      title="How the scores are built"
-      description="The full derivation, from public data series to the weekly guidance."
-    >
+    /* No description (2026-11-11): "The full derivation, from public data series to the
+       weekly guidance" restated the heading. */
+    <ReportSection id="formula-reference" title="How the scores are built">
       {/* Where this week's scores sit is the brief's section, linked; this page drew the
           same two ladders, pause, change and restart lines and all, until 2026-10-27. What
           follows is how the scores are made. */}
@@ -309,9 +307,6 @@ export function FormulaReference({
         , on the brief.
       </p>
 
-      {/* A reader who does not already know what a Treasury series or a credit
-          spread is cannot start at the formulas. This tier says what the score
-          does in words first; the grid below it stays exact. */}
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score
           does in words first; the grid below it stays exact.

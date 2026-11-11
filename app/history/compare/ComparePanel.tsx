@@ -203,10 +203,8 @@ export async function ComparePanel({
       {selectorBlock}
 
       <section id="compare-key-deltas" className="weather-panel @container p-6 space-y-4">
-        <div>
-          <p className="type-label text-slate-400">Difference</p>
-          <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
-        </div>
+        {/* No "Difference" label over it (2026-11-11): the heading says so. */}
+        <h2 className="type-section text-slate-100">What changed between them</h2>
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-panel)] p-3">
           <div className="flex flex-wrap items-center gap-2 text-xs">

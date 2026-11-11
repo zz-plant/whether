@@ -113,7 +113,6 @@ export default async function Page() {
         </ul>
         <div className="flex flex-wrap gap-3 pt-2">
           <Link href="/resources/capital-posture-template" className="weather-button inline-flex items-center justify-center" data-conversion-event="download">Download the capital planning template</Link>
-          <ActionLink href="/operate#ops-export-briefs" variant="pill" data-conversion-event="request">Open board-pack exports</ActionLink>
         </div>
       </section>
     </ContentPageShell>

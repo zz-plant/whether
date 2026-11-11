@@ -7,10 +7,8 @@ import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { Tag } from "../components/ui/tag";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
-import { buildPublishedBriefPath, latestPublishedBrief, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { getOrderedRegimeLegend } from "../../lib/regimePresentation";
-import { getPlaybookForRegime } from "../../lib/playbook";
 import { formatDateUTC } from "../../lib/formatters";
 import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCE_RUBRIC, ADVICE_STANCES } from "../../lib/adviceStance";
 import {
@@ -19,7 +17,6 @@ import {
   canonChangeLines,
   canonEssays,
   describeCanonBaseRate,
-  essaysWrittenIn,
   formatCanonAuthors,
   formatCanonPublished,
   formatCanonShare,
@@ -243,16 +240,6 @@ export default function ProductCanonPage() {
       : [],
   );
 
-  const thisWeek = latestPublishedBrief
-    ? {
-        conditions: publishedBriefDisplay(latestPublishedBrief).conditions,
-        publishedLabel: formatDateUTC(latestPublishedBrief.publishedAt),
-        href: buildPublishedBriefPath(latestPublishedBrief.slug),
-        essays: essaysWrittenIn(timeline, latestPublishedBrief.regime),
-        monthsInConditions: baseRate.rows.find((row) => row.regime === latestPublishedBrief.regime)?.months ?? 0,
-      }
-    : null;
-
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
@@ -356,36 +343,6 @@ export default function ProductCanonPage() {
         </SecondaryPageSection>
       ) : null}
 
-      {thisWeek ? (
-        <SecondaryPageSection
-          title={`Written in conditions like this week's: ${thisWeek.conditions}`}
-          description={`This week's guidance, published ${thisWeek.publishedLabel}, is for ${thisWeek.conditions} conditions. These were published in ${thisWeek.conditions} months.`}
-          actions={
-            <ActionLink href={thisWeek.href} variant="pill">
-              Read this week&rsquo;s guidance
-            </ActionLink>
-          }
-        >
-          {thisWeek.essays.length > 0 ? (
-            <ul className="space-y-2 text-base text-slate-300">
-              {thisWeek.essays.map((essay) => (
-                <li key={essay.slug}>
-                  <a href={`#${essay.slug}`} className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">
-                    {essay.title}
-                  </a>{" "}
-                  — {formatCanonAuthors(essay)}, {formatCanonPublished(essay)}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-base text-slate-300">
-              None of these was published in a {thisWeek.conditions} month, across the{" "}
-              {monthsLabel(thisWeek.monthsInConditions)} of {thisWeek.conditions} on record.
-            </p>
-          )}
-        </SecondaryPageSection>
-      ) : null}
-
       <SecondaryPageSection
         title="The list, oldest first"
         description="The date is first publication. If an essay later became a book, the note says which version the date refers to."
@@ -425,7 +382,7 @@ export default function ProductCanonPage() {
                    and every entry was fully laid out on load. The intrinsic
                    size is the estimate the scrollbar uses before an entry
                    renders; `auto` remembers the real one after. Anchor links
-                   from "this week" above still land: the browser renders a
+                   from the pairs above still land: the browser renders a
                    targeted entry even while it is skipped. */
                 className="grid gap-x-8 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] @xl:grid-cols-[10rem_minmax(0,1fr)]"
               >
@@ -506,33 +463,11 @@ export default function ProductCanonPage() {
         </ul>
       </SecondaryPageSection>
 
-      <SecondaryPageSection
-        title="What the four conditions mean"
-        description="The four words this week's guidance uses. Each pairs the work it rewards with the work it punishes."
-      >
-        <ul className="space-y-3 text-sm text-slate-300">
-          {getOrderedRegimeLegend().map((entry) => {
-            const playbook = getPlaybookForRegime(entry.regime);
-            return (
-              <li key={entry.regime} className="space-y-1">
-                <p>
-                  <span className="text-slate-100">{entry.label}.</span> {entry.weatherRationale}
-                </p>
-                {playbook ? (
-                  <>
-                    <p className="text-slate-400">{playbook.insight}</p>
-                    <p className="text-slate-400">
-                      <span className="text-slate-300">Do more:</span> {playbook.start.slice(0, 2).join(" · ")}.{" "}
-                      <span className="text-slate-300">Do less:</span> {playbook.stop.slice(0, 2).join(" · ")}.
-                    </p>
-                  </>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-      </SecondaryPageSection>
-
+      {/* Two sections went on 2026-11-11. "Written in conditions like this week's"
+          listed the texts in this week's conditions: the table's row for them,
+          again. "What the four conditions mean" glossed the weather words with the
+          brief's do-more and do-less lists, which /trust#formula-reference and the
+          brief carry; the plane above draws the four on their two lines. */}
       <SecondaryPageSection title="Sources">
         <ul className="space-y-2 text-base text-slate-300">
           <li>

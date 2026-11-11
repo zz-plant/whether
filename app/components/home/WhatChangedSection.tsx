@@ -291,7 +291,12 @@ export function WhatChangedSection({
                            what that leaves the reader with; this says why, with the
                            uncapped number, under the ladder that has the width. */
                         <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
-                          This is as high as the score goes. Uncapped it would be {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
+                          {/* The meaning beside it already says the score is at its top when it
+                              held there (2026-11-11), so the note gives only the uncapped number. */}
+                          {!comparisonUnavailable && (meanings.get(row.key) ?? meaningOf(row, basis)).capped
+                            ? null
+                            : "This is as high as the score goes. "}
+                          Uncapped it would be {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
                         </p>
                       ) : null}
                     </div>

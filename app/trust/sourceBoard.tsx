@@ -73,7 +73,8 @@ export function SourceBoard({
     <ReportSection
       id="source-board"
       title="Sources and last update"
-      description="Each feed behind the scores: whether this reading came from it live, how often it updates, and when it last did."
+      /* No description (2026-11-11): it named the row's columns (live or not, cadence,
+         last update), which each row prints under the source's name. */
     >
       <ul className="@container divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
         {rows.map((row) => (

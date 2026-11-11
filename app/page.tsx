@@ -28,7 +28,7 @@ import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { describeMarketMoveScale, describeScoreMoveRanges } from "../lib/report/marketMoveScale";
-import { describeGuidanceChange, describeMovementCause, buildStandupLine } from "../lib/report/decisionMovement";
+import { describeGuidanceChange, describeMovementCause } from "../lib/report/decisionMovement";
 import { anyPauseLineMet } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -55,10 +55,7 @@ import { RecordSection } from "./components/home/RecordSection";
 import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
-import { ShareLinks } from "./components/home/ShareLinks";
 import { ShareBriefButton } from "./components/shareBriefButton";
-import { CopyStandupButton } from "./components/CopyStandupButton";
-import { CopyExecSummaryButton } from "./components/CopyExecSummaryButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
   HOME_DECISION_PARAM,
@@ -593,19 +590,6 @@ async function PageContent({
     movement: decisionMovement,
     regimeChanged: homepage.weeklyDecisionCardModel.decision.reportDynamics.regimeChanged,
   });
-  /* The week's one-line standup, for the quick-copy pill: what the guidance did
-     this week and what would change it, in one pasteable line. */
-  const standupLine = buildStandupLine({
-    regime,
-    change: guidanceChange,
-    weeklyCall: homepage.weeklyCall,
-    assessment: reportData.assessment,
-  });
-  /* A three-bullet executive summary for a leadership email or Monday sync, from
-     the same brief lines the share panel copies. */
-  const execSummaryText = briefShareLines && briefShareLines.length > 0
-    ? briefShareLines.map((line) => `• ${line}`).join("\n")
-    : primaryCall;
   const quietWeek =
     !historicalSelection
     && !savedCopy
@@ -826,8 +810,6 @@ async function PageContent({
               <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">
                   <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} showLabel />
-                  <CopyStandupButton text={standupLine} />
-                  <CopyExecSummaryButton text={execSummaryText} />
                   <CopyImageCardButton />
                   {/* The core loop, beside the artifact rather than 4,000px below
                       it: the alert is what a quiet week is for. */}
@@ -863,15 +845,10 @@ async function PageContent({
               })}
             >
               <RunwayFold regime={regime} isHistorical={Boolean(historicalSelection)} />
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <div>
                 <ActionLink href={operateHref} variant="primary">
                   {cadenceCall?.planLabel ?? "Build this week’s plan →"}
                 </ActionLink>
-                {!historicalSelection && homeAreaRows.some((row) => row.pause?.met) ? (
-                  <ActionLink id="what-you-may-hear" href="/roles#decision-conversations" variant="inline">
-                    Sample conversations about pause rules
-                  </ActionLink>
-                ) : null}
               </div>
               {/* The formats a reader with one of these roles came for, named. They sat
                   behind "Share or embed this" at the foot of the page. After the areas
@@ -976,9 +953,6 @@ async function PageContent({
                 meant to be used, so it follows everything it watches. */}
             <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
 
-            {/* Last, as a line rather than a section: the way out to every share
-                format, and the week's published brief. */}
-            <ShareLinks currentRecordDate={reportData.treasury.record_date} />
         </div>
       </div>
 

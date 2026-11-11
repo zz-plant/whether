@@ -9,11 +9,12 @@ import { decisionAreaLabel, decisionAreaOrder, type DecisionArea } from "../repo
  * skims and a crawler reads as structure, and six identical ones say the pages
  * are six copies of a template, which is close to what they were.
  *
- * Three stay fixed on purpose. "Copy this answer" labels a button, "Citation"
- * a provenance block and "Related pages" the links onward; each is the same
- * thing on every page, and inventing per-page wording for them would be
- * decoration, not structure. The others are built from the page's own heading,
- * decision areas, and threshold focus.
+ * Two stay fixed on purpose. "Citation" labels a provenance block and "Related
+ * pages" the links onward; each is the same thing on every page, and inventing
+ * per-page wording for them would be decoration, not structure. The others are
+ * built from the page's own heading, decision areas, and threshold focus. A
+ * third, "Copy this answer", headed a second copy button and went with it
+ * (2026-11-11): the page's one copy button sits under the answer card.
  */
 type AnswerSectionHeadingInput = {
   applyHeading: string;
@@ -41,8 +42,6 @@ const joinAreas = (areas: readonly DecisionArea[]): string => {
 };
 
 export const buildAnswerSectionHeadings = (page: AnswerSectionHeadingInput) => ({
-  /** Labels the copy button. The same affordance on every page. */
-  copy: "Copy this answer",
   /**
    * Written per page (`applyHeading` in content/answers/pages.json). It was
    * "What this means for {audience}", which named who reads the section rather

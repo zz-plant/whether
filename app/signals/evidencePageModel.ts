@@ -107,7 +107,8 @@ export const focusLabelByTab: Record<FocusTab, string> = {
 /** The page's sections, in the order a reader answers their questions. */
 const signalsSectionLinks = [
   { href: "#what-changed", label: "What changed" },
-  { href: "#instruments", label: "Deeper evidence" },
+  /* The section's own heading: the outline called it "Deeper evidence" over a heading that said this. */
+  { href: "#instruments", label: "Charts, past months and checks" },
 ];
 
 /* The site node comes from `graph`, so `isPartOf` names it by id; it was an inline WebSite with

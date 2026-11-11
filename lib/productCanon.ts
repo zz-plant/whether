@@ -808,10 +808,6 @@ export const describeCanonBaseRate = (baseRate: CanonBaseRate): string => {
   return `${verdict} With ${expand.of + conserve.of} capital texts, ${swing}.`;
 };
 
-/** Essays written in the given conditions, oldest first. */
-export const essaysWrittenIn = (timeline: readonly CanonTimelineEntry[], regime: RegimeKey) =>
-  timeline.filter((entry) => entry.reading.kind === "reading" && entry.reading.regime === regime);
-
 /** "A", "A and B", "A, B and C"; a memo the firm signed is bylined to the firm, and a partner's memo adds the firm. */
 export const formatCanonAuthors = (essay: Pick<CanonEssay, "authors"> & { firm?: string }) => {
   const people =

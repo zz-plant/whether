@@ -668,19 +668,6 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.doesNotMatch(watch, /href="#subscribe"/);
   });
 
-  /* Sharing is the page's last line: the way out to /share and the published brief,
-     with no heading over them (2026-10-09). The plan link closes the areas section,
-     and the decision record is in the footer ("Your decisions"). */
-  it("keeps the closing line to the share link and the published brief", () => {
-    const { ShareLinks } = require("../app/components/home/ShareLinks");
-    const html = renderToStaticMarkup(<ShareLinks currentRecordDate="2026-09-28" />);
-    assert.doesNotMatch(html, /<h2/, "no section heading over two links");
-    assert.doesNotMatch(html, /href="\/operate"/, "the plan link is the areas section's");
-    assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant|Subscribe/);
-    const { pagesInGroup } = require("../lib/navigation/informationArchitecture");
-    assert.ok(pagesInGroup("decide").some((page: { href: string }) => page.href === "/decisions"), "the decision record stays in the Plan group's row and the footer");
-  });
-
   it("deep-links AreaTable consequence rows to #ops-monthly-action-summary on /operate", () => {
     const { toRoute } = require("../lib/navigation/routeType");
     const html = renderToStaticMarkup(

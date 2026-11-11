@@ -44,14 +44,9 @@ export function RecordSection({
         <>
           {/* The count under each condition; the band itself is the frame's now, under the
               navigation, and a second strip here drew the record twice (2026-11-10). */}
+          {/* No sampling note under the counts (2026-11-11): the record band's own caption
+              says its fields are month-end readings, a scroll above. */}
           <MonthStrip entries={record} band={false} />
-          {/* Two sampling conventions on one page: the headline is this week's
-              reading, the record behind this band is month-end readings. Said
-              once, under the band, because a reader comparing the two would
-              otherwise read the difference as a data gap (2026-10-22). */}
-          <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-400" data-record-sampling>
-            The band is the climate, read at each month-end. The guidance above is this week&rsquo;s weather.
-          </p>
         </>
       ) : null}
       {/* How long spells last beside the last few changes, wherever the column holds

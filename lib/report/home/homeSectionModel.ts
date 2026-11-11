@@ -81,8 +81,8 @@ export const buildHomeDecisionCookie = (area: DecisionArea | null): string =>
  * the plan before the evidence. `areas` keeps the id the old "What that changes for
  * you" section had, so a link to it still lands on the areas. The diagnosis heading
  * carries the week's weather word, so it is passed by the route, not stored here.
- * Sharing is the page's last line, not a section: a heading over one link
- * (`ShareLinks`).
+ * Sharing is the action row under the card and the header's share panel; the page
+ * has no share section or closing share line (2026-11-11).
  */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },

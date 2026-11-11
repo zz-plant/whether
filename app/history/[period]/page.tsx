@@ -23,7 +23,6 @@ import {
   buildPostureArchivePath,
   findPostureArchivePeriod,
   postureArchiveStaticParams,
-  postureArchiveYears,
   type PostureArchivePeriod,
 } from "../../../lib/summary/postureArchive";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
@@ -234,9 +233,8 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         )}
       />
 
-      {/* The breadcrumbs above already reach the brief, /history and the parent
-          year, so the pill row that repeated them is gone; the closing section
-          carries the one call to the current brief. One regime tag over the
+      {/* The breadcrumbs above already reach /history and the parent year, and the
+          header reaches the brief, so the pill row that repeated them is gone. One regime tag over the
           title: the status tag, an "Archived Period" mark, the glyph and a
           "this record does not change" line were four more statements that the
           period is closed. */}
@@ -289,12 +287,14 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         </section>
       ) : null}
 
-      {period.regimeMix.length ? (
+      {/* The split and its changes, in one section (2026-11-11). A period that held one
+          condition throughout has none: its headline sentence ("Sunny for all 12 monthly
+          readings.") already says so, and a split of one row and a "held for the whole
+          period" section under it said it twice more. The "Derived from N readings"
+          caption went too; each row carries its "of N". */}
+      {period.regimeMix.length > 1 || period.transitions.length ? (
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">How the period split</h2>
-          <p className="text-sm text-slate-300">
-            Derived from {period.sampleCount} {cadenceNoun(period)} inside {period.title}.
-          </p>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.regimeMix.map((share) => (
               <li key={share.regime} className="flex flex-wrap items-center justify-between gap-2">
@@ -307,34 +307,24 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
-
-      {period.transitions.length ? (
-        <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
-          <ul className="space-y-2 text-sm text-slate-300">
-            {period.transitions.map((transition) => (
-              <li key={transition.asOf} className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-slate-100">{transition.dateLabel}</span>
-                <span className="inline-flex flex-wrap items-center gap-1.5">
-                  <ConditionLabel regime={transition.from}>{toWeatherLabel(transition.fromLabel)}</ConditionLabel>
-                  <span aria-hidden="true">→</span>
-                  <span className="sr-only">to</span>
-                  <ConditionLabel regime={transition.to}>{toWeatherLabel(transition.toLabel)}</ConditionLabel>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : period.regimeMix.length === 1 ? (
-        /* Only where every reading inside the period says so. /history/2011 printed
-           it with no readings at all, above its own Sunny Q1 and Q2. */
-        <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
-          <p className="text-sm text-slate-300">
-            Conditions held at {toWeatherLabel(period.regimeMix[0].label)} for the whole period.
-          </p>
+          {period.transitions.length ? (
+            <>
+              <h3 className="pt-2 text-sm font-semibold text-slate-100">Changes in conditions</h3>
+              <ul className="space-y-2 text-sm text-slate-300">
+                {period.transitions.map((transition) => (
+                  <li key={transition.asOf} className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold text-slate-100">{transition.dateLabel}</span>
+                    <span className="inline-flex flex-wrap items-center gap-1.5">
+                      <ConditionLabel regime={transition.from}>{toWeatherLabel(transition.fromLabel)}</ConditionLabel>
+                      <span aria-hidden="true">→</span>
+                      <span className="sr-only">to</span>
+                      <ConditionLabel regime={transition.to}>{toWeatherLabel(transition.toLabel)}</ConditionLabel>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </section>
       ) : null}
 
@@ -388,13 +378,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
               </li>
             ))}
           </ul>
-          <p className="text-xs text-slate-400">
-            These come from the{" "}
-            <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-              product management reading list
-            </Link>
-            . It places each title on the conditions of the month it came out.
-          </p>
         </section>
       ) : null}
 
@@ -420,6 +403,14 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         </section>
       ) : null}
 
+      {/* The page ends on its neighbours and one line to the current brief (2026-11-11).
+          A "Browse another year" grid of fourteen pills repeated /history's year line,
+          one breadcrumb away, and "What are conditions now?" was a heading and a solid
+          button over the one link a closed record owes the brief. */}
+      <p className="text-sm text-slate-300">
+        {period.title} is a closed record.{" "}
+        <ActionLink href="/" variant="inline">This week&apos;s brief</ActionLink> has the current conditions.
+      </p>
       <nav aria-label="Adjacent periods" className="flex flex-wrap gap-2">
         {previous ? (
           <ActionLink href={buildPostureArchivePath(previous.slug)} variant="ghost">
@@ -432,33 +423,6 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           </ActionLink>
         ) : null}
       </nav>
-
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Browse another year</h2>
-        <ul className="flex flex-wrap gap-2">
-          {postureArchiveYears.map((year) => (
-            <li key={year.slug}>
-              <ActionLink
-                href={buildPostureArchivePath(year.slug)}
-                variant="pill"
-                aria-current={year.slug === period.slug ? "page" : undefined}
-              >
-                {year.title}
-              </ActionLink>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What are conditions now?</h2>
-        <p className="text-sm text-slate-300">
-          {period.title} is a closed record. The weekly brief has the current conditions, this week&apos;s move and the lines that would change it.
-        </p>
-        <ActionLink href="/" variant="primary">
-          Open this week&apos;s brief
-        </ActionLink>
-      </section>
     </ContentPageShell>
   );
 }

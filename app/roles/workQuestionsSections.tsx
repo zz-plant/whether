@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { RegimeKey } from "../../lib/regimeEngine";
-import { getRegimePublicLabel, getRegimeWeatherRationale } from "../../lib/regimePresentation";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import {
   buildWorkSituationsCopy,
   STARTING_QUESTION,
@@ -38,9 +38,8 @@ export function ConditionQuestionsSection({
   return (
     <section className={panel} data-testid="condition-questions">
       <h2 className="text-lg font-semibold text-slate-100">What might come up in {getRegimePublicLabel(regime)} conditions</h2>
-      <p className="text-sm text-slate-300">
-        {getRegimeWeatherRationale(regime)} We wrote these as examples. They are not quotes or survey results.
-      </p>
+      {/* No rationale line: every page this prints on states the conditions under its heading. */}
+      <p className="text-sm text-slate-300">We wrote these as examples. They are not quotes or survey results.</p>
       <ul className="space-y-3">
         {questions.map(({ who, question, roleHref, tool }) => (
           <li key={question} className="space-y-1 border-t border-[color:var(--border-faint)] pt-3">
@@ -84,7 +83,8 @@ export function WorkSituationsSection({ situations, pagePath }: { situations: re
         copyText={buildWorkSituationsCopy(situations)}
         copyTarget="Questions to be ready for"
         telemetryEvent={{ pagePath, cluster: "authority", intent: "vp-product", ctaId: "copy_work_questions" }}
-        className="weather-button-primary inline-flex min-h-11 items-center justify-center px-4 py-2 text-sm font-semibold"
+        /* Secondary: the leadership questions' copy button below is the page's one solid action. */
+        className="weather-button inline-flex min-h-11 items-center justify-center px-4 py-2 text-sm font-semibold"
       />
     </section>
   );

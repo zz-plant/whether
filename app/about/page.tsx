@@ -66,10 +66,8 @@ export default function AboutPage() {
         <p className="text-base text-slate-300">
           Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
         </p>
-      </section>
-
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="type-section">How it works</h2>
+        {/* One section under the h1 (2026-11-11): "How it works" was an h2 directly
+            under "How Whether works", the same heading twice in a row. */}
         <p className="text-base text-slate-300">
           Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a
           score at which to restart. The two are set apart, so a small move back won&rsquo;t restart anything.
@@ -184,9 +182,6 @@ export default function AboutPage() {
           <ActionLink href="/trust" variant="pill">
             Sources and formulas
           </ActionLink>
-          <ActionLink href="/history" variant="pill">
-            All past guidance
-          </ActionLink>
         </div>
       </section>
 
@@ -199,9 +194,6 @@ export default function AboutPage() {
         <div className="flex flex-wrap gap-2 pt-1">
           <ActionLink href={publisherContactPath} variant="primary">
             Contact
-          </ActionLink>
-          <ActionLink href="/" variant="pill">
-            This week&apos;s brief
           </ActionLink>
         </div>
       </section>

@@ -32,13 +32,13 @@ const slotLabelClass = (slot: keyof typeof DECISION_SLOT_TONE) =>
  * The method: an action, a pause line and a restart line, written down before the
  * action begins. It was the last section of /trust ("How to use the thresholds"),
  * a page a reader opens to check whether this week's reading is current, where
- * the product's thesis read as an appendix. It sits on /about beside "How it
- * works", in the vocabulary every screen uses (pause and resume
+ * the product's thesis read as an appendix. It sits on /about under the intro
+ * that says how Whether works, in the vocabulary every screen uses (pause and resume
  * lines, not threshold and reversal). /threshold redirects to #method and
  * /template to #template; /trust keeps a one-line link.
  *
- * "How it works", directly above, already names the three parts, so
- * this section opens on them filled in rather than defining them again.
+ * The intro, directly above, already names the three parts, so this
+ * section opens on them filled in rather than defining them again.
  */
 export function MethodSection() {
   return (
@@ -66,43 +66,25 @@ export function MethodSection() {
         />
       </section>
 
-      {/* Folded: the definitions and the essay explain a method (§XII: the
-          explanation behind a claim folds; the claim does not). Native <details>,
-          so the text stays server-rendered and find-in-page and a search engine
-          still reach it. */}
+      {/* Folded: the essay explains a method (§XII: the explanation behind a
+          claim folds; the claim does not). Native <details>, so the text stays
+          server-rendered and find-in-page and a search engine still reach it.
+          The three definition cards that opened it went on 2026-11-11: they
+          defined the action and the two lines a second time, after the intro
+          and the worked example above. */}
       <details className="weather-auto-chevron group">
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-          How the three parts work
+          Agree on them in advance
         </summary>
-        <div className="mt-4 space-y-8">
-          <section className="space-y-4">
-            <div className="grid gap-4">
-              <div className="weather-surface px-4 py-4 space-y-2">
-                <p className={slotLabelClass("action")}>{DECISION_CONTRACT_LABELS.slot.action}</p>
-                <p className="text-base text-slate-200">The commitment you will make this week.</p>
-              </div>
-              <div className="weather-surface px-4 py-4 space-y-2">
-                <p className={slotLabelClass("threshold")}>{DECISION_CONTRACT_LABELS.slot.threshold}</p>
-                <p className="text-base text-slate-200">The measurable condition for pausing that commitment.</p>
-              </div>
-              <div className="weather-surface px-4 py-4 space-y-2">
-                <p className={slotLabelClass("reversal")}>{DECISION_CONTRACT_LABELS.slot.reversal}</p>
-                <p className="text-base text-slate-200">The condition that must be met before you restart.</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-fluid-lg font-semibold text-slate-100">Agree on them in advance</h3>
-            <p className="text-base text-slate-300 leading-relaxed">
-              Write down when you would pause and when you would restart before committing cash. When either
-              happens, review the decision against the condition you agreed on.
-            </p>
-            <p className="text-base text-slate-300 leading-relaxed">
-              They give you a reason to review a decision. They cannot establish that it is right or safe;
-              check your cash position and the costs of stopping or restarting.
-            </p>
-          </section>
+        <div className="mt-4 space-y-4">
+          <p className="text-base text-slate-300 leading-relaxed">
+            Write down when you would pause and when you would restart before committing cash. When either
+            happens, review the decision against the condition you agreed on.
+          </p>
+          <p className="text-base text-slate-300 leading-relaxed">
+            They give you a reason to review a decision. They cannot establish that it is right or safe;
+            check your cash position and the costs of stopping or restarting.
+          </p>
         </div>
       </details>
 

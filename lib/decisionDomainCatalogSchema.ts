@@ -63,7 +63,6 @@ const toolkitDefinitionSchema = z.object({
   instruments: z.array(z.string()),
   runSequence: z.array(runSequenceStepSchema),
   misuseCases: z.array(z.string()),
-  canonLinks: z.array(linkSchema),
 });
 
 const failureModeDefinitionSchema = z.object({

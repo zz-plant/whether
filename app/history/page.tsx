@@ -1,6 +1,5 @@
 import { ScreenshotCaption } from "../components/screenshotCaption";
 import Link from "next/link";
-import { ActionLink } from "../components/ui/actionLink";
 import { Tag } from "../components/ui/tag";
 import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { UrlDetails } from "../components/ui/urlDetails";
@@ -26,8 +25,8 @@ import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ConditionIcon, ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
-import { ComparePanel } from "../history/compare/ComparePanel";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { buildPageMetadata } from "../../lib/seo";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
@@ -48,6 +47,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string; compare?: string; yearA?: string; monthA?: string; yearB?: string; monthB?: string };
+
+const COMPARE_KEYS = ["yearA", "monthA", "yearB", "monthB"] as const;
 
 /** "Sep and Oct 2026", or "Dec 2025 and Jan 2026" across a year's end. */
 const formatMonthList = (months: readonly string[]) => {
@@ -82,6 +83,18 @@ export default async function HistoryPage({
   searchParams?: Promise<HistorySearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
+  /* The comparison opened inside a fold here, a third way to /history/compare beside
+     the sub-tab and the explorer, and its period pickers left for that page anyway
+     (2026-11-11). A link kept from the fold still lands on the comparison. */
+  if (resolvedSearchParams?.compare === "1" || COMPARE_KEYS.some((key) => resolvedSearchParams?.[key])) {
+    const query = new URLSearchParams();
+    for (const key of COMPARE_KEYS) {
+      const value = resolvedSearchParams?.[key];
+      if (value) query.set(key, value);
+    }
+    const search = query.toString();
+    redirect(search ? `/history/compare?${search}` : "/history/compare");
+  }
   const regimeSeries = getTimeMachineRegimeSeries();
   const statsSeries = getTimeMachineRegimeSeries(60);
   // The whole record, not a trailing window. "Months on record: 60" next to
@@ -129,9 +142,6 @@ export default async function HistoryPage({
    * ItemList naming the 82 archive periods and every published week that hang
    * off it. Until now the largest cluster in the sitemap had no declared parent.
    */
-  const compareOpen = Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1");
-  const compareContent = compareOpen ? await ComparePanel({ searchParams: resolvedSearchParams }) : null;
-
   const structuredData = buildHistoryStructuredData({
     /* The year strip below is what this page links; the quarters are reachable
        from their parent year. Declaring them here would name URLs the rendered
@@ -240,14 +250,13 @@ export default async function HistoryPage({
               })}
             </ul>
           </div>
+          {/* No pointer to the briefs below and no "Prepare a board decision note" link
+              (2026-11-11): the briefs are the next section, and the record's export is the
+              Track record's "Copy the record summary". */}
           <p className="max-w-prose text-sm text-slate-300">
             These months are scored with today&rsquo;s formula. They don&rsquo;t show what we said at
-            the time or what any company did. For what we published, use the dated briefs below.
+            the time or what any company did.
           </p>
-          {/* One link (2026-10-27). "Compare funding conditions across periods" and "Read
-              the current weekly brief" sat beside it, both already in the page's own tabs
-              and the site's, and the compare page a third time in the fold below. */}
-          <ActionLink href="/answers/how-to-brief-executives-on-market-conditions" variant="inline">Prepare a board decision note</ActionLink>
         </section>
       ) : null}
 
@@ -267,12 +276,10 @@ export default async function HistoryPage({
                 append-only rule is the guarantee worth stating. The readings go
                 unnumbered (2026-10-09): their count and window are the track
                 record's "Months on record" tile, and this line printed them a
-                second time ("177 month-end readings, Jan 2012 to Sep 2026"). */}
-            <p className="text-sm text-slate-300">
-              {publishedBriefs.length === 1
-                ? `We keep every weekly brief, next to the monthly readings, and never edit one after it's published.`
-                : `${publishedBriefs.length} weekly briefs, next to the monthly readings. We never edit a brief after it's published.`}
-            </p>
+                second time ("177 month-end readings, Jan 2012 to Sep 2026"). The count of
+                briefs went too (2026-11-11): the record band above prints it, and the rows
+                below list them. */}
+            <p className="text-sm text-slate-300">We never edit a brief after it&rsquo;s published.</p>
           </div>
           <PublishedWeeks briefs={publishedBriefs} />
           {/* Where the two records name different conditions for one month: both facts,
@@ -381,18 +388,6 @@ export default async function HistoryPage({
           allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
         />
       </div>
-
-      <UrlDetails
-        queryKey="compare"
-        initialOpen={Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1")}
-        className="weather-auto-chevron weather-panel px-5 py-4"
-        summaryClassName="cursor-pointer select-none text-fluid-sm font-medium text-white/70"
-        summary={<span>Compare two periods side by side</span>}
-      >
-        <div className="mt-4">
-          {compareOpen ? compareContent : <ActionLink href="/history/compare" variant="inline">Open the full comparison</ActionLink>}
-        </div>
-      </UrlDetails>
 
       <UrlDetails
         queryKey="explore"

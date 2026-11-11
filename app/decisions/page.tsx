@@ -58,7 +58,7 @@ export default async function DecisionsPage() {
           said what the first section's description says in full. */}
       <SecondaryPageHeader
         title="Your decision record"
-        description="Every decision you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed."
+        description="Every decision you recorded, checked against this week's reading."
       />
       <SecondaryPageSection
         title="Recorded from this browser"
@@ -72,10 +72,10 @@ export default async function DecisionsPage() {
           record={recordSeries}
         />
       </SecondaryPageSection>
-      <SecondaryPageSection
-        title="Take it with you"
-        description="It's your record. Download it in a format other tools can read."
-      >
+      {/* No caption under the heading (2026-11-11): "It's your record. Download it in
+          a format other tools can read" said what the buttons and the paragraph under
+          them say. */}
+      <SecondaryPageSection title="Take it with you">
         <DecisionRecordDownloads />
         <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
           The CSV is one row per decision, for a spreadsheet. The JSON file is one line per decision, oldest
