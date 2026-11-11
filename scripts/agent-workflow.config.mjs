@@ -160,7 +160,7 @@ export const TOOL_HINTS = [
     id: "page-load",
     keywords: ["page load", "load time", "ttfb"],
     command: "python3 scripts/perf/audit_page_load_times.py",
-    why: "curl timings for production routes, printed as JSON. Seven of its eight URLs now redirect, so update its URL list first.",
+    why: "curl timings for production routes, printed as JSON.",
   },
   {
     id: "ledger-token",
