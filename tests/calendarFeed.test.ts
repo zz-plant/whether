@@ -65,6 +65,30 @@ describe("calendar feed", () => {
     assert.ok(!body.includes(`UID:upcoming-${recordedStamp}@whether.work`), "a Monday with its own record is not");
   });
 
+  /* The week of Nov 9, 2026 read from the live feed on Nov 11 with no event at all: the
+     marker had moved on to Nov 16 at midnight on Nov 9, and the week's record waits on
+     Thursday's freeze. A subscriber opening the calendar on a Monday saw an empty day. */
+  it("keeps marking this Monday until its own record exists", () => {
+    const latest = [...briefs].sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
+    assert.ok(latest, "the archive has at least one week");
+    const recorded = new Date(`${latest.recordDate}T12:00:00Z`);
+    const thisMonday = new Date(recorded);
+    thisMonday.setUTCDate(recorded.getUTCDate() - ((recorded.getUTCDay() + 6) % 7) + 7);
+    const wednesday = new Date(thisMonday);
+    wednesday.setUTCDate(thisMonday.getUTCDate() + 2);
+    const nextMonday = new Date(thisMonday);
+    nextMonday.setUTCDate(thisMonday.getUTCDate() + 7);
+    const stamp = (date: Date) => date.toISOString().slice(0, 10).replace(/-/g, "");
+
+    const body = unfold(buildBriefCalendarFeed(briefs, wednesday));
+    const marker = body
+      .split("BEGIN:VEVENT")
+      .find((chunk) => chunk.includes(`UID:upcoming-${stamp(thisMonday)}@whether.work`));
+    assert.ok(marker, `the Monday after ${latest.slug} is still marked in its own week`);
+    assert.ok(marker.includes(`DTSTART;VALUE=DATE:${stamp(thisMonday)}`));
+    assert.ok(body.includes(`UID:upcoming-${stamp(nextMonday)}@whether.work`), "and so is the Monday after it");
+  });
+
   it("serves the feed as text/calendar", async () => {
     const response = GET();
     assert.equal(response.headers.get("content-type"), "text/calendar; charset=utf-8");
