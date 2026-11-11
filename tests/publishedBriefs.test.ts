@@ -5,6 +5,7 @@ import {
   buildPublishedBriefSlug,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
+  findUnpublishedWeeks,
   getPublishedBriefs,
   groupPublishedBriefRuns,
   publishedBriefRunLabel,
@@ -176,7 +177,12 @@ describe("published brief runs", () => {
     for (const [index, run] of runs.entries()) {
       const next = runs[index + 1]?.[0];
       const last = run.at(-1);
-      if (next && last) assert.ok(next.regime !== last.regime || next.summary !== last.summary, "a run ends where the guidance changes");
+      if (next && last) {
+        assert.ok(
+          next.regime !== last.regime || next.summary !== last.summary || findUnpublishedWeeks(next, last).length > 0,
+          "a run ends where the guidance changes or a week has no brief",
+        );
+      }
     }
   });
 

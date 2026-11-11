@@ -23,8 +23,10 @@ import {
   buildPublishedBriefTitle,
   buildPublishedBriefSlackUpdate,
   buildPublishedBriefBoardUpdate,
+  describeUnpublishedWeeks,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
+  findUnpublishedWeeks,
   labelForArea,
   latestPublishedBrief,
   publishedBriefDisplay,
@@ -152,6 +154,12 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const headline = publishedBriefHeadline(brief);
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
+  /* The weeks the two links pass over, in the links' order (2026-11-11): w41's next week
+     read "Week of Oct 26, 2026" with nothing saying Oct 12 and Oct 19 have no brief. */
+  const unpublished = [
+    previous ? describeUnpublishedWeeks(findUnpublishedWeeks(previous, brief)) : null,
+    next ? describeUnpublishedWeeks(findUnpublishedWeeks(brief, next)) : null,
+  ].filter((line): line is string => line !== null);
   /* A newer week is frozen, so this one is no longer the current guidance. */
   const superseded = Boolean(next && latestPublishedBrief && latestPublishedBrief.slug !== brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
@@ -485,17 +493,24 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       </article>
 
       {previous || next ? (
-        <nav aria-label="Adjacent weeks" className="flex flex-wrap gap-2">
-          {previous ? (
-            <ActionLink href={buildPublishedBriefPath(previous.slug)} variant="ghost">
-              ← Week of {publishedBriefWeekLabel(previous)}
-            </ActionLink>
-          ) : null}
-          {next ? (
-            <ActionLink href={buildPublishedBriefPath(next.slug)} variant="ghost">
-              Week of {publishedBriefWeekLabel(next)} →
-            </ActionLink>
-          ) : null}
+        <nav aria-label="Adjacent weeks" className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {previous ? (
+              <ActionLink href={buildPublishedBriefPath(previous.slug)} variant="ghost">
+                ← Week of {publishedBriefWeekLabel(previous)}
+              </ActionLink>
+            ) : null}
+            {next ? (
+              <ActionLink href={buildPublishedBriefPath(next.slug)} variant="ghost">
+                Week of {publishedBriefWeekLabel(next)} →
+              </ActionLink>
+            ) : null}
+          </div>
+          {unpublished.map((line) => (
+            <p key={line} className="text-fluid-sm text-slate-400" data-unpublished-weeks>
+              {line}
+            </p>
+          ))}
         </nav>
       ) : null}
 
