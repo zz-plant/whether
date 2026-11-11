@@ -109,24 +109,34 @@ const briefEvent = (brief: PublishedBrief) => {
 };
 
 /**
- * The feed: the latest frozen weeks, newest first, and the coming Monday as a
- * marker until its own record replaces it. The marker names no conditions,
- * because none have been read yet.
+ * The feed: the latest frozen weeks, newest first, and a marker on the coming
+ * Monday and on this week's Monday until each one's own record replaces it.
+ * The marker names no conditions and links to `/`, which carries the week
+ * until its freeze lands.
+ *
+ * Only the coming Monday was marked, so the marker left a Monday at midnight
+ * on that Monday, and the week's record arrives with Thursday's freeze: every
+ * subscriber's calendar was empty on the day it promised that week's guidance.
+ * A week whose freeze never lands keeps the marker only while it is this week,
+ * since `/` no longer carries it after that.
  */
 export const buildBriefCalendarFeed = (briefs: readonly PublishedBrief[], now: Date): string => {
   const recent = [...briefs].sort((a, b) => b.recordDate.localeCompare(a.recordDate)).slice(0, FEED_WEEKS);
-  const nextMonday = new Date(mondayOf(now).valueOf() + 7 * DAY_MS);
+  const thisMonday = mondayOf(now);
+  const nextMonday = new Date(thisMonday.valueOf() + 7 * DAY_MS);
   const covered = new Set(recent.map((brief) => compactDate(mondayOf(brief.recordDate))));
-  const upcoming = covered.has(compactDate(nextMonday))
-    ? []
-    : allDayEvent({
-        uid: `upcoming-${compactDate(nextMonday)}@whether.work`,
+  const upcoming = [nextMonday, thisMonday]
+    .filter((monday) => !covered.has(compactDate(monday)))
+    .flatMap((monday) =>
+      allDayEvent({
+        uid: `upcoming-${compactDate(monday)}@whether.work`,
         stamp: now,
-        monday: nextMonday,
+        monday,
         summary: "Whether: this week's guidance is out",
         description: `The week's conditions, guidance, and pause and restart lines.\n\n${buildCanonicalUrl("/")}`,
         url: buildCanonicalUrl("/"),
-      });
+      }),
+    );
 
   return [
     "BEGIN:VCALENDAR",
