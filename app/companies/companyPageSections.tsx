@@ -2,7 +2,7 @@ import { ActionLink } from "../components/ui/actionLink";
 import { findLeadAnswerForArea } from "../answers/decisionPages";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { COMPANIES, type CompanyEntry } from "../../lib/companies/companyRegistry";
-import { COMPANY_ROLES, type CompanyRole } from "../../lib/report/companyRoles";
+import type { CompanyRole } from "../../lib/report/companyRoles";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import {
   decisionAreaLabel,
@@ -28,22 +28,32 @@ export type WeekConditions = {
 
 const panel = "weather-panel space-y-3 px-6 max-sm:px-0 py-6";
 
-export function ConditionsSection({ conditions }: { conditions: WeekConditions }) {
+/**
+ * This week's conditions, as lines under the page's heading, with the link back to the brief
+ * they come from. They were a section of their own headed "This week's conditions: Cloudy"
+ * on every company and role page, an `h2` over three lines that were the page's lead
+ * (2026-11-11); each page's "Where to go next" carried the brief link at the foot.
+ */
+export function WeekConditionsLines({ conditions }: { conditions: WeekConditions }) {
   return (
-    <section className={panel}>
-      <h2 className="text-lg font-semibold text-slate-100">This week&apos;s conditions: {conditions.label}</h2>
+    <>
       {conditions.savedCopyNotice ? (
         <p data-testid="company-saved-copy" className="weather-caveat-band weather-caveat-mark px-4 py-3 text-xs">
           {conditions.savedCopyNotice}
         </p>
       ) : null}
-      <p className="text-sm text-slate-300">{conditions.rationale}</p>
+      <p className="text-sm text-slate-300">
+        <span className="font-semibold text-slate-100">This week&apos;s conditions: {conditions.label}.</span> {conditions.rationale}
+      </p>
       <p className="text-sm text-slate-200">
         <span className="font-semibold text-slate-100">{publicDecisionLabels.call}, written for companies that depend on outside funding:</span>{" "}
-        {conditions.guidance}
+        {conditions.guidance}{" "}
+        {/* At the end of the guidance it comes from, not on a line of its own: there it
+            read as the first item of the role links under it on a company's overview. */}
+        <ActionLink href="/" variant="inline">This week&apos;s full brief</ActionLink>
       </p>
       <p className="text-xs text-slate-400">Data as of <time dateTime={conditions.recordDateIso}>{conditions.recordDateLabel}</time>. Every company reads the same conditions.</p>
-    </section>
+    </>
   );
 }
 
@@ -148,28 +158,22 @@ const neighbours = (company: CompanyEntry, count: number): CompanyEntry[] => {
   );
 };
 
-export function CompanyNextLinks({ company, role }: { company: CompanyEntry; role?: CompanyRole }) {
+/*
+ * Only what the page does not already link. The brief is in the conditions lines, and the
+ * company's overview, its other roles and the company list are a breadcrumb away; the
+ * overview's own row of three neighbours went for the same reason (2026-11-11).
+ */
+export function CompanyNextLinks({ company, role }: { company: CompanyEntry; role: CompanyRole }) {
   return (
     <section className={panel}>
       <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
       <div className="flex flex-wrap gap-2 text-xs font-semibold">
-        <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
-        {/* The overview's heading block already links every role here. */}
-        {role
-          ? COMPANY_ROLES.filter((other) => other.slug !== role.slug).map((other) => (
-              <ActionLink key={other.slug} href={`/companies/${company.slug}/${other.slug}`} variant="pill">
-                {other.title} at {company.name}
-              </ActionLink>
-            ))
-          : null}
-        {role ? <ActionLink href={`/companies/${company.slug}`} variant="pill">{company.name} overview</ActionLink> : null}
         {neighbours(company, 3).map((other) => (
-          <ActionLink key={other.slug} href={role ? `/companies/${other.slug}/${role.slug}` : `/companies/${other.slug}`} variant="pill">
-            {role ? `${role.title} at ${other.name}` : other.name}
+          <ActionLink key={other.slug} href={`/companies/${other.slug}/${role.slug}`} variant="pill">
+            {role.title} at {other.name}
           </ActionLink>
         ))}
-        {role ? <ActionLink href={`/roles/${role.slug}`} variant="pill">{role.title} at any company</ActionLink> : null}
-        <ActionLink href="/companies" variant="pill">All companies</ActionLink>
+        <ActionLink href={`/roles/${role.slug}`} variant="pill">{role.title} at any company</ActionLink>
       </div>
     </section>
   );

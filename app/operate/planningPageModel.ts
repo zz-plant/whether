@@ -311,15 +311,9 @@ export async function buildPlanningPageModel(
               hideHeader: true,
               id: "ops-decision-shield-panel",
               title: "Test a decision",
-              children: h(Fragment, null,
-                h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
-                // Resolve's direct answers live on Guides since 2026-10-08, grouped
-                // by decision area with this week's standing beside each.
-                h("p", { className: "text-xs leading-5 text-slate-400" },
-                  h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Answers by decision area"),
-                  " covers the most common decisions and says where each stands this week.",
-                ),
-              ),
+              // The panel alone (2026-11-11): a line under it sent the reader to
+              // "Answers by decision area", which the footer names on every page.
+              children: h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
             }),
           },
           /* The use the record fits: lines agreed once, and an email the day one is

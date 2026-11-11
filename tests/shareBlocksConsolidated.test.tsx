@@ -22,24 +22,22 @@ mockAny.module("next/navigation", () => ({
  * Until 2026-10-08 the site offered to share one week in five places: the brief's "Do
  * and share" slide and image buttons, the plan's "Share the brief" step, Trust's "Cite
  * this guidance" and "Meeting snippet", /share itself, and each frozen week's own copy
- * panel. /share holds every format now. The brief and Trust each carry one "Share
- * or embed this →" link instead; Decide carried it as a closing card until
- * 2026-10-09 and now reaches /share through the header and the footer, as every
- * page does. A frozen week keeps its date-pinned panel, because /share carries
+ * panel. /share holds every format now. The brief and Trust (since 2026-11-11) and
+ * Decide (since 2026-10-09) reach it through the header and the footer, as every page
+ * does. A frozen week keeps its date-pinned panel, because /share carries
  * the current week and cannot copy a past one.
  */
 
-const LINK_TEXT = "Share or embed this →";
 const shareLinksIn = (html: string) =>
   [...html.matchAll(/<a\b[^>]*href="\/share"[^>]*>([\s\S]*?)<\/a>/g)].map((match) => match[1].replace(/<[^>]+>/g, "").trim());
 
-describe("one way out to /share from each reading page", () => {
-  it("the brief's closing line links to /share instead of copying the slide and the card itself", async () => {
-    const { ShareLinks } = await import("../app/components/home/ShareLinks");
-    const html = renderToStaticMarkup(<ShareLinks currentRecordDate="2026-09-28" />);
-    assert.deepEqual(shareLinksIn(html), [LINK_TEXT]);
-    const source = readFileSync("app/components/home/ShareLinks.tsx", "utf8");
-    assert.doesNotMatch(source, /CopyMeetingSlideButton|CopyImageCardButton/, "the copy buttons live on /share");
+describe("no reading page repeats the header's way to /share", () => {
+  it("the brief reaches /share through the header and the footer, with no closing line of its own", () => {
+    // The closing "Share or embed this →" line went on 2026-11-11: the header and the
+    // footer carry the same link a few hundred pixels away, and the card's brief number
+    // already links the published brief the line named second.
+    const source = readFileSync("app/page.tsx", "utf8");
+    assert.doesNotMatch(source, /ShareOrEmbedLink|<ShareLinks|href="\/share"/);
   });
 
   it("Decide has no share step and no closing share card", async () => {
@@ -50,11 +48,11 @@ describe("one way out to /share from each reading page", () => {
     assert.doesNotMatch(source, /id: "ops-export-briefs"|BriefIslandPicker|SHARE_OR_EMBED/, "the share step and card are gone");
   });
 
-  it("Trust drops the citation and the meeting snippet for one link to /share", async () => {
+  it("Trust drops the citation and the meeting snippet, and links /share only through the header and footer", async () => {
     const html = renderToStaticMarkup(await (await import("../app/trust/page")).default({}));
     assert.ok(!html.includes('id="sources-freshness"'), "no Cite this guidance section");
     assert.ok(!html.includes('id="meeting-snippet"'), "no Meeting snippet section");
-    assert.deepEqual(shareLinksIn(html), [LINK_TEXT]);
+    assert.deepEqual(shareLinksIn(html), [], "the header and the footer link /share; the page does not repeat it");
   });
 
   it("a frozen week keeps its own date-pinned copy panel and adds no /share link", () => {

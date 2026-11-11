@@ -7,7 +7,6 @@ import { describeAgentTools } from "../../lib/agent/tools";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildPageMetadata } from "../../lib/seo";
-import { SAAS_BASKET } from "../../lib/saasMultiples";
 
 /* Through the shared builder, for the reason /share records: without its own
    `openGraph` this page previewed as the homepage when its link was shared. */
@@ -134,13 +133,6 @@ export default function ApiDocsPage() {
             A weather word works wherever a tool takes conditions: Freezing, Cloudy, Stormy or Sunny, in any case. A
             wrong argument is refused with the values that would have worked.
           </p>
-          <p className="text-xs text-slate-300">
-            An agent that reads URLs can start at{" "}
-            <Link href="/llms.txt" className="text-sky-200 underline decoration-sky-600 underline-offset-2">
-              /llms.txt
-            </Link>
-            : it lists every answer page against the question it answers and states how current the reading is.
-          </p>
         </section>
 
         <section className="space-y-4">
@@ -156,9 +148,6 @@ export default function ApiDocsPage() {
             >
               Discovery. Lists every available tool with its parameters.
             </Endpoint>
-            <Endpoint signature="GET /api/mcp?tool=get_state">
-              The compact state to decide from: the answer <code className="font-mono">/api/agent?view=state</code> gives.
-            </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_brief">
               A summary: current conditions, action, room before a change (the <code className="font-mono">confidence</code> field), record date. Optional weekly, monthly, quarterly or
               yearly view. The MCP tool of the same name returns the full brief.
@@ -171,16 +160,15 @@ export default function ApiDocsPage() {
               Weeks until a score crosses its change line at a pace you give, or, with no arguments, at today&apos;s scores and pace.
               Scenario modeling for agents.
             </Endpoint>
-            <Endpoint signature="GET /api/mcp?tool=get_comps">
-              Median SaaS EV/Revenue multiple across {SAAS_BASKET.length} public companies.
-            </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_signals">
               Coverage map of which months have signal history available.
             </Endpoint>
           </div>
+          {/* get_state and get_comps had entries here too (until 2026-11-11): the first
+              is /api/agent?view=state below, the second /api/comps. */}
           <p className="text-xs text-slate-300">
-            The rest (the rules behind the guidance, one signal&apos;s trailing history, plan checks) take the same
-            form; <code className="font-mono">get_actions</code> lists each with its arguments and a call that works.
+            The rest take the same form; <code className="font-mono">get_actions</code> lists each with its
+            arguments and a call that works.
           </p>
         </section>
 
@@ -404,7 +392,9 @@ export default function ApiDocsPage() {
               tryLabel="View llms.txt"
               tryAriaLabel="View llms.txt: the agent discovery document"
             >
-              Agent discovery document. Linked from &lt;link rel=&quot;llm&quot;&gt; in the page head.
+              Agent discovery document, for an agent that reads URLs. It lists every answer page against the
+              question it answers and states how current the reading is. Linked from &lt;link
+              rel=&quot;llm&quot;&gt; in the page head.
             </Endpoint>
             <Endpoint
               signature="GET /llms-full.txt"
@@ -531,10 +521,7 @@ export default function ApiDocsPage() {
           </p>
         </section>
 
-        <p className="text-fluid-nano text-slate-400">
-          Every endpoint is free and needs no key or account. Data is provided for
-          informational purposes.
-        </p>
+        <p className="text-fluid-nano text-slate-400">Data is provided for informational purposes.</p>
       </article>
     </PageShell>
   );

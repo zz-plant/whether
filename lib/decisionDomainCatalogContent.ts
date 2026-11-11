@@ -206,7 +206,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Treating top-line growth as PMF", "Scaling channels before cohort quality is stable"],
-      canonLinks: [{ label: "PMF routing", href: "/resources#more-tools" }],
     },
     {
       slug: "focus",
@@ -268,7 +267,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Adding projects without explicit trade-offs"],
-      canonLinks: [{ label: "Roadmap routing", href: "/resources#more-tools" }],
     },
     {
       slug: "rollback",
@@ -326,7 +324,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Making irreversible bets without contingency paths"],
-      canonLinks: [{ label: "Irreversibility trust check", href: "/trust" }],
     },
     {
       slug: "decision-rights",
@@ -388,7 +385,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Confusing consensus with accountability"],
-      canonLinks: [{ label: "Governance routing", href: "/resources#more-tools" }],
     },
     {
       slug: "launch-gates",
@@ -447,7 +443,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Launching on optimism without evidence against the pause line"],
-      canonLinks: [{ label: "Launch trust checks", href: "/trust" }],
     },
     {
       slug: "ops-capacity",
@@ -511,7 +506,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Assuming normal capacity under stress"],
-      canonLinks: [{ label: "Capacity trust checks", href: "/trust" }],
     },
     {
       slug: "claims",
@@ -570,7 +564,6 @@ export const rawDecisionDomainCatalog = {
         },
       ],
       misuseCases: ["Publishing AI claims without operational proof"],
-      canonLinks: [{ label: "Claims and trust", href: "/trust" }],
     },
   ],
   failureModes,

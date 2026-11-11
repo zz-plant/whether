@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HearingBubbles } from "../components/ui/hearingBubbles";
-import { selectHearingForAreas } from "../guides/stakeholderGuides";
-import { decisionAreaOrder } from "../../lib/report/boundedDecisionRules";
 import { ROLES } from "../../lib/report/companyRoles";
 import { conditionQuestions } from "../../lib/report/workQuestions";
 import { buildPageMetadata } from "../../lib/seo";
 import { buildHubStructuredData } from "../../lib/seo/pageStructuredData";
-import { ConditionsSection } from "../companies/companyPageSections";
+import { WeekConditionsLines } from "../companies/companyPageSections";
 import { loadWeekConditions } from "../companies/loadCompanyPage";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { SectionTabs } from "../components/sectionTabs";
@@ -15,10 +12,6 @@ import { ContentPageShell } from "../components/ui/contentPageShell";
 import { ConditionQuestionsSection } from "./workQuestionsSections";
 
 export const revalidate = 3600;
-
-const decisionConversations = decisionAreaOrder.flatMap((area) =>
-  selectHearingForAreas([area]).map(({ hearing }) => hearing),
-);
 
 const title = "What each role can ask for this week";
 const description = "What each role can ask for this week at any tech company: the questions to ask leadership, the general rules, and the conversations that come up.";
@@ -57,6 +50,7 @@ export default async function RolesPage() {
           </Link>
           .
         </p>
+        <WeekConditionsLines conditions={conditions} />
         <ul className="weather-grid gap-x-4 gap-y-2 text-sm [--col-min:14rem]">
           {ROLES.map((role) => (
             <li key={role.slug}>
@@ -67,12 +61,11 @@ export default async function RolesPage() {
           ))}
         </ul>
       </section>
-      <ConditionsSection conditions={conditions} />
       <ConditionQuestionsSection regime={regime} questions={conditionQuestions(regime)} pagePath="/roles" />
-      <section id="decision-conversations" aria-labelledby="decision-conversations-heading" className="space-y-4">
-        <h2 id="decision-conversations-heading" className="type-section">Sample conversations about pause rules</h2>
-        <HearingBubbles entries={decisionConversations} className="max-w-2xl" />
-      </section>
+      {/* "Sample conversations about pause rules" went (2026-11-11): five exchanges a leader
+          has about a paused hire or roadmap, drawn from the stakeholder guides on /resources,
+          where they still print. Beside the questions above they were a second list of what
+          might come up, written for the other side of the table. */}
     </ContentPageShell>
   );
 }

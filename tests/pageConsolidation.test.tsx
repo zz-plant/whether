@@ -12,8 +12,8 @@ describe("the method and its form: a section of /about", () => {
   it("carries both halves — the three parts and the blank form", () => {
     const html = renderToStaticMarkup(<MethodSection />);
 
-    // From the framework half.
-    assert.match(html, /How the three parts work/);
+    // From the framework half. Its three definition cards ("How the three parts
+    // work") went on 2026-11-11: /about's intro already defines the three parts.
     assert.match(html, /Agree on them in advance/);
     // From the form half, which used to be /template.
     assert.match(html, /Decision template to print or copy/);

@@ -499,17 +499,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         </nav>
       ) : null}
 
-      <nav aria-label="Brief navigation" className="flex flex-wrap gap-2">
-        <ActionLink href="/" variant="primary">
-          This week&apos;s brief
-        </ActionLink>
-        <ActionLink href="/history" variant="pill">
-          All past guidance
-        </ActionLink>
-        <ActionLink href="/about" variant="pill">
-          About Whether
-        </ActionLink>
-      </nav>
+      {/* No closing row of buttons (2026-11-11): "This week's brief" was the second link
+          to / on the page after "Read this week's guidance", "All past guidance" was the
+          breadcrumb's History, and "About Whether" the header's About. */}
 
       {/* A shared brief used to be a dead end: the recipient got the citation
           and nothing that brought next Monday's call to them. */}

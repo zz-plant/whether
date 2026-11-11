@@ -38,7 +38,7 @@ const source = (overrides: Partial<SignalReadingSource["assessment"]["scores"]> 
 
 const render = (cluster: Parameters<typeof buildSignalClusterReading>[0]) =>
   renderToStaticMarkup(
-    <SignalReadingPanel reading={buildSignalClusterReading(cluster, source())} recordDateLabel="Sep 18, 2026" />,
+    <SignalReadingPanel reading={buildSignalClusterReading(cluster, source())} />,
   ).replace(/<[^>]+>/g, " ");
 
 describe("signal watch pages say what they measure in plain words", () => {
@@ -64,7 +64,7 @@ describe("signal watch pages say what they measure in plain words", () => {
       },
     };
     const text = renderToStaticMarkup(
-      <SignalReadingPanel reading={buildSignalClusterReading("capital-tightness-watch", dated)} recordDateLabel="Oct 5, 2026" />,
+      <SignalReadingPanel reading={buildSignalClusterReading("capital-tightness-watch", dated)} />,
     )
       .replace(/<!-- -->/g, "")
       .replace(/<[^>]+>/g, " ")

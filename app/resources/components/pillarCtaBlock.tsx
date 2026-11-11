@@ -34,16 +34,9 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
         >
           {downloadLabel}
         </ActionLink>
-        <ActionLink
-          href="/operate#ops-export-briefs"
-          variant="pill"
-          className="text-sm"
-          data-conversion-event="request"
-          data-conversion-surface="pillar-cta"
-          data-conversion-keyword={keyword}
-        >
-          Open board-pack brief
-        </ActionLink>
+        {/* "Open board-pack brief" went on 2026-11-11: a second link to /operate,
+            at an anchor (#ops-export-briefs) the plan stopped drawing when its
+            share step moved to /share. */}
       </div>
     </section>
   );

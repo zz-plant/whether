@@ -152,13 +152,9 @@ export function TrackRecordTiles({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <div>
-          <h2 className="type-section" id="track-record-heading">Track record</h2>
-          <p className="max-w-prose text-sm text-slate-300">
-            Every month-end reading Whether has made, scored with the same published formula, so
-            you can check each one against what happened next.
-          </p>
-        </div>
+        {/* The heading alone (2026-11-11): an intro said the readings are scored with
+            the published formula, which /history's first section and the record band say. */}
+        <h2 className="type-section" id="track-record-heading">Track record</h2>
         {action}
       </div>
 
@@ -174,10 +170,9 @@ export function TrackRecordTiles({
             <Fact label="Changes in conditions" value={record.regimeChanges.toLocaleString("en-US")} unit={changeRate} />
           </FactList>
 
-          <p className="text-fluid-sm text-slate-400">
-            {CALL_CHANGE_RULE} One noisy month can&rsquo;t change them. Most months nothing changes, and a
-            change is worth your attention.
-          </p>
+          {/* The rule alone (2026-11-11): "One noisy month can't change them" said it again,
+              and "most months nothing changes" is the yearly rate beside it. */}
+          <p className="text-fluid-sm text-slate-400">{CALL_CHANGE_RULE}</p>
         </div>
 
         {aside ? <div className="min-w-0">{aside}</div> : null}

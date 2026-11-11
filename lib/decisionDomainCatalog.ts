@@ -51,7 +51,6 @@ type ToolkitDefinition = {
     deliverable: string;
   }[];
   misuseCases: string[];
-  canonLinks: { label: string; href: string }[];
 };
 
 type FailureModeDefinition = {

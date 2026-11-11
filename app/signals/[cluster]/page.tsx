@@ -153,7 +153,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
           scoringBasis: reportData.scoringBasis,
         })}
       />
-      {reading ? <SignalReadingPanel reading={reading} recordDateLabel={reportData.recordDateLabel} /> : null}
+      {reading ? <SignalReadingPanel reading={reading} /> : null}
       {/* The five decision pages under this signal. They were in the sitemap
           and linked from nowhere on the site, so the only path to them was the
           sitemap itself — and this page, whose metadata comment calls them its

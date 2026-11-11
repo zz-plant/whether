@@ -21,7 +21,6 @@ import { WhatWouldChangeSection } from "../app/components/home/WhatWouldChangeSe
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
-import { ShareLinks } from "../app/components/home/ShareLinks";
 import { sinceLastVisitDelta } from "../app/components/home/SinceLastVisit";
 
 /*
@@ -166,16 +165,6 @@ describe("/ states the stage and runway in the controls alone", () => {
     );
     assert.match(text(html), /Same weather, your rules: a Series A company with 12–24 months of runway, planned monthly · Change(?! settings)/);
     assert.match(html, /data-plan-horizon/);
-  });
-});
-
-describe("/ ends on one line, not a Share section", () => {
-  it("names the published brief by its week, with no third and fourth date", () => {
-    const html = renderToStaticMarkup(<ShareLinks currentRecordDate="2026-10-07" />);
-    assert.doesNotMatch(html, /<h2/);
-    assert.doesNotMatch(text(html), /The reading above is from|frozen record is dated/);
-    assert.match(text(html), /Published brief for the week of Oct 5, 2026 →/);
-    assert.match(html, /href="\/brief\/2026-w41"/);
   });
 });
 

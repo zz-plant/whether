@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../../lib/navigation/routeType";
 import { buildScopedVariantDecisionAdjustment } from "../../../../lib/report/boundedDecisionRules";
-import { askForThisWeek, findRole, paybackBarLine, ROLES } from "../../../../lib/report/companyRoles";
+import { askForThisWeek, findRole, paybackBarLine } from "../../../../lib/report/companyRoles";
 import { findRoleStage, ROLE_STAGES, stageForWorkers } from "../../../../lib/report/roleStages";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { buildRolePageStructuredData } from "../../../../lib/seo/pageStructuredData";
-import { ConditionsSection, RoleDecisionsSection } from "../../../companies/companyPageSections";
+import { RoleDecisionsSection, WeekConditionsLines } from "../../../companies/companyPageSections";
 import { loadWeekConditions } from "../../../companies/loadCompanyPage";
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { JsonLdScript } from "../../../components/jsonLdScript";
@@ -79,11 +79,11 @@ export default async function RoleStagePage({ params }: { params: Promise<Params
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {atCompanies} can ask for this week</h1>
-        <p className="text-sm text-slate-300">
-          Is now a good time to ask for a raise or more headcount at this stage? What changes for {role.label}, beside this week&apos;s conditions.
-        </p>
+        {/* The question the page answers, then the week it answers it in. A second sentence
+            listed what the page goes on to show (2026-11-11). */}
+        <p className="text-sm text-slate-300">Is now a good time to ask for a raise or more headcount at this stage?</p>
+        <WeekConditionsLines conditions={conditions} />
       </section>
-      <ConditionsSection conditions={conditions} />
       <RoleStageSection
         atCompanies={atCompanies}
         askFor={role.atStage[stage]}
@@ -97,18 +97,16 @@ export default async function RoleStagePage({ params }: { params: Promise<Params
         rules={[]}
       />
       <LeadershipQuestionsSection role={role} stage={stage} pagePath={path} answersHref={`${rolePath}#runway-answers`} />
+      {/* The same role at the other stages, for a reader who landed on the wrong one. The
+          brief is in the conditions lines and the role's own page is the breadcrumb's. Nine
+          other roles at this stage went too: a reader looks up their own role (2026-11-11). */}
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
-          <ActionLink href={rolePath} variant="pill">{role.title} at any company</ActionLink>
           {ROLE_STAGES.filter((other) => other !== stage).map((other) => (
             <ActionLink key={other} href={`/roles/${role.slug}/${other}`} variant="pill">
               At {stageForWorkers(other).atCompanies}
             </ActionLink>
-          ))}
-          {ROLES.filter((other) => other.slug !== role.slug).map((other) => (
-            <ActionLink key={other.slug} href={`/roles/${other.slug}/${stage}`} variant="pill">{other.title}</ActionLink>
           ))}
         </div>
       </section>

@@ -11,7 +11,7 @@ import { JsonLdScript } from "../../components/jsonLdScript";
 import { buildCompanyPageStructuredData } from "../../../lib/seo/pageStructuredData";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
-import { CompanyNextLinks, CompanyPositionSection, ConditionsSection } from "../companyPageSections";
+import { CompanyPositionSection, WeekConditionsLines } from "../companyPageSections";
 import { loadCompanyPage } from "../loadCompanyPage";
 
 type Params = { company: string };
@@ -69,6 +69,7 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">{company.name}: this week&apos;s conditions and its latest filings</h1>
+        <WeekConditionsLines conditions={conditions} />
         <ul className="space-y-1 text-sm">
           {COMPANY_ROLES.map((role) => (
             <li key={role.slug}>
@@ -79,9 +80,7 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
           ))}
         </ul>
       </section>
-      <ConditionsSection conditions={conditions} />
       {situation ? <CompanyPositionSection company={company} situation={situation} /> : null}
-      <CompanyNextLinks company={company} />
     </ContentPageShell>
   );
 }

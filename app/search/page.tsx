@@ -42,12 +42,9 @@ export default async function SearchPage({
     <PageShell backdropVariant="hub">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Search" }]} />
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5">
-        <header className="space-y-2 max-w-2xl">
-          <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>
-          <p className="text-sm text-slate-300">
-            Find the page that answers your question: the evidence, the pause lines, a toolkit, or the method behind the guidance.
-          </p>
-        </header>
+        {/* The heading alone (2026-11-11): a sentence under it described what a search
+            box finds, above the box and its own prompt. */}
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">Search</h1>
 
         {/* A client component, and still server-rendered: Next renders these
             into the initial HTML, so `?q=` arrives as results rather than as an

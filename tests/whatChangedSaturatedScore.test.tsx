@@ -33,9 +33,17 @@ describe("a score at the top of its scale", () => {
   it("says a clipped score cannot show a move, instead of showing nothing", () => {
     const html = render([row({ saturatedPressure: 148 })]);
 
-    assert.match(html, /This is as high as the score goes\. Uncapped it would be 148, so a further rise can’t show here\./);
-    assert.match(html, /would be 148/, "the raw pressure stays visible beside it");
+    assert.match(html, /Money is as hard to raise as this score can show\./);
+    assert.match(html, /Uncapped it would be 148, so a further rise can’t show here\./);
+    assert.doesNotMatch(html, /This is as high as the score goes/, "the meaning beside the note already says the score is at its top");
     assert.doesNotMatch(html, /\bclipped\b|\bceiling\b|100-point/i, "said in the reader's terms, not the scoring code's");
+  });
+
+  it("says the score is at its top in the note when no meaning line says it", () => {
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={[row({ saturatedPressure: 148 })]} lead="No earlier reading." comparisonUnavailable />,
+    );
+    assert.match(html, /This is as high as the score goes\. Uncapped it would be 148, so a further rise can’t show here\./);
   });
 
   it("stays silent when the score is simply flat and not clipped", () => {

@@ -100,11 +100,12 @@ export default async function ResourcesHubPage({
     }))
     .filter((group) => group.answers.length > 0 || group.guides.length > 0);
 
-  const hasToolSelection = Boolean(
+  /* A team or stage choice opens the browse controls it came from. A toolkit
+     query does not: its results draw beside the worksheet list, outside them. */
+  const hasSelection = Boolean(
     resolvedSearchParams?.stakeholder
     || resolvedSearchParams?.stage
-    || resolvedSearchParams?.library
-    || resolvedSearchParams?.toolkitQuery,
+    || resolvedSearchParams?.library,
   );
 
   return (
@@ -251,36 +252,36 @@ export default async function ResourcesHubPage({
               top of this page; the two links that stood here were the one way in. */}
           {/* The worksheets by name, outside the fold (2026-10-27). They were
               listed only inside the closed disclosure below, so a reader who
-              did not open it never learned the site had them. */}
-          <p className="text-sm text-slate-300">
-            One-decision worksheets:{" "}
-            {toolkitDefinitions.map((toolkit, index) => (
-              <Fragment key={toolkit.slug}>
-                {index > 0 ? <span aria-hidden="true"> · </span> : null}
-                <Link href={`/toolkits/${toolkit.slug}`} className="text-[var(--accent-action)] underline underline-offset-4">
-                  {toolkit.title.replace(/ toolkit$/i, "")}
-                </Link>
-              </Fragment>
-            ))}
-          </p>
+              did not open it never learned the site had them. Since 2026-11-11
+              this line is the one list of them: the disclosure's "Recommended
+              tools" cards listed the same worksheets again, so the panel now
+              draws only when a search sends a query (`?toolkitQuery=`). */}
+          <div id="toolkit-library" className="space-y-3">
+            <p className="text-sm text-slate-300">
+              One-decision worksheets:{" "}
+              {toolkitDefinitions.map((toolkit, index) => (
+                <Fragment key={toolkit.slug}>
+                  {index > 0 ? <span aria-hidden="true"> · </span> : null}
+                  <Link href={`/toolkits/${toolkit.slug}`} className="text-[var(--accent-action)] underline underline-offset-4">
+                    {toolkit.title.replace(/ toolkit$/i, "")}
+                  </Link>
+                </Fragment>
+              ))}
+            </p>
+            <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
+          </div>
           <GuidedTranslationPanels searchParams={resolvedSearchParams} />
           {/* No side inset (2026-11-10): the panel's default 24px put this row's title
-              right of every heading on the page. */}
-          <details className="weather-auto-chevron weather-panel px-0 py-4" open={hasToolSelection}>
+              right of every heading on the page. Roles is a tab of this page, so the
+              disclosure no longer sends a reader there twice (2026-11-11). */}
+          <details className="weather-auto-chevron weather-panel px-0 py-4" open={hasSelection}>
             <summary className="select-none text-base font-semibold text-slate-100">
-              Browse by company stage, situation or toolkit
+              Browse by team, company stage or situation
             </summary>
-            <div className="mt-4 space-y-6">
+            <div className="mt-4">
               <section className="weather-switch gap-4 [--col-min:20rem]">
                 <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
                   <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">Leadership guidance and stage</h3>
-                  <div className="rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5 text-xs text-slate-400">
-                    Looking for role-specific guidance? Visit{" "}
-                    <Link href="/roles" className="font-semibold text-[var(--accent-action)] underline underline-offset-4">
-                      Roles
-                    </Link>{" "}
-                    for role landing pages, leadership questions and worksheets.
-                  </div>
                   <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
                     {stakeholderGuides.map((guide) => (
                       <li key={guide.slug}>
@@ -308,17 +309,6 @@ export default async function ResourcesHubPage({
                     ))}
                   </ul>
                 </nav>
-                <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
-              </section>
-              <section className="weather-switch gap-4 [--col-min:20rem]">
-                <div className="space-y-3">
-                  <h3 className="text-sm type-eyebrow text-slate-300">Help by role</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <ActionLink href="/roles" variant="pill">
-                      Open Roles &rarr;
-                    </ActionLink>
-                  </div>
-                </div>
                 <div className="space-y-3">
                   <h3 className="text-sm type-eyebrow text-slate-300">Help by situation</h3>
                   <div className="flex flex-wrap gap-2">

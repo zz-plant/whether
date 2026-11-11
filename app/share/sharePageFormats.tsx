@@ -103,42 +103,6 @@ const LEGACY_HASHES: Readonly<Record<string, string>> = {
 const resolveShareFormat = (options: readonly ShareFormatOption[], hash: string): ShareFormatOption | undefined =>
   options.find((option) => option.id === (LEGACY_HASHES[hash] ?? hash)) ?? options[0];
 
-/* The subscribed feed (`/calendar.ics`): every Monday carries its own week's
-   guidance. webcal:// opens Apple Calendar and Outlook; Google takes the same
-   address through its add-by-URL page. Offered beside the meeting formats and,
-   since 2026-10-27, beside RSS on the page's feed list too: shown only under
-   two of fifteen formats, the feed was reachable by a reader who had already
-   picked a meeting pack and by no one else. */
-export const CalendarSubscribeLinks = ({
-  feedUrl,
-  lead = "Subscribe to the weekly brief",
-}: {
-  feedUrl: string;
-  /** The words before the two links. */
-  lead?: string;
-}) => {
-  const webcal = feedUrl.replace(/^https?:/, "webcal:");
-  const linkClass =
-    "weather-hit text-fluid-sm text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200";
-  return (
-    <span className="text-fluid-sm text-slate-400">
-      {lead}:{" "}
-      <a href={webcal} className={linkClass}>
-        Apple or Outlook
-      </a>{" "}
-      ·{" "}
-      <a
-        href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}`}
-        target="_blank"
-        rel="noreferrer"
-        className={linkClass}
-      >
-        Google
-      </a>
-    </span>
-  );
-};
-
 export function SharePageFormats({
   scoreReferences = [],
   options,

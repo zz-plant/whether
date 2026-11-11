@@ -39,6 +39,12 @@ export function resolveToolkitLibraryState(query?: string) {
   };
 }
 
+/**
+ * The toolkit search's results, drawn under the worksheet list on /resources when a
+ * search sends `?toolkitQuery=`. With no query it draws nothing: the list above it names
+ * every worksheet, and the shortlist cards this drew by default named them again
+ * (2026-11-11). The `#toolkit-library` anchor is the list's wrapper on the page.
+ */
 export function ToolkitLibraryPanels({
   query,
 }: {
@@ -50,23 +56,17 @@ export function ToolkitLibraryPanels({
     normalizedQuery,
   } = resolveToolkitLibraryState(query);
 
+  if (!normalizedQuery) return null;
+
   return (
-    <section id="toolkit-library" className="space-y-3">
+    <section aria-labelledby="toolkit-results-heading" className="space-y-3">
       <div className="space-y-2">
-        <h2 className="type-section">
-          {normalizedQuery ? "Tool results" : "Recommended tools"}
-        </h2>
+        <h2 id="toolkit-results-heading" className="type-section">Tool results</h2>
         <p className="text-sm text-slate-300">
-          {normalizedQuery ? (
-            <>
-              Matched from search.{" "}
-              <Link href={buildToolkitLibraryHref()} className="text-[var(--accent-action)] underline underline-offset-4">
-                Show the full shortlist
-              </Link>
-            </>
-          ) : (
-            "Each opens a one-decision worksheet. Search the site with ⌘K."
-          )}
+          Matched from search.{" "}
+          <Link href={buildToolkitLibraryHref()} className="text-[var(--accent-action)] underline underline-offset-4">
+            Clear the search
+          </Link>
         </p>
       </div>
 

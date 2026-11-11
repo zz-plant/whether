@@ -9,7 +9,7 @@ import { ActionLink } from "../components/ui/actionLink";
 import { ReusableVisuals } from "./reusableVisuals";
 import { findBriefVideo } from "../../lib/export/briefVideo";
 import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
-import { CalendarSubscribeLinks, SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
+import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
@@ -422,9 +422,8 @@ export default async function SharePage() {
                   link in the layout's <head> names. */}
               <a href={`${siteUrl}/feed.xml`} className="inline-flex min-h-[44px] items-center text-fluid-sm font-semibold text-sky-300 hover:text-sky-200">RSS</a>
             </li>
-            <li className="flex items-center">
-              <CalendarSubscribeLinks feedUrl={`${siteUrl}${CALENDAR_FEED_PATH}`} lead="Each Monday's guidance in your calendar" />
-            </li>
+            {/* The calendar feed's two links stood here too until 2026-11-11; the
+                subscribe form directly below prints the same pair. */}
           </ul>
         </nav>
         <SubscribeForm />

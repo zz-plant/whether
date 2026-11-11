@@ -64,7 +64,6 @@ describe("home route render contract", () => {
       "<WhatWouldChangeSection",
       "<RecordSection",
       "<AlertSection",
-      "<ShareLinks",
     ];
     for (const section of order) {
       assert.equal(routeSource.split(section).length - 1, 1, `${section} is mounted exactly once`);
@@ -74,12 +73,12 @@ describe("home route render contract", () => {
     assert.ok(routeSource.indexOf("groups={buildAreaGroups(") > routeSource.indexOf("<DecisionPicker"), "the picker is handed every area's rule");
     assert.ok(routeSource.indexOf("<RunwayFold") > routeSource.indexOf("groups={buildAreaGroups("), "the distances fold under the rules");
     assert.ok(routeSource.indexOf("<RunwayFold") < routeSource.indexOf("<WhatWouldChangeSection"));
-    for (const retired of ["<WhatItChangesSection", "<DoAndShareSection", "<FirstVisitExplainer", "offersFirstVisitFold"]) {
+    for (const retired of ["<WhatItChangesSection", "<DoAndShareSection", "<FirstVisitExplainer", "offersFirstVisitFold", "<ShareLinks", "<CopyStandupButton", "<CopyExecSummaryButton"]) {
       assert.ok(!routeSource.includes(retired), `${retired} has no place on /`);
     }
 
     // CSS must not reorder what the document says: no section carries an order class.
-    for (const file of ["WhatChangedSection", "WhatWouldChangeSection", "DecisionPicker", "AlertSection", "RecordSection", "ShareLinks"]) {
+    for (const file of ["WhatChangedSection", "WhatWouldChangeSection", "DecisionPicker", "AlertSection", "RecordSection"]) {
       const source = readFileSync(`app/components/home/${file}.tsx`, "utf8");
       assert.doesNotMatch(source, /className="[^"]*\border-\d/, `${file} carries an order class`);
     }
@@ -111,12 +110,9 @@ describe("home route render contract", () => {
 
   it("keeps one canonical copy action in the homepage body", () => {
     // One one-tap `Copy Brief`, under `DecisionHero`. The header `Export` menu is the format picker and
-    // `StickyCallStrip` is its on-scroll persistence — no third in-body copy button.
-    //
-    // This used to assert against `ThreeWhethersCard`, which 69221739 stopped rendering and
-    // which is now deleted. The DD-005 rule it protected is unchanged, so it moves to the
-    // one other body surface that carries a copy control: the non-weekly cadence lead.
-    const actSource = readFileSync("app/components/home/ShareLinks.tsx", "utf8");
+    // `StickyCallStrip` is its on-scroll persistence — no third in-body copy button. The standup
+    // and three-bullet copies beside it went on 2026-11-11: the bullets were the Copy Brief
+    // block's own lines, and formats are the header panel's job.
     const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
 
     // It sits directly under the call card (2026-09-30): on the first screen,
@@ -127,7 +123,6 @@ describe("home route render contract", () => {
     const heroIndex = routeSource.indexOf("<DecisionHero");
     const copyIndex = routeSource.indexOf("<ShareBriefButton");
     assert.ok(heroIndex > -1 && copyIndex > heroIndex, "Copy Brief follows the call card");
-    assert.ok(!actSource.includes("<ShareBriefButton"), "the act section does not repeat it");
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
     assert.ok(!heroSource.includes("<ShareBriefButton"), "no copy action inside the screenshot card");
     // The cadence lead copies a different artifact — the month's or quarter's call, not the

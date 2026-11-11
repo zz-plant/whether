@@ -203,7 +203,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
     { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital discipline framework" },
     { href: "/resources/reversibility-as-governance", label: "Reversibility as governance" },
     { href: resourceSupportingPages.decisionShieldOverview.path, label: resourceSupportingPages.decisionShieldOverview.title },
-    { href: resourceSupportingPages.capitalPostureTemplate.path, label: resourceSupportingPages.capitalPostureTemplate.title },
+    /* No template entry (2026-11-11): the closing block above downloads it. */
   ].filter((link) => link.href !== `/resources/${page.slug}`);
   const linkClass = "text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100";
   const lexiconByIndex = ["capital-regime", "escalation-thresholds", "reversibility", "30-day-confirmation-logic"] as const;
@@ -332,7 +332,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           ))}
         </ul>
       </section>
-
+      {/* The end call-to-action docs/editorial-guardrails.md asks of every pillar,
+          beside the one after the argument. */}
       <PillarCtaBlock
         title="Need the board pack itself?"
         body="Ask for a walkthrough of the board pack."

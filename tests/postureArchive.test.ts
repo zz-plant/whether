@@ -154,9 +154,16 @@ describe("/history/[period] says what its own split says", () => {
     assert.match(tied, /Freezing for 22 of 52 weekly readings, tied with Stormy\./);
   });
 
+  /* The headline sentence says it once (2026-11-11). A one-row split and a "Conditions
+     held at Freezing for the whole period." section under it said it twice more. */
   it("says conditions held for the whole period only where every reading did", async () => {
-    assert.match(await render("2024"), /Conditions held at Freezing for the whole period\./);
-    assert.doesNotMatch(await render("2022-q3"), /for the whole period/);
+    const held = await render("2024");
+    assert.match(held, /Freezing for all 52 weekly readings\./);
+    assert.doesNotMatch(held, /How the period split|for the whole period/, "one statement of a period that never changed");
+    const split = await render("2022-q3");
+    assert.doesNotMatch(split, /for all \d+ weekly readings/);
+    assert.match(split, /How the period split/);
+    assert.match(split, /Changes in conditions/, "a split period lists its changes inside the split");
   });
 });
 

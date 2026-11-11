@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
-import { askForThisWeek, findRole, paybackBarLine, ROLES } from "../../../lib/report/companyRoles";
+import { askForThisWeek, findRole, paybackBarLine } from "../../../lib/report/companyRoles";
 import { ROLE_STAGES, stageForWorkers } from "../../../lib/report/roleStages";
 import { conditionQuestionForRole, workSituationsForRole } from "../../../lib/report/workQuestions";
 import { buildRolePageStructuredData } from "../../../lib/seo/pageStructuredData";
-import { ConditionsSection, RoleDecisionsSection } from "../../companies/companyPageSections";
+import { RoleDecisionsSection, WeekConditionsLines } from "../../companies/companyPageSections";
 import { loadWeekConditions } from "../../companies/loadCompanyPage";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { JsonLdScript } from "../../components/jsonLdScript";
@@ -61,11 +61,11 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} can ask for this week</h1>
-        <p className="text-sm text-slate-300">
-          Is now a good time to ask for a raise, more headcount, or a slower roadmap? What this week's conditions say for {role.label} and what to ask leadership, at any tech company, public or private.
-        </p>
+        {/* The question the page answers, then the week it answers it in. A second sentence
+            listed what the page goes on to show (2026-11-11). */}
+        <p className="text-sm text-slate-300">Is now a good time to ask for a raise, more headcount, or a slower roadmap?</p>
+        <WeekConditionsLines conditions={conditions} />
       </section>
-      <ConditionsSection conditions={conditions} />
       <RoleDecisionsSection
         role={role}
         askFor={askForThisWeek(role, regime)}
@@ -92,9 +92,6 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
           {toolkits.length > 0 ? (
             <div className="space-y-2">
               <h3 className="type-eyebrow text-slate-300">Worksheets</h3>
-              <p className="text-xs text-slate-400">
-                Worksheets for decisions {role.label} face under current conditions:
-              </p>
               <div className="flex flex-wrap gap-2">
                 {toolkits.map((toolkit) => (
                   <ActionLink key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} variant="pill">
@@ -106,18 +103,16 @@ export default async function RolePage({ params }: { params: Promise<Params> }) 
           ) : null}
         </div>
       </section>
+      {/* The role at each stage: the only links to those four pages. The brief is in the
+          conditions lines; the other roles and the company figures are on /roles and
+          /companies, a breadcrumb and a footer link away (2026-11-11). */}
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
           {ROLE_STAGES.map((stage) => (
             <ActionLink key={stage} href={`/roles/${role.slug}/${stage}`} variant="pill">
               At {stageForWorkers(stage).atCompanies}
             </ActionLink>
-          ))}
-          <ActionLink href="/companies" variant="pill">Public company figures</ActionLink>
-          {ROLES.filter((other) => other.slug !== role.slug).map((other) => (
-            <ActionLink key={other.slug} href={`/roles/${other.slug}`} variant="pill">{other.title}</ActionLink>
           ))}
         </div>
       </section>

@@ -5,13 +5,11 @@ import { buildPageMetadata } from "../../lib/seo";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
-import { ShareOrEmbedLink } from "../components/shareOrEmbedLink";
 import {
   DECISION_CONTRACT_LABELS,
   PRIMARY_AUDIENCE_SUMMARY,
 } from "../../lib/report/reportCopy";
 import { ReportSection } from "../components/reportSection";
-import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord";
 import { FormulaReference } from "./formulaReference";
 import { RunHistorySection } from "./runHistorySection";
 import { SourceBoard } from "./sourceBoard";
@@ -52,8 +50,9 @@ export default async function MethodPage({
      warnings. The source board used to lead this group; it is open under the
      derivation now (`SourceBoard`), because it is the evidence the strip's
      "Sources" verdict was judged from. The citation and the meeting snippet
-     that bracketed it moved to /share on 2026-10-08 (`ShareOrEmbedLink`
-     below); the snippet was folded into the agenda there on 2026-11-03. */
+     that bracketed it moved to /share on 2026-10-08, which the header and the footer
+     link (the page's own "Share or embed this →" line went on 2026-11-11); the snippet
+     was folded into the agenda there on 2026-11-03. */
   const secondaryContent = (
     <>
       <ReportSection
@@ -87,19 +86,17 @@ export default async function MethodPage({
                 section below. */}
           </div>
         </div>
-      </ReportSection>
-
-      {/* The study moved to /calibration — it is original research and deserved
-          an address, and two indexable URLs carrying it would compete. This
-          keeps the reader who is here to judge the call pointed at it. */}
-      <ReportSection
-        id="confidence-record"
-        title={CONFIDENCE_RECORD_TITLE}
-        description="We check, across the whole archive, how often conditions held at each room before a change."
-      >
-        <ActionLink href="/calibration" variant="pill">
-          Read the calibration study
-        </ActionLink>
+        {/* The study moved to /calibration — it is original research and deserved
+            an address, and two indexable URLs carrying it would compete. One line
+            here, under the room it grades (2026-11-11): it was a section of its own,
+            a heading and a sentence over one link. */}
+        <p className="mt-6 text-sm text-slate-300">
+          How often conditions held at each room before a change, across the whole archive:{" "}
+          <ActionLink href="/calibration" variant="inline">
+            read the calibration study
+          </ActionLink>
+          .
+        </p>
       </ReportSection>
 
       <ReportSection id="revisit-call" title="What would make this guidance wrong?">
@@ -187,9 +184,6 @@ export default async function MethodPage({
            hide (2026-10-09). */
         <div className="space-y-10">{secondaryContent}</div>
       )}
-
-      {/* The citation is a /share format now, with every other paste of the week. */}
-      <ShareOrEmbedLink />
 
       {/* The method moved to /about (2026-10-09): it is the product's thesis, and as
           the last section of the page a reader opens to check this week's reading

@@ -30,7 +30,7 @@ import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
  */
 
 /* The margin is what the API calls `confidence` (2026-10-09); the study grades it under its display name. */
-export const CONFIDENCE_RECORD_TITLE = "How often conditions held near a change";
+const CONFIDENCE_RECORD_TITLE = "How often conditions held near a change";
 
 const percentFormat = (value: number) => `${Math.round(value)}%`;
 

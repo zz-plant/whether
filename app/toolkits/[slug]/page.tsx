@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { toRoute, type Route } from "../../../lib/navigation/routeType";
+import type { Route } from "../../../lib/navigation/routeType";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildToolkitHowTo } from "../../../lib/seo/pageStructuredData";
 import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
@@ -11,8 +11,6 @@ import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
-import { ArrowRightIcon } from "../../components/uiIcons";
-import { ActionLink } from "../../components/ui/actionLink";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -142,26 +140,18 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What&apos;s in this toolkit</h2>
+        {/* Named, not linked (2026-11-11). Each name linked to the toolkit's
+            "related guidance" page with `?instrument=` after its `#` fragment:
+            Guides or /trust, neither of which draws the instrument. */}
         <ul className="space-y-2 text-sm text-slate-200">
-          {toolkit.instruments.map((item, index) => {
-            const mappedCanon = toolkit.canonLinks[index % toolkit.canonLinks.length];
-            const instrumentHref = `${mappedCanon.href}?instrument=${encodeURIComponent(item)}` as Route;
-            return (
-              <li key={item}>
-                <Link href={instrumentHref} className="inline-flex min-h-[44px] items-center gap-2 text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
-                  <ArrowRightIcon className="h-3.5 w-3.5 shrink-0" />
-                  <span>{item}</span>
-                </Link>
-              </li>
-            );
-          })}
+          {toolkit.instruments.map((item) => <li key={item}>• {item}</li>)}
         </ul>
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Common mistakes to avoid</h2>
         <ul className="space-y-2 text-sm text-slate-200">{toolkit.misuseCases.map((item) => <li key={item}>• {item}</li>)}</ul>
-        <h2 className="pt-2 text-lg font-semibold text-slate-100">Related guidance</h2>
-        <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <ActionLink key={link.href} href={toRoute(link.href)} variant="pill">{link.label}</ActionLink>)}</div>
+        {/* "Related guidance" went on 2026-11-11: one pill, to the breadcrumb's own
+            "More tools" or to /trust, which the footer names on every page. */}
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start from your role or situation</h2>

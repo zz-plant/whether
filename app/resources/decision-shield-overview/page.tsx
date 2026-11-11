@@ -44,35 +44,9 @@ export default async function DecisionShieldOverviewPage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What it returns</h2>
-        <ul className="space-y-2 text-sm text-slate-200">
-          <li className="flex gap-2">
-            <span aria-hidden="true" className="text-slate-500">•</span>
-            <span>
-              <span className="font-semibold text-slate-100">A verdict.</span> Safe, Risky or
-              Dangerous, from the current conditions and your stage, category and action.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span aria-hidden="true" className="text-slate-500">•</span>
-            <span>
-              <span className="font-semibold text-slate-100">A pause line.</span> The condition to
-              hold while you proceed: phase hiring in tranches, ship milestones, cap the discount
-              window.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span aria-hidden="true" className="text-slate-500">•</span>
-            <span>
-              <span className="font-semibold text-slate-100">A restart line.</span> The condition that
-              would change the guidance, so the decision carries a stop rather than a one-time
-              guess.
-            </span>
-          </li>
-        </ul>
-      </section>
-
+      {/* "What it returns" went on 2026-11-11: its verdict, pause line and restart
+          line were the intro's sentence above as three bullets, and the verdict's
+          three values are the section below. */}
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">The three verdicts</h2>
         <ul className="space-y-2 text-sm text-slate-200">

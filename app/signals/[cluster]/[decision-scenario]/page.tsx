@@ -188,13 +188,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">{signal.title}: {scenario.title}</h1>
         <p className="text-sm text-slate-300">{signal.summary}</p>
-        {/* Facts about the reading, not controls: they were two pill buttons,
-            the shape every clickable chip on the site uses, and did nothing. */}
+        {/* A fact about the reading, not a control. A "Freshness" entry beside it
+            printed the check time the trust line already carries in brackets. */}
         <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
-          <div className="flex gap-1.5">
-            <dt className="text-slate-500">Freshness</dt>
-            <dd className="font-medium text-slate-200">{payload.freshness}</dd>
-          </div>
           <div className="flex gap-1.5">
             <dt className="text-slate-500">Trust</dt>
             <dd className="font-medium text-slate-200">{payload.trustSummary}</dd>
@@ -229,6 +225,31 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
             </div>
           ))}
         </dl>
+        {/* The copy and the two places worth going next, under the guidance they
+            act on. They were a "Copy this decision brief" section of one button
+            and a "Where to go next" row of five; the signal's own page is the
+            breadcrumb's, and the CEO guide and the plan are a tab away under
+            Guides and Plan (2026-11-11). Each link is named for where it goes,
+            as a screen reader's link list reads it. */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-1">
+          <ReportCta
+            href={pagePath}
+            label="Copy decision brief"
+            copyText={copyText}
+            copyTarget="Decision brief"
+            telemetryEvent={{
+              pagePath,
+              cluster: "authority",
+              intent: contentIntent,
+              ctaId: "copy_signal_brief",
+            }}
+            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
+          />
+          <ActionLink href="/" variant="inline">This week&apos;s full brief</ActionLink>
+          {leadAnswer ? (
+            <ActionLink href={`/answers/${leadAnswer.slug}`} variant="inline">{leadAnswer.title}</ActionLink>
+          ) : null}
+        </div>
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Trust and evidence</h2>
@@ -241,39 +262,6 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
               <p className="mt-2 text-sm text-slate-300">{item.summary}</p>
             </article>
           ))}
-        </div>
-      </section>
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Copy this decision brief</h2>
-        <p className="text-sm text-slate-300">
-          What to say when someone asks why.
-        </p>
-        <ReportCta
-          href={pagePath}
-          label="Copy decision brief"
-          copyText={copyText}
-          copyTarget="Decision brief"
-          telemetryEvent={{
-            pagePath,
-            cluster: "authority",
-            intent: contentIntent,
-            ctaId: "copy_signal_brief",
-          }}
-          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
-        />
-      </section>
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>
-        <div className="flex flex-wrap gap-2">
-          {/* Each named for where it goes: "The evidence", "Full answer", "Decision tool" and
-              "What to do" meant nothing read alone, as a screen reader's link list reads them. */}
-          <ActionLink href="/" variant="pill">This week&apos;s full brief</ActionLink>
-          <ActionLink href={`/signals/${cluster}`} variant="pill">{signal.title}</ActionLink>
-          {leadAnswer ? (
-            <ActionLink href={`/answers/${leadAnswer.slug}`} variant="pill">{leadAnswer.title}</ActionLink>
-          ) : null}
-          <ActionLink href="/resolve/ceo" variant="pill">Guide for CEOs</ActionLink>
-          <ActionLink href="/operate#ops-monthly-action-summary" variant="pill">This week&apos;s rule for each area</ActionLink>
         </div>
       </section>
     </ContentPageShell>

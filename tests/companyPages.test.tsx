@@ -4,8 +4,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   CompanyNextLinks,
   CompanyPositionSection,
-  ConditionsSection,
   RoleDecisionsSection,
+  WeekConditionsLines,
 } from "../app/companies/companyPageSections";
 import { pilotPeerGrowth, readCompanyRecord, refreshCompanyFilings } from "../lib/companies/companyFilingStore";
 import { COMPANIES, findCompany, type CompanyEntry } from "../lib/companies/companyRegistry";
@@ -200,47 +200,48 @@ describe("the page sections", () => {
 
   it("marks the reading's date up as a date", () => {
     const html = renderToStaticMarkup(
-      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
+      <WeekConditionsLines conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
     );
     assert.match(html, /<time dateTime="2026-11-03">Nov 3, 2026<\/time>/);
   });
 
   it("warns on the page when the reading is a saved one, and only then", () => {
     const week = { label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" };
-    assert.doesNotMatch(renderToStaticMarkup(<ConditionsSection conditions={week} />), /company-saved-copy/);
-    const saved = renderToStaticMarkup(<ConditionsSection conditions={{ ...week, savedCopyNotice: "Live data is late." }} />);
+    assert.doesNotMatch(renderToStaticMarkup(<WeekConditionsLines conditions={week} />), /company-saved-copy/);
+    const saved = renderToStaticMarkup(<WeekConditionsLines conditions={{ ...week, savedCopyNotice: "Live data is late." }} />);
     assert.match(saved, /company-saved-copy/);
     assert.match(saved, /Live data is late\./);
   });
 
   it("says who the guidance is written for, and calls the rules general", () => {
     const html = renderToStaticMarkup(
-      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
+      <WeekConditionsLines conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
     );
     assert.match(html, /written for companies that depend on outside funding/);
   });
 
-  it("prints the shared conditions as shared", () => {
+  it("prints the shared conditions as shared, and links the brief they come from", () => {
     const html = renderToStaticMarkup(
-      <ConditionsSection conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
+      <WeekConditionsLines conditions={{ label: "Cloudy", rationale: "Money is costly.", guidance: "Hold.", recordDateLabel: "Nov 3, 2026", recordDateIso: "2026-11-03" }} />,
     );
     assert.match(html, /Cloudy/);
     assert.match(html, /Every company reads the same conditions/);
+    assert.match(html, /href="\/"/, "every company and role page links back to the brief");
   });
 
-  it("links every page onward, and keeps the role when it walks to another company", () => {
+  it("walks the role to other companies, and to the role at any company", () => {
     const role = findCompanyRole("product-managers");
+    assert.ok(role);
     const html = renderToStaticMarkup(<CompanyNextLinks company={company} role={role} />);
-    assert.match(html, /href="\/companies\/microsoft"/);
-    assert.match(html, /href="\/companies\/microsoft\/software-engineers"/);
     assert.match(html, /href="\/companies\/google\/product-managers"/);
-    assert.match(html, /href="\/"/);
+    assert.match(html, /href="\/roles\/product-managers"/);
   });
 
   it("wraps round the end of the list", () => {
     const last = COMPANIES.at(-1);
-    assert.ok(last);
-    assert.match(renderToStaticMarkup(<CompanyNextLinks company={last} />), /href="\/companies\/microsoft"/);
+    const role = findCompanyRole("product-managers");
+    assert.ok(last && role);
+    assert.match(renderToStaticMarkup(<CompanyNextLinks company={last} role={role} />), /href="\/companies\/microsoft\/product-managers"/);
   });
 });
 
