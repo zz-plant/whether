@@ -105,7 +105,7 @@
   "dependencies": {
     "@base-ui/react": "^1.8.0",
     "@cantoo/pdf-lib": "^2.9.1",
-    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "commander": "^14.0.3",
@@ -139,7 +139,7 @@
     "oxlint": "^1.81.0",
     "oxlint-tsgolint": "^7.0.2001",
     "path-to-regexp": "6.3.0",
-    "postcss": "8.5.10",
+    "postcss": "8.5.26",
     "react-server-dom-webpack": "19.2.9",
     "rolldown": "1.2.6",
     "shadcn": "^4.21.0",
@@ -147,7 +147,7 @@
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
     "vinext": "1.0.1",
-    "vite": "^8.2.2",
+    "vite": "^8.2.4",
     "wawoff2": "^2.0.1"
   },
   "bin": {
