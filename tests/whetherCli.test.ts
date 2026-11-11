@@ -25,7 +25,14 @@ const resolveServerPort = (server: http.Server) => {
   return address.port;
 };
 
-const CLI_TIMEOUT_MS = 10_000;
+/*
+ * How long one CLI process may run before it is killed. A hang guard, not a speed assertion:
+ * the CLI exits in about 0.25s, but this file spawns ~60 Node processes while two other test
+ * shards run, and on the deploy gate's builder one `doctor` call was killed at the old 10s cap
+ * (2026-11-11, build a8ba70f1; the same seed passes locally). bun's own per-test timeout is 60s
+ * locally and 120s in the deploy gate, so 30s still catches a real hang well before it.
+ */
+const CLI_TIMEOUT_MS = 30_000;
 
 const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
   new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
@@ -41,7 +48,11 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
       if (settled) return;
       settled = true;
       child.kill("SIGTERM");
-      resolve({ status: null, stdout, stderr });
+      resolve({
+        status: null,
+        stdout,
+        stderr: `${stderr}\n[runCli] killed after ${CLI_TIMEOUT_MS}ms: whether ${args.join(" ")}`,
+      });
     }, CLI_TIMEOUT_MS);
 
     child.stdout.on("data", (chunk: Buffer) => {
