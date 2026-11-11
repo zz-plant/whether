@@ -15,7 +15,7 @@ import { ConfidenceRecordSummary } from "../components/history/confidenceRecord"
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs, groupPublishedBriefRuns, publishedBriefDisplay, publishedBriefRunLabel, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, listPublishedRecord, publishedBriefDisplay, publishedBriefRunLabel, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
@@ -305,8 +305,18 @@ export default async function HistoryPage({
               and the guidance, with each week of a run linked under it. The last row
               drops its hairline: the section's own divider sits 24px under it, and the
               two read as a double rule over Track record. */}
+          {/* Between two runs, one line for the weeks with no brief (2026-11-11): no link and
+              no tag, so it reads as the record's own note rather than a brief. */}
           <ul className="@container border-t border-[color:var(--border-default)]">
-            {groupPublishedBriefRuns(publishedBriefs).map((run) => {
+            {listPublishedRecord(publishedBriefs).map((row) => {
+              if (row.kind === "unpublished") {
+                return (
+                  <li key={row.weeks.join()} data-unpublished-weeks={row.weeks.join(" ")} className="max-w-none border-b border-[color:var(--border-default)] py-3 last:border-b-0">
+                    <p className="max-w-[64ch] text-fluid-sm leading-snug text-slate-400">{row.line}</p>
+                  </li>
+                );
+              }
+              const { run } = row;
               const [newest] = run;
               if (!newest) return null;
               return (

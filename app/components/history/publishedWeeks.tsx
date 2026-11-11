@@ -17,9 +17,10 @@ const shortDate = (time: number) =>
 /**
  * The published record week by week (docs/design/rebuild-covenant.md): one cell for
  * each week since the first brief, filled in its condition's ink where a brief was
- * published and left open where none was. The list under it shows what was published;
- * this shows what was not, which the list cannot. It states no reason for an empty
- * week, because the archive records none.
+ * published and left open where none was, so the gaps show at a glance. The cells state
+ * no reason for an empty week; the list under it names each stretch of them in a line of
+ * its own, with the reason where one is recorded (`UNPUBLISHED_WEEKS`,
+ * lib/report/publishedBriefs.ts).
  */
 export function PublishedWeeks({ briefs }: { briefs: readonly PublishedBrief[] }) {
   if (briefs.length === 0) return null;

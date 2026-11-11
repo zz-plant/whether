@@ -9,11 +9,11 @@
  *
  * Append the current week with `bun run brief:freeze`.
  */
-import { formatWeekMondayUTC } from "../formatters";
+import { formatDateUTC, formatWeekMondayUTC } from "../formatters";
 import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
-import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
+import { formatIsoWeekSlug, getIsoWeekInfo, isoWeekMonday, parseIsoWeekSlug } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl, escapeXml } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
 import { MARGIN_LABEL, formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
@@ -505,22 +505,112 @@ const briefBySlug = new Map(briefs.map((brief) => [brief.slug, brief]));
 /** Newest first. */
 export const getPublishedBriefs = () => briefs;
 
+/*
+ * The weeks since the first brief that have no brief, with the reason the repository
+ * recorded for each (docs/agents/lessons/automation-and-deploy-gate.md). w32 to w37:
+ * the scheduled freeze completed no good run from Aug 1 until it froze w38 on Sep 17,
+ * and on the last three Thursdays it refused the saved copy while FRED was blocked to
+ * it. w42 and w43: the Thursday freeze was refused by the account's usage limit on
+ * Oct 15 and Oct 22, and the Monday freeze Workflow opened no pull request. The w44
+ * record's correction states the October weeks.
+ *
+ * They are not in `data/published_briefs.json`, and nothing writes a brief for them
+ * now. A freeze records only the current week (`briefPublishGuard.ts`), the scoring
+ * engine has changed since, and a record stamped for a week it was not published in
+ * would fabricate the weekly cadence the archive is evidence of
+ * (docs/programmatic-seo-operations.md, "Frozen live briefs, not simulated history").
+ * So the record names them instead (`listPublishedRecord`). A week missed after these
+ * is shown the same way, by the fact alone until its reason is added here.
+ */
+const SCHEDULED_RUN_DID_NOT_COMPLETE = "The scheduled run that publishes the brief did not complete.";
+
+export const UNPUBLISHED_WEEKS: Readonly<Record<string, string>> = {
+  "2026-w32": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w33": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w34": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w35": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w36": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w37": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w42": SCHEDULED_RUN_DID_NOT_COMPLETE,
+  "2026-w43": SCHEDULED_RUN_DID_NOT_COMPLETE,
+};
+
+const weekMonday = (slug: string) => {
+  const week = parseIsoWeekSlug(slug);
+  return week ? isoWeekMonday(week) : null;
+};
+
+/** The weeks strictly between two published weeks, oldest first: the ones with no brief. Empty for adjacent weeks. */
+export const findUnpublishedWeeks = (older: Pick<PublishedBrief, "slug">, newer: Pick<PublishedBrief, "slug">): string[] => {
+  const from = weekMonday(older.slug);
+  const to = weekMonday(newer.slug);
+  if (!from || !to) return [];
+  const weeks: string[] = [];
+  for (let time = from.getTime() + MS_PER_WEEK; time < to.getTime(); time += MS_PER_WEEK) {
+    weeks.push(formatIsoWeekSlug(getIsoWeekInfo(new Date(time))));
+  }
+  return weeks;
+};
+
+/**
+ * One line for a stretch of weeks with no brief: "No brief was published for the weeks of
+ * Oct 12 and Oct 19, 2026.", the words the w44 correction uses, then the recorded reason
+ * where every week in the stretch has the same one. Null for no weeks.
+ */
+export const describeUnpublishedWeeks = (weeks: readonly string[]): string | null => {
+  const mondays = weeks.map(weekMonday).filter((monday): monday is Date => monday !== null);
+  const first = mondays.at(0);
+  const last = mondays.at(-1);
+  if (!first || !last) return null;
+  const label = (monday: Date) => formatDateUTC(monday.toISOString().slice(0, 10));
+  const end = label(last);
+  const start = first.getUTCFullYear() === last.getUTCFullYear() ? label(first).replace(/, \d{4}$/, "") : label(first);
+  const span =
+    mondays.length === 1 ? `the week of ${end}` : mondays.length === 2 ? `the weeks of ${start} and ${end}` : `the weeks of ${start} to ${end}`;
+  const reasons = new Set(weeks.map((week) => UNPUBLISHED_WEEKS[week]));
+  const [reason] = reasons;
+  return `No brief was published for ${span}.${reasons.size === 1 && reason ? ` ${reason}` : ""}`;
+};
+
 /**
  * Consecutive weeks that published the same guidance, one entry each (2026-10-27).
  * /history listed a card per week, so four Freezing weeks read as four announcements
- * of two sentences. Same conditions and same summary make a run; newest first, as
- * `getPublishedBriefs`. Every week keeps its own page.
+ * of two sentences. Same conditions and same summary in adjacent weeks make a run; a
+ * week with no brief ends one (2026-11-11), since "Weeks of Sep 15 – Oct 6" says every
+ * week between was published. Newest first, as `getPublishedBriefs`. Every week keeps
+ * its own page.
  */
 export const groupPublishedBriefRuns = (list: readonly PublishedBrief[]): PublishedBrief[][] => {
   const runs: PublishedBrief[][] = [];
   for (const brief of list) {
     const run = runs.at(-1);
     const head = run?.at(0);
-    if (run && head && head.regime === brief.regime && head.summary === brief.summary) run.push(brief);
+    const oldest = run?.at(-1);
+    const continues = head && oldest && head.regime === brief.regime && head.summary === brief.summary && findUnpublishedWeeks(brief, oldest).length === 0;
+    if (run && continues) run.push(brief);
     else runs.push([brief]);
   }
   return runs;
 };
+
+type PublishedRecordRow =
+  | { kind: "run"; run: PublishedBrief[] }
+  | { kind: "unpublished"; weeks: string[]; line: string };
+
+/**
+ * /history's list of published weeks, newest first: each run, and between two runs a
+ * line for the weeks with no brief (2026-11-11). The list went from "Week of Oct 26,
+ * 2026" to "Weeks of Sep 15 – Oct 6, 2026" with nothing between them; the grid above it
+ * drew the empty weeks, and only as unlabelled cells.
+ */
+export const listPublishedRecord = (list: readonly PublishedBrief[]): PublishedRecordRow[] =>
+  groupPublishedBriefRuns(list).flatMap((run, index, runs): PublishedRecordRow[] => {
+    const oldest = run.at(-1);
+    const older = runs[index + 1]?.[0];
+    const weeks = oldest && older ? findUnpublishedWeeks(older, oldest) : [];
+    const line = describeUnpublishedWeeks(weeks);
+    return line ? [{ kind: "run", run }, { kind: "unpublished", weeks, line }] : [{ kind: "run", run }];
+  });
 
 /** "Week of Oct 6, 2026", or "Weeks of Sep 15 – Oct 6, 2026" for a run. */
 export const publishedBriefRunLabel = (run: readonly PublishedBrief[]): string => {

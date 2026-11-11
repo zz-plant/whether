@@ -479,7 +479,11 @@ not follow the pointer; it animates only while the lens is opening or closing.
 apart. A published week is its condition's fill with its own pattern (plain Sunny, ruled
 Stormy, hatched Cloudy, cross-hatched Freezing); a week with no brief is an empty cell with a
 dashed strong border. The caption counts the empty weeks and states no reason. Where a brief and
-its month-end name different conditions, a caveat note states both facts and no cause.
+its month-end name different conditions, a caveat note states both facts and no cause. In the list
+of runs under it, and under the week links at the foot of each `/brief/<week>` page, each stretch
+of weeks with no brief is one muted line with no link and no tag ("No brief was published for the
+weeks of Oct 12 and Oct 19, 2026."), followed by the reason where one is recorded
+(`UNPUBLISHED_WEEKS` in `lib/report/publishedBriefs.ts`). The weeks are never added to the archive.
 
 ### The guidance block
 
