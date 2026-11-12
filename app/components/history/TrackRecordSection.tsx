@@ -66,7 +66,9 @@ export function TrackRecordSection({
           value={counts?.changes ?? record.transitions.length}
           unit={`in the last ${counts?.readings ?? record.observations} months`}
         />
-        <Fact label="Warned a month ahead" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        {/* What `signaled` measures, said of the readings (2026-11-12): "Warned a month ahead"
+            had them warn, which a reading cannot do (tests/titleSubjects.test.ts). */}
+        <Fact label="Near the line the month before" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
         {/* Says what lasted (2026-11-10): "Typical length" named no noun. */}
         <Fact
           label="Conditions typically held"

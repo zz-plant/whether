@@ -35,21 +35,21 @@ export const ADVICE_STANCE_DEFINITIONS: Record<
 > = {
   expand: {
     label: "Expand",
-    question: "Told founders to grow faster",
+    question: "Advice to grow faster",
     definition: "Invest, grow, hire or move faster.",
     corpusDefinition:
       "Tells founders to grow faster: hire or spend ahead of revenue, raise more to accelerate, take bigger or more bets, or put growth ahead of efficiency.",
   },
   conserve: {
     label: "Conserve",
-    question: "Told founders to protect cash",
+    question: "Advice to protect cash",
     definition: "Focus, cut, extend runway, run leaner or reach profitability.",
     corpusDefinition:
       "Tells founders to protect cash: cut or hold spending, slow or freeze hiring, extend runway, reach profitability, raise to survive rather than to accelerate, or put efficiency ahead of growth.",
   },
   craft: {
     label: "Craft",
-    question: "Taught a method, no direction for money",
+    question: "A method, with no direction for money",
     definition: "Method advice that sets no direction for money or headcount.",
     corpusDefinition:
       "Teaches a method (product, hiring practice, sales, management, how to run a fundraise) without telling founders to speed up or slow down their spending.",

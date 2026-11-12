@@ -96,7 +96,8 @@ describe("/signals leads with the delta and folds its instruments", () => {
       /* Was "What would the call be with different lines?": "the call" is
          retired reader vocabulary (lib/report/AGENTS.md). Changed on purpose. */
       "What would conditions be with different lines?",
-      "What did the brief say in an earlier month?",
+      /* Was "What did the brief say…": a brief does not speak (tests/titleSubjects.test.ts). */
+      "What was the guidance in an earlier month?",
       "Which past cycle looks most like this one?",
       "Which habits from the zero-rate years still shape your company?",
     ]) {
@@ -162,7 +163,7 @@ describe("/signals answers each closed question in its summary", () => {
   /* The summary is the one place the count prints: the timeline under it carried a
      "Changes in conditions" card with the same sentence until 2026-10-14. */
   it("past months: the change count, printed once", () => {
-    const answer = summaryAnswer(withTrends, "What did the brief say in an earlier month?");
+    const answer = summaryAnswer(withTrends, "What was the guidance in an earlier month?");
     assert.ok(answer && /^(No change|\d+ changes?) across the last \d+ months$/.test(answer), answer);
     const timeline = withTrends.slice(withTrends.indexOf('id="regime-timeline"'));
     assert.ok(!timeline.includes(answer), "the timeline under it does not repeat it");

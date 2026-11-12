@@ -225,8 +225,8 @@ answering a question the answer pages already answer.
 ## Headings (h1–h4, eyebrows, section labels)
 
 Headings are the scan path: an operator reads the heading, decides whether the block matters
-this week, and moves on. Eight rules, each written after a real drift found by the 2026-09-02
-inventory of every heading in `app/`:
+this week, and moves on. Nine rules, each written after a real drift (the first eight by the 2026-09-02
+inventory of every heading in `app/`):
 
 - **A heading names what the reader gets, in the reader's words.** No codenames, framework
   terms, or engine vocabulary. Retired from user-visible text: "Decision contract" (now "This
@@ -257,6 +257,18 @@ inventory of every heading in `app/`:
   the record…"), "this site" as the party the privacy policy is about, and a pointer that carries
   information ("the table below has every value"). `tests/readerClauseShapes.test.tsx` holds the
   announcing verbs (found 2026-11-09).
+- **A title gives a person's verb only to a person.** A brief, a filing, a record, a reading or a
+  post cannot say, tell, warn, think or want anything; a title that has one do it gives the thing
+  a mind and hides who acted. Name the thing or the fact instead. Found 2026-11-12: "{company}:
+  what its filings say about hiring and spending" is now "{company}: hiring and spending in its
+  filings"; "What did the brief say in an earlier month?" is "What was the guidance in an earlier
+  month?"; the fact "Warned a month ahead" (the readings warned) is "Near the line the month
+  before", which is what it counts; the legend "Told founders to grow faster" (the posts told) is
+  "Advice to grow faster". A person keeps their verbs ("Sales says…", "why a board trusts…"),
+  verbs a thing can do are fine ("What the record shows"), and a participle on a noun is not a
+  clause ("Recommended tools"). A title that opens on a past-tense speech verb has no subject, so
+  the reader supplies the nearest thing: give it one. `tests/titleSubjects.test.ts` reads every
+  title in `app/`, `lib/` and `content/`.
 - **Sentence case everywhere.** Capitals only for proper nouns: Whether, Room to move, the
   weather regime names, FRED. No all-caps in source — `.type-eyebrow` uppercases in CSS — and no
   emoji in a heading or label.
