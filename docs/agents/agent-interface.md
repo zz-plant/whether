@@ -173,7 +173,7 @@ site's weather word in any case; and the server's name is `whether`, not `whethe
 ## Option C: remote MCP endpoint
 
 `https://whether.work/api/mcp` is an MCP streamable-HTTP server (JSON-RPC 2.0; `initialize`,
-`ping`, `tools/list`, `tools/call`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
+`ping`, `tools/list`, `tools/call`, `prompts/*`, `resources/*`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
 key. Transport: `lib/mcp/httpMcpServer.ts`, a fresh `lib/mcp/server.ts` per request; transport tests:
 `tests/mcpStreamableTransport.test.ts`.
 A POST body over 4 MiB, the SDK's default limit, is refused with 413 and a JSON-RPC error
@@ -195,6 +195,33 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
 - `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions. A plan naming no decision the matrix has a row for (a price rise, money coming in, ad spend) comes back with `verdict: null` (`"not_graded"` from `lint_sprint_goal`), a `nextStep` and the `answer` that covers it, if one does; until 2026-11-03 it was graded as a hire. The first three also take `category`, to grade what the wording could not, and `cashUsd`, `monthlySpendUsd`, `monthlyRevenueUsd`, `runwayMonths` and `businessModel`, because an agent has no browser profile and every plan it sent was graded on conditions alone. Over the plain-GET shim those figures sit in the URL, which reaches the request logs; send them over MCP.
 - `list_agent_skills` — the skill contract.
+
+### Prompts and resources (2026-11-12)
+
+Tools are for a model to call. Prompts and resources are for the person using the client, who sees
+prompts as commands and resources as things to attach. Both are in `lib/mcp/promptsAndResources.ts`,
+are served on both transports, and only run tools from the registry. A resource or prompt is
+counted in `agent-tool` telemetry as the tool it ran. Tests: `tests/mcpPromptsAndResources.test.ts`.
+
+| Prompt | Arguments | Carries |
+| --- | --- | --- |
+| `check-plan` | `plan`, `runway_months` (optional) | `stress_test_plan`'s answer and the state |
+| `answer-question` | `question` | `get_answer`'s answer, or its refusal |
+| `share-this-week` | none | `get_standup_line` and the state, for a note of four lines at most |
+
+A prompt runs its tools before the model sees anything. The verdict and the lines arrive as data,
+so the prompt works in a client that does not let the model call tools. Every prompt ends on the
+same rules: quote the date, link the page, flag a reading that is not current, and presume no
+team or board.
+
+| Resource | Same answer as |
+| --- | --- |
+| `whether://state` | `get_state` |
+| `whether://brief/weekly` | `get_brief` |
+| `whether://weeks/{week}` (template; the newest eight are listed) | `get_brief` with `week` |
+
+There are no subscriptions: the remote transport is stateless and has nowhere to hold one. A
+client that wants to know when the call changes comes back at `freshness.nextCallDue`.
 
 Client config (shape):
 

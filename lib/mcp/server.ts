@@ -1,7 +1,26 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { CallToolRequestSchema, ErrorCode, ListToolsRequestSchema, McpError, ToolSchema } from "@modelcontextprotocol/sdk/types.js";
+import {
+  CallToolRequestSchema,
+  ErrorCode,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  ListToolsRequestSchema,
+  McpError,
+  ReadResourceRequestSchema,
+  ToolSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 import { AgentInputError, type AgentToolTransport } from "../agent/registry";
 import { callAgentTool, listAgentTools } from "../agent/tools";
+import {
+  getWhetherPrompt,
+  listWhetherPrompts,
+  listWhetherResources,
+  listWhetherResourceTemplates,
+  McpItemRequestError,
+  readWhetherResource,
+} from "./promptsAndResources";
 import { MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./serverIdentity";
 
 /**
@@ -15,11 +34,16 @@ import { MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "./serverIdentity";
  * none of the remote server's structured results or refusals that say what was allowed. Both
  * read one list and one call path (`lib/agent/tools.ts`). This uses the SDK's low-level `Server`
  * so a wrong argument is answered by our own refusal, in the same words on both transports, and
- * not by the SDK's schema validation.
+ * not by the SDK's schema validation. Prompts and resources (`promptsAndResources.ts`) are
+ * served the same way, over the same tools.
  */
 export const createWhetherMcpServer = (transport: AgentToolTransport) => {
   const server = new Server(MCP_SERVER_INFO, {
-    capabilities: { tools: { listChanged: false } },
+    capabilities: {
+      tools: { listChanged: false },
+      prompts: { listChanged: false },
+      resources: { subscribe: false, listChanged: false },
+    },
     instructions: MCP_SERVER_INSTRUCTIONS,
   });
 
@@ -37,6 +61,27 @@ export const createWhetherMcpServer = (transport: AgentToolTransport) => {
       throw error;
     }
   });
+
+  // Prompts and resources run the same tools (`promptsAndResources.ts`); a name or URI this
+  // server does not have is the caller's mistake, answered as invalid params.
+  const asInvalidParams = async <Result>(work: () => Promise<Result>) => {
+    try {
+      return await work();
+    } catch (error) {
+      if (error instanceof McpItemRequestError) throw new McpError(ErrorCode.InvalidParams, error.message);
+      throw error;
+    }
+  };
+
+  server.setRequestHandler(ListPromptsRequestSchema, async () => listWhetherPrompts());
+  server.setRequestHandler(GetPromptRequestSchema, async ({ params }) =>
+    asInvalidParams(() => getWhetherPrompt(params.name, params.arguments, transport)),
+  );
+  server.setRequestHandler(ListResourcesRequestSchema, async () => listWhetherResources());
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => listWhetherResourceTemplates());
+  server.setRequestHandler(ReadResourceRequestSchema, async ({ params }) =>
+    asInvalidParams(() => readWhetherResource(params.uri, transport)),
+  );
 
   return server;
 };
