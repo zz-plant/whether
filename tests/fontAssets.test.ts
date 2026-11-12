@@ -4,6 +4,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { brotliDecompressSync } from "node:zlib";
 import { describe, it } from "bun:test";
+import { fetchStaticAsset, installAssetFetcher } from "../lib/runtime/staticAssets";
 
 /*
  * The font files, read as files (ui-ux-standards §XXII).
@@ -220,6 +221,25 @@ describe("the web fonts", () => {
 });
 
 describe("the share cards' fonts", () => {
+  /* In production a fetch of the Worker's own origin never reached the files, so every card
+     drew Satori's built-in face (found 2026-11-12). The worker installs the assets binding. */
+  it("are read through the static-assets binding the worker installs, not the Worker's own origin", async () => {
+    assert.match(readFileSync("worker/index.ts", "utf8"), /installAssetFetcher\(\(assetRequest\) => env\.ASSETS\.fetch\(assetRequest\)\)/);
+    assert.match(readFileSync("lib/image/ogFonts.ts", "utf8"), /await fetchStaticAsset\(face\.path, requestUrl\)/);
+    const seen: string[] = [];
+    installAssetFetcher(async (request) => {
+      seen.push(request.url);
+      return new Response("font");
+    });
+    try {
+      const response = await fetchStaticAsset("/fonts/og/source-sans-3-400.ttf", "https://whether.work/api/og?template=report");
+      assert.equal(await response.text(), "font");
+      assert.deepEqual(seen, ["https://whether.work/fonts/og/source-sans-3-400.ttf"]);
+    } finally {
+      installAssetFetcher(null);
+    }
+  });
+
   /* Static instances of the site's own two faces (scripts/generate-og-fonts.mjs), since
      2026-11-12 (Archivo until then). Satori reads these, and lib/image/ogFonts.ts no
      longer rewrites the arrow. */

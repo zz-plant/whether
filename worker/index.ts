@@ -4,6 +4,7 @@ import handler from "vinext/server/app-router-entry";
 import { refreshOperatingState } from "../lib/operatingState/refreshOperatingState";
 import { writeAnalytics } from "../lib/telemetry/analyticsEngine";
 import { installWaitUntil } from "../lib/runtime/backgroundWork";
+import { installAssetFetcher } from "../lib/runtime/staticAssets";
 import { withDeadline } from "../lib/withDeadline";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
@@ -266,6 +267,9 @@ export default {
      * Installed per-request on globalThis; concurrent requests in one isolate may hand
      * work to a sibling ctx, which Workers keeps alive just the same. */
     installWaitUntil(ctx.waitUntil.bind(ctx));
+    /* The share cards read their fonts from the static assets; a fetch of this Worker's
+       own origin does not reach them (lib/runtime/staticAssets.ts). */
+    installAssetFetcher((assetRequest) => env.ASSETS.fetch(assetRequest));
 
     const url = new URL(request.url);
 
