@@ -197,7 +197,8 @@ output `deploy:cloudflare` uploads. `cf` cannot set a single secret or tail logs
 which `tests/redirectResolution.test.ts` had imported without declaring; it is a dev dependency
 now. Verified locally: the build, `cf deploy --dry-run` on both lanes (every production binding
 Wrangler deployed, resolved), the landmark audit and `bun run e2e:email` (50 of 53, the same three
-failures as `main` under `wrangler dev`). Not verified until the first deploy after merge: the
+failures as `main` under `wrangler dev`; on 2026-11-12 those three turned out to be the suite reading
+the month-end letter as the Monday brief, fixed in `scripts/e2e/email-flows.mjs`). Not verified until the first deploy after merge: the
 upload itself and the exports lifecycle against the live Worker.
 
 **Never set `WORKERS_CI=1` outside Workers Builds (2026-11-03).** The gate takes it to mean a build
