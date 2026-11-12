@@ -137,7 +137,7 @@ recapture correctly.
 | `bun run telemetry:agent-tools` | Calls to each agent tool over HTTP by how they ended, from `agent-tool`: answered, not graded, refused and where the refusal pointed. Counts only; the questions are not recorded. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](agent-interface.md). |
-| `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. |
+| `bun run smoke:prod` | Runs post-deploy synthetic smoke checks against the production site. The words each page must still say live in `scripts/smoke-page-checks.mjs`, and the landmark audit asks them of the local worker too, so renaming a heading fails the gate instead of every smoke run after the deploy. |
 
 ## Where things live
 
