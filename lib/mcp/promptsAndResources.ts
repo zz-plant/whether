@@ -1,6 +1,7 @@
 import { AgentInputError, type AgentToolTransport } from "../agent/registry";
 import { runAgentTool } from "../agent/tools";
-import { getPublishedBriefs } from "../report/publishedBriefs";
+import { formatIsoWeekSlug, parseIsoWeekSlug } from "../isoWeek";
+import { findPublishedBrief, getPublishedBriefs } from "../report/publishedBriefs";
 
 /**
  * MCP prompts and resources, over the same tools every transport serves.
@@ -73,17 +74,6 @@ export const listWhetherResourceTemplates = () => ({
   ],
 });
 
-/** Which tool answers a resource, and with what. Null for a URI this server does not serve. */
-const toolForUri = (uri: string): { tool: string; args: Record<string, string> } | null => {
-  if (uri === STATE_URI) return { tool: "get_state", args: {} };
-  if (uri === WEEKLY_BRIEF_URI) return { tool: "get_brief", args: { cadence: "weekly" } };
-  if (uri.startsWith(WEEK_URI_PREFIX)) {
-    const week = decodeURIComponent(uri.slice(WEEK_URI_PREFIX.length));
-    if (/^\d{4}-w\d{1,2}$/i.test(week)) return { tool: "get_brief", args: { week } };
-  }
-  return null;
-};
-
 /** Thrown for a URI or prompt this server does not have; the transport answers it as invalid params. */
 export class McpItemRequestError extends Error {
   constructor(message: string) {
@@ -92,21 +82,39 @@ export class McpItemRequestError extends Error {
   }
 }
 
+/* A week as a client may fill the template ("2026-W5", "2026-w05"), in the slug the archive uses. */
+const weekSlugFromUri = (uri: string): string | null => {
+  let raw: string;
+  try {
+    raw = decodeURIComponent(uri.slice(WEEK_URI_PREFIX.length));
+  } catch {
+    return null; // Malformed percent-encoding is the caller's URI, not a fault.
+  }
+  const match = /^(\d{4})-w(\d{1,2})$/i.exec(raw.trim());
+  const week = match ? parseIsoWeekSlug(`${match[1]}-w${match[2].padStart(2, "0")}`) : null;
+  return week ? formatIsoWeekSlug(week) : null;
+};
+
+/** Which tool answers a resource, and with what; a refusal for a URI this server does not serve. */
+const toolForUri = (uri: string): { tool: string; args: Record<string, string> } => {
+  if (uri === STATE_URI) return { tool: "get_state", args: {} };
+  if (uri === WEEKLY_BRIEF_URI) return { tool: "get_brief", args: { cadence: "weekly" } };
+  if (uri.startsWith(WEEK_URI_PREFIX)) {
+    const week = weekSlugFromUri(uri);
+    if (!week) throw new McpItemRequestError(`${JSON.stringify(uri)} does not name a week; use a slug like 2026-w41.`);
+    /* Checked here, so only a week that was never published is the caller's mistake; anything
+       get_brief throws after this is a fault and propagates as one. */
+    if (!findPublishedBrief(week)) {
+      throw new McpItemRequestError(`No brief was published for ${week}. Published weeks: ${getPublishedBriefs().map((brief) => brief.slug).join(", ")}.`);
+    }
+    return { tool: "get_brief", args: { week } };
+  }
+  throw new McpItemRequestError(`Unknown resource ${JSON.stringify(uri)}. Served: ${STATE_URI}, ${WEEKLY_BRIEF_URI}, ${WEEK_URI_TEMPLATE}.`);
+};
+
 export const readWhetherResource = async (uri: string, transport: AgentToolTransport) => {
   const target = toolForUri(uri);
-  if (!target) {
-    throw new McpItemRequestError(
-      `Unknown resource ${JSON.stringify(uri)}. Served: ${STATE_URI}, ${WEEKLY_BRIEF_URI}, ${WEEK_URI_TEMPLATE}.`,
-    );
-  }
-  let result: Record<string, unknown>;
-  try {
-    result = await runAgentTool(target.tool, target.args, transport);
-  } catch (error) {
-    // get_brief refuses an unknown week with the list of weeks it has; that is the caller's URI, not a fault.
-    if (target.args.week) throw new McpItemRequestError(error instanceof Error ? error.message : String(error));
-    throw error;
-  }
+  const result = await runAgentTool(target.tool, target.args, transport);
   return { contents: [{ uri, mimeType: JSON_MIME, text: asJson(result) }] };
 };
 
@@ -139,10 +147,13 @@ const runOrRefusal = async (tool: string, args: Record<string, unknown>, transpo
   }
 };
 
-const optionalNumber = (value: string | undefined) => {
-  if (value === undefined || value.trim() === "") return undefined;
-  const parsed = Number(value.replace(/[$,\s]/g, ""));
-  return Number.isFinite(parsed) ? parsed : undefined;
+/* A prompt argument is free text. A runway the test cannot read is said to the model, not dropped:
+   a verdict graded on conditions alone must not read as one that weighed the company's runway. */
+const readRunway = (value: string | undefined): { months?: number; note?: string } => {
+  if (value === undefined || value.trim() === "") return {};
+  const parsed = Number(value.replace(/months?/i, "").replace(/[,\s]/g, ""));
+  if (Number.isFinite(parsed) && parsed >= 0) return { months: parsed };
+  return { note: `The runway given (${JSON.stringify(value)}) is not a number of months, so the test did not use it; say so.` };
 };
 
 const PROMPTS: readonly WhetherPrompt[] = [
@@ -155,13 +166,14 @@ const PROMPTS: readonly WhetherPrompt[] = [
       { name: "runway_months", description: "Months of runway, if known.", required: false },
     ],
     build: async ({ plan, runway_months }, transport) => {
-      const runwayMonths = optionalNumber(runway_months);
+      const runway = readRunway(runway_months);
       const [state, test] = await Promise.all([
         runAgentTool("get_state", {}, transport),
-        runOrRefusal("stress_test_plan", { planText: plan, ...(runwayMonths === undefined ? {} : { runwayMonths }) }, transport),
+        runOrRefusal("stress_test_plan", { planText: plan, ...(runway.months === undefined ? {} : { runwayMonths: runway.months }) }, transport),
       ]);
       return [
         `Does this plan hold up under this week's conditions? Plan: ${plan}`,
+        ...(runway.note ? [runway.note] : []),
         "Lead with the verdict, then the line that would pause it and the line that would let it go ahead. " +
           "Name the fragile assumptions the test found. If the verdict is null, say the test has no rules for this kind of decision and point to the answer it names.",
         ANSWER_RULES,

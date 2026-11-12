@@ -68,9 +68,19 @@ describe("MCP prompts and resources", () => {
 
     const missing = await rpc("resources/read", { uri: "whether://weeks/1999-w01" });
     assert.equal(missing.error.code, -32602);
-    assert.match(missing.error.message, /not found/);
+    assert.match(missing.error.message, /No brief was published for 1999-w01/);
     const unknown = await rpc("resources/read", { uri: "https://example.com/" });
     assert.equal(unknown.error.code, -32602);
+  });
+
+  it("reads a week written the way a client may fill the template, and refuses a malformed one as the caller's", async () => {
+    const [year, number] = getPublishedBriefs()[0].slug.split("-w");
+    const { result } = await rpc("resources/read", { uri: `whether://weeks/${year}-W${Number(number)}` });
+    assert.equal(JSON.parse(result.contents[0].text).slug, getPublishedBriefs()[0].slug);
+    for (const uri of ["whether://weeks/%E0", "whether://weeks/last-week"]) {
+      const refused = await rpc("resources/read", { uri });
+      assert.equal(refused.error.code, -32602, uri);
+    }
   });
 
   it("lists three prompts with their arguments", async () => {
@@ -90,6 +100,14 @@ describe("MCP prompts and resources", () => {
     assert.ok("verdict" in JSON.parse(testJson), "the verdict arrives as data");
     assert.match(text, /This week's state \(get_state\):\n\{/);
     assert.match(text, /automation\.ready is false/);
+    assert.doesNotMatch(text, /not a number of months/);
+  });
+
+  it("tells the model when a runway could not be read, instead of dropping it", async () => {
+    const { result } = await rpc("prompts/get", { name: "check-plan", arguments: { plan: "Hire two engineers", runway_months: "about a year" } });
+    assert.match(result.messages[0].content.text, /The runway given \("about a year"\) is not a number of months/);
+    const months = await rpc("prompts/get", { name: "check-plan", arguments: { plan: "Hire two engineers", runway_months: "18 months" } });
+    assert.doesNotMatch(months.result.messages[0].content.text, /not a number of months/);
   });
 
   it("passes on get_answer's refusal instead of failing the prompt", async () => {
@@ -101,7 +119,9 @@ describe("MCP prompts and resources", () => {
     const { result } = await rpc("prompts/get", { name: "share-this-week" });
     const text: string = result.messages[0].content.text;
     assert.match(text, /Standup line \(get_standup_line\):\n\{"standupLine"/);
-    assert.doesNotMatch(text, /\byour team\b|\bthe board\b/i, "it presumes no team or board");
+    // The prompt's own words, before the data it carries: the guidance never presumes a team, a board or an approver.
+    const instructions = text.slice(0, text.indexOf("Standup line (get_standup_line):"));
+    assert.doesNotMatch(instructions, /\b(your|the) (team|teams|engineers|board|manager|approver|leadership)\b/i, "it presumes no team or board");
   });
 
   it("refuses an unknown prompt and a missing required argument as invalid params", async () => {
