@@ -178,6 +178,8 @@ key. Transport: `lib/mcp/httpMcpServer.ts`, a fresh `lib/mcp/server.ts` per requ
 `tests/mcpStreamableTransport.test.ts`.
 A POST body over 4 MiB, the SDK's default limit, is refused with 413 and a JSON-RPC error
 (code -32000), whether its `Content-Length` says so or the bytes arriving pass the limit.
+The rest of a refused upload is read and discarded before the 413 is sent, up to 32 MiB, because
+Cloudflare's edge can replace an answer sent mid-upload with its own 502.
 The `initialize` result carries instructions that say where to start (`lib/mcp/serverIdentity.ts`).
 They are prose and name ten of the thirteen tools by use; `get_signals`, `get_analog_playbook` and
 `list_agent_skills` are left to `tools/list` on purpose, since none changes where an agent starts or

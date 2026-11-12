@@ -33,6 +33,39 @@ const jsonErrorResponse = (status: number, code: number, message: string) =>
     headers: { "content-type": "application/json" },
   });
 
+/**
+ * How much of an over-cap upload is still taken before the 413 goes out: eight
+ * times the cap, 32 MiB. A longer upload is cancelled there.
+ */
+const DISCARD_CEILING_BYTES = 8 * DEFAULT_MAX_REQUEST_BODY_SIZE;
+
+/**
+ * Take what is left of a refused upload and keep none of it.
+ *
+ * A Worker that answers while the client is still sending does not reliably
+ * get its answer delivered: in production on 2026-11-12, Cloudflare's edge
+ * replaced 3 of 7 such 413s with its own 502. Reading the upload to its end
+ * first removes the race. Each chunk is dropped as it arrives, so memory stays
+ * flat whatever the size, which is what the cap is for.
+ */
+const discardRequestBody = async (request: Request): Promise<void> => {
+  if (request.body === null || request.body.locked) return;
+  const reader = request.body.getReader();
+  try {
+    let discarded = 0;
+    while (discarded < DISCARD_CEILING_BYTES) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      discarded += value.byteLength;
+    }
+    await reader.cancel();
+  } catch {
+    // The upload failed or was aborted. The request is refused either way.
+  } finally {
+    reader.releaseLock();
+  }
+};
+
 /** Handle one MCP streamable-HTTP POST. */
 export const handleMcpRequest = async (request: Request): Promise<Response> => {
   // The body is parsed here so a batched request can be refused before the
@@ -42,13 +75,15 @@ export const handleMcpRequest = async (request: Request): Promise<Response> => {
   //
   // It is read with the SDK's own reader and limit (4 MiB), the ones the
   // transport would use on an unread request: a declared Content-Length over
-  // the limit is refused before anything is read, and a body that turns out
-  // longer than it declared, or declared nothing, stops being read once it
-  // passes the limit. The answer is the transport's: 413 and code -32000.
+  // the limit is refused on the header alone, and a body that turns out
+  // longer than it declared, or declared nothing, stops being kept once it
+  // passes the limit. The rest of a refused upload is discarded before the
+  // answer, which is the transport's: 413 and code -32000.
   let message: unknown;
   try {
     const body = await readRequestBody(request, DEFAULT_MAX_REQUEST_BODY_SIZE);
     if (body.tooLarge) {
+      await discardRequestBody(request);
       return jsonErrorResponse(413, -32000, requestBodyTooLargeMessage(DEFAULT_MAX_REQUEST_BODY_SIZE));
     }
     message = JSON.parse(body.text);

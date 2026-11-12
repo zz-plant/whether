@@ -530,3 +530,18 @@ against what Next actually throws instead of against a stub written in another f
 The workflow files under `.github/workflows/` are kept as manual (`workflow_dispatch`) fallbacks for
 a missed run or a restored Actions budget. Running both would open two PRs, not corrupt anything.
 
+
+## An answer sent before the upload ends (2026-11-12)
+
+#1811 capped the `/api/mcp` request body at 4 MiB and answered 413 as soon as it knew the body was
+too large: on the `Content-Length` header alone, or the moment the bytes passed the cap. Against the
+built Worker in workerd that answered 413 every time. In production, 3 of 7 over-cap uploads got
+Cloudflare's own 502 instead, across HTTP/1.1 and HTTP/2, with and without a declared length. The
+edge was still forwarding the upload when the Worker finished, and sometimes reported the broken
+upload instead of the answer. The only local hint had been a 500 from the preview's Node proxy on the
+same request, which the PR put down to the proxy.
+
+`lib/mcp/httpMcpServer.ts` now reads the rest of a refused upload and discards it, up to 32 MiB,
+before it answers. Nothing is kept, so the cap still bounds memory. A handler that refuses a request
+on its size or its headers should do the same, and the check that settles it is repeated uploads
+against the deployed Worker, not workerd.

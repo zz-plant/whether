@@ -203,52 +203,109 @@ describe("MCP streamable HTTP transport", () => {
 
   /* The route reads the body itself, to refuse a batch, and hands the transport the parsed
      message; the transport's limit covers only a body it reads, so until 2026-11-12 a POST
-     of any size was read into memory. */
-  it("refuses a declared Content-Length over the cap with 413, before reading the body", async () => {
+     of any size was read into memory.
+
+     An over-cap body is refused, but the rest of the upload is still taken and thrown away
+     before the 413 goes out. Answering while the client was still sending is what the first
+     version did, and Cloudflare's edge turned 3 of 7 such answers into its own 502
+     (production, 2026-11-12). Past DISCARD_CEILING_BYTES the upload is cancelled instead. */
+  const DISCARD_CEILING_BYTES = 8 * BODY_CAP_BYTES;
+
+  /** A request whose body is `available` bytes of spaces, counted as the handler takes them. */
+  const streamedRequest = (available: number, headers: Record<string, string> = {}) => {
+    const chunk = new Uint8Array(64 * 1024).fill(0x20);
+    const taken = { bytes: 0, cancelled: false };
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (taken.bytes >= available) {
+          controller.close();
+          return;
+        }
+        taken.bytes += chunk.byteLength;
+        controller.enqueue(chunk);
+      },
+      cancel() {
+        taken.cancelled = true;
+      },
+    });
     const request = new Request("https://whether.work/api/mcp", {
       method: "POST",
-      headers: { ...MCP_HEADERS, "content-length": String(BODY_CAP_BYTES + 1) },
-      // A small, valid body: only the declared length can be what refuses it.
-      body: PING,
+      headers: { ...MCP_HEADERS, ...headers },
+      body,
     });
-    const response = await handleMcpRequest(request);
+    return { request, taken };
+  };
 
+  const assertTooLarge = async (response: Response) => {
     assert.equal(response.status, 413);
-    assert.equal(request.bodyUsed, false, "the body was not read");
     assert.match(response.headers.get("content-type") ?? "", /application\/json/);
     assert.deepEqual(await response.json(), {
       jsonrpc: "2.0",
       id: null,
       error: { code: -32000, message: "Payload Too Large: Request body must not exceed 4194304 bytes" },
     });
+  };
+
+  it("refuses a declared Content-Length over the cap with 413, after taking the upload", async () => {
+    const available = BODY_CAP_BYTES + 2 * 1024 * 1024;
+    const { request, taken } = streamedRequest(available, { "content-length": String(available) });
+
+    await assertTooLarge(await handleMcpRequest(request));
+
+    assert.equal(taken.bytes, available, "the whole upload was taken before the answer");
+    assert.equal(taken.cancelled, false);
   });
 
-  it("stops reading a streamed body that declares no length once it passes the cap", async () => {
-    const chunk = new Uint8Array(64 * 1024).fill(0x20);
+  it("refuses a small body that declares an over-cap length, whatever it holds", async () => {
+    const request = new Request("https://whether.work/api/mcp", {
+      method: "POST",
+      headers: { ...MCP_HEADERS, "content-length": String(BODY_CAP_BYTES + 1) },
+      // A small, valid body: only the declared length can be what refuses it.
+      body: PING,
+    });
+
+    await assertTooLarge(await handleMcpRequest(request));
+  });
+
+  it("refuses a streamed body that declares no length once it passes the cap, after taking the rest", async () => {
     const available = BODY_CAP_BYTES * 2;
-    let produced = 0;
+    const { request, taken } = streamedRequest(available);
+    assert.equal(request.headers.get("content-length"), null);
+
+    await assertTooLarge(await handleMcpRequest(request));
+
+    assert.equal(taken.bytes, available, "the whole upload was taken before the answer");
+    assert.equal(taken.cancelled, false);
+  });
+
+  it("stops taking an upload at the discard ceiling and cancels it", async () => {
+    const available = DISCARD_CEILING_BYTES * 4;
+    const { request, taken } = streamedRequest(available);
+
+    await assertTooLarge(await handleMcpRequest(request));
+
+    assert.ok(
+      taken.bytes <= BODY_CAP_BYTES + DISCARD_CEILING_BYTES + 1024 * 1024,
+      `taking stopped near the ceiling: ${taken.bytes} of ${available} bytes were taken`,
+    );
+    assert.equal(taken.cancelled, true, "the rest of the upload was cancelled");
+  });
+
+  it("still answers 413 when the upload fails while it is being discarded", async () => {
+    let sent = 0;
     const body = new ReadableStream<Uint8Array>({
       pull(controller) {
-        if (produced >= available) {
-          controller.close();
+        sent += 1;
+        if (sent > 80) {
+          controller.error(new Error("client went away"));
           return;
         }
-        produced += chunk.byteLength;
-        controller.enqueue(chunk);
+        controller.enqueue(new Uint8Array(64 * 1024).fill(0x20));
       },
     });
     const request = new Request("https://whether.work/api/mcp", { method: "POST", headers: MCP_HEADERS, body });
-    assert.equal(request.headers.get("content-length"), null);
 
-    const response = await handleMcpRequest(request);
-
-    assert.equal(response.status, 413);
-    const payload = await response.json();
-    assert.equal(payload.error.code, -32000);
-    assert.ok(
-      produced < BODY_CAP_BYTES + 1024 * 1024,
-      `read stopped near the cap: ${produced} of ${available} bytes were taken from the stream`,
-    );
+    await assertTooLarge(await handleMcpRequest(request));
   });
 
   it("answers a body exactly at the cap as before, and refuses one byte more", async () => {
