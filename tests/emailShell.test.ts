@@ -207,6 +207,9 @@ describe("the shared email shell, on a deployment that is not production", () =>
       assert.equal(resolveEmailBaseUrl(new Request("http://localhost:8787/api/email/send-weekly")), "http://localhost:8787");
       assert.equal(resolveEmailBaseUrl(new Request(`${previewOrigin}/api/email/send-weekly`)), previewOrigin);
       assert.equal(resolveEmailBaseUrl(new Request("https://evil.example/api/email/send-weekly")), siteUrl, "a forged Host header cannot choose the link target");
+      /* Cloudflare refuses a List-Unsubscribe with an http link, and the whole message with it. */
+      assert.equal(resolveEmailBaseUrl(new Request("http://whether.work/api/email/send-weekly")), siteUrl, "a send triggered over http still mails https links");
+      assert.equal(resolveEmailBaseUrl(new Request(`${previewOrigin.replace("https:", "http:")}/api/email/send-weekly`)), previewOrigin);
       assert.equal(resolveEmailBaseUrl(), siteUrl, "a cron send has no request and keeps the production origin");
     } finally {
       if (configured[0] !== undefined) process.env.APP_BASE_URL = configured[0];
@@ -223,6 +226,10 @@ describe("what a mail client can act on", () => {
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     });
     assert.deepEqual(unsubscribeHeaders(null), {}, "no token, no header rather than a broken one");
+  });
+
+  it("leaves the header off an http link, which Cloudflare refuses along with the whole message", () => {
+    assert.deepEqual(unsubscribeHeaders("tok", "http://localhost:8787"), {});
   });
 
   it("sends the header on the weekly brief", async () => {
@@ -385,6 +392,8 @@ describe("the month-end pulse email", () => {
 
     assert.ok(message.html.startsWith(PRODUCTION_SHELL_HEAD));
     assert.match(message.html, /\/api\/email\/unsubscribe\?token=/);
+    assert.ok(message.headers?.["List-Unsubscribe"]?.includes(`token=${encodeURIComponent(subscriber.token)}`), "the mail client's own button");
+    assert.equal(message.headers?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
 
     /* The block is a reader's paste, so everything in it is escaped — this
        escaped `<` alone — and nothing is lost doing it. */

@@ -2238,6 +2238,16 @@ confirming reading.
   back to `siteUrl`. Tests: `tests/emailUnsubscribeRoute.test.ts`, "how much confirmation mail one
   address gets" in `tests/subscriberWeeklyFlag.test.ts`, and the host cases in
   `tests/subscriptionAndCronSecurity.test.ts`. `/privacy` 2.1 says so.
+- **Corrected 2026-11-12: the one-click header and http.** The brief, the alerts, the plan-line
+  crossings and the month-end letter have sent `List-Unsubscribe` and `List-Unsubscribe-Post` since
+  2026-10-30. Cloudflare's send refuses a `List-Unsubscribe` with an http link and refuses the
+  whole message with it, and a send triggered by a request (`/api/email/send-weekly`,
+  `/api/alert-deliveries`, `/api/month-end-pulse`) took the request's scheme as given, so one made
+  over plain http would have failed for every recipient. `resolveEmailBaseUrl` now writes https for
+  every public host, and `unsubscribeHeaders` sends nothing for an http link, which a request can
+  now choose only on a developer's machine. The binding's type declares `headers`, which it never did. The
+  header is now asserted on every stream, not only the brief: `tests/emailShell.test.ts`,
+  `tests/alertDelivery.test.ts`, `tests/planLines.test.ts`.
 - **The picker points at plan lines.** Under a picked area's published lines, "Move these lines for
   your plan →" opens `/operate#ops-plan-lines`. The alert form names everything it sends: the
   guidance changing, a score crossing one of its lines, an outsized move in a market input.

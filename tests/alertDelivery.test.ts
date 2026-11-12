@@ -154,10 +154,10 @@ const REGIME_CHANGE: AlertDecision = {
  * only inside a closure to `null`, and the usual escape is an assertion this repo counts.
  */
 const recordingAdapter = () => {
-  const sends: Array<{ html: string; text: string }> = [];
+  const sends: Array<{ html: string; text: string; headers?: Record<string, string> }> = [];
   const adapter: EmailDeliveryAdapter = {
-    send: async ({ html, text }) => {
-      sends.push({ html, text });
+    send: async ({ html, text, headers }) => {
+      sends.push({ html, text, headers });
       return { ok: true };
     },
   };
@@ -180,6 +180,8 @@ describe("alert mail", () => {
     assert.equal(sends.length, 1, "the adapter was called");
     assert.match(sends[0].html, /\/api\/email\/unsubscribe\?token=token-123/);
     assert.match(sends[0].text, /\/api\/email\/unsubscribe\?token=token-123/);
+    assert.match(sends[0].headers?.["List-Unsubscribe"] ?? "", /^<https:\/\/[^>]+\/api\/email\/unsubscribe\?token=token-123>$/, "the mail client's own button");
+    assert.equal(sends[0].headers?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
   });
 
   /*
@@ -214,6 +216,7 @@ describe("alert mail", () => {
     assert.equal(sends.length, 1);
     assert.doesNotMatch(sends[0].html, /unsubscribe/i);
     assert.doesNotMatch(sends[0].text, /unsubscribe/i);
+    assert.deepEqual(sends[0].headers ?? {}, {});
   });
 });
 

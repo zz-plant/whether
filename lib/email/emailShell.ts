@@ -57,13 +57,19 @@ export const unsubscribeFooterText = (
  * `List-Unsubscribe-Post` says a bare POST to it is a valid unsubscribe. Gmail
  * and Apple Mail only draw the button when both are present; without them the
  * endpoint still works, but only from the footer link, two clicks in.
+ *
+ * Only for an https link. Cloudflare's send refuses a `List-Unsubscribe` that
+ * names an http one, and refuses the whole message with it rather than dropping
+ * the header (developers.cloudflare.com/email-service/reference/headers/), so an
+ * http header would cost the reader the mail, not the button. The only http
+ * origin a request can choose is a developer's machine (`lib/email/publicBaseUrl.ts`).
  */
 export const unsubscribeHeaders = (
   token: string | null | undefined,
   baseUrl: string = siteUrl,
 ): Record<string, string> => {
   const url = buildUnsubscribeUrl(token, baseUrl);
-  return url
+  return url?.startsWith("https://")
     ? { "List-Unsubscribe": `<${url}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
     : {};
 };
