@@ -207,7 +207,9 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                 2024 coordinate cannot get at it that way. Prose plus a table is both
                 more useful and more portable than a description AT announces
                 inconsistently. */}
-            <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="mx-auto block h-auto w-full max-w-[30rem]" aria-hidden="true">
+            {/* Drawn at 0.87 of its units on a 320px phone, which put the 12-unit ticks at
+                10px; 14 units draw every label at 12px there (typography.css). */}
+            <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="weather-phone-labels mx-auto block h-auto w-full max-w-[30rem] [--phone-label:14px]" aria-hidden="true">
               {/* Kept under aria-hidden because a native tooltip is a pointer
                   affordance, not an accessibility one; the table is the other route. */}
               <title>{chartTitle}</title>

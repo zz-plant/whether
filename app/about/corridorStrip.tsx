@@ -50,7 +50,8 @@ export function CorridorStrip({
     <figure data-corridor-strip className="mt-4 space-y-1">
       <svg
         viewBox="0 0 320 88"
-        className="block h-auto w-full max-w-[22rem]"
+        /* 288px wide on a 320px phone: 13.5 units draw the labels at 12px (typography.css). */
+        className="weather-phone-labels block h-auto w-full max-w-[22rem] [--phone-label:13.5px]"
         aria-hidden="true"
         role="presentation"
       >

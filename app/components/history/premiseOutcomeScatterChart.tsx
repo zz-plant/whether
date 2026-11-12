@@ -43,7 +43,9 @@ export function PremiseOutcomeScatterChart({
       </figcaption>
 
       <div className="relative">
-        <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot block h-auto w-full text-slate-300" aria-hidden="true">
+        {/* 256px wide inside its card on a 320px phone, so the 10- and 11-unit labels drew at
+            7px and 8px; 17 units draw them at 12px (typography.css). */}
+        <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot weather-phone-labels block h-auto w-full text-slate-300 [--phone-label:17px]" aria-hidden="true">
           {/* Zero line */}
           <line x1={pad.l} x2={W - pad.r} y1={yOf(0)} y2={yOf(0)} stroke="var(--border-default)" strokeWidth="1" />
           <text x={pad.l - 6} y={yOf(0) + 3.5} textAnchor="end" fontSize="10" fill="var(--app-text-muted)">

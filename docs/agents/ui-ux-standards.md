@@ -1000,7 +1000,11 @@ four report pages on a phone (15px under 20px sections), page titles at five siz
 - MUST: draw nothing on a phone under 12px. `text-fluid-nano` has a 12px floor; the ladder's line
   numbers are 12px. A chart whose coordinate box is wider than a phone draws a phone version
   rather than scaling its labels down (`adviceCorpusSection.tsx` draws a 360-unit drawing below
-  `sm`); a fixed-size diagram sets its labels so they render at 10px or more.
+  `sm`); a fixed-size diagram sets its labels so they render at 10px or more. A chart drawn
+  narrower than its viewBox on a phone carries `weather-phone-labels` and sets `--phone-label`
+  to the size, in its units, that draws at 12px on a 320px phone (typography.css, 2026-11-12).
+  Measure SVG text at its rendered size: an audit that reads `font-size` reports a 5-unit label
+  drawn at 13px as 5px.
 - MUST: set the lines a reader acts on at `text-fluid-sm`, not caption size: the brief's "Conditions
   change if", "Pause if", "Restart when" and the chosen area's answer.
 - MUST: keep the trust strip's phone line to one short phrase per cell. The basis warning prints

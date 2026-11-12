@@ -82,7 +82,8 @@ function MarginReliabilityChart({ rows }: { rows: readonly BandRow[] }) {
   const radius = (months: number) => 3 + Math.sqrt(months) * 0.9;
   return (
     <figure className="m-0 space-y-2" data-margin-reliability>
-      <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot block h-auto w-full max-w-[24rem] text-slate-200" aria-hidden="true">
+      {/* 289px wide on a 320px phone: 12.5 units draw the labels at 12px (typography.css). */}
+      <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot weather-phone-labels block h-auto w-full max-w-[24rem] text-slate-200 [--phone-label:12.5px]" aria-hidden="true">
         <rect x={pad.l} y={pad.t} width={W - pad.l - pad.r} height={H - pad.t - pad.b} fill="none" stroke="currentColor" strokeOpacity="0.18" />
         {ticks.map((tick) => (
           <g key={tick}>

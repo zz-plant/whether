@@ -226,7 +226,11 @@ export function ThresholdLadder({
       width="100%"
       style={{ height: "auto", maxWidth: viewBoxWidth * 1.4 }}
       aria-labelledby={`${idPrefix}-title ${idPrefix}-desc`}
-      className={className}
+      /* A 300-unit ladder is drawn 288px wide on a 320px phone, which put its 12-unit
+         labels at 11.5px; 12.5 units there draw them at 12px (typography.css). The
+         caption layout above estimates 12-unit text at 0.52em a character, and the
+         labels measure 78-88% of that, so at 12.5 they still fit the estimate. */
+      className={`weather-phone-labels [--phone-label:12.5px] ${className ?? ""}`.trim()}
     >
       <title id={`${idPrefix}-title`}>{`${signalLabel}: ${readout}`}</title>
       <desc id={`${idPrefix}-desc`}>{desc}</desc>

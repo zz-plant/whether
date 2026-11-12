@@ -108,7 +108,8 @@ function RegimeQuadrant() {
     { key: "EXPANSION", x0: r, x1: 100, y0: 0, y1: t },
   ];
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
+    /* 254px wide on a 320px phone: 12.5 units draw the labels at 12px (typography.css). */
+    <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot weather-phone-labels h-auto w-full max-w-[20rem] text-slate-300 [--phone-label:12.5px]" aria-labelledby="regime-quadrant-title">
       <title id="regime-quadrant-title">
         {`Four conditions, picked by whether funding pressure is above ${t} and whether risk appetite is below ${r}.`}
       </title>
