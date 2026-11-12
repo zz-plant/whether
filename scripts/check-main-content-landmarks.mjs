@@ -36,6 +36,7 @@ import {
   collectUnresolvedAnchors,
 } from "./main-content-landmarks.mjs";
 import { isDeployGate } from "./deploy-gate.mjs";
+import { missingSmokeMarkers, SMOKE_PAGE_CHECKS } from "./smoke-page-checks.mjs";
 import { isLocalHostname, readCheckoutDevServer, withDevServer } from "./dev-server.lib.mjs";
 import { isWorkerBundleCurrent } from "./worker-bundle.mjs";
 
@@ -109,7 +110,42 @@ const probe = async (url) => {
   }
 };
 
-const reportResults = (results) => {
+/**
+ * The production smoke's page markers, asked of the tree being checked. A marker the
+ * page no longer says fails here, on the commit that renamed it; only the smoke read
+ * them before, after the deploy (scripts/smoke-page-checks.mjs). A page that did not
+ * render is reported and not judged, as a route the landmark audit cannot render is.
+ */
+const checkSmokeMarkers = async (readyBaseUrl) => {
+  const missing = [];
+  const unchecked = [];
+  for (const check of SMOKE_PAGE_CHECKS) {
+    try {
+      const response = await fetch(new URL(check.path, readyBaseUrl), { signal: AbortSignal.timeout(routeTimeoutMs) });
+      const html = await response.text();
+      if (response.status !== 200) unchecked.push({ path: check.path, reason: `HTTP ${response.status}` });
+      else {
+        const markers = missingSmokeMarkers(html, check);
+        if (markers.length > 0) missing.push({ path: check.path, markers });
+      }
+    } catch (error) {
+      unchecked.push({ path: check.path, reason: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  return { missing, unchecked };
+};
+
+const reportResults = ({ results, smoke }) => {
+  if (smoke.unchecked.length > 0) {
+    console.warn(`\n⚠ ${smoke.unchecked.length} smoke page(s) did not render, so their markers were not checked:`);
+    for (const page of smoke.unchecked) console.warn(`    ${page.path}  (${page.reason})`);
+  }
+  for (const page of smoke.missing) {
+    console.error(`\n✗ ${page.path} no longer says what the production smoke asks of it:`);
+    for (const marker of page.markers) console.error(`    "${marker}"`);
+    console.error("    Update scripts/smoke-page-checks.mjs with the page's new wording.");
+  }
+
   // A route that never rendered is reported, never counted as a violation.
   const unauditable = results.filter((result) => result.unauditable);
   const timedOut = results.filter((result) => result.timedOut);
@@ -168,6 +204,9 @@ const reportResults = (results) => {
   }
 
   console.log(`\n✅ ${audited} rendered routes own one <main id="main-content">, and every #anchor they link to exists`);
+  if (smoke.missing.length > 0) return 1;
+  const checked = SMOKE_PAGE_CHECKS.length - smoke.unchecked.length;
+  console.log(`✅ ${checked} smoke page(s) still say what the production smoke asks of them`);
   return 0;
 };
 
@@ -175,8 +214,10 @@ const run = async () => {
   const routes = await collectMainContentRouteSamples();
   console.log(`Auditing ${routes.length} routes for main-landmark ownership.`);
 
-  const audit = async (readyBaseUrl) =>
-    auditMainContentRoutes({ baseUrl: readyBaseUrl, routes, concurrency, timeoutMs: routeTimeoutMs });
+  const audit = async (readyBaseUrl) => ({
+    results: await auditMainContentRoutes({ baseUrl: readyBaseUrl, routes, concurrency, timeoutMs: routeTimeoutMs }),
+    smoke: await checkSmokeMarkers(readyBaseUrl),
+  });
 
   if (hasFlag("--no-dev")) {
     const initialProbe = await probe(baseUrl);
