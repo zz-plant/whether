@@ -27,10 +27,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!company) return {};
   const { indexable } = await loadCompanyPage(company);
   const metadata = buildPageMetadata({
-    title: `${company.name}: what its filings say about hiring and spending`,
+    /* The filings are the source, not a speaker (tests/titleSubjects.test.ts). */
+    title: `${company.name}: hiring and spending in its filings`,
     description: companyDescription(company),
     path: `/companies/${company.slug}`,
-    imageAlt: `${company.name}: what its filings say about hiring and spending`,
+    imageAlt: `${company.name}: hiring and spending in its filings`,
   });
   if (!indexable) metadata.robots = { index: false, follow: true };
   return metadata;

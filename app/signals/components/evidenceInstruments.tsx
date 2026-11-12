@@ -252,7 +252,7 @@ export const SignalsInstrumentsSection = ({
         initialOpen={monthPickerOpen}
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
-        summary={<InstrumentQuestion question="What did the brief say in an earlier month?" answer={pastMonthsAnswer} />}
+        summary={<InstrumentQuestion question="What was the guidance in an earlier month?" answer={pastMonthsAnswer} />}
       >
         <TimeMachinePanel
           selectedYear={selectedYear}
