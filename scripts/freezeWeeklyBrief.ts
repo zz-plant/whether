@@ -14,7 +14,9 @@
  */
 import { appendFile, readFile, writeFile } from "node:fs/promises";
 import { parsePublishedBriefs } from "../lib/report/publishedBriefs";
+import { assessGovernedRegime } from "../lib/report/briefPublishGuard";
 import { assembleCurrentWeekBrief } from "../lib/report/publishedBriefRecord";
+import { siteUrl } from "../lib/siteUrl";
 
 const OUTPUT_PATH = new URL("../data/published_briefs.json", import.meta.url);
 
@@ -34,6 +36,23 @@ if (!assembled.ok) {
 }
 
 const { slug, record } = assembled;
+
+/* This run has no KV, so no committed regime: it must agree with production's call before it
+   writes one (`assessGovernedRegime`). The Worker freeze Workflow reads KV and is not this path. */
+const readGovernedState = async (): Promise<unknown> => {
+  try {
+    const response = await fetch(`${siteUrl}/api/agent?view=state`, { signal: AbortSignal.timeout(15_000) });
+    return response.ok ? await response.json() : null;
+  } catch {
+    return null;
+  }
+};
+
+const governed = assessGovernedRegime({ regime: record.regime, recordDate: record.recordDate, governed: await readGovernedState() });
+if (!governed.ok) {
+  console.error(`Refusing to freeze ${slug}: ${governed.reason}`);
+  process.exit(1);
+}
 
 /*
  * The workflow names its pull-request branch after the week, so an unmerged

@@ -127,3 +127,55 @@ export const assessPublishReadiness = ({
 
   return { ok: true };
 };
+
+/* Reads one field of an unparsed JSON body, so an answer of any shape is a refusal and never a throw. */
+const fieldOf = (value: unknown, key: string): unknown =>
+  typeof value === "object" && value !== null && key in value ? Reflect.get(value, key) : undefined;
+
+/**
+ * Whether a freeze's conditions are the ones production's call carries.
+ *
+ * The conditions are not a function of the reading alone. The engine commits a change of
+ * conditions only through the confirmation gate (`advanceRegimeState`), which reads the
+ * committed state from KV (`regime:machine-snapshot`) and holds it while a score sits within the
+ * near band of its line. `bun run brief:freeze` runs where there is no KV: the loader gets no
+ * machine state, and the reading classifies as if nothing had been committed. On 2026-11-12 that
+ * froze w46 as Cloudy (risk appetite 53, three points over its line) while production carried
+ * Freezing: a reading of 42 on Nov 6 had committed it, and 53 is inside the band that holds it.
+ *
+ * So the freeze asks production, which runs the gate, and refuses on any disagreement, and when
+ * it cannot ask. A different record date is a refusal too: the two would be judging different
+ * readings, and the daily refresh closes that gap within a day.
+ */
+export const assessGovernedRegime = ({
+  regime,
+  recordDate,
+  governed,
+}: {
+  regime: string;
+  recordDate: string;
+  /** Production's `/api/agent?view=state` body as fetched, or null when it could not be. */
+  governed: unknown;
+}): PublishReadiness => {
+  const governedRegime = fieldOf(fieldOf(governed, "conditions"), "key");
+  const governedRecordDate = fieldOf(governed, "recordDate");
+  if (typeof governedRegime !== "string") {
+    return {
+      ok: false,
+      reason: "Production's state could not be read, so the conditions cannot be checked against the confirmation gate this run has no state for.",
+    };
+  }
+  if (governedRecordDate !== recordDate) {
+    return {
+      ok: false,
+      reason: `Production's state is of the reading of ${String(governedRecordDate)}, this run's of ${recordDate}. Retry after the daily refresh, when both read the same record.`,
+    };
+  }
+  if (governedRegime !== regime) {
+    return {
+      ok: false,
+      reason: `This run classifies the reading as ${regime}; production's call, which applies the confirmation gate, is ${governedRegime}. This run has no committed state to confirm against, so it would publish a change of conditions the gate has not confirmed.`,
+    };
+  }
+  return { ok: true };
+};
