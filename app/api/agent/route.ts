@@ -7,6 +7,7 @@ import {
 } from "../../../lib/agentInterface";
 import { agentApiCorsHeaders } from "../../../lib/agentApiCors";
 import { buildAgentStateResponse } from "../../../lib/agentState";
+import { buildPublishedChanges, InvalidSinceWeekError } from "../../../lib/agent/publishedChanges";
 import { buildJevHandoff } from "../../../lib/jev/jevHandoff";
 import { DECISION_MODELS, isDecisionModel } from "../../../lib/jev/jevClient";
 import { buildUseConstraint } from "../../../lib/report/useConstraint";
@@ -123,9 +124,9 @@ export async function GET(request: Request) {
     );
   }
 
-  if (view === "state" && format === "jev") {
+  if (view !== "full" && format === "jev") {
     return NextResponse.json(
-      { error: "view=state cannot be combined with format=jev; the Jev request carries its own state.", allowedViews: AGENT_VIEWS },
+      { error: `view=${view} cannot be combined with format=jev; the Jev request carries its own state.`, allowedViews: AGENT_VIEWS },
       { status: 400, headers: agentApiCorsHeaders },
     );
   }
@@ -141,6 +142,22 @@ export async function GET(request: Request) {
         headers: agentApiCorsHeaders,
       }
     );
+  }
+
+  if (view === "changes") {
+    /* The published weeks, which are weekly by definition. */
+    if (requestedCadence !== "weekly") {
+      return NextResponse.json(
+        { error: "view=changes reads the published weekly briefs and takes no other cadence.", allowedCadences: ["weekly"] },
+        { status: 400, headers: agentApiCorsHeaders },
+      );
+    }
+    try {
+      return NextResponse.json(buildPublishedChanges({ since: searchParams.get("since") }), { headers: agentApiCorsHeaders });
+    } catch (error) {
+      if (!(error instanceof InvalidSinceWeekError)) throw error;
+      return NextResponse.json({ error: error.message }, { status: 400, headers: agentApiCorsHeaders });
+    }
   }
 
   if (view === "state") {

@@ -39,6 +39,7 @@ export const MCP_SERVER_INSTRUCTIONS =
   "The call is the same for every company; what it means for one depends on its runway and stage, so apply it to those " +
   "when the user gives them. Quote the reading's date and link the page an answer came from. " +
   "get_brief is the full weekly brief (about 22KB), for its wording, provenance and the other cadences. " +
+  "get_changes_since says whether the published call changed since a week you name; a scheduled agent passes the nextSince it got last time and acts only when changed is true. " +
   "get_standup_line is the daily standup line with guidance movement and flip conditions. " +
   "get_decision_rules gives the bounded rules behind the guidance. " +
   "get_answer pulls one decision answer — hiring, raising capital, burn — with its current standing and the rules in force. " +
