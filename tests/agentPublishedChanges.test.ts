@@ -6,6 +6,12 @@ import { runAgentTool } from "../lib/agent/tools";
 import { AgentInputError } from "../lib/agent/registry";
 import { getPublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
 
+const only = <Item>(items: readonly Item[], index = 0): Item => {
+  const item = items[index];
+  if (item === undefined) throw new Error(`expected an item at ${index}, got ${items.length}`);
+  return item;
+};
+
 /*
  * The change feed answers "did the call change since the week I last saw" from the frozen
  * records. The fixtures are one real record restamped as other weeks, so each test changes
@@ -48,7 +54,7 @@ describe("published changes", () => {
     });
     assert.equal(result.changed, true);
     assert.deepEqual(result.unpublishedWeeks, ["2026-w11", "2026-w12"]);
-    assert.ok(result.weeks[0].changes?.conditions, "the conditions change is data");
+    assert.ok(only(result.weeks).changes?.conditions, "the conditions change is data");
     assert.match(result.summary, /The call changed since 2026-w10\. 2026-w13: conditions /);
     assert.equal(result.nextSince, "2026-w13");
     assert.equal(result.awaitingThisWeek, false);
@@ -60,7 +66,7 @@ describe("published changes", () => {
       briefs: [week("2026-w10", { scores: paused }), week("2026-w11", { scores: unpaused })],
       now: NOW,
     });
-    const hiring = result.weeks[0].changes?.areas.find((change) => change.area === "hiring");
+    const hiring = only(result.weeks).changes?.areas.find((change) => change.area === "hiring");
     assert.deepEqual(hiring && { from: hiring.from, moved: hiring.moved === "lifted" || hiring.moved === "resumable" }, { from: "pause", moved: true });
     assert.equal(result.changed, true);
     assert.match(result.summary, /Hiring (pause lifted|restart lines met)/);
@@ -107,7 +113,7 @@ describe("published changes", () => {
 
 describe("the change feed on the agent route and as a tool", () => {
   it("answers view=changes with the real archive", async () => {
-    const latest = getPublishedBriefs()[0];
+    const latest = only(getPublishedBriefs());
     const response = await getAgent(new Request(`https://whether.work/api/agent?view=changes&since=${latest.slug}`));
     assert.equal(response.status, 200);
     const body = await response.json();
@@ -124,7 +130,7 @@ describe("the change feed on the agent route and as a tool", () => {
   });
 
   it("answers get_changes_since the same, and refuses a bad since by argument", async () => {
-    const latest = getPublishedBriefs()[0];
+    const latest = only(getPublishedBriefs());
     const result = await runAgentTool("get_changes_since", { since: latest.slug }, "http");
     assert.equal(result.changed, false);
     await assert.rejects(runAgentTool("get_changes_since", { since: "yesterday" }, "http"), (error: unknown) => {
