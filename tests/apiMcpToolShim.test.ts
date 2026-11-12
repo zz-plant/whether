@@ -186,6 +186,27 @@ describe("/api/mcp from a browser", () => {
     assert.equal(refused.headers.get("access-control-allow-origin"), "*", "a page can read why it was refused");
   });
 
+  /* The cap on a JSON-RPC body is the transport module's; this holds that the route a client
+     posts to applies it, and that a page is told why. */
+  it("refuses an oversized JSON-RPC POST with 413 a page can read", async () => {
+    const response = await postMcp(
+      new Request("https://whether.work/api/mcp", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json, text/event-stream",
+          "content-length": String(4 * 1024 * 1024 + 1),
+        },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" }),
+      }),
+    );
+
+    assert.equal(response.status, 413);
+    assert.equal(response.headers.get("access-control-allow-origin"), "*");
+    const payload = await response.json();
+    assert.equal(payload.error.code, -32000);
+  });
+
   it("stays closed to a page for subscribe, which sends an email", async () => {
     const preflight = await optionsMcp(new Request("https://whether.work/api/mcp?tool=subscribe", { method: "OPTIONS" }));
     assert.equal(preflight.headers.get("access-control-allow-origin"), null);

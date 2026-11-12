@@ -5,19 +5,27 @@ import { handleMcpRequest, isMcpStreamOpenRequest } from "../lib/mcp/httpMcpServ
 import { MCP_PROTOCOL_VERSIONS } from "../lib/mcp/serverIdentity";
 import { buildWebMcpToolCall } from "../app/components/webMcpBridge";
 
+// The SDK transport enforces the spec's Accept requirement: a client must accept
+// both media types, even though this server answers JSON only.
+const MCP_HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream" };
+
 const postMcp = (body: unknown) =>
   handleMcpRequest(
     new Request("https://whether.work/api/mcp", {
       method: "POST",
-      // The SDK transport enforces the spec's Accept requirement: a client must accept
-      // both media types, even though this server answers JSON only.
-      headers: {
-        "content-type": "application/json",
-        accept: "application/json, text/event-stream",
-      },
+      headers: MCP_HEADERS,
       body: typeof body === "string" ? body : JSON.stringify(body),
     }),
   );
+
+/* The SDK's default limit on a request body. Written out, not imported: an SDK update that
+   moves it changes what this route accepts, and should be seen here. */
+const BODY_CAP_BYTES = 4 * 1024 * 1024;
+
+const PING = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" });
+
+/** A ping padded to an exact length with trailing spaces, which JSON ignores. */
+const pingOfLength = (bytes: number) => PING + " ".repeat(bytes - PING.length);
 
 describe("MCP streamable HTTP transport", () => {
   it("negotiates initialize with a supported protocol version", async () => {
@@ -191,6 +199,68 @@ describe("MCP streamable HTTP transport", () => {
     assert.equal(response.status, 400);
     const payload = await response.json();
     assert.equal(payload.error.code, -32700);
+  });
+
+  /* The route reads the body itself, to refuse a batch, and hands the transport the parsed
+     message; the transport's limit covers only a body it reads, so until 2026-11-12 a POST
+     of any size was read into memory. */
+  it("refuses a declared Content-Length over the cap with 413, before reading the body", async () => {
+    const request = new Request("https://whether.work/api/mcp", {
+      method: "POST",
+      headers: { ...MCP_HEADERS, "content-length": String(BODY_CAP_BYTES + 1) },
+      // A small, valid body: only the declared length can be what refuses it.
+      body: PING,
+    });
+    const response = await handleMcpRequest(request);
+
+    assert.equal(response.status, 413);
+    assert.equal(request.bodyUsed, false, "the body was not read");
+    assert.match(response.headers.get("content-type") ?? "", /application\/json/);
+    assert.deepEqual(await response.json(), {
+      jsonrpc: "2.0",
+      id: null,
+      error: { code: -32000, message: "Payload Too Large: Request body must not exceed 4194304 bytes" },
+    });
+  });
+
+  it("stops reading a streamed body that declares no length once it passes the cap", async () => {
+    const chunk = new Uint8Array(64 * 1024).fill(0x20);
+    const available = BODY_CAP_BYTES * 2;
+    let produced = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (produced >= available) {
+          controller.close();
+          return;
+        }
+        produced += chunk.byteLength;
+        controller.enqueue(chunk);
+      },
+    });
+    const request = new Request("https://whether.work/api/mcp", { method: "POST", headers: MCP_HEADERS, body });
+    assert.equal(request.headers.get("content-length"), null);
+
+    const response = await handleMcpRequest(request);
+
+    assert.equal(response.status, 413);
+    const payload = await response.json();
+    assert.equal(payload.error.code, -32000);
+    assert.ok(
+      produced < BODY_CAP_BYTES + 1024 * 1024,
+      `read stopped near the cap: ${produced} of ${available} bytes were taken from the stream`,
+    );
+  });
+
+  it("answers a body exactly at the cap as before, and refuses one byte more", async () => {
+    const atCap = await postMcp(pingOfLength(BODY_CAP_BYTES));
+    assert.equal(atCap.status, 200);
+    assert.deepEqual(await atCap.json(), { result: {}, jsonrpc: "2.0", id: 1 });
+
+    const over = await postMcp(pingOfLength(BODY_CAP_BYTES + 1));
+    assert.equal(over.status, 413);
+    const payload = await over.json();
+    assert.equal(payload.id, null);
+    assert.equal(payload.error.code, -32000);
   });
 
   it("detects SSE stream-open requests", () => {

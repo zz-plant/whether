@@ -176,6 +176,8 @@ site's weather word in any case; and the server's name is `whether`, not `whethe
 `ping`, `tools/list`, `tools/call`; protocol revisions 2025-06-18 and 2025-03-26). No checkout, no
 key. Transport: `lib/mcp/httpMcpServer.ts`, a fresh `lib/mcp/server.ts` per request; transport tests:
 `tests/mcpStreamableTransport.test.ts`.
+A POST body over 4 MiB, the SDK's default limit, is refused with 413 and a JSON-RPC error
+(code -32000), whether its `Content-Length` says so or the bytes arriving pass the limit.
 The `initialize` result carries instructions that say where to start (`lib/mcp/serverIdentity.ts`).
 They are prose and name ten of the thirteen tools by use; `get_signals`, `get_analog_playbook` and
 `list_agent_skills` are left to `tools/list` on purpose, since none changes where an agent starts or
