@@ -535,7 +535,8 @@ export const UNPUBLISHED_WEEKS: Readonly<Record<string, string>> = {
   "2026-w43": SCHEDULED_RUN_DID_NOT_COMPLETE,
 };
 
-const weekMonday = (slug: string) => {
+/** The Monday a week slug names, or null for one that is not a week. */
+export const weekMonday = (slug: string) => {
   const week = parseIsoWeekSlug(slug);
   return week ? isoWeekMonday(week) : null;
 };

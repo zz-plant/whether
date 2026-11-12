@@ -40,6 +40,15 @@ export async function GET(request: Request) {
   // The views are the manifest's (`lib/agent/discovery.ts`), so it cannot list one this refuses.
   const view = searchParams.get("view") ?? DEFAULT_AGENT_VIEW;
 
+  /* `week` and `period` answer one frozen record and are read before the view, so with another
+     view they would answer something other than what was asked, silently. */
+  if (view !== DEFAULT_AGENT_VIEW && (weekParam || periodParam)) {
+    return NextResponse.json(
+      { error: `view=${view} cannot be combined with week or period; those answer one frozen record.`, allowedViews: AGENT_VIEWS },
+      { status: 400, headers: agentApiCorsHeaders },
+    );
+  }
+
   if (weekParam) {
     const brief = findPublishedBrief(weekParam.toLowerCase());
     if (!brief) {

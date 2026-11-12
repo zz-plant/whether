@@ -1,5 +1,5 @@
 import { nextWeeklyCallDue } from "../agentState";
-import { formatIsoWeekSlug, getIsoWeekInfo, isoWeekMonday, parseIsoWeekSlug } from "../isoWeek";
+import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, type DecisionArea } from "../report/boundedDecisionRules";
 import { areaMovementKind, areaStateAt, type AreaMovementKind, type AreaState } from "../report/decisionMovement";
@@ -8,6 +8,8 @@ import {
   findUnpublishedWeeks,
   getPublishedBriefs,
   publishedBriefHeadline,
+  publishedBriefModifiedAt,
+  weekMonday,
   type PublishedBrief,
 } from "../report/publishedBriefs";
 import { buildUseConstraint } from "../report/useConstraint";
@@ -83,16 +85,15 @@ const weekEntry = (brief: PublishedBrief, previous: PublishedBrief | undefined) 
     /** Against the published week before it; null for the first week on record. */
     changes,
     changed: changes !== null && (changes.conditions !== null || changes.areas.length > 0),
+    /** Set when the record was corrected after it was published, per the corrections policy. */
+    correction: brief.correction,
     permalink: buildCanonicalUrl(buildPublishedBriefPath(brief.slug)),
   };
 };
 
 type WeekEntry = ReturnType<typeof weekEntry>;
 
-const weekStart = (slug: string) => {
-  const week = parseIsoWeekSlug(slug);
-  return week ? isoWeekMonday(week).getTime() : null;
-};
+const weekStart = (slug: string) => weekMonday(slug)?.getTime() ?? null;
 
 const MOVEMENT_WORDS: Record<AreaChange["moved"], string> = {
   paused: "pause began",
@@ -141,8 +142,13 @@ export const buildPublishedChanges = ({
   const sinceStart = sinceSlug === null ? null : weekStart(sinceSlug);
   if (sinceSlug !== null && sinceStart === null) throw new InvalidSinceWeekError(since ?? "");
 
-  /* Oldest first, so each week is compared with the one published before it. */
-  const chronological = [...briefs].sort((left, right) => (weekStart(left.slug) ?? 0) - (weekStart(right.slug) ?? 0));
+  /* Oldest first, so each week is compared with the one published before it. A record whose
+     slug names no week has no place in the order, and is left out rather than sorted first. */
+  const dated = briefs.flatMap((brief) => {
+    const start = weekStart(brief.slug);
+    return start === null ? [] : [{ brief, start }];
+  });
+  const chronological = dated.sort((left, right) => left.start - right.start).map(({ brief }) => brief);
   const entries = chronological.map((brief, index) => ({ brief, entry: weekEntry(brief, chronological[index - 1]) }));
 
   const baseline =
@@ -161,6 +167,25 @@ export const buildPublishedChanges = ({
   const published = new Set(chronological.map((brief) => brief.slug));
   const missing = baseline && latest && baseline.slug !== latest.slug ? findUnpublishedWeeks(baseline, latest).filter((week) => !published.has(week)) : [];
   const thisWeek = formatIsoWeekSlug(getIsoWeekInfo(now));
+  const awaitingThisWeek = latest ? latest.slug !== thisWeek : true;
+  /* This week's brief is due Monday 14:00 UTC and has often landed later in the week. Past that
+     time and still missing, the next call is overdue, and `nextCallDue` (next Monday) would send a
+     scheduled agent to sleep through it. */
+  const thisWeekDue = (weekStart(thisWeek) ?? now.getTime()) + 14 * 60 * 60 * 1000;
+  const overdue = awaitingThisWeek && now.getTime() >= thisWeekDue;
+  /* A correction to a week the caller has already seen is written into that week's record, which
+     no week after `since` carries; these are the ones corrected after the baseline was published. */
+  const correctedSince = baseline
+    ? chronological
+        .filter((brief) => (weekStart(brief.slug) ?? 0) <= (weekStart(baseline.slug) ?? 0) && brief.correction)
+        .filter((brief) => publishedBriefModifiedAt(brief) > baseline.publishedAt)
+        .map((brief) => ({ slug: brief.slug, correctedAt: publishedBriefModifiedAt(brief), correction: brief.correction }))
+    : [];
+  const summaryParts = [
+    summarize(sinceSlug, baseline, weeks),
+    ...(correctedSince.length > 0 ? [`Corrected since: ${correctedSince.map((entry) => entry.slug).join(", ")}.`] : []),
+    ...(overdue ? [`This week's brief (${thisWeek}) is due and not published yet; check again daily until it is.`] : []),
+  ];
 
   return {
     type: "published_changes" as const,
@@ -168,7 +193,7 @@ export const buildPublishedChanges = ({
     /** The published week the comparison starts from: `since` itself, or the last one published before it. */
     baseline: baseline ? { slug: baseline.slug, recordDate: baseline.recordDate, conditions: getRegimePublicLabel(baseline.regime) } : null,
     changed,
-    summary: summarize(sinceSlug, baseline, weeks),
+    summary: summaryParts.join(" "),
     latest: latest ? { slug: latest.slug, recordDate: latest.recordDate, conditions: getRegimePublicLabel(latest.regime) } : null,
     /** Pass this as `since` next time. */
     nextSince: latest?.slug ?? sinceSlug,
@@ -176,8 +201,14 @@ export const buildPublishedChanges = ({
     weeks,
     /** Weeks between `since` and the latest that have no published brief. */
     unpublishedWeeks: missing.filter((week) => sinceStart === null || (weekStart(week) ?? 0) > sinceStart),
-    /** The current week has no brief yet when this is true; the next one is due at `nextCallDue`. */
-    awaitingThisWeek: latest ? latest.slug !== thisWeek : true,
+    /** Weeks at or before the baseline whose record was corrected after the baseline was published. */
+    correctedSince,
+    thisWeek,
+    /** The current week has no brief yet. */
+    awaitingThisWeek,
+    /** This week's brief was due (Monday 14:00 UTC) and is not published: check again daily, not at `nextCallDue`. */
+    overdue,
+    /** The next scheduled publication after now. */
     nextCallDue: nextWeeklyCallDue(now),
     use: buildUseConstraint(),
   };

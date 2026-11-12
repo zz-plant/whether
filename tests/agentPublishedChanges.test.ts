@@ -19,8 +19,14 @@ const scores = base.scores;
 const week = (slug: string, change: Partial<PublishedBrief> = {}): PublishedBrief => ({ ...base, slug, ...change });
 const NOW = new Date("2026-03-25T12:00:00Z"); // 2026-w13
 
-/* Funding pressure just inside every pause line the record states: the pauses lift. */
-const belowEveryPause = Math.min(...base.decisions.flatMap((decision) => (decision.pause ?? []).filter((line) => line.metric === "tightness").map((line) => line.value))) - 1;
+/* Scores that put every area's pause on (funding pressure past each of its pause lines) and
+   every pause off (inside each line on both scores), from the record's own lines, so the test
+   does not depend on which week the newest record happened to be. */
+const pauseLines = base.decisions.flatMap((decision) => decision.pause ?? []);
+const tightnessLines = pauseLines.filter((line) => line.metric === "tightness").map((line) => line.value);
+const appetiteLines = pauseLines.filter((line) => line.metric === "riskAppetite").map((line) => line.value);
+const paused = { ...scores, tightness: Math.max(...tightnessLines) + 1 };
+const unpaused = { ...scores, tightness: Math.min(...tightnessLines) - 1, riskAppetite: Math.max(...appetiteLines, 0) + 1 };
 
 describe("published changes", () => {
   it("does not count a reworded week as a change", () => {
@@ -51,18 +57,31 @@ describe("published changes", () => {
   it("names an area whose pause lifted, from the record's own lines and scores", () => {
     const result = buildPublishedChanges({
       since: "2026-w10",
-      briefs: [week("2026-w10"), week("2026-w11", { scores: { ...scores, tightness: belowEveryPause, riskAppetite: 99 } })],
+      briefs: [week("2026-w10", { scores: paused }), week("2026-w11", { scores: unpaused })],
       now: NOW,
     });
     const hiring = result.weeks[0].changes?.areas.find((change) => change.area === "hiring");
-    const before = buildPublishedChanges({ briefs: [week("2026-w10")], now: NOW }).weeks[0].areas.find((area) => area.area === "hiring");
-    if (before?.state === "pause") {
-      assert.ok(hiring && hiring.from === "pause" && hiring.to !== "pause", JSON.stringify(result.weeks[0].changes));
-      assert.equal(result.changed, true);
-      assert.match(result.summary, /Hiring (pause lifted|restart lines met)/);
-    } else {
-      assert.equal(hiring, undefined, "an area that was not paused cannot lift");
-    }
+    assert.deepEqual(hiring && { from: hiring.from, moved: hiring.moved === "lifted" || hiring.moved === "resumable" }, { from: "pause", moved: true });
+    assert.equal(result.changed, true);
+    assert.match(result.summary, /Hiring (pause lifted|restart lines met)/);
+  });
+
+  it("names a correction written into a week the caller already saw", () => {
+    const corrected = week("2026-w10", { publishedAt: "2026-03-02T14:00:00.000Z", correction: "Corrected Mar 10, 2026. The Do now line was wrong." });
+    const result = buildPublishedChanges({ since: "2026-w10", briefs: [corrected, week("2026-w11")], now: NOW });
+    assert.deepEqual(result.correctedSince.map((entry) => entry.slug), ["2026-w10"]);
+    assert.match(result.summary, /Corrected since: 2026-w10\./);
+    assert.equal(buildPublishedChanges({ since: "2026-w10", briefs: [week("2026-w10"), week("2026-w11")], now: NOW }).correctedSince.length, 0);
+  });
+
+  it("says this week's brief is overdue once Monday 14:00 has passed without it", () => {
+    const briefs = [week("2026-w12")];
+    const mondayMorning = buildPublishedChanges({ since: "2026-w12", briefs, now: new Date("2026-03-23T09:00:00Z") });
+    assert.equal(mondayMorning.awaitingThisWeek, true);
+    assert.equal(mondayMorning.overdue, false);
+    const wednesday = buildPublishedChanges({ since: "2026-w12", briefs, now: new Date("2026-03-25T09:00:00Z") });
+    assert.equal(wednesday.overdue, true);
+    assert.match(wednesday.summary, /This week's brief \(2026-w13\) is due and not published yet/);
   });
 
   it("compares from the last week published at or before since", () => {
@@ -98,7 +117,7 @@ describe("the change feed on the agent route and as a tool", () => {
   });
 
   it("refuses a since that is not a week, another cadence, and format=jev", async () => {
-    for (const query of ["view=changes&since=last-week", "view=changes&cadence=monthly", "view=changes&format=jev"]) {
+    for (const query of ["view=changes&since=last-week", "view=changes&cadence=monthly", "view=changes&format=jev", "view=changes&week=2026-w41", "view=state&period=2024-q1"]) {
       const response = await getAgent(new Request(`https://whether.work/api/agent?${query}`));
       assert.equal(response.status, 400, query);
     }
