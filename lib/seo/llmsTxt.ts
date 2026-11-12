@@ -112,6 +112,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     `- Query historical archive periods: GET ${endpoints.agent}?period=<slug> (e.g. 2024-q1 or 2023)`,
     "- Response: JSON with summary, posture, decision delta, flip watch, agent handoff payload + prompt, provenance",
     "- `&view=state` answers the compact state instead (weekly only); the default view is the whole brief",
+    `- \`&view=changes&since=<slug>\` answers whether the published call changed since that week (conditions and each area's pause state, never wording), with \`nextSince\` to pass next time: a scheduled agent can poll this weekly and act only when \`changed\` is true`,
     "- Invalid cadence or view: HTTP 400 with the values allowed",
     "",
     "### CLI endpoints",

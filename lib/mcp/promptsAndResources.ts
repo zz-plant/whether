@@ -90,8 +90,8 @@ const weekSlugFromUri = (uri: string): string | null => {
   } catch {
     return null; // Malformed percent-encoding is the caller's URI, not a fault.
   }
-  const match = /^(\d{4})-w(\d{1,2})$/i.exec(raw.trim());
-  const week = match ? parseIsoWeekSlug(`${match[1]}-w${match[2].padStart(2, "0")}`) : null;
+  const [, year, number] = /^(\d{4})-w(\d{1,2})$/i.exec(raw.trim()) ?? [];
+  const week = year && number ? parseIsoWeekSlug(`${year}-w${number.padStart(2, "0")}`) : null;
   return week ? formatIsoWeekSlug(week) : null;
 };
 

@@ -18,7 +18,9 @@
  * This comment said 714 (counted 2026-10-09) while the baseline merged at 888 on
  * 2026-10-11: the count grew on the branch and the number was set to the merged
  * tree. It fell to 855 on 2026-11-05, when `one()` in tests/pageStructuredData.test.ts stopped
- * returning a possibly-absent match.
+ * returning a possibly-absent match. It was 845 on 2026-11-12, with headroom of ten the MCP
+ * prompts and change-feed branches used up together (857) though each passed alone; their reads
+ * are guarded now and the baseline sits at the count.
  *
  * The gate is `tests/checkUncheckedAccess.test.ts`, which runs this count in
  * every suite run, so pre-push, `bun run check` and the deploy gate all hold it.
@@ -39,7 +41,7 @@ const CONFIG_PATH = join(tmpdir(), "whether-unchecked-access.tsconfig.json");
  * The current count. Lowering it is an edit to this file that lands with the
  * work that earned it; raising it is a policy change and belongs in its own PR.
  */
-export const UNCHECKED_ACCESS_BASELINE = 855;
+export const UNCHECKED_ACCESS_BASELINE = 845;
 
 export type TscDiagnostic = { file: string; code: string; line: number };
 

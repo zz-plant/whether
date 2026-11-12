@@ -203,6 +203,15 @@ export default function ApiDocsPage() {
               <code className="font-mono">automation.ready</code> before acting without a person looking.
             </Endpoint>
             <Endpoint
+              signature="GET /api/agent?view=changes&since=2026-w41"
+              tryHref="/api/agent?view=changes&since=2026-w41"
+              tryLabel="Try it"
+            >
+              Whether the published guidance changed since a week: the conditions and each area&apos;s pause or restart state, compared week by week from the frozen records. Returns{" "}
+              <code className="font-mono">changed</code>, a one-sentence <code className="font-mono">summary</code>, and{" "}
+              <code className="font-mono">nextSince</code> to pass next time. Weekly only.
+            </Endpoint>
+            <Endpoint
               signature="GET /api/agent?cadence=weekly"
               tryHref="/api/agent?cadence=weekly"
               tryLabel="Try it"

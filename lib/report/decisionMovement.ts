@@ -61,7 +61,7 @@ export const areaLinesFromActionStrip = (
     resume: item.resumeConditions ?? [],
   }));
 
-type AreaState = "pause" | "hold" | "resume";
+export type AreaState = "pause" | "hold" | "resume";
 
 /**
  * How an area moved between the two readings. `resumable` is where the restart lines now
@@ -118,13 +118,15 @@ export type DecisionMovement = {
   headlines: string[];
 };
 
-const stateAt = (lines: AreaLines, scores: Scores): AreaState => {
+/** Where one area stands against its own lines: paused when any pause line holds, resumable when every restart line does. */
+export const areaStateAt = (lines: Pick<AreaLines, "pause" | "resume">, scores: Scores): AreaState => {
   if (lines.pause.some((line) => isRuleConditionMet(line, scores[line.metric]))) return "pause";
   if (lines.resume.length > 0 && lines.resume.every((line) => isRuleConditionMet(line, scores[line.metric]))) return "resume";
   return "hold";
 };
 
-const kindOf = (from: AreaState, to: AreaState): AreaMovementKind => {
+/** The movement between two area states, in the vocabulary `get_state`'s `change.crossed` uses. */
+export const areaMovementKind = (from: AreaState, to: AreaState): AreaMovementKind => {
   if (from === to) return "held";
   if (to === "pause") return "paused";
   if (to === "resume") return "resumable";
@@ -206,9 +208,9 @@ const moveOf = (
   current: Scores,
   window: string,
 ): AreaMovement => {
-  const from = stateAt(lines, previous);
-  const to = stateAt(lines, current);
-  const kind = kindOf(from, to);
+  const from = areaStateAt(lines, previous);
+  const to = areaStateAt(lines, current);
+  const kind = areaMovementKind(from, to);
   const pauseFlips = flippedLines(lines.pause, previous, current);
   const resumeFlips = flippedLines(lines.resume, previous, current);
   const liftedPause = pauseFlips.filter((flip) => !flip.holds);

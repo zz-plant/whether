@@ -267,7 +267,7 @@ describe("/api/agent?view=state", () => {
     const body = await response.json();
 
     assert.equal(response.status, 400);
-    assert.deepEqual(body.allowedViews, ["full", "state"]);
+    assert.deepEqual(body.allowedViews, ["full", "state", "changes"]);
   });
 
   it("does not mix with the Jev request, which carries its own state", async () => {

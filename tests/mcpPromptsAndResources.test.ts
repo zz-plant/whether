@@ -7,6 +7,13 @@ import { createWhetherMcpServer } from "../lib/mcp/server";
 import { getPublishedBriefs } from "../lib/report/publishedBriefs";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
+const nth = <Item>(items: readonly Item[], index = 0): Item => {
+  const item = items[index];
+  if (item === undefined) throw new Error(`expected an item at ${index}, got ${items.length}`);
+  return item;
+};
+const newest = nth(getPublishedBriefs()).slug;
+
 serveUnreachableUpstreams();
 
 /*
@@ -47,7 +54,7 @@ describe("MCP prompts and resources", () => {
     const { result } = await rpc("resources/list");
     const uris: string[] = result.resources.map((resource: { uri: string }) => resource.uri);
     assert.deepEqual(uris.slice(0, 2), ["whether://state", "whether://brief/weekly"]);
-    assert.equal(uris[2], `whether://weeks/${getPublishedBriefs()[0].slug}`);
+    assert.equal(nth(uris, 2), `whether://weeks/${newest}`);
     const templates = await rpc("resources/templates/list");
     assert.equal(templates.result.resourceTemplates[0].uriTemplate, "whether://weeks/{week}");
   });
@@ -62,7 +69,7 @@ describe("MCP prompts and resources", () => {
   });
 
   it("reads a published week through the template, and refuses one that was never published", async () => {
-    const week = getPublishedBriefs()[1].slug;
+    const week = nth(getPublishedBriefs(), 1).slug;
     const { result } = await rpc("resources/read", { uri: `whether://weeks/${week}` });
     assert.equal(JSON.parse(result.contents[0].text).slug, week);
 
@@ -74,9 +81,8 @@ describe("MCP prompts and resources", () => {
   });
 
   it("reads a week written the way a client may fill the template, and refuses a malformed one as the caller's", async () => {
-    const [year, number] = getPublishedBriefs()[0].slug.split("-w");
-    const { result } = await rpc("resources/read", { uri: `whether://weeks/${year}-W${Number(number)}` });
-    assert.equal(JSON.parse(result.contents[0].text).slug, getPublishedBriefs()[0].slug);
+    const { result } = await rpc("resources/read", { uri: `whether://weeks/${newest.replace(/-w0?/, "-W")}` });
+    assert.equal(JSON.parse(result.contents[0].text).slug, newest);
     for (const uri of ["whether://weeks/%E0", "whether://weeks/last-week"]) {
       const refused = await rpc("resources/read", { uri });
       assert.equal(refused.error.code, -32602, uri);
@@ -96,7 +102,7 @@ describe("MCP prompts and resources", () => {
     assert.equal(message.role, "user");
     const text: string = message.content.text;
     assert.match(text, /Plan: Sign a three-year cloud commitment/);
-    const testJson = text.split("Stress test (stress_test_plan):\n")[1].split("\n\n")[0];
+    const testJson = nth(nth(text.split("Stress test (stress_test_plan):\n"), 1).split("\n\n"));
     assert.ok("verdict" in JSON.parse(testJson), "the verdict arrives as data");
     assert.match(text, /This week's state \(get_state\):\n\{/);
     assert.match(text, /automation\.ready is false/);

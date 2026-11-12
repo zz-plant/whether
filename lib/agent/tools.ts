@@ -5,6 +5,7 @@ import { agentStateSchema, buildAgentState } from "../agentState";
 import { getHistoricalAnalogPlaybook } from "../analogPlaybook";
 import { companyFinancialProfileFor, routePlanText, stressTestDecisionPlan, type PlanStressTestResult } from "../decisionShield";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
+import { buildPublishedChanges, InvalidSinceWeekError } from "./publishedChanges";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules, formatStandingRuleTriplet } from "../report/boundedDecisionRules";
 import { EMPTY_OPERATOR_PROFILE } from "../operatorProfile";
@@ -267,6 +268,24 @@ const AGENT_TOOLS = [
         };
       }
       return { ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() };
+    },
+  }),
+  defineTool({
+    name: "get_changes_since",
+    title: "Check whether the call changed since a week",
+    description:
+      "Whether the published weekly call changed since a week you name (e.g. '2026-w41'): the conditions and each area's pause or restart state, compared week by week from the frozen records, never from wording. For an agent that runs on a schedule and acts only on a change: pass the nextSince this returned last time. Without since, the newest eight weeks.",
+    input: {
+      since: textInput.optional().describe("A published week slug, e.g. '2026-w41'. The comparison starts from the last week published at or before it."),
+    },
+    example: { since: "2026-w41" },
+    run: async ({ since }) => {
+      try {
+        return { ...buildPublishedChanges({ since }) };
+      } catch (error) {
+        if (!(error instanceof InvalidSinceWeekError)) throw error;
+        throw new AgentInputError(error.message, "invalid_arguments", [{ argument: "since", message: error.message }]);
+      }
     },
   }),
   defineTool({

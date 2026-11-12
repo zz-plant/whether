@@ -14,8 +14,9 @@
 export const WHETHER_AGENT_MANIFEST_PATH = "/.well-known/whether-agent.json";
 
 /* `full` is the whole brief and stays the default; `state` is the compact answer an agent
-   decides from (`lib/agentState.ts`), about a tenth the size. */
-export const AGENT_VIEWS = ["full", "state"] as const;
+   decides from (`lib/agentState.ts`), about a tenth the size; `changes` is whether the
+   published call changed since a week the caller names (`lib/agent/publishedChanges.ts`). */
+export const AGENT_VIEWS = ["full", "state", "changes"] as const;
 export const DEFAULT_AGENT_VIEW = "full";
 
 /** The tool an agent calls first, on every MCP surface. */
@@ -30,6 +31,7 @@ export const AGENT_START_TOOL = "get_state";
 export const buildAgentEndpoints = (baseUrl: string) => ({
   agent: `${baseUrl}/api/agent`,
   state: `${baseUrl}/api/agent?view=state`,
+  changes: `${baseUrl}/api/agent?view=changes`,
   mcp: `${baseUrl}/api/mcp`,
   brief: `${baseUrl}/brief.md`,
   llms: `${baseUrl}/llms.txt`,
