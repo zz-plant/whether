@@ -21,7 +21,8 @@ const assets = [
   { path: "/whether-logo.svg", expectedType: /image\/svg\+xml/ },
 
   // Web Fonts
-  { path: "/fonts/archivo-variable.55ade54a.woff2", expectedType: /font\/woff2/ },
+  { path: "/fonts/source-sans-3-variable.45c48165.woff2", expectedType: /font\/woff2/ },
+  { path: "/fonts/bricolage-grotesque-variable.41784463.woff2", expectedType: /font\/woff2/ },
   { path: "/fonts/chivo-mono-variable.def202bf.woff2", expectedType: /font\/woff2/ },
 
   // Satori / OG Fonts

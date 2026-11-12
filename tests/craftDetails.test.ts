@@ -30,7 +30,7 @@ const offendersOf = async (extensions: string[], pattern: RegExp) => {
 };
 
 describe("type the shipped files can set", () => {
-  /* Archivo and Chivo Mono ship upright only, so `italic` slants the roman. The chat
+  /* Every shipped face is upright only, so `italic` slants the roman. The chat
      preview's <em> is the one italic left: it shows how a chat client renders `_text_`. */
   it("sets no italic, which the faces do not draw", async () => {
     assert.deepEqual(await offendersOf([".tsx", ".ts"], /className=(?:"[^"]*|\{`[^`]*|\{"[^"]*)\bitalic\b/), []);

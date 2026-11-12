@@ -178,8 +178,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0c1511" },
-    { media: "(prefers-color-scheme: light)", color: "#ecf0e8" },
+    { media: "(prefers-color-scheme: dark)", color: "#10141c" },
+    { media: "(prefers-color-scheme: light)", color: "#eef1f6" },
   ],
 };
 
@@ -195,16 +195,16 @@ export default function RootLayout({
        is the only writer; with scripts off the page draws the stylesheet's base theme. */
     <html lang="en" suppressHydrationWarning className="font-sans">
       <head>
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#10201a" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0f1419" />
         {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
             so there is no fonts.googleapis.com stylesheet in the critical path
-            and no preconnect to a third-party host. Archivo is one variable file
-            that sets every line above the fold — text, the call, the stamp — so it
-            is the one preload. Chivo Mono sets aligned figures and paste previews,
-            all below the fold; it loads when the stylesheet first asks for it. */}
-        <link rel="preload" href="/fonts/archivo-variable.55ade54a.woff2" as="font" type="font/woff2" crossOrigin="" />
-        {/* Besley sets the guidance, which is the largest paint on the brief. */}
-        <link rel="preload" href="/fonts/besley-variable.b9cc4b63.woff2" as="font" type="font/woff2" crossOrigin="" />
+            and no preconnect to a third-party host. Source Sans 3 sets every line
+            of text above the fold, so it is preloaded. Chivo Mono sets aligned
+            figures and paste previews, all below the fold; it loads when the
+            stylesheet first asks for it. */}
+        <link rel="preload" href="/fonts/source-sans-3-variable.45c48165.woff2" as="font" type="font/woff2" crossOrigin="" />
+        {/* Bricolage Grotesque sets the guidance and the score figures, the largest paint on the brief. */}
+        <link rel="preload" href="/fonts/bricolage-grotesque-variable.41784463.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         {/* The two routes a reader is most likely to walk next are prefetched by
             address, unconditionally, as they were before (a cached /operate is

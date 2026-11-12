@@ -1,98 +1,114 @@
 ---
 name: Whether
-description: Weekly operating guidance for startup leaders, set as a dated statement on paper whose only ornament is the record
+description: Weekly operating guidance for startup leaders, set as the week's weather report: the condition is the sky, and the brief is filed on paper beneath it
 colors:
-  paper: "#ecf0e8"
-  paper-sheet: "#f4f7f1"
-  paper-raised: "#fafcf8"
-  paper-nested: "#e1e7db"
-  ink: "#10201a"
-  ink-secondary: "#2b3b33"
-  ink-muted: "#40524a"
+  paper: "#eef1f6"
+  paper-sheet: "#f8fafc"
+  paper-raised: "#fcfdfe"
+  paper-nested: "#e3e8f0"
+  ink: "#0f1419"
+  ink-secondary: "#2a3442"
+  ink-muted: "#4a5568"
   crossed-ink: "#b81f27"
   crossed: "#c4242b"
   crossed-tint: "#f6e2df"
-  night: "#0c1511"
-  night-sheet: "#111b16"
-  night-raised: "#1a271f"
-  night-nested: "#09110d"
-  night-ink: "#e6ece2"
-  night-ink-secondary: "#c5d0c7"
-  night-ink-muted: "#a3b2a9"
+  night: "#10141c"
+  night-sheet: "#161b26"
+  night-raised: "#1f2533"
+  night-nested: "#0b0e14"
+  night-ink: "#e8ecf4"
+  night-ink-secondary: "#b8c2d4"
+  night-ink-muted: "#9aa8c0"
   night-crossed-ink: "#f0666a"
   night-crossed: "#e5484d"
   night-crossed-tint: "#2a1719"
-  sunny: "#e0a81c"
-  cloudy: "#9a5b1e"
-  stormy: "#8f9be0"
-  freezing: "#2a4fa8"
+  sunny: "#e8a81c"
+  cloudy: "#6a8aaa"
+  stormy: "#465290"
+  freezing: "#9fd0f2"
   sunny-ink: "#765600"
-  cloudy-ink: "#8a4f16"
-  stormy-ink: "#3f47b5"
-  freezing-ink: "#1f3f8f"
+  cloudy-ink: "#46607a"
+  stormy-ink: "#3d4880"
+  freezing-ink: "#1a5e94"
   night-sunny-ink: "#f0c95a"
-  night-cloudy-ink: "#dba463"
-  night-stormy-ink: "#b9c1ff"
-  night-freezing-ink: "#93b2f5"
-  band-line-on-light: "#10201a"
-  band-line-on-dense: "#ecf0e8"
+  night-cloudy-ink: "#a9bdd1"
+  night-stormy-ink: "#aab4ec"
+  night-freezing-ink: "#a3d6fa"
+  band-line-on-light: "#0f1419"
+  band-line-on-dense: "#eef1f6"
+  sunny-sky-top: "#f7c53a"
+  sunny-sky: "#e8a81c"
+  cloudy-sky-top: "#a5b7c9"
+  cloudy-sky: "#8a9fb6"
+  stormy-sky-top: "#34406b"
+  stormy-sky: "#232b4a"
+  freezing-sky-top: "#b5dcf5"
+  freezing-sky: "#8ac2ec"
+  night-sunny-sky-top: "#5a4310"
+  night-sunny-sky: "#3d2e0b"
+  night-cloudy-sky-top: "#2b3a4c"
+  night-cloudy-sky: "#1f2a37"
+  night-stormy-sky-top: "#252e52"
+  night-stormy-sky: "#171d33"
+  night-freezing-sky-top: "#1f4466"
+  night-freezing-sky: "#16324d"
 typography:
   guidance:
-    fontFamily: "Besley, Besley Fallback, Georgia, Archivo, serif"
+    fontFamily: "Bricolage Grotesque, Bricolage Grotesque Fallback, Source Sans 3, system-ui, sans-serif"
     fontSize: "clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem)"
     fontWeight: 700
     lineHeight: 1.06
     letterSpacing: "-0.018em"
   figure:
-    fontFamily: "Besley, Besley Fallback, Georgia, Archivo, serif"
+    fontFamily: "Bricolage Grotesque, Bricolage Grotesque Fallback, Source Sans 3, system-ui, sans-serif"
     fontSize: "5.75rem"
     fontWeight: 800
     lineHeight: 0.9
     letterSpacing: "-0.03em"
     fontFeature: "tnum, lnum"
   condition:
-    fontFamily: "Besley, Besley Fallback, Georgia, Archivo, serif"
+    fontFamily: "Bricolage Grotesque, Bricolage Grotesque Fallback, Source Sans 3, system-ui, sans-serif"
     fontSize: "2.125rem"
     fontWeight: 800
     lineHeight: 1
     letterSpacing: "-0.01em"
   page-title:
-    fontFamily: "Besley, Besley Fallback, Georgia, Archivo, serif"
+    fontFamily: "Bricolage Grotesque, Bricolage Grotesque Fallback, Source Sans 3, system-ui, sans-serif"
     fontSize: "clamp(1.625rem, 1.15rem + 1.8vw, 2.125rem)"
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.015em"
   section:
-    fontFamily: "Besley, Besley Fallback, Georgia, Archivo, serif"
+    fontFamily: "Bricolage Grotesque, Bricolage Grotesque Fallback, Source Sans 3, system-ui, sans-serif"
     fontSize: "clamp(1.375rem, 1rem + 1.1vw, 1.625rem)"
     fontWeight: 700
     lineHeight: 1.25
     letterSpacing: "-0.012em"
   area-name:
-    fontFamily: "Besley, Besley Fallback, Georgia, Archivo, serif"
+    fontFamily: "Bricolage Grotesque, Bricolage Grotesque Fallback, Source Sans 3, system-ui, sans-serif"
     fontSize: "1.25rem"
     fontWeight: 700
     lineHeight: 1
   title:
-    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
+    fontFamily: "Source Sans 3, Source Sans 3 Fallback, system-ui, sans-serif"
     fontSize: "clamp(1.125rem, 0.95rem + 0.7vw, 1.25rem)"
     fontWeight: 600
     lineHeight: 1.35
   body:
-    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
+    fontFamily: "Source Sans 3, Source Sans 3 Fallback, system-ui, sans-serif"
     fontSize: "clamp(1rem, 0.85rem + 0.5vw, 1.0625rem)"
     fontWeight: 400
   secondary:
-    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
+    fontFamily: "Source Sans 3, Source Sans 3 Fallback, system-ui, sans-serif"
     fontSize: "clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem)"
     fontWeight: 400
   label:
-    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
+    fontFamily: "Source Sans 3, Source Sans 3 Fallback, system-ui, sans-serif"
     fontSize: "clamp(0.75rem, 0.66rem + 0.15vw, 0.8125rem)"
     fontWeight: 600
     lineHeight: 1
   mono:
-    fontFamily: "Chivo Mono, Archivo, ui-monospace, monospace"
+    fontFamily: "Chivo Mono, Source Sans 3, ui-monospace, monospace"
     fontWeight: 400
     fontFeature: "tnum"
 rounded:
@@ -167,37 +183,44 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Covenant"**
+**Creative North Star: "The Forecast"** (since 2026-11-12; Covenant, 2026-11-10 to 2026-11-12)
 
-The lines are a policy agreed in advance, and the weekly brief is the dated statement of where
-each one stands. The page is that statement, printed on pale green-grey safety paper in a
-green-black ink, and its one ornament is the record itself: a full-bleed engraved band under the
-navigation of every route, drawn from every month-end reading since January 2012. Everything
-below the band is a document, read top to bottom: the guidance, the five areas, the two scores,
-then the sections that explain them.
+The weekly brief is the week's weather report for a startup: the condition is the sky, and how
+to proceed follows from it. The homepage opens on a sky tinted by the week's condition, full
+width, with the guidance written on it and the two scores on a panel of paper; a storm week and a
+sunny week look like different pages. Beneath the sky the brief is filed on cool paper in a
+blue-black ink, read top to bottom: the five areas, the trust facts, then the sections that
+explain them. The record band under the navigation of every route is every month-end reading
+since January 2012, drawn as the same four conditions.
 
-The world borrows the discipline of credit agreements and security printing: structure is the
-only ornament, every engraved line is drawn from data, each line and tick names itself where it
-sits, and nothing decorative is added. It refuses the dark data panel with glowing accents, and
-its opposite, the cream editorial page with an italic serif masthead. "Covenant" names the world
-for contributors; it never appears in reader copy, and no reader term was minted for it.
+The world borrows a modern weather app's glanceability and an investor update's restraint: the
+condition drives the page, structure stays quiet, every engraved line on the band is drawn from
+data, and nothing decorative is added except the sky's slow clouds. It refuses the dark data
+panel with glowing accents, the credit-agreement document Covenant was, and the editorial
+broadsheet. "Forecast" names the world for contributors; it never appears in reader copy beyond
+the weather words the site already uses.
 
-Light is the identity; dark is the second theme, the same paper with the lights off. With no
-stored choice the device setting picks the theme, and a stored choice wins
-(`app/layout.tsx`, the theme bootstrap). With scripts off, the stylesheet's base draws, which is
-the dark `:root` block.
+Light is the identity; dark is the second theme, the same page at night: the paper goes
+blue-black and each sky darkens to its condition after dark. With no stored choice the device
+setting picks the theme, and a stored choice wins (`app/layout.tsx`, the theme bootstrap). With
+scripts off, the stylesheet's base draws, which is the dark `:root` block.
+
+The direction contract is `.impeccable/surfaces/app-page-tsx.md`.
 
 **Key Characteristics:**
 
-- One field of colour at page scale: the record band. Everything else is ink on paper.
-- Two voices: Besley binds, Archivo explains.
-- Ruled sheets, not cards: hairlines, a 2px ink rule over a list, small radii.
-- No surface casts a shadow.
+- Colour commits at page scale in two places: the record band, and the homepage's sky.
+  Everything else is ink on paper.
+- Two voices: Bricolage Grotesque binds, Source Sans 3 explains.
+- Ruled lists and lifted sheets: hairlines and a 2px ink rule over a list; a card or a button
+  carries a layered three-step shadow, and nothing nested repeats it.
 - Every drawing puts the easier side up or to the right.
-- A quiet week has no motion.
+- A quiet week moves only the sky's clouds, and they hold still under reduced motion.
 
-**Open.** Known gaps (share images, print and `/history/compare` still in the earlier world) and the open decisions (Besley against Hepta Slab, per-area history, condition fills on
-their weak ground) live in `docs/design/rebuild-covenant.md`, not here.
+**Open.** Known gaps (share images still in Archivo, the record band not yet a weather strip, no
+sky cross-fade on a condition change) and the earlier open decisions (per-area history,
+condition fills on their weak ground) live in `docs/design/rebuild-covenant.md` and the surface
+brief, not here.
 
 ## Colors
 
@@ -206,7 +229,7 @@ action colour is the ink, in every week.
 
 ### Primary
 
-- **Green-black ink** (`ink`, `night-ink` in the dark theme): text, links, buttons and focus
+- **Blue-black ink** (`ink`, `night-ink` in the dark theme): text, links, buttons and focus
   rings. Links keep their underline (offset 0.18em, thickness from the font). A primary button
   is a solid ink fill with the paper as its label; a secondary is outlined in the strong border.
   The week's condition never colours a control.
@@ -216,27 +239,54 @@ action colour is the ink, in every week.
 
 ### Secondary: the four conditions
 
-Each condition owns one fill, identical in both themes, and one text ink per theme.
+Each condition owns one fill, identical in both themes, one text ink per theme, and one sky per
+theme.
 
 - **Sunny gold** (`sunny`; ink `sunny-ink` / `night-sunny-ink`): risk appetite on, cheap money.
-- **Cloudy sienna** (`cloudy`; ink `cloudy-ink` / `night-cloudy-ink`): risk appetite on, dear money.
-- **Stormy periwinkle** (`stormy`; ink `stormy-ink` / `night-stormy-ink`): risk appetite off,
-  cheap money.
-- **Freezing deep blue** (`freezing`; ink `freezing-ink` / `night-freezing-ink`): risk appetite
-  off, dear money.
+- **Cloudy overcast** (`cloudy`, a grey-blue; ink `cloudy-ink` / `night-cloudy-ink`): risk
+  appetite on, dear money.
+- **Stormy slate** (`stormy`, a deep blue-violet; ink `stormy-ink` / `night-stormy-ink`): risk
+  appetite off, cheap money.
+- **Freezing ice** (`freezing`, a pale blue; ink `freezing-ink` / `night-freezing-ink`): risk
+  appetite off, dear money.
 
-Warm against cool is risk appetite, light against dense is the price of money. Sunny and Stormy
-are the light fields; Cloudy and Freezing the dense. The fills are the same four hexes as
-`REGIME_HEX_COLORS` (`lib/regimePhaseSpace.ts`) and the `[data-regime]` map in
-`app/styles/tokens.css`; `tests/regimeColourContract.test.tsx` holds all three together. A
-component never picks a condition hue: it names its regime with `data-regime` and reads
-`--regime-accent` (the fill) or `--regime-ink` (the text ink).
+The fills follow the weather each word names, not the two axes: gold sun, overcast grey-blue,
+storm slate and pale ice. Stormy is the one dense field; Sunny, Cloudy and Freezing are light, and
+the record band draws its lines dark on them and pale on Stormy (`isLightField`,
+`lib/report/recordBandCodec.ts`). The closest pair under simulated colour-vision deficiency is
+Cloudy and Stormy, 16.5 apart in OKLab, so the glyph beside every word and the pattern in every
+field carry the condition as well. The fills are the same four hexes as `REGIME_HEX_COLORS`
+(`lib/regimePhaseSpace.ts`), `OG_CONDITION_INK` (`lib/image/ogTheme.ts`, for the inks) and the
+`[data-regime]` map in `app/styles/tokens.css`; `tests/regimeColourContract.test.tsx` holds them
+together. A component never picks a condition hue: it names its regime with `data-regime` and
+reads `--regime-accent` (the fill), `--regime-ink` (the text ink) or the sky tokens.
 
 The fill appears as a field in the record band and History's week cells, as a quadrant wash on
 the conditions map, and nowhere else. As text, the condition word prints in its ink, in every
-list, table, legend and caveat as well as beside the guidance: `ConditionWord`
-(`app/components/ui/conceptIcons.tsx`) sets it, and `ConditionLabel` adds the glyph. A column
-of months then reads as stretches in the inks the band draws as fields.
+list, table, legend and caveat: `ConditionWord` (`app/components/ui/conceptIcons.tsx`) sets it,
+and `ConditionLabel` adds the glyph. A column of months then reads as stretches in the inks the
+band draws as fields.
+
+### The sky
+
+The homepage's first screen sits on its condition (`app/styles/forecast.css`, drawn by
+`DecisionHero` wherever it has a margin). Each sky is a vertical gradient from
+`--regime-sky-top` to `--regime-sky`, with its own two inks, `--regime-sky-ink` and
+`--regime-sky-muted`, that clear 4.5:1 at both ends (`tests/forecastVisualWorld.test.tsx`):
+
+| Condition | Light theme sky | Ink on it | Dark theme sky | Ink on it |
+| --- | --- | --- | --- | --- |
+| Sunny | `#f7c53a` → `#e8a81c` | `#1a1408` | `#5a4310` → `#3d2e0b` | `#f6e7c4` |
+| Cloudy | `#a5b7c9` → `#8a9fb6` | `#0f1419` | `#2b3a4c` → `#1f2a37` | `#e3eaf2` |
+| Stormy | `#34406b` → `#232b4a` | `#eef1f6` | `#252e52` → `#171d33` | `#e8ecf4` |
+| Freezing | `#b5dcf5` → `#8ac2ec` | `#0a1a3a` | `#1f4466` → `#16324d` | `#e2f1ff` |
+
+On the light theme a sky is light where its fill is, so Stormy's is the one dark sky and takes
+the paper as its ink. Text on the sky takes the sky's inks, the condition word and its glyph
+included: the sky already says the condition in colour, and the glyph says it in shape. The
+scores sit on a panel of paper on the sky, which puts every page ink back, so the ladders' red
+reads there as it does everywhere else. Four soft cloud masses drift on it, by `transform` only,
+and hold still under reduced motion. A page with no condition gets the plain paper.
 
 ### Tertiary: a crossed line
 
@@ -251,9 +301,11 @@ of months then reads as stretches in the inks the band draws as fields.
   **Raised** (`paper-raised`) for a selected key and the caveat band. **Nested**
   (`paper-nested`) steps below the ground in its own hue.
 - **Night** (`night`, `night-sheet`, `night-raised`, `night-nested`): the dark theme's tiers, a
-  green-black that keeps the ink's hue.
+  blue-black that keeps the ink's hue.
 - **Borders** are the ink thinned, never a second grey: faint, subtle, default and strong at
   0.10 / 0.16 / 0.24 / 0.50 alpha on paper and 0.08 / 0.13 / 0.20 / 0.42 on night.
+- **Paper** is a cool blue-white and the ink a blue-black (Forecast); Covenant's were a pale
+  green-grey safety paper and a green-black.
 - **Band line inks** (`band-line-on-light`, `band-line-on-dense`): constants of the plate, the
   same in both themes. The dark line prints on the light fields, the pale line on the dense.
 
@@ -266,53 +318,56 @@ an outlined diamond, never red: shape carries the state where hue cannot.
 **The Ink Is the Action Rule.** Links, buttons, focus rings, the selected pill and the caret are
 the ink in every week. A condition's colour means the condition and nothing else.
 
-**The One Field Rule.** Colour commits at page scale in one place, the record band. The
-condition word beside the guidance is the only other coloured element on the first screen. The
-regime atmosphere wash is off (`--atmosphere-*: transparent`), because a wash would tint the
-paper the band is printed on.
+**The Two Fields Rule.** Colour commits at page scale in two places: the record band on every
+route, and the sky on the homepage's first screen. Both draw the four conditions and nothing
+else. The regime atmosphere wash is off everywhere else (`--atmosphere-*: transparent`), so
+the paper below the sky, and every other route, stays paper.
 
 ## Typography
 
-**Binding voice:** Besley (with Besley Fallback, metric-matched Georgia, then Archivo)
-**Explaining voice:** Archivo (with Archivo Fallback, metric-matched Arial)
-**Figure columns:** Chivo Mono (with Archivo for arrows)
+**Binding voice:** Bricolage Grotesque (with Bricolage Grotesque Fallback, metric-matched Arial
+Bold, then Source Sans 3)
+**Explaining voice:** Source Sans 3 (with Source Sans 3 Fallback, metric-matched Arial)
+**Figure columns:** Chivo Mono (with Source Sans 3 for arrows)
 
-**Character:** Besley is a Clarendon, the face of engraved securities and public notices; it
-reads sturdy and calm at display sizes. Archivo is a grotesque set at normal width for
-everything that explains. Width no longer separates the voices; the face does.
+**Character:** Bricolage Grotesque is a grotesque with a little ink-trap quirk in its heavy
+weights; it reads warm and decided at display sizes and keeps the guidance off the geometric-sans
+monoculture. Source Sans 3 is a clean, open grotesque for everything that explains. The two
+differ by face and weight, not width.
 
 All three are self-hosted variable files, subset to the site's text, with hashed file names
-(`app/styles/fonts.css`). Archivo and Besley are preloaded.
+(`app/styles/fonts.css` records the build). Source Sans 3 and Bricolage Grotesque are preloaded.
+Satori's share cards still draw Archivo (`public/fonts/og`); moving them is open.
 
 ### Hierarchy
 
-- **Guidance** (Besley 700, 26 → 52px, line-height 1.06): the week's guidance, the only `h1`
+- **Guidance** (Bricolage 700, 26 → 52px, line-height 1.06): the week's guidance, the only `h1`
   on `/`. On a phone it sets at `clamp(1.625rem, 1.1rem + 2.2vw, 2rem)`; from `md` at
   `clamp(2.375rem, 3.3vw, 3.25rem)`, line-height 1.02, tracking -0.03em. At most 101 characters
   (`tests/heroCallAssumptions.test.ts`): four lines on a phone and on a desktop.
-- **Figure** (Besley 800, 92px in the margin, 46px on a phone, line-height 0.9, tabular lining
+- **Figure** (Bricolage 800, 92px in the margin, 46px on a phone, line-height 0.9, tabular lining
   digits): the two published scores. `.type-figure`; the size comes from the caller.
-- **Condition word** (Besley 800, 27px, 34px from `sm`): Sunny, Cloudy, Stormy or Freezing, in
+- **Condition word** (Bricolage 800, 27px, 34px from `sm`): Sunny, Cloudy, Stormy or Freezing, in
   its own ink. `.type-stamp`; on a report intro and in lists it sets at body size.
-- **Page title** (Besley 700, 26 → 34px): a report route's `h1`.
-- **Section** (Besley 700, 22 → 26px): a page's `h2` and a panel's title. `.type-section`.
-- **Area name** (Besley 700, 20px): the five area rows.
-- **Wordmark** (Besley 800, 17px).
-- **Title** (Archivo 600, 18 → 20px): a card's own heading, `h3` and below.
-- **Body** (Archivo 400, 16 → 17px): prose, capped at 60ch.
-- **Secondary** (Archivo, 14 → 15px): supporting prose, captions, labels.
-- **Label** (Archivo 600, 12 → 13px): metadata, the band's labels, axis years, badges.
+- **Page title** (Bricolage 700, 26 → 34px): a report route's `h1`.
+- **Section** (Bricolage 700, 22 → 26px): a page's `h2` and a panel's title. `.type-section`.
+- **Area name** (Bricolage 700, 20px): the five area rows.
+- **Wordmark** (Bricolage 800, 17px).
+- **Title** (Source Sans 600, 18 → 20px): a card's own heading, `h3` and below.
+- **Body** (Source Sans 400, 16 → 17px): prose, capped at 60ch.
+- **Secondary** (Source Sans, 14 → 15px): supporting prose, captions, labels.
+- **Label** (Source Sans 600, 12 → 13px): metadata, the band's labels, axis years, badges.
 - **Mono** (Chivo Mono, inherits size, tabular): only where figures align with each other.
 
-Every Archivo size is a fluid `clamp()` step (`--text-fluid-nano` through `--text-fluid-2xl`),
+Every Source Sans size is a fluid `clamp()` step (`--text-fluid-nano` through `--text-fluid-2xl`),
 and Tailwind's `text-xs` through `text-xl` resolve to them, so there is no second scale.
 `text-2xl` and up stay fixed, for figures.
 
 ### Named Rules
 
-**The Binding Voice Rule.** Besley sets what the page commits to: the guidance, the condition
-word, area names, score figures, headings and the wordmark. Archivo sets everything that
-explains. The voice reaches the page through real rules only (`:where(h1, h2)`,
+**The Binding Voice Rule.** Bricolage Grotesque sets what the page commits to: the guidance,
+the condition word, area names, score figures, headings and the wordmark. Source Sans 3 sets
+everything that explains. The voice reaches the page through real rules only (`:where(h1, h2)`,
 `.type-section`, `.text-display`, `.type-stamp`, `.type-figure`); there is no `font-display`
 utility.
 
@@ -323,7 +378,7 @@ range (`tests/typeSteps.test.tsx`). Two sizes closer than that read as one job s
 voice with `tabular-nums`. Mono is for a column, a before/after pair or a rail's own labels. A
 figure that appears on more than one surface is the same figure everywhere.
 
-**The Measure Rule.** Prose stops at 60ch, about 75 characters in Archivo, from a base-layer
+**The Measure Rule.** Prose stops at 60ch, about 69 characters in Source Sans 3, from a base-layer
 rule on `p` and on list items holding text; a utility on the element overrides it, and a flex
 or grid row is exempt.
 
@@ -336,9 +391,11 @@ One frame on every route: the global header, the record band full-bleed beneath 
 document. The page gutter is `--weather-shell-pad-inline` (16px); the brief's measure is 72rem,
 the wide report shell 84rem.
 
-On `/` from `md`, the guidance block is a reading column and a margin of up to 22rem, separated
-by one unbroken hairline. The margin opens with the week line and the brief's number, beside the
-condition word, then the two score figures on their ruled lines, then the trust facts. On a
+On `/` from `md`, the guidance block is a reading column and a margin of up to 22rem. Its top
+half is the sky, full width: the condition word and the guidance in the column, the week line
+and the brief's number heading the margin beside them, then the two score figures on their ruled
+lines on a panel of paper. Below the sky, on the paper, the five areas fill the column and the
+trust facts the margin, behind one hairline. On a
 phone the column runs: the week and brief number, the condition word with its gloss and the
 delta, the guidance, the two scores side by side as compact figures with the link to why, the
 five areas, then the trust facts. The bottom tab bar and the running head stay.
@@ -361,11 +418,20 @@ a 2px ink rule above, a default hairline under each row.
 
 ## Elevation & Depth
 
-Paper has no depth. No surface casts a shadow: a sheet is told from the ground by its hairline
-and a step of tone, and a container nested inside another drops its shadow and blur, and at the
-third level its border and fill (`app/styles/surfaces.css`). Only what floats over the page
-(menus, dialogs, the toast) may lift. The shadow tokens (`--elev-1` to `--elev-4`) are complete
-values, scaled by `--shadow-scale` per viewport, and are recorded in the sidecar.
+Sheets lift off the paper (Forecast, 2026-11-12). The outermost card or surface carries
+`--elev-card`: three layers, a contact edge, a short lift and a wide soft fall (1/2, 4/8 and
+12/24, in `--shadow-color-faint`), so a sheet reads as a physical sheet rather than a drawn box.
+A button carries `--elev-control`, the same three layers at a third of the reach, and rises to
+the card's on hover. A container nested inside another drops its shadow and blur, and at the
+third level its border and fill (`app/styles/surfaces.css`, the de-escalation ladder), so depth
+is only ever said once. Every layer is offset downward: there is no zero-offset shadow and no
+glow. Pills and fields stay flat; a field is a well, not a key. What floats over the page (menus,
+dialogs, the toast) lifts on `--elev-1` to `--elev-4`. Every shadow token is a complete value,
+scaled by `--shadow-scale` per viewport, and only the shadow colours flip between themes (the
+light theme's are the ink at about a quarter of the dark alpha).
+
+The sky carries the page's atmosphere instead: a gradient and slow clouds behind the first
+screen. The body below it stays flat and readable.
 
 Depth also has an order, one scale named by relationship (`app/styles/tokens.css`):
 
@@ -385,8 +451,9 @@ hand-picked 40 or 50. Bare `z-10`/`z-20` stay legal for stacking inside a positi
 
 ### Named Rules
 
-**The Flat Paper Rule.** A container is a ruled sheet. If it needs a shadow to separate, it
-needs a hairline instead.
+**The Say-It-Once Rule.** Depth is said once per stack: the outermost sheet lifts, everything in
+it is flat. A card inside a card is still wrong, shadow or not. Covenant's Flat Paper Rule (no
+surface casts a shadow, 2026-11-10 to 2026-11-12) is retired.
 
 ## Shapes
 
@@ -405,8 +472,10 @@ corners: they are print, not furniture.
 ### Buttons
 
 - **Shape:** the control radius (4px), 46px tall, 44px minimum target everywhere.
-- **Primary:** a solid ink fill with the paper as its label, no shadow.
-- **Secondary:** the sheet with a strong ink-thinned border and the ink as its label.
+- **Primary:** a solid ink fill with the paper as its label, at the control depth
+  (`--elev-control`), rising to the card's on hover.
+- **Secondary:** the sheet with a strong ink-thinned border and the ink as its label, at the
+  same control depth.
 - **Hover / Focus:** a link or a button rises 1px under a fine pointer; a label never does.
   Focus is a 2px ink outline at 2px offset with a soft halo, declared once on every focusable
   element. Press is a 1px sink.
@@ -416,7 +485,7 @@ corners: they are print, not furniture.
 - **Style:** sentence case, 12–13px semibold, 2px radius, a hairline border.
 - **Line states:** crossed tags take the red at 8% under a red hairline; clear tags the ink.
   There is no action-colour tag: a tag is a display.
-- **Condition:** no box. The word in Besley and its condition ink is the whole mark.
+- **Condition:** no box. The word in Bricolage Grotesque and its condition ink is the whole mark.
 
 ### Inputs / Fields
 
@@ -426,14 +495,14 @@ corners: they are print, not furniture.
 
 ### Navigation
 
-- **Global header:** the Besley wordmark, then This week, Plan, History, Guides; Share and
+- **Global header:** the Bricolage wordmark, then This week, Plan, History, Guides; Share and
   embed, About and search to the right. The current route is underlined in a 2px ink rule.
 - **Phone:** a sticky bottom tab bar and a running head that names the week's call once the
   guidance scrolls away.
 
 ### The record band (signature)
 
-The page's one field of colour and its only ornament, an `aside` labelled "The record" directly
+One of the page's two fields of colour, with the homepage's sky, an `aside` labelled "The record" directly
 under the header on every route (`app/components/recordBand.tsx`, `lib/report/recordBand.ts`,
 `app/styles/record-band.css`). Server-rendered SVG from the bundled month-end series; the still
 image needs no script.
@@ -487,7 +556,8 @@ weeks of Oct 12 and Oct 19, 2026."), followed by the reason where one is recorde
 
 ### The guidance block
 
-`app/components/DecisionHero.tsx`. No box: the document's opening. In order: the week control
+`app/components/DecisionHero.tsx`. No box: the document's opening, on the sky where the hero has
+a margin (the homepage) and on the paper where it has none (the answer pages). In order: the week control
 and the brief's number ("No. 2026-W45"), which head the margin from `md`; the condition word in
 its ink with a stroke icon and its gloss; since when and the week's direction, with "Feels like"
 run in as a caveat; the guidance as the `h1`; on a phone, the two compact figures; a facts line
@@ -498,7 +568,7 @@ regime with `data-regime`, and the week's move is keyed on it.
 ### Area rows
 
 `app/components/home/AreaStrip.tsx`: five numbered rows under a 2px ink rule, each a link at
-least 44px tall with a hairline under it. Number, the area name in Besley, the standing with its
+least 44px tall with a hairline under it. Number, the area name in Bricolage Grotesque, the standing with its
 line-state glyph (red and a pause glyph when on hold, ink and a play glyph when clear), and from
 `lg` the action beside it. Numbered in the one order the areas are always given.
 
@@ -506,7 +576,7 @@ line-state glyph (red and a pause glyph when on hold, ink and a play glyph when 
 
 `app/components/ui/scoreLadder.tsx`, two displays of one component.
 
-- **Figure** (`figure`): the number in Besley 800, the label with "(higher is worse)" or
+- **Figure** (`figure`): the number in Bricolage Grotesque 800, the label with "(higher is worse)" or
   "(higher is better)", one sentence of standing led by its glyph, and a 2px ink rule with the
   pause range as a red bar, a 3px red pause tick, 2px ink ticks, an 18px ink reading ring, and
   "pause 76" / "restart 66" named in place in 12px. The two names read away from each other.
@@ -550,8 +620,8 @@ Both are leaves, never containers.
 Motion is functional and short: 120ms for a press, 200–240ms for state changes
 (`--transition-fast`, `--transition-base`, `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`), and
 none under `prefers-reduced-motion`. Pages cross-fade (100ms out, 220ms in) with the title
-morphing in place. Nothing animates on scroll, and nothing loops except a loading skeleton,
-which stops under reduced motion.
+morphing in place. Nothing animates on scroll, and nothing loops except a loading skeleton and
+the sky's clouds (34–46s drifts, `transform` only), both still under reduced motion.
 
 **The week's move** is the one authored exception: on a week the conditions changed or an area
 changed standing, the guidance block replays it once on arrival. The reading travels from the
@@ -571,9 +641,10 @@ and opacity only, under two seconds, still under reduced motion, print and scree
   label in the surrounding ink.
 - **Do** draw links, buttons and focus rings in the ink, with links underlined.
 - **Do** set the guidance, condition word, area names, score figures, headings and wordmark in
-  Besley, and everything that explains in Archivo.
-- **Do** separate sheets with a hairline and a step of tone, and lists with a 2px ink rule over
-  hairline rows.
+  Bricolage Grotesque, and everything that explains in Source Sans 3.
+- **Do** lift the outermost sheet with `--elev-card` and a button with `--elev-control`, and
+  separate lists with a 2px ink rule over hairline rows.
+- **Do** read a sky from its tokens (`--regime-sky-*`) and give anything on it the sky's ink.
 - **Do** give every condition a pattern as well as a fill wherever it fills an area, so the
   drawing survives greyscale and colour-vision deficiency.
 - **Do** label each line and tick where it sits, and keep the easier side up or to the right.
@@ -583,8 +654,10 @@ and opacity only, under two seconds, still under reduced motion, print and scree
 
 ### Don't:
 
-- **Don't** put a shadow on a container, or a card inside a card.
-- **Don't** use a condition's colour for a control, a section label or a page wash.
+- **Don't** put a card inside a card, or a shadow on anything nested in a lifted sheet.
+- **Don't** draw a zero-offset shadow or a glow.
+- **Don't** use a condition's colour for a control or a section label, or wash a page in it
+  outside the homepage's sky.
 - **Don't** add a hue that is neither a condition nor a crossed line; a caveat is ink with a
   diamond.
 - **Don't** add a legend where a label in place will do.
@@ -598,5 +671,5 @@ and opacity only, under two seconds, still under reduced motion, print and scree
 Copy is part of the design system and is governed by `docs/editorial-guardrails.md`: one name
 per thing, sentence case, no superlatives, no fear. Headings name what the reader gets in the
 reader's words. Numbers always carry their meaning: "90 of 100" never appears alone. The world's
-name and its borrowed vocabulary (covenant, certificate, compliance, attestation) never appear
-in reader copy.
+name never appears in reader copy, and neither does the vocabulary the Covenant world borrowed
+(covenant, certificate, compliance, attestation).

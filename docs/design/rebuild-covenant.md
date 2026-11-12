@@ -4,6 +4,11 @@ Status: working, 2026-11-10. The owner chose the direction and the first build l
 day: the tokens, the type, the record band on every route, the first screen of the brief and
 History. "What is built" below says exactly what, and what is not yet.
 
+Superseded in part on 2026-11-12 by Forecast (`.impeccable/surfaces/app-page-tsx.md`, DESIGN.md):
+the palette, the two voices (Bricolage Grotesque and Source Sans 3 replaced Besley and Archivo),
+card and button depth, and the homepage's first screen, which now sits on a sky in the week's
+condition. The record band, History, the reading order and the copy rules below still hold.
+
 This brief replaces the visual world of the site and keeps the product: the same guidance, lines,
 routes and copy rules. Read it before extending the rebuild. `DESIGN.md` describes the site as
 built; where the two differ, `DESIGN.md` is what shipped and this is what was intended.

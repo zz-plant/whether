@@ -129,10 +129,10 @@ const fontFaces = [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)].map(([, block])
   },
 }));
 
-/** The local, metric-matched faces drawn while Archivo is in flight. */
-const FALLBACK = "Archivo Fallback";
-/** And while Besley is: the binding voice since 2026-11-10 (docs/design/rebuild-covenant.md). */
-const DISPLAY_FALLBACK = "Besley Fallback";
+/** The local, metric-matched faces drawn while Source Sans 3 is in flight. */
+const FALLBACK = "Source Sans 3 Fallback";
+/** And while Bricolage Grotesque is: the display voice since 2026-11-12 (Forecast). */
+const DISPLAY_FALLBACK = "Bricolage Grotesque Fallback";
 
 const face = (family: string) => {
   const found = fontFaces.find((candidate) => candidate.family === family);
@@ -142,7 +142,7 @@ const face = (family: string) => {
 
 /* The symbols the copy sets: the trend set, the comparisons, the change and the minus. */
 const SANS_SYMBOLS = ["→", "←", "↑", "↓", "≤", "≥", "≈", "≠", "Δ", "‰", "−"];
-/* Chivo Mono draws no arrows; --font-mono falls back to Archivo for them. */
+/* Chivo Mono draws no arrows; --font-mono falls back to Source Sans 3 for them. */
 const MONO_SYMBOLS = ["≤", "≥", "≈", "≠", "Δ", "‰", "−"];
 
 describe("the web fonts", () => {
@@ -159,13 +159,13 @@ describe("the web fonts", () => {
     for (const { family, file } of fontFaces.filter((candidate) => candidate.family !== FALLBACK && candidate.family !== DISPLAY_FALLBACK)) {
       assert.ok(file && existsSync(join(FONT_DIR, file)), `${family}: ${file}`);
     }
-    /* Both faces that set the first screen: Archivo its text, Besley the guidance. */
+    /* Both faces that set the first screen: Source Sans 3 its text, Bricolage the guidance. */
     const preloads = [...readFileSync("app/layout.tsx", "utf8").matchAll(/<link rel="preload" href="\/fonts\/([^"]+)"/g)].flatMap(([, file]) => (file ? [file] : []));
-    assert.deepEqual(preloads, [face("Archivo").file, face("Besley").file], "the preloads are the Archivo and Besley files the stylesheet loads");
+    assert.deepEqual(preloads, [face("Source Sans 3").file, face("Bricolage Grotesque").file], "the preloads are the two files the stylesheet loads first");
   });
 
   it("draw the symbols the copy sets, and the stylesheet sends those symbols to them", () => {
-    for (const [family, symbols] of [["Archivo", SANS_SYMBOLS], ["Chivo Mono", MONO_SYMBOLS]] as const) {
+    for (const [family, symbols] of [["Source Sans 3", SANS_SYMBOLS], ["Chivo Mono", MONO_SYMBOLS]] as const) {
       const { file, routes } = face(family);
       const cmap = cmapOfWoff2(readFileSync(join(FONT_DIR, file)));
       for (const symbol of symbols) {
@@ -173,12 +173,12 @@ describe("the web fonts", () => {
         assert.ok(routes(symbol), `${family}'s unicode-range includes ${symbol}`);
       }
     }
-    assert.match(readFileSync("app/styles/tokens.css", "utf8"), /--font-mono:\s*"Chivo Mono",\s*"Archivo"/);
+    assert.match(readFileSync("app/styles/tokens.css", "utf8"), /--font-mono:\s*"Chivo Mono",\s*"Source Sans 3"/);
   });
 
-  /* Until 2026-10-07 a first visit drew system-ui until Archivo arrived, and on a 430px
-     phone the swap reflowed the home page's decision chips (ui-ux-standards §XXII). */
-  it("stand in for Archivo and Besley on a first visit with local faces sized to them", () => {
+  /* Until 2026-10-07 a first visit drew system-ui until the text face arrived, and on a
+     430px phone the swap reflowed the home page's decision chips (ui-ux-standards §XXII). */
+  it("stand in for Source Sans 3 and Bricolage on a first visit with local faces sized to them", () => {
     const tokens = readFileSync("app/styles/tokens.css", "utf8");
     const fallbacks = [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)]
       .map(([, block]) => block)
@@ -194,34 +194,35 @@ describe("the web fonts", () => {
         assert.match(block, new RegExp(`${descriptor}:\\s*[\\d.]+%;`), `${descriptor} is set`);
       }
     }
-    /* The display voice has its own stand-ins: Georgia at text weight, Georgia Bold from
-       700, where the guidance is set. */
+    /* The display voice has its own stand-ins, both Arial Bold: Bricolage is a grotesque,
+       and it is set at 500 and up. The figure weight, 800, has its own size. */
     const display = [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)]
       .flatMap(([, block]) => (block ? [block] : []))
       .filter((block) => block.includes(`font-family: "${DISPLAY_FALLBACK}"`));
     assert.equal(display.length, 2);
     for (const block of display) {
       assert.doesNotMatch(block, /url\(/, "a stand-in is a face the reader already has, never a download");
-      assert.match(block, /src:\s*local\("Georgia/);
+      assert.match(block, /src:\s*local\("Arial Bold"\)/);
       for (const descriptor of ["size-adjust", "ascent-override", "descent-override", "line-gap-override"]) {
         assert.match(block, new RegExp(`${descriptor}:\\s*[\\d.]+%;`), `${descriptor} is set`);
       }
     }
-    assert.ok(display.some((block) => block.includes("font-weight: 700 900;") && /local\("Georgia Bold"\)/.test(block)), "the guidance's weight has a real bold stand-in");
-    assert.match(tokens, /--font-display:\s*"Besley",\s*"Besley Fallback",\s*Georgia,\s*"Archivo"/, "Archivo sits behind Besley for the arrows it does not draw");
+    assert.ok(display.some((block) => block.includes("font-weight: 800 900;")), "the figure weight has its own stand-in");
+    assert.match(tokens, /--font-display:\s*"Bricolage Grotesque",\s*"Bricolage Grotesque Fallback",\s*"Source Sans 3"/, "Source Sans 3 sits behind Bricolage for the symbols it does not draw");
     const normalWidth = fallbacks.filter((block) => !block.includes("font-stretch"));
     for (const weight of ["font-weight: 600;", "font-weight: 700 900;"]) {
       const face = normalWidth.find((block) => block.includes(weight));
-      assert.ok(face, `normal-width text at ${weight} has a real bold stand-in`);
+      assert.ok(face, `text at ${weight} has a real bold stand-in`);
       assert.match(face, /local\("Arial Bold"\)/);
     }
-    assert.match(tokens, /--font-sans:\s*"Archivo",\s*"Archivo Fallback",\s*system-ui/);
+    assert.match(tokens, /--font-sans:\s*"Source Sans 3",\s*"Source Sans 3 Fallback",\s*system-ui/);
   });
 });
 
 describe("the share cards' fonts", () => {
-  /* Static instances of the same Archivo (scripts/generate-og-fonts.mjs). Satori
-     reads these, and lib/image/ogFonts.ts no longer rewrites the arrow. */
+  /* Static Archivo instances (scripts/generate-og-fonts.mjs, from scripts/og-font-sources):
+     the cards were not moved to the site's faces on 2026-11-12. Satori reads these, and
+     lib/image/ogFonts.ts no longer rewrites the arrow. */
   it("draw the arrow and the comparisons", () => {
     const files = readdirSync(join(FONT_DIR, "og")).filter((name) => name.endsWith(".ttf"));
     assert.equal(files.length, 4);
