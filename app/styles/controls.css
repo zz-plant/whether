@@ -366,14 +366,16 @@ details[open] > summary[data-chevron]::after,
    between its rows, so each link reaches up across the gap and stops at the words above.
    The reach downward needs no limit: whatever sits below is painted later and keeps its
    own words. */
-/* The same, for a small square control (the week chevrons) that is a box already. */
+/* The same, for a small square control (the week chevrons) that is a box already. 8px
+   round a box of 28px or more; a smaller box reaches further, to 44px (the 24px rate
+   steppers on /operate/scenarios). */
 .weather-hit-box {
   position: relative;
 }
 .weather-hit-box::after {
   content: "";
   position: absolute;
-  inset: -8px;
+  inset: min(-8px, calc(50% - 22px));
 }
 
 /* A link in a list of links (the site footer). A 44px row on a touch screen;

@@ -130,7 +130,17 @@ body:has([data-record-plate]) .record-band-plate {
    print. Plain for Sunny, ruled for Stormy, hatched for Cloudy, cross-hatched for
    Freezing. */
 .record-week-cell {
+  position: relative;
   background-color: var(--regime-accent);
+}
+/* A cell is 28px tall and, on a phone, about 16px wide (2026-11-12 phone audit). The tap
+   area reaches 8px above and below, to 44px, and half of the 3px gap to each side, so it
+   meets its neighbour's area and never covers the neighbour's cell. Its width is the
+   strip's: one week in 1/n of the column. */
+.record-week-cell::after {
+  content: "";
+  position: absolute;
+  inset: -8px -1.5px;
 }
 .record-week-cell[data-regime="VOLATILE"] {
   background-image: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-light) 55%, transparent) 4px 5px);
