@@ -179,7 +179,8 @@ describe("MCP streamable HTTP transport", () => {
   });
 
   it("rejects unknown methods", async () => {
-    const response = await postMcp({ jsonrpc: "2.0", id: 8, method: "resources/list" });
+    // Completion is a capability this server does not advertise.
+    const response = await postMcp({ jsonrpc: "2.0", id: 8, method: "completion/complete", params: { ref: { type: "ref/prompt", name: "check-plan" }, argument: { name: "plan", value: "hi" } } });
     const payload = await response.json();
     assert.equal(payload.error.code, -32601);
   });
