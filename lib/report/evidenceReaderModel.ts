@@ -57,7 +57,7 @@ type SignalDeltaSource = {
 };
 
 /** `SignalDeltaSource` plus the reading the moves are against and what they are made of, where the source has them. */
-export type SignalDynamicsSource = SignalDeltaSource & Partial<Pick<ReportDynamics, "comparedWith" | "movement">>;
+export type SignalDynamicsSource = SignalDeltaSource & Partial<Pick<ReportDynamics, "comparedWith" | "movement" | "regimeChanged">>;
 
 
 export type SignalReferenceRow = {

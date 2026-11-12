@@ -142,7 +142,7 @@
     "postcss": "8.5.26",
     "react-server-dom-webpack": "19.2.9",
     "rolldown": "1.2.6",
-    "shadcn": "^4.21.0",
+    "shadcn": "^4.23.0",
     "suppression-census": "0.1.0",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
