@@ -190,3 +190,51 @@ describe("remote session history fetch", () => {
     assert.match(output(result), /unshallow skipped/);
   });
 });
+
+describe("shared checkout guard hook", () => {
+  const hook = join(root, ".claude/hooks/guard-shared-tree.mjs");
+  const run = (command: string, tool = "Bash") => spawnSync("node", [hook], {
+    input: JSON.stringify({ tool_name: tool, tool_input: { command } }), encoding: "utf8", timeout: 10_000,
+  });
+
+  for (const command of [
+    "git stash",
+    "git stash pop",
+    "git stash -u",
+    "git stash clear",
+    "git stash save wip",
+    "bun run test && git stash && bun run test",
+    "git -C ../other stash",
+    "WORKERS_CI=1 bun run check:vinext",
+    "export WORKERS_CI=1; bun run check",
+    "env WORKERS_CI='1' node scripts/run-checks.mjs",
+  ]) {
+    it(`blocks ${command}`, () => {
+      const result = run(command);
+      assert.equal(result.status, 2, output(result));
+      assert.match(result.stderr, /^Blocked: /);
+    });
+  }
+
+  for (const command of [
+    "git stash list --format='%H %gs'",
+    "git stash push -u -m session-abc",
+    "git stash push --message=session-abc",
+    "git stash apply 1a2b3c4d",
+    "git stash show -p 1a2b3c4d",
+    "git status && git diff HEAD -- lib/x.ts",
+    "WORKERS_CI=0 bun run check",
+    "echo $WORKERS_CI_COMMIT_SHA",
+    "rg stashed docs/",
+  ]) {
+    it(`allows ${command}`, () => {
+      const result = run(command);
+      assert.equal(result.status, 0, output(result));
+    });
+  }
+
+  it("ignores other tools and payloads it cannot read", () => {
+    assert.equal(run("git stash", "Read").status, 0);
+    assert.equal(spawnSync("node", [hook], { input: "not json", encoding: "utf8" }).status, 0);
+  });
+});
