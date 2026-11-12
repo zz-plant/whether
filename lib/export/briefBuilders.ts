@@ -213,6 +213,8 @@ export const briefIsQuietWeek = (document: BriefDocument): boolean => {
   });
   /* Not a held week: the guidance is on hold because of the readings, and they are what explains it. */
   if (document.slots.policyOverrideActive) return false;
+  /* Nor a week whose conditions changed, even when the sentence could not name the pair. */
+  if (document.readings.previous?.regimeChanged === true) return false;
   return movement !== null && movement.moved.length === 0 && movement.conditions === null && document.confidence === "HIGH";
 };
 

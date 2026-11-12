@@ -40,6 +40,13 @@ type PreviousScores = Partial<Record<RuleConditionMetric, number | null>> & {
 export type PreviousReading = ScorePair & {
   comparedWith?: ComparedWith | null;
   movement?: ReportDynamics["movement"];
+  /**
+   * Set when the week's own comparison found the conditions changed. The two scores cannot
+   * say it: in the week of 2026-11-09 both readings were 90 and 53 and the conditions went
+   * from Cloudy to Freezing. Absent on every other week, so nothing that prints an earlier
+   * reading changes.
+   */
+  regimeChanged?: true;
 };
 
 /** The line where conditions change, as a paste names it beside its number. */
@@ -102,6 +109,7 @@ export const previousScoresFromDynamics = (
     riskAppetite: roundToTenth(current.riskAppetite - deltaFor("riskAppetite")),
     ...(dynamics.comparedWith ? { comparedWith: dynamics.comparedWith } : {}),
     ...(dynamics.movement ? { movement: dynamics.movement } : {}),
+    ...(dynamics.regimeChanged === true ? { regimeChanged: true as const } : {}),
   };
 };
 

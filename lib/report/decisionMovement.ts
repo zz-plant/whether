@@ -263,7 +263,7 @@ export const buildDecisionMovement = ({
   areas,
 }: {
   scores: Scores;
-  previous: (Scores & { comparedWith?: Pick<ComparedWith, "label"> | null }) | null | undefined;
+  previous: (Scores & { comparedWith?: Pick<ComparedWith, "label"> | null; regimeChanged?: boolean }) | null | undefined;
   thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
   /** The market state now, as assessed. The earlier one is what the earlier scores classify into. */
   regime: RegimeKey;
@@ -290,6 +290,10 @@ export const buildDecisionMovement = ({
     scoresAgreeWithState && previousRegime !== regime
       ? { from: getRegimePublicLabel(previousRegime), to: getRegimePublicLabel(regime) }
       : null;
+  /* Whether the conditions changed, as the week's own comparison found it. Not inferred
+     from the scores here: an assessed state can sit off its scores in both readings, and
+     that week held. */
+  const stateMoved = previous.regimeChanged === true;
 
   const groups: MovementGroup[] = GROUP_ORDER.flatMap((kind) => {
     const inGroup = moved.filter((entry) => entry.kind === kind);
@@ -300,9 +304,16 @@ export const buildDecisionMovement = ({
 
   const { sentence, headline, headlines } = ((): { sentence: string; headline: string; headlines: string[] } => {
     if (moved.length === 0) {
+      /* "Held steady" is a claim about the state too, so it is not made in a week whose
+         comparison found the conditions changed. When they changed but the pair cannot be
+         named (above), the sentence keeps to the areas. On 2026-11-09 the hero read
+         "Tightening this week, was Cloudy on Nov 3" while this read "Conditions held steady
+         since Nov 3" in the Slack brief and the decision and agent APIs. */
       const nothing = conditions
         ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no area paused or restarted.`
-        : `Conditions held steady ${window}, and no area paused or restarted. ${describeGuidanceStands(basis)}`;
+        : stateMoved
+          ? `No area paused or restarted ${window}.`
+          : `Conditions held steady ${window}, and no area paused or restarted. ${describeGuidanceStands(basis)}`;
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
@@ -406,7 +417,8 @@ export const buildDecisionMovementForReport = ({
   actionStripItems,
 }: {
   assessment: { regime: RegimeKey; scores: Scores; thresholds: { tightnessRegime: number; riskAppetiteRegime: number } };
-  reportDynamics: Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith">;
+  reportDynamics: Pick<ReportDynamics, "directionLabel" | "changedSignals" | "anomalySignals" | "comparedWith"> &
+    Partial<Pick<ReportDynamics, "regimeChanged">>;
   actionStripItems?: readonly ActionStripItem[];
 }): DecisionMovement | null => {
   const scores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
