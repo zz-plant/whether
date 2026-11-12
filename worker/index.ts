@@ -15,7 +15,6 @@ import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegime
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
 import { sendOpsFailureNotice, type FailedStep } from "../lib/delivery/opsNotice";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
-import { withSpeculationRules } from "../lib/runtime/speculationRules";
 import { negotiateMarkdown, withAgentDiscoveryLinks } from "../lib/runtime/agentResponse";
 import {
   agentManifestResponse,
@@ -304,9 +303,7 @@ export default {
        served the Markdown brief instead of HTML (lib/runtime/agentResponse.ts).
        Browsers never send that Accept header, so no reader sees a difference. */
     const markdownRequest = negotiateMarkdown(request);
-    const response = withSpeculationRules(
-      withAgentDiscoveryLinks(await handler.fetch(markdownRequest ?? request, env, ctx)),
-    );
+    const response = withAgentDiscoveryLinks(await handler.fetch(markdownRequest ?? request, env, ctx));
 
     const cookieHeader = request.headers.get("cookie");
     if (cookieHeader && /whether-(company-stage|company-runway|rate-sensitivity|ticker)=/.test(cookieHeader)) {

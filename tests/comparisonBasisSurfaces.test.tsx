@@ -43,12 +43,15 @@ describe("the earlier scores a week hands every surface", () => {
   const current = { tightness: 90, riskAppetite: 43 };
 
   it("carry the reading they are from, and none where the week records none", () => {
+    // Both fixtures are weeks whose conditions changed, and since 2026-11-12 the earlier
+    // reading says so (the two scores alone cannot: see lastWeekDerivation.test.ts).
     assert.deepEqual(previousScoresFromDynamics(datedWeek, current), {
       tightness: 63,
       riskAppetite: 56,
       comparedWith,
+      regimeChanged: true,
     });
-    assert.deepEqual(previousScoresFromDynamics(undatedWeek, current), { tightness: 63, riskAppetite: 56 });
+    assert.deepEqual(previousScoresFromDynamics(undatedWeek, current), { tightness: 63, riskAppetite: 56, regimeChanged: true });
   });
 });
 

@@ -21,15 +21,17 @@ const movement = ({
   to,
   regime,
   label = "Aug 31",
+  regimeChanged = false,
 }: {
   from: { tightness: number; riskAppetite: number };
   to: { tightness: number; riskAppetite: number };
   regime: RegimeKey;
   label?: string | null;
+  regimeChanged?: boolean;
 }) =>
   buildDecisionMovement({
     scores: to,
-    previous: { ...from, comparedWith: label ? { label } : null },
+    previous: { ...from, comparedWith: label ? { label } : null, ...(regimeChanged ? { regimeChanged: true } : {}) },
     thresholds: DEFAULT_THRESHOLDS,
     regime,
     areas: areaLinesFromRules(rulesFor(regime, to)),
@@ -179,6 +181,38 @@ describe("buildDecisionMovement", () => {
     assert.equal(behind.conditions, null);
     assert.doesNotMatch(behind.sentence, /conditions changed/i);
     assert.match(behind.sentence, /^Since Aug 31, the pause now applies to every area, because /);
+  });
+
+  it("does not say conditions held steady in a week whose comparison found them changed", () => {
+    // The week of 2026-11-09: funding pressure 90 and risk appetite 53 at both readings, which
+    // classify as Cloudy, and conditions assessed as Freezing. The hero said "Tightening this
+    // week, was Cloudy on Nov 3" while this sentence said "Conditions held steady since Nov 3"
+    // in the Slack brief, /api/decision and /api/agent.
+    const changed = movement({
+      from: { tightness: 90, riskAppetite: 53 },
+      to: { tightness: 90, riskAppetite: 53 },
+      regime: "SCARCITY",
+      label: "Nov 3",
+      regimeChanged: true,
+    });
+
+    assert.ok(changed);
+    assert.deepEqual(changed.moved, []);
+    assert.equal(changed.conditions, null);
+    assert.equal(changed.sentence, "No area paused or restarted since Nov 3.");
+    assert.equal(changed.headline, changed.sentence);
+    assert.deepEqual(changed.headlines, [changed.sentence]);
+
+    // The same scores and state in a week whose comparison found no change did hold steady:
+    // an assessed state can sit off its scores in both readings.
+    const steady = movement({
+      from: { tightness: 90, riskAppetite: 53 },
+      to: { tightness: 90, riskAppetite: 53 },
+      regime: "SCARCITY",
+      label: "Nov 3",
+    });
+    assert.ok(steady);
+    assert.equal(steady.sentence, "Conditions held steady since Nov 3, and no area paused or restarted. The guidance stands.");
   });
 
   it("reads 'this week' where the source did not date the earlier reading", () => {
