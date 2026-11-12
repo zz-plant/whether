@@ -121,7 +121,9 @@ export function AdvicePlane({
 
   return (
     <figure className="m-0 space-y-3" data-advice-plane>
-      <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="block h-auto w-full max-w-[26rem]" aria-hidden="true">
+      {/* 288px wide on a 320px phone, which drew the 12-unit ticks at 10px; 14.5 units draw
+          every label at 12px there (typography.css). */}
+      <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="weather-phone-labels block h-auto w-full max-w-[26rem] [--phone-label:14.5px]" aria-hidden="true">
         {quadrants.map((quadrant) => (
           <rect key={quadrant.regime} x={quadrant.x} y={quadrant.y} width={quadrant.w} height={quadrant.h} fill={quadrant.fill} />
         ))}

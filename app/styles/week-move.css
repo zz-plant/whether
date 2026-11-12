@@ -35,9 +35,11 @@
   display: none;
 }
 
-/* A 44px target around a 14px glyph (the word is hidden on a phone). */
+/* A 44px target around a 14px glyph (the word is hidden on a phone). It reaches 10px to
+   the left, over the date it follows, and 20px to the right, where the line is empty: at
+   15px on the right it was 39px wide (2026-11-12 phone audit). */
 .week-move-replay.weather-hit::after {
-  inset: -15px -15px -15px -10px;
+  inset: -15px -20px -15px -10px;
 }
 
 @media screen and (prefers-reduced-motion: no-preference) {

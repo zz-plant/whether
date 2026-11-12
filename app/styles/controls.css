@@ -357,16 +357,25 @@ details[open] > summary[data-chevron]::after,
 .weather-hit::after {
   content: "";
   position: absolute;
-  inset: -14px -4px;
+  inset: calc(-1 * var(--weather-hit-up, 14px)) -4px -14px;
 }
-/* The same, for a small square control (the week chevrons) that is a box already. */
+/* Where links stack, the later one is painted over the earlier, hit area and all, so its
+   14px reach upward covered the lower half of the words above it: on a 2026-11-12 phone
+   audit a tap on "Funding pressure" on /signals opened Hiring, and on a brief "Add next
+   Monday's review" opened the weekly schedule. A stack sets `--weather-hit-up` to the gap
+   between its rows, so each link reaches up across the gap and stops at the words above.
+   The reach downward needs no limit: whatever sits below is painted later and keeps its
+   own words. */
+/* The same, for a small square control (the week chevrons) that is a box already. 8px
+   round a box of 28px or more; a smaller box reaches further, to 44px (the 24px rate
+   steppers on /operate/scenarios). */
 .weather-hit-box {
   position: relative;
 }
 .weather-hit-box::after {
   content: "";
   position: absolute;
-  inset: -8px;
+  inset: min(-8px, calc(50% - 22px));
 }
 
 /* A link in a list of links (the site footer). A 44px row on a touch screen;

@@ -383,7 +383,9 @@ export async function DecisionAnswerPageContent({
           {leadArea ? (
             <div className="mt-3 space-y-1 text-xs">
               <p className="text-slate-400">The signals behind these lines, for {decisionAreaLabel(leadArea).toLowerCase()}:</p>
-              <ul className="flex flex-wrap gap-x-4 gap-y-1">
+              {/* One link a row on a phone: each reaches up only into the gap above it
+                  (`--weather-hit-up`, controls.css), not into the words of the one before. */}
+              <ul className="flex flex-wrap gap-x-4 gap-y-1 [--weather-hit-up:6px]">
                 {indexableSignalsClusters.map((signal) => (
                   <li key={signal.slug}>
                     <ActionLink href={`/signals/${signal.slug}/${leadArea}`} variant="inline">
@@ -402,7 +404,8 @@ export async function DecisionAnswerPageContent({
           {reviewedAt ? (
             <p className="text-xs text-slate-400">Answer last reviewed: {reviewedAt}.</p>
           ) : null}
-          <ul className="mt-3 space-y-1">
+          {/* Each link reaches up only into the 11px between rows (`--weather-hit-up`). */}
+          <ul className="mt-3 space-y-1 [--weather-hit-up:8px]">
             {page.supportingLinks.map((link) => (
               <li key={link.href}><ActionLink href={link.href} variant="inline">{link.label}</ActionLink></li>
             ))}

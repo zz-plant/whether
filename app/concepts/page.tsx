@@ -349,8 +349,12 @@ export default function ProductCanonPage() {
       >
         <EssayYearStrip timeline={timeline} recordStart={recordStart} />
         {/* A jump rail for a list that runs to ten thousand pixels: the strip
-            above says where the years are, this takes a reader to one. */}
-        <nav aria-label="Jump to a year" className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+            above says where the years are, this takes a reader to one. On a phone it
+            wraps to three rows; each year reaches up only across the 8px row gap
+            (`--weather-hit-up`, controls.css), so a row is 24px and a tap on a year opens
+            that year. At 14px over a 4px gap the row below took the lower half of each
+            year above it (2026-11-12). */}
+        <nav aria-label="Jump to a year" className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-xs [--weather-hit-up:8px]">
           {[...new Set(timeline.map((essay) => essay.published.year))].sort((a, b) => a - b).map((year) => {
             const first = timeline.find((essay) => essay.published.year === year);
             return first ? (

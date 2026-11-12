@@ -853,9 +853,10 @@ async function PageContent({
               {/* The formats a reader with one of these roles came for, named. They sat
                   behind "Share or embed this" at the foot of the page. After the areas
                   rather than beside Copy Brief: the decision, then the artifact, and the
-                  words-before-the-areas budget stands. */}
+                  words-before-the-areas budget stands. A wrapped row reaches up only
+                  across the 4px gap (`--weather-hit-up`, controls.css). */}
               {!historicalSelection ? (
-                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)]">
+                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)] [--weather-hit-up:4px]">
                   Share as:
                   {ROLE_FORMAT_LINKS.map((format) => (
                     <ActionLink key={format.href} href={format.href} variant="inline">

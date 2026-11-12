@@ -44,13 +44,15 @@ function SliderNudgeValue({
   decreaseLabel: string;
   increaseLabel: string;
 }) {
+  /* The two keys keep their 24px square on a 320px phone, where the row squeezed them to
+     14px wide, and take a 44px tap area round it (`weather-hit-box`, controls.css). */
   return (
     <div className="flex items-center gap-1.5 tabular-nums">
       <button
         type="button"
         onClick={() => onChange(Math.max(min, Number((value - step).toFixed(2))))}
         aria-label={decreaseLabel}
-        className="flex h-6 w-6 items-center justify-center rounded border border-slate-700/80 bg-slate-800 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-slate-100 transition-colors"
+        className="weather-hit-box flex h-6 w-6 shrink-0 items-center justify-center rounded border border-slate-700/80 bg-slate-800 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-slate-100 transition-colors"
       >
         −
       </button>
@@ -61,7 +63,7 @@ function SliderNudgeValue({
         type="button"
         onClick={() => onChange(Math.min(max, Number((value + step).toFixed(2))))}
         aria-label={increaseLabel}
-        className="flex h-6 w-6 items-center justify-center rounded border border-slate-700/80 bg-slate-800 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-slate-100 transition-colors"
+        className="weather-hit-box flex h-6 w-6 shrink-0 items-center justify-center rounded border border-slate-700/80 bg-slate-800 text-xs font-semibold text-slate-300 hover:border-slate-500 hover:text-slate-100 transition-colors"
       >
         +
       </button>

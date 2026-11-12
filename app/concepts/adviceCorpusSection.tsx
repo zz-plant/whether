@@ -79,12 +79,23 @@ function buildModel() {
 /*
  * Two drawings of one chart (2026-10-27). In one 680-unit drawing a phone scaled the
  * labels to about 5px; no single font size reads at both widths, because SVG text scales
- * with its box. The phone drawing is 360 units wide, drawn at about 1:1, with 11px labels
- * and a year every four years; from `sm` the wide one, as before.
+ * with its box. The phone drawing is 360 units wide with a year every four years; from
+ * `sm` the wide one, as before. A 320px phone draws the phone drawing at 288px, 0.8 of its
+ * units, so its labels are 15 units, 12px there (2026-11-12; they were 11, drawn at 8.8px).
+ * At that size the plot gives room on the left for "100%" and on the right for "Conserve",
+ * and the note at the crossing breaks after "Funding pressure" to stay clear of the axis.
  */
-type ChartLayout = { viewW: number; plotLeft: number; plotRight: number; label: number; tick: number; yearEvery: number };
-const WIDE: ChartLayout = { viewW: 680, plotLeft: 40, plotRight: 600, label: 11, tick: 10, yearEvery: 2 };
-const NARROW: ChartLayout = { viewW: 360, plotLeft: 40, plotRight: 298, label: 11, tick: 11, yearEvery: 4 };
+type ChartLayout = {
+  viewW: number;
+  plotLeft: number;
+  plotRight: number;
+  label: number;
+  tick: number;
+  yearEvery: number;
+  breakCrossingNote: boolean;
+};
+const WIDE: ChartLayout = { viewW: 680, plotLeft: 40, plotRight: 600, label: 11, tick: 10, yearEvery: 2, breakCrossingNote: false };
+const NARROW: ChartLayout = { viewW: 360, plotLeft: 46, plotRight: 284, label: 15, tick: 15, yearEvery: 4, breakCrossingNote: true };
 const TOP_Y = 18;
 const TOP_H = 64;
 const BOTTOM_Y = 112;
@@ -167,6 +178,8 @@ function CorpusChart({
   const shareY = (share: number) => BOTTOM_Y + BOTTOM_H - share * BOTTOM_H;
   const pressureY = (value: number) => TOP_Y + TOP_H - (value / 100) * TOP_H;
   const pressure = quarters.map((quarter) => quarter.fundingPressure);
+  /* 12 units under the wide drawing's 10-unit note, as it always was; the same leading at 15. */
+  const noteLineStep = Math.round(layout.tick * 1.2);
   const pressureArea = `${linePath(pressure, xOf, pressureY)}L${xOf(quarters.length - 1)} ${TOP_Y + TOP_H}L${layout.plotLeft} ${TOP_Y + TOP_H}Z`;
   const years = quarters.flatMap((quarter, index) => (quarter.period.endsWith("Q1") && Number(quarter.period.slice(0, 4)) % layout.yearEvery === 0 ? [{ year: quarter.period.slice(0, 4), x: xOf(index) }] : []));
   const lastExpand = [...quarters].reverse().find((quarter) => quarter.expand !== null);
@@ -262,8 +275,17 @@ function CorpusChart({
             fontSize={layout.tick}
             fill="var(--app-text-secondary)"
           >
-            <tspan x={xOfMonth(crossingMonth) - 5}>Funding pressure above {FUNDING_LINE}</tspan>
-            <tspan x={xOfMonth(crossingMonth) - 5} dy={12}>
+            {layout.breakCrossingNote ? (
+              <>
+                <tspan x={xOfMonth(crossingMonth) - 5}>Funding pressure</tspan>
+                <tspan x={xOfMonth(crossingMonth) - 5} dy={noteLineStep}>
+                  above {FUNDING_LINE}
+                </tspan>
+              </>
+            ) : (
+              <tspan x={xOfMonth(crossingMonth) - 5}>Funding pressure above {FUNDING_LINE}</tspan>
+            )}
+            <tspan x={xOfMonth(crossingMonth) - 5} dy={noteLineStep}>
               {expandLabel} {delta >= 0 ? "+" : "−"}
               {Math.abs(delta)} pts after
             </tspan>

@@ -167,7 +167,7 @@ export const SignalsWhatChangedSection = ({
                        restart lines" without saying whose. */
                     <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
                   ) : row.key === "baseRate" ? (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px]">
                       Feeds into <a href="#tightness" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
                     </span>
                   ) : (
@@ -175,7 +175,7 @@ export const SignalsWhatChangedSection = ({
                        funding pressure only below zero (`computeRiskAppetiteScore`
                        and the inversion points in regimeEngineCore). This said
                        funding pressure alone. */
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
+                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px]">
                       Feeds into <a href="#riskAppetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted (short-term rates above long-term)
                     </span>
                   )}

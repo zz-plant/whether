@@ -12,11 +12,13 @@
  * (`rounded-md`, 4px), not the 2px stamp — a numeral is a figure, not a verdict.
  */
 export function OrdinalMarker({ children, className = "" }: { children: number; className?: string }) {
+  /* 11px from `sm`, and the 12px step on a phone, where nothing draws smaller
+     (ui-ux-standards §XXVIII; the 2026-11-12 phone audit found the numerals at 11px). */
   return (
     <span
       aria-hidden="true"
       data-ordinal=""
-      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-slate-700/60 bg-slate-800/80 text-[11px] font-semibold tabular-nums text-slate-400 ${className}`.trim()}
+      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-slate-700/60 bg-slate-800/80 text-[11px] font-semibold tabular-nums text-slate-400 max-sm:text-xs ${className}`.trim()}
     >
       {children}
     </span>

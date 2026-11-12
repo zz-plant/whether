@@ -82,6 +82,20 @@ svg :where(.type-eyebrow, .type-badge) {
   font-size: inherit;
 }
 
+/* A chart's labels on a phone (2026-11-12). SVG text scales with its drawing, so a chart
+   drawn narrower than its viewBox shrinks its labels: on a 320px phone the /calibration
+   scatter drew its axis at 7px and the /about line strip at 8px, under the 12px floor
+   (ui-ux-standards §XXVIII). Such a chart carries `weather-phone-labels` and sets
+   `--phone-label` to the size, in its own units, that draws at 12px or more where it is
+   narrowest, on a 320px phone. Whether labels collide depends on their size in those
+   units, not on how wide the chart is drawn, so a size that fits at 320px fits on any
+   phone. Below `sm` only: from there the chart is drawn at its desktop size. */
+@media (width < 40rem) {
+  .weather-phone-labels text {
+    font-size: var(--phone-label);
+  }
+}
+
 /* Uppercase micro badge — status pills, mode chips, trust tags. The one
    primitive that keeps capitals: a badge is a stamp, not a label. Deliberately
    separate from .type-eyebrow: these sit on dynamic tone classes (trustToneClass, STATUS_COLORS,

@@ -66,6 +66,7 @@ section that matches the change, not the file.
   - Constraint: Focus must return to the trigger when a modal closes.
 - MUST: Focus contrast ratio ≥ 3:1. The default browser ring is insufficient if it doesn't meet contrast against your background.
 - MUST: 44x44px minimum touch target. Not "about that size." Strictly ≥44 CSS pixels. Use negative margins or pseudo-elements to expand invisible hitboxes.
+  - A tap on a control's own words opens that control. `weather-hit` reaches 14px above and below a link, and of two stacked links the later is painted over the earlier, so where links stack or wrap closer than that the container sets `--weather-hit-up` to the gap between rows (controls.css). On 2026-11-12 a phone audit found the later link taking up to 70% of the box of the one above it, on `/signals`, the briefs, `/history`, `/concepts`, `/companies`, `/roles`, the answer pages and the homepage: a tap on "Funding pressure" on `/signals` opened Hiring. Where a row of links is under 24px apart, widen the gap to make it 24px (the calendar links, the `/concepts` year rail). `weather-hit-box` grows any box to at least 44px.
 - NEVER: `outline: none` in CSS. If you remove the outline, you MUST replace it immediately with a box-shadow or background change in the same rule.
 
 ## III. Data integrity & form hygiene
@@ -999,7 +1000,11 @@ four report pages on a phone (15px under 20px sections), page titles at five siz
 - MUST: draw nothing on a phone under 12px. `text-fluid-nano` has a 12px floor; the ladder's line
   numbers are 12px. A chart whose coordinate box is wider than a phone draws a phone version
   rather than scaling its labels down (`adviceCorpusSection.tsx` draws a 360-unit drawing below
-  `sm`); a fixed-size diagram sets its labels so they render at 10px or more.
+  `sm`); a fixed-size diagram sets its labels so they render at 10px or more. A chart drawn
+  narrower than its viewBox on a phone carries `weather-phone-labels` and sets `--phone-label`
+  to the size, in its units, that draws at 12px on a 320px phone (typography.css, 2026-11-12).
+  Measure SVG text at its rendered size: an audit that reads `font-size` reports a 5-unit label
+  drawn at 13px as 5px.
 - MUST: set the lines a reader acts on at `text-fluid-sm`, not caption size: the brief's "Conditions
   change if", "Pause if", "Restart when" and the chosen area's answer.
 - MUST: keep the trust strip's phone line to one short phrase per cell. The basis warning prints

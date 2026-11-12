@@ -56,9 +56,13 @@ export function CalendarReviewActions({
   const oneTimeUrl = buildOneTimeReviewUrl({ title, details: resolvedDetails });
   const recurringUrl = buildMondayCalendarUrl(title, resolvedDetails);
 
+  /* On a phone these wrap one link a row. Each reaches up only across the row gap
+     (`--weather-hit-up`, controls.css): at 14px "Schedule a weekly review" took the lower
+     half of "Add next Monday's review". The compact rows are 18px of text, so their gap
+     is 6px, not 4px, for a 24px row a thumb can tell from the next (2026-11-12). */
   if (variant === "compact") {
     return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-fluid-nano text-slate-300">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-fluid-nano text-slate-300 [--weather-hit-up:6px]">
         <a href={oneTimeUrl} target="_blank" rel="noreferrer" className={linkClass}>
           Add next Monday&rsquo;s review
         </a>
@@ -89,7 +93,7 @@ export function CalendarReviewActions({
   return (
     <div className="rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 space-y-2 text-fluid-sm text-slate-300">
       <p className="type-eyebrow text-slate-400">Calendar actions</p>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 [--weather-hit-up:8px]">
         <a href={oneTimeUrl} target="_blank" rel="noreferrer" className={linkClass}>
           Add next Monday&rsquo;s review
         </a>

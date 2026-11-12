@@ -36,9 +36,11 @@ function Endpoint({ signature, children, tryHref, tryLabel, tryAriaLabel }: Endp
       {tryHref ? (
         <a
           href={tryHref}
-          /* Twenty links read "Try it": the endpoint tells them apart out of context. */
+          /* Twenty links read "Try it": the endpoint tells them apart out of context. An
+             18px line on its own at the foot of the card; `weather-hit` takes the tap area
+             to 44px without moving it. */
           aria-label={tryAriaLabel ?? `${tryLabel}: ${signature}`}
-          className="inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600"
+          className="weather-hit inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600"
         >
           {tryLabel} →
         </a>
@@ -433,9 +435,11 @@ export default function ApiDocsPage() {
             <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               {embedSnippet}
             </pre>
+            {/* A 44px tap area that stops at the snippet above, so a swipe across the
+                snippet still scrolls it (`--weather-hit-up`, controls.css). */}
             <Link
               href="/share#embed"
-              className="inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600"
+              className="weather-hit inline-flex text-fluid-nano text-sky-200 underline decoration-sky-600 [--weather-hit-up:8px]"
             >
               Configure it with a live preview →
             </Link>
