@@ -234,7 +234,15 @@ describe("delivering plan-line alerts", () => {
     await store.verifyEmail(subscriber.confirmToken ?? "");
     kv.entries.set("alert:state", JSON.stringify({ regime: "DEFENSIVE", tightness: 74, riskAppetite: 50, lastSentAt: "2026-01-01T00:00:00.000Z" }));
     const sentBodies: string[] = [];
-    Object.assign(globalThis, { EMAIL: { send: async (message: { text: string }) => { sentBodies.push(message.text); } } });
+    const sentHeaders: Array<Record<string, string> | undefined> = [];
+    Object.assign(globalThis, {
+      EMAIL: {
+        send: async (message: { text: string; headers?: Record<string, string> }) => {
+          sentBodies.push(message.text);
+          sentHeaders.push(message.headers);
+        },
+      },
+    });
     try {
       await deliverAlerts({
         regime: "DEFENSIVE",
@@ -250,6 +258,8 @@ describe("delivering plan-line alerts", () => {
     }
     assert.equal(sentBodies.length, 1);
     assert.match(sentBodies[0], /With less than 6 months of runway, the hiring pause is what protects the runway/);
+    assert.ok(sentHeaders[0]?.["List-Unsubscribe"]?.includes(`token=${encodeURIComponent(subscriber.token)}`), "the mail client's own unsubscribe button");
+    assert.equal(sentHeaders[0]?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
   });
 });
 

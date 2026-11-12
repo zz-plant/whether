@@ -66,6 +66,10 @@ export const createCloudflareEmailAdapter = (
     subject: string;
     html: string;
     text: string;
+    /* Cloudflare takes only the headers on its allowlist, `X-` ones, and well-formed
+       values, and refuses the whole message over one it does not take
+       (developers.cloudflare.com/email-service/reference/headers/). */
+    headers?: Record<string, string>;
   }) => Promise<unknown> } }).EMAIL;
 
   if (!emailBinding) {

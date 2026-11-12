@@ -26,6 +26,9 @@ const normalizeBaseUrl = (value: string | null | undefined) => {
 
 const siteHost = new URL(siteUrl).hostname;
 
+const isDeveloperMachine = (hostname: string) =>
+  hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+
 /* Hosts a link may point at: the site, this worker on workers.dev (production,
    or a preview version's "<id>-whether.<account>.workers.dev"), and a
    developer's machine. */
@@ -33,14 +36,18 @@ const isTrustedLinkHost = (hostname: string) =>
   hostname === siteHost
   || hostname === `www.${siteHost}`
   || /^(?:[a-z0-9-]+-)?whether\.[a-z0-9-]+\.workers\.dev$/.test(hostname)
-  || hostname === "localhost"
-  || hostname === "127.0.0.1"
-  || hostname === "[::1]";
+  || isDeveloperMachine(hostname);
 
 /**
  * Where a link in an email points. A configured base wins; otherwise the host the
  * request came in on, but only one of ours. A forged Host header must not be able
  * to mail a reader a link to someone else's site.
+ *
+ * Every public host of ours answers on https, and a link to one is written https
+ * whichever scheme the request used. The request's own origin was taken as given
+ * until 2026-11-12, so a send triggered over plain http put an http link in
+ * `List-Unsubscribe`, which Cloudflare refuses along with the whole message
+ * (`unsubscribeHeaders` in `lib/email/emailShell.ts`): every recipient's send failed.
  */
 export const resolveEmailBaseUrl = (request?: Request): string => {
   const configured = normalizeBaseUrl(process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL);
@@ -48,7 +55,8 @@ export const resolveEmailBaseUrl = (request?: Request): string => {
 
   if (request) {
     const url = new URL(request.url);
-    if (isTrustedLinkHost(url.hostname)) return url.origin;
+    if (isDeveloperMachine(url.hostname)) return url.origin;
+    if (isTrustedLinkHost(url.hostname)) return `https://${url.host}`;
   }
 
   return siteUrl;
