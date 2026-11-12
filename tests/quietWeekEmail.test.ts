@@ -47,6 +47,12 @@ describe("a quiet week, by the brief document", () => {
     );
   });
 
+  it("is not quiet in a week whose conditions changed, even with both scores where they were", () => {
+    // 2026-11-09: 90 and 53 at both readings, conditions from Cloudy to Freezing. The email would
+    // have left out the two readings as a week in which nothing happened.
+    assert.equal(briefIsQuietWeek({ ...withPrevious(document, { ...same, regimeChanged: true }), confidence: "HIGH" }), false);
+  });
+
   it("is not quiet on a week a score moved an area", () => {
     const moved = { ...same, riskAppetite: same.riskAppetite > 50 ? 30 : 80 };
     assert.equal(briefIsQuietWeek({ ...withPrevious(document, moved), confidence: "HIGH" }), false);

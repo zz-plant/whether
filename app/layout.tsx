@@ -206,23 +206,18 @@ export default function RootLayout({
         {/* Bricolage Grotesque sets the guidance and the score figures, the largest paint on the brief. */}
         <link rel="preload" href="/fonts/bricolage-grotesque-variable.41784463.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
-        {/* The two routes a reader is most likely to walk next are prefetched by
-            address, unconditionally, as they were before (a cached /operate is
-            the reason "Build this week's plan →" feels instant). Everything else
-            is prefetched on hover by the Speculation Rules API — document rules
-            cover every same-origin link, except /api (its GET endpoints are
-            reads, but a crawler's click on "Try it" is not a page a reader is
-            navigating to). Moderate eagerness: one request per hovered link,
-            deduplicated by URL, and nothing executed — these are prefetches, not
-            prerenders, so no speculative page load fires telemetry. The rules
-            are delivered by the worker's Speculation-Rules response header
-            (worker/index.ts): the HTML standard requires type=speculationrules
-            scripts to be inline and fires an error on one with a src, and this
-            layout is where the repo's one dangerouslySetInnerHTML exemption is
-            NOT (app/components/jsonLdScript.tsx owns it), so a src= script here
-            prefetched nothing (2026-10-22). */}
-        <link rel="prefetch" href="/operate" />
-        <link rel="prefetch" href="/signals" />
+        {/* No document prefetch here: no prefetch link to a page, and no
+            speculation rules. Both shipped until 2026-11-12 and neither ever
+            reached a reader. Cloudflare answers every `Sec-Purpose: prefetch`
+            request to a route a Worker serves with a 503 (`cf-speculation-refused`),
+            so each page view logged two failed requests in the console; the hover
+            rules were never applied, because their file was served as
+            `application/json`, which a browser ignores for a rule set. Nor could
+            either help where prefetches do arrive: every page is `no-store`, so a
+            full navigation fetches it again, and a link clicked inside the site
+            is the router's, which prefetches its own payload (that is what makes
+            "Build this week's plan →" open at once).
+            `tests/documentPrefetch.test.ts` holds this. */}
         {/* No `hrefLang="x-default"` here. It lived in the layout, so every page
             declared the homepage as its x-default target — the same inherited-
             pointer problem as the canonical above. x-default names the fallback

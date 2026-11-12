@@ -64,6 +64,9 @@ function probe(asset) {
     [
       "-sS",
       "-i",
+      // Behind an HTTPS proxy curl prints the proxy's "200 Connection
+      // Established" block first, and the first block is the one parsed.
+      "--suppress-connect-headers",
       "--max-time", "20",
       "-A", "Whether-Asset-Probe/1.0 (+https://github.com/zz-plant/whether)",
       url

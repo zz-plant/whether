@@ -51,6 +51,13 @@ describe("previousScoresFromDynamics", () => {
   it("does not draw a 55-point week as flat", () => {
     assert.deepEqual(previousScoresFromDynamics(anomalousWeek, current), { tightness: 82, riskAppetite: 20 });
   });
+
+  it("says when the week's comparison found the conditions changed, which the two scores cannot", () => {
+    // 2026-11-09: both scores unchanged since Nov 3 and the conditions went from Cloudy to Freezing.
+    assert.deepEqual(previousScoresFromDynamics({ ...quietWeek, regimeChanged: true }, current), { ...current, regimeChanged: true });
+    // Absent on every other week, so nothing that prints an earlier reading changes.
+    assert.deepEqual(previousScoresFromDynamics({ ...quietWeek, regimeChanged: false }, current), current);
+  });
 });
 
 describe("homepage signal rows", () => {
