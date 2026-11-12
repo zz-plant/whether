@@ -3,13 +3,13 @@
  *
  * Two constraints drive this: satori (next/og ImageResponse) reads TTF/OTF/WOFF
  * but not woff2, and its parser rejects variable fonts (fvar table) — which the
- * files in public/fonts are. So each face is decompressed from woff2 and then
+ * Archivo source in scripts/og-font-sources is. So each face is decompressed from woff2 and then
  * pinned to one point on every axis with fontTools: Archivo has weight and
  * width, and the cards need the same three voices the site uses — the call
  * semi-condensed, text at normal width, the regime word expanded.
  *
  * Requires python3 with fonttools (`pip install fonttools`). Run manually when
- * a font in public/fonts changes:
+ * the Archivo source changes:
  *   node scripts/generate-og-fonts.mjs
  *
  * Output is committed (public/fonts/og/*.ttf) — the OG route fetches these
@@ -22,7 +22,10 @@ import { fileURLToPath } from "node:url";
 import wawoff2 from "wawoff2";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const sourceDir = path.join(root, "public", "fonts");
+/* The share cards are still set in Archivo, which the site stopped serving when its text
+   moved to Source Sans 3 (2026-11-12). The variable file lives here as this script's
+   source only, so no reader downloads it. */
+const sourceDir = path.join(root, "scripts", "og-font-sources");
 const outDir = path.join(root, "public", "fonts", "og");
 
 const faces = [

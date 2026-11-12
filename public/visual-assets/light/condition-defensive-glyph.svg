@@ -3,6 +3,6 @@
 <desc id="light-condition-defensive-glyph-desc">Cloudy condition reference: the canonical weather glyph beside its name. Money is available but pricey.</desc>
 <g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
 
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8a4f16" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud shrink-0 text-[color:var(--regime-ink)]" data-regime="DEFENSIVE" data-concept-icon="condition" aria-hidden="true" focusable="false" x="24" y="40"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#8a4f16" text-anchor="start">Cloudy</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#46607a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud shrink-0 text-[color:var(--regime-ink)]" data-regime="DEFENSIVE" data-concept-icon="condition" aria-hidden="true" focusable="false" x="24" y="40"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#46607a" text-anchor="start">Cloudy</text>
 </g>
 </svg>

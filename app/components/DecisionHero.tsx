@@ -242,6 +242,200 @@ export function DecisionHero({
     />
   ) : null;
 
+  /* The block's parts, laid out two ways below: on the sky with the scores in its margin
+     (the homepage), or as one column (the answer pages, which pass no margin). */
+  const conditionRow = (
+    <>
+      {/* The kicker: the regime stamp, then what the week did — its direction
+          and, on a week conditions moved, what they were. The regime's
+          meaning is the line under the call, not this one: on the eyebrow it
+          ran four facts together ("hard to raise · Tightening this week ·
+          Was Cloudy on Sep 30") ahead of the call they lead into. */}
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+        {/* With no margin, the week on a row of its own above the statement it selects. */}
+        {aside ? null : weekLine("basis-full")}
+        <span className="relative inline-flex">
+          {/* The earlier conditions' stamp, over this week's until the reading
+              crosses the change line (week-move.css). Its word is printed from
+              an attribute, so the page's text names this week's conditions once. */}
+          {move?.conditions ? (
+            <span
+              aria-hidden="true"
+              data-regime={move.conditions.from}
+              data-week-move-stamp
+              className={`week-move-old week-move-stamp-old ${STAMP_CLASS}`}
+            >
+              <ConditionIcon regime={move.conditions.from} />
+              <span className="week-move-attr" data-text={REGIME_LABELS[move.conditions.from]} />
+            </span>
+          ) : null}
+          <span className={`${STAMP_CLASS} ${move?.conditions ? "week-move-stamp-new" : ""}`}>
+            {/* The weather the word names, beside it. An unknown regime prints
+                its word alone: the sun it used to fall back to claimed a
+                condition nobody had read. */}
+            {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
+            <span>{regimeWeatherLabel}</span>
+          </span>
+        </span>
+
+        {/* What the word means for money, beside it, where the line under the guidance
+            carries the two scores instead (2026-11-10): a returning reader met "Cloudy"
+            with no gloss on the first screen once the facts took that line. */}
+        {regimeKey && reading?.facts ? (
+          <span className="text-fluid-base leading-snug text-[var(--app-text-secondary)]" data-regime-gloss>
+            {REGIME_WEATHER_RATIONALES[regimeKey]}
+          </span>
+        ) : null}
+
+        {since || direction || earlier ? (
+          <span className="text-fluid-sm font-medium leading-snug text-[var(--app-text-secondary)]">
+            {since && !earlier ? (
+              <span data-conditions-since>
+                {since}
+                {direction ? " · " : null}
+              </span>
+            ) : null}
+            {direction}
+            {earlier ? (
+              <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
+                {/* The separator stays on the line before; a wrapped line must not open with "·". */}
+                {direction ? " · " : null}<span className="whitespace-nowrap">{earlier}</span>
+              </span>
+            ) : null}
+            {/* In the sentence, not beside it: as a flex item it took a row of its
+                own on a phone, above the call. "Feels like" too (2026-11-10), with a
+                non-breaking space so a wrapped line never opens with the separator. */}
+            {move ? <> <ReplayMoveButton since={move.since} /></> : null}
+            {feelsLike ? <>{"\u00a0· "}{feelsLikeLink}</> : null}
+          </span>
+        ) : null}
+
+        {feelsLike && !(since || direction || earlier) ? feelsLikeLink : null}
+
+        {move && !(since || direction || earlier) ? <ReplayMoveButton since={move.since} /> : null}
+      </div>
+    </>
+  );
+
+  const heading = (
+    <>
+      {/* The homepage's `h1`. It was an `h2` under a visually hidden `h1`
+          reading "Weekly Brief", so the one heading a crawler and a
+          screen-reader user meet first said nothing this week that it did
+          not say every week. The call is the page. On a page that asks a
+          question, the question is the heading and the call answers it, in
+          the same size and place. */}
+      {question ? (
+        <>
+          <h1
+            id="weekly-call-title"
+            style={{ viewTransitionName: "page-title" }}
+            className="max-w-2xl text-pretty text-fluid-lg font-semibold text-[var(--app-text-secondary)]"
+          >
+            {question}
+          </h1>
+          <p className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-[var(--app-text)]">
+            {call}
+          </p>
+        </>
+      ) : (
+        <h1
+          id="weekly-call-title"
+          style={{ viewTransitionName: "page-title" }}
+          className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-[var(--app-text)]"
+        >
+          {call}
+        </h1>
+      )}
+    </>
+  );
+
+  const phoneScoresAndFacts = (
+    <>
+      {/* What the weather word means for money, as the line under the call:
+          the stamp names the week, the call says what to do, this says why. */}
+      {/* On a phone the two scores follow the guidance as figures, the number and where it
+          stands, and the facts line gives way to them: both printed the same two numbers,
+          and together they pushed the fifth area under the tab bar (2026-11-10). */}
+      {phoneFigure ? (
+        <div className={aside ? "weather-hero-sky-panel md:hidden" : "md:hidden"} data-hero-phone-figure>
+          {phoneFigure}
+        </div>
+      ) : null}
+
+      {regimeKey ? (
+        <p className={`max-w-xl text-pretty text-fluid-base leading-snug text-[var(--app-text-secondary)] ${phoneFigure ? "max-md:hidden" : ""}`.trim()} data-regime-meaning>
+          {reading?.facts ? null : REGIME_WEATHER_RATIONALES[regimeKey]}
+          {reading ? (
+            <>
+              {reading.facts ? null : " "}
+              <span className="tabular-nums" data-reading-numbers>
+                {reading.facts ? withDefinedScores(reading.facts) : reading.numbers}
+              </span>{" "}
+              <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+                Why
+              </Link>
+            </>
+          ) : null}
+        </p>
+      ) : null}
+    </>
+  );
+
+  const bodyItems = (
+    <>
+      {areaStrip}
+
+      {/* Whose rules these are, under the areas they scale (2026-11-10). It was a boxed
+          chip beside the condition word, a second box on the line that names the week.
+          Still the control that opens stage and runway, and it still says so in words. */}
+      {location ? (
+        <p className="text-fluid-sm leading-snug text-[var(--app-text-muted)]">
+          Rules for{" "}
+          <Link
+            href={location.href}
+            title={location.hint}
+            data-reading-location
+            className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]"
+          >
+            <span>{location.label}</span>
+            <span aria-hidden="true" className="text-[var(--app-text-muted)]"> · </span>
+            <span>
+              change<span className="sr-only"> stage and runway</span>
+            </span>
+          </Link>
+        </p>
+      ) : null}
+
+      {published ? (
+        <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
+          {published.text}{" "}
+          <Link href={published.href} className="weather-hit underline decoration-slate-600 underline-offset-4">
+            Read the published brief
+          </Link>
+        </p>
+      ) : null}
+
+      {lines && lines.length > 0 ? (
+        <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm @lg:grid-cols-[max-content_1fr]">
+          {lines.map((line) => (
+            <div key={line.label} className="space-y-0.5 @lg:contents @lg:space-y-0">
+              <dt className="font-semibold text-[var(--app-text-secondary)]">{line.label}</dt>
+              <dd className="text-[var(--app-text)]">{line.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
+      {detail ? (
+        <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
+          <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">{detail}</p>
+        </div>
+      ) : null}
+
+    </>
+  );
+
   return (
     /*
      * `id="share-ready-artifact"` lives here, on the card that actually is the
@@ -258,199 +452,48 @@ export function DecisionHero({
       style={turnStyle}
     >
       <div className="relative z-10 min-w-0 space-y-3">
-        {/* With a graphic beside it, the left column stretches to the graphic's
-            height and the trust row sits at its foot, so the call is not left
-            floating over an empty band. */}
-        {/* From `md` the week line heads the margin, beside the condition word, and the
-            reading column starts on the week's statement (2026-11-10): on its own row it put
-            the guidance 54px further down a laptop screen. On a phone it leads the column. */}
-        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:grid-rows-[auto_1fr] md:gap-x-10 md:gap-y-0 lg:gap-x-14" : undefined}>
-        {aside ? weekLine("weather-hero-margin-head max-md:mb-1 md:col-start-2 md:row-start-1 md:pb-5") : null}
-        <div className={`@container flex min-w-0 flex-col gap-2 sm:gap-3 ${aside ? "md:col-start-1 md:row-span-2 md:row-start-1" : ""}`.trim()}>
-        {/* The kicker: the regime stamp, then what the week did — its direction
-            and, on a week conditions moved, what they were. The regime's
-            meaning is the line under the call, not this one: on the eyebrow it
-            ran four facts together ("hard to raise · Tightening this week ·
-            Was Cloudy on Sep 30") ahead of the call they lead into. */}
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-          {/* With no margin, the week on a row of its own above the statement it selects. */}
-          {aside ? null : weekLine("basis-full")}
-          <span className="relative inline-flex">
-            {/* The earlier conditions' stamp, over this week's until the reading
-                crosses the change line (week-move.css). Its word is printed from
-                an attribute, so the page's text names this week's conditions once. */}
-            {move?.conditions ? (
-              <span
-                aria-hidden="true"
-                data-regime={move.conditions.from}
-                data-week-move-stamp
-                className={`week-move-old week-move-stamp-old ${STAMP_CLASS}`}
-              >
-                <ConditionIcon regime={move.conditions.from} />
-                <span className="week-move-attr" data-text={REGIME_LABELS[move.conditions.from]} />
-              </span>
-            ) : null}
-            <span className={`${STAMP_CLASS} ${move?.conditions ? "week-move-stamp-new" : ""}`}>
-              {/* The weather the word names, beside it. An unknown regime prints
-                  its word alone: the sun it used to fall back to claimed a
-                  condition nobody had read. */}
-              {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
-              <span>{regimeWeatherLabel}</span>
-            </span>
-          </span>
-
-          {/* What the word means for money, beside it, where the line under the guidance
-              carries the two scores instead (2026-11-10): a returning reader met "Cloudy"
-              with no gloss on the first screen once the facts took that line. */}
-          {regimeKey && reading?.facts ? (
-            <span className="text-fluid-base leading-snug text-[var(--app-text-secondary)]" data-regime-gloss>
-              {REGIME_WEATHER_RATIONALES[regimeKey]}
-            </span>
-          ) : null}
-
-          {since || direction || earlier ? (
-            <span className="text-fluid-sm font-medium leading-snug text-[var(--app-text-secondary)]">
-              {since && !earlier ? (
-                <span data-conditions-since>
-                  {since}
-                  {direction ? " · " : null}
-                </span>
-              ) : null}
-              {direction}
-              {earlier ? (
-                <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
-                  {/* The separator stays on the line before; a wrapped line must not open with "·". */}
-                  {direction ? " · " : null}<span className="whitespace-nowrap">{earlier}</span>
-                </span>
-              ) : null}
-              {/* In the sentence, not beside it: as a flex item it took a row of its
-                  own on a phone, above the call. "Feels like" too (2026-11-10), with a
-                  non-breaking space so a wrapped line never opens with the separator. */}
-              {move ? <> <ReplayMoveButton since={move.since} /></> : null}
-              {feelsLike ? <>{"\u00a0· "}{feelsLikeLink}</> : null}
-            </span>
-          ) : null}
-
-          {feelsLike && !(since || direction || earlier) ? feelsLikeLink : null}
-
-          {move && !(since || direction || earlier) ? <ReplayMoveButton since={move.since} /> : null}
-        </div>
-
-        {/* The homepage's `h1`. It was an `h2` under a visually hidden `h1`
-            reading "Weekly Brief", so the one heading a crawler and a
-            screen-reader user meet first said nothing this week that it did
-            not say every week. The call is the page. On a page that asks a
-            question, the question is the heading and the call answers it, in
-            the same size and place. */}
-        {question ? (
+        {aside ? (
           <>
-            <h1
-              id="weekly-call-title"
-              style={{ viewTransitionName: "page-title" }}
-              className="max-w-2xl text-pretty text-fluid-lg font-semibold text-[var(--app-text-secondary)]"
-            >
-              {question}
-            </h1>
-            <p className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-[var(--app-text)]">
-              {call}
-            </p>
+            {/* The sky (Forecast, 2026-11-12; .impeccable/surfaces/app-page-tsx.md): the
+                week's statement sits on its condition, full width, and the two scores sit on
+                it in a panel of paper. From `md` the week line heads the margin beside the
+                condition word and the scores follow it; on a phone the week line leads and
+                the scores follow the guidance. The areas and the trust facts are on the paper
+                below. The clouds are drawn, never read. */}
+            <div className="weather-hero-sky" data-hero-sky>
+              <span aria-hidden="true" className="weather-hero-sky-clouds">
+                <span />
+                <span />
+                <span />
+                <span />
+              </span>
+              <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:grid-rows-[auto_1fr] md:gap-x-10 md:gap-y-0 lg:gap-x-14">
+                {weekLine("weather-hero-margin-head max-md:mb-1 md:col-start-2 md:row-start-1 md:pb-5")}
+                <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3 md:col-start-1 md:row-span-2 md:row-start-1">
+                  {conditionRow}
+                  {heading}
+                  {phoneScoresAndFacts}
+                </div>
+                <div className="weather-hero-aside weather-hero-sky-panel max-md:hidden md:col-start-2 md:row-start-2">
+                  <div className="max-md:hidden">{aside}</div>
+                </div>
+              </div>
+            </div>
+            <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-x-10 md:pt-4 lg:gap-x-14">
+              <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">{bodyItems}</div>
+              {trust ? <div className="weather-hero-trust flex flex-col max-md:mt-3">{trustStrip}</div> : null}
+            </div>
           </>
         ) : (
-          <h1
-            id="weekly-call-title"
-            style={{ viewTransitionName: "page-title" }}
-            className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-[var(--app-text)]"
-          >
-            {call}
-          </h1>
-        )}
-
-        {/* What the weather word means for money, as the line under the call:
-            the stamp names the week, the call says what to do, this says why. */}
-        {/* On a phone the two scores follow the guidance as figures, the number and where it
-            stands, and the facts line gives way to them: both printed the same two numbers,
-            and together they pushed the fifth area under the tab bar (2026-11-10). */}
-        {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
-
-        {regimeKey ? (
-          <p className={`max-w-xl text-pretty text-fluid-base leading-snug text-[var(--app-text-secondary)] ${phoneFigure ? "max-md:hidden" : ""}`.trim()} data-regime-meaning>
-            {reading?.facts ? null : REGIME_WEATHER_RATIONALES[regimeKey]}
-            {reading ? (
-              <>
-                {reading.facts ? null : " "}
-                <span className="tabular-nums" data-reading-numbers>
-                  {reading.facts ? withDefinedScores(reading.facts) : reading.numbers}
-                </span>{" "}
-                <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
-                  Why
-                </Link>
-              </>
-            ) : null}
-          </p>
-        ) : null}
-
-        {areaStrip}
-
-        {/* Whose rules these are, under the areas they scale (2026-11-10). It was a boxed
-            chip beside the condition word, a second box on the line that names the week.
-            Still the control that opens stage and runway, and it still says so in words. */}
-        {location ? (
-          <p className="text-fluid-sm leading-snug text-[var(--app-text-muted)]">
-            Rules for{" "}
-            <Link
-              href={location.href}
-              title={location.hint}
-              data-reading-location
-              className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]"
-            >
-              <span>{location.label}</span>
-              <span aria-hidden="true" className="text-[var(--app-text-muted)]"> · </span>
-              <span>
-                change<span className="sr-only"> stage and runway</span>
-              </span>
-            </Link>
-          </p>
-        ) : null}
-
-        {published ? (
-          <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
-            {published.text}{" "}
-            <Link href={published.href} className="weather-hit underline decoration-slate-600 underline-offset-4">
-              Read the published brief
-            </Link>
-          </p>
-        ) : null}
-
-        {lines && lines.length > 0 ? (
-          <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm @lg:grid-cols-[max-content_1fr]">
-            {lines.map((line) => (
-              <div key={line.label} className="space-y-0.5 @lg:contents @lg:space-y-0">
-                <dt className="font-semibold text-[var(--app-text-secondary)]">{line.label}</dt>
-                <dd className="text-[var(--app-text)]">{line.value}</dd>
-              </div>
-            ))}
-          </dl>
-        ) : null}
-
-        {detail ? (
-          <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
-            <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">{detail}</p>
-          </div>
-        ) : null}
-
-        {/* With no margin (the answer pages), the trust facts close the column as before. */}
-        {trust && !aside ? trustStrip : null}
-        </div>
-        {/* The margin (docs/design/rebuild-covenant.md): from `md` up the two scores, then
-            the trust facts under them. On a phone the scores are the figures above and the
-            trust facts follow the column. */}
-        {aside ? (
-          <div className="weather-hero-aside flex flex-col gap-6 max-md:mt-3 md:col-start-2 md:row-start-2">
-            <div className="max-md:hidden">{aside}</div>
+          <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">
+            {conditionRow}
+            {heading}
+            {phoneScoresAndFacts}
+            {bodyItems}
+            {/* With no margin (the answer pages), the trust facts close the column as before. */}
             {trust ? trustStrip : null}
           </div>
-        ) : null}
-        </div>
+        )}
 
         {/* The card is the block people screenshot and crop, so it names its
             own source inside its border. */}

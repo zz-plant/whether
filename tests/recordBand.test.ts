@@ -52,14 +52,15 @@ describe("the record band's fields and counts", () => {
 
   it("gives each piece of line the ink its field calls for: dark on the light fills, pale on the dense", () => {
     assert.ok(band);
-    assert.ok(isLightField("EXPANSION") && isLightField("VOLATILE"));
-    assert.ok(!isLightField("SCARCITY") && !isLightField("DEFENSIVE"));
+    /* Stormy is the one dark fill since 2026-11-12 (Forecast). */
+    assert.ok(isLightField("EXPANSION") && isLightField("SCARCITY") && isLightField("DEFENSIVE"));
+    assert.ok(!isLightField("VOLATILE"));
     /* Two bundles of five lines, each cut into one piece per stretch. */
     assert.equal(band.wide.paths.length, 2 * 5 * band.runs.length);
     assert.equal(band.narrow.paths.length, 2 * 4 * band.runs.length);
     assert.deepEqual(
       band.wide.paths.slice(0, band.runs.length).map((path) => path.light),
-      [true, true, false, false, true],
+      [true, false, true, true, true],
     );
   });
 

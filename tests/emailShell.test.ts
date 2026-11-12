@@ -49,26 +49,26 @@ const captureMail = () => {
 
 /* The shell's closing lines exactly as production mailed them before the shell
    was shared, with the unsubscribe token as `TOKEN`, in the colours of the
-   Synoptic palette (2026-10-09, lib/image/ogTheme.ts). */
+   night palette (Forecast's since 2026-11-12, lib/image/ogTheme.ts). */
 const PRODUCTION_SHELL_FOOTER = [
   `<div style="margin-top:24px;">`,
-  `<a href="https://whether.work" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#e6ece2;color:#0c1511;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
+  `<a href="https://whether.work" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#e8ecf4;color:#10141c;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
   `</div>`,
-  `<p style="margin-top:32px;font-size:0.75rem;color:#a3b2a9;">Based on public data. Your situation may vary.</p>`,
-  `<hr style="border:none;border-top:1px solid #3c453f;margin-top:24px;" />`,
+  `<p style="margin-top:32px;font-size:0.75rem;color:#9aa8c0;">Based on public data. Your situation may vary.</p>`,
+  `<hr style="border:none;border-top:1px solid #40454f;margin-top:24px;" />`,
   `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
-  `<td style="font-size:0.7rem;color:#a3b2a9;padding-top:12px;">`,
-  `<a href="https://whether.work/trust" style="color:#a3b2a9;text-decoration:underline;">Methodology</a>`,
+  `<td style="font-size:0.7rem;color:#9aa8c0;padding-top:12px;">`,
+  `<a href="https://whether.work/trust" style="color:#9aa8c0;text-decoration:underline;">Methodology</a>`,
   ` · `,
-  `<a href="https://whether.work/share" style="color:#a3b2a9;text-decoration:underline;">Share</a>`,
+  `<a href="https://whether.work/share" style="color:#9aa8c0;text-decoration:underline;">Share</a>`,
   ` · `,
-  `<a href="https://whether.work" style="color:#a3b2a9;text-decoration:underline;">whether.work</a>`,
-  ` · <a href="https://whether.work/api/email/unsubscribe?token=TOKEN" style="color:#a3b2a9;text-decoration:underline;">Unsubscribe</a>`,
+  `<a href="https://whether.work" style="color:#9aa8c0;text-decoration:underline;">whether.work</a>`,
+  ` · <a href="https://whether.work/api/email/unsubscribe?token=TOKEN" style="color:#9aa8c0;text-decoration:underline;">Unsubscribe</a>`,
   `</td></tr></table>`,
   `</body></html>`,
 ];
 
-const PRODUCTION_SHELL_HEAD = `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0c1511;color:#c5d0c7;">`;
+const PRODUCTION_SHELL_HEAD = `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#10141c;color:#b8c2d4;">`;
 
 afterEach(() => {
   Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
@@ -102,18 +102,18 @@ describe("the shared email shell, on production", () => {
       html,
       [
         PRODUCTION_SHELL_HEAD,
-        `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#e6ece2;">Whether Plan Alert</h1>`,
+        `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#e8ecf4;">Whether Plan Alert</h1>`,
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;">`,
         `<tr>`,
-        `<td style="padding:12px 16px;border:1px solid #3c453f;border-radius:8px;background:#2a1719;">`,
+        `<td style="padding:12px 16px;border:1px solid #40454f;border-radius:8px;background:#2a1719;">`,
         `<p style="font-size:0.85rem;color:#f0666a;margin:0;"><strong>PH</strong></p>`,
         `</td></tr></table>`,
         `<div style="margin-top:12px;">`,
         `<table role="presentation" style="width:100%;border-collapse:collapse;">`,
         `<tr>`,
-        `<td style="padding:16px;border:1px solid #3c453f;border-radius:8px;background:#111b16;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#a3b2a9;margin:0 0 6px;">What you set and where the scores are</p>`,
-        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#e6ece2;">PB</p>`,
+        `<td style="padding:16px;border:1px solid #40454f;border-radius:8px;background:#161b26;">`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#9aa8c0;margin:0 0 6px;">What you set and where the scores are</p>`,
+        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#e8ecf4;">PB</p>`,
         `</td></tr></table>`,
         `</div>`,
         ...PRODUCTION_SHELL_FOOTER.map((line) => line.replace("TOKEN", "tok")),
@@ -145,7 +145,7 @@ describe("the shared email shell, on production", () => {
     assert.ok(message, "the subscriber was mailed");
     const lines = message.html.split("\n");
     assert.equal(lines[0], PRODUCTION_SHELL_HEAD);
-    assert.equal(lines[1], `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#e6ece2;">Whether Weekly Brief</h1>`);
+    assert.equal(lines[1], `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#e8ecf4;">Whether Weekly Brief</h1>`);
     assert.deepEqual(
       lines.slice(-PRODUCTION_SHELL_FOOTER.length),
       PRODUCTION_SHELL_FOOTER.map((line) => line.replace("TOKEN", encodeURIComponent(subscriber.token))),
