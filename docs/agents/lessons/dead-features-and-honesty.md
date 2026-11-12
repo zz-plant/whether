@@ -488,3 +488,26 @@ saved-copy flag. `/operate` gates its alert on the second, so on the `ok: true` 
 - **Two holds on one screen are two instructions.** The banner held "new hires, spend and vendor contracts
   until it returns", and the call under it held "anything you can't undo until the missing inputs return".
   Where the call is already a hold, the banner says only what the data is.
+
+## A speed-up nothing received (2026-11-12)
+
+The layout prefetched `/operate` and `/signals` with two link tags, and the Worker advertised
+hover-prefetch rules in a response header. Both had tests, and a comment credited the first with the
+main button opening at once. Loading production in a browser showed neither had ever worked.
+
+- **The CDN refused the requests.** Cloudflare answers a `Sec-Purpose: prefetch` request to a route a
+  Worker serves with a 503 (`cf-speculation-refused: prefetch refused: disabled for worker requests`),
+  so every page view logged two failed requests in the console. The suite and the local Worker have no
+  CDN in front of them, and there the same requests return 200.
+- **The browser ignored the rules.** The rules file was a static asset, served as `application/json`. A
+  rule set named by the header is only accepted as `application/speculationrules+json`, and the browser
+  says so in a console warning. The test checked the header's value and the file's contents, which is
+  everything except whether a browser takes it.
+- **Nothing could have used them.** Every page is `no-store`, so a full navigation fetches it again, and
+  a link clicked inside the site goes through the router, which prefetches its own payload. That
+  payload is what made the button fast.
+
+All of it went (`tests/documentPrefetch.test.ts`). The check that found it is worth repeating after a
+change to what pages load: open the deployed page in the full Chromium build and read the console and
+the failed requests. Playwright's default headless shell is the wrong tool for this one: after a
+refused prefetch it reports the next full navigation as aborted, which the full build does not do.
