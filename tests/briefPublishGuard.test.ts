@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
-import { PUBLISH_MAX_RECORD_AGE_DAYS, assessPublishReadiness } from "../lib/report/briefPublishGuard";
+import { PUBLISH_MAX_RECORD_AGE_DAYS, assessGovernedRegime, assessPublishReadiness } from "../lib/report/briefPublishGuard";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
 
 const NOW = new Date("2026-08-29T04:00:00Z");
@@ -152,6 +152,7 @@ describe("wiring", () => {
 
     const freezeScript = await readFile("scripts/freezeWeeklyBrief.ts", "utf8");
     assert.ok(freezeScript.includes("process.exit(1)"), "scripts/freezeWeeklyBrief.ts no longer fails the run");
+    assert.ok(freezeScript.includes("assessGovernedRegime("), "scripts/freezeWeeklyBrief.ts checks its conditions against production's gated call");
 
     const workflow = await readFile("worker/workflows/weeklyBriefFreeze.ts", "utf8");
     assert.ok(workflow.includes("throw new Error(`not ready to publish"), "the Workflow no longer fails its step on an unready week");
@@ -166,5 +167,33 @@ describe("wiring", () => {
     // homepage will advertise from it are the same judgment.
     const { PUBLISHED_BRIEF_STALE_AFTER_DAYS } = await import("../lib/report/publishedBriefs");
     assert.equal(PUBLISH_MAX_RECORD_AGE_DAYS, PUBLISHED_BRIEF_STALE_AFTER_DAYS);
+  });
+});
+
+describe("assessGovernedRegime", () => {
+  /* The case that published w46: the reading classifies as DEFENSIVE on its own, and production's
+     confirmation gate holds SCARCITY because risk appetite is inside the near band. */
+  const state = (key: string, recordDate = "2026-11-09") => ({ recordDate, conditions: { key, label: "Freezing" } });
+
+  it("refuses conditions the confirmation gate has not confirmed", () => {
+    const result = assessGovernedRegime({ regime: "DEFENSIVE", recordDate: "2026-11-09", governed: state("SCARCITY") });
+    assert.equal(result.ok, false);
+    assert.match(result.ok ? "" : result.reason, /classifies the reading as DEFENSIVE; production's call, which applies the confirmation gate, is SCARCITY/);
+  });
+
+  it("passes when production carries the same conditions for the same reading", () => {
+    assert.deepEqual(assessGovernedRegime({ regime: "SCARCITY", recordDate: "2026-11-09", governed: state("SCARCITY") }), { ok: true });
+  });
+
+  it("refuses when the two read different records", () => {
+    const result = assessGovernedRegime({ regime: "SCARCITY", recordDate: "2026-11-10", governed: state("SCARCITY") });
+    assert.match(result.ok ? "" : result.reason, /reading of 2026-11-09, this run's of 2026-11-10/);
+  });
+
+  it("refuses when production could not be read, whatever came back", () => {
+    for (const governed of [null, undefined, "502 Bad Gateway", {}, { conditions: null }, { conditions: { key: 3 } }]) {
+      const result = assessGovernedRegime({ regime: "SCARCITY", recordDate: "2026-11-09", governed });
+      assert.equal(result.ok, false, JSON.stringify(governed));
+    }
   });
 });

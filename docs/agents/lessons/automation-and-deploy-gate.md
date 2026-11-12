@@ -201,6 +201,19 @@ failures as `main` under `wrangler dev`; on 2026-11-12 those three turned out to
 the month-end letter as the Monday brief, fixed in `scripts/e2e/email-flows.mjs`). Not verified until the first deploy after merge: the
 upload itself and the exports lifecycle against the live Worker.
 
+**A freeze outside the Worker has no committed regime (2026-11-12).** The conditions are not a
+function of the reading: a change commits only through the confirmation gate (`advanceRegimeState`),
+which reads the committed state from KV (`regime:machine-snapshot`) and holds it while a score is
+inside the near band of its line. `bun run brief:freeze` runs in a session or container with no KV,
+so the loader has no machine state and the reading classifies as if nothing were committed. w46
+was frozen that way as Cloudy (risk appetite 53, three over its line) while production carried
+Freezing: a reading of 42 on Nov 6 had committed it (posture event `2026-11-06:SCARCITY`), and 53
+is inside the band that holds it. The page, the email and `/api/agent?view=state` said Freezing;
+`/brief/2026-w46` said Cloudy. The script now asks production's state before writing and refuses
+on any disagreement or when it cannot ask (`assessGovernedRegime`, `lib/report/briefPublishGuard.ts`).
+To see what production committed and why, read the posture events in the durable KV namespace:
+`cf kv keys list --prefix posture-event` and `cf kv keys get regime:machine-snapshot`.
+
 **Never set `WORKERS_CI=1` outside Workers Builds (2026-11-03).** The gate takes it to mean a build
 container and `git reset --hard`s every drifted tracked file, so a local `WORKERS_CI=1 bun run
 check:vinext` silently discards uncommitted work: it erased 37 files of this migration once. To
