@@ -318,8 +318,10 @@ describe("brief decision card render", () => {
     const printed = text.slice(text.indexOf("Historical mode"), text.indexOf("\u2026") + 1);
 
     assert.ok(printed.endsWith("\u2026"), "a scope that does not fit ends in an ellipsis");
-    // One line at 22px across the row beside the stamp holds about 78 characters.
-    assert.ok(printed.length <= 78, `the scope ran to ${printed.length} characters`);
+    // One line at 22px across the row beside the stamp (the content width less the
+    // stamp's 230px), at the per-character width the wrap estimate uses for the text face.
+    const perLine = Math.floor((1088 - 230) / (22 * SANS_EM));
+    assert.ok(printed.length <= perLine, `the scope ran to ${printed.length} characters`);
   });
 
   it("counts an arrow as the full em it draws, so a line of them wraps", () => {

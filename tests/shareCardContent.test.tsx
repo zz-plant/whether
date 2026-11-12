@@ -79,7 +79,10 @@ describe("the weekly card", () => {
 
   /* The canvas is fixed and satori cannot measure, so a block that wraps further
      than planned draws over the one below it. On 2026-09-29 a 69-character call
-     was set at 62px, took three lines, and overlapped the sentence under it. */
+     was set at 62px in Archivo, took three lines, and overlapped the sentence under
+     it. In Bricolage Grotesque (2026-11-12) that call sets in two lines at 62px and
+     the text under it in fewer, so it keeps the size (rendered and checked); the
+     week's 87-character call is the one that needs a smaller one now. */
   it("sets a headline at a size it fits in, and shortens nothing that already fits", () => {
     const week = {
       headline: "Conditions are tightening. Freeze new commitments and protect runway.",
@@ -88,7 +91,8 @@ describe("the weekly card", () => {
       flipCondition: "Funding pressure at or below 66 for two readings in a row",
     };
     const layout = layoutReportCard(week);
-    assert.ok(layout.headlineSize < 62, `the overlapping week is set at ${layout.headlineSize}px`);
+    const longer = layoutReportCard({ ...week, headline: "Protect the revenue you already have, and hold off on new bets until money gets cheaper." });
+    assert.ok(longer.headlineSize < 62, `the 87-character call is set at ${longer.headlineSize}px`);
     assert.equal(layout.whyItMatters, week.whyItMatters);
     assert.equal(layout.changeSummary, week.changeSummary);
     assert.equal(layout.flipCondition, week.flipCondition);

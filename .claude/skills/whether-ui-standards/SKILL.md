@@ -39,7 +39,7 @@ The canonical rules live in `docs/agents/ui-ux-standards.md`. Read it before edi
 | XXIV | Glyphs beside words — conditions, areas and line states each draw one glyph from one mapping through `ui/conceptIcons.tsx`; 16px inline, 20px on cards |
 | XXV | Decoration that encodes something — no header emblems, stat-tile rows, kickers over headings, closing "Next" cards, card-in-card, emoji in pastes, washes, gradients or glows; the homepage sky is the one sanctioned gradient |
 | XXIX | How containers wrap and stack — the page frame answers to the viewport, everything inside it to its own box (`weather-switch`, `weather-sidebar`, `weather-grid`, or a container query) |
-| XXX | The record band — the strip of month-end readings under the header of every route: mounted once, every mark a reading, the published briefs kept apart from the month-ends |
+| XXX | The record band — the weather strip of month-end readings under the header of every route: mounted once, every mark a reading, the published briefs kept apart from the month-ends; its readout tints the homepage sky |
 
 Sections VIII and XI are the ones most often violated by accident, because they're about *what belongs where* rather than about code. Before adding a card, ask which layer owns that information. If copy fits two layers, it goes on the earliest one and the later one links out.
 
@@ -69,7 +69,7 @@ These come from the Web Interface Guidelines and matter specifically for this co
 
 ## Read the font file, not the font's name
 
-A type designer's habit (§XXII): a page can only set what `public/fonts/*.woff2` contains. Before you put a symbol in copy or chrome, or reach for an OpenType feature, list what the file draws. §XXII gives the fontTools one-liner. The files are subset to the site's text (`app/styles/fonts.css` records the build). Source Sans 3, the text face since 2026-11-12, draws → ← ↑ ↓ ↔ ≤ ≥ ≈ ≠ Δ ‰ −, but no ▾ ✓ ✕ or other symbols, no italic and no small capitals. Bricolage Grotesque, the display face, draws the same less ↔ ↕ and Δ, and `--font-display` lists Source Sans 3 behind it for those. The share cards are still Archivo (`public/fonts/og`). Anything outside the file is set in the reader's OS font, so it looks different on every platform. Chrome marks come from `app/components/uiIcons.tsx`, and `tests/craftDetails.test.ts` holds the line for the common ones. A symbol the copy needs goes into the file, under a new hashed name (`tests/fontAssets.test.ts`).
+A type designer's habit (§XXII): a page can only set what `public/fonts/*.woff2` contains. Before you put a symbol in copy or chrome, or reach for an OpenType feature, list what the file draws. §XXII gives the fontTools one-liner. The files are subset to the site's text (`app/styles/fonts.css` records the build). Source Sans 3, the text face since 2026-11-12, draws → ← ↑ ↓ ↔ ≤ ≥ ≈ ≠ Δ ‰ −, but no ▾ ✓ ✕ or other symbols, no italic and no small capitals. Bricolage Grotesque, the display face, draws the same less ↔ ↕ and Δ, and `--font-display` lists Source Sans 3 behind it for those. The share cards draw the same two faces from static instances in `public/fonts/og` (`scripts/generate-og-fonts.mjs`). Anything outside the file is set in the reader's OS font, so it looks different on every platform. Chrome marks come from `app/components/uiIcons.tsx`, and `tests/craftDetails.test.ts` holds the line for the common ones. A symbol the copy needs goes into the file, under a new hashed name (`tests/fontAssets.test.ts`).
 
 ## Reduced motion is under-covered
 

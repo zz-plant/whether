@@ -75,10 +75,11 @@ const PAD_X = 56;
 const CONTENT_WIDTH = WIDTH - PAD_X * 2;
 const CALL_SIZES = [56, 50, 46, 42] as const;
 const MAX_CALL_LINES = 3;
-/* The value is set at 84px, where a digit is about 50px wide; both rows share
+/* The value is set at 84px in the figure face, Bricolage Grotesque 800 as on the site
+   (.type-figure), where the widest digit (0 and 8) is 0.639em, 54px; both rows share
    one column, sized for the longer value, so their labels start on one edge. */
 const VALUE_SIZE = 84;
-const VALUE_GLYPH_WIDTH = 52;
+const VALUE_GLYPH_WIDTH = 54;
 /* The source has a line of its own under the chip: the label names three inputs, and
    "Source: " takes about 90px of the row. */
 const SOURCE_WIDTH = CONTENT_WIDTH - 90;
@@ -137,7 +138,9 @@ const readingRow = (reading: ScoreReadingParts, valueWidth: number, palette: typ
           justifyContent: "flex-end",
           width: valueWidth,
           fontSize: VALUE_SIZE,
-          fontWeight: 600,
+          fontWeight: 700,
+          fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
+          letterSpacing: "-0.03em",
           lineHeight: 1,
           color: palette.text,
         }}

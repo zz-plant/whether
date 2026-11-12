@@ -225,4 +225,9 @@ reading the set. Product specs live in `docs/`.
   veto's trailing VIX mean was pulled down by holiday zeros, until 2026-09-14. Route every FRED
   value through `isMissingFredValue` (`lib/fred.ts`); the archive generators share one parser in
   `lib/summary/regimeArchiveContext.ts` for the same reason.
+- **A route cannot fetch its own origin in production.** A Worker's subrequest to its own
+  hostname never reached `public/`, so every share card drew Satori's built-in face instead of
+  the site's fonts, silently, until 2026-11-12. Read a file under `public/` from server code with
+  `fetchStaticAsset` (`lib/runtime/staticAssets.ts`), which goes through the `ASSETS` binding the
+  worker entry installs; the dev server cannot show this, because there the fetch works.
 - Use `rg` for discovery; avoid `ls -R` and `grep -R`.

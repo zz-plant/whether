@@ -316,8 +316,8 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
 const CARD_TEXT_WIDTH = 976;
 /**
  * Per-character widths for the slide's system sans, set above what it measures on
- * this copy. It runs wider than the Archivo faces `lib/image/textFit.ts` was measured
- * on: the 92-character call drawn at 20px/700 overran the card (2026-10-09), which puts
+ * this copy. It runs wider than the card faces `lib/image/textFit.ts` was measured
+ * on (Archivo then, Bricolage Grotesque and Source Sans 3 since 2026-11-12): the 92-character call drawn at 20px/700 overran the card (2026-10-09), which puts
  * the bold average above 0.53em.
  */
 const SLIDE_BOLD_EM = 0.56;

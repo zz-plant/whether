@@ -11,8 +11,8 @@
  * Grotesque sets what the page commits to: the guidance, the condition word, the score
  * figures, headings and the wordmark. Source Sans 3 sets everything that explains. They
  * replaced Besley and Archivo (Covenant, 2026-11-10), whose files are gone from
- * public/fonts; the share cards are still set in Archivo, from instances that
- * scripts/generate-og-fonts.mjs builds out of scripts/og-font-sources.
+ * public/fonts. The share cards draw the same two faces, from static instances that
+ * scripts/generate-og-fonts.mjs builds out of these files (public/fonts/og).
  *
  * Built 2026-11-12 from the google/fonts sources, Source Sans 3 3.052
  * (ofl/sourcesans3/SourceSans3[wght].ttf) and Bricolage Grotesque 1.001

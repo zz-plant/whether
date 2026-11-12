@@ -32,6 +32,7 @@ export function CommandCenterNavBlock({
   offlineBadgeLabel,
   trustStrip,
   regime,
+  frameCondition,
 }: {
   pageTitle: string;
   pageSummary?: string;
@@ -51,6 +52,9 @@ export function CommandCenterNavBlock({
   trustStrip?: Omit<TrustStripProps, "className">;
   /** The reading's regime. With it, the status word is a condition and the running head repeats it. */
   regime?: string;
+  /** The conditions the running head names where the page has no one status word for
+   *  them: /history/compare holds two periods ("Cloudy · Stormy"). Never printed here. */
+  frameCondition?: string;
 }) {
   // The status word leads and prints in the regime ink — it is this page's
   // equivalent of the hero's stamp, and the only word on the route that
@@ -108,7 +112,7 @@ export function CommandCenterNavBlock({
            too, and the head keeps its qualifier on the date, so a frame of the record
            does not read as this week's call. It also carries no regime: that page
            draws in neutral ink on purpose. */
-        condition: (regime && isRegimeKey(regime)) || statusPrefix ? statusLabel : null,
+        condition: frameCondition ?? ((regime && isRegimeKey(regime)) || statusPrefix ? statusLabel : null),
         date: recordDateLabel ? `${statusPrefix ?? "Data as of"}${statusPrefix ? ": " : " "}${recordDateLabel}` : null,
         title: pageTitle,
         tension: formatNearestChange(trustStrip?.margin, regime),

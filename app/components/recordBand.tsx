@@ -2,15 +2,23 @@ import Link from "next/link";
 import { RECORD_BAND_HEIGHT, buildRecordBand } from "../../lib/report/recordBand";
 import { isLightField } from "../../lib/report/recordBandCodec";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
+import type { RegimeKey } from "../../lib/types";
+import { ConditionIcon } from "./ui/conceptIcons";
 import { getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { RecordBandReadout } from "./recordBandReadout";
+
+const CONDITIONS: readonly RegimeKey[] = ["EXPANSION", "DEFENSIVE", "VOLATILE", "SCARCITY"];
 
 const monthLabel = (recordDate: string) =>
   new Date(`${recordDate}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 /**
  * The record band, under the navigation of every route (docs/design/rebuild-covenant.md).
+ * Since 2026-11-12 it is the Forecast's weather strip (.impeccable/surfaces/app-page-tsx.md):
+ * each stretch is drawn as a small sky, lighter at the top, and moving along it reads
+ * the month out as a card with its condition and its two scores as large numerals,
+ * while the homepage's sky takes that month's weather.
  *
  * It is the page's one field of colour and its only ornament, and every mark in it is
  * a reading: a field per stretch of conditions, risk appetite above and funding
@@ -54,11 +62,22 @@ export function RecordBand() {
           aria-hidden="true"
           focusable="false"
         >
+          {/* One sky per condition, from the data-regime map: each gradient names its
+              regime, so its stops read that condition's fill (record-band.css). */}
+          <defs>
+            {CONDITIONS.map((regime) => (
+              <linearGradient key={regime} id={`record-sky-${regime}`} data-regime={regime} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" className="record-band-sky-top" />
+                <stop offset="1" className="record-band-sky-base" />
+              </linearGradient>
+            ))}
+          </defs>
           {model.runs.map((run) => (
             <rect
               key={run.start}
               className="record-band-field"
               data-regime={run.regime}
+              style={{ fill: `url(#record-sky-${run.regime})` }}
               x={run.start}
               y={0}
               /* A hair wider than its months, so no seam of ground shows between two fields. */
@@ -117,6 +136,30 @@ export function RecordBand() {
           ) : null;
         })}
         <span className="record-band-cursor" data-record-band-cursor hidden />
+        {/* The month under the pointer, as the weather strip reads it: filled and placed by
+            recordBandReadout.tsx, hidden until then. Hidden from assistive tech too: the
+            slider's aria-valuetext says the same in words. */}
+        <div className="record-band-reading" data-record-band-reading aria-hidden="true" hidden>
+          <span className="record-band-reading-when">
+            <span className="record-band-reading-month" data-reading-month />
+            <span className="record-band-reading-condition">
+              {CONDITIONS.map((regime) => (
+                <span key={regime} data-reading-glyph={regime} hidden>
+                  <ConditionIcon regime={regime} />
+                </span>
+              ))}
+              <span data-reading-condition />
+            </span>
+          </span>
+          <span className="record-band-reading-figure">
+            <span className="type-figure" data-reading-pressure />
+            <span className="record-band-reading-label">Funding pressure</span>
+          </span>
+          <span className="record-band-reading-figure">
+            <span className="type-figure" data-reading-risk />
+            <span className="record-band-reading-label">Risk appetite</span>
+          </span>
+        </div>
         <div className="record-band-overlay" data-record-band-overlay />
       </div>
       <div className="record-band-axis" aria-hidden="true">

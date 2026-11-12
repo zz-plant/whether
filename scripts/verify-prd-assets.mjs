@@ -26,10 +26,10 @@ const assets = [
   { path: "/fonts/chivo-mono-variable.def202bf.woff2", expectedType: /font\/woff2/ },
 
   // Satori / OG Fonts
-  { path: "/fonts/og/archivo-semicondensed-700.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
-  { path: "/fonts/og/archivo-400.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
-  { path: "/fonts/og/archivo-600.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
-  { path: "/fonts/og/archivo-expanded-700.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/bricolage-grotesque-700.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/bricolage-grotesque-800.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/source-sans-3-400.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
+  { path: "/fonts/og/source-sans-3-600.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },
 
   // Scripts & Downloads
   { path: "/embed.js", expectedType: /(application|text)\/(javascript|x-javascript)/ },

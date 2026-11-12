@@ -495,7 +495,9 @@ bootstrap script in `app/layout.tsx`, `app/components/themeToggleButton.tsx`).
   `.weather-hero-card`. A custom property resolves where it is declared, so an element on the sky
   that carries its own `data-regime` re-declares `--regime-ink` from the map: the glyph did, and
   drew Stormy's dark ink on the light theme's Stormy sky until `forecast.css` gave it the sky's.
-  `DecisionHero` draws the sky only where it has a margin (the homepage).
+  `DecisionHero` draws the sky only where it has a margin (the homepage). The sky's colours are
+  registered with `@property` (`tokens.css`), so a change of condition cross-fades in 300ms
+  (`forecast.css`), still under reduced motion.
 - MUST: print the report intro's status word (`CommandCenterNavBlock`) in `--regime-ink`, and give
   the intro card no other hue. From 2026-09-16 to 2026-10-09 the card also carried the hero's wash,
   border tint and 3px top rule (`.weather-page-intro`, now deleted): a second and third drawing of
@@ -564,10 +566,11 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
   guidance as well. Labels stay sentence case: the Forecast contract's tracked uppercase label
   was not adopted, because capitals are for stamps only (below).
 - **Chivo Mono is the one monospace** (`--font-mono`), for the figures §XV assigns it and for
-  the paste previews; it falls back to Source Sans 3 for arrows. Satori's cards still draw Archivo
-  alone, in static instances at its semi-condensed, normal and expanded widths, built from the
-  source kept in `scripts/og-font-sources/` (`scripts/generate-og-fonts.mjs`,
-  `lib/image/ogFonts.ts`); the Forecast voices have not reached them. Re-measure `lib/image/textFit.ts` when a
+  the paste previews; it falls back to Source Sans 3 for arrows. Satori's cards draw the two
+  voices from static instances of the site's own files (`scripts/generate-og-fonts.mjs`,
+  `lib/image/ogFonts.ts`): Bricolage Grotesque 700 for the call and 800 for the condition word
+  and the figures, at optical size 48, and Source Sans 3 400 and 600 for the text. They drew
+  Archivo, in semi-condensed, normal and expanded instances, until 2026-11-12. Re-measure `lib/image/textFit.ts` when a
   face changes.
 - **Capitals are for stamps.** A stamp is a short, fixed status mark that is not read as a sentence:
   `.type-badge`, timeline badges, the historical banner, a `<kbd>`. The condition word is not
@@ -638,8 +641,8 @@ Added 2026-10-07 with DD-060 (`docs/design-debt-prioritized.md`). The habit is a
 and font engineer's: Wei Huang (Work Sans, Fragment Mono) and the foundries that circle works
 with. A page can only set what the font file contains, so read the file, not the font's name.
 The shipped files are `public/fonts/*.woff2`: Source Sans 3 and Bricolage Grotesque since
-2026-11-12, and Chivo Mono. (Archivo and Besley were removed that day; Archivo's source stays in
-`scripts/og-font-sources/` for the share cards.) Before relying on a glyph or a feature, list the
+2026-11-12, and Chivo Mono. (Archivo and Besley were removed that day, and the share cards' static
+instances in `public/fonts/og` were rebuilt from the new two.) Before relying on a glyph or a feature, list the
 file's characters and features with fontTools, the same Python `scripts/generate-og-fonts.mjs`
 needs (swap the glob for `bricolage-grotesque-variable` or `chivo-mono-variable` to read another
 face):
@@ -1050,7 +1053,9 @@ width it is given:
 
 Added 2026-11-10 with the Covenant rebuild (`docs/design/rebuild-covenant.md`). The record band is
 the strip under the header of every route: every month-end reading since the record began, drawn
-once. It is the one place colour commits at page scale (§XVI, §XXV).
+once. With the homepage's sky, it is one of the two places colour commits at page scale (§XVI,
+§XXV). Since 2026-11-12 it is the Forecast's weather strip: each field is a small sky, and the
+readout shows the month as a card with its scores as large figures.
 
 Its parts are `app/components/recordBand.tsx` (the server drawing), `lib/report/recordBand.ts`
 (its model), `lib/report/recordBandCodec.ts` (the month tokens and the line geometry),
@@ -1069,7 +1074,9 @@ the frame.
   the band is narrower than 46rem every line is plain: at two pixels a month a pattern aliases
   into noise.
 - MUST: keep the two line inks the same in both themes, as the fills are: `--band-line-on-light`
-  on Sunny and Stormy, `--band-line-on-dense` on Cloudy and Freezing.
+  on Sunny, Cloudy and Freezing, `--band-line-on-dense` on Stormy, the one dense fill since
+  2026-11-12 (`isLightField`). A field's sky lifts its top a fifth toward the paper, never more,
+  so the line ink chosen for its fill still holds at the top.
 - MUST: keep the two records apart. The fields and lines are the month-end readings, scored with
   today's formula. The marks under the band are the briefs as published, one each, from a dashed
   line where publication began; a week with no brief has no mark. The caption counts each record
@@ -1083,7 +1090,17 @@ the frame.
   under the pointer, its conditions and its two scores. Arrow keys step a month, or a year with
   Shift; Home and End go to the ends; a click or Enter opens the brief as it read that month;
   Escape, leaving or blurring restores the caption. The strip sets `touch-action: pan-y` (§VI).
-- The drawn strip is 5.25rem tall where the band is narrower than 46rem and 9.375rem from there.
+- The readout's card (`[data-record-band-reading]`) is drawn on the server, empty and hidden, and
+  filled by the readout: the month, the condition word with its glyph (`ConditionIcon`, §XXIV)
+  and both scores in `.type-figure`. It is `aria-hidden`; the slider's `aria-valuetext` carries
+  the same words. It slides with the pointer without measuring itself (`--at`, the cursor's share
+  of the band, sets its left edge and moves it back by the same share of its own width), and takes
+  `width: max-content`, or near the right end it was squeezed into what was left of the band.
+- MUST: hand the month's condition to the homepage's sky while it is read (`data-regime` on
+  `[data-hero-sky]`, resolved by the data-regime map and cross-fading in 300ms, §XVI) and take it
+  back on every way the reading ends. The guidance on the sky does not change; the card names the
+  month the sky shows.
+- The drawn strip is 4.25rem tall where the band is narrower than 46rem and 9.375rem from there.
   On `/history` it opens to `clamp(9rem, 21vw, 18.75rem)`: `RecordPlateCanvas` renders the
   `data-record-plate` marker
   the stylesheet keys on, so the height is in the first paint, then lays a canvas over the same

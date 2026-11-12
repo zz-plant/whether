@@ -139,7 +139,8 @@ describe("the sky changes the inks and the panel puts every one back", () => {
   it("holds the clouds still for a reader who asks for less motion", () => {
     assert.match(forecast, /@media \(prefers-reduced-motion: reduce\) \{\s*\.weather-hero-sky-clouds > span \{ animation: none; \}/);
     /* Only transform moves, so the blur is drawn once and the compositor carries the rest. */
-    const drift = forecast.slice(forecast.indexOf("@keyframes weather-sky-drift"), forecast.indexOf("@media (prefers-reduced-motion"));
+    const driftAt = forecast.indexOf("@keyframes weather-sky-drift");
+    const drift = forecast.slice(driftAt, forecast.indexOf("@media", driftAt));
     assert.match(drift, /transform:/);
     assert.doesNotMatch(drift, /opacity|filter|width|height|top|left/);
   });
@@ -150,6 +151,42 @@ describe("the sky changes the inks and the panel puts every one back", () => {
 
   it("loads after the tokens it reads", () => {
     assert.ok(globals.indexOf("forecast.css") > globals.indexOf("tokens.css"));
+  });
+});
+
+describe("the sky cross-fades, and the record band reads out as a weather strip", () => {
+  const band = readFileSync("app/components/recordBand.tsx", "utf8");
+  const readout = readFileSync("app/components/recordBandReadout.tsx", "utf8");
+  const bandCss = readFileSync("app/styles/record-band.css", "utf8");
+
+  it("registers the sky's colours, so a change of condition interpolates instead of jumping", () => {
+    for (const name of ["--regime-sky-top", "--regime-sky", "--regime-sky-ink", "--regime-sky-muted", "--regime-sky-cloud"]) {
+      assert.match(tokens, new RegExp(`@property ${name} \\{ syntax: "<color>"; inherits: true;`), name);
+      assert.match(forecast, new RegExp(`${name} 300ms var\\(--ease-out\\)`), `${name} cross-fades in 300ms`);
+    }
+    assert.match(forecast, /@media \(prefers-reduced-motion: reduce\) \{\s*\.weather-hero-sky \{ transition: none; \}/);
+  });
+
+  it("draws each field as a sky in its own condition, one gradient per condition", () => {
+    assert.match(band, /<linearGradient key=\{regime\} id=\{`record-sky-\$\{regime\}`\} data-regime=\{regime\}/);
+    assert.match(band, /style=\{\{ fill: `url\(#record-sky-\$\{run\.regime\}\)` \}\}/);
+    assert.match(bandCss, /\.record-band-sky-base \{ stop-color: var\(--regime-accent\); \}/);
+  });
+
+  it("reads a month out as a card with the condition's glyph and the two scores as figures, hidden from assistive tech", () => {
+    assert.match(band, /<div className="record-band-reading" data-record-band-reading aria-hidden="true" hidden>/);
+    assert.match(band, /<ConditionIcon regime=\{regime\} \/>/);
+    assert.match(band, /className="type-figure" data-reading-pressure/);
+    assert.match(band, /className="type-figure" data-reading-risk/);
+    assert.match(readout, /plate\.setAttribute\("aria-valuetext", text\)/, "the slider says the same in words");
+    assert.match(bandCss, /\.record-band-reading \{[^}]*width: max-content;/, "the card keeps its own width wherever it sits");
+  });
+
+  it("tints the homepage's sky to the month while it is read, and gives it back when the reading ends", () => {
+    assert.match(readout, /sky\(\)\?\.setAttribute\("data-regime", reading\.regime\)/);
+    const clear = readout.slice(readout.indexOf("const clear = () => {"), readout.indexOf("};", readout.indexOf("const clear = () => {")));
+    assert.match(clear, /sky\(\)\?\.removeAttribute\("data-regime"\)/);
+    assert.match(clear, /card\.hidden = true/);
   });
 });
 

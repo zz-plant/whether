@@ -1,8 +1,8 @@
 <svg role="img" aria-label="Whether" xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200">
-  <rect width="100%" height="100%" fill="#0f1316"/>
-  <g transform="translate(20 55.72) scale(3.4499999999999997)" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="100%" height="100%" fill="#10141c"/>
+  <g transform="translate(3.8000000000000114 55.72) scale(3.4499999999999997)" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M2 14c3-5 6-5 9 0s6 5 9 0"/>
     <circle cx="5" cy="11" r="1.5" fill="#38bdf8"/>
     <circle cx="19" cy="11" r="1.5" fill="#38bdf8"/>
-  </g><text x="124.39999999999999" y="125.92" font-family="Archivo" font-weight="700" font-stretch="semi-condensed" font-size="72" fill="#edf0ee" text-anchor="start" letter-spacing="-0.72">Whether</text>
+  </g><text x="108.2" y="125.92" font-family="Bricolage Grotesque" font-weight="800" font-size="72" fill="#e8ecf4" text-anchor="start" letter-spacing="-0.72">Whether</text>
 </svg>
