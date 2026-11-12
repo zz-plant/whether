@@ -243,9 +243,14 @@ Moved out of the mechanics doc so it is read when a task touches lint, the suite
   none stops anyone looking for the real cause. The real contention is `tests/whetherCli.test.ts`
   spawning 62 Node processes, which no runner flag reaches. `BUN_TEST_CONCURRENCY` is still
   honoured when set explicitly; nothing sets it.
-- **Zod is pinned to 4.4.3.** 4.5.x changes schema types in a way `@modelcontextprotocol/sdk`
-  1.30's tool registration does not accept (`ZodString` is not assignable to its `AnySchema`);
-  `scripts/mcp/whether-mcp-server.ts` stops typechecking. Revisit with the MCP SDK v2 migration.
+- **Zod was pinned to 4.4.3 until 2026-11-12 and is `^4.6.7` now.** 4.5.x changed schema types in
+  a way `@modelcontextprotocol/sdk` 1.30's tool registration did not accept (`ZodString` was not
+  assignable to its `AnySchema`); `scripts/mcp/whether-mcp-server.ts` stopped typechecking. That
+  no longer reproduces: the stdio server stopped calling `registerTool` on 2026-09-29 (#1473), and
+  with SDK 1.32.2 typecheck, the suite and the build pass on 4.6.7. 4.6.6 is the first release
+  clear of GHSA-mrhx-c7xc-m3w5, so the range must not fall below it. The SDK has to resolve the
+  root zod: a `@modelcontextprotocol/sdk/zod` entry in `bun.lock`, which `bun update` of the SDK
+  wrote once, would put a second zod in the Worker bundle.
 - **Provider keys and trial switches.** `FRED_API_KEY` routes FRED reads to the API (JSON,
   ALFRED vintages via `fetchFredRows(..., { asOf })`); `ALPHA_VANTAGE_API_KEY` routes the SaaS
   comps median to Alpha Vantage; `GITHUB_TOKEN` lets the regime-history Workflow open its PR.
