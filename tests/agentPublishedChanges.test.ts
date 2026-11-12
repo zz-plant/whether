@@ -22,7 +22,8 @@ const base = getPublishedBriefs().find((brief) => brief.scores && brief.decision
 if (!base?.scores) throw new Error("the archive has no record with scores and hiring lines");
 const scores = base.scores;
 
-const week = (slug: string, change: Partial<PublishedBrief> = {}): PublishedBrief => ({ ...base, slug, ...change });
+/* Uncorrected unless a test says otherwise: the record copied may carry a correction of its own. */
+const week = (slug: string, change: Partial<PublishedBrief> = {}): PublishedBrief => ({ ...base, slug, correction: null, ...change });
 const NOW = new Date("2026-03-25T12:00:00Z"); // 2026-w13
 
 /* Scores that put every area's pause on (funding pressure past each of its pause lines) and
@@ -78,6 +79,12 @@ describe("published changes", () => {
     assert.deepEqual(result.correctedSince.map((entry) => entry.slug), ["2026-w10"]);
     assert.match(result.summary, /Corrected since: 2026-w10\./);
     assert.equal(buildPublishedChanges({ since: "2026-w10", briefs: [week("2026-w10"), week("2026-w11")], now: NOW }).correctedSince.length, 0);
+  });
+
+  it("names a correction made the same day the week was published", () => {
+    const sameDay = week("2026-w10", { publishedAt: "2026-03-05T14:03:00.000Z", correction: "Corrected Mar 5, 2026. The conditions were wrong." });
+    const result = buildPublishedChanges({ since: "2026-w10", briefs: [sameDay], now: NOW });
+    assert.deepEqual(result.correctedSince.map((entry) => entry.slug), ["2026-w10"]);
   });
 
   it("says this week's brief is overdue once Monday 14:00 has passed without it", () => {

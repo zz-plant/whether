@@ -178,7 +178,9 @@ export const buildPublishedChanges = ({
   const correctedSince = baseline
     ? chronological
         .filter((brief) => (weekStart(brief.slug) ?? 0) <= (weekStart(baseline.slug) ?? 0) && brief.correction)
-        .filter((brief) => publishedBriefModifiedAt(brief) > baseline.publishedAt)
+        /* A correction states its day, not its time ("Corrected Nov 12, 2026."), so it is compared by
+           day: a correction made the day the baseline was published may postdate the caller's read. */
+        .filter((brief) => publishedBriefModifiedAt(brief).slice(0, 10) >= baseline.publishedAt.slice(0, 10))
         .map((brief) => ({ slug: brief.slug, correctedAt: publishedBriefModifiedAt(brief), correction: brief.correction }))
     : [];
   const summaryParts = [
@@ -201,7 +203,7 @@ export const buildPublishedChanges = ({
     weeks,
     /** Weeks between `since` and the latest that have no published brief. */
     unpublishedWeeks: missing.filter((week) => sinceStart === null || (weekStart(week) ?? 0) > sinceStart),
-    /** Weeks at or before the baseline whose record was corrected after the baseline was published. */
+    /** Weeks at or before the baseline whose record was corrected on or after the day the baseline was published. */
     correctedSince,
     thisWeek,
     /** The current week has no brief yet. */

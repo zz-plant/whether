@@ -1600,6 +1600,6 @@
     "sourceLabel": "Federal Reserve Economic Data (FRED)",
     "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
     "freshnessLabel": "Nov 12, 2026, 2:03 PM UTC",
-    "correction": null
+    "correction": "Corrected Nov 12, 2026. This brief said Cloudy; this week's conditions were Freezing. Risk appetite read 42 on Nov 6, and two readings confirmed Freezing. The Nov 9 reading of 53 is three points over its line, inside the band where a change of conditions waits to be confirmed, so Freezing held. The brief was frozen without that confirmation and read Nov 9 on its own. It should have read: Conditions are tightening. Only say yes to things that bring in cash or that a customer is already counting on. The scores are unchanged."
   }
 ]
