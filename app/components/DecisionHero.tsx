@@ -222,7 +222,7 @@ export function DecisionHero({
           <Link
             href={briefNumber.href}
             data-brief-number
-            className="weather-hit text-fluid-sm tabular-nums text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+            className="weather-hit text-fluid-sm tabular-nums text-[var(--app-text-muted)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]"
           >
             <span className="sr-only">Published brief </span>No. {briefNumber.label}
           </Link>
@@ -303,13 +303,13 @@ export function DecisionHero({
               carries the two scores instead (2026-11-10): a returning reader met "Cloudy"
               with no gloss on the first screen once the facts took that line. */}
           {regimeKey && reading?.facts ? (
-            <span className="text-fluid-base leading-snug text-slate-300" data-regime-gloss>
+            <span className="text-fluid-base leading-snug text-[var(--app-text-secondary)]" data-regime-gloss>
               {REGIME_WEATHER_RATIONALES[regimeKey]}
             </span>
           ) : null}
 
           {since || direction || earlier ? (
-            <span className="text-fluid-sm font-medium leading-snug text-slate-200">
+            <span className="text-fluid-sm font-medium leading-snug text-[var(--app-text-secondary)]">
               {since && !earlier ? (
                 <span data-conditions-since>
                   {since}
@@ -347,11 +347,11 @@ export function DecisionHero({
             <h1
               id="weekly-call-title"
               style={{ viewTransitionName: "page-title" }}
-              className="max-w-2xl text-pretty text-fluid-lg font-semibold text-slate-300"
+              className="max-w-2xl text-pretty text-fluid-lg font-semibold text-[var(--app-text-secondary)]"
             >
               {question}
             </h1>
-            <p className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
+            <p className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-[var(--app-text)]">
               {call}
             </p>
           </>
@@ -359,7 +359,7 @@ export function DecisionHero({
           <h1
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
+            className="max-w-[50rem] text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-[var(--app-text)]"
           >
             {call}
           </h1>
@@ -373,7 +373,7 @@ export function DecisionHero({
         {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
 
         {regimeKey ? (
-          <p className={`max-w-xl text-pretty text-fluid-base leading-snug text-slate-300 ${phoneFigure ? "max-md:hidden" : ""}`.trim()} data-regime-meaning>
+          <p className={`max-w-xl text-pretty text-fluid-base leading-snug text-[var(--app-text-secondary)] ${phoneFigure ? "max-md:hidden" : ""}`.trim()} data-regime-meaning>
             {reading?.facts ? null : REGIME_WEATHER_RATIONALES[regimeKey]}
             {reading ? (
               <>
@@ -395,16 +395,16 @@ export function DecisionHero({
             chip beside the condition word, a second box on the line that names the week.
             Still the control that opens stage and runway, and it still says so in words. */}
         {location ? (
-          <p className="text-fluid-sm leading-snug text-slate-400">
+          <p className="text-fluid-sm leading-snug text-[var(--app-text-muted)]">
             Rules for{" "}
             <Link
               href={location.href}
               title={location.hint}
               data-reading-location
-              className="weather-hit font-medium text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+              className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]"
             >
               <span>{location.label}</span>
-              <span aria-hidden="true" className="text-slate-500"> · </span>
+              <span aria-hidden="true" className="text-[var(--app-text-muted)]"> · </span>
               <span>
                 change<span className="sr-only"> stage and runway</span>
               </span>
@@ -425,8 +425,8 @@ export function DecisionHero({
           <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm @lg:grid-cols-[max-content_1fr]">
             {lines.map((line) => (
               <div key={line.label} className="space-y-0.5 @lg:contents @lg:space-y-0">
-                <dt className="font-semibold text-slate-300">{line.label}</dt>
-                <dd className="text-slate-100">{line.value}</dd>
+                <dt className="font-semibold text-[var(--app-text-secondary)]">{line.label}</dt>
+                <dd className="text-[var(--app-text)]">{line.value}</dd>
               </div>
             ))}
           </dl>
@@ -434,7 +434,7 @@ export function DecisionHero({
 
         {detail ? (
           <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
-            <p className="text-sm leading-relaxed text-slate-300">{detail}</p>
+            <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">{detail}</p>
           </div>
         ) : null}
 

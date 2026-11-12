@@ -1,0 +1,176 @@
+/*
+ * Forecast — the condition-driven visual world (2026-11-11).
+ *
+ * A user-pinned hybrid: filed brief (data room) + investor-update letter +
+ * modern weather-app condition theming. The page's ground shifts with the
+ * condition (Sunny / Cloudy / Stormy / Freezing), so a storm week and a sunny
+ * week look like different apps. This file is additive and scoped to
+ * [data-forecast] so it can be adopted route by route without disturbing the
+ * incumbent Covenant tokens in tokens.css.
+ *
+ * Source of truth: .impeccable/surfaces/app-page-tsx.md (Direction contract).
+ * Preview: .impeccable/mocks/forecast-home.html.
+ *
+ * Fonts: Bricolage Grotesque (display) + Source Sans 3 (body). Self-hosting
+ * needs woff2 output (Brotli), which is unavailable on this machine; until the
+ * files land in public/fonts, the preview loads them from Google Fonts. Do not
+ * ship an external font host in production (the capture rule refuses it).
+ */
+
+:root {
+  /* Arctic paper whites — cool, crisp, not warm cream. */
+  --forecast-paper: #eef1f6;
+  --forecast-card: #f8fafc;
+  --forecast-line: #c8d0dc;
+  --forecast-ink: #0f1419;
+  --forecast-ink-secondary: #2a3442;
+  --forecast-ink-muted: #4a5568;
+  --forecast-red: #b3242b;
+
+  /* Layered multi-shadow (Stripe/Linear style), zero detector flags. */
+  --forecast-shadow: 0 1px 2px rgba(15, 20, 25, .06),
+                     0 4px 8px rgba(15, 20, 25, .08),
+                     0 12px 24px rgba(15, 20, 25, .06);
+
+  --forecast-font-display: 'Bricolage Grotesque', 'Archivo', system-ui, sans-serif;
+  --forecast-font-body: 'Source Sans 3', 'Archivo', system-ui, sans-serif;
+}
+
+/* One block per condition. Each owns its sky, ink and paper. The condition is
+   the page's ground, not just a word. Ink clears 4.5:1 on the sky; muted
+   clears 4.5:1 on the sky. */
+[data-forecast] {
+  --f-sky-top: #7a9ab8;
+  --f-sky: #6a8aaa;
+  --f-ink: #0f1419;
+  --f-ink-secondary: #2a3442;
+  --f-muted: #162028;
+  --f-paper: #eef1f6;
+  --f-card: #f8fafc;
+  --f-line: #c8d0dc;
+  /* Re-theme the existing semantic tokens to the Forecast world. The homepage
+     components read these, so the condition drives the page without a JSX
+     rewrite. The sky band (.forecast-sky) draws the strong condition colour;
+     the body stays calm paper. */
+  --bg-body: var(--f-paper);
+  --bg-panel: var(--f-card);
+  --bg-raised: var(--f-card);
+  --app-text: var(--f-ink);
+  --app-text-secondary: var(--f-ink-secondary);
+  --app-text-muted: var(--f-muted);
+  --border-default: color-mix(in srgb, var(--f-ink) 18%, transparent);
+  --font-sans: var(--forecast-font-body);
+  --font-display: var(--forecast-font-display);
+}
+[data-forecast][data-condition="sunny"] {
+  --f-sky-top: #f7c53a;
+  --f-sky: #e8a81c;
+  --f-ink: #1a1408;
+  --f-ink-secondary: #4a3c12;
+  --f-muted: #5a4a1a;
+  --f-paper: #f4f6fa;
+  --f-card: #fafcff;
+  --f-line: #d8dce8;
+}
+[data-forecast][data-condition="cloudy"] {
+  --f-sky-top: #7a9ab8;
+  --f-sky: #6a8aaa;
+  --f-ink: #0f1419;
+  --f-ink-secondary: #2a3442;
+  --f-muted: #162028;
+  --f-paper: #eef1f6;
+  --f-card: #f8fafc;
+  --f-line: #c8d0dc;
+}
+[data-forecast][data-condition="stormy"] {
+  --f-sky-top: #1e2540;
+  --f-sky: #141a30;
+  --f-ink: #e8ecf4;
+  --f-ink-secondary: #b8c2d4;
+  --f-muted: #9aa8c0;
+  --f-paper: #10141c;
+  --f-card: #1a1f2a;
+  --f-line: #2a3040;
+}
+[data-forecast][data-condition="freezing"] {
+  --f-sky-top: #8ac2ec;
+  --f-sky: #6aa8dc;
+  --f-ink: #0a1a3a;
+  --f-ink-secondary: #1a3a6a;
+  --f-muted: #2a4a7a;
+  --f-paper: #eaf0f8;
+  --f-card: #f5f9fd;
+  --f-line: #b0c8e0;
+}
+
+/* Reduced eyebrows: the Forecast world prints section labels in sentence case
+   at body weight, not tracked uppercase. A label is a label, not a kicker. */
+[data-forecast] .f-label {
+  font-family: var(--forecast-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--f-muted);
+}
+
+/* The sky band: full-bleed condition ground with animated atmospheric depth. */
+[data-forecast] .forecast-sky {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--f-sky-top) 0%, var(--f-sky) 100%);
+  color: var(--f-ink);
+  padding: 52px 28px 64px;
+}
+[data-forecast] .forecast-sky .forecast-clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+[data-forecast] .forecast-clouds span {
+  position: absolute;
+  background: rgba(255, 255, 255, .14);
+  border-radius: 50%;
+  filter: blur(28px);
+  animation: forecast-drift 22s ease-in-out infinite alternate;
+}
+[data-forecast] .forecast-clouds span:nth-child(1) { width: 280px; height: 120px; top: -10%; left: 2%; }
+[data-forecast] .forecast-clouds span:nth-child(2) { width: 420px; height: 180px; top: 20%; right: -4%; animation-duration: 30s; animation-delay: -6s; }
+[data-forecast] .forecast-clouds span:nth-child(3) { width: 220px; height: 90px; top: 55%; left: 38%; animation-duration: 26s; animation-delay: -12s; }
+[data-forecast] .forecast-clouds span:nth-child(4) { width: 340px; height: 140px; top: 70%; right: 20%; animation-duration: 34s; animation-delay: -3s; }
+@keyframes forecast-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -18px) scale(1.12); }
+  100% { transform: translate(-24px, 6px) scale(.94); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-forecast] .forecast-clouds span { animation: none; }
+}
+
+/* The guidance and score figures take the display face. */
+[data-forecast] .forecast-display {
+  font-family: var(--forecast-font-display);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.04;
+}
+[data-forecast] .forecast-figure {
+  font-family: var(--forecast-font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.03em;
+  line-height: .9;
+}
+[data-forecast] .forecast-body {
+  font-family: var(--forecast-font-body);
+}
+
+/* Elevated surfaces carry the layered shadow. */
+[data-forecast] .forecast-card {
+  background: var(--f-card);
+  border: 1px solid var(--f-line);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--forecast-shadow);
+}

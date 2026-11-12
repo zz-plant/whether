@@ -771,7 +771,7 @@ async function PageContent({
                       <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} />
                     ))}
                     {/* The facts line's one link to the basis, which it carries from md up. */}
-                    <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-slate-300 underline decoration-slate-600 underline-offset-4">
+                    <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4">
                       Why conditions are {publicRegimeLabel}
                     </Link>
                   </div>
@@ -855,7 +855,7 @@ async function PageContent({
                   rather than beside Copy Brief: the decision, then the artifact, and the
                   words-before-the-areas budget stands. */}
               {!historicalSelection ? (
-                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-slate-400">
+                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)]">
                   Share as:
                   {ROLE_FORMAT_LINKS.map((format) => (
                     <ActionLink key={format.href} href={format.href} variant="inline">
