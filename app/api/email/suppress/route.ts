@@ -12,10 +12,11 @@ export const runtime = "edge";
  * stays so the address can be un-suppressed by hand, and so the reason it left
  * is not lost.
  *
- * This is the substrate, not the feed: Cloudflare's bounce and complaint events
- * still need wiring to it (an `email()` handler or the REST API's
- * `permanent_bounces`). Until then an operator calls this with the address the
- * bounce named.
+ * Bounces and complaints do not come through here. Cloudflare takes a bounce on
+ * its own bounce domain and lists the address, so none reaches this Worker; the
+ * next send to the address is refused, and two refusals a day apart suppress it
+ * (`recordDeliveryRefusal` in lib/email/subscriberStore.ts). This route is for an
+ * operator stopping an address by hand.
  */
 export async function POST(request: Request) {
   const authError = requireCronAuth(request);

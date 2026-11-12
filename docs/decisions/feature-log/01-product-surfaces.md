@@ -2248,6 +2248,17 @@ confirming reading.
   now choose only on a developer's machine. The binding's type declares `headers`, which it never did. The
   header is now asserted on every stream, not only the brief: `tests/emailShell.test.ts`,
   `tests/alertDelivery.test.ts`, `tests/planLines.test.ts`.
+- **Bounces and complaints, 2026-11-12.** A bounce never reaches this Worker: Cloudflare's Email
+  Service takes it on `cf-bounce.whether.work`, lists the address, and throws
+  `E_RECIPIENT_SUPPRESSED` from the next `send()` to it. Every stream counted that as a failed send,
+  so one dead mailbox turned the Monday brief step and the daily alert step red and mailed the ops
+  notice every run. The adapter now reports a refusal apart from a failure; the brief, the alerts,
+  the plan-line crossings and the month-end letter count it in `refusedRecipients`, never in
+  `errors`, and tell the record. Cloudflare also lists a soft bounce for a day, so one refusal only
+  dates the record (`deliveryRefusedAt`); a second a day or more later, within 30 days, suppresses
+  it. Confirming a request lifts a suppression, since the reader clicked from an email that reached
+  them. The in-memory store's send lists now drop suppressed addresses, as the KV store's always
+  did. `/privacy` 2.1 says so. Tests: `tests/emailRefusedRecipients.test.ts`.
 - **The picker points at plan lines.** Under a picked area's published lines, "Move these lines for
   your plan →" opens `/operate#ops-plan-lines`. The alert form names everything it sends: the
   guidance changing, a score crossing one of its lines, an outsized move in a market input.

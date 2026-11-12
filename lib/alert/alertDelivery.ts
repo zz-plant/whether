@@ -7,8 +7,11 @@ import { describePlanLineCrossing, evaluatePlanLineCrossings, planLineDeliveryKe
 import { evaluateFlashMoves, flashInputsFrom } from "./flashMoves";
 import {
   createCloudflareEmailAdapter,
+  emailDeliveryOutcome,
+  recordRefusedRecipient,
   type EmailDeliveryAdapter,
 } from "../email/emailDelivery";
+import type { DeliveryOutcome } from "../delivery/fanOut";
 import { unsubscribeHeaders } from "../email/emailShell";
 import { getSubscriberStore, type Subscriber } from "../email/subscriberStore";
 import type { OperatingSnapshot } from "../operatingState/types";
@@ -96,6 +99,8 @@ type DeliveryResult = {
   alerts: AlertDecision[];
   /** Set when the only reading available was not one to act on; nothing was judged or sent. */
   refused?: string;
+  /** Subscribers Cloudflare refused as suppressed. Not errors; the record is told (`recordRefusedRecipient`). Absent when none. */
+  refusedRecipients?: number;
 };
 
 export const deliverAlertToSubscriber = async (
@@ -105,7 +110,7 @@ export const deliverAlertToSubscriber = async (
   adapter: EmailDeliveryAdapter,
   unsubscribeToken?: string | null,
   baseUrl?: string,
-): Promise<boolean> => {
+): Promise<DeliveryOutcome> => {
   try {
     let template: ReturnType<typeof decisionVerdictEmail>;
     if (alert.type === "flash" && alert.flash) {
@@ -130,7 +135,7 @@ export const deliverAlertToSubscriber = async (
     } else if (alert.line) {
       template = thresholdCrossingEmail(alert.line, conditions[alert.line.metric], unsubscribeToken, baseUrl);
     } else {
-      return false;
+      return "failed";
     }
     const result = await adapter.send({
       to: { email },
@@ -139,9 +144,9 @@ export const deliverAlertToSubscriber = async (
       text: template.text,
       headers: unsubscribeHeaders(unsubscribeToken, baseUrl),
     });
-    return result.ok;
+    return emailDeliveryOutcome(result);
   } catch {
-    return false;
+    return "failed";
   }
 };
 
@@ -150,7 +155,7 @@ const sendPlanLineEmail = async (
   crossing: { headline: string; body: string },
   adapter: EmailDeliveryAdapter,
   baseUrl?: string,
-): Promise<boolean> => {
+): Promise<DeliveryOutcome> => {
   try {
     const template = planLineEmail(crossing, sub.token, baseUrl);
     const result = await adapter.send({
@@ -160,9 +165,9 @@ const sendPlanLineEmail = async (
       text: template.text,
       headers: unsubscribeHeaders(sub.token, baseUrl),
     });
-    return result.ok;
+    return emailDeliveryOutcome(result);
   } catch {
-    return false;
+    return "failed";
   }
 };
 
@@ -294,8 +299,12 @@ export const deliverAlerts = async (
   let sent = 0;
   let skipped = 0;
   let errors = 0;
+  let refusedRecipients = 0;
 
   for (const sub of subscribers) {
+    /* Cloudflare refuses an address on its suppression list before anything is
+       sent, so the rest of this run's mail to it would be refused the same way. */
+    let refusedHere = false;
     for (const alert of alerts) {
       // Keyed on the address rather than on the record, because two records could once
       // resolve to one inbox and each got its own "already delivered" marker — the
@@ -305,7 +314,7 @@ export const deliverAlerts = async (
         skipped++;
         continue;
       }
-      const ok = await deliverAlertToSubscriber(
+      const outcome = await deliverAlertToSubscriber(
         sub.email,
         alert,
         conditions,
@@ -313,7 +322,11 @@ export const deliverAlerts = async (
         sub.token,
         options.baseUrl,
       );
-      if (ok) {
+      if (outcome === "gone") {
+        refusedHere = true;
+        break;
+      }
+      if (outcome === "sent") {
         sent++;
         await trackAlertDelivery(sub.email, alertDeliveryKey(alert), alert.headline);
       } else {
@@ -322,26 +335,38 @@ export const deliverAlerts = async (
     }
 
     const current = { tightness: conditions.tightness, riskAppetite: conditions.riskAppetite };
-    for (const crossing of evaluatePlanLineCrossings(sub.planLines, current, conditions.previousScores)) {
+    const crossings = refusedHere ? [] : evaluatePlanLineCrossings(sub.planLines, current, conditions.previousScores);
+    for (const crossing of crossings) {
       const key = planLineDeliveryKey(crossing);
       if (await wasAlreadyDelivered(sub.email, key)) {
         skipped++;
         continue;
       }
       const described = describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway, selfFunded: sub.stage === "bootstrapped" });
-      const ok = await sendPlanLineEmail(sub, described, adapter, options.baseUrl);
-      if (ok) {
+      const outcome = await sendPlanLineEmail(sub, described, adapter, options.baseUrl);
+      if (outcome === "gone") {
+        refusedHere = true;
+        break;
+      }
+      if (outcome === "sent") {
         sent++;
         await trackAlertDelivery(sub.email, key, described.headline);
       } else {
         errors++;
       }
     }
+
+    if (refusedHere) {
+      refusedRecipients++;
+      await recordRefusedRecipient(sub).catch(() => undefined);
+    }
   }
+
+  const refusals = refusedRecipients > 0 ? { refusedRecipients } : {};
 
   /* The published-line state moves only when a published alert fired, as before:
      it is "where the scores were when we last wrote", not the previous reading. */
-  if (alerts.length === 0) return { sent, skipped, errors, alerts };
+  if (alerts.length === 0) return { sent, skipped, errors, alerts, ...refusals };
 
   await writeAlertState({
     regime: conditions.regime,
@@ -350,5 +375,5 @@ export const deliverAlerts = async (
     lastSentAt: new Date().toISOString(),
   });
 
-  return { sent, skipped, errors, alerts };
+  return { sent, skipped, errors, alerts, ...refusals };
 };

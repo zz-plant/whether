@@ -1,5 +1,5 @@
 import { ageRunwayBand, describeRunwayBandAge } from "../report/operatorRunway";
-import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
+import { createCloudflareEmailAdapter, emailDeliveryOutcome, getActiveSubscriptions, recordRefusedRecipient } from "./emailDelivery";
 import { emailTextFooter, escapeHtml, renderEmailShell, unsubscribeHeaders } from "./emailShell";
 import { resolveEmailBaseUrl } from "./publicBaseUrl";
 import type { OperatingSnapshot } from "../operatingState/types";
@@ -151,6 +151,8 @@ type SendWeeklyBriefResult = {
   message?: string;
   /** Subscribers who already had this week's brief and were not sent it again. Absent when none. */
   skipped?: number;
+  /** Recipients Cloudflare refused as suppressed. Not errors; the record is told (`recordRefusedRecipient`). Absent when none. */
+  refusedRecipients?: number;
 };
 
 /**
@@ -375,17 +377,20 @@ export const sendWeeklyBrief = async (options?: {
       });
 
       const result = await adapter.send({ to: recipient, subject, html, text, headers: unsubscribeHeaders(recipient.token, baseUrl) });
-      return result.ok ? "sent" : "failed";
+      return emailDeliveryOutcome(result);
     },
     /* Once per subscriber per ISO week, so a manual run after the Monday cron
        does not mail the brief twice, and a run that failed part-way reaches
-       only the ones it missed. A stub delivers nothing, so it records nothing. */
+       only the ones it missed. A stub delivers nothing, so it records nothing.
+       A recipient Cloudflare refuses is retired into its record, never counted
+       as an error. */
     deliveryMode === "live"
       ? {
           once: {
             markers: onceFor(weeklyPeriodKey("weekly-email", now), { force: options?.force }),
             keyOf: (recipient) => recipient.email,
           },
+          retire: recordRefusedRecipient,
         }
       : {},
   );
@@ -393,6 +398,7 @@ export const sendWeeklyBrief = async (options?: {
   const sent = tally.sent;
   const errors = tally.failed;
   const skipped = tally.skipped;
+  const refusedRecipients = tally.retired;
 
   const ok = errors === 0;
   const error = ok
@@ -410,6 +416,7 @@ export const sendWeeklyBrief = async (options?: {
     deliveryMode,
     ...(error ? { error } : {}),
     ...(skipped > 0 ? { skipped } : {}),
+    ...(refusedRecipients > 0 ? { refusedRecipients } : {}),
     ...(alreadySent ? { message: "Every subscriber already has this week's brief; nothing was sent again. Pass force to re-send." } : {}),
   };
 };

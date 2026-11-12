@@ -74,6 +74,12 @@ export type Subscriber = {
    * mailbox is not retried every Monday.
    */
   suppressed?: boolean;
+  /**
+   * When Cloudflare first refused a send to this address because it is on its
+   * suppression list. A second refusal a day or more later suppresses the address
+   * here (`withDeliveryRefusal`); a confirmation from the inbox clears both.
+   */
+  deliveryRefusedAt?: string;
   /** The band sent with `pendingPlanLines`. Absent beside pending lines means they carry none. */
   pendingPlanRunway?: PlanRunway;
   /**
@@ -172,6 +178,8 @@ export interface SubscriberStore {
   getSubscriberByToken(token: string): Promise<Subscriber | null>;
   /** Stop sending to an address without deleting its record: a hard bounce or a complaint. */
   suppress(email: string): Promise<boolean>;
+  /** Notes that Cloudflare refused a send to this address at `at`; true when that suppresses it. */
+  recordDeliveryRefusal(email: string, at: Date): Promise<boolean>;
   backendStatus(): "durable" | "local-fallback";
 }
 
@@ -297,8 +305,36 @@ const confirms = (sub: Subscriber, token: string, now: number): boolean => {
   return !sub.verified && sub.token === token;
 };
 
-/** The record once its inbox has said yes. */
-const confirmedRecord = (sub: Subscriber): Subscriber => ({ ...withoutPending(withPendingApplied(sub)), verified: true });
+/**
+ * The record once its inbox has said yes. A suppression is lifted with it: the
+ * reader confirmed from an email that reached them, so the address takes mail.
+ */
+const confirmedRecord = (sub: Subscriber): Subscriber => {
+  const { suppressed: _lifted, deliveryRefusedAt: _cleared, ...confirmed } = withoutPending(withPendingApplied(sub));
+  return { ...confirmed, verified: true };
+};
+
+/* How long a refusal is remembered when no second one follows. */
+const REFUSAL_MEMORY_MS = 30 * DAY_MS;
+
+/**
+ * The record after Cloudflare refused a send to it (`E_RECIPIENT_SUPPRESSED`).
+ *
+ * Cloudflare keeps the suppression list, and a bounce never reaches this Worker:
+ * the refusal on the next send is how the record learns of one. One refusal is not
+ * enough to stop sending. Cloudflare lists a soft bounce (a full mailbox) for 24
+ * hours, a hard bounce for seven days or for good, and a complaint for good
+ * (developers.cloudflare.com/email-service/concepts/suppressions/). So a second
+ * refusal at least a day after the first, within 30 days, is a listing a soft bounce
+ * does not explain, and the address is suppressed here. Until then each refusal is
+ * a send that did not go, not a failed one.
+ */
+const withDeliveryRefusal = (sub: Subscriber, at: Date): Subscriber => {
+  const since = at.getTime() - Date.parse(sub.deliveryRefusedAt ?? "");
+  if (since >= DAY_MS && since <= REFUSAL_MEMORY_MS) return { ...sub, suppressed: true };
+  if (since >= 0 && since < DAY_MS) return sub;
+  return { ...sub, deliveryRefusedAt: at.toISOString() };
+};
 
 /** The record as it will read once the address confirms: what a confirmation email promises. */
 export const withPendingApplied = (sub: Subscriber): Subscriber => {
@@ -310,6 +346,11 @@ export const withPendingApplied = (sub: Subscriber): Subscriber => {
     weekly: pendingFlags.weekly ?? rest.weekly,
     active: pendingFlags.reactivate ? true : rest.active,
   };
+};
+
+const readDeliveryRefusal = (raw: object): Pick<Subscriber, "deliveryRefusedAt"> => {
+  const refusedAt = readStoredString(raw, "deliveryRefusedAt");
+  return refusedAt ? { deliveryRefusedAt: refusedAt } : {};
 };
 
 const readConfirmMails = (raw: object): Pick<Subscriber, "confirmMailSentAt"> => {
@@ -376,6 +417,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     ...(isRunwayBand(Reflect.get(raw, "runwayBand")) ? { runwayBand: Reflect.get(raw, "runwayBand") as RunwayBand } : {}),
     ...(Reflect.get(raw, "runwayBandFixed") === true ? { runwayBandFixed: true } : {}),
     ...(Reflect.get(raw, "suppressed") === true ? { suppressed: true } : {}),
+    ...readDeliveryRefusal(raw),
     ...readPlanRunway(raw),
     ...readPendingPlanLines(raw),
     ...readPendingFlags(raw),
@@ -587,6 +629,17 @@ class KvSubscriberStore implements SubscriberStore {
     return true;
   }
 
+  async recordDeliveryRefusal(email: string, at: Date): Promise<boolean> {
+    const existing = await this.getSubscriberByEmail(email);
+    if (!existing) return false;
+    const sub = withDeliveryRefusal(existing, at);
+    if (sub !== existing) {
+      await this.kv.put(SUB_PREFIX + existing.email, JSON.stringify(sub)).catch(() => { /* non-fatal */ });
+      this.fallback.saveToMemory(sub);
+    }
+    return sub.suppressed === true && existing.suppressed !== true;
+  }
+
   async getSubscriberByToken(token: string): Promise<Subscriber | null> {
     const email = await this.kv.get(TOKEN_PREFIX + token);
     if (!email) return this.fallback.getByToken(token);
@@ -629,8 +682,10 @@ class InMemorySubscriberStore implements SubscriberStore {
 
   async listActiveSubscribers(): Promise<Subscriber[]> {
     const subscribers: Subscriber[] = [];
+    /* Suppressed addresses leave the send lists here too. Only the KV store
+       dropped them until 2026-11-12, so the fallback mailed a suppressed address. */
     for (const sub of this.byEmail.values()) {
-      if (sub.active && sub.verified) subscribers.push(sub);
+      if (sub.active && sub.verified && !sub.suppressed) subscribers.push(sub);
     }
     return subscribers;
   }
@@ -702,6 +757,15 @@ class InMemorySubscriberStore implements SubscriberStore {
     if (!existing) return false;
     this.saveToMemory({ ...existing, suppressed: true });
     return true;
+  }
+
+  async recordDeliveryRefusal(email: string, at: Date): Promise<boolean> {
+    const normalized = normalizeEmail(email);
+    const existing = normalized ? this.getByEmail(normalized) : null;
+    if (!existing) return false;
+    const sub = withDeliveryRefusal(existing, at);
+    if (sub !== existing) this.saveToMemory(sub);
+    return sub.suppressed === true && existing.suppressed !== true;
   }
 
   backendStatus(): "local-fallback" {

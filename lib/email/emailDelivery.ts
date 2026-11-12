@@ -7,6 +7,7 @@
 import type { OperatorStage } from "../report/operatorStage";
 import type { RunwayBand } from "../report/operatorRunway";
 import type { PlanLines, PlanRunway } from "../alert/planLines";
+import type { DeliveryOutcome } from "../delivery/fanOut";
 
 type EmailRecipient = {
   email: string;
@@ -43,8 +44,20 @@ export type EmailDeliveryAdapter = {
      * without them the one-click endpoint exists but nothing advertises it.
      */
     headers?: Record<string, string>;
-  }) => Promise<{ ok: true } | { ok: false; error: string }>;
+  }) => Promise<EmailSendResult>;
 };
+
+/**
+ * `refused` is Cloudflare declining the recipient before anything was sent,
+ * because the address is on its suppression list: a hard bounce, a complaint, or
+ * a soft bounce in the last day. It is not a failed send.
+ */
+type EmailSendResult = { ok: true } | { ok: false; error: string; refused?: true };
+
+/* developers.cloudflare.com/email-service/concepts/suppressions/: with "Drop suppressed
+   recipients" off, Cloudflare's default, the binding throws this code. */
+const isRefusedRecipient = (error: unknown) =>
+  typeof error === "object" && error !== null && Reflect.get(error, "code") === "E_RECIPIENT_SUPPRESSED";
 
 export const EMAIL_NOT_CONFIGURED_ERROR = "Email delivery is not configured on this deployment.";
 
@@ -104,13 +117,26 @@ export const createCloudflareEmailAdapter = (
         });
         return { ok: true };
       } catch (error) {
-        return { ok: false, error: error instanceof Error ? error.message : String(error) };
+        const message = error instanceof Error ? error.message : String(error);
+        return isRefusedRecipient(error) ? { ok: false, error: message, refused: true } : { ok: false, error: message };
       }
     },
   };
 };
 
 import { getSubscriberStore } from "./subscriberStore";
+
+/**
+ * A send in the fan-out's words (`lib/delivery/fanOut.ts`): a recipient Cloudflare
+ * refuses is gone, not failed, so a bounced address does not turn the Monday brief
+ * or the daily alert step red and mail the ops notice every run.
+ */
+export const emailDeliveryOutcome = (result: EmailSendResult): DeliveryOutcome =>
+  result.ok ? "sent" : result.refused ? "gone" : "failed";
+
+/** Tells the subscriber record Cloudflare refused it, the fan-out's `retire` for every email stream. */
+export const recordRefusedRecipient = (recipient: { email: string }) =>
+  getSubscriberStore().recordDeliveryRefusal(recipient.email, new Date());
 
 export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
   const store = getSubscriberStore();
