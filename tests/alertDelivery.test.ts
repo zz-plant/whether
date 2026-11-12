@@ -176,7 +176,7 @@ describe("alert mail", () => {
       "token-123",
     );
 
-    assert.equal(ok, true);
+    assert.equal(ok, "sent");
     assert.equal(sends.length, 1, "the adapter was called");
     assert.match(sends[0].html, /\/api\/email\/unsubscribe\?token=token-123/);
     assert.match(sends[0].text, /\/api\/email\/unsubscribe\?token=token-123/);

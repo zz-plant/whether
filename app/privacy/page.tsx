@@ -91,7 +91,10 @@ export default function PrivacyPage() {
               figure. It is replaced or cleared with the lines. Finally, it stores a random token for the
               unsubscribe link and, while a request is waiting for you, a separate one-time code for its
               confirmation link. It keeps the times of any confirmation emails sent to your address in the
-              last day, to stop anyone sending it more than three in an hour or six in a day. It is held in
+              last day, to stop anyone sending it more than three in an hour or six in a day. If Cloudflare,
+              which sends the emails, refuses to send to your address because mail to it bounced or was
+              marked as spam, it stores when that first happened. A second refusal a day or more later stops
+              all mail to the address until you confirm a request from it again. It is held in
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until you
               confirm. Any later request for your address changes nothing until you open the link it sends
               and press Confirm on the page that link shows. That holds for turning alerts or the Monday brief

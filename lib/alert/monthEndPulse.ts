@@ -28,7 +28,7 @@ import {
 import { getWhetherKv } from "../runtime/kv";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getSubscriberStore } from "../email/subscriberStore";
-import { createCloudflareEmailAdapter } from "../email/emailDelivery";
+import { createCloudflareEmailAdapter, emailDeliveryOutcome, recordRefusedRecipient } from "../email/emailDelivery";
 import { escapeHtml, renderEmailShell, unsubscribeFooterText, unsubscribeHeaders } from "../email/emailShell";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { fanOut } from "../delivery/fanOut";
@@ -165,8 +165,8 @@ const sendEmailPulse = async (headline: string, block: string, baseUrl?: string)
           baseUrl,
         }),
       });
-      return result.ok ? "sent" : "failed";
-    });
+      return emailDeliveryOutcome(result);
+    }, { retire: recordRefusedRecipient });
     return tally.sent;
   } catch {
     return 0;
