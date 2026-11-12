@@ -54,8 +54,10 @@ export function RecordSection({
           half a laptop screen empty. */}
       <div className="weather-switch items-start gap-x-8 gap-y-4 [--col-min:20rem]">
         {spellLengths?.rest ? <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300">{spellLengths.rest}</p> : null}
+        {/* A line of links that wraps: each reaches up 2px, short of the words on the line
+            above (`--weather-hit-up`, controls.css), whose link boxes end about 3px over it. */}
         {turningPoints.length > 0 ? (
-          <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300">
+          <p className="max-w-[60ch] text-fluid-sm leading-relaxed text-slate-300 [--weather-hit-up:2px]">
             Last changes:{" "}
             {turningPoints.map((point, index) => (
               <span key={point.href}>

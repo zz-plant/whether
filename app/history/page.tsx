@@ -232,8 +232,9 @@ export default async function HistoryPage({
               screens from the strip that draws the same months. */}
           <div className="space-y-2">
             <h3 className="type-eyebrow">By year</h3>
-            {/* A line of links, not fourteen boxed chips (2026-11-10). */}
-            <ul className="flex flex-wrap gap-x-5 gap-y-1 text-fluid-sm">
+            {/* A line of links, not fourteen boxed chips (2026-11-10). Each reaches up
+                only across the 4px row gap (`--weather-hit-up`, controls.css). */}
+            <ul className="flex flex-wrap gap-x-5 gap-y-1 text-fluid-sm [--weather-hit-up:4px]">
               {postureArchiveYears.map((year) => {
                 const yearRegime = regimeKeyFromLabel(year.operatorLabel);
                 return (

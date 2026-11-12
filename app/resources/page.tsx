@@ -212,8 +212,9 @@ export default async function ResourcesHubPage({
           })}
           </div>
 
-          {/* Two references the answers lean on, linked under the list they serve. */}
-          <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          {/* Two references the answers lean on, linked under the list they serve. Stacked
+              on a phone, the second reaches up only across the gap (`--weather-hit-up`). */}
+          <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5 gap-y-2 [--weather-hit-up:8px]">
             <ActionLink href="/comps" variant="inline">SaaS valuation multiples</ActionLink>
             <ActionLink href="/history/compare" variant="inline">Compare historical funding conditions</ActionLink>
           </nav>

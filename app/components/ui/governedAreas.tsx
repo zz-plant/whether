@@ -23,8 +23,11 @@ export function GovernedAreas({
   className?: string;
 }) {
   const areas = areasGovernedBy(metric);
+  /* The line sits right under its score's name, which is a link too, and a second line
+     of areas sits right under the first: the areas' tap areas reach down, not up
+     (`--weather-hit-up`, controls.css), or they take the lower half of the words above. */
   return (
-    <span className={`block text-fluid-nano font-normal text-slate-400 ${className}`.trim()} data-governs={metric}>
+    <span className={`block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px] ${className}`.trim()} data-governs={metric}>
       Affects:{" "}
       {areas.map((area, index) => (
         <Fragment key={area}>

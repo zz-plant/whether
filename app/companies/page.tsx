@@ -39,7 +39,9 @@ export default function CompaniesPage() {
           </Link>
           .
         </p>
-        <ul className="weather-grid gap-x-4 gap-y-2 text-sm [--col-min:10rem]">
+        {/* One company a row on a phone; each reaches up only across the row gap
+            (`--weather-hit-up`, controls.css), not into the name above it. */}
+        <ul className="weather-grid gap-x-4 gap-y-2 text-sm [--col-min:10rem] [--weather-hit-up:8px]">
           {COMPANIES.map((company) => (
             <li key={company.slug}>
               <Link href={`/companies/${company.slug}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">

@@ -51,7 +51,9 @@ export default async function RolesPage() {
           .
         </p>
         <WeekConditionsLines conditions={conditions} />
-        <ul className="weather-grid gap-x-4 gap-y-2 text-sm [--col-min:14rem]">
+        {/* One role a row on a phone; each reaches up only across the row gap
+            (`--weather-hit-up`, controls.css), not into the role above it. */}
+        <ul className="weather-grid gap-x-4 gap-y-2 text-sm [--col-min:14rem] [--weather-hit-up:8px]">
           {ROLES.map((role) => (
             <li key={role.slug}>
               <Link href={`/roles/${role.slug}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
