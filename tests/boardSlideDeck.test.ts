@@ -101,11 +101,11 @@ describe("board slide PPTX", () => {
     assert.match(slide, /saved copy, not a live reading/);
     assert.doesNotMatch(slide, /<whatever>/);
     // Each condition wears its own colour (REGIME_HEX_COLORS): the badge's edge
-    // is Freezing's frost blue here and Sunny's gold on an easing week. It was
+    // is Freezing's icy blue here and Sunny's gold on an easing week. It was
     // rose for Cloudy and Freezing and green for the rest, so Stormy wore Sunny's.
-    assert.match(slide, /<a:srgbClr val="2A4FA8"\/>/);
+    assert.match(slide, /<a:srgbClr val="9FD0F2"\/>/);
     const easing = readStoredZip(buildBoardSlidePptx({ ...payload, regime: "EXPANSION" })).get("ppt/slides/slide1.xml")?.content ?? "";
-    assert.match(easing, /<a:srgbClr val="E0A81C"\/>/);
+    assert.match(easing, /<a:srgbClr val="E8A81C"\/>/);
     assert.doesNotMatch(easing, /3A6FA3/);
   });
 

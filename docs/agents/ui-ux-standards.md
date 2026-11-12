@@ -236,12 +236,19 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   grouping. The ladder at the end of `app/styles/surfaces.css` enforces this for boxes made from a
   `weather-*` class; it cannot reach one written as Tailwind utilities, so that case is on the
   author.
-- MUST: tell a surface from the page by its hairline and a step of tone, not by a shadow. Since
-  2026-11-10 `.weather-surface`, `.weather-card`, `.weather-surface-secondary`, the hub section and
-  the hub link card set `box-shadow: none` (`app/styles/surfaces.css`,
-  `app/styles/layout-shells.css`); until then each cast a step of the `--elev-*` ladder. What
-  floats over the page still casts one: a menu, a dialog, the toast, the sticky strip. Controls
-  followed the same day (§XXVI): a pill, a button, a field, a key and the segmented well are flat.
+- MUST: tell a surface from the page by its hairline and a step of tone, and let its lift say it
+  is a sheet. Since 2026-11-12 (Forecast; `.impeccable/surfaces/app-page-tsx.md`) `.weather-surface`
+  and `.weather-card` carry `--elev-card`: three layers, a contact edge, a short lift and a wide
+  soft fall, each offset downward (`app/styles/tokens.css`, `app/styles/surfaces.css`). The
+  homepage sky's panel of paper (`.weather-hero-sky-panel`, `app/styles/forecast.css`) carries the
+  same. `.weather-surface-secondary`, the hub section and the hub link card stay flat. From
+  2026-11-10 to 2026-11-12 (Covenant) no surface cast a shadow; before that each cast a step of the
+  `--elev-*` ladder. What floats over the page casts `--elev-1` to `--elev-4`: a menu, a dialog,
+  the toast, the sticky strip. A button carries `--elev-control`, the card's layers at a third of
+  the reach, and rises to `--elev-card` on hover (§XXVI); a pill, a field, a key and the segmented
+  well are flat.
+- NEVER: a zero-offset shadow as depth, or a glow. Every layer of an elevation token has a
+  downward offset (`tests/forecastVisualWorld.test.tsx`).
 - An offset shadow is elevation. A zero-offset coloured halo is emphasis, and is fine at depth —
   `DecisionHero`'s reconsideration panel tints one by line state (the front red or the clear ink), which carries meaning
   rather than lifting the box.
@@ -361,8 +368,8 @@ Scope: any surface that states a reading, a threshold, or the distance between t
 - NEVER: render the same figure in two faces. The boldness score was mono in `StickyCallStrip`
   and sans in `DecisionHero`, which read as two quantities on one screen. One number, one face,
   across every surface it appears on.
-- A score set as a figure is `.type-figure` (`app/styles/typography.css`, 2026-11-10): Besley at
-  weight 800 with `tabular-nums`, sized by the caller. `ScoreLadder`'s `figure` prop draws a
+- A score set as a figure is `.type-figure` (`app/styles/typography.css`, 2026-11-10): the display
+  voice (Bricolage Grotesque since 2026-11-12) at weight 800 with `tabular-nums`, sized by the caller. `ScoreLadder`'s `figure` prop draws a
   score that way: the number, one sentence of where it stands against its pause line and, unless
   `"compact"`, a ruled line with its lines named where they sit. The brief states its two
   published scores so, in the guidance block's right-hand column from `md` and side by side on a
@@ -402,29 +409,33 @@ the site, since 2026-10-09.
 
 The palette's rule is Synoptic's, from 2026-10-09 (`docs/design/palette-directions.md`, applied in
 `docs/decisions/feature-log/01-product-surfaces.md` §1.1.69): colour carries two things and nothing else, the four
-conditions and where a line stands. Everything else is ink. Its values are Covenant's since
-2026-11-10 (`docs/design/rebuild-covenant.md`). Light is the site's identity and dark the second
+conditions and where a line stands. Everything else is ink. Its values are Forecast's since
+2026-11-12 (`.impeccable/surfaces/app-page-tsx.md`, DESIGN.md); Covenant's from 2026-11-10
+(`docs/design/rebuild-covenant.md`) were a green-grey paper with sienna and periwinkle conditions. Light is the site's identity and dark the second
 theme; with no stored choice a page follows the device setting, and a stored choice wins (the
 bootstrap script in `app/layout.tsx`, `app/components/themeToggleButton.tsx`).
 
 | Role | Token | Dark | Light |
 | --- | --- | --- | --- |
-| Ground (night ground / paper) | `--bg-body` | `#0c1511` | `#ecf0e8` |
-| Panel | `--bg-panel` | `#111b16` | `#f4f7f1` |
-| Ink, and the action colour (§XXVII) | `--app-text`, `--accent-action` | `#e6ece2` | `#10201a` |
-| Secondary ink | `--app-text-secondary` | `#c5d0c7` | `#2b3b33` |
-| Muted ink | `--app-text-muted` | `#a3b2a9` | `#40524a` |
+| Ground (night ground / paper) | `--bg-body` | `#10141c` | `#eef1f6` |
+| Panel | `--bg-panel` | `#161b26` | `#f8fafc` |
+| Ink, and the action colour (§XXVII) | `--app-text`, `--accent-action` | `#e8ecf4` | `#0f1419` |
+| Secondary ink | `--app-text-secondary` | `#b8c2d4` | `#2a3442` |
+| Muted ink | `--app-text-muted` | `#9aa8c0` | `#4a5568` |
 | A line crossed or close (front red) | `--line-crossed-ink` / `--line-crossed` | `#f0666a` / `#e5484d` | `#b81f27` / `#c4242b` |
 | A line clear | `--line-clear-ink` | the ink | the ink |
-| Sunny (Sun) | `--color-condition-sunny` / `-ink` | `#e0a81c` / `#f0c95a` | `#e0a81c` / `#765600` |
-| Cloudy (Haze) | `--color-condition-cloudy` / `-ink` | `#9a5b1e` / `#dba463` | `#9a5b1e` / `#8a4f16` |
-| Stormy (Lightning) | `--color-condition-stormy` / `-ink` | `#8f9be0` / `#b9c1ff` | `#8f9be0` / `#3f47b5` |
-| Freezing (Frost) | `--color-condition-freezing` / `-ink` | `#2a4fa8` / `#93b2f5` | `#2a4fa8` / `#1f3f8f` |
+| Sunny (gold) | `--color-condition-sunny` / `-ink` | `#e8a81c` / `#f0c95a` | `#e8a81c` / `#765600` |
+| Cloudy (overcast) | `--color-condition-cloudy` / `-ink` | `#6a8aaa` / `#a9bdd1` | `#6a8aaa` / `#46607a` |
+| Stormy (slate) | `--color-condition-stormy` / `-ink` | `#465290` / `#aab4ec` | `#465290` / `#3d4880` |
+| Freezing (ice) | `--color-condition-freezing` / `-ink` | `#9fd0f2` / `#a3d6fa` | `#9fd0f2` / `#1a5e94` |
 
 - MUST: draw a condition from the condition tokens and a line state from the line-state tokens,
-  never one from the other. Warm is risk appetite on (Sunny, Cloudy), cool is off (Stormy,
-  Freezing); light is cheap money (Sunny, Stormy), dense is dear (Cloudy, Freezing), so the four
-  differ in lightness as well as hue and a red-green colourblind reader keeps them apart. A cleared
+  never one from the other. Since 2026-11-12 the fills follow the weather each word names (gold
+  sun, overcast grey-blue, storm slate, pale ice) rather than the two axes; Stormy is the one
+  dense fill (`isLightField`, `lib/report/recordBandCodec.ts`). The closest pair under simulated
+  protan, deutan and tritan vision is Cloudy and Stormy, 16.5 apart in OKLab, which is why every
+  condition also carries a glyph (§XXIV) and, where it fills an area, a pattern (§XXX). Covenant's
+  fills encoded the axes (warm for risk on, light for cheap money). A cleared
   line printed in Sunny's green and a crossed one in Cloudy's amber until 2026-10-09; on the light
   theme those two would have been one brown. `tests/regimeColourContract.test.tsx` holds the badge
   to the line-state utilities and the data-regime map to the condition inks.
@@ -471,8 +482,20 @@ bootstrap script in `app/layout.tsx`, `app/components/themeToggleButton.tsx`).
   both shells. The brief's container and the report backdrop each held a regime → tint table of
   their own — the report one had Sunny in teal and never faded, so the ground under every card on
   every report route was lifted to a grey and the depth ladder lost half its separation. The four
-  washes are transparent since 2026-11-10: the record band is the one place colour commits at
-  page scale (§XXX). The token and the class stay, so a shell still paints nothing of its own.
+  washes are transparent since 2026-11-10. Colour commits at page scale in two places: the record
+  band (§XXX) and, since 2026-11-12, the homepage's sky (below). The token and the class stay, so
+  a shell still paints nothing of its own.
+- MUST: draw the homepage's sky from its tokens: `--regime-sky-top` and `--regime-sky` for the
+  gradient, `--regime-sky-ink` and `--regime-sky-muted` for text on it, one set per condition and
+  theme in `app/styles/tokens.css` (DESIGN.md "The sky" lists them). Each ink clears 4.5:1 at both
+  ends of its gradient, and on the light theme Stormy's is the one dark sky
+  (`tests/forecastVisualWorld.test.tsx`). Text on the sky takes the sky's inks through the
+  overrides on `.weather-hero-sky`, the condition word and its glyph included; a panel of paper on
+  it (`.weather-hero-sky-panel`) puts every page ink back from the `--page-*` captures on
+  `.weather-hero-card`. A custom property resolves where it is declared, so an element on the sky
+  that carries its own `data-regime` re-declares `--regime-ink` from the map: the glyph did, and
+  drew Stormy's dark ink on the light theme's Stormy sky until `forecast.css` gave it the sky's.
+  `DecisionHero` draws the sky only where it has a margin (the homepage).
 - MUST: print the report intro's status word (`CommandCenterNavBlock`) in `--regime-ink`, and give
   the intro card no other hue. From 2026-09-16 to 2026-10-09 the card also carried the hero's wash,
   border tint and 3px top rule (`.weather-page-intro`, now deleted): a second and third drawing of
@@ -523,25 +546,28 @@ bootstrap script in `app/layout.tsx`, `app/components/themeToggleButton.tsx`).
 
 Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 
-- **Two voices** (since 2026-11-10; `app/styles/fonts.css`). Besley, a Clarendon, is the display
-  voice (`--font-display`): the guidance (`.text-display`), `h1`/`h2`, `.type-section`, the
+- **Two voices** (since 2026-11-12, Forecast; `app/styles/fonts.css`). Bricolage Grotesque, a
+  grotesque with optical sizes, is the display voice (`--font-display`): the guidance (`.text-display`), `h1`/`h2`, `.type-section`, the
   secondary titles, the condition word (`.type-stamp`) and a score set as a figure
-  (`.type-figure`, §XV). Archivo (`--font-sans`) sets everything else: text, tables, controls and
-  labels. The face separates the voices, and it reaches the page through those rules. Three call
+  (`.type-figure`, §XV). Source Sans 3 (`--font-sans`) sets everything else: text, tables,
+  controls and labels. The face separates the voices, and it reaches the page through those rules. Three call
   sites name the token themselves (`font-[family-name:var(--font-display)]`): the wordmark in the
   header and the footer, and the area names in `AreaStrip`. `.type-stamp` is the condition word
   and nothing else, in sentence case: beside the guidance, a report route's status word, the
-  running head, a `Tag regime`. From 2026-10-05 to 2026-11-10 Archivo set every word and width
-  separated the voices (a semi-condensed display, an expanded capitals stamp);
+  running head, a `Tag regime`. Besley (a Clarendon) and Archivo were the two voices from
+  2026-11-10 to 2026-11-12 (Covenant). From 2026-10-05 to 2026-11-10 Archivo set every word and
+  width separated the voices (a semi-condensed display, an expanded capitals stamp);
   `--font-stretch-display` and `--font-stretch-stamp` are 100% now, kept so the rules that read
   them needed no edit. NEVER: add another family, or set a width at a call site (`font-stretch`,
   `font-variation-settings`). Before 2026-10-05 a serif set the headings while the weekly call
-  stayed in the sans, so the lesser lines spoke in the stronger voice; Besley sets the guidance
-  as well.
-- **Chivo Mono is the one monospace** (`--font-mono`), from Archivo's foundry, for the figures
-  §XV assigns it and for the paste previews. Satori's cards still draw Archivo alone, in static
-  instances at its semi-condensed, normal and expanded widths (`scripts/generate-og-fonts.mjs`,
-  `lib/image/ogFonts.ts`); Besley has not reached them. Re-measure `lib/image/textFit.ts` when a
+  stayed in the sans, so the lesser lines spoke in the stronger voice; the display voice sets the
+  guidance as well. Labels stay sentence case: the Forecast contract's tracked uppercase label
+  was not adopted, because capitals are for stamps only (below).
+- **Chivo Mono is the one monospace** (`--font-mono`), for the figures §XV assigns it and for
+  the paste previews; it falls back to Source Sans 3 for arrows. Satori's cards still draw Archivo
+  alone, in static instances at its semi-condensed, normal and expanded widths, built from the
+  source kept in `scripts/og-font-sources/` (`scripts/generate-og-fonts.mjs`,
+  `lib/image/ogFonts.ts`); the Forecast voices have not reached them. Re-measure `lib/image/textFit.ts` when a
   face changes.
 - **Capitals are for stamps.** A stamp is a short, fixed status mark that is not read as a sentence:
   `.type-badge`, timeline badges, the historical banner, a `<kbd>`. The condition word is not
@@ -611,32 +637,34 @@ Added 2026-09-24 with DD-033 (`docs/design-debt-prioritized.md`).
 Added 2026-10-07 with DD-060 (`docs/design-debt-prioritized.md`). The habit is a type designer's
 and font engineer's: Wei Huang (Work Sans, Fragment Mono) and the foundries that circle works
 with. A page can only set what the font file contains, so read the file, not the font's name.
-The shipped files are `public/fonts/*.woff2`: Archivo, Chivo Mono and, since 2026-11-10, Besley.
-Before relying on a glyph or a feature, list the file's characters and features with fontTools,
-the same Python `scripts/generate-og-fonts.mjs` needs (swap the glob for `besley-variable` or
-`chivo-mono-variable` to read another face):
+The shipped files are `public/fonts/*.woff2`: Source Sans 3 and Bricolage Grotesque since
+2026-11-12, and Chivo Mono. (Archivo and Besley were removed that day; Archivo's source stays in
+`scripts/og-font-sources/` for the share cards.) Before relying on a glyph or a feature, list the
+file's characters and features with fontTools, the same Python `scripts/generate-og-fonts.mjs`
+needs (swap the glob for `bricolage-grotesque-variable` or `chivo-mono-variable` to read another
+face):
 
 ```
-python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob('public/fonts/archivo-variable.*.woff2')[0]); print(''.join(sorted(chr(c) for c in f.getBestCmap() if c > 0xFF))); print(sorted({r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord}))"
+python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob('public/fonts/source-sans-3-variable.*.woff2')[0]); print(''.join(sorted(chr(c) for c in f.getBestCmap() if c > 0xFF))); print(sorted({r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord}))"
 ```
 
 - **A character the face does not draw is set in another typeface.** Each missing character falls
   back, glyph by glyph, to whatever the reader's OS has: a different weight, size and baseline on
   every platform.
   - **What the files draw.** Since 2026-10-07 (DD-060) the files are subset to the site's text,
-    and `app/styles/fonts.css` records the build. Archivo draws → ← ↑ ↓ ↔ ≤ ≥ ≈ ≠ Δ ‰ −. Chivo
-    Mono draws the same less the arrows, and `--font-mono` falls back to Archivo for those.
-    Besley draws the same less the arrows and ™, and `--font-display` lists Archivo behind it for
-    those.
+    and `app/styles/fonts.css` records the build. Source Sans 3 draws → ← ↑ ↓ ↔ ↕ ≤ ≥ ≈ ≠ Δ ‰ −.
+    Chivo Mono draws the same less the arrows, and `--font-mono` falls back to Source Sans 3 for
+    those. Bricolage Grotesque draws → ← ↑ ↓ but no ↔ ↕ or Δ, so its `unicode-range` is exactly
+    what its file covers and `--font-display` lists Source Sans 3 behind it for the rest.
   - **What they don't draw.** ▾ ✓ ✕ ⌘, or any other symbol. In chrome, draw the mark with the
     icon set (`app/components/uiIcons.tsx`). The disclosure chevron is a masked SVG
     (`app/styles/controls.css`), never a triangle glyph. `tests/craftDetails.test.ts` rejects
     ▾ ▸ ↗ ✓ ✔ ✕ ✗ under `app/`.
   - **When the copy needs a new symbol, fix the file, not the copy.** Add the codepoint to the
     subset command and the `unicode-range` in `fonts.css`, and ship the file under its new hashed
-    name. `tests/fontAssets.test.ts` checks that Archivo and Chivo Mono draw the symbols the copy
-    uses, that the stylesheet routes them there, that the two preloads are the Archivo and Besley
-    files, and that each file is named by its SHA-256, since
+    name. `tests/fontAssets.test.ts` checks that the text face and Chivo Mono draw the symbols
+    the copy uses, that the stylesheet routes them there, that the two preloads are the Source Sans
+    3 and Bricolage Grotesque files, and that each file is named by its SHA-256, since
     `public/sw.js` never refetches a `/fonts/` URL. Then run `scripts/generate-og-fonts.mjs` so
     the share cards draw it too. In copy, a word still beats a symbol where it reads as well
     ("at or below").
@@ -645,40 +673,37 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   marks, and a prompt with the muted ink. The one exception is the chat preview's `<em>`
   (`app/share/chatPreview.tsx`), which shows how a chat client renders `_text_`. The test rejects
   the `italic` utility and `font-style: italic` elsewhere.
-- **No feature the files lack.** Archivo keeps `tnum`, `pnum`, `frac`, `liga`, `kern`, `case`
-  and `zero`; Chivo Mono the same less `case` and `kern`. Besley keeps `tnum`, `liga` and `kern`
-  only, so `frac`, `zero` and `case` do nothing in the display face, and its one axis is weight,
-  400 to 900. `case` is on for `.type-badge`, where it lifts the hyphen to sit between capitals;
+- **No feature the files lack.** Source Sans 3 keeps `pnum`, `frac`, `liga`, `case` and `zero`,
+  and has no `tnum` because its default figures are already tabular (`tabular-nums` changes
+  nothing there; `pnum` is what would). Chivo Mono keeps `tnum`, `pnum`, `frac`, `liga` and
+  `zero`. Bricolage Grotesque keeps `tnum`, `pnum`, `frac` and `case`, with proportional figures
+  by default and no `liga` or `zero`; its axes are weight, 500 to 800, and optical size, 12 to 96,
+  which the browser sets from the font size, so a heading takes the text cut and a score figure
+  the display cut. `case` is on for `.type-badge`, where it lifts the hyphen to sit between capitals;
   `.type-stamp` carried it while the condition word was capitals (until 2026-11-10). The files
   have no small capitals or old-style figures, so
   `font-variant-caps: small-caps` would synthesize scaled capitals, lighter than the real ones
   beside them. Capitals stay full size and tracked (§XVIII).
-- **The figure register absorbs the sign.** In Archivo the hyphen is 333 units wide and `+` is
-  636, so signed figures set in the sans don't line up down a column, even with `tabular-nums`. In
+- **The figure register absorbs the sign.** In Source Sans 3 `+` and `−` take the 497-unit figure
+  width but the hyphen is 311, so a figure signed with a hyphen-minus doesn't line up down a
+  column; in Bricolage the figures themselves are proportional until `tabular-nums`. In
   Chivo Mono, `-`, `+` and `−` share the 600-unit advance. That is one more reason a column of
   signed figures is mono (§XV).
-- **A first visit draws a stand-in sized to Archivo, not system-ui.** Measured 2026-10-07 on `/`
-  with the font requests held back in Playwright (dev server; system-ui was Inter in that
-  container): the swap reflowed the decision chips at 430px, 0.108 by the layout-shift formula
-  over element rects (0.044 in the one run Chrome's `layout-shift` observer attributed it; it
-  reported 0 on the rest), and 0.008 at 1280px. `"Archivo Fallback"` in `fonts.css` (Arial or
-  Liberation Sans at `size-adjust: 98.81%`; the Arial Bold face at 88.1% that stood in for the
-  semi-condensed display went with that voice on 2026-11-10)
-  sets the page's copy within about 1% of Archivo. After: 0.0001 at 430px and 0.009 at 1280px
-  (observer 0.0000 and 0.0001). The 1280px remainder is a `max-w-[64ch]` paragraph: `ch` is
-  measured on "0", which no override matches. Semibold and bold at normal width have their own
-  Arial Bold faces (95.02% for 600, 98.39% for 700–900): on the regular face alone they were
-  synthetic bold, which does not widen the glyphs, and set 3–8% narrower than Archivo; with them a
-  20px line measures −0.2% (600) and −0.3% (700) in headless Chromium. Every weight a page sets
-  needs a real face here, not only the ones measured on `/`. Re-measure when a face or
+- **A first visit draws a stand-in sized to the shipped face, not system-ui.** Measured 2026-10-07
+  on `/` with the font requests held back in Playwright: with system-ui as the stand-in, the swap
+  reflowed the decision chips at 430px, 0.108 by the layout-shift formula over element rects, and
+  a metric-matched Arial took it to 0.0001. Since 2026-11-12 `"Source Sans 3 Fallback"` in
+  `fonts.css` is Arial or Liberation Sans at `size-adjust: 94.19%`, with Arial Bold faces at
+  89.87% (600) and 92.54% (700–900), each scaled so its average advance matches Source Sans 3's on
+  the letter-frequency string next/font uses, and each override the face's own hhea metric over
+  that scale. A synthetic bold does not widen the glyphs, so every weight a page sets needs a real
+  face here. A `ch` width is measured on "0", which no override matches. Re-measure when a face or
   `--font-sans` changes.
-- **Besley has stand-ins of its own** (2026-11-10): `"Besley Fallback"` in `fonts.css`, second in
-  `--font-display`. Georgia at `size-adjust: 113.85%` covers weights 400 to 600 and Georgia Bold
-  at 106.33% covers 700 to 900, sized to 700, where the guidance is set. `fonts.css` records
-  that at 800 (the condition word, the score figures) the stand-in sets about 4% narrower, and
-  that Android, which has no Georgia, draws a heading in Archivo until the swap. The layout-shift
-  figures above were taken with Archivo as the display face; `fonts.css` records none for the
-  Besley swap.
+- **The display face has stand-ins of its own:** `"Bricolage Grotesque Fallback"`, second in
+  `--font-display`. Arial Bold, the nearer shape for a grotesque (Besley's was Georgia), at
+  `size-adjust: 100.65%` for 500 to 700 and 102.03% for 800 to 900, measured at optical size 32.
+  `fonts.css` records the measurement; no layout-shift figure has been taken for the Forecast
+  swap yet.
 
 ## XXIII. Motion a reader doesn't notice
 
@@ -780,7 +805,12 @@ Everything else stays quiet.
   specular on a control (controls fill from `--bg-raised` and `--bg-nested`, the primary from
   `--cta-fill`), no halo on hover, no coloured stripe across the top of a card, no accent discs on
   a slide. Condition colour stays where a condition is named: the condition word, the conditions
-  chart and the record band.
+  chart, the record band and the homepage's sky.
+- The sky is the one sanctioned gradient (2026-11-12, Forecast). It encodes the week's condition at
+  the scale of the first screen, with the glyph and the word beside it, so a storm week and a sunny
+  week look like different pages before a word is read. Its clouds are its one ornament: four
+  blurred masses drifting by `transform`, still under reduced motion (§XXIII). No other surface
+  takes a gradient, and the sky takes no glow.
 - What stays, and why. Focus rings: they mark where the keyboard is. The skeleton shimmer: it says
   something is loading. The backdrop blur on the sticky strip, the phone tab bar and the command
   palette: it keeps their text legible over a scrolling page. The site's name inside the guidance
@@ -788,8 +818,8 @@ Everything else stays quiet.
   other page's header names the site already. Its regime rule went with its box on 2026-11-10;
   the condition word beside the guidance names the week in a crop.
 - The week's word (2026-11-10). Beside the guidance and on a report intro the condition word is
-  a boxless word in the condition's ink (`.weather-tag-placard`), set in Besley (`.type-stamp`,
-  §XVIII). A list of past weeks prints it the same way through `.weather-tag-regime`. From
+  a boxless word in the condition's ink (`.weather-tag-placard`), set in the display voice
+  (`.type-stamp`, §XVIII); on the homepage's sky it takes the sky's ink. A list of past weeks prints it the same way through `.weather-tag-regime`. From
   2026-10-21 to 2026-11-10 it was a placard: capitals on the condition's solid fill, in
   `--regime-on-accent` ink. The record band carries the solid condition colour on every page now
   (§XXX). The conditions chart lights the week's quadrant and dims the other
@@ -818,8 +848,10 @@ an instrument: what it is shaped like says how it works. The form is physical, t
   `ordinal`: a rule along the foot of the well with a tick under each key and a pointer under the
   chosen one. An option off that scale passes `apart` and stands after a divider with no tick:
   Bootstrapped is not a stage after Series B+.
-- NEVER: a gradient, a specular edge, a texture, a shadow or a coloured glow to make a control
-  look physical. Its form is its border, its fill, the lamp and the 1px press.
+- NEVER: a gradient, a specular edge, a texture or a coloured glow to make a control look
+  physical, and no shadow on a key or a well. Its form is its border, its fill, the lamp and the
+  1px press. A button's one shadow is `--elev-control` (§XIII, 2026-11-12), the same on every
+  button, which says it can be pressed rather than drawing it as a part.
 - Motion is the press only: 120ms on the transform, and none under reduced motion.
 - MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
   well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end

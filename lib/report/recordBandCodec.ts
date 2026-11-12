@@ -44,8 +44,12 @@ export const recordBandMonthAt = (firstDate: string, index: number) => {
 /** The viewBox height. Tall, so integer coordinates resolve a fifth of a pixel on a 200px band. */
 export const RECORD_BAND_HEIGHT = 1000;
 
-/** Sunny and Stormy are the light fills (cheap money); they take the dark line, the dense two the pale one. */
-export const isLightField = (regime: RegimeKey) => regime === "EXPANSION" || regime === "VOLATILE";
+/**
+ * Stormy is the one dark fill (Forecast, 2026-11-12); it takes the pale line and the other
+ * three the dark one. Until then Sunny and Stormy were the light pair and Cloudy and
+ * Freezing the dense, because the Covenant fills encoded the price of money as lightness.
+ */
+export const isLightField = (regime: RegimeKey) => regime !== "VOLATILE";
 
 /**
  * Each condition's line pattern, so a stretch reads without its colour: plain for

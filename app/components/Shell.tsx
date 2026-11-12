@@ -4,7 +4,6 @@ import { AnchorFeedback } from "./anchorFeedback";
 import { FocusModeController } from "./focusModeController";
 import { Skeleton } from "./skeleton";
 import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
-import { REGIME_LABELS } from "../../lib/regimePresentation";
 
 /* No transition here: one on every property animated the padding change at the
    `sm` breakpoint while a window resized (§I, never animate layout). The entrance
@@ -67,11 +66,6 @@ export function Shell({
     );
   }
 
-  const regimeKey = regimeDataAttribute(regime);
-  // The Forecast world keys its palette on the public condition word (Sunny,
-  // Cloudy, Stormy, Freezing), not the internal regime key.
-  const conditionSlug = regimeKey ? REGIME_LABELS[regimeKey].toLowerCase() : undefined;
-
   return (
     // The atmosphere resolves from data-regime (tokens.css), so the brief and
     // the report routes paint the same wash from the same table.
@@ -82,9 +76,7 @@ export function Shell({
     // in a band of empty ground before the footer. PageShell grows the same way.
     <div
       className="weather-regime-ground flex-1 bg-[var(--bg-body)] text-[var(--app-text)] transition-colors"
-      data-regime={regimeKey}
-      data-forecast=""
-      data-condition={conditionSlug}
+      data-regime={regimeDataAttribute(regime)}
       style={regimeAccentStyle(regime)}
     >
       <FocusModeController />

@@ -1,176 +1,149 @@
 /*
- * Forecast — the condition-driven visual world (2026-11-11).
+ * The sky: the homepage's first screen on its condition (Forecast, 2026-11-12).
  *
- * A user-pinned hybrid: filed brief (data room) + investor-update letter +
- * modern weather-app condition theming. The page's ground shifts with the
- * condition (Sunny / Cloudy / Stormy / Freezing), so a storm week and a sunny
- * week look like different apps. This file is additive and scoped to
- * [data-forecast] so it can be adopted route by route without disturbing the
- * incumbent Covenant tokens in tokens.css.
+ * The direction contract is .impeccable/surfaces/app-page-tsx.md: the week's statement
+ * sits on a sky tinted by the condition, full width, so a storm week and a sunny week
+ * look like different pages, and the two scores sit on it in a panel of paper. The
+ * colours are tokens (tokens.css): --regime-sky-top and --regime-sky per condition and
+ * theme, each with its own two inks. Everything else in the Forecast world is the token
+ * layer itself, so every route takes the paper, the inks and the two voices without a
+ * rule here.
  *
- * Source of truth: .impeccable/surfaces/app-page-tsx.md (Direction contract).
- * Preview: .impeccable/mocks/forecast-home.html.
- *
- * Fonts: Bricolage Grotesque (display) + Source Sans 3 (body). Self-hosting
- * needs woff2 output (Brotli), which is unavailable on this machine; until the
- * files land in public/fonts, the preview loads them from Google Fonts. Do not
- * ship an external font host in production (the capture rule refuses it).
+ * DecisionHero draws the sky only where it has a margin, which is the homepage; the
+ * answer pages keep one column on the paper.
  */
 
-:root {
-  /* Arctic paper whites — cool, crisp, not warm cream. */
-  --forecast-paper: #eef1f6;
-  --forecast-card: #f8fafc;
-  --forecast-line: #c8d0dc;
-  --forecast-ink: #0f1419;
-  --forecast-ink-secondary: #2a3442;
-  --forecast-ink-muted: #4a5568;
-  --forecast-red: #b3242b;
-
-  /* Layered multi-shadow (Stripe/Linear style), zero detector flags. */
-  --forecast-shadow: 0 1px 2px rgba(15, 20, 25, .06),
-                     0 4px 8px rgba(15, 20, 25, .08),
-                     0 12px 24px rgba(15, 20, 25, .06);
-
-  --forecast-font-display: 'Bricolage Grotesque', 'Archivo', system-ui, sans-serif;
-  --forecast-font-body: 'Source Sans 3', 'Archivo', system-ui, sans-serif;
+/* The page's inks, captured on the block before the sky changes them, so a panel of
+   paper on the sky can put them back. A custom property resolves where it is declared,
+   so these hold the page's values all the way down. */
+.weather-hero-card {
+  --page-text: var(--app-text);
+  --page-text-secondary: var(--app-text-secondary);
+  --page-text-muted: var(--app-text-muted);
+  --page-regime-ink: var(--regime-ink);
+  --page-accent-action: var(--accent-action);
+  --page-caveat-fg: var(--color-caveat-fg);
+  --page-caveat-border: var(--color-caveat-border);
+  --page-border-faint: var(--border-faint);
+  --page-border-subtle: var(--border-subtle);
+  --page-border-default: var(--border-default);
+  --page-border-strong: var(--border-strong);
 }
 
-/* One block per condition. Each owns its sky, ink and paper. The condition is
-   the page's ground, not just a word. Ink clears 4.5:1 on the sky; muted
-   clears 4.5:1 on the sky. */
-[data-forecast] {
-  --f-sky-top: #7a9ab8;
-  --f-sky: #6a8aaa;
-  --f-ink: #0f1419;
-  --f-ink-secondary: #2a3442;
-  --f-muted: #162028;
-  --f-paper: #eef1f6;
-  --f-card: #f8fafc;
-  --f-line: #c8d0dc;
-  /* Re-theme the existing semantic tokens to the Forecast world. The homepage
-     components read these, so the condition drives the page without a JSX
-     rewrite. The sky band (.forecast-sky) draws the strong condition colour;
-     the body stays calm paper. */
-  --bg-body: var(--f-paper);
-  --bg-panel: var(--f-card);
-  --bg-raised: var(--f-card);
-  --app-text: var(--f-ink);
-  --app-text-secondary: var(--f-ink-secondary);
-  --app-text-muted: var(--f-muted);
-  --border-default: color-mix(in srgb, var(--f-ink) 18%, transparent);
-  --font-sans: var(--forecast-font-body);
-  --font-display: var(--forecast-font-display);
-}
-[data-forecast][data-condition="sunny"] {
-  --f-sky-top: #f7c53a;
-  --f-sky: #e8a81c;
-  --f-ink: #1a1408;
-  --f-ink-secondary: #4a3c12;
-  --f-muted: #5a4a1a;
-  --f-paper: #f4f6fa;
-  --f-card: #fafcff;
-  --f-line: #d8dce8;
-}
-[data-forecast][data-condition="cloudy"] {
-  --f-sky-top: #7a9ab8;
-  --f-sky: #6a8aaa;
-  --f-ink: #0f1419;
-  --f-ink-secondary: #2a3442;
-  --f-muted: #162028;
-  --f-paper: #eef1f6;
-  --f-card: #f8fafc;
-  --f-line: #c8d0dc;
-}
-[data-forecast][data-condition="stormy"] {
-  --f-sky-top: #1e2540;
-  --f-sky: #141a30;
-  --f-ink: #e8ecf4;
-  --f-ink-secondary: #b8c2d4;
-  --f-muted: #9aa8c0;
-  --f-paper: #10141c;
-  --f-card: #1a1f2a;
-  --f-line: #2a3040;
-}
-[data-forecast][data-condition="freezing"] {
-  --f-sky-top: #8ac2ec;
-  --f-sky: #6aa8dc;
-  --f-ink: #0a1a3a;
-  --f-ink-secondary: #1a3a6a;
-  --f-muted: #2a4a7a;
-  --f-paper: #eaf0f8;
-  --f-card: #f5f9fd;
-  --f-line: #b0c8e0;
-}
-
-/* Reduced eyebrows: the Forecast world prints section labels in sentence case
-   at body weight, not tracked uppercase. A label is a label, not a kicker. */
-[data-forecast] .f-label {
-  font-family: var(--forecast-font-body);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--f-muted);
-}
-
-/* The sky band: full-bleed condition ground with animated atmospheric depth. */
-[data-forecast] .forecast-sky {
+/* On the sky, text takes the sky's inks: dark on a light sky, the paper on Stormy's.
+   Each clears 4.5:1 at both ends of its gradient (tokens.css). The condition word is
+   the sky's ink too: the sky already says which condition it is, in colour, and the
+   glyph says it in shape. Popovers that open from here are portalled to the body, so
+   they keep the page's inks. */
+.weather-hero-sky {
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, var(--f-sky-top) 0%, var(--f-sky) 100%);
-  color: var(--f-ink);
-  padding: 52px 28px 64px;
+  isolation: isolate;
+  padding-block: 1.25rem 1.5rem;
+  color: var(--regime-sky-ink);
+  --app-text: var(--regime-sky-ink);
+  --app-text-secondary: var(--regime-sky-ink);
+  --app-text-muted: var(--regime-sky-muted);
+  --regime-ink: var(--regime-sky-ink);
+  --accent-action: var(--regime-sky-ink);
+  --color-caveat-fg: var(--regime-sky-ink);
+  --color-caveat-border: var(--regime-sky-muted);
+  --border-faint: color-mix(in srgb, var(--regime-sky-ink) 12%, transparent);
+  --border-subtle: color-mix(in srgb, var(--regime-sky-ink) 22%, transparent);
+  --border-default: color-mix(in srgb, var(--regime-sky-ink) 32%, transparent);
+  --border-strong: color-mix(in srgb, var(--regime-sky-ink) 55%, transparent);
 }
-[data-forecast] .forecast-sky .forecast-clouds {
+
+@media (min-width: 768px) {
+  .weather-hero-sky {
+    padding-block: 2.25rem 2.5rem;
+  }
+}
+
+/* The condition word's glyph, and the earlier week's stamp over it, each carry their
+   own data-regime, so the regime map would hand them their condition's page ink on
+   the sky: Stormy's dark ink on the light theme's Stormy sky, which drew nothing. On
+   the sky they take its ink, read from --app-text, which the sky resolved for this
+   week's condition, not the earlier week's. */
+.weather-hero-sky :is(.weather-tag-placard, .weather-tag-placard [data-regime]) {
+  --regime-ink: var(--app-text);
+}
+
+/* Full width from inside the brief's measure. The body clips horizontal overflow
+   (tokens.css), so the band reaching past a scrollbar draws no scroll. */
+.weather-hero-sky::before,
+.weather-hero-sky-clouds {
   position: absolute;
-  inset: 0;
+  inset-block: 0;
+  inset-inline: calc(50% - 50vw);
   pointer-events: none;
-  z-index: 1;
+}
+
+.weather-hero-sky::before {
+  content: "";
+  z-index: -2;
+  background: linear-gradient(180deg, var(--regime-sky-top), var(--regime-sky));
+}
+
+/* Four soft masses of cloud, drifting slowly. Only `transform` moves, so the blur is
+   drawn once and the compositor carries the rest. They hold still for a reader who
+   asks for less motion (ui-ux-standards §XXIII). */
+.weather-hero-sky-clouds {
+  z-index: -1;
   overflow: hidden;
 }
-[data-forecast] .forecast-clouds span {
+
+.weather-hero-sky-clouds > span {
   position: absolute;
-  background: rgba(255, 255, 255, .14);
   border-radius: 50%;
+  background: var(--regime-sky-cloud);
   filter: blur(28px);
-  animation: forecast-drift 22s ease-in-out infinite alternate;
+  animation: weather-sky-drift 34s ease-in-out infinite alternate;
 }
-[data-forecast] .forecast-clouds span:nth-child(1) { width: 280px; height: 120px; top: -10%; left: 2%; }
-[data-forecast] .forecast-clouds span:nth-child(2) { width: 420px; height: 180px; top: 20%; right: -4%; animation-duration: 30s; animation-delay: -6s; }
-[data-forecast] .forecast-clouds span:nth-child(3) { width: 220px; height: 90px; top: 55%; left: 38%; animation-duration: 26s; animation-delay: -12s; }
-[data-forecast] .forecast-clouds span:nth-child(4) { width: 340px; height: 140px; top: 70%; right: 20%; animation-duration: 34s; animation-delay: -3s; }
-@keyframes forecast-drift {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(40px, -18px) scale(1.12); }
-  100% { transform: translate(-24px, 6px) scale(.94); }
+
+.weather-hero-sky-clouds > span:nth-child(1) { width: 18rem; height: 7.5rem; top: -12%; left: 4%; }
+.weather-hero-sky-clouds > span:nth-child(2) { width: 26rem; height: 11rem; top: 18%; right: -4%; animation-duration: 42s; animation-delay: -8s; }
+.weather-hero-sky-clouds > span:nth-child(3) { width: 14rem; height: 5.5rem; top: 58%; left: 36%; animation-duration: 38s; animation-delay: -15s; }
+.weather-hero-sky-clouds > span:nth-child(4) { width: 22rem; height: 9rem; top: 72%; right: 18%; animation-duration: 46s; animation-delay: -4s; }
+
+@keyframes weather-sky-drift {
+  from { transform: translate3d(-1.5rem, 0, 0) scale(1); }
+  to { transform: translate3d(2.5rem, -1rem, 0) scale(1.08); }
 }
+
 @media (prefers-reduced-motion: reduce) {
-  [data-forecast] .forecast-clouds span { animation: none; }
+  .weather-hero-sky-clouds > span { animation: none; }
 }
 
-/* The guidance and score figures take the display face. */
-[data-forecast] .forecast-display {
-  font-family: var(--forecast-font-display);
-  font-weight: 800;
-  letter-spacing: -.02em;
-  line-height: 1.04;
-}
-[data-forecast] .forecast-figure {
-  font-family: var(--forecast-font-display);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -.03em;
-  line-height: .9;
-}
-[data-forecast] .forecast-body {
-  font-family: var(--forecast-font-body);
+/* A panel of paper on the sky: the scores (and on a phone, the scores under the
+   guidance). It puts the page's inks back, so the ladders' red and ink read as they do
+   everywhere else, and it is the one box in the block, so it carries the layered
+   elevation (--elev-card). Two classes deep so it keeps that depth inside the block,
+   which the de-escalation ladder in surfaces.css counts as a container. */
+.weather-hero-sky .weather-hero-sky-panel {
+  --app-text: var(--page-text);
+  --app-text-secondary: var(--page-text-secondary);
+  --app-text-muted: var(--page-text-muted);
+  --regime-ink: var(--page-regime-ink);
+  --accent-action: var(--page-accent-action);
+  --color-caveat-fg: var(--page-caveat-fg);
+  --color-caveat-border: var(--page-caveat-border);
+  --border-faint: var(--page-border-faint);
+  --border-subtle: var(--page-border-subtle);
+  --border-default: var(--page-border-default);
+  --border-strong: var(--page-border-strong);
+  color: var(--app-text);
+  background: color-mix(in srgb, var(--bg-panel) 88%, transparent);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--elev-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 1rem 1.125rem;
 }
 
-/* Elevated surfaces carry the layered shadow. */
-[data-forecast] .forecast-card {
-  background: var(--f-card);
-  border: 1px solid var(--f-line);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--forecast-shadow);
+@media (max-width: 767px) {
+  .weather-hero-sky .weather-hero-sky-panel {
+    margin-top: 0.5rem;
+    padding: 0.875rem 1rem;
+  }
 }

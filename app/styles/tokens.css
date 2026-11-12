@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-slate-950: #12171a;
+  --color-slate-950: #0e1219;
   /* The text-fluid-* utilities. --fs-* in :root carries the same values for
      plain CSS rules (.type-label, .type-badge); keep the two in step. */
   /* 12px at the floor (2026-10-27): at 11px the captions, hints and "Governs:" lines
@@ -75,30 +75,31 @@
   /* Conditions. One fill per condition, the same in both themes and the same
      four hexes as REGIME_HEX_COLORS (lib/regimePhaseSpace.ts) and the
      data-regime map below; tests/regimeColourContract.test.tsx holds all
-     three together. Warm is risk appetite on (Sunny, Cloudy), cool is off
-     (Stormy, Freezing); light is cheap money (Sunny, Stormy), dense is dear
-     (Cloudy, Freezing). Red-green deficiency keeps the blue-yellow axis and
-     lightness, which are the two things these differ on. The Covenant values
-     (2026-11-10, docs/design/rebuild-covenant.md) are printing inks, since
-     they fill whole fields of the record band: the closest pair is 23.7 apart
-     in OKLab x100 under simulated protanopia, where about 5 reads as one
-     colour. The ink is the condition as text: a light tint on the dark
-     ground, a dark one in the light block, each clearing 4.5:1 on ground and
-     panel. */
-  --color-condition-sunny: #e0a81c;
-  --color-condition-cloudy: #9a5b1e;
-  --color-condition-stormy: #8f9be0;
-  --color-condition-freezing: #2a4fa8;
+     three together. Forecast (2026-11-12, .impeccable/surfaces/app-page-tsx.md)
+     colours each condition as the sky it names: Sunny gold, Cloudy an overcast
+     grey-blue, Stormy a deep storm slate, Freezing an icy pale blue. Covenant's
+     fills before it (2026-11-10) put the chart's two axes on hue and lightness;
+     these follow the weather instead, and keep what protected readers: the
+     closest pair, Cloudy and Stormy, is 16.5 apart in OKLab x100 under
+     simulated protanopia, deuteranopia and tritanopia, where about 5 reads as
+     one colour. Stormy is the one dark fill (the record band gives it the pale
+     line, recordBandCodec.ts). The ink is the condition as text: a light tint on
+     the dark ground, a dark one in the light block, each clearing 4.5:1 on
+     ground and panel. */
+  --color-condition-sunny: #e8a81c;
+  --color-condition-cloudy: #6a8aaa;
+  --color-condition-stormy: #465290;
+  --color-condition-freezing: #9fd0f2;
   --color-condition-sunny-ink: #f0c95a;
-  --color-condition-cloudy-ink: #dba463;
-  --color-condition-stormy-ink: #b9c1ff;
-  --color-condition-freezing-ink: #93b2f5;
+  --color-condition-cloudy-ink: #a9bdd1;
+  --color-condition-stormy-ink: #aab4ec;
+  --color-condition-freezing-ink: #a3d6fa;
 
   /* Text role tokens */
   /* Display sizes the weekly-call headline (its only consumer, DecisionHero),
-     set in Besley bold since 2026-11-10 (it was semi-condensed Archivo, whose
-     narrow width let it grow past the old 36px cap). Besley sets wider, so the
-     same sizes hold four lines on a desktop and five on a phone. It was 54px in a serif once, a magazine cover line; the cap
+     set in Bricolage Grotesque since 2026-11-12 (Besley bold from 2026-11-10,
+     semi-condensed Archivo before that, whose narrow width let it grow past the
+     old 36px cap). It was 54px in a serif once, a magazine cover line; the cap
      stays because a 7vw ceiling wrapped it to seven lines and pushed the brief
      below the fold. The ceiling rose from 2.5rem to 3.25rem on 2026-10-08,
      with the floor moved only 2px: the call is the one thing the card is
@@ -124,8 +125,8 @@
   }
   /* The reading measure, in the base layer so a utility on the element wins. A paragraph
      in a wide panel ran 100 to 180 characters a line on a laptop. 60ch is about 75
-     characters here, not 60: `ch` measures Archivo's "0", which is wider than its average
-     letter (fonts.css). A flex or grid element, or a list item holding blocks, is a row of
+     characters here, not 60: `ch` measures Source Sans 3's "0" (497 units, against an
+     average letter of 430), so 60ch holds about 69 characters (fonts.css). A flex or grid element, or a list item holding blocks, is a row of
      parts rather than a line of prose. */
   :where(p:not(.flex, .grid, .inline-flex)),
   :where(li:not(.flex, .grid, .inline-flex, :has(> :is(div, p, ul, ol, table, section, article, h2, h3, h4)))) {
@@ -137,17 +138,19 @@
 :root {
   --weather-shell-pad-inline: 1rem;
   color-scheme: dark;
-  --font-sans: "Archivo", "Archivo Fallback", system-ui, sans-serif;
-  /* The binding voice (Covenant, 2026-11-10): Besley, a Clarendon, for what
-     the page commits to: the guidance, the condition word, area names, score
-     numerals and titles. Archivo explains (fonts.css). Deliberately outside
-     @theme: there is no `font-display` utility, and adding the key here would
-     mint one. The voice reaches the page through real rules only: :where(h1,
-     h2), .type-section, .text-display, .type-stamp and .type-figure. */
-  --font-display: "Besley", "Besley Fallback", Georgia, "Archivo", serif;
-  /* Width no longer separates the voices: the face does. Both tokens stay at
-     normal width so the rules that read them need no second edit; Besley has
-     no width axis and Archivo sets at its own. */
+  --font-sans: "Source Sans 3", "Source Sans 3 Fallback", system-ui, sans-serif;
+  /* The display voice (Forecast, 2026-11-12): Bricolage Grotesque, for what the
+     page commits to: the guidance, the condition word, score figures, headings
+     and the wordmark. Source Sans 3 explains (fonts.css). It replaced Besley,
+     Covenant's Clarendon (2026-11-10). Source Sans 3 is behind it for the four
+     symbols Bricolage does not draw (↔ ↕ ∕ Δ). Deliberately outside @theme:
+     there is no `font-display` utility, and adding the key here would mint one.
+     The voice reaches the page through real rules only: :where(h1, h2),
+     .type-section, .text-display, .type-stamp and .type-figure. */
+  --font-display: "Bricolage Grotesque", "Bricolage Grotesque Fallback", "Source Sans 3", system-ui, sans-serif;
+  /* Width does not separate the voices: the face does. Both tokens stay at
+     normal width so the rules that read them need no second edit; the shipped
+     Bricolage file is pinned at normal width. */
   --font-stretch-display: 100%;
   --font-stretch-stamp: 100%;
   /* Figure register — which face a number is set in, assigned by role rather
@@ -168,9 +171,9 @@
      different quantities on one screen. If a figure appears on more than one
      surface, it is the same figure everywhere.
 
-     Archivo is second in the stack because Chivo Mono draws no arrows: an
-     arrow in mono text falls to the sibling face rather than to the OS. */
-  --font-mono: "Chivo Mono", "Archivo", ui-monospace, monospace;
+     Source Sans 3 is second in the stack because Chivo Mono draws no arrows:
+     an arrow in mono text falls to the sibling face rather than to the OS. */
+  --font-mono: "Chivo Mono", "Source Sans 3", ui-monospace, monospace;
   --text-primary: var(--app-text);
   --footer-link: var(--app-text-secondary);
   --footer-link-hover: var(--app-text);
@@ -223,23 +226,23 @@
      2026-11-10: the light theme's paper with the lights off, a green-black
      that keeps the ink's own hue. Tiers step by tone and hairline only; no
      surface casts a shadow (surfaces.css). */
-  --bg-body: #0c1511;
-  --bg-panel: #111b16;
-  --bg-surface: #111b16;
-  --bg-surface-muted: rgba(17, 27, 22, 0.86);
-  --bg-raised: #1a271f;
-  --bg-nested: #09110d;
-  --bg-nested-light: rgba(230, 236, 226, 0.05);
+  --bg-body: #10141c;
+  --bg-panel: #161b26;
+  --bg-surface: #161b26;
+  --bg-surface-muted: rgba(22, 27, 38, 0.86);
+  --bg-raised: #1f2533;
+  --bg-nested: #0b0e14;
+  --bg-nested-light: rgba(232, 236, 244, 0.05);
 
   /* Borders — at the old 0.045-0.085 alphas a card edge was below the visible
      threshold on most panels, which forced every separation onto luminance the
      surfaces above don't have. Faint stays decorative; subtle and up must
      actually be seen. (DD-006) Drawn in the text ink, so a border is the
      page's own colour thinned rather than a second grey. */
-  --border-faint: rgba(230, 236, 226, 0.08);
-  --border-subtle: rgba(230, 236, 226, 0.13);
-  --border-default: rgba(230, 236, 226, 0.20);
-  --border-strong: rgba(230, 236, 226, 0.42);
+  --border-faint: rgba(232, 236, 244, 0.08);
+  --border-subtle: rgba(232, 236, 244, 0.13);
+  --border-default: rgba(232, 236, 244, 0.20);
+  --border-strong: rgba(232, 236, 244, 0.42);
 
   /* Ink. Also the action colour: links, buttons and focus rings draw in it,
      and links keep their underline. A fifth hue that meant "click" (sky,
@@ -247,9 +250,9 @@
      accents, and it was what forced Stormy off blue. Secondary and muted are
      the two most-rendered inks (slate-400/500 alias muted, 574 call sites),
      so the three roles stay far enough apart to be told apart. */
-  --app-text: #e6ece2;
-  --app-text-secondary: #c5d0c7;
-  --app-text-muted: #a3b2a9;
+  --app-text: #e8ecf4;
+  --app-text-secondary: #b8c2d4;
+  --app-text-muted: #9aa8c0;
 
   /* Line states (the semantic families in @theme alias these). The front red
      clears 5.2:1 on the panel and on the crossed stamp's own 10% tint; clear
@@ -291,20 +294,20 @@
      AA on the light ground below. Until 2026-09-15 the hero painted itself teal
      whatever the week said, so a Freezing call sat in the colour the stripe
      uses for Sunny. The neutral fallback is a grey, the same as regimeAccent.ts. */
-  --regime-accent: #909c95;
+  --regime-accent: #8a95a8;
   --regime-ink: var(--app-text-secondary);
   /* Text on a solid --regime-accent fill (the placard stamp, layout-shells.css).
-     Dark ink on Sunny 8.3:1, Stormy 6.5:1, Cloudy 4.6:1 and the neutral grey;
-     white on Freezing 5.3:1, where the dark ink fell to 3.4:1. The fills are
-     the same in both themes, so this needs no light override. */
-  --regime-on-accent: #10201a;
+     Dark ink on Sunny 8.9:1, Freezing 11.3:1, Cloudy 5.1:1 and the neutral grey;
+     the paper on Stormy 9.7:1, the one dark fill. The fills are the same in
+     both themes, so this needs no light override. */
+  --regime-on-accent: #0f1419;
 
   /* The record band's two line inks (record-band.css). Constants of the plate,
      the same in both themes as the condition fills are: the dark line prints on
      the light fields (Sunny, Stormy), the pale one on the dense (Cloudy,
      Freezing). */
-  --band-line-on-light: #10201a;
-  --band-line-on-dense: #ecf0e8;
+  --band-line-on-light: #0f1419;
+  --band-line-on-dense: #eef1f6;
 
   /* Regime phase map (the conditions chart and RegimePhaseMap) -----------
      Quadrant washes for the plane the classifier actually cuts. This chart is
@@ -313,13 +316,13 @@
      the axis ticks, the trace and the markers. The marker hues come from
      REGIME_HEX_COLORS in lib/regimePhaseSpace.ts, so only the washes and the
      chart furniture live here. */
-  --phase-scarcity: rgba(42, 79, 168, 0.30);
-  --phase-defensive: rgba(154, 91, 30, 0.26);
-  --phase-volatile: rgba(143, 155, 224, 0.20);
-  --phase-expansion: rgba(224, 168, 28, 0.20);
-  --phase-grid: rgba(230, 236, 226, 0.14);
-  --phase-boundary: rgba(230, 236, 226, 0.45);
-  --phase-trace: rgba(197, 208, 199, 0.80);
+  --phase-scarcity: rgba(159, 208, 242, 0.24);
+  --phase-defensive: rgba(106, 138, 170, 0.30);
+  --phase-volatile: rgba(70, 82, 144, 0.50);
+  --phase-expansion: rgba(232, 168, 28, 0.20);
+  --phase-grid: rgba(232, 236, 244, 0.14);
+  --phase-boundary: rgba(232, 236, 244, 0.45);
+  --phase-trace: rgba(184, 194, 212, 0.80);
 
   /* Elevation ------------------------------------------------------------
      Two token families, deliberately not interchangeable:
@@ -357,6 +360,19 @@
   --elev-4: 0 calc(4 * var(--sh)) calc(9 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-soft),
             0 calc(24 * var(--sh)) calc(48 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-mid);
 
+  /* A card's depth (Forecast, 2026-11-12): three layers, a contact edge, a short lift
+     and a wide soft fall, so a sheet reads as lifted off the paper rather than drawn on
+     it. The outermost box carries it and the de-escalation ladder in surfaces.css takes
+     it off anything nested. Covenant drew no shadow at all (2026-11-10). */
+  --elev-card: 0 calc(1 * var(--sh)) calc(2 * var(--sh)) var(--shadow-color-faint),
+               0 calc(4 * var(--sh)) calc(8 * var(--sh)) var(--shadow-color-faint),
+               0 calc(12 * var(--sh)) calc(24 * var(--sh)) var(--shadow-color-faint);
+  /* A button's depth: the same three layers at a third of the reach, so a control sits
+     on the paper the way a card does, only lower. On hover it rises to the card's. */
+  --elev-control: 0 calc(1 * var(--sh)) calc(1 * var(--sh)) var(--shadow-color-faint),
+                  0 calc(2 * var(--sh)) calc(4 * var(--sh)) var(--shadow-color-faint),
+                  0 calc(4 * var(--sh)) calc(8 * var(--sh)) calc(-2 * var(--sh)) var(--shadow-color-faint);
+
   /* Control depth (2026-10-13, ui-ux-standards §XXVI). A control is drawn as a part of an
      instrument: a recessed well (--well-inset) that keys sit in, and a key that sinks when
      pressed (--key-pressed). Shadow geometry only, no gradient and no specular (§XXV); like
@@ -384,13 +400,13 @@
      --app-text); success is the clear state and warning and danger the
      crossed one, so a chart that marks "safe" and "trouble" speaks the line
      states' language. */
-  --accent-action: #e6ece2;
+  --accent-action: #e8ecf4;
   --accent-info: var(--accent-action);
   --accent-success: var(--line-clear-ink);
   --accent-warning: var(--line-crossed-ink);
   --accent-danger: var(--line-crossed-ink);
-  --accent-border: rgba(230, 236, 226, 0.40);
-  --accent-border-soft: rgba(230, 236, 226, 0.16);
+  --accent-border: rgba(232, 236, 244, 0.40);
+  --accent-border-soft: rgba(232, 236, 244, 0.16);
 
   /* Z-index scale (2026-10-31). Seven values named by relationship, not by
      widget, because that is the only thing that decides an order: what sits
@@ -433,11 +449,12 @@
      gradient, then a flat steel blue (#2b6c8c) under light ink, until
      2026-10-09; the action colour is the ink now, so the fill is the ink and
      the label is the ground (--cta-ink), 15.4:1 on the dark theme and 14.6:1 on
-     the light one. */
+     the light one. It sits at the control depth (--elev-control) and rises to a
+     card's on hover (Forecast, 2026-11-12); it was flat from 2026-11-10. */
   --cta-fill: var(--accent-action);
   --cta-ink: var(--bg-body);
-  --cta-shadow: none;
-  --cta-shadow-hover: none;
+  --cta-shadow: var(--elev-control);
+  --cta-shadow-hover: var(--elev-card);
   --cta-border: var(--accent-action);
 
   /* Interactive */
@@ -644,8 +661,8 @@ html[data-screenshot="true"] body {
   --color-rose-600: var(--line-crossed);
   /* The dark end of slate, which the @theme inline block leaves at stock
      blue-grey: folded onto the night chart's own greys. */
-  --color-slate-600: #66746b;
-  --color-slate-700: #44524a;
+  --color-slate-600: #6b7787;
+  --color-slate-700: #475264;
   --color-slate-800: var(--bg-raised);
   --color-slate-900: var(--bg-panel);
   --color-slate-950: var(--bg-nested);
@@ -659,66 +676,66 @@ html[data-theme="light"] {
      not white: a sheet is told from the ground by its hairline. Nested steps
      below the ground in the ground's own hue. It was Synoptic's chart paper
      (#f1f4f3 with white panels) from 2026-10-09, and a cream before that. */
-  --bg-body: #ecf0e8;
-  --bg-panel: #f4f7f1;
-  --bg-surface: #f4f7f1;
-  --bg-surface-muted: rgba(244, 247, 241, 0.88);
-  --bg-raised: #fafcf8;
-  --bg-nested: #e1e7db;
-  --bg-nested-light: rgba(16, 32, 26, 0.04);
+  --bg-body: #eef1f6;
+  --bg-panel: #f8fafc;
+  --bg-surface: #f8fafc;
+  --bg-surface-muted: rgba(248, 250, 252, 0.88);
+  --bg-raised: #fcfdfe;
+  --bg-nested: #e3e8f0;
+  --bg-nested-light: rgba(15, 20, 25, 0.04);
 
   /* The ink thinned, at the same steps as the dark ladder, so a border reads
      as strongly against this ground as the dark one does against its own
      (DD-006 found the light theme a step weaker on every tier). */
-  --border-faint: rgba(16, 32, 26, 0.10);
-  --border-subtle: rgba(16, 32, 26, 0.16);
-  --border-default: rgba(16, 32, 26, 0.24);
-  --border-strong: rgba(16, 32, 26, 0.50);
+  --border-faint: rgba(15, 20, 25, 0.10);
+  --border-subtle: rgba(15, 20, 25, 0.16);
+  --border-default: rgba(15, 20, 25, 0.24);
+  --border-strong: rgba(15, 20, 25, 0.50);
 
   /* Muted clears 6.2:1 on the ground at 12-13px; the old slate-500 there
      landed under AA, which is why muted sits this dark. */
-  --app-text: #10201a;
-  --app-text-secondary: #2b3b33;
-  --app-text-muted: #40524a;
+  --app-text: #0f1419;
+  --app-text-secondary: #2a3442;
+  --app-text-muted: #4a5568;
 
   --line-crossed-ink: #b81f27;
   --line-crossed: #c4242b;
   --line-crossed-bg: #f6e2df;
 
   --color-condition-sunny-ink: #765600;
-  --color-condition-cloudy-ink: #8a4f16;
-  --color-condition-stormy-ink: #3f47b5;
-  --color-condition-freezing-ink: #1f3f8f;
+  --color-condition-cloudy-ink: #46607a;
+  --color-condition-stormy-ink: #3d4880;
+  --color-condition-freezing-ink: #1a5e94;
 
   /* The dark end of slate on this ground: borders and a switch's track. */
-  --color-slate-600: #6c7c73;
-  --color-slate-700: #4a5c53;
+  --color-slate-600: #6b7787;
+  --color-slate-700: #4f5b6d;
 
 
   /* Phase-map quadrants and furniture, re-mixed for a white plot ground: the
      washes a touch lighter than on the dark chart, and the grid and trace
      darken rather than lighten to stay visible at all. */
-  --phase-scarcity: rgba(42, 79, 168, 0.18);
-  --phase-defensive: rgba(154, 91, 30, 0.18);
-  --phase-volatile: rgba(143, 155, 224, 0.22);
-  --phase-expansion: rgba(224, 168, 28, 0.22);
-  --phase-grid: rgba(16, 32, 26, 0.12);
-  --phase-boundary: rgba(16, 32, 26, 0.38);
-  --phase-trace: rgba(43, 59, 51, 0.72);
+  --phase-scarcity: rgba(159, 208, 242, 0.45);
+  --phase-defensive: rgba(106, 138, 170, 0.26);
+  --phase-volatile: rgba(70, 82, 144, 0.22);
+  --phase-expansion: rgba(232, 168, 28, 0.22);
+  --phase-grid: rgba(15, 20, 25, 0.12);
+  --phase-boundary: rgba(15, 20, 25, 0.38);
+  --phase-trace: rgba(42, 52, 66, 0.72);
 
-  --accent-action: #10201a;
-  --accent-border: rgba(16, 32, 26, 0.34);
-  --accent-border-soft: rgba(16, 32, 26, 0.14);
-  --cta-ink: #ecf0e8;
+  --accent-action: #0f1419;
+  --accent-border: rgba(15, 20, 25, 0.34);
+  --accent-border-soft: rgba(15, 20, 25, 0.14);
+  --cta-ink: #eef1f6;
 
   /* Only the shadow COLORS flip — the --elev-* geometry is shared, so a card is
      the same height in both themes and only the ink changes. Light shadows need
      roughly a quarter of the dark alpha: on a light ground the eye reads a 0.28
      shadow as a dirty smear. Tinted with the ink rather than neutral black, so
      it does not look like soot. */
-  --shadow-color-faint: rgba(16, 32, 26, 0.05);
-  --shadow-color-soft: rgba(16, 32, 26, 0.08);
-  --shadow-color-mid: rgba(16, 32, 26, 0.13);
+  --shadow-color-faint: rgba(15, 20, 25, 0.05);
+  --shadow-color-soft: rgba(15, 20, 25, 0.08);
+  --shadow-color-mid: rgba(15, 20, 25, 0.13);
 
   /* A white top edge on a white card is invisible at best and a seam at worst. */
   --edge-highlight: rgba(255, 255, 255, 0);
@@ -753,10 +770,36 @@ html[data-theme="light"] {
    Atmosphere is the top-of-page wash both shells paint (.weather-regime-ground),
    resolved here so the brief and the report routes cannot key it differently —
    the report backdrop used to hold its own hue table, with Sunny in teal. */
-[data-regime="EXPANSION"] { --regime-accent: #e0a81c; --regime-ink: var(--color-condition-sunny-ink); --regime-atmosphere: var(--atmosphere-expansion); --regime-on-accent: #10201a; }
-[data-regime="SCARCITY"] { --regime-accent: #2a4fa8; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); --regime-on-accent: #f4f7f1; }
-[data-regime="DEFENSIVE"] { --regime-accent: #9a5b1e; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); --regime-on-accent: #f4f7f1; }
-[data-regime="VOLATILE"] { --regime-accent: #8f9be0; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); --regime-on-accent: #10201a; }
+[data-regime="EXPANSION"] { --regime-accent: #e8a81c; --regime-ink: var(--color-condition-sunny-ink); --regime-atmosphere: var(--atmosphere-expansion); --regime-on-accent: #0f1419; }
+[data-regime="SCARCITY"] { --regime-accent: #9fd0f2; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); --regime-on-accent: #0f1419; }
+[data-regime="DEFENSIVE"] { --regime-accent: #6a8aaa; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); --regime-on-accent: #0f1419; }
+[data-regime="VOLATILE"] { --regime-accent: #465290; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); --regime-on-accent: #f8fafc; }
+
+/* The sky (Forecast, 2026-11-12; .impeccable/surfaces/app-page-tsx.md): the
+   homepage's first screen sits on its condition, so a storm week and a sunny
+   week look like different pages (forecast.css draws it). Each sky is a
+   gradient from --regime-sky-top to --regime-sky with its own two inks, which
+   clear 4.5:1 at both ends: on a light sky the ink is dark, on Stormy's it is
+   the paper. These are the dark theme's skies, the condition at night; the
+   light theme's are below. A page with no condition gets a plain ground. */
+:root {
+  --regime-sky-top: var(--bg-panel);
+  --regime-sky: var(--bg-body);
+  --regime-sky-ink: var(--app-text);
+  --regime-sky-muted: var(--app-text-secondary);
+  /* The clouds on it: white, faint at night, a touch more by day, least on a storm. */
+  --regime-sky-cloud: rgba(255, 255, 255, 0.05);
+}
+html[data-theme="light"] { --regime-sky-cloud: rgba(255, 255, 255, 0.32); }
+html[data-theme="light"] [data-regime="VOLATILE"] { --regime-sky-cloud: rgba(255, 255, 255, 0.08); }
+[data-regime="EXPANSION"] { --regime-sky-top: #5a4310; --regime-sky: #3d2e0b; --regime-sky-ink: #f6e7c4; --regime-sky-muted: #d8c79c; }
+[data-regime="DEFENSIVE"] { --regime-sky-top: #2b3a4c; --regime-sky: #1f2a37; --regime-sky-ink: #e3eaf2; --regime-sky-muted: #b4c2d2; }
+[data-regime="VOLATILE"] { --regime-sky-top: #252e52; --regime-sky: #171d33; --regime-sky-ink: #e8ecf4; --regime-sky-muted: #b8c2dc; }
+[data-regime="SCARCITY"] { --regime-sky-top: #1f4466; --regime-sky: #16324d; --regime-sky-ink: #e2f1ff; --regime-sky-muted: #a9cbe8; }
+html[data-theme="light"] [data-regime="EXPANSION"] { --regime-sky-top: #f7c53a; --regime-sky: #e8a81c; --regime-sky-ink: #1a1408; --regime-sky-muted: #4a3c12; }
+html[data-theme="light"] [data-regime="DEFENSIVE"] { --regime-sky-top: #a5b7c9; --regime-sky: #8a9fb6; --regime-sky-ink: #0f1419; --regime-sky-muted: #24313e; }
+html[data-theme="light"] [data-regime="VOLATILE"] { --regime-sky-top: #34406b; --regime-sky: #232b4a; --regime-sky-ink: #eef1f6; --regime-sky-muted: #c3cbe0; }
+html[data-theme="light"] [data-regime="SCARCITY"] { --regime-sky-top: #b5dcf5; --regime-sky: #8ac2ec; --regime-sky-ink: #0a1a3a; --regime-sky-muted: #1d3c66; }
 
 /* The action colour is the ink, in every week (Covenant, 2026-11-10). From
    2026-10-14 a shell that knew its regime drew links, buttons and focus rings
@@ -843,7 +886,7 @@ html[data-theme="light"] .weather-pill[aria-current="page"] {
    class boundary so hover:/focus: variants keep their own treatment. */
 html[data-theme="light"] [class^="bg-slate-950"], html[data-theme="light"] [class*=" bg-slate-950"],
 html[data-theme="light"] [class^="bg-slate-900"], html[data-theme="light"] [class*=" bg-slate-900"] { background-color: var(--bg-nested-light) !important; }
-html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(16, 32, 26, 0.05) !important; }
+html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(15, 20, 25, 0.05) !important; }
 html[data-theme="light"] [class^="border-slate-800"], html[data-theme="light"] [class*=" border-slate-800"],
 html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [class*=" border-slate-900"] { border-color: var(--border-subtle) !important; }
 /* The hue patches that lived here — a 700-level hex per hue for text-<hue>-*,
@@ -862,12 +905,12 @@ html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [
   :root {
     --shadow-color-soft: rgba(0, 0, 0, 0.22);
     --shadow-color-mid: rgba(0, 0, 0, 0.36);
-    --border-faint: rgba(230, 236, 226, 0.095);
-    --border-subtle: rgba(230, 236, 226, 0.14);
+    --border-faint: rgba(232, 236, 244, 0.095);
+    --border-subtle: rgba(232, 236, 244, 0.14);
   }
 
   html[data-theme="light"] {
-    --border-faint: rgba(16, 32, 26, 0.11);
-    --border-subtle: rgba(16, 32, 26, 0.17);
+    --border-faint: rgba(15, 20, 25, 0.11);
+    --border-subtle: rgba(15, 20, 25, 0.17);
   }
 }

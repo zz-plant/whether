@@ -47,19 +47,19 @@ import { regimeSignalLabel } from "./report/signalTranslations";
  * app/styles/tokens.css; tests/regimeColourContract.test.tsx holds the three
  * together.
  *
- * Synoptic (2026-10-09, docs/design/palette-directions.md): each condition is
- * coloured by the weather it names, and the four sit on the chart's two axes.
- * Warm is risk appetite on, cool is off; light is cheap money, dense is dear.
- * They differ in lightness as well as hue, so a red-green colourblind reader
- * keeps them apart: Sunny and Freezing were emerald and rose, 5.6 apart for a
- * deuteranope (OKLab x100), and are 34.6 apart here. One set serves both
- * themes; as text, each condition has its own ink per theme in tokens.css.
+ * Forecast (2026-11-12, .impeccable/surfaces/app-page-tsx.md): each condition is
+ * the colour of the sky it names. Synoptic (2026-10-09) and Covenant (2026-11-10)
+ * put the chart's two axes on hue and lightness; these follow the weather, and
+ * the four stay apart for a colourblind reader: the closest pair, Cloudy and
+ * Stormy, is 16.5 apart (OKLab x100) under simulated protanopia, deuteranopia
+ * and tritanopia. One set serves both themes; as text, each condition has its own
+ * ink per theme in tokens.css.
  */
 export const REGIME_HEX_COLORS: Record<RegimeKey, string> = {
-  EXPANSION: "#e0a81c", // Sun: warm, clear
-  DEFENSIVE: "#9a5b1e", // Haze: warm, dense
-  VOLATILE: "#8f9be0", // Lightning: cool, clear
-  SCARCITY: "#2a4fa8", // Frost: cool, dense
+  EXPANSION: "#e8a81c", // Sun: gold
+  DEFENSIVE: "#6a8aaa", // Overcast: grey-blue
+  VOLATILE: "#465290", // Storm: deep slate
+  SCARCITY: "#9fd0f2", // Frost: icy pale blue
 };
 
 /** Score at which `tightness` stops distinguishing between expensive and very

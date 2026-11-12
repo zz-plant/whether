@@ -602,6 +602,7 @@ a.weather-hub-link-card:hover {
   }
 
   .weather-hero-aside,
+  .weather-hero-trust,
   .weather-hero-margin-head {
     border-inline-start: 1px solid var(--border-subtle);
     padding-inline-start: 1.25rem;

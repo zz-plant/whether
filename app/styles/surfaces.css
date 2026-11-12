@@ -13,8 +13,9 @@
      .weather-card     one step in. rounded-xl, a hairline, padding baked in.
                        For a self-contained item in a list or grid.
 
-   No tier casts a shadow since 2026-11-10 (docs/design/rebuild-covenant.md):
-   paper has no depth, and only what floats over the page does.
+   The outermost tier carries the layered card depth (--elev-card, Forecast,
+   2026-11-12): a sheet lifts off the paper. Covenant drew no shadow at all from
+   2026-11-10 to 2026-11-12. Anything nested loses it (the ladder below).
      .weather-panel    layout tier. Padding only; appearance comes from the
                        shell. For a page section that shouldn't read as a
                        floating object.
@@ -27,10 +28,9 @@
   @apply rounded-2xl border;
   border-color: var(--border-default);
   background: var(--bg-surface);
-  /* Paper has no depth (Covenant, 2026-11-10): a sheet is told from the ground by
-     its hairline and a step of tone, and only what floats over the page (menus,
-     dialogs, the toast) casts a shadow. */
-  box-shadow: none;
+  /* A sheet lifts off the paper (Forecast, 2026-11-12): a hairline, a step of tone
+     and the layered card depth. Nested, the ladder below takes the depth off. */
+  box-shadow: var(--elev-card);
   transition: border-color 250ms ease;
   container-type: inline-size;
 }
@@ -50,7 +50,7 @@
   border-color: var(--border-default);
   transition: border-color 250ms ease;
   background: var(--bg-panel);
-  box-shadow: none;
+  box-shadow: var(--elev-card);
 }
 
 /* No hover on a container. A stat card that lifts and glows under the pointer
@@ -155,12 +155,12 @@
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hero-sky-panel, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hero-sky-panel, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary) {
   box-shadow: none;
   backdrop-filter: none;
@@ -174,17 +174,17 @@
 :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hero-sky-panel, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hero-sky-panel, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
-    .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
+    .weather-hero-card, .weather-hero-sky-panel, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
     .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
@@ -295,7 +295,7 @@ button .weather-chip:active,
      on white for a border, and the light front red for a crossed line. */
   body {
     background: #ffffff !important;
-    color: #10201a !important;
+    color: #0f1419 !important;
     font-size: 11pt !important;
   }
 
@@ -320,7 +320,7 @@ button .weather-chip:active,
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    color: #10201a !important;
+    color: #0f1419 !important;
   }
 
   /* A card fits on a page and reads better whole. A panel or a section may not: told
@@ -342,13 +342,13 @@ button .weather-chip:active,
   .type-eyebrow,
   .type-data,
   h1, h2, h3, h4, p, span, dt, dd {
-    color: #10201a !important;
+    color: #0f1419 !important;
   }
 
   .text-slate-400,
   .text-slate-500,
   .text-slate-300 {
-    color: #40524a !important;
+    color: #4a5568 !important;
   }
 
   .text-amber-300,

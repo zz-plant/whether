@@ -4,11 +4,12 @@
    only "press me". Raised controls (pill, button) take --bg-raised; fields
    (input, control) take --bg-nested, a step below the card they sit in.
 
-   No control casts a shadow (2026-11-10, DESIGN.md "Elevation & Depth"): paper has
-   no depth, so a control is told by its strong border and its fill, rises 1px
-   under a fine pointer and sinks 1px while pressed. Only what floats over the page
-   (menus, dialogs, the toast) lifts. The --elev-1 lift and the --well-inset and
-   --key-pressed insets were the last shadows on the page's own surfaces. */
+   A button sits on the paper at the control depth (Forecast, 2026-11-12; DESIGN.md
+   "Elevation & Depth"): --elev-control, the card's three layers at a third of the
+   reach, rising to the card's own (--elev-card) under a fine pointer and sinking 1px
+   while pressed. It is told first by its strong border and its fill; the shadow says
+   it can be pressed. Covenant drew no control shadow (2026-11-10). Pills and fields
+   stay flat: a pill is a filter or a label, and a field is a well, not a key. */
 .weather-pill {
   @apply border border-slate-700/80;
   min-height: 44px;
@@ -61,11 +62,12 @@
   font-variant-numeric: tabular-nums;
   border-color: var(--border-strong);
   background: var(--bg-raised);
-  box-shadow: none;
+  box-shadow: var(--elev-control);
   text-decoration: none;
   transition:
     transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
     border-color 200ms ease,
+    box-shadow 200ms ease,
     color 200ms ease,
     background-color 200ms ease;
 }
@@ -174,6 +176,7 @@ input:not([type="range"]) {
   button.weather-button:hover {
     transform: translateY(-1px);
     border-color: var(--accent-border);
+    box-shadow: var(--elev-card);
   }
 
   a.weather-button-primary:hover,
@@ -284,7 +287,7 @@ summary.list-none:focus-visible,
 
 /* The chevron is the icon set's (uiIcons' ChevronDownIcon: lucide's path at its
    1.8 stroke), drawn as a mask in the muted ink. It was a text glyph, U+25BE,
-   which neither Archivo nor Chivo Mono draws, so every disclosure on the site
+   which none of the site's faces draws, so every disclosure on the site
    borrowed its caret from whatever symbol font the reader's OS had: a different
    size, weight and baseline per platform, beside the SVG chevrons on the header
    pills. The mask's stroke only sets coverage; the colour is the background. */

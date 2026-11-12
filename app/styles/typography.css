@@ -92,8 +92,8 @@ svg :where(.type-eyebrow, .type-badge) {
   @apply font-semibold uppercase;
   font-size: var(--fs-nano);
   letter-spacing: 0.08em;
-  /* Case-sensitive forms: Archivo lifts the hyphen to sit between capitals
-     rather than at x-height. */
+  /* Case-sensitive forms: Source Sans 3 lifts the hyphen to sit between
+     capitals rather than at x-height. */
   font-feature-settings: "case";
 }
 

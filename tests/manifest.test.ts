@@ -11,8 +11,8 @@ describe("web app manifest", () => {
     assert.equal(value.display, "standalone");
     assert.equal(value.start_url, "/");
     assert.equal(value.scope, "/");
-    assert.equal(value.theme_color, "#ecf0e8");
-    assert.equal(value.background_color, "#ecf0e8");
+    assert.equal(value.theme_color, "#eef1f6");
+    assert.equal(value.background_color, "#eef1f6");
     assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/operate"));
     assert.ok(value.shortcuts?.some((shortcut) => shortcut.url === "/signals"));
     assert.ok(value.icons?.some((icon) => icon.src === "/icon-192.png" && icon.sizes === "192x192"));
