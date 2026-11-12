@@ -121,13 +121,13 @@ const mailsTo = async (address) => {
   return Promise.all(mine.map((entry) => detailOf(entry.messageId)));
 };
 
-/** Wait for a mail to an address that satisfies `predicate`. */
-const waitForMail = async (address, predicate, { timeoutMs = 20000 } = {}) => {
+/** Wait for a mail to an address that satisfies `predicate`, among those after the first `after`. */
+const waitForMail = async (address, predicate, { timeoutMs = 20000, after = 0 } = {}) => {
   const deadline = Date.now() + timeoutMs;
   let seen = [];
   while (Date.now() < deadline) {
     seen = await mailsTo(address);
-    const match = seen.find(predicate);
+    const match = seen.slice(after).find(predicate);
     if (match) return match;
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
@@ -238,10 +238,15 @@ async function main() {
   const wrongSecret = await post("/api/email/send-weekly", {}, { authorization: "Bearer not-the-secret" });
   check("send-weekly refuses a wrong secret", wrongSecret.status === 401, `status ${wrongSecret.status}`);
 
+  /* The brief is the mail this call sends. Matching it by subject also matched the
+     month-end letter ("Whether — Changed since last month-end: …"), which the daily
+     run above sends once a month has a prior month-end to compare with: from
+     November 2026 every run read the letter as the brief and failed three checks. */
+  const beforeBrief = (await mailsTo(weeklyAddress)).length;
   const first = await post("/api/email/send-weekly", {}, authed).then((response) => response.json());
   check("send-weekly runs", first.ok === true, JSON.stringify(first));
   check("it sends to both confirmed subscribers", first.sent === 2, JSON.stringify(first));
-  const briefMail = await waitForMail(weeklyAddress, (entry) => /^Whether (Brief )?—/.test(entry.subject) && !(entry.subject ?? "").startsWith("Whether Alert"));
+  const briefMail = await waitForMail(weeklyAddress, (entry) => !(entry.subject ?? "").startsWith("Whether Alert"), { after: beforeBrief });
   check("the brief arrived", Boolean(briefMail), "no brief captured");
   check("brief subject names the conditions", /Cloudy|Freezing|Stormy|Sunny/.test(briefMail?.subject ?? ""), briefMail?.subject);
   check("the brief states conditions and the guidance", /Conditions:/.test(briefMail?.text ?? "") && /Guidance:/.test(briefMail?.text ?? ""), briefMail?.text?.slice(0, 300));
