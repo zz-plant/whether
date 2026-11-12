@@ -14,7 +14,8 @@ import {
   type BriefVideoAsset,
 } from "../lib/export/briefVideo";
 
-const brief = latestPublishedBrief!;
+/* Uncorrected: a corrected brief never advertises a video (asserted below), and the newest record may carry a correction. */
+const brief = { ...latestPublishedBrief!, correction: null };
 const payload = publishedBriefToSlidePayload(brief, null);
 
 const fixture = async (): Promise<BriefVideoAsset> => ({
