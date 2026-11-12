@@ -352,3 +352,23 @@ Each of these was findable only by reading the file that reads it. Leave them un
 | `UI_CAPTURE_OUT_DIR=<dir>` | `scripts/ci-screenshot-smoke.mjs` | Where the smoke check writes its PNGs (default `artifacts/ui`). The other capture scripts take `--out-dir`. |
 | `WHETHER_CHROMIUM_PATH=<path>` | `scripts/ui-capture.lib.mjs` | A Chromium to launch when Playwright's pinned build is missing; tried only after the default launch fails. |
 | `WHETHER_SMOKE_STRICT_HTML=1` | `scripts/prod-synthetic-smoke.mjs` | `smoke:prod` fails a page answering 403 instead of skipping its HTML checks. |
+
+## Shared checkout guard (2026-11-12)
+
+Several agent sessions share one checkout and one stash stack, and two commands that are harmless in
+a private clone have discarded other sessions' work here. `.claude/hooks/guard-shared-tree.mjs`
+(a `PreToolUse` hook on Bash, tested in `tests/validationScripts.test.ts`) refuses both:
+
+- **A bare `git stash`, `pop`, `clear` or an unnamed `push`/`save`.** On 2026-08-14 a stash taken
+  to check whether three failures predated a change swept up a peer session's half-finished
+  refactor; the pop failed on a file the stash restored, and the tree ended up holding both
+  sessions' changes. The tests had passed only because the stash reverted the peer's refactor,
+  which was the actual cause. To attribute a failure, read `git diff HEAD -- <file>`. To set work
+  aside, make a WIP commit. A named `git stash push -u -m <tag>`, restored with
+  `git stash apply <sha>`, stays allowed.
+- **`WORKERS_CI=1` anywhere in a command** — see the 2026-11-03 entry in
+  [automation-and-deploy-gate](automation-and-deploy-gate.md).
+
+`.husky/pre-commit` still stashes unstaged changes around `lint-staged`; that runs inside git, not
+through the hook, and restores them. The hook loads when a session starts, so a session already
+running when it lands is unguarded until restarted.

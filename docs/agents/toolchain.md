@@ -94,6 +94,7 @@ the task instead of reading them all.
 ### Session hygiene
 
 - The SessionStart hook unshallows a shallow clone, so `git log` / `git blame` see real history.
+- A PreToolUse hook refuses a bare `git stash` and `WORKERS_CI=1`: both have discarded other sessions' uncommitted work in a shared checkout ([lesson](lessons/toolchain-and-gates.md#shared-checkout-guard-2026-11-12)).
 - `bun run agent:route -- "<task>"` before broad searching; it names docs, sections, first files, owning tests, skills and the minimum checks.
 - Stale worktrees under `.claude/worktrees` slow every filesystem walk; `bun run agent:worktrees` shows which are clean and old enough to prune.
 - When a fix changes documented behaviour, update the matching doc in the same commit
