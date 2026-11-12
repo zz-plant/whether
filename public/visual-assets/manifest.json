@@ -3,11 +3,11 @@
   "generator": "bun scripts/generate-visual-assets.tsx",
   "gallery": "index.html",
   "font": {
-    "family": "Archivo",
+    "family": "Source Sans 3",
     "editableSvg": true,
     "svgFallback": "Arial, sans-serif",
     "rasterFontSource": "public/fonts/og",
-    "note": "SVG text stays editable. Install Archivo for an exact match in another application. PNGs use the bundled font instances."
+    "note": "SVG text stays editable. Install Source Sans 3 for an exact match in another application. PNGs use the bundled font instances."
   },
   "usage": "References define concepts. Templates are visibly illustrative and contain no current readings or advice. Replace placeholder material with a cited, dated reading before using it as a decision artifact. Keep glyphs paired with their words.",
   "sourceOfTruth": [

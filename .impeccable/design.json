@@ -1,112 +1,112 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-10T17:16:09.320Z",
+  "generatedAt": "2026-11-12T08:00:00.000Z",
   "title": "Design System: Whether",
   "extensions": {
     "colorMeta": {
       "paper": {
         "role": "neutral",
-        "displayName": "Safety paper",
-        "canonical": "oklch(95.0% 0.011 128.6)",
+        "displayName": "Paper",
+        "canonical": "oklch(95.7% 0.007 260.7)",
         "tonalRamp": [
-          "#0a0c07",
-          "#232620",
-          "#40433d",
-          "#5f635c",
-          "#80847d",
-          "#a3a69f",
-          "#c7cbc3",
-          "#ecf0e8"
+          "#090b0e",
+          "#232529",
+          "#404246",
+          "#5f6166",
+          "#808287",
+          "#a2a5aa",
+          "#c6c9ce",
+          "#eceff4"
         ]
       },
       "paper-sheet": {
         "role": "neutral",
         "displayName": "Sheet",
-        "canonical": "oklch(97.2% 0.009 128.6)",
+        "canonical": "oklch(98.4% 0.003 247.9)",
         "tonalRamp": [
-          "#0a0c08",
-          "#242622",
-          "#41433e",
-          "#60625d",
-          "#81837e",
-          "#a3a6a0",
-          "#c7cac4",
-          "#edf0ea"
+          "#0a0b0d",
+          "#242527",
+          "#414244",
+          "#606163",
+          "#818284",
+          "#a3a5a7",
+          "#c7c9cb",
+          "#edeff1"
         ]
       },
       "paper-raised": {
         "role": "neutral",
         "displayName": "Raised sheet",
-        "canonical": "oklch(98.8% 0.006 128.5)",
+        "canonical": "oklch(99.4% 0.002 247.8)",
         "tonalRamp": [
-          "#0a0c09",
-          "#242623",
-          "#41433f",
-          "#60625e",
-          "#81837f",
-          "#a4a6a2",
-          "#c8cac6",
-          "#edefeb"
+          "#0b0b0c",
+          "#242526",
+          "#414243",
+          "#606162",
+          "#818283",
+          "#a4a5a6",
+          "#c8c9ca",
+          "#edeeef"
         ]
       },
       "paper-nested": {
         "role": "neutral",
         "displayName": "Nested paper",
-        "canonical": "oklch(92.0% 0.017 128.7)",
+        "canonical": "oklch(93.0% 0.012 259.8)",
         "tonalRamp": [
-          "#090d05",
-          "#22271e",
-          "#3f443a",
-          "#5e6359",
-          "#7f847a",
-          "#a2a79c",
-          "#c6cbc0",
-          "#ebf1e5"
+          "#080b10",
+          "#22252b",
+          "#3e4249",
+          "#5d6168",
+          "#7e838a",
+          "#a1a5ad",
+          "#c5c9d1",
+          "#eaeff7"
         ]
       },
       "ink": {
         "role": "primary",
-        "displayName": "Green-black ink",
-        "canonical": "oklch(22.7% 0.025 168.3)",
+        "displayName": "Blue-black ink",
+        "canonical": "oklch(18.8% 0.013 248.5)",
         "tonalRamp": [
-          "#020e09",
-          "#192923",
-          "#35463f",
-          "#54665f",
-          "#75877f",
-          "#97aaa2",
-          "#bacfc6",
-          "#dff4eb"
+          "#070c10",
+          "#20262b",
+          "#3d4349",
+          "#5c6268",
+          "#7d838a",
+          "#9fa6ad",
+          "#c3cad1",
+          "#e8eff7"
         ]
       },
       "ink-secondary": {
         "role": "primary",
         "displayName": "Secondary ink",
-        "canonical": "oklch(33.5% 0.025 163.0)",
+        "canonical": "oklch(32.2% 0.029 256.8)",
         "tonalRamp": [
-          "#020e08",
-          "#1a2921",
-          "#36463e",
-          "#55665d",
-          "#75877e",
-          "#98aaa0",
-          "#bbcfc4",
-          "#e0f4ea"
+          "#040b17",
+          "#1c2633",
+          "#384351",
+          "#576272",
+          "#788394",
+          "#9aa6b7",
+          "#becadc",
+          "#e4f0ff"
         ]
       },
       "ink-muted": {
         "role": "primary",
         "displayName": "Muted ink",
-        "canonical": "oklch(42.1% 0.026 166.3)",
+        "canonical": "oklch(44.7% 0.034 261.3)",
         "tonalRamp": [
-          "#020f09",
-          "#182922",
-          "#35473f",
-          "#54665e",
-          "#74887f",
-          "#96aba1",
-          "#bacfc5",
-          "#dff4eb"
+          "#040b19",
+          "#1c2536",
+          "#384255",
+          "#566275",
+          "#778397",
+          "#99a6bb",
+          "#bdcae0",
+          "#e6efff"
         ]
       },
       "crossed-ink": {
@@ -157,106 +157,106 @@
       "night": {
         "role": "neutral",
         "displayName": "Night ground",
-        "canonical": "oklch(18.5% 0.016 165.5)",
+        "canonical": "oklch(19.1% 0.017 264.0)",
         "tonalRamp": [
-          "#050d0a",
-          "#1e2823",
-          "#3a4540",
-          "#59645f",
-          "#7a8580",
-          "#9ca8a3",
-          "#c0cdc7",
-          "#e5f2ec"
+          "#080b13",
+          "#21252e",
+          "#3d424c",
+          "#5c616c",
+          "#7d828d",
+          "#9fa5b0",
+          "#c3c9d5",
+          "#e9effb"
         ]
       },
       "night-sheet": {
         "role": "neutral",
         "displayName": "Night sheet",
-        "canonical": "oklch(21.0% 0.018 162.7)",
+        "canonical": "oklch(22.2% 0.023 265.6)",
         "tonalRamp": [
-          "#050d09",
-          "#1d2823",
-          "#3a453f",
-          "#59655e",
-          "#79867f",
-          "#9ca9a2",
-          "#c0cdc6",
-          "#e5f2eb"
+          "#070b15",
+          "#202530",
+          "#3c424f",
+          "#5b616f",
+          "#7c8291",
+          "#9ea5b4",
+          "#c2c9d9",
+          "#e7efff"
         ]
       },
       "night-raised": {
         "role": "neutral",
         "displayName": "Night raised",
-        "canonical": "oklch(25.8% 0.023 157.3)",
+        "canonical": "oklch(26.5% 0.028 266.5)",
         "tonalRamp": [
-          "#040e07",
-          "#1c2921",
-          "#38463d",
-          "#57655c",
-          "#77877d",
-          "#9aaa9f",
-          "#bdcec3",
-          "#e2f4e8"
+          "#060b17",
+          "#1f2533",
+          "#3b4251",
+          "#5a6172",
+          "#7b8294",
+          "#9da5b7",
+          "#c1c9dc",
+          "#e7efff"
         ]
       },
       "night-nested": {
         "role": "neutral",
         "displayName": "Night nested",
-        "canonical": "oklch(16.8% 0.015 162.6)",
+        "canonical": "oklch(16.3% 0.014 264.1)",
         "tonalRamp": [
-          "#060d09",
-          "#1f2723",
-          "#3b4540",
-          "#5a645f",
-          "#7b8580",
-          "#9da8a2",
-          "#c1ccc6",
-          "#e6f2eb"
+          "#080b11",
+          "#22252c",
+          "#3e4249",
+          "#5d6169",
+          "#7e828b",
+          "#a1a5ae",
+          "#c5c9d2",
+          "#eaeff8"
         ]
       },
       "night-ink": {
         "role": "primary",
         "displayName": "Night ink",
-        "canonical": "oklch(93.6% 0.015 132.5)",
+        "canonical": "oklch(94.2% 0.012 264.5)",
         "tonalRamp": [
-          "#090d06",
-          "#22271f",
-          "#3f443c",
-          "#5e635b",
-          "#7f847b",
-          "#a1a79e",
-          "#c5cbc2",
-          "#ebf1e7"
+          "#090b10",
+          "#22252b",
+          "#3f4248",
+          "#5e6168",
+          "#7f828a",
+          "#a1a5ad",
+          "#c5c9d1",
+          "#ebeff7"
         ]
       },
       "night-ink-secondary": {
         "role": "primary",
         "displayName": "Night secondary ink",
-        "canonical": "oklch(84.7% 0.017 151.1)",
+        "canonical": "oklch(81.2% 0.028 262.3)",
         "tonalRamp": [
-          "#060d08",
-          "#1f2821",
-          "#3c453d",
-          "#5a645c",
-          "#7b857d",
-          "#9ea8a0",
-          "#c2ccc4",
-          "#e7f2e9"
+          "#050b17",
+          "#1e2533",
+          "#3a4251",
+          "#596271",
+          "#798393",
+          "#9ca5b7",
+          "#c0cadc",
+          "#e6efff"
         ]
       },
       "night-ink-muted": {
         "role": "primary",
         "displayName": "Night muted ink",
-        "canonical": "oklch(74.9% 0.021 159.6)",
+        "canonical": "oklch(72.9% 0.038 261.3)",
         "tonalRamp": [
-          "#040e08",
-          "#1c2821",
-          "#39463e",
-          "#57655d",
-          "#78867e",
-          "#9aa9a0",
-          "#becec4",
-          "#e3f3ea"
+          "#030b1b",
+          "#1a2538",
+          "#374257",
+          "#556277",
+          "#76839a",
+          "#98a6be",
+          "#bbcae3",
+          "#e6efff"
         ]
       },
       "night-crossed-ink": {
@@ -307,61 +307,61 @@
       "sunny": {
         "role": "secondary",
         "displayName": "Sunny gold",
-        "canonical": "oklch(76.4% 0.151 83.4)",
+        "canonical": "oklch(77.2% 0.154 79.9)",
         "tonalRamp": [
-          "#130900",
-          "#322200",
-          "#563d01",
-          "#7d5b00",
-          "#a57a07",
-          "#d19b06",
-          "#f8bf40",
-          "#ffecca"
+          "#120900",
+          "#332100",
+          "#583c00",
+          "#7f5900",
+          "#a97800",
+          "#d59800",
+          "#fdbc3d",
+          "#ffeccd"
         ]
       },
       "cloudy": {
         "role": "secondary",
-        "displayName": "Cloudy sienna",
-        "canonical": "oklch(53.2% 0.110 60.0)",
+        "displayName": "Cloudy overcast",
+        "canonical": "oklch(62.1% 0.061 248.8)",
         "tonalRamp": [
-          "#170600",
-          "#3b1c00",
-          "#633401",
-          "#8d500d",
-          "#b27137",
-          "#d8945b",
-          "#feb87e",
-          "#feeadb"
+          "#000c1b",
+          "#082741",
+          "#274461",
+          "#466482",
+          "#6686a6",
+          "#88a9ca",
+          "#abcdf0",
+          "#e2f0ff"
         ]
       },
       "stormy": {
         "role": "secondary",
-        "displayName": "Stormy periwinkle",
-        "canonical": "oklch(70.7% 0.102 275.9)",
+        "displayName": "Stormy slate",
+        "canonical": "oklch(45.9% 0.102 273.5)",
         "tonalRamp": [
-          "#070034",
-          "#1a1b55",
-          "#343b77",
-          "#525b9a",
-          "#727cbf",
-          "#93a0e5",
-          "#bac5ff",
-          "#eaeefe"
+          "#050032",
+          "#181c55",
+          "#323b77",
+          "#4f5c9b",
+          "#6f7dbf",
+          "#90a1e5",
+          "#b8c6ff",
+          "#e9eeff"
         ]
       },
       "freezing": {
         "role": "secondary",
-        "displayName": "Freezing deep blue",
-        "canonical": "oklch(45.3% 0.150 264.2)",
+        "displayName": "Freezing ice",
+        "canonical": "oklch(83.5% 0.070 239.0)",
         "tonalRamp": [
-          "#000038",
-          "#01146c",
-          "#173990",
-          "#345bb5",
-          "#547edb",
-          "#77a2ff",
-          "#afc9fe",
-          "#e7efff"
+          "#000d18",
+          "#00283f",
+          "#174763",
+          "#396785",
+          "#5a88a8",
+          "#7caccd",
+          "#9fd0f2",
+          "#dff2ff"
         ]
       },
       "sunny-ink": {
@@ -382,29 +382,29 @@
       "cloudy-ink": {
         "role": "secondary",
         "displayName": "Cloudy ink",
-        "canonical": "oklch(48.7% 0.104 59.2)",
+        "canonical": "oklch(47.9% 0.052 249.0)",
         "tonalRamp": [
-          "#170600",
-          "#3b1c00",
-          "#643400",
-          "#8c5118",
-          "#b0723d",
-          "#d59560",
-          "#fcb983",
-          "#ffeadb"
+          "#000c1c",
+          "#0e273d",
+          "#2b445d",
+          "#4a647e",
+          "#6a85a1",
+          "#8ca8c5",
+          "#afcdeb",
+          "#e2f0ff"
         ]
       },
       "stormy-ink": {
         "role": "secondary",
         "displayName": "Stormy ink",
-        "canonical": "oklch(45.9% 0.172 274.3)",
+        "canonical": "oklch(42.0% 0.094 273.3)",
         "tonalRamp": [
-          "#060034",
-          "#180074",
-          "#2d2d9a",
-          "#4751c0",
-          "#6575e7",
-          "#8a9cfe",
+          "#050031",
+          "#181e52",
+          "#323c73",
+          "#505d96",
+          "#707ebb",
+          "#92a1e0",
           "#b8c6ff",
           "#e9eeff"
         ]
@@ -412,16 +412,16 @@
       "freezing-ink": {
         "role": "secondary",
         "displayName": "Freezing ink",
-        "canonical": "oklch(39.4% 0.138 264.4)",
+        "canonical": "oklch(46.9% 0.109 247.4)",
         "tonalRamp": [
-          "#000037",
-          "#031866",
-          "#1b3a8a",
-          "#395caf",
-          "#587fd5",
-          "#79a2fb",
-          "#afc9fe",
-          "#e7effe"
+          "#000c1b",
+          "#002745",
+          "#004574",
+          "#23659c",
+          "#4787c0",
+          "#6aabe6",
+          "#9ccfff",
+          "#e2f1ff"
         ]
       },
       "night-sunny-ink": {
@@ -442,76 +442,316 @@
       "night-cloudy-ink": {
         "role": "secondary",
         "displayName": "Night Cloudy ink",
-        "canonical": "oklch(75.7% 0.105 69.7)",
+        "canonical": "oklch(79.0% 0.036 248.3)",
         "tonalRamp": [
-          "#150800",
-          "#371f00",
-          "#5e3900",
-          "#875505",
-          "#aa7634",
-          "#cf9958",
-          "#f5bd7c",
-          "#feebd6"
+          "#010c19",
+          "#172736",
+          "#334455",
+          "#516375",
+          "#728597",
+          "#94a8bb",
+          "#b8cce0",
+          "#e2f0ff"
         ]
       },
       "night-stormy-ink": {
         "role": "secondary",
         "displayName": "Night Stormy ink",
-        "canonical": "oklch(82.7% 0.088 278.6)",
+        "canonical": "oklch(78.2% 0.081 276.5)",
         "tonalRamp": [
-          "#08012e",
-          "#1d1d4e",
-          "#383c6f",
-          "#565b92",
-          "#767db6",
-          "#98a0dc",
-          "#bdc4fe",
+          "#06032c",
+          "#1c1f4b",
+          "#373d6c",
+          "#555d8f",
+          "#757eb3",
+          "#97a1d8",
+          "#bbc5fe",
           "#eaedff"
         ]
       },
       "night-freezing-ink": {
         "role": "secondary",
         "displayName": "Night Freezing ink",
-        "canonical": "oklch(76.6% 0.103 265.0)",
+        "canonical": "oklch(85.3% 0.073 239.5)",
         "tonalRamp": [
-          "#010035",
-          "#0b1f56",
-          "#273e78",
-          "#445f9b",
-          "#6481c0",
-          "#85a4e6",
-          "#b0c9ff",
-          "#e7effe"
+          "#000d18",
+          "#00283f",
+          "#144765",
+          "#376786",
+          "#5889aa",
+          "#7aacce",
+          "#9ed0f4",
+          "#dff1ff"
         ]
       },
       "band-line-on-light": {
         "role": "neutral",
         "displayName": "Band line on a light field",
-        "canonical": "oklch(22.7% 0.025 168.3)",
+        "canonical": "oklch(18.8% 0.013 248.5)",
         "tonalRamp": [
-          "#020e09",
-          "#192923",
-          "#35463f",
-          "#54665f",
-          "#75877f",
-          "#97aaa2",
-          "#bacfc6",
-          "#dff4eb"
+          "#070c10",
+          "#20262b",
+          "#3d4349",
+          "#5c6268",
+          "#7d838a",
+          "#9fa6ad",
+          "#c3cad1",
+          "#e8eff7"
         ]
       },
       "band-line-on-dense": {
         "role": "neutral",
         "displayName": "Band line on a dense field",
-        "canonical": "oklch(95.0% 0.011 128.6)",
+        "canonical": "oklch(95.7% 0.007 260.7)",
         "tonalRamp": [
-          "#0a0c07",
-          "#232620",
-          "#40433d",
-          "#5f635c",
-          "#80847d",
-          "#a3a69f",
-          "#c7cbc3",
-          "#ecf0e8"
+          "#090b0e",
+          "#232529",
+          "#404246",
+          "#5f6166",
+          "#808287",
+          "#a2a5aa",
+          "#c6c9ce",
+          "#eceff4"
+        ]
+      },
+      "sunny-sky-top": {
+        "role": "secondary",
+        "displayName": "Sunny sky (top)",
+        "canonical": "oklch(84.5% 0.156 87.7)",
+        "tonalRamp": [
+          "#110a00",
+          "#302300",
+          "#533f00",
+          "#795d00",
+          "#a17d00",
+          "#cc9e00",
+          "#f4c236",
+          "#ffedc3"
+        ]
+      },
+      "sunny-sky": {
+        "role": "secondary",
+        "displayName": "Sunny sky",
+        "canonical": "oklch(77.2% 0.154 79.9)",
+        "tonalRamp": [
+          "#120900",
+          "#332100",
+          "#583c00",
+          "#7f5900",
+          "#a97800",
+          "#d59800",
+          "#fdbc3d",
+          "#ffeccd"
+        ]
+      },
+      "cloudy-sky-top": {
+        "role": "secondary",
+        "displayName": "Cloudy sky (top)",
+        "canonical": "oklch(77.1% 0.033 248.2)",
+        "tonalRamp": [
+          "#020c18",
+          "#182634",
+          "#344453",
+          "#536373",
+          "#738495",
+          "#96a7b9",
+          "#b9ccde",
+          "#e2f0ff"
+        ]
+      },
+      "cloudy-sky": {
+        "role": "secondary",
+        "displayName": "Cloudy sky",
+        "canonical": "oklch(69.4% 0.041 250.8)",
+        "tonalRamp": [
+          "#000c1c",
+          "#152639",
+          "#314458",
+          "#506378",
+          "#70859b",
+          "#92a7bf",
+          "#b6cce4",
+          "#e3f0ff"
+        ]
+      },
+      "stormy-sky-top": {
+        "role": "secondary",
+        "displayName": "Stormy sky (top)",
+        "canonical": "oklch(38.2% 0.075 270.7)",
+        "tonalRamp": [
+          "#04052a",
+          "#182149",
+          "#333f6a",
+          "#515f8c",
+          "#7180b0",
+          "#93a3d5",
+          "#b7c7fb",
+          "#e8eeff"
+        ]
+      },
+      "stormy-sky": {
+        "role": "secondary",
+        "displayName": "Stormy sky",
+        "canonical": "oklch(29.8% 0.057 271.6)",
+        "tonalRamp": [
+          "#050723",
+          "#1b2341",
+          "#374061",
+          "#556082",
+          "#7681a5",
+          "#98a4ca",
+          "#bbc8f0",
+          "#e9eeff"
+        ]
+      },
+      "freezing-sky-top": {
+        "role": "secondary",
+        "displayName": "Freezing sky (top)",
+        "canonical": "oklch(87.5% 0.054 236.4)",
+        "tonalRamp": [
+          "#000d17",
+          "#03283c",
+          "#23465b",
+          "#43667c",
+          "#63889f",
+          "#85abc3",
+          "#a9cfe8",
+          "#def2ff"
+        ]
+      },
+      "freezing-sky": {
+        "role": "secondary",
+        "displayName": "Freezing sky",
+        "canonical": "oklch(79.1% 0.084 241.5)",
+        "tonalRamp": [
+          "#000d19",
+          "#002840",
+          "#09466a",
+          "#30678c",
+          "#5289b0",
+          "#75acd5",
+          "#98d1fb",
+          "#e0f1ff"
+        ]
+      },
+      "night-sunny-sky-top": {
+        "role": "secondary",
+        "displayName": "Night Sunny sky (top)",
+        "canonical": "oklch(39.8% 0.073 83.0)",
+        "tonalRamp": [
+          "#110a00",
+          "#322200",
+          "#553e09",
+          "#755d2d",
+          "#987f4e",
+          "#bba170",
+          "#e0c693",
+          "#ffecc9"
+        ]
+      },
+      "night-sunny-sky": {
+        "role": "secondary",
+        "displayName": "Night Sunny sky",
+        "canonical": "oklch(31.1% 0.054 84.9)",
+        "tonalRamp": [
+          "#110a00",
+          "#312200",
+          "#4f401e",
+          "#6f5f3d",
+          "#91805d",
+          "#b5a37f",
+          "#d9c7a2",
+          "#ffedc7"
+        ]
+      },
+      "night-cloudy-sky-top": {
+        "role": "secondary",
+        "displayName": "Night Cloudy sky (top)",
+        "canonical": "oklch(34.3% 0.037 253.4)",
+        "tonalRamp": [
+          "#020b1a",
+          "#182637",
+          "#344356",
+          "#526376",
+          "#738499",
+          "#95a7bd",
+          "#b9cbe2",
+          "#e3f0ff"
+        ]
+      },
+      "night-cloudy-sky": {
+        "role": "secondary",
+        "displayName": "Night Cloudy sky",
+        "canonical": "oklch(28.1% 0.029 253.0)",
+        "tonalRamp": [
+          "#040c17",
+          "#1b2633",
+          "#374351",
+          "#566371",
+          "#778493",
+          "#99a7b7",
+          "#bccbdc",
+          "#e3f0ff"
+        ]
+      },
+      "night-stormy-sky-top": {
+        "role": "secondary",
+        "displayName": "Night Stormy sky (top)",
+        "canonical": "oklch(31.2% 0.066 271.5)",
+        "tonalRamp": [
+          "#040626",
+          "#1a2245",
+          "#353f65",
+          "#545f87",
+          "#7480aa",
+          "#96a3cf",
+          "#b9c7f5",
+          "#e9eeff"
+        ]
+      },
+      "night-stormy-sky": {
+        "role": "secondary",
+        "displayName": "Night Stormy sky",
+        "canonical": "oklch(23.7% 0.043 271.2)",
+        "tonalRamp": [
+          "#06091d",
+          "#1d243a",
+          "#394159",
+          "#58607a",
+          "#79819d",
+          "#9ba4c1",
+          "#bfc8e6",
+          "#e8eeff"
+        ]
+      },
+      "night-freezing-sky-top": {
+        "role": "secondary",
+        "displayName": "Night Freezing sky (top)",
+        "canonical": "oklch(37.7% 0.072 248.5)",
+        "tonalRamp": [
+          "#000c1b",
+          "#002646",
+          "#204567",
+          "#3f6589",
+          "#5f86ac",
+          "#81a9d1",
+          "#a5cef7",
+          "#e2f0ff"
+        ]
+      },
+      "night-freezing-sky": {
+        "role": "secondary",
+        "displayName": "Night Freezing sky",
+        "canonical": "oklch(31.0% 0.060 249.6)",
+        "tonalRamp": [
+          "#000c1c",
+          "#0a2641",
+          "#284460",
+          "#476482",
+          "#6786a5",
+          "#89a9c9",
+          "#accdef",
+          "#e2f0ff"
         ]
       }
     },
@@ -542,7 +782,7 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "A card's own heading, h3 and below, in Archivo."
+        "purpose": "A card's own heading, h3 and below, in Source Sans 3."
       },
       "body": {
         "displayName": "Body",
@@ -563,9 +803,19 @@
     },
     "shadows": [
       {
+        "name": "elev-card",
+        "value": "0 calc(1 * var(--sh)) calc(2 * var(--sh)) var(--shadow-color-faint), 0 calc(4 * var(--sh)) calc(8 * var(--sh)) var(--shadow-color-faint), 0 calc(12 * var(--sh)) calc(24 * var(--sh)) var(--shadow-color-faint)",
+        "purpose": "The outermost card or surface, and the sky's panel of paper: three downward layers. Anything nested in it is flat (the de-escalation ladder)."
+      },
+      {
+        "name": "elev-control",
+        "value": "0 calc(1 * var(--sh)) calc(1 * var(--sh)) var(--shadow-color-faint), 0 calc(2 * var(--sh)) calc(4 * var(--sh)) var(--shadow-color-faint), 0 calc(4 * var(--sh)) calc(8 * var(--sh)) calc(-2 * var(--sh)) var(--shadow-color-faint)",
+        "purpose": "Every button: the card's three layers at a third of the reach, rising to elev-card on hover."
+      },
+      {
         "name": "elev-1",
         "value": "0 calc(1 * var(--sh)) calc(2 * var(--sh)) calc(-1 * var(--sh)) var(--shadow-color-soft), 0 calc(2 * var(--sh)) calc(6 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-faint)",
-        "purpose": "Floating elements only. Containers carry none (The Flat Paper Rule)."
+        "purpose": "Floating elements: menus, popovers, the sticky strip."
       },
       {
         "name": "elev-2",
@@ -618,6 +868,16 @@
         "name": "week-move-travel",
         "value": "760ms cubic-bezier(0.65, 0, 0.35, 1)",
         "purpose": "The week's move: a reading travelling to this week's score, once, on a week something moved."
+      },
+      {
+        "name": "sky-cross-fade",
+        "value": "300ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "The sky moving to another condition: a week picked, or a month read off the record band. Still under reduced motion."
+      },
+      {
+        "name": "sky-drift",
+        "value": "34s to 46s ease-in-out, alternate",
+        "purpose": "The sky's four clouds, transform only. Still under reduced motion."
       }
     ],
     "breakpoints": [
@@ -662,7 +922,7 @@
       "refersTo": "button-primary",
       "description": "The one solid control: an ink fill with the paper as its label. Copy brief, subscribe.",
       "html": "<button class=\"ds-btn-primary\">Copy brief</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0.55rem 1.05rem; border: 1px solid #10201a; border-radius: 4px; background: #10201a; color: #ecf0e8; font: 600 0.8125rem/1.25 Archivo, 'Archivo Fallback', system-ui, sans-serif; box-shadow: none; cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { transform: translateY(-1px); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(16, 32, 26, 0.14); }"
+      "css": ".ds-btn-primary { box-shadow: 0 1px 1px rgba(15, 20, 25, 0.05), 0 2px 4px rgba(15, 20, 25, 0.05), 0 4px 8px -2px rgba(15, 20, 25, 0.05); display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0.55rem 1.05rem; border: 1px solid #0f1419; border-radius: 4px; background: #0f1419; color: #eef1f6; font: 600 0.8125rem/1.25 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 240ms ease; } .ds-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 1px 2px rgba(15, 20, 25, 0.05), 0 4px 8px rgba(15, 20, 25, 0.05), 0 12px 24px rgba(15, 20, 25, 0.05); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(15, 20, 25, 0.14); }"
     },
     {
       "name": "Secondary button",
@@ -670,7 +930,7 @@
       "refersTo": "button-secondary",
       "description": "An outlined control in the ink: the other copy formats, secondary actions.",
       "html": "<button class=\"ds-btn-secondary\">Copy 1-line standup</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; min-height: 46px; padding: 0 1.05rem; border: 1px solid rgba(16, 32, 26, 0.50); border-radius: 4px; background: #f4f7f1; color: #10201a; font: 500 0.9375rem/1.25 Archivo, 'Archivo Fallback', system-ui, sans-serif; cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), border-color 240ms ease; } .ds-btn-secondary:hover { transform: translateY(-1px); border-color: rgba(16, 32, 26, 0.34); } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(16, 32, 26, 0.14); }"
+      "css": ".ds-btn-secondary { box-shadow: 0 1px 1px rgba(15, 20, 25, 0.05), 0 2px 4px rgba(15, 20, 25, 0.05), 0 4px 8px -2px rgba(15, 20, 25, 0.05); display: inline-flex; align-items: center; min-height: 46px; padding: 0 1.05rem; border: 1px solid rgba(15, 20, 25, 0.50); border-radius: 4px; background: #f8fafc; color: #0f1419; font: 500 0.9375rem/1.25 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 240ms ease, border-color 240ms ease; } .ds-btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 1px 2px rgba(15, 20, 25, 0.05), 0 4px 8px rgba(15, 20, 25, 0.05), 0 12px 24px rgba(15, 20, 25, 0.05); border-color: rgba(15, 20, 25, 0.34); } .ds-btn-secondary:active { transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(15, 20, 25, 0.14); }"
     },
     {
       "name": "Text field",
@@ -678,53 +938,53 @@
       "refersTo": "input",
       "description": "A field on the sheet, ruled in the strong border; 16px text so a phone does not zoom.",
       "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"you@company.com\"></label>",
-      "css": ".ds-field { display: grid; gap: 0.375rem; max-width: 22rem; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-field-label { font-size: 0.875rem; font-weight: 500; color: #2b3b33; } .ds-input { min-height: 44px; padding: 0.625rem 0.875rem; border: 1px solid rgba(16, 32, 26, 0.50); border-radius: 4px; background: #f4f7f1; color: #10201a; font: 400 16px/1.4 inherit; } .ds-input::placeholder { color: #40524a; opacity: 0.85; } .ds-input:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(16, 32, 26, 0.14); }"
+      "css": ".ds-field { display: grid; gap: 0.375rem; max-width: 22rem; font-family: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; } .ds-field-label { font-size: 0.875rem; font-weight: 500; color: #2a3442; } .ds-input { min-height: 44px; padding: 0.625rem 0.875rem; border: 1px solid rgba(15, 20, 25, 0.50); border-radius: 4px; background: #f8fafc; color: #0f1419; font: 400 16px/1.4 inherit; } .ds-input::placeholder { color: #4a5568; opacity: 0.85; } .ds-input:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(15, 20, 25, 0.14); }"
     },
     {
       "name": "Global header",
       "kind": "nav",
-      "description": "The Besley wordmark and four routes; the current one ruled in 2px ink.",
+      "description": "The Bricolage Grotesque wordmark and four routes; the current one ruled in 2px ink.",
       "html": "<nav class=\"ds-nav\"><span class=\"ds-nav-mark\">Whether</span><a class=\"ds-nav-link\" aria-current=\"page\" href=\"#\">This week</a><a class=\"ds-nav-link\" href=\"#\">Plan</a><a class=\"ds-nav-link\" href=\"#\">History</a><a class=\"ds-nav-link\" href=\"#\">Guides</a></nav>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 1.5rem; padding: 0.875rem 1rem; background: #ecf0e8; border-bottom: 1px solid rgba(16, 32, 26, 0.24); font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-nav-mark { font: 800 1.0625rem/1 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.01em; color: #10201a; } .ds-nav-link { position: relative; padding-block: 0.25rem; font-size: 0.9375rem; color: #2b3b33; text-decoration: none; } .ds-nav-link:hover { color: #10201a; } .ds-nav-link[aria-current=\"page\"] { color: #10201a; font-weight: 600; } .ds-nav-link[aria-current=\"page\"]::after { content: \"\"; position: absolute; left: 0; right: 0; bottom: -0.875rem; height: 2px; background: #10201a; } .ds-nav-link:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+      "css": ".ds-nav { display: flex; align-items: center; gap: 1.5rem; padding: 0.875rem 1rem; background: #eef1f6; border-bottom: 1px solid rgba(15, 20, 25, 0.24); font-family: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; } .ds-nav-mark { font: 800 1.0625rem/1 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Source Sans 3', system-ui, sans-serif; letter-spacing: -0.01em; color: #0f1419; } .ds-nav-link { position: relative; padding-block: 0.25rem; font-size: 0.9375rem; color: #2a3442; text-decoration: none; } .ds-nav-link:hover { color: #0f1419; } .ds-nav-link[aria-current=\"page\"] { color: #0f1419; font-weight: 600; } .ds-nav-link[aria-current=\"page\"]::after { content: \"\"; position: absolute; left: 0; right: 0; bottom: -0.875rem; height: 2px; background: #0f1419; } .ds-nav-link:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; }"
     },
     {
       "name": "Record band",
       "kind": "custom",
       "refersTo": "record-band-wide",
-      "description": "The signature: condition fields crossed by two bundles of fine lines, risk appetite above and funding pressure below, a mark per published brief, a caption that counts both records.",
-      "html": "<aside class=\"ds-band\" aria-label=\"The record\"><div class=\"ds-band-plate\"><svg viewBox=\"0 0 100 1000\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><rect x=\"0\" width=\"48\" height=\"1000\" fill=\"#e0a81c\"/><rect x=\"48\" width=\"16\" height=\"1000\" fill=\"#8f9be0\"/><rect x=\"64\" width=\"24\" height=\"1000\" fill=\"#2a4fa8\"/><rect x=\"88\" width=\"12\" height=\"1000\" fill=\"#9a5b1e\"/><g fill=\"none\" stroke-width=\"1\" vector-effect=\"non-scaling-stroke\"><path d=\"M0 180 L48 190\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M0 200 L48 210\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M48 190 Q52 170 56 190 T64 190\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M64 260 L67 240 L70 260 L73 240 L76 260 L79 240 L82 260 L85 240 L88 260\" stroke=\"#ecf0e8\" stroke-opacity=\"0.86\"/><path d=\"M0 600 L48 600\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M0 620 L48 620\" stroke=\"#10201a\" stroke-opacity=\"0.62\"/><path d=\"M64 800 L67 780 L70 800 L73 780 L76 800 L79 780 L82 800 L85 780 L88 800\" stroke=\"#ecf0e8\" stroke-opacity=\"0.86\"/><path d=\"M88 780 L89 770 L90 780 L91 770 L92 780 L93 770 L94 780 L95 770 L96 780 L97 770 L98 780 L99 770 L100 780\" stroke=\"#ecf0e8\" stroke-opacity=\"0.86\"/></g><g stroke=\"#ecf0e8\" stroke-width=\"1\" vector-effect=\"non-scaling-stroke\"><line x1=\"48\" x2=\"48\" y1=\"0\" y2=\"1000\"/><line x1=\"64\" x2=\"64\" y1=\"0\" y2=\"1000\"/><line x1=\"88\" x2=\"88\" y1=\"0\" y2=\"1000\"/><line x1=\"94\" x2=\"94\" y1=\"0\" y2=\"1000\" stroke-dasharray=\"3 3\" stroke-width=\"1.5\"/></g></svg><span class=\"ds-band-label\" style=\"top:16%\">Risk appetite</span><span class=\"ds-band-label\" style=\"top:58%\">Funding pressure</span></div><div class=\"ds-band-axis\"><span style=\"left:0%\">2012</span><span style=\"left:48%\">2019</span><span style=\"left:64%\">2022</span><i style=\"left:95%\"></i><i style=\"left:97%\"></i><i style=\"left:99%\"></i></div><p class=\"ds-band-caption\">178 month-end readings since Jan 2012, scored with today’s formula · 7 briefs, published as written · <a href=\"#\">History</a></p></aside>",
-      "css": ".ds-band { background: #ecf0e8; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-band-plate { position: relative; height: 150px; border-block: 1px solid rgba(16, 32, 26, 0.24); cursor: crosshair; touch-action: pan-y; } .ds-band-plate svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; } .ds-band-plate:focus-visible { outline: 2px solid #10201a; outline-offset: -3px; } .ds-band-label { position: absolute; left: 0.75rem; font-size: 0.75rem; font-weight: 600; line-height: 1; color: #10201a; pointer-events: none; } .ds-band-axis { position: relative; height: 1.25rem; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: #40524a; } .ds-band-axis span { position: absolute; top: 0; padding: 0.3rem 0 0 0.3rem; line-height: 1; border-left: 1px solid rgba(16, 32, 26, 0.50); } .ds-band-axis i { position: absolute; top: 0; width: 2px; height: 0.5rem; margin-left: -1px; background: #10201a; } .ds-band-caption { margin: 0; padding: 0.125rem 1rem 0; font-size: 0.75rem; line-height: 1.4; color: #40524a; text-align: right; font-variant-numeric: tabular-nums; } .ds-band-caption a { color: #10201a; font-weight: 600; text-underline-offset: 0.2em; } .ds-band-caption a:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+      "description": "The weather strip, under the navigation of every route: a field per stretch of conditions, each a small sky lighter at the top, crossed by two bundles of fine lines, risk appetite above and funding pressure below, a mark per published brief. Moving along it reads the month out as a card with the two scores as large numerals, and tints the homepage's sky to that month.",
+      "html": "<aside class=\"ds-band\" aria-label=\"The record\"><div class=\"ds-band-plate\"><svg viewBox=\"0 0 100 1000\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><rect x=\"0\" width=\"48\" height=\"1000\" fill=\"#e8a81c\"/><rect x=\"48\" width=\"16\" height=\"1000\" fill=\"#465290\"/><rect x=\"64\" width=\"24\" height=\"1000\" fill=\"#9fd0f2\"/><rect x=\"88\" width=\"12\" height=\"1000\" fill=\"#6a8aaa\"/><g fill=\"none\" stroke-width=\"1\" vector-effect=\"non-scaling-stroke\"><path d=\"M0 180 L48 190\" stroke=\"#0f1419\" stroke-opacity=\"0.62\"/><path d=\"M0 200 L48 210\" stroke=\"#0f1419\" stroke-opacity=\"0.62\"/><path d=\"M48 190 Q52 170 56 190 T64 190\" stroke=\"#0f1419\" stroke-opacity=\"0.62\"/><path d=\"M64 260 L67 240 L70 260 L73 240 L76 260 L79 240 L82 260 L85 240 L88 260\" stroke=\"#eef1f6\" stroke-opacity=\"0.86\"/><path d=\"M0 600 L48 600\" stroke=\"#0f1419\" stroke-opacity=\"0.62\"/><path d=\"M0 620 L48 620\" stroke=\"#0f1419\" stroke-opacity=\"0.62\"/><path d=\"M64 800 L67 780 L70 800 L73 780 L76 800 L79 780 L82 800 L85 780 L88 800\" stroke=\"#eef1f6\" stroke-opacity=\"0.86\"/><path d=\"M88 780 L89 770 L90 780 L91 770 L92 780 L93 770 L94 780 L95 770 L96 780 L97 770 L98 780 L99 770 L100 780\" stroke=\"#eef1f6\" stroke-opacity=\"0.86\"/></g><g stroke=\"#eef1f6\" stroke-width=\"1\" vector-effect=\"non-scaling-stroke\"><line x1=\"48\" x2=\"48\" y1=\"0\" y2=\"1000\"/><line x1=\"64\" x2=\"64\" y1=\"0\" y2=\"1000\"/><line x1=\"88\" x2=\"88\" y1=\"0\" y2=\"1000\"/><line x1=\"94\" x2=\"94\" y1=\"0\" y2=\"1000\" stroke-dasharray=\"3 3\" stroke-width=\"1.5\"/></g></svg><span class=\"ds-band-label\" style=\"top:16%\">Risk appetite</span><span class=\"ds-band-label\" style=\"top:58%\">Funding pressure</span></div><div class=\"ds-band-axis\"><span style=\"left:0%\">2012</span><span style=\"left:48%\">2019</span><span style=\"left:64%\">2022</span><i style=\"left:95%\"></i><i style=\"left:97%\"></i><i style=\"left:99%\"></i></div><p class=\"ds-band-caption\">178 month-end readings since Jan 2012, scored with today’s formula · 7 briefs, published as written · <a href=\"#\">History</a></p></aside>",
+      "css": ".ds-band { background: #eef1f6; font-family: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; } .ds-band-plate { position: relative; height: 150px; border-block: 1px solid rgba(15, 20, 25, 0.24); cursor: crosshair; touch-action: pan-y; } .ds-band-plate svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; } .ds-band-plate:focus-visible { outline: 2px solid #0f1419; outline-offset: -3px; } .ds-band-label { position: absolute; left: 0.75rem; font-size: 0.75rem; font-weight: 600; line-height: 1; color: #0f1419; pointer-events: none; } .ds-band-axis { position: relative; height: 1.25rem; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: #4a5568; } .ds-band-axis span { position: absolute; top: 0; padding: 0.3rem 0 0 0.3rem; line-height: 1; border-left: 1px solid rgba(15, 20, 25, 0.50); } .ds-band-axis i { position: absolute; top: 0; width: 2px; height: 0.5rem; margin-left: -1px; background: #0f1419; } .ds-band-caption { margin: 0; padding: 0.125rem 1rem 0; font-size: 0.75rem; line-height: 1.4; color: #4a5568; text-align: right; font-variant-numeric: tabular-nums; } .ds-band-caption a { color: #0f1419; font-weight: 600; text-underline-offset: 0.2em; } .ds-band-caption a:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; }"
     },
     {
       "name": "Guidance block",
       "kind": "custom",
       "refersTo": "guidance",
-      "description": "The document's opening, with no box: brief number, the condition word in its ink with its gloss, the guidance as the h1, the facts line.",
+      "description": "The document's opening, with no box. On the homepage it sits on the sky, the week's condition as a full-width gradient: the condition word and its glyph, the guidance as the h1, and the two scores on a panel of paper. On the answer pages it sits on the paper in one column.",
       "html": "<section class=\"ds-guidance\"><p class=\"ds-guidance-week\">Week of Nov 2, 2026 <a href=\"#\">No. 2026-W45</a></p><p class=\"ds-guidance-stamp\"><span class=\"ds-condition\">Cloudy</span><span class=\"ds-gloss\">Money is available but pricey.</span></p><h1 class=\"ds-guidance-call\">Protect the revenue you already have, and hold off on new bets until money gets cheaper.</h1><p class=\"ds-guidance-facts\">Funding pressure is 90, higher than most months since 2012. Risk appetite is 54, lower than most months. <a href=\"#\">Why</a></p></section>",
-      "css": ".ds-guidance { display: grid; gap: 0.75rem; max-width: 50rem; color: #10201a; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-guidance-week { margin: 0; font-size: 0.9375rem; color: #2b3b33; } .ds-guidance-week a { margin-left: 1rem; color: #40524a; text-underline-offset: 4px; } .ds-guidance-stamp { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem; } .ds-condition { font: 800 2.125rem/1 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.01em; color: #8a4f16; } .ds-gloss { font-size: 1.0625rem; color: #2b3b33; } .ds-guidance-call { margin: 0; font: 700 clamp(2.5rem, 3.5vw, 3.25rem)/1.02 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.03em; text-wrap: pretty; } .ds-guidance-facts { margin: 0; max-width: 36rem; font-size: 1.0625rem; line-height: 1.375; color: #2b3b33; } .ds-guidance a { color: #10201a; } .ds-guidance a:hover { text-decoration-thickness: 2px; } .ds-guidance a:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+      "css": ".ds-guidance { display: grid; gap: 0.75rem; max-width: 50rem; color: #0f1419; font-family: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; } .ds-guidance-week { margin: 0; font-size: 0.9375rem; color: #2a3442; } .ds-guidance-week a { margin-left: 1rem; color: #4a5568; text-underline-offset: 4px; } .ds-guidance-stamp { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem; } .ds-condition { font: 800 2.125rem/1 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Source Sans 3', system-ui, sans-serif; letter-spacing: -0.01em; color: #46607a; } .ds-gloss { font-size: 1.0625rem; color: #2a3442; } .ds-guidance-call { margin: 0; font: 700 clamp(2.5rem, 3.5vw, 3.25rem)/1.02 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Source Sans 3', system-ui, sans-serif; letter-spacing: -0.03em; text-wrap: pretty; } .ds-guidance-facts { margin: 0; max-width: 36rem; font-size: 1.0625rem; line-height: 1.375; color: #2a3442; } .ds-guidance a { color: #0f1419; } .ds-guidance a:hover { text-decoration-thickness: 2px; } .ds-guidance a:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; }"
     },
     {
       "name": "Area rows",
       "kind": "custom",
       "refersTo": "area-row",
-      "description": "Five numbered rows under a 2px ink rule: number, area in Besley, standing with its glyph, the action.",
+      "description": "Five numbered rows under a 2px ink rule: number, area in Bricolage Grotesque, standing with its glyph, the action.",
       "html": "<ol class=\"ds-areas\"><li><a href=\"#\"><span class=\"ds-n\">1</span><span class=\"ds-area\">Hiring</span><span class=\"ds-held\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/></svg>On hold</span><span class=\"ds-rule\">Only replace people who leave.</span></a></li><li><a href=\"#\"><span class=\"ds-n\">2</span><span class=\"ds-area\">Roadmap</span><span class=\"ds-clear\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg>Clear</span><span class=\"ds-rule\">Keep the core roadmap on schedule.</span></a></li></ol>",
-      "css": ".ds-areas { list-style: none; margin: 0; padding: 0; border-top: 2px solid #10201a; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-areas li { border-bottom: 1px solid rgba(16, 32, 26, 0.24); } .ds-areas a { display: grid; grid-template-columns: 1.25rem 8.5rem 6.5rem minmax(0, 1fr); align-items: baseline; gap: 0.75rem; min-height: 44px; padding-block: 0.375rem; color: #10201a; text-decoration: none; font-size: 0.9375rem; line-height: 1.25; } .ds-n { font-size: 0.8125rem; color: #40524a; font-variant-numeric: tabular-nums; } .ds-area { font: 700 1.25rem/1 Besley, 'Besley Fallback', Georgia, serif; } .ds-areas a:hover .ds-area { text-decoration: underline; text-underline-offset: 4px; } .ds-held, .ds-clear { display: inline-flex; align-items: center; gap: 0.375rem; font-weight: 500; } .ds-held { color: #b81f27; } .ds-clear { color: #10201a; } .ds-rule { color: #2b3b33; } .ds-areas a:focus-visible { outline: 2px solid #10201a; outline-offset: 2px; }"
+      "css": ".ds-areas { list-style: none; margin: 0; padding: 0; border-top: 2px solid #0f1419; font-family: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; } .ds-areas li { border-bottom: 1px solid rgba(15, 20, 25, 0.24); } .ds-areas a { display: grid; grid-template-columns: 1.25rem 8.5rem 6.5rem minmax(0, 1fr); align-items: baseline; gap: 0.75rem; min-height: 44px; padding-block: 0.375rem; color: #0f1419; text-decoration: none; font-size: 0.9375rem; line-height: 1.25; } .ds-n { font-size: 0.8125rem; color: #4a5568; font-variant-numeric: tabular-nums; } .ds-area { font: 700 1.25rem/1 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Source Sans 3', system-ui, sans-serif; } .ds-areas a:hover .ds-area { text-decoration: underline; text-underline-offset: 4px; } .ds-held, .ds-clear { display: inline-flex; align-items: center; gap: 0.375rem; font-weight: 500; } .ds-held { color: #b81f27; } .ds-clear { color: #0f1419; } .ds-rule { color: #2a3442; } .ds-areas a:focus-visible { outline: 2px solid #0f1419; outline-offset: 2px; }"
     },
     {
       "name": "Score figure",
       "kind": "custom",
       "refersTo": "score-figure",
-      "description": "A published score as a figure: the number in Besley 800, one sentence of standing, a 2px ink rule with the pause range in red and each line named in place.",
+      "description": "A published score as a figure: the number in Bricolage Grotesque 800, one sentence of standing, a 2px ink rule with the pause range in red and each line named in place.",
       "html": "<figure class=\"ds-figure\"><figcaption><span class=\"ds-figure-n\">90</span><span class=\"ds-figure-label\">Funding pressure <span>(higher is worse)</span></span><span class=\"ds-figure-standing\"><b>14 pts past its pause line.</b> Restarts below 66.</span></figcaption><div class=\"ds-figure-rule\"><span class=\"ds-line\"></span><span class=\"ds-zone\" style=\"left:0;width:24%\"></span><span class=\"ds-tick ds-tick-pause\" style=\"left:24%\"></span><span class=\"ds-tick\" style=\"left:34%\"></span><span class=\"ds-reading\" style=\"left:10%\"></span><span class=\"ds-name ds-name-pause\" style=\"right:76%\">pause 76</span><span class=\"ds-name\" style=\"left:34%\">restart 66</span></div></figure>",
-      "css": ".ds-figure { margin: 0; max-width: 22rem; font-family: Archivo, 'Archivo Fallback', system-ui, sans-serif; color: #10201a; } .ds-figure figcaption { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; column-gap: 0.75rem; } .ds-figure-n { grid-row: span 2; font: 800 5.75rem/0.9 Besley, 'Besley Fallback', Georgia, serif; letter-spacing: -0.03em; font-variant-numeric: tabular-nums lining-nums; } .ds-figure-label { font-size: 0.8125rem; font-weight: 500; color: #2b3b33; } .ds-figure-label span { margin-left: 0.375rem; font-weight: 400; color: #40524a; } .ds-figure-standing { font-size: 0.9375rem; line-height: 1.375; color: #2b3b33; } .ds-figure-standing b { color: #b81f27; } .ds-figure-rule { position: relative; height: 2.5rem; margin-top: 0.75rem; } .ds-line { position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: #10201a; } .ds-zone { position: absolute; top: 6px; height: 8px; background: #c4242b; } .ds-tick { position: absolute; top: 2px; width: 2px; height: 18px; transform: translateX(-50%); background: #10201a; } .ds-tick-pause { width: 3px; background: #c4242b; } .ds-reading { position: absolute; top: 2px; width: 18px; height: 18px; transform: translateX(-50%); border: 3px solid #10201a; border-radius: 9999px; background: #ecf0e8; box-sizing: border-box; } .ds-name { position: absolute; top: 24px; padding-left: 0.375rem; font-size: 12px; line-height: 1; white-space: nowrap; color: #2b3b33; font-variant-numeric: tabular-nums; } .ds-name-pause { padding: 0 0.375rem 0 0; color: #b81f27; }"
+      "css": ".ds-figure { margin: 0; max-width: 22rem; font-family: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; color: #0f1419; } .ds-figure figcaption { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; column-gap: 0.75rem; } .ds-figure-n { grid-row: span 2; font: 800 5.75rem/0.9 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', 'Source Sans 3', system-ui, sans-serif; letter-spacing: -0.03em; font-variant-numeric: tabular-nums lining-nums; } .ds-figure-label { font-size: 0.8125rem; font-weight: 500; color: #2a3442; } .ds-figure-label span { margin-left: 0.375rem; font-weight: 400; color: #4a5568; } .ds-figure-standing { font-size: 0.9375rem; line-height: 1.375; color: #2a3442; } .ds-figure-standing b { color: #b81f27; } .ds-figure-rule { position: relative; height: 2.5rem; margin-top: 0.75rem; } .ds-line { position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: #0f1419; } .ds-zone { position: absolute; top: 6px; height: 8px; background: #c4242b; } .ds-tick { position: absolute; top: 2px; width: 2px; height: 18px; transform: translateX(-50%); background: #0f1419; } .ds-tick-pause { width: 3px; background: #c4242b; } .ds-reading { position: absolute; top: 2px; width: 18px; height: 18px; transform: translateX(-50%); border: 3px solid #0f1419; border-radius: 9999px; background: #eef1f6; box-sizing: border-box; } .ds-name { position: absolute; top: 24px; padding-left: 0.375rem; font-size: 12px; line-height: 1; white-space: nowrap; color: #2a3442; font-variant-numeric: tabular-nums; } .ds-name-pause { padding: 0 0.375rem 0 0; color: #b81f27; }"
     },
     {
       "name": "Published weeks",
       "kind": "custom",
       "description": "History's week cells: a condition's fill with its own pattern where a brief was published, an empty dashed cell where none was.",
       "html": "<ol class=\"ds-weeks\"><li class=\"ds-wk ds-sunny\" title=\"Sunny\"></li><li class=\"ds-wk ds-empty\" title=\"No brief\"></li><li class=\"ds-wk ds-stormy\" title=\"Stormy\"></li><li class=\"ds-wk ds-freezing\" title=\"Freezing\"></li><li class=\"ds-wk ds-freezing\" title=\"Freezing\"></li><li class=\"ds-wk ds-empty\" title=\"No brief\"></li><li class=\"ds-wk ds-cloudy\" title=\"Cloudy\"></li></ol>",
-      "css": ".ds-weeks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; max-width: 28rem; } .ds-wk { height: 28px; } .ds-sunny { background: #e0a81c; } .ds-stormy { background-color: #8f9be0; background-image: repeating-linear-gradient(0deg, transparent 0 4px, rgba(16, 32, 26, 0.55) 4px 5px); } .ds-cloudy { background-color: #9a5b1e; background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(236, 240, 232, 0.7) 4px 5px); } .ds-freezing { background-color: #2a4fa8; background-image: repeating-linear-gradient(45deg, transparent 0 5px, rgba(236, 240, 232, 0.7) 5px 6px), repeating-linear-gradient(-45deg, transparent 0 5px, rgba(236, 240, 232, 0.7) 5px 6px); } .ds-empty { border: 1px dashed rgba(16, 32, 26, 0.50); box-sizing: border-box; } .ds-wk:not(.ds-empty):hover { outline: 2px solid #10201a; outline-offset: 1px; }"
+      "css": ".ds-weeks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; max-width: 28rem; } .ds-wk { height: 28px; } .ds-sunny { background: #e8a81c; } .ds-stormy { background-color: #465290; background-image: repeating-linear-gradient(0deg, transparent 0 4px, rgba(15, 20, 25, 0.55) 4px 5px); } .ds-cloudy { background-color: #6a8aaa; background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(238, 241, 246, 0.7) 4px 5px); } .ds-freezing { background-color: #9fd0f2; background-image: repeating-linear-gradient(45deg, transparent 0 5px, rgba(238, 241, 246, 0.7) 5px 6px), repeating-linear-gradient(-45deg, transparent 0 5px, rgba(238, 241, 246, 0.7) 5px 6px); } .ds-empty { border: 1px dashed rgba(15, 20, 25, 0.50); box-sizing: border-box; } .ds-wk:not(.ds-empty):hover { outline: 2px solid #0f1419; outline-offset: 1px; }"
     },
     {
       "name": "Caveat band",
@@ -732,19 +992,18 @@
       "refersTo": "caveat-band",
       "description": "Read this reading with care: ink on the raised tier, a 2px ink top rule, an outlined diamond. Never red.",
       "html": "<p class=\"ds-caveat\">4 briefs published in Sep and Oct 2026 read Freezing. Scored today, those month-ends read Cloudy. The briefs stay as written.</p>",
-      "css": ".ds-caveat { margin: 0; max-width: 40rem; padding: 0.75rem 1rem; border: 1px solid #40524a; border-top: 2px solid #10201a; border-radius: 2px; background: #fafcf8; color: #10201a; font: 400 0.9375rem/1.5 Archivo, 'Archivo Fallback', system-ui, sans-serif; } .ds-caveat::before { content: \"\"; display: inline-block; width: 0.4375rem; height: 0.4375rem; margin-right: 0.5rem; border: 1.5px solid currentColor; transform: rotate(45deg); vertical-align: 0.0625rem; }"
+      "css": ".ds-caveat { margin: 0; max-width: 40rem; padding: 0.75rem 1rem; border: 1px solid #4a5568; border-top: 2px solid #0f1419; border-radius: 2px; background: #fcfdfe; color: #0f1419; font: 400 0.9375rem/1.5 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, sans-serif; } .ds-caveat::before { content: \"\"; display: inline-block; width: 0.4375rem; height: 0.4375rem; margin-right: 0.5rem; border: 1.5px solid currentColor; transform: rotate(45deg); vertical-align: 0.0625rem; }"
     }
   ],
   "narrative": {
-    "northStar": "The Covenant",
-    "overview": "The lines are a policy agreed in advance, and the weekly brief is the dated statement of where each one stands. The page is that statement, printed on pale green-grey safety paper in a green-black ink, and its one ornament is the record itself: a full-bleed engraved band under the navigation of every route, drawn from every month-end reading since January 2012. Everything below the band is a document, read top to bottom: the guidance, the five areas, the two scores, then the sections that explain them.\n\nThe world borrows the discipline of credit agreements and security printing: structure is the only ornament, every engraved line is drawn from data, each line and tick names itself where it sits, and nothing decorative is added. It refuses the dark data panel with glowing accents, and its opposite, the cream editorial page with an italic serif masthead. \"Covenant\" names the world for contributors; it never appears in reader copy, and no reader term was minted for it.\n\nLight is the identity; dark is the second theme, the same paper with the lights off. With no stored choice the device setting picks the theme, and a stored choice wins (`app/layout.tsx`, the theme bootstrap). With scripts off, the stylesheet's base draws, which is the dark `:root` block.",
+    "northStar": "The Forecast",
+    "overview": "The weekly brief is the week's weather report for a startup: the condition is the sky, and how to proceed follows from it. The homepage opens on a sky tinted by the week's condition, full width, with the guidance written on it and the two scores on a panel of paper; a storm week and a sunny week look like different pages. Beneath the sky the brief is filed on cool paper in a blue-black ink, read top to bottom: the five areas, the trust facts, then the sections that explain them. The record band under the navigation of every route is every month-end reading since January 2012, drawn as the same four conditions.\n\nThe world borrows a modern weather app's glanceability and an investor update's restraint: the condition drives the page, structure stays quiet, every engraved line on the band is drawn from data, and nothing decorative is added except the sky's slow clouds. It refuses the dark data panel with glowing accents, the credit-agreement document Covenant was, and the editorial broadsheet. \"Forecast\" names the world for contributors; it never appears in reader copy beyond the weather words the site already uses.\n\nLight is the identity; dark is the second theme, the same page at night: the paper goes blue-black and each sky darkens to its condition after dark. With no stored choice the device setting picks the theme, and a stored choice wins (`app/layout.tsx`, the theme bootstrap). With scripts off, the stylesheet's base draws, which is the dark `:root` block.\n\nThe direction contract is `.impeccable/surfaces/app-page-tsx.md`.",
     "keyCharacteristics": [
-      "One field of colour at page scale: the record band. Everything else is ink on paper.",
-      "Two voices: Besley binds, Archivo explains.",
-      "Ruled sheets, not cards: hairlines, a 2px ink rule over a list, small radii.",
-      "No surface casts a shadow.",
+      "Colour commits at page scale in two places: the record band, and the homepage's sky. Everything else is ink on paper.",
+      "Two voices: Bricolage Grotesque binds, Source Sans 3 explains.",
+      "Ruled lists and lifted sheets: hairlines and a 2px ink rule over a list; a card or a button carries a layered three-step shadow, and nothing nested repeats it.",
       "Every drawing puts the easier side up or to the right.",
-      "A quiet week has no motion."
+      "A quiet week moves only the sky's clouds, and they hold still under reduced motion."
     ],
     "rules": [
       {
@@ -758,13 +1017,13 @@
         "section": "colors"
       },
       {
-        "name": "The One Field Rule",
-        "body": "Colour commits at page scale in one place, the record band. The condition word beside the guidance is the only other coloured element on the first screen. The regime atmosphere wash is off (`--atmosphere-*: transparent`), because a wash would tint the paper the band is printed on.",
+        "name": "The Two Fields Rule",
+        "body": "Colour commits at page scale in two places: the record band on every route, and the sky on the homepage's first screen. Both draw the four conditions and nothing else. The regime atmosphere wash is off everywhere else (`--atmosphere-*: transparent`), so the paper below the sky, and every other route, stays paper.",
         "section": "colors"
       },
       {
         "name": "The Binding Voice Rule",
-        "body": "Besley sets what the page commits to: the guidance, the condition word, area names, score figures, headings and the wordmark. Archivo sets everything that explains. The voice reaches the page through real rules only (`:where(h1, h2)`, `.type-section`, `.text-display`, `.type-stamp`, `.type-figure`); there is no `font-display` utility.",
+        "body": "Bricolage Grotesque sets what the page commits to: the guidance, the condition word, area names, score figures, headings and the wordmark. Source Sans 3 sets everything that explains. The voice reaches the page through real rules only (`:where(h1, h2)`, `.type-section`, `.text-display`, `.type-stamp`, `.type-figure`); there is no `font-display` utility.",
         "section": "typography"
       },
       {
@@ -779,28 +1038,31 @@
       },
       {
         "name": "The Measure Rule",
-        "body": "Prose stops at 60ch, about 75 characters in Archivo, from a base-layer rule on `p` and on list items holding text; a utility on the element overrides it, and a flex or grid row is exempt.",
+        "body": "Prose stops at 60ch, about 69 characters in Source Sans 3, from a base-layer rule on `p` and on list items holding text; a utility on the element overrides it, and a flex or grid row is exempt.",
         "section": "typography"
       },
       {
-        "name": "The Flat Paper Rule",
-        "body": "A container is a ruled sheet. If it needs a shadow to separate, it needs a hairline instead.",
+        "name": "The Say-It-Once Rule",
+        "body": "Depth is said once per stack: the outermost sheet lifts, everything in it is flat. A card inside a card is still wrong, shadow or not. Covenant's Flat Paper Rule (no surface casts a shadow, 2026-11-10 to 2026-11-12) is retired.",
         "section": "elevation"
       }
     ],
     "dos": [
       "Do name a condition with `data-regime` and read `--regime-accent` or `--regime-ink`; never type a condition hex at the call site.",
+      "Do print a condition word through `ConditionWord` or `ConditionLabel`, never as a bare label in the surrounding ink.",
       "Do draw links, buttons and focus rings in the ink, with links underlined.",
-      "Do set the guidance, condition word, area names, score figures, headings and wordmark in Besley, and everything that explains in Archivo.",
-      "Do separate sheets with a hairline and a step of tone, and lists with a 2px ink rule over hairline rows.",
+      "Do set the guidance, condition word, area names, score figures, headings and wordmark in Bricolage Grotesque, and everything that explains in Source Sans 3.",
+      "Do lift the outermost sheet with `--elev-card` and a button with `--elev-control`, and separate lists with a 2px ink rule over hairline rows.",
+      "Do read a sky from its tokens (`--regime-sky-*`) and give anything on it the sky's ink.",
       "Do give every condition a pattern as well as a fill wherever it fills an area, so the drawing survives greyscale and colour-vision deficiency.",
       "Do label each line and tick where it sits, and keep the easier side up or to the right.",
       "Do keep red for a crossed line, always with a glyph and a word.",
       "Do keep the record band's two records apart: fields are month-end readings scored today; marks are briefs as published."
     ],
     "donts": [
-      "Don't put a shadow on a container, or a card inside a card.",
-      "Don't use a condition's colour for a control, a section label or a page wash.",
+      "Don't put a card inside a card, or a shadow on anything nested in a lifted sheet.",
+      "Don't draw a zero-offset shadow or a glow.",
+      "Don't use a condition's colour for a control or a section label, or wash a page in it outside the homepage's sky.",
       "Don't add a hue that is neither a condition nor a crossed line; a caveat is ink with a diamond.",
       "Don't add a legend where a label in place will do.",
       "Don't add a decorative mark the record did not draw.",

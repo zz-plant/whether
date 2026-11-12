@@ -17,8 +17,10 @@
  *   §1.1.69), so it is copied, not redesigned;
  * - the ground, ink and condition colours come from lib/image/ogTheme.ts and
  *   lib/regimePhaseSpace.ts, the palette the share cards use;
- * - the words are the site footer's description, set in Archivo from
- *   public/fonts/og, the static instances the OG cards render with.
+ * - the words are the site footer's description, the wordmark in Bricolage Grotesque
+ *   800 (as the site header sets it) and the text in Source Sans 3, from
+ *   public/fonts/og, the static instances the OG cards render with (Archivo until
+ *   2026-11-12).
  *
  * source.svg is written too: the lockup on its ground, as the design reference
  * check-assets.ts requires.
@@ -66,10 +68,10 @@ const SCENES: Record<string, SceneSpec> = {
   unfurl: { width: 1200, height: 628, layout: "card" },
 };
 
-const DISPLAY_FONT = `font-family="Archivo" font-weight="700" font-stretch="semi-condensed"`;
-const BODY_FONT = `font-family="Archivo" font-weight="400"`;
-/** Archivo semi-condensed bold sets "Whether" about 3.55em wide; used to centre the lockup. */
-const WORDMARK_EM_WIDTH = 3.55;
+const DISPLAY_FONT = `font-family="Bricolage Grotesque" font-weight="800"`;
+const BODY_FONT = `font-family="Source Sans 3" font-weight="400"`;
+/** Bricolage Grotesque 800 sets "Whether" 4.07em wide, 4.0em at the -0.01em tracking below; used to centre the lockup. */
+const WORDMARK_EM_WIDTH = 4.0;
 
 /** The header mark, drawn on its own 24-unit grid and placed at `size` px. */
 function mark(x: number, y: number, size: number): string {
@@ -143,7 +145,7 @@ function sceneSvg(spec: SceneSpec): string {
 `;
 }
 
-/** rsvg-convert finds fonts through fontconfig, so point it at the repo's Archivo instances first. */
+/** rsvg-convert finds fonts through fontconfig, so point it at the repo's card instances first. */
 function fontconfigFile(dir: string): string {
   const path = join(dir, "fonts.conf");
   writeFileSync(path, `<?xml version="1.0"?>

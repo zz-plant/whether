@@ -60,7 +60,7 @@ try {
 <svg x="${x + 12}" y="${y + 12}" width="320" height="210" viewBox="0 0 ${asset.width} ${asset.height}" preserveAspectRatio="xMidYMid meet">${body}</svg>
 <text x="${x + 16}" y="${y + 250}" font-size="17" font-weight="600" fill="${p.ink}">${xml(asset.title)}</text>`;
     }).join("\n");
-    const sheet = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img"><title>Whether ${theme} visual asset contact sheet</title><desc>All ${selected.length} ${theme} visual references and illustrative templates. No current readings or recommendations.</desc><rect width="100%" height="100%" fill="${p.bg}"/><g font-family="Archivo, Arial, sans-serif"><text x="32" y="62" font-size="36" font-weight="700" fill="${p.ink}">Whether · ${theme} visual assets</text><text x="32" y="108" font-size="23" fill="${p.muted}">${selected.length} reusable references and templates · no current readings</text>${cells}</g></svg>\n`;
+    const sheet = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img"><title>Whether ${theme} visual asset contact sheet</title><desc>All ${selected.length} ${theme} visual references and illustrative templates. No current readings or recommendations.</desc><rect width="100%" height="100%" fill="${p.bg}"/><g font-family="'Source Sans 3', Arial, sans-serif"><text x="32" y="62" font-size="36" font-weight="700" fill="${p.ink}">Whether · ${theme} visual assets</text><text x="32" y="108" font-size="23" fill="${p.muted}">${selected.length} reusable references and templates · no current readings</text>${cells}</g></svg>\n`;
     emit(`contact-sheet-${theme}.svg`, sheet);
     emit(`contact-sheet-${theme}.png`, png(sheet));
   }
@@ -69,7 +69,7 @@ try {
     version: 1,
     generator: "bun scripts/generate-visual-assets.tsx",
     gallery: "index.html",
-    font: { family: "Archivo", editableSvg: true, svgFallback: "Arial, sans-serif", rasterFontSource: "public/fonts/og", note: "SVG text stays editable. Install Archivo for an exact match in another application. PNGs use the bundled font instances." },
+    font: { family: "Source Sans 3", editableSvg: true, svgFallback: "Arial, sans-serif", rasterFontSource: "public/fonts/og", note: "SVG text stays editable. Install Source Sans 3 for an exact match in another application. PNGs use the bundled font instances." },
     usage: "References define concepts. Templates are visibly illustrative and contain no current readings or advice. Replace placeholder material with a cited, dated reading before using it as a decision artifact. Keep glyphs paired with their words.",
     sourceOfTruth: ["lib/regimePresentation.ts", "lib/regimePhaseSpace.ts", "lib/report/boundedDecisionRules.ts", "lib/report/operatingCalls.ts", "lib/report/trustStatus.ts", "lib/image/ogTheme.ts", "app/styles/tokens.css"],
     themes: ["dark", "light"],

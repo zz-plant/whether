@@ -13,10 +13,10 @@
  * font loader for any glyph outside its default face, and that download failing
  * aborts the render mid-stream (a 200 with an empty body, not an error).
  */
-export const OG_FONT_DISPLAY = "Archivo SemiCondensed";
-export const OG_FONT_BODY = "Archivo";
-/** The regime word's face, expanded like the site's stamp (.type-stamp). */
-export const OG_FONT_STAMP = "Archivo Expanded";
+export const OG_FONT_DISPLAY = "Bricolage Grotesque";
+export const OG_FONT_BODY = "Source Sans 3";
+/** The condition word's face, the display voice at its heaviest like the site's stamp (.type-stamp). */
+export const OG_FONT_STAMP = "Bricolage Grotesque Heavy";
 
 /**
  * What the cards print in place of the site's symbols.
@@ -61,14 +61,16 @@ type OgFont = {
   style: "normal";
 };
 
-/* Static instances of the one variable file the site serves, written by
-   scripts/generate-og-fonts.mjs: the call semi-condensed, text at normal
-   width, the regime word expanded — the same three voices as the pages. */
+/* Static instances of the two variable files the site serves, written by
+   scripts/generate-og-fonts.mjs (Forecast, 2026-11-12): the call in Bricolage
+   Grotesque 700, the condition word in its 800 under a family of its own (the
+   templates ask for it at weight 700), and the text in Source Sans 3 — the same
+   voices as the pages. They were Archivo until then. */
 const FACES: ReadonlyArray<{ path: string; name: string; weight: 400 | 600 | 700 }> = [
-  { path: "/fonts/og/archivo-semicondensed-700.ttf", name: OG_FONT_DISPLAY, weight: 700 },
-  { path: "/fonts/og/archivo-400.ttf", name: OG_FONT_BODY, weight: 400 },
-  { path: "/fonts/og/archivo-600.ttf", name: OG_FONT_BODY, weight: 600 },
-  { path: "/fonts/og/archivo-expanded-700.ttf", name: OG_FONT_STAMP, weight: 700 },
+  { path: "/fonts/og/bricolage-grotesque-700.ttf", name: OG_FONT_DISPLAY, weight: 700 },
+  { path: "/fonts/og/source-sans-3-400.ttf", name: OG_FONT_BODY, weight: 400 },
+  { path: "/fonts/og/source-sans-3-600.ttf", name: OG_FONT_BODY, weight: 600 },
+  { path: "/fonts/og/bricolage-grotesque-800.ttf", name: OG_FONT_STAMP, weight: 700 },
 ];
 
 let cache: Promise<OgFont[] | undefined> | null = null;

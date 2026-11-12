@@ -4,7 +4,12 @@
 
    The fills come from the data-regime map, the same hexes as every other drawing.
    The two line inks are constants of the plate (tokens.css, --band-line-*): the band
-   is one print, the same in both themes, the way the condition fills are. */
+   is one print, the same in both themes, the way the condition fills are.
+
+   Since 2026-11-12 it is the Forecast's weather strip: each field is a small sky,
+   its fill at the foot lifted a fifth toward the paper at the top, so the light and
+   dense fields keep their line inks; and the readout shows the month on the band as a
+   card with the two scores as large numerals. */
 
 .record-band {
   position: relative;
@@ -47,6 +52,12 @@ body:has([data-record-plate]) .record-band-plate {
 .record-band-field {
   fill: var(--regime-accent);
 }
+
+/* The stops of each field's sky (recordBand.tsx draws one gradient per condition, each
+   naming its regime). The field's own `fill: url(...)` is inline, so this rule's flat
+   fill is what a renderer without gradients keeps. */
+.record-band-sky-top { stop-color: color-mix(in srgb, var(--regime-accent) 78%, var(--band-line-on-dense)); }
+.record-band-sky-base { stop-color: var(--regime-accent); }
 
 .record-band-lines path {
   fill: none;
@@ -148,6 +159,70 @@ body:has([data-record-plate]) .record-band-plate {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+/* The month under the pointer, as a card on the band (recordBandReadout.tsx). It
+   floats over the drawing, so it lifts. It slides with the pointer: --at is the
+   cursor's place along the band, 0 to 1, and the card's own width is moved back by
+   the same share, so it stays whole on the band at either end without a measurement. */
+.record-band-reading {
+  --at: 1;
+  position: absolute;
+  left: calc(var(--at) * 100%);
+  top: 50%;
+  z-index: 1;
+  transform: translate(calc(var(--at) * -100%), -50%);
+  /* Its own width, not what is left of the band past its left edge: placed at 60% on a
+     phone it had 40% of the band to fill, and the glyph shrank to nothing. */
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.3125rem 0.625rem;
+  white-space: nowrap;
+  color: var(--app-text);
+  background: color-mix(in srgb, var(--bg-panel) 97%, transparent);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elev-card);
+  pointer-events: none;
+}
+.record-band-reading[hidden] { display: none; }
+
+.record-band-reading-when {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.record-band-reading-month {
+  font-size: var(--fs-nano);
+  color: var(--app-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.record-band-reading-condition {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-fluid-sm);
+  line-height: 1;
+  color: var(--regime-ink);
+}
+.record-band-reading-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.record-band-reading-figure .type-figure { font-size: 1.5rem; }
+.record-band-reading-label {
+  font-size: var(--fs-nano);
+  line-height: 1;
+  color: var(--app-text-muted);
+}
+@container (min-width: 46rem) {
+  .record-band-reading { gap: 1rem; padding: 0.5rem 0.875rem; }
+  .record-band-reading-figure .type-figure { font-size: 2.25rem; }
 }
 .record-band-overlay > canvas {
   display: block;

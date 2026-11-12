@@ -59,6 +59,24 @@
   }
 }
 
+/* A condition change cross-fades the sky in 300ms (the Forecast motion grammar): a week
+   picked in the stepper, and a month read off the record band, which tints the sky to
+   that month while it is read (recordBandReadout.tsx). The colours are registered in
+   tokens.css, so they interpolate; the text's inks move with the ground, so the two
+   never part. Still under reduced motion. */
+.weather-hero-sky {
+  transition:
+    --regime-sky-top 300ms var(--ease-out),
+    --regime-sky 300ms var(--ease-out),
+    --regime-sky-ink 300ms var(--ease-out),
+    --regime-sky-muted 300ms var(--ease-out),
+    --regime-sky-cloud 300ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-hero-sky { transition: none; }
+}
+
 /* The condition word's glyph, and the earlier week's stamp over it, each carry their
    own data-regime, so the regime map would hand them their condition's page ink on
    the sky: Stormy's dark ink on the light theme's Stormy sky, which drew nothing. On

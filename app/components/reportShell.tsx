@@ -53,6 +53,9 @@ export type ReportShellModel = {
     /** The condition the status word names, where the page has no regime of its
      *  own (/history's latest archived month): it inks the word and nothing else. */
     statusRegime?: RegimeKey;
+    /** The conditions a frame's running head names where no status word does: the
+     *  compare page's two periods. The intro does not print it. */
+    frameCondition?: string;
     recordDateLabel: string;
     fetchedAtLabel?: string;
   };
@@ -105,7 +108,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
-    status: { statusLabel, statusPrefix, regime, statusRegime, recordDateLabel, fetchedAtLabel = "" },
+    status: { statusLabel, statusPrefix, regime, statusRegime, frameCondition, recordDateLabel, fetchedAtLabel = "" },
     page: { pageTitle, pageSummary, sectionLinks, currentPath, tabsQuery },
     trust: {
       trustStatusTone,
@@ -188,6 +191,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             offlineBadgeLabel={offlineBadgeLabel}
             trustStrip={trustStrip}
             regime={regime}
+            frameCondition={frameCondition}
           />
 
           {/* The outline, as a row of tabs, where the rail is hidden. Under the

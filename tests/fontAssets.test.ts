@@ -220,9 +220,9 @@ describe("the web fonts", () => {
 });
 
 describe("the share cards' fonts", () => {
-  /* Static Archivo instances (scripts/generate-og-fonts.mjs, from scripts/og-font-sources):
-     the cards were not moved to the site's faces on 2026-11-12. Satori reads these, and
-     lib/image/ogFonts.ts no longer rewrites the arrow. */
+  /* Static instances of the site's own two faces (scripts/generate-og-fonts.mjs), since
+     2026-11-12 (Archivo until then). Satori reads these, and lib/image/ogFonts.ts no
+     longer rewrites the arrow. */
   it("draw the arrow and the comparisons", () => {
     const files = readdirSync(join(FONT_DIR, "og")).filter((name) => name.endsWith(".ttf"));
     assert.equal(files.length, 4);

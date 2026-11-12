@@ -7,22 +7,25 @@
  * `app/api/og/reportImageTemplate.tsx`, the brief card in `briefImageTemplate`).
  *
  * The estimate is a greedy word wrap at a per-character width a little above
- * what the faces measure on this copy (Archivo semi-condensed 700, the call's
- * face, averages 0.42em; Archivo 400 and 600 average 0.44 and 0.45em), so it
- * over-counts lines rather than under-counts them: a card that leaves a little
- * air is fine, one that overlaps is not. Re-measure when a face changes:
- * scripts/generate-og-fonts.mjs writes the instances these were taken from.
+ * what the faces measure on this copy, so it over-counts lines rather than
+ * under-counts them: a card that leaves a little air is fine, one that overlaps is
+ * not. Measured 2026-11-12 over the brief formats' text (86,000 characters,
+ * tests/fixtures/briefFormats.golden.json): Bricolage Grotesque 700 at optical size
+ * 48, the call's face, averages 0.466em; Source Sans 3 400 and 600 average 0.416
+ * and 0.429em. Each constant keeps the margin Archivo's had (0.42em under 0.45,
+ * 0.46em under 0.49): the call wraps sooner than it did in Archivo, the text later.
+ * Re-measure when a face changes: scripts/generate-og-fonts.mjs writes the
+ * instances these were taken from.
  */
-export const DISPLAY_EM = 0.45;
-export const SANS_EM = 0.49;
+export const DISPLAY_EM = 0.5;
+export const SANS_EM = 0.46;
 
 /**
- * Characters a full em wide, counted as two. An average cannot absorb them:
- * → ← ↔ advance 1000 units of 1000 in every card face, and — and ‰ about the
- * same in the text faces (— is 875 in the call's semi-condensed face). Counted
- * at the average, a run of them measures under half its drawn width, and since
- * 2026-10-07 the cards print the arrow as itself instead of "->". Letters stay
- * in the average they were measured in.
+ * Characters wider than the average, counted as two. An average cannot absorb
+ * them: → and ← advance about 0.61em in both card faces, — about 0.8em and ‰ 1.2
+ * to 1.4em, against an average under half an em. Counted at the average, a run of
+ * them measures under its drawn width; counted twice, an arrow is over-counted,
+ * which is the safe side. Letters stay in the average they were measured in.
  */
 const WIDE = /[\u2190\u2192\u2194\u2014\u2030]/g;
 const measure = (text: string): number => text.length + (text.match(WIDE)?.length ?? 0);

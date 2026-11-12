@@ -217,10 +217,8 @@ The direction contract is `.impeccable/surfaces/app-page-tsx.md`.
 - Every drawing puts the easier side up or to the right.
 - A quiet week moves only the sky's clouds, and they hold still under reduced motion.
 
-**Open.** Known gaps (share images still in Archivo, the record band not yet a weather strip, no
-sky cross-fade on a condition change) and the earlier open decisions (per-area history,
-condition fills on their weak ground) live in `docs/design/rebuild-covenant.md` and the surface
-brief, not here.
+**Open.** The earlier open decisions (per-area history, condition fills on their weak ground)
+live in `docs/design/rebuild-covenant.md` and the surface brief, not here.
 
 ## Colors
 
@@ -337,7 +335,10 @@ differ by face and weight, not width.
 
 All three are self-hosted variable files, subset to the site's text, with hashed file names
 (`app/styles/fonts.css` records the build). Source Sans 3 and Bricolage Grotesque are preloaded.
-Satori's share cards still draw Archivo (`public/fonts/og`); moving them is open.
+The share cards draw the same two voices from static instances of these files
+(`public/fonts/og`, `scripts/generate-og-fonts.mjs`): the call in Bricolage Grotesque 700, the
+condition word and the score figures at 800, the text in Source Sans 3. They were Archivo until
+2026-11-12.
 
 ### Hierarchy
 
@@ -508,13 +509,15 @@ under the header on every route (`app/components/recordBand.tsx`, `lib/report/re
 image needs no script.
 
 - **Construction.** One slot per month-end reading. Each stretch of conditions is a field in
-  that condition's fill, a hair wider than its months so no ground shows between fields; a
+  that condition's fill, drawn as a small sky (Forecast, 2026-11-12): the fill at its foot,
+  lifted a fifth toward the paper at its top, so the fields read as weather and keep their line
+  inks. Each field is a hair wider than its months so no ground shows between fields; a
   pale seam marks each boundary, and a 1px default border rules the plate top and bottom. Two
   bundles of fine lines cross it: risk appetite above, funding pressure below and drawn
   downward as pressure rises, so easier is up. Lines are 1px, non-scaling, smoothed over three
   months. A dashed pale line marks where publication began.
-- **Line inks.** On a light field (Sunny, Stormy) the dark line ink at 0.62 opacity; on a dense
-  field (Cloudy, Freezing) the pale line ink at 0.86. The same in both themes.
+- **Line inks.** On a light field (Sunny, Cloudy, Freezing) the dark line ink at 0.62 opacity;
+  on the dense field (Stormy) the pale line ink at 0.86. The same in both themes.
 - **Line pattern per condition** (`recordBandLineY`, `lib/report/recordBandCodec.ts`): plain for
   Sunny, a slow sine wave for Stormy (four-month wavelength), a tight triangle ripple for Cloudy
   (four-thirds of a month), a zigzag for Freezing (two months). The band reads in greyscale.
@@ -533,6 +536,12 @@ image needs no script.
   and End jump, Enter, Space or a click opens that month's brief, Escape, leaving, cancelling or
   blur restores the caption. A vertical swipe that starts on the band still scrolls the page.
   The readout has no easing.
+- **The weather strip's card.** The same reading also shows on the band as a card of paper, which
+  floats and so lifts (`--elev-card`): the month, the condition word with its glyph in its ink,
+  and the two scores as large figures (24px on a phone, 36px from 46rem). It slides with the
+  pointer and never leaves the band, and it is hidden from assistive tech, which hears the
+  slider's value instead. On the homepage the sky takes the month's condition while it is read
+  and cross-fades back to the week's when the reading ends; the guidance on it does not change.
 
 ### History's plate
 
@@ -620,7 +629,9 @@ Both are leaves, never containers.
 Motion is functional and short: 120ms for a press, 200–240ms for state changes
 (`--transition-fast`, `--transition-base`, `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`), and
 none under `prefers-reduced-motion`. Pages cross-fade (100ms out, 220ms in) with the title
-morphing in place. Nothing animates on scroll, and nothing loops except a loading skeleton and
+morphing in place. The sky cross-fades to another condition in 300ms (its colours are registered
+with `@property`, so they interpolate): a week picked in the stepper, or a month read off the
+record band. Nothing animates on scroll, and nothing loops except a loading skeleton and
 the sky's clouds (34–46s drifts, `transform` only), both still under reduced motion.
 
 **The week's move** is the one authored exception: on a week the conditions changed or an area

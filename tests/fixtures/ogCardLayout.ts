@@ -32,8 +32,8 @@ export const findSatoriLayoutViolations = (node: ReactNode, path = "root"): stri
 };
 
 export const ogFontFaces: Array<{ name: string; data: Buffer; weight: 400 | 600 | 700; style: "normal" }> = [
-  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/archivo-semicondensed-700.ttf"), weight: 700, style: "normal" },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-400.ttf"), weight: 400, style: "normal" },
-  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/archivo-600.ttf"), weight: 600, style: "normal" },
-  { name: OG_FONT_STAMP, data: readFileSync("public/fonts/og/archivo-expanded-700.ttf"), weight: 700, style: "normal" },
+  { name: OG_FONT_DISPLAY, data: readFileSync("public/fonts/og/bricolage-grotesque-700.ttf"), weight: 700, style: "normal" },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/source-sans-3-400.ttf"), weight: 400, style: "normal" },
+  { name: OG_FONT_BODY, data: readFileSync("public/fonts/og/source-sans-3-600.ttf"), weight: 600, style: "normal" },
+  { name: OG_FONT_STAMP, data: readFileSync("public/fonts/og/bricolage-grotesque-800.ttf"), weight: 700, style: "normal" },
 ];

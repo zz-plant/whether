@@ -4,7 +4,7 @@
  * emails. Mirrors the dark theme in app/styles/tokens.css: Forecast's night
  * slate (2026-11-12, .impeccable/surfaces/app-page-tsx.md), which replaced
  * Covenant's green-black. The site's default is the light theme; these formats
- * are still drawn dark, and still set in Archivo (lib/image/ogFonts.ts).
+ * are still drawn dark. They are set in the site's two voices (lib/image/ogFonts.ts).
  *
  * Colour means one of two things here, as on the site. A condition takes its
  * fill from REGIME_HEX_COLORS (lib/regimePhaseSpace.ts); a line takes its state,
@@ -33,9 +33,8 @@ export const OG_LINE_CROSSED_BG = "#2a1719";
  * Each condition as text on this ground: the dark theme's condition inks in
  * tokens.css (--color-condition-*-ink, Forecast since 2026-11-12), which clear
  * 8.2:1 on the panel. The fill (REGIME_HEX_COLORS) is for rules, borders and
- * bars; Stormy's fill is 2.5:1 here, legible as a 26px stamp but not as a
- * sentence. The ground and inks above are still Covenant's night: the cards
- * keep their own palette and Archivo until they are redrawn.
+ * bars; Stormy's fill is 2.4:1 here, legible as a 26px stamp but not as a
+ * sentence.
  */
 export const OG_CONDITION_INK: Record<RegimeKey, string> = {
   EXPANSION: "#f0c95a",

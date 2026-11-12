@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CommandCenterNavBlock } from "../app/components/report-shell/CommandCenterNavBlock";
@@ -116,6 +117,15 @@ describe("running head facts", () => {
     assert.equal(facts["data-frame-date"], "Last completed month: Sep 30, 2026");
     assert.equal(facts["data-frame-regime"], undefined);
     assert.equal(attributesIn(intro({ regime: undefined, statusLabel: "Historical" }))["data-frame-condition"], undefined);
+  });
+
+  it("names both periods on the compare page, which prints no status word of its own", () => {
+    const html = intro({ regime: undefined, statusLabel: "", frameCondition: "Cloudy · Stormy" });
+    const facts = attributesIn(html);
+    assert.equal(facts["data-frame-condition"], "Cloudy · Stormy");
+    assert.equal(facts["data-frame-regime"], undefined, "two conditions take no one condition's ink");
+    assert.doesNotMatch(html, />Cloudy · Stormy</, "the intro does not print it");
+    assert.match(readFileSync("app/history/compare/page.tsx", "utf8"), /frameCondition,/);
   });
 
   it("marks a reading page's header with its title", () => {

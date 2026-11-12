@@ -775,6 +775,16 @@ html[data-theme="light"] {
 [data-regime="DEFENSIVE"] { --regime-accent: #6a8aaa; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); --regime-on-accent: #0f1419; }
 [data-regime="VOLATILE"] { --regime-accent: #465290; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); --regime-on-accent: #f8fafc; }
 
+/* The sky's colours are registered as colours, not token streams, so the sky can
+   cross-fade between two conditions (forecast.css): an unregistered custom property
+   cannot be interpolated, and a gradient cannot be transitioned at all. A browser
+   without @property switches at once. */
+@property --regime-sky-top { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --regime-sky { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --regime-sky-ink { syntax: "<color>"; inherits: true; initial-value: #000; }
+@property --regime-sky-muted { syntax: "<color>"; inherits: true; initial-value: #000; }
+@property --regime-sky-cloud { syntax: "<color>"; inherits: true; initial-value: transparent; }
+
 /* The sky (Forecast, 2026-11-12; .impeccable/surfaces/app-page-tsx.md): the
    homepage's first screen sits on its condition, so a storm week and a sunny
    week look like different pages (forecast.css draws it). Each sky is a

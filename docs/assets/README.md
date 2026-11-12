@@ -40,7 +40,8 @@ Each file's size comes from the spec table in `scripts/check-assets.ts`; the che
 size, an indexed palette or a missing type.
 
 The generator uses the site's own parts: the header mark and its colour, the share cards' palette
-from `lib/image/ogTheme.ts` and `lib/regimePhaseSpace.ts`, and Archivo from `public/fonts/og`. It
+from `lib/image/ogTheme.ts` and `lib/regimePhaseSpace.ts`, and the wordmark in Bricolage Grotesque
+with the text in Source Sans 3, from `public/fonts/og` (Archivo until 2026-11-12). It
 needs `rsvg-convert` (`brew install librsvg`). The mark itself is the owner's call
 (`docs/decisions/feature-log/01-product-surfaces.md` §1.1.69), so the generator copies it rather than redrawing it.
 
