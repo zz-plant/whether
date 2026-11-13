@@ -6,11 +6,12 @@ import {
   organizationId,
   organizationName,
   organizationSameAs,
+  shortSiteName,
+  siteAlternateNames,
   websiteId,
-  websiteName,
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
-import { buildAuthorSchema } from "../../publisher";
+import { buildAuthorSchema, publishedDataLicenseUrl } from "../../publisher";
 import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
 import { MARGIN_LABEL, formatMarginBand } from "../reportFormatting";
 
@@ -78,7 +79,8 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
     {
       "@type": "WebSite",
       "@id": websiteId,
-      name: websiteName,
+      name: shortSiteName,
+      alternateName: [...siteAlternateNames],
       url: siteUrl,
       image: buildOgImageUrl({ template: "report" }),
       description: defaultSiteDescription,
@@ -115,7 +117,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         creator: {
           "@id": organizationId,
         },
-        license: `${siteUrl}/terms-of-service`,
+        license: publishedDataLicenseUrl,
         temporalCoverage: brief.datePublishedIso,
         /*
          * The posture, regime and confidence, in a property schema.org actually

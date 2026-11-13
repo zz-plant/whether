@@ -1,6 +1,6 @@
-import { buildBreadcrumbList, buildCanonicalUrl, buildOgImageUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
+import { buildBreadcrumbList, buildCanonicalUrl, buildOgImageUrl, organizationId, organizationName, shortSiteName, siteAlternateNames, websiteId } from "../seo";
 import { siteUrl } from "../siteUrl";
-import { buildAuthorSchema, buildPublisherSchema, weeklyPublicationName } from "../publisher";
+import { buildAuthorSchema, buildPublisherSchema, publishedDataLicenseUrl, weeklyPublicationName } from "../publisher";
 import { buildGroupBreadcrumbs, createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
@@ -26,7 +26,8 @@ type JsonLdGraph = {
 const websiteNode = () => ({
   "@type": "WebSite",
   "@id": websiteId,
-  name: websiteName,
+  name: shortSiteName,
+  alternateName: [...siteAlternateNames],
   url: siteUrl,
   image: buildOgImageUrl({ template: "report" }),
 });
@@ -281,7 +282,7 @@ export const buildHistoryStructuredData = ({
         "Every month-end reading on record, with each change in conditions and the length of each spell, scored from public US Treasury and macro series.",
       url,
       creator: buildPublisherSchema(organizationName),
-      license: buildCanonicalUrl("/terms-of-service"),
+      license: publishedDataLicenseUrl,
       isAccessibleForFree: true,
       ...(coverage ? { temporalCoverage: `${coverage.from}/${coverage.to}` } : {}),
       variableMeasured: [
@@ -574,6 +575,8 @@ export const buildCalibrationStudyStructuredData = ({
         + `${totals.held} of ${totals.months} held.`,
       url,
       creator: { "@id": organizationId },
+      license: publishedDataLicenseUrl,
+      isAccessibleForFree: true,
       isBasedOn: {
         "@type": "CreativeWork",
         name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
@@ -649,14 +652,15 @@ export const buildProductCanonStructuredData = ({
 export const buildPublishedBriefStructuredData = ({
   brief,
   canonicalUrl,
-  imageUrl,
+  imageUrls,
   headline,
   description,
   dateModified,
 }: {
   brief: PublishedBrief;
   canonicalUrl: string;
-  imageUrl: string;
+  /** `buildPublishedBriefImageUrls`: the card at 16:9, 4:3 and 1:1. */
+  imageUrls: readonly string[];
   headline: string;
   description: string;
   /** `publishedBriefModifiedAt`: a correction is the one edit a record takes. */
@@ -684,7 +688,7 @@ export const buildPublishedBriefStructuredData = ({
       temporalCoverage: `${brief.recordDate}/${brief.recordDate}`,
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),
-      image: [imageUrl],
+      image: [...imageUrls],
       url: canonicalUrl,
       mainEntityOfPage: canonicalUrl,
       isAccessibleForFree: true,

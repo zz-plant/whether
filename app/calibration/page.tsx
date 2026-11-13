@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-import { buildPageMetadata } from "../../lib/seo";
+import { buildPageMetadata, organizationName } from "../../lib/seo";
+import { publisherAuthor } from "../../lib/publisher";
 import { buildCalibrationStudyStructuredData } from "../../lib/seo/pageStructuredData";
 import {
   SecondaryPageHeader,
@@ -36,14 +37,26 @@ export const runtime = "edge";
  * `/trust` keeps a pointer rather than a copy — two indexable URLs carrying the
  * same study would compete with each other.
  */
-export const metadata: Metadata = buildPageMetadata({
-  title: "How often the guidance held up",
-  description:
-    "How often the weekly guidance held, checked against every month since 2012, and how close conditions came to changing each time.",
-  path: "/calibration",
-  imageAlt: "How often the guidance held up",
-  imageParams: { template: "method", eyebrow: "The record" },
-});
+export const metadata: Metadata = {
+  ...buildPageMetadata({
+    title: "How often the guidance held up",
+    description:
+      "How often the weekly guidance held, checked against every month since 2012, and how close conditions came to changing each time.",
+    path: "/calibration",
+    imageAlt: "How often the guidance held up",
+    imageParams: { template: "method", eyebrow: "The record" },
+  }),
+  /* Google Scholar reads these Highwire Press tags, not schema.org: the `ScholarlyArticle` node
+     reaches every other reader, and these reach Scholar. The date is the study's first
+     publication at this address (2026-09-17); its figures update monthly on the same URL. */
+  other: {
+    citation_title: "How often the guidance held up",
+    citation_author: publisherAuthor.name,
+    citation_publication_date: "2026/09/17",
+    citation_technical_report_institution: organizationName,
+    citation_language: "en",
+  },
+};
 
 export default function CalibrationPage() {
   const totals = confidenceCalibrationTotals();

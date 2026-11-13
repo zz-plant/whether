@@ -20,7 +20,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { CALENDAR_FEED_PATH } from "../lib/export/calendarFeed";
-import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
+import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, shortSiteName, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
 import { activationLastWeekStorageKey } from "../lib/activationFunnel";
 import { WebMcpBridge } from "./components/webMcpBridge";
@@ -145,7 +145,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: siteName,
     description: siteDescription,
-    siteName,
+    siteName: shortSiteName,
     images: [
       {
         url: socialImageUrl,

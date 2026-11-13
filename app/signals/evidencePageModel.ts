@@ -8,6 +8,7 @@ import {
   websiteId,
 } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
+import { publishedDataLicenseUrl } from "../../lib/publisher";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
 import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
@@ -131,7 +132,7 @@ const buildStructuredData = () =>
         description:
           "Macro signal dataset for Whether, including the pause lines, the two scores, and the evidence behind the guidance.",
         creator: { "@id": organizationId },
-        license: `${siteUrl}/terms-of-service`,
+        license: publishedDataLicenseUrl,
       },
     },
     {

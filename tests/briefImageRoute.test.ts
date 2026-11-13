@@ -394,5 +394,39 @@ describe("brief chart OG template", () => {
     assert.match(text, /Conditions by quarter/);
     for (const label of ["Freezing", "Cloudy", "Stormy", "Sunny"]) assert.match(text, new RegExp(label));
   });
+
+  it("draws the article images at 16:9, 4:3 and 1:1, and every other card at 1200x630", async () => {
+    const { readOgSize } = await import("../app/api/og/renderOgElement");
+    const { buildPublishedBriefImageUrls, getPublishedBriefs } = await import("../lib/report/publishedBriefs");
+    const brief = getPublishedBriefs()[0];
+    assert.ok(brief);
+    const sizes = buildPublishedBriefImageUrls(brief).map((url) => readOgSize(new URL(url).searchParams));
+    assert.deepEqual(sizes, [
+      { width: 1200, height: 675 },
+      { width: 1200, height: 900 },
+      { width: 1200, height: 1200 },
+    ]);
+    const social = { width: 1200, height: 630 };
+    assert.deepEqual(readOgSize(new URLSearchParams("template=brief-chart")), social);
+    assert.deepEqual(readOgSize(new URLSearchParams("template=brief-chart&ratio=toString")), social);
+    assert.deepEqual(readOgSize(new URLSearchParams("template=answers&ratio=1x1")), social, "only the chart card stretches");
+  });
+
+  it("lays out at every article size", async () => {
+    const { renderBriefChartOgImage } = await import("../app/api/og/briefChartTemplate");
+    for (const canvasHeight of [630, 675, 900, 1200]) {
+      const chart = renderBriefChartOgImage({
+        posture: "Freezing",
+        weekLabel: "Nov 9, 2026",
+        regime: "SCARCITY",
+        points: [{ label: "2026-Q3", regime: "SCARCITY", intensity: 0.9 }],
+        canvasHeight,
+      });
+      assert.deepEqual(findSatoriLayoutViolations(chart), [], `at 1200x${canvasHeight}`);
+      const image = new ImageResponse(chart, { width: 1200, height: canvasHeight, fonts: ogFontFaces });
+      const body = await image.arrayBuffer();
+      assert.deepEqual([...new Uint8Array(body.slice(0, 4))], [0x89, 0x50, 0x4e, 0x47], `a PNG at 1200x${canvasHeight}`);
+    }
+  });
 });
 

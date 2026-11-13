@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
+import { publishedDataLicenseUrl } from "../../lib/publisher";
 import { LegalPageShell } from "../components/legalPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -12,7 +13,7 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function TermsOfServicePage() {
   return (
-    <LegalPageShell title="Terms of Service" effectiveDate="10/14/2026">
+    <LegalPageShell title="Terms of Service" effectiveDate="11/12/2026">
 
         <section className="space-y-4 text-base leading-7 text-slate-200">
           <p>
@@ -37,6 +38,18 @@ export default function TermsOfServicePage() {
             Subject to these Terms and any applicable order form or agreement with Whether, Whether
             grants you a limited, non-exclusive, non-transferable, revocable right to access and use the
             Service for lawful internal business operations.
+          </p>
+          <p className="text-base leading-7 text-slate-200">
+            Whether&apos;s own published readings, scores, market conditions, weekly guidance and frozen
+            weekly briefs are also licensed under the{" "}
+            <a className="underline underline-offset-4" href={publishedDataLicenseUrl} rel="license">
+              Creative Commons Attribution 4.0 International license (CC BY 4.0)
+            </a>
+            . You may copy, share and adapt them for any purpose, including commercially, if you credit
+            Whether and link to whether.work. That license does not cover values Whether reproduces from
+            its sources (Treasury and credit series from FRED, company figures from SEC filings, and
+            market prices), which remain under their providers&apos; terms, nor the software, the Whether
+            name or its logo.
           </p>
         </section>
 

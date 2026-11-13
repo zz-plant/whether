@@ -17,6 +17,15 @@ export const organizationName = "Whether";
  */
 export const websiteName = "Whether — Weekly Operating Guidance for Startup Leaders";
 /*
+ * What a search result calls the site: the `WebSite` node's `name` and `og:site_name`. Both carried
+ * `websiteName` until 2026-11-12, and Google's site-name system asks for the short name people use
+ * for a site, not a tagline, so it was left to pick one. `websiteName` stays the default <title>.
+ * "Whether" is also an ordinary word, so the alternates give Google the product's name and the
+ * domain to fall back on.
+ */
+export const shortSiteName = organizationName;
+export const siteAlternateNames: readonly string[] = ["Whether Weekly Brief", new URL(siteUrl).host];
+/*
  * The line leads with the decisions, not the day. The record moves a few times a
  * year (`lineCrossingMonths` in `lib/report/trackRecord.ts`), so "each Monday"
  * as the opening promised news the weekly reading rarely has; the use that fits
@@ -117,6 +126,21 @@ export const withUpdatedMarker = (title: string, value: string | null | undefine
 };
 export const buildSocialImageUrl = (path = defaultSocialImagePath) =>
   buildCanonicalUrl(path);
+
+/*
+ * The sizes `/api/og` draws a card at, by its `ratio` parameter. With none it draws the 1200x630
+ * card every page names as `og:image`. Google's article guidance asks for 16:9, 4:3 and 1:1 images
+ * too, and picks the one that fits the slot (Top Stories, Discover); given only the wide card, it
+ * crops a square out of the middle and cuts both ends off each line. Only the weekly brief's chart
+ * card is laid out to stretch, so `/api/og` honours `ratio` on that template alone.
+ */
+export const ogImageRatios = ["16x9", "4x3", "1x1"] as const;
+export type OgImageRatio = (typeof ogImageRatios)[number];
+export const ogImageRatioSizes: Readonly<Record<OgImageRatio, { width: number; height: number }>> = {
+  "16x9": { width: 1200, height: 675 },
+  "4x3": { width: 1200, height: 900 },
+  "1x1": { width: 1200, height: 1200 },
+};
 
 export const buildOgImageUrl = (params?: Record<string, string>) => {
   const imageUrl = new URL("/api/og", siteUrl);
@@ -240,7 +264,7 @@ export const buildPageMetadata = ({
       url: canonicalUrl,
       title,
       description,
-      siteName: websiteName,
+      siteName: shortSiteName,
       images: [{
         url: imageUrl,
         width: 1200,
