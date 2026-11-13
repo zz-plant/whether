@@ -104,7 +104,11 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
     <ReportSection
       id="run-history"
       title={`Scheduled runs, last ${windowDays} days`}
-      description="The jobs that keep this brief up to date, read from the log each run writes."
+      /* The section states the count, and the count is the claim: a brief that
+         shows only its successes is asking to be trusted rather than checked.
+         The description said what the log was ("read from the log each run
+         writes") and never why a reader is being shown it. */
+      description="Every job that keeps this brief current, and every run that failed. Published because a brief that shows only its successes is asking to be trusted rather than checked."
     >
       {runHistory.status === "unavailable" ? (
         <p className="text-sm text-slate-300">
