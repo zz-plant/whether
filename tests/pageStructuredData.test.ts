@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import {
   buildAnswerFaqStructuredData,
   buildApiDocsStructuredData,
+  buildCalibrationStudyStructuredData,
   buildCompanyPageStructuredData,
   buildCompsStructuredData,
   buildHistoryStructuredData,
@@ -16,8 +17,8 @@ import {
   graph as pageGraph,
 } from "../lib/seo/pageStructuredData";
 import { buildHomeStructuredData } from "../lib/report/home/structuredData";
-import { buildPublisherSchema } from "../lib/publisher";
-import { organizationId, organizationSameAs, websiteId } from "../lib/seo";
+import { buildPublisherSchema, publishedDataLicenseUrl } from "../lib/publisher";
+import { buildPageMetadata, organizationId, organizationSameAs, websiteId } from "../lib/seo";
 import { findToolkitDefinition } from "../lib/decisionDomainCatalog";
 import { getPostureArchivePeriods } from "../lib/summary/postureArchive";
 import { getPublishedBriefs } from "../lib/report/publishedBriefs";
@@ -59,6 +60,22 @@ describe("site entities", () => {
     const publisher = buildPublisherSchema("Whether");
     assert.equal(publisher["@id"], organizationId);
     assert.deepEqual(publisher.sameAs, [...organizationSameAs]);
+  });
+
+  /* Google's site-name system takes the short name people use for a site and passes over a
+     tagline; the node carried the category line until 2026-11-12. */
+  it("names the site as people say it, with the product and the domain as alternates", () => {
+    const home = buildHomeStructuredData({
+      headline: "h", description: "d", datePublishedIso: "2026-09-10",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+    });
+    for (const graph of [home, buildApiDocsStructuredData()]) {
+      const website = one(graph, "WebSite");
+      assert.equal(website.name, "Whether");
+      assert.deepEqual(website.alternateName, ["Whether Weekly Brief", "whether.work"]);
+    }
+    const metadata = buildPageMetadata({ title: "t", description: "d", path: "/about", imageAlt: "a" });
+    assert.equal(metadata.openGraph?.siteName, "Whether");
   });
 
   it("joins every page graph to the site entity by id", () => {
@@ -284,7 +301,7 @@ describe("/brief/[week]", () => {
     const graph = buildPublishedBriefStructuredData({
       brief,
       canonicalUrl: `https://whether.work/brief/${brief.slug}`,
-      imageUrl: `https://whether.work/brief/${brief.slug}/opengraph-image`,
+      imageUrls: ["https://whether.work/a.png", "https://whether.work/b.png"],
       headline: "Test headline",
       description: "Test description",
       dateModified: "2026-12-01T00:00:00.000Z",
@@ -306,5 +323,50 @@ describe("/brief/[week]", () => {
     });
     assert.equal(article.temporalCoverage, `${brief.recordDate}/${brief.recordDate}`);
     assert.ok(Array.isArray(article.keywords));
+    assert.deepEqual(article.image, ["https://whether.work/a.png", "https://whether.work/b.png"]);
+  });
+});
+
+describe("data licenses", () => {
+  /* The terms page grants a revocable right of internal use, so as a Dataset's license it listed
+     Whether's own readings as closed data in Google Dataset Search. */
+  it("puts Whether's own readings under CC BY 4.0", () => {
+    const home = buildHomeStructuredData({
+      headline: "h", description: "d", datePublishedIso: "2026-09-10",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+    });
+    const history = buildHistoryStructuredData({ periods: [], publishedBriefs: [], coverage: null });
+    const calibration = buildCalibrationStudyStructuredData({ totals: { months: 10, held: 8 } });
+    for (const graph of [home, history, calibration]) {
+      for (const dataset of nodesOf(graph, "Dataset")) assert.equal(dataset.license, publishedDataLicenseUrl);
+    }
+    assert.equal(publishedDataLicenseUrl, "https://creativecommons.org/licenses/by/4.0/");
+  });
+
+  it("but not the SaaS basket, whose medians come from licensed market prices", () => {
+    const comps = buildCompsStructuredData({
+      data: {
+        source: "yahoo",
+        fetchedAt: "2026-11-10T00:00:00.000Z",
+        medianEvToRevenue: 7.1,
+        medianRevenueGrowth: 0.2,
+        companyCount: 10,
+        growthCompanyCount: 10,
+      },
+      tickers: ["SNOW"],
+    });
+    assert.equal(one(comps, "Dataset").license, "https://whether.work/terms-of-service");
+  });
+});
+
+describe("Google Scholar", () => {
+  /* Scholar ignores the ScholarlyArticle node; it reads Highwire Press meta tags, and needs at
+     least a title, an author and a publication date to list a page. */
+  it("can list the calibration study", async () => {
+    const { metadata } = await import("../app/calibration/page");
+    assert.equal(metadata.other?.citation_title, metadata.title);
+    assert.equal(metadata.other?.citation_author, "Kanav Jain");
+    assert.match(String(metadata.other?.citation_publication_date), /^\d{4}\/\d{2}\/\d{2}$/);
+    assert.equal(metadata.other?.citation_technical_report_institution, "Whether");
   });
 });

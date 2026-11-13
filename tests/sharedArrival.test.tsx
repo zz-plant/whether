@@ -80,3 +80,13 @@ describe("a dated record that newer weeks replaced", () => {
     assert.doesNotMatch(await renderRecord(latest.slug), /data-newer-guidance/);
   });
 });
+
+describe("a reader who found the week on Google", () => {
+  it("can make Whether a preferred source, through Google's own page and no third-party script", async () => {
+    assert.ok(latestPublishedBrief);
+    const html = await renderRecord(latestPublishedBrief.slug);
+    assert.match(html, /href="https:\/\/www\.google\.com\/preferences\/source\?q=whether\.work"[^>]*>Add Whether as a preferred source</);
+    assert.ok(html.indexOf("data-preferred-source") > html.indexOf('id="monday-email"'), "after the Monday email, as the other way in");
+    assert.doesNotMatch(html, /news\.google\.com\/swg/);
+  });
+});

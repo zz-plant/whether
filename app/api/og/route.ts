@@ -5,10 +5,7 @@
  */
 import { ImageResponse } from "next/og";
 import { loadOgFonts } from "../../../lib/image/ogFonts";
-import { renderOgElement } from "./renderOgElement";
-
-const OG_WIDTH = 1200;
-const OG_HEIGHT = 630;
+import { readOgSize, renderOgElement } from "./renderOgElement";
 
 export const runtime = "edge";
 export const revalidate = 300;
@@ -16,9 +13,10 @@ export const revalidate = 300;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const fonts = await loadOgFonts(request.url);
+  const { width, height } = readOgSize(searchParams);
   const image = new ImageResponse(await renderOgElement(searchParams), {
-    width: OG_WIDTH,
-    height: OG_HEIGHT,
+    width,
+    height,
     ...(fonts ? { fonts } : {}),
   });
 

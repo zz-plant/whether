@@ -4,7 +4,7 @@ import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { toImageSafeProps, toImageSafeText } from "../../../lib/image/ogFonts";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { loadComparePreview } from "../../../lib/image/compareImagePayload";
-import { canonicalPositioningLine } from "../../../lib/seo";
+import { canonicalPositioningLine, ogImageRatioSizes, type OgImageRatio } from "../../../lib/seo";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
 import { renderCompareOgImage } from "./compareTemplate";
@@ -47,6 +47,19 @@ const readTemplate = (searchParams: URLSearchParams): OgTemplate => {
   if (isStaticTemplate(template)) return template;
   if (template === "brief-chart" || template === "compare" || template === "answers") return template;
   return "report";
+};
+
+const DEFAULT_SIZE = { width: 1200, height: 630 } as const;
+
+const isOgImageRatio = (value: string): value is OgImageRatio => Object.hasOwn(ogImageRatioSizes, value);
+
+/**
+ * The canvas a URL's card is drawn on: `ogImageRatioSizes[ratio]` for the weekly brief's chart card,
+ * which is laid out to stretch, and 1200x630 for every other card and every other `ratio`.
+ */
+export const readOgSize = (searchParams: URLSearchParams): { width: number; height: number } => {
+  const ratio = searchParams.get("ratio")?.trim() ?? "";
+  return readTemplate(searchParams) === "brief-chart" && isOgImageRatio(ratio) ? ogImageRatioSizes[ratio] : DEFAULT_SIZE;
 };
 
 /* Ends on a word. A raw slice put "commit to growth inve" on a share card. */
@@ -111,6 +124,7 @@ export const renderOgElement = async (searchParams: URLSearchParams): Promise<Re
         weekLabel: readParam(searchParams, "week", "", 24),
         regime: readRegime(searchParams) ?? "VOLATILE",
         points: buildPostureTimelinePoints(),
+        canvasHeight: readOgSize(searchParams).height,
       }),
     );
   }

@@ -14,7 +14,7 @@ import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo, isoWeekMonday, parseIsoWeekSlug } from "../isoWeek";
-import { buildCanonicalUrl, buildOgImageUrl, escapeXml } from "../seo";
+import { buildCanonicalUrl, buildOgImageUrl, escapeXml, ogImageRatios } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
 import { MARGIN_LABEL, formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
@@ -712,6 +712,10 @@ export const buildPublishedBriefImageParams = (brief: PublishedBrief) => ({
 
 export const buildPublishedBriefImageUrl = (brief: PublishedBrief) =>
   buildOgImageUrl(buildPublishedBriefImageParams(brief));
+
+/** The week's card at each ratio Google's article markup asks for: the NewsArticle's `image`. */
+export const buildPublishedBriefImageUrls = (brief: PublishedBrief) =>
+  ogImageRatios.map((ratio) => buildOgImageUrl({ ...buildPublishedBriefImageParams(brief), ratio }));
 
 export const findPublishedBrief = (slug: string) => briefBySlug.get(slug);
 

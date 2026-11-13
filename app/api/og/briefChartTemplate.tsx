@@ -33,19 +33,32 @@ const frameStyle: CSSProperties = {
   fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`,
 };
 
+/**
+ * The canvas this layout was drawn for. A taller one (the article images) sets the conditions
+ * word and the week larger, up to 1.6 times, and gives the chart the height that is left: in a
+ * square thumbnail the chart had taken all of it, and the word a reader needs went to a corner.
+ */
+const BASE_CANVAS_HEIGHT = 630;
+const MAX_TYPE_SCALE = 1.6;
+
 export const renderBriefChartOgImage = ({
   posture,
   weekLabel,
   regime,
   points,
+  canvasHeight = BASE_CANVAS_HEIGHT,
 }: {
   posture: string;
   weekLabel: string;
   regime: RegimeKey;
   points: BriefChartPoint[];
+  /** 630 for the social card; 675, 900 or 1200 for the article images (`ogImageRatioSizes`). */
+  canvasHeight?: number;
 }): ReactElement => {
   const accent = regimeColor[regime];
   const visible = points.slice(-28);
+  const tall = canvasHeight > BASE_CANVAS_HEIGHT;
+  const typeScale = tall ? Math.min(MAX_TYPE_SCALE, canvasHeight / BASE_CANVAS_HEIGHT) : 1;
 
   return (
     <div style={frameStyle}>
@@ -77,10 +90,10 @@ export const renderBriefChartOgImage = ({
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: 24 }}>
-        <div style={{ display: "flex", fontSize: 62, fontWeight: 700, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: OG_CONDITION_INK[regime], lineHeight: 1.05 }}>
+        <div style={{ display: "flex", fontSize: Math.round(62 * typeScale), fontWeight: 700, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: OG_CONDITION_INK[regime], lineHeight: 1.05 }}>
           {posture}
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: OG_TEXT_SECONDARY, marginTop: 10 }}>{weekLabel ? `Week of ${weekLabel}` : "This week's guidance"}</div>
+        <div style={{ display: "flex", fontSize: Math.round(30 * typeScale), color: OG_TEXT_SECONDARY, marginTop: Math.round(10 * typeScale) }}>{weekLabel ? `Week of ${weekLabel}` : "This week's guidance"}</div>
       </div>
 
       <div
@@ -88,8 +101,7 @@ export const renderBriefChartOgImage = ({
           display: "flex",
           alignItems: "flex-end",
           gap: 8,
-          height: 220,
-          marginTop: "auto",
+          ...(tall ? { flexGrow: 1, marginTop: Math.round(48 * typeScale) } : { height: 220, marginTop: "auto" }),
         }}
       >
         {visible.map((point, index) => (

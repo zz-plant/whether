@@ -20,6 +20,21 @@ export const publisherAuthor = {
   sameAs: ["https://kanav.net"],
 } as const;
 
+/**
+ * The license on Whether's own published readings, scores and briefs (Terms of Service, section 2),
+ * and the `license` of each Dataset built from them. Until 2026-11-12 that was the terms page, whose
+ * grant is a revocable right of internal use, so Google Dataset Search listed the data as closed.
+ * Not /comps: its medians are computed from licensed market prices.
+ */
+export const publishedDataLicenseUrl = "https://creativecommons.org/licenses/by/4.0/";
+
+/**
+ * Google's setting for adding this site as a preferred source, which shows its pages more often in
+ * that reader's Top Stories (Search Central, "Preferred sources"). The deeplink, not Google's button
+ * script, so a page that offers it loads nothing from a third party.
+ */
+export const googlePreferredSourceUrl = `https://www.google.com/preferences/source?q=${new URL(siteUrl).host}`;
+
 /** The periodical the frozen weeks are issues of: the feed's title and their structured data's. */
 export const weeklyPublicationName = "Whether Weekly Brief";
 

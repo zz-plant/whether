@@ -12,12 +12,12 @@ import {
   buildPageMetadata,
   homeOrientationLine,
 } from "../../../lib/seo";
-import { publisherAuthor } from "../../../lib/publisher";
+import { googlePreferredSourceUrl, publisherAuthor } from "../../../lib/publisher";
 import { buildPublishedBriefStructuredData } from "../../../lib/seo/pageStructuredData";
 import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefImageParams,
-  buildPublishedBriefImageUrl,
+  buildPublishedBriefImageUrls,
   buildPublishedBriefDescription,
   buildPublishedBriefPath,
   buildPublishedBriefTitle,
@@ -191,7 +191,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const structuredData = buildPublishedBriefStructuredData({
     brief,
     canonicalUrl,
-    imageUrl: buildPublishedBriefImageUrl(brief),
+    imageUrls: buildPublishedBriefImageUrls(brief),
     headline: briefTitle(brief),
     description: buildPublishedBriefDescription(brief),
     dateModified: publishedBriefModifiedAt(brief),
@@ -523,6 +523,15 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       {/* The shared-arrival note's "Get it every Monday" lands here: this form starts on Monday delivery. */}
       <div id="monday-email" data-print-hide>
         <SubscribeForm />
+        {/* The other way a week reaches a reader who did not come looking: Google shows a
+            preferred source's pages more often in that reader's Top Stories. */}
+        <p className="mt-3 text-fluid-sm text-slate-400" data-preferred-source>
+          Reading on Google instead?{" "}
+          <ActionLink href={googlePreferredSourceUrl} variant="inline" target="_blank" rel="noreferrer">
+            Add Whether as a preferred source
+          </ActionLink>{" "}
+          and its weekly briefs show up more often in your Top Stories.
+        </p>
       </div>
     </ContentPageShell>
   );
