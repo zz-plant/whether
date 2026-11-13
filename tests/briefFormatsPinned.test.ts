@@ -164,8 +164,9 @@ const collectSlides = async (out: Record<string, string>, snapshot: OperatingSna
   const pptx = await getBoardSlide(new NextRequest(`https://whether.test/api/export/board-slide${query}${query ? "&" : "?"}format=pptx`));
   out[`deck route: pptx sha256${query}`] = sha256(await pptx.arrayBuffer());
   out[`deck route: pptx filename${query}`] = pptx.headers.get("Content-Disposition") ?? "";
-  /* The PDF stamps its own creation time, so its bytes are not stable; the payload it draws is. */
-  const payload = buildExportSlidePayload(snapshot, stage ?? null);
+  /* The PDF stamps its own creation time, so its bytes are not stable; the payload it draws is.
+     Read through the same origin the routes above were called on, so the pin is what a reader gets. */
+  const payload = buildExportSlidePayload(snapshot, stage ?? null, "https://whether.test");
   out[`slide payload${query}`] = JSON.stringify(payload);
   out[`slide markdown${query}`] = formatMeetingSlideMarkdown(payload);
   out[`slide html${query}`] = formatMeetingSlideHtml(payload);

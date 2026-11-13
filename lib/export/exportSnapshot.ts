@@ -61,12 +61,19 @@ export const withSlideRecord = (payload: MeetingSlidePayload): MeetingSlidePaylo
  * every slide, PPTX and PDF reached without a `?stage=` was titled as a
  * seed-stage company's — a fact about the reader the site never asked for. No
  * stage means no stage on the slide.
+ *
+ * `origin` is the request's, so the file a reader downloads carries the address
+ * the call can be read at. It was the share panel's slide alone that printed
+ * one: the SVG, PPTX and PDF routes built the same payload without an origin,
+ * so the copies that land in a deck — the ones a director who has never seen the
+ * site will read — named the source and the date but not where to look.
  */
 export const buildExportSlidePayload = (
   snapshot: OperatingSnapshot,
   stage: StartupVariantMode | null,
+  origin?: string,
 ): MeetingSlidePayload =>
-  withSlideRecord(briefArtifactToSlidePayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage })));
+  withSlideRecord(briefArtifactToSlidePayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage }), origin));
 
 /**
  * Builds a meeting slide payload from a frozen PublishedBrief.
