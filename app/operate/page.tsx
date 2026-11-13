@@ -13,7 +13,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "This week's plan: hiring, spending and runway rules",
   description:
-    "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
+    "Set the rules in advance: this week's guidance, your runway, and your own pause and restart lines, so changing course is a line being crossed.",
   path: "/operate",
   imageAlt: "Whether planning view",
   imageParams: {

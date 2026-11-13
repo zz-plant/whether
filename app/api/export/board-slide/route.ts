@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     if (!snapshot) {
       return new NextResponse("Operating snapshot unavailable", { status: 503 });
     }
-    payload = buildExportSlidePayload(snapshot, stage);
+    payload = buildExportSlidePayload(snapshot, stage, request.nextUrl.origin);
   }
 
   const bytes = format === "pdf" ? await buildBoardSlidePdf(payload) : buildBoardSlidePptx(payload);

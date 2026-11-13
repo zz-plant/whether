@@ -174,6 +174,13 @@ export async function buildPlanningPageModel(
       },
       page: {
         pageTitle: "Operating rules and decision tools",
+        /* The page is the product's authority claim made operable: the reader
+           sets the lines ahead of time, so changing course later is a line being
+           crossed rather than a meeting. It read as a settings page — a list of
+           tools — while the stance it enacts (`AGENTS.md`, "A policy agreed in
+           advance") was stated nowhere on it. */
+        pageSummary:
+          "The rules you set in advance. Write your own pause and restart lines, so changing course later is a line being crossed, not a meeting.",
         /* The warnings section exists only in a week that has warnings, so its link does too. */
         sectionLinks: failureModes.length > 0
           ? operationsSectionLinks.plan

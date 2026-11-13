@@ -59,6 +59,21 @@ export const OPERATING_LATITUDE_LABEL = "Room to move";
  */
 export const OPERATING_LATITUDE_GLOSS = "how much you can hire, spend and commit, blended from risk appetite and funding pressure; higher means more room";
 
+/**
+ * The claim that leads the homepage's "What would change our mind" section.
+ *
+ * Every other surface states what the guidance is; this says what it is
+ * against. A first-time reader meets the pause, restart and change lines with
+ * no reason to think they are unusual, because the rest of the category
+ * publishes a read and stops. The sentence names the contrast once, where the
+ * lines are, so a screenshot of that section carries the argument and not just
+ * the reading.
+ *
+ * Homepage only: an answer page or an archived week draws as before.
+ */
+export const BOUNDED_CALL_CONTRAST =
+  "Most guidance tells you what's happening. This tells you what would make it wrong.";
+
 export const DECISION_CONTRACT_LABELS = {
   /* Noun slots for exports. "Threshold" and "Reversal" were retired on
      2026-10-09 for the names every screen already used for the same two lines. */

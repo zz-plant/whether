@@ -249,6 +249,22 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
       textBox({ name: "Footer resume", x: 80, y: FOOTER_TOP + footerLines(payload).length * FOOTER_LINE_HEIGHT, width: 1040, height: FOOTER_LINE_HEIGHT * 2, text: resumeLine, style: { sizePx: 13, bold: true, color: COLORS.inkMuted } }),
     );
   }
+  /* The address last, under everything: a slide opened in a board pack is read
+     by people who were not sent the brief, and the provenance line names the
+     site without saying which page. */
+  if (payload.url) {
+    shapes.push(
+      textBox({
+        name: "Footer url",
+        x: 80,
+        y: FOOTER_TOP + footerLines(payload).length * FOOTER_LINE_HEIGHT + (resumeLine ? FOOTER_LINE_HEIGHT * 2 : 0),
+        width: 1040,
+        height: FOOTER_LINE_HEIGHT,
+        text: payload.url,
+        style: { sizePx: 12, color: COLORS.inkSoft },
+      }),
+    );
+  }
 
   return (
     `${XML_HEADER}<p:sld ${NS_A} ${NS_R} ${NS_P}><p:cSld>` +
@@ -645,6 +661,16 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
   const resumeLine = slideResumeLine(payload);
   if (resumeLine) {
     drawText(resumeLine, { x: 80, y: FOOTER_TOP + 2 + footer.length * FOOTER_LINE_HEIGHT, sizePx: 13, font: bold, fill: COLORS.inkMuted, maxWidthPx: 1040 });
+  }
+  if (payload.url) {
+    drawText(payload.url, {
+      x: 80,
+      y: FOOTER_TOP + 2 + footer.length * FOOTER_LINE_HEIGHT + (resumeLine ? FOOTER_LINE_HEIGHT * 2 : 0),
+      sizePx: 12,
+      font: regular,
+      fill: COLORS.inkSoft,
+      maxWidthPx: 1040,
+    });
   }
 
   return doc.save();

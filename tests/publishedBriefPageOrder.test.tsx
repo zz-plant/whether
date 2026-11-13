@@ -43,6 +43,26 @@ describe("/brief/[week] leads with the delta, then the guidance, then the share 
     assert.equal(html.match(/>Conditions change if<\/dt>/g)?.length, 1, "the call-change line is labelled once outside the paste preview");
   });
 
+  /* A cited week is where the product is checked against itself, and the page
+     used to stop at the week's own delta: a claim with no outcome. */
+  it("says what the record read after the week, and where to read it", async () => {
+    const page = await import("../app/brief/[week]/page");
+    const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ week: "2026-w31" }) }));
+
+    const changed = html.indexOf("What changed this week");
+    const outcome = html.indexOf("What happened after this week");
+    const areas = html.indexOf("Guidance by area");
+    assert.ok(changed !== -1 && outcome !== -1 && areas !== -1);
+    assert.ok(changed < outcome, "the outcome follows the week's own delta");
+    assert.ok(outcome < areas, "and is read before the area rules");
+
+    const section = html.slice(outcome, areas);
+    assert.match(section, /The next published brief, for the week of [A-Z][a-z]{2} \d{1,2}, \d{4}/);
+    assert.match(section, /a change from/, "w31 read Sunny and the next published week did not");
+    assert.match(section, /This brief said conditions would change if/);
+    assert.match(section, /href="\/brief\/2026-w38"/, "it links the week it reports");
+  });
+
   /* w40 printed "+27.0 vs prior week": the stored move was against Aug 31, five
      weeks back, and the week before had read 85, not 63. */
   it("names the reading each move is against, in whole points", async () => {

@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { BoundedValue } from "../ui/boundedValue";
-import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, BOUNDED_CALL_CONTRAST } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
 import { RegimeRadar } from "./RegimeRadar";
 import type { RegimeKey } from "../../../lib/types";
@@ -121,7 +122,7 @@ export function WhatWouldChangeSection({
   const pauseLine = leadHeld === true ? undefined : guardrail;
 
   return (
-    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
+    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} lead={BOUNDED_CALL_CONTRAST}>
       {/* No key to the three lines (2026-11-03): the two questions below answer
           what each line does, in the reader's terms, and the key was a third
           explanation of the mechanism on one page. */}
@@ -224,6 +225,20 @@ export function WhatWouldChangeSection({
           ) : null}
         </div>
       </div>
+      {/* The claim above is only worth making beside its proof. A reader who has
+          just been told these lines are unusual should be able to check how often
+          they held and read every brief behind them in one click, or the sentence
+          is marketing rather than a claim the product stands behind. */}
+      <p className="text-fluid-sm text-slate-400">
+        We publish how often these held, and every brief behind them:{" "}
+        <Link href="/calibration" className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+          the calibration study
+        </Link>{" "}
+        ·{" "}
+        <Link href="/history" className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+          the record
+        </Link>
+      </p>
     </HomeSection>
   );
 }

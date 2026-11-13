@@ -333,6 +333,16 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   const esc = (text: string) =>
     text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+  /* The footer stacks: one line per score against its line, the margin and the
+     provenance under them, then the stage's restart line and the address. The
+     offsets are derived from the score lines rather than fixed at 36 and 54,
+     which left an 18px gap under the no-scores week's single line. */
+  const readingLines = slideReadingLines(payload);
+  const resumeLine = slideResumeLine(payload);
+  const marginTop = readingLines.length * 18;
+  const resumeTop = marginTop + 18;
+  const urlTop = resumeTop + (resumeLine ? 18 : 0);
+
   // SVG text does not wrap, so a card's line is wrapped here: at most two lines, one
   // size smaller at a time before anything is cut, and a cut ends at a word.
   const cardBody = (text: string, size: number, weight: number, fill: string): string => {
@@ -407,18 +417,23 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
 
   <!-- Footer: each score against its line, then the margin -->
   <g transform="translate(80, 582)">
-${slideReadingLines(payload)
+${readingLines
   .map(
     (line, index) =>
       `    <text x="0" y="${index * 18}" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_SECONDARY}">${esc(line)}</text>`,
   )
   .join("\n")}
-    <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_MUTED}">
+    <text x="0" y="${marginTop}" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_MUTED}">
       <tspan fill="${OG_TEXT}">${esc(slideMargin(payload))}</tspan> · ${esc(slideFooterLine(payload).slice(slideMargin(payload).length + 3))}
     </text>${
-      slideResumeLine(payload)
+      resumeLine
         ? `
-    <text x="0" y="54" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_SECONDARY}">${esc(slideResumeLine(payload) ?? "")}</text>`
+    <text x="0" y="${resumeTop}" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_SECONDARY}">${esc(resumeLine)}</text>`
+        : ""
+    }${
+      payload.url
+        ? `
+    <text x="0" y="${urlTop}" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="500" fill="${OG_TEXT_MUTED}">${esc(payload.url)}</text>`
         : ""
     }
   </g>

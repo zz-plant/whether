@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Operating snapshot unavailable", { status: 503 });
   }
 
-  const payload = buildExportSlidePayload(snapshot, stage);
+  const payload = buildExportSlidePayload(snapshot, stage, request.nextUrl.origin);
   const svg = formatMeetingSlideSvg(payload);
 
   return new NextResponse(svg, {

@@ -233,7 +233,13 @@ describe("report route page summaries", () => {
     assert.doesNotMatch(signals, /pageSummary: "What moved/);
 
     const history = await readFile("app/history/page.tsx", "utf8");
-    assert.match(history, /pageSummary: "Has it been right\? Look up the guidance for any past month and see how it held up."/);
+    // The summary states the record's claim (what would have changed each call,
+    // and that none was edited), not the outline of sections beneath it.
+    assert.match(
+      history,
+      /"Has it been right\? Every brief says what would have changed the guidance, and none has been edited since\./,
+    );
+    assert.doesNotMatch(history, /Look up the guidance for any past month/);
     assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);
 
     const plan = await readFile("app/operate/planningPageModel.ts", "utf8");
