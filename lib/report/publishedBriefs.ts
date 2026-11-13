@@ -738,6 +738,55 @@ export const findAdjacentPublishedBriefs = (slug: string) => {
 };
 
 /**
+ * What the record says happened after a published week.
+ *
+ * A published week is the only place this product can be checked against
+ * itself, and the page stopped at "What changed this week": a cited link showed
+ * a claim and never an outcome. The one thing a reader forwarding it cannot
+ * verify, and a competitor cannot fake, is that the line the brief published is
+ * the line the next reading can be held to.
+ *
+ * It puts the published change line beside the next published week's conditions
+ * and claims nothing more. The record holds month-end readings and published
+ * weeks, not the reading in between, so it cannot say which score crossed; it
+ * says what was said and what was read, and lets the reader compare.
+ */
+type BriefOutcome =
+  | {
+      kind: "superseded";
+      /** The next published week, by the label its own page carries. */
+      weekLabel: string;
+      slug: string;
+      /** Conditions this brief published, and the next week's. */
+      from: string;
+      to: string;
+      /** True when the next published week read the same conditions. */
+      held: boolean;
+      /** The line this brief published for a change in conditions. */
+      changeLine: string;
+    }
+  | { kind: "latest"; changeLine: string };
+
+export const describeBriefOutcome = (
+  brief: PublishedBrief,
+  next: PublishedBrief | undefined,
+): BriefOutcome => {
+  /* A clause, not a sentence: the page puts it mid-line ("...would change if
+     <line>."), and the stored line carries its own full stop. */
+  const changeLine = publishedBriefDisplay(brief).conditionsChangeIf.replace(/\.\s*$/, "");
+  if (!next) return { kind: "latest", changeLine };
+  return {
+    kind: "superseded",
+    weekLabel: publishedBriefWeekLabel(next),
+    slug: next.slug,
+    from: getRegimePublicLabel(brief.regime),
+    to: getRegimePublicLabel(next.regime),
+    held: next.regime === brief.regime,
+    changeLine,
+  };
+};
+
+/**
  * How far the newest frozen week may trail the live record date before the
  * homepage stops advertising it.
  *

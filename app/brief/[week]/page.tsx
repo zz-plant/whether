@@ -23,6 +23,7 @@ import {
   buildPublishedBriefTitle,
   buildPublishedBriefSlackUpdate,
   buildPublishedBriefBoardUpdate,
+  describeBriefOutcome,
   describeUnpublishedWeeks,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
@@ -165,6 +166,10 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
   const emailUpdate = buildPublishedBriefEmailUpdate(brief);
   const boardUpdate = buildPublishedBriefBoardUpdate(brief);
+  /* What the record says happened next: the line this week published, beside the
+     conditions the next published week read. A cited week is where the product is
+     checked against itself, and this is the only surface that can show it. */
+  const outcome = describeBriefOutcome(brief, next);
 
   // The record's readings and corridor, drawn. Records frozen before the lines
   // were data carry neither and fall back to the sentences below.
@@ -279,6 +284,37 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           <h2 className="type-section">What changed this week</h2>
           <p className="text-sm text-slate-300">{display.whatChanged}</p>
         </section>
+
+        {/* What the record says happened next. The page ended at the week's own
+            delta, so a cited link showed a claim and never an outcome; the one
+            thing a reader forwarding it cannot check is whether the line the
+            brief published is the line the next reading met. It states both and
+            claims nothing about which score crossed, because the record holds
+            month-ends and published weeks, not the reading between them. */}
+        {outcome.kind === "superseded" ? (
+          <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+            <h2 className="type-section">What happened after this week</h2>
+            <p className="text-sm text-slate-300">
+              {outcome.held ? (
+                <>
+                  The next published brief, for the week of {outcome.weekLabel}, read{" "}
+                  <span className="font-semibold text-slate-100">{outcome.to}</span> as well. This
+                  brief said conditions would change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
+                </>
+              ) : (
+                <>
+                  The next published brief, for the week of {outcome.weekLabel}, read{" "}
+                  <span className="font-semibold text-slate-100">{outcome.to}</span> — a change from{" "}
+                  <span className="font-semibold text-slate-100">{outcome.from}</span>. This brief said
+                  conditions would change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
+                </>
+              )}
+            </p>
+            <ActionLink href={buildPublishedBriefPath(outcome.slug)} variant="inline" className="self-start">
+              Read that week
+            </ActionLink>
+          </section>
+        ) : null}
 
         {video && videoOpenGraph ? (
           <>

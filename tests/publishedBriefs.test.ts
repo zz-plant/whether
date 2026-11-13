@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import {
   buildPublishedBriefPath,
   buildPublishedBriefSlug,
+  describeBriefOutcome,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
   findUnpublishedWeeks,
@@ -14,6 +15,7 @@ import {
   parsePublishedBriefs,
   publishedBriefAgeInDays,
   publishedBriefStaticParams,
+  publishedBriefWeekLabel,
   PUBLISHED_BRIEF_STALE_AFTER_DAYS,
   selectCitablePermalinkBrief,
 } from "../lib/report/publishedBriefs";
@@ -191,5 +193,57 @@ describe("published brief runs", () => {
     if (single) assert.match(publishedBriefRunLabel(single), /^Week of [A-Z][a-z]{2} \d{1,2}, \d{4}$/);
     const span = runs.find((run) => run.length > 1);
     if (span) assert.match(publishedBriefRunLabel(span), /^Weeks of [A-Z][a-z]{2} \d{1,2}(, \d{4})? – [A-Z][a-z]{2} \d{1,2}, \d{4}$/);
+  });
+});
+
+/*
+ * A published week is the only place the product can be checked against itself,
+ * and the page used to stop at the week's own delta. The outcome is derived from
+ * two records and claims nothing the archive does not hold.
+ */
+describe("what happened after a published week", () => {
+  it("reports a change in conditions, naming both readings", () => {
+    const brief = findPublishedBrief("2026-w31");
+    const next = findPublishedBrief("2026-w38");
+    assert.ok(brief && next);
+    const outcome = describeBriefOutcome(brief, next);
+    assert.equal(outcome.kind, "superseded");
+    if (outcome.kind !== "superseded") return;
+    assert.equal(outcome.held, false);
+    assert.notEqual(outcome.from, outcome.to);
+    assert.equal(outcome.slug, "2026-w38");
+    assert.match(outcome.weekLabel, /^[A-Z][a-z]{2} \d{1,2}, \d{4}$/);
+    assert.ok(outcome.changeLine.length > 0, "it carries the line the brief published");
+  });
+
+  it("reports a held week as held, with the same conditions twice", () => {
+    const brief = findPublishedBrief("2026-w38");
+    const next = findPublishedBrief("2026-w39");
+    assert.ok(brief && next);
+    const outcome = describeBriefOutcome(brief, next);
+    assert.equal(outcome.kind, "superseded");
+    if (outcome.kind !== "superseded") return;
+    assert.equal(outcome.held, true);
+    assert.equal(outcome.from, outcome.to);
+  });
+
+  it("says only that it is the latest when no later brief exists", () => {
+    const latest = latestPublishedBrief;
+    assert.ok(latest);
+    const outcome = describeBriefOutcome(latest, undefined);
+    assert.equal(outcome.kind, "latest");
+    assert.ok(outcome.changeLine.length > 0);
+  });
+
+  it("agrees with the adjacent-week lookup the page uses", () => {
+    const brief = findPublishedBrief("2026-w40");
+    assert.ok(brief);
+    const { next } = findAdjacentPublishedBriefs(brief.slug);
+    assert.ok(next);
+    const outcome = describeBriefOutcome(brief, next);
+    assert.equal(outcome.kind, "superseded");
+    if (outcome.kind !== "superseded") return;
+    assert.equal(outcome.slug, next.slug);
+    assert.equal(outcome.weekLabel, publishedBriefWeekLabel(next));
   });
 });
