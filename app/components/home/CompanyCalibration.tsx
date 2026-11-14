@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Hourglass } from "lucide-react";
 import { StagePersonaSelector } from "../StagePersonaSelector";
 import { RunwayPersonaSelector } from "../RunwayPersonaSelector";
@@ -48,6 +48,14 @@ export function CompanyCalibration({
   horizon?: { control: ReactNode; current: "weekly" | "monthly" | "quarterly" };
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [justCalibrated, setJustCalibrated] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const targetHash = `#${HOME_SECTIONS.calibration.id}`;
@@ -75,7 +83,8 @@ export function CompanyCalibration({
     <section
       id={HOME_SECTIONS.calibration.id}
       aria-label="Your stage and runway"
-      className="group/calibration space-y-3 border-t border-[color:var(--border-subtle)] pt-4 target:block"
+      data-calibration-updated={justCalibrated ? "" : undefined}
+      className="group/calibration space-y-3 border-t border-[color:var(--border-subtle)] pt-4 transition-colors duration-150 motion-reduce:transition-none target:block"
     >
       {/* Folded to one line (2026-10-14). The two four-key rows stood between
           the call and "What are you deciding?", so the first thing asked of a
@@ -97,7 +106,16 @@ export function CompanyCalibration({
             <span className="hidden text-[var(--accent-action)] underline underline-offset-4 group-open:inline">Done</span>
           </span>
         </summary>
-        <div className="mt-3 grid gap-3 weather-company-options">
+        <div
+          className="mt-3 grid gap-3 weather-company-options"
+          onClickCapture={(event) => {
+            if (event.target instanceof Element && event.target.closest("a, button, input")) {
+              if (timerRef.current) clearTimeout(timerRef.current);
+              setJustCalibrated(true);
+              timerRef.current = setTimeout(() => setJustCalibrated(false), 1400);
+            }
+          }}
+        >
           <StagePersonaSelector activeStage={activeStage} className="@xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" />
           <RunwayPersonaSelector activeRunway={activeRunway} className="@xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" />
           {horizon ? (

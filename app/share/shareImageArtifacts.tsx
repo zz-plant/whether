@@ -204,7 +204,13 @@ export function ShareImageArtifacts() {
   const [theme, setTheme] = useState<BriefImageTheme>("dark");
   const artifacts = buildShareImageArtifacts(stage ?? DEFAULT_OPERATOR_STAGE, source, layout, theme);
   return (
-    <section id="image-artifacts" className="weather-panel weather-section-stack p-0" aria-labelledby="share-files-heading">
+    <section
+      id="image-artifacts"
+      className="weather-panel weather-section-stack p-0"
+      aria-labelledby="share-files-heading"
+      data-share-card-layout={layout}
+      data-share-card-theme={theme}
+    >
       <h2 id="share-files-heading" className="type-section">Files and images for a deck or a thread</h2>
       {/* The slide and the card straight onto the clipboard. These two buttons
           sat in the brief's "Do and share" until 2026-10-08, one of five places

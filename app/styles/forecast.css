@@ -77,6 +77,20 @@
   .weather-hero-sky { transition: none; }
 }
 
+/* While the record band previews an earlier month on the homepage sky, soften the
+   current week's paper panel so the temporal split between the historical sky and
+   this week's guidance stays unmistakable. */
+.weather-hero-sky[data-band-preview] .weather-hero-sky-panel {
+  opacity: 0.78;
+  transition: opacity 180ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-hero-sky[data-band-preview] .weather-hero-sky-panel {
+    transition: none;
+  }
+}
+
 /* The condition word's glyph, and the earlier week's stamp over it, each carry their
    own data-regime, so the regime map would hand them their condition's page ink on
    the sky: Stormy's dark ink on the light theme's Stormy sky, which drew nothing. On

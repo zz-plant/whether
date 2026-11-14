@@ -143,6 +143,8 @@ export function SharePageFormats({
 
   const text =
     selected.kind === "text" ? selected.text : formatInvestorUpdateSnippet(selected.parts, runwayBand);
+  const lineCount = text.split(/\r?\n/).filter((line) => line.trim().length > 0).length;
+  const previewMedium = selected.kind === "text" && selected.preview === "chat" ? "Chat format" : "Plain text";
   const hint =
     selected.kind === "investor" && !runwayBand
       ? `${selected.hint} Pick a runway band on the brief to add what it means for your cash.`
@@ -212,7 +214,12 @@ export function SharePageFormats({
 
         <div className="min-w-0 space-y-3" data-share-format={selected.id}>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <h3 className="text-fluid-base font-semibold text-slate-100 max-md:sr-only">{selected.label}</h3>
+            <div className="flex items-baseline gap-2.5 max-md:sr-only">
+              <h3 className="text-fluid-base font-semibold text-slate-100">{selected.label}</h3>
+              <span className="text-fluid-nano tabular-nums text-slate-400" data-share-preview-meta>
+                {`${previewMedium} · ${lineCount} ${lineCount === 1 ? "line" : "lines"}`}
+              </span>
+            </div>
             <ClipboardActionRow
               label={selected.copyLabel}
               state={getClipboardUiState(selected.id, { status, error, activeTarget, copiedTarget })}

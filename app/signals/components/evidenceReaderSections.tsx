@@ -150,11 +150,11 @@ export const SignalsWhatChangedSection = ({
                   <div className="flex items-center gap-1.5">
                     <OrdinalMarker>{idx + 1}</OrdinalMarker>
                     {row.watchHref ? (
-                      <Link href={toRoute(row.watchHref)} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
+                      <Link href={toRoute(row.watchHref)} className="weather-hit text-base underline decoration-slate-600 underline-offset-4 hover:text-white">
                         {row.label}
                       </Link>
                     ) : (
-                      row.label
+                      <span className="text-base">{row.label}</span>
                     )}
                   </div>
                   {/* No "Moves first" / "Confirms later" under the name (2026-11-03): the

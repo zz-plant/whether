@@ -261,6 +261,30 @@ export const describeLadderPosition = (value: number, lines: readonly LadderLine
   return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} ${nearest.distance === 1 ? "pt" : "pts"} ${side} ${at}`;
 };
 
+const describeScrubLineCrossing = (
+  scrubValue: number,
+  liveValue: number,
+  lines: readonly LadderLine[],
+): { kind: LadderLineKind; summary: string } | null => {
+  if (scrubValue === liveValue) return null;
+  const crossed = (lineValue: number) =>
+    (liveValue < lineValue && scrubValue >= lineValue) ||
+    (liveValue > lineValue && scrubValue <= lineValue);
+  const pause = lines.find((line) => line.kind === "pause");
+  if (pause && crossed(pause.value)) {
+    return { kind: "pause", summary: "crosses pause line" };
+  }
+  const resume = lines.find((line) => line.kind === "resume");
+  if (resume && crossed(resume.value)) {
+    return { kind: "resume", summary: "reaches restart line" };
+  }
+  const change = lines.find((line) => line.kind === "callChange");
+  if (change && crossed(change.value)) {
+    return { kind: "callChange", summary: "crosses change line" };
+  }
+  return null;
+};
+
 /**
  * Which end of the scale is worse, read off the ladder's own lines: a pause
  * line above the restart line means a rising score is the bad direction
@@ -458,8 +482,9 @@ export function ScoreLadder({
 
   const isScrubbing = scrub !== null;
   const scrubbedRounded = scrub ? Math.round(scrub.value) : value;
+  const scrubCrossing = isScrubbing ? describeScrubLineCrossing(scrubbedRounded, value, lines) : null;
   const caption = isScrubbing
-    ? `${describeLadderPosition(scrubbedRounded, lines)} (${formatSignedDelta(scrubbedRounded - value)} vs ${formatPoints(value)})`
+    ? `${describeLadderPosition(scrubbedRounded, lines)} (${formatSignedDelta(scrubbedRounded - value)} vs ${formatPoints(value)})${scrubCrossing ? ` · ${scrubCrossing.summary}` : ""}`
     : describeLadderPosition(value, lines);
   /* Rows for each width the ladder is drawn at; the container query on the
      track picks one. Positions go through custom properties so one element
@@ -621,6 +646,7 @@ export function ScoreLadder({
       className={`@container space-y-1.5 ${className}`.trim()}
       data-score-ladder
       data-scrubbing={isScrubbing ? "" : undefined}
+      data-scrub-crossed={scrubCrossing?.kind}
     >
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs">
         <span className="font-medium text-slate-200">
@@ -679,6 +705,7 @@ export function ScoreLadder({
           <span
             key={`tick-${line.kind}-${line.value}`}
             data-ladder-tick
+            data-passed-kind={passedAt(line.value) === null ? undefined : line.kind}
             className={`absolute top-1.5 h-[calc(18px+var(--row)*13px)] w-0.5 -translate-x-1/2 @[28rem]:h-[calc(18px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[0]} ${passedAt(line.value) === null ? "" : "week-move-tick"}`}
             style={{
               ...markStyle(at(line.value), row, wideRow),

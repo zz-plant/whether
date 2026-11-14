@@ -3,12 +3,15 @@
 import { useCallback, useRef, useState } from "react";
 import { ClipboardActionRow } from "./clipboardActionRow";
 import { trackActivationEvent } from "../../lib/activationFunnel";
+import type { BriefImageLayout, BriefImageTheme } from "../../lib/image/briefImageTemplate";
 import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
 import { CheckIcon, CopyIcon, SpinnerIcon } from "./uiIcons";
 import { useBriefArtifact } from "./useBriefArtifact";
 
 interface CopyImageCardButtonProps {
   className?: string;
+  layout?: BriefImageLayout;
+  theme?: BriefImageTheme;
 }
 
 type Outcome = "copied" | "shared" | "saved";
@@ -28,8 +31,16 @@ type Outcome = "copied" | "shared" | "saved";
  * as a file and the button says "Saved", not "Copied", because "Copied" is
  * shown only after a write resolved (docs/decisions/feature-log/01-product-surfaces.md 1.1.10).
  */
+const isBriefImageLayout = (value: string | undefined): value is BriefImageLayout =>
+  value === "standard" || value === "landscape" || value === "square" || value === "portrait";
+
+const isBriefImageTheme = (value: string | undefined): value is BriefImageTheme =>
+  value === "dark" || value === "light";
+
 export function CopyImageCardButton({
   className = "",
+  layout,
+  theme,
 }: CopyImageCardButtonProps) {
   const artifact = useBriefArtifact();
   const [copyState, setCopyState] = useState<"idle" | "copying" | "copied" | "error">("idle");
@@ -44,7 +55,19 @@ export function CopyImageCardButton({
 
   const handleCopy = useCallback(async () => {
     setCopyState("copying");
-    const imagePath = buildImageBriefApiPath(new URLSearchParams(window.location.search));
+    const params = new URLSearchParams(window.location.search);
+    const hostSection = document.getElementById("image-artifacts");
+    const rawLayout = hostSection?.dataset.shareCardLayout;
+    const rawTheme = hostSection?.dataset.shareCardTheme;
+    const activeLayout = layout ?? (isBriefImageLayout(rawLayout) ? rawLayout : undefined);
+    const activeTheme = theme ?? (isBriefImageTheme(rawTheme) ? rawTheme : undefined);
+    if (activeLayout && activeLayout !== "standard") params.set("layout", activeLayout);
+    if (activeTheme) {
+      params.set("theme", activeTheme);
+    } else if (!params.has("theme") && document.documentElement.dataset.theme === "light") {
+      params.set("theme", "light");
+    }
+    const imagePath = buildImageBriefApiPath(params);
     const render = fetch(imagePath).then(async (res) => {
       if (!res.ok) throw new Error(`Brief card answered HTTP ${res.status}`);
       return new Blob([await res.arrayBuffer()], { type: "image/png" });
@@ -108,7 +131,7 @@ export function CopyImageCardButton({
 
     trackActivationEvent({ step: "committed", path: window.location.pathname, commitment: "copied_brief" });
     settle("copied", 2500);
-  }, [artifact, settle]);
+  }, [artifact, layout, settle, theme]);
 
   return (
     <ClipboardActionRow

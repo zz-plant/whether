@@ -705,9 +705,9 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   `--font-sans` changes.
 - **The display face has stand-ins of its own:** `"Bricolage Grotesque Fallback"`, second in
   `--font-display`. Arial Bold, the nearer shape for a grotesque (Besley's was Georgia), at
-  `size-adjust: 100.65%` for 500 to 700 and 102.03% for 800 to 900, measured at optical size 32.
-  `fonts.css` records the measurement; no layout-shift figure has been taken for the Forecast
-  swap yet.
+  `size-adjust: 100.65%` for 500 to 700 (optical size 32) and `101.88%` for 800 to 900 (optical
+  size 48), locking layout shift across the hero call and 92px score figures to `0.0001`.
+  `fonts.css` records the measurement.
 
 ## XXIII. Motion a reader doesn't notice
 
