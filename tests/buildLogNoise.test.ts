@@ -147,10 +147,12 @@ describe("full-suite test output", () => {
           "});",
         ].join("\n"),
       );
+      const env: NodeJS.ProcessEnv = { ...process.env, WHETHER_TEST_QUIET: quiet, NO_COLOR: "1" };
+      delete env.FORCE_COLOR;
       const { status, stdout, stderr } = spawnSync(
         "bun",
         ["test", "--preload", join(REPO_ROOT, "scripts/test-network-guard.ts"), "noisy.test.ts"],
-        { cwd: root, encoding: "utf8", env: { ...process.env, WHETHER_TEST_QUIET: quiet } },
+        { cwd: root, encoding: "utf8", env },
       );
       return { status, output: `${stdout}${stderr}` };
     } finally {

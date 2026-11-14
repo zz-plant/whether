@@ -37,10 +37,31 @@ export function RunningHead() {
   const pathname = usePathname();
   const [facts, setFacts] = useState<FrameFacts | null>(null);
   const [section, setSection] = useState<string | null>(null);
+  const [sectionJump, setSectionJump] = useState<{ path: string | null; label: string } | null>(null);
   const [shown, setShown] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const { direction, isPastThreshold } = useScrollDirection();
   const headerHidden = isPastThreshold && direction === "down";
+  const sectionStep = sectionJump && sectionJump.path === pathname ? sectionJump.label : null;
+
+  useEffect(() => {
+    const onSectionJump = (event: Event) => {
+      if (!(event instanceof CustomEvent)) return;
+      const detail = event.detail;
+      if (
+        detail &&
+        typeof detail === "object" &&
+        "index" in detail &&
+        "total" in detail &&
+        typeof detail.index === "number" &&
+        typeof detail.total === "number"
+      ) {
+        setSectionJump({ path: pathname, label: `${detail.index}/${detail.total}` });
+      }
+    };
+    document.addEventListener("whether-section-jump", onSectionJump);
+    return () => document.removeEventListener("whether-section-jump", onSectionJump);
+  }, [pathname]);
 
   useEffect(() => {
     let frame = 0;
@@ -163,6 +184,11 @@ export function RunningHead() {
                 <span className="max-md:hidden">{facts.title} · </span>
               ) : null}
               {place}
+              {sectionStep ? (
+                <span className="ml-1.5 tabular-nums text-slate-400 max-md:hidden" data-running-head-step>
+                  ({sectionStep})
+                </span>
+              ) : null}
             </span>
           ) : null}
         </p>

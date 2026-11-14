@@ -70,9 +70,11 @@ export function RecordBandReadout() {
       if (!reading) {
         card.hidden = true;
         sky()?.removeAttribute("data-regime");
+        sky()?.removeAttribute("data-band-preview");
         return;
       }
-      if (cardMonth) cardMonth.textContent = monthName(index);
+      const label = monthName(index);
+      if (cardMonth) cardMonth.textContent = label;
       if (cardCondition) cardCondition.textContent = REGIME_LABELS[reading.regime];
       if (cardPressure) cardPressure.textContent = String(reading.tightness);
       if (cardRisk) cardRisk.textContent = String(reading.riskAppetite);
@@ -83,6 +85,7 @@ export function RecordBandReadout() {
       card.style.setProperty("--at", String(at));
       card.hidden = false;
       sky()?.setAttribute("data-regime", reading.regime);
+      sky()?.setAttribute("data-band-preview", label);
     };
     const show = (index: number) => {
       current = Math.min(Math.max(index, 0), months - 1);
@@ -100,6 +103,7 @@ export function RecordBandReadout() {
       cursor.hidden = true;
       card.hidden = true;
       sky()?.removeAttribute("data-regime");
+      sky()?.removeAttribute("data-band-preview");
     };
     const indexAt = (clientX: number) => {
       const box = plate.getBoundingClientRect();

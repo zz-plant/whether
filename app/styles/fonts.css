@@ -138,11 +138,13 @@
 
 /*
  * Stand-ins while Bricolage is in flight, measured the same way at optical size 32 (a
- * page title): Bricolage's average advance over Arial Bold's, and its own metrics
+ * page title) for 500–700 and optical size 48 (figures and condition stamps) for 800–900:
+ * Bricolage's average advance over Arial Bold's, and its own metrics
  * (ascender 930, descender 270, of 1000) divided by the result. Bricolage is a
  * grotesque, so Arial Bold is the nearer shape; Besley's stand-in was Georgia.
- *   display, wght 700    0.4969em over Arial Bold 0.4937em = 100.65%
- *   figure, wght 800     0.5037em over Arial Bold 0.4937em = 102.03%
+ * Measured layout shift on `/` at 430px and 1440px: 0.0001.
+ *   display, wght 700 (opsz 32)  0.4969em over Arial Bold 0.4937em = 100.65%
+ *   figure, wght 800 (opsz 48)   0.5030em over Arial Bold 0.4937em = 101.88%
  */
 @font-face {
   font-family: "Bricolage Grotesque Fallback";
@@ -164,9 +166,9 @@
   font-style: normal;
   font-weight: 800 900;
   src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
-  size-adjust: 102.03%;
-  ascent-override: 91.15%;
-  descent-override: 26.46%;
+  size-adjust: 101.88%;
+  ascent-override: 91.28%;
+  descent-override: 26.5%;
   line-gap-override: 0%;
   unicode-range: U+0020-007E, U+00A0-00A3, U+00A5-00AC, U+00AE-00FF, U+0131, U+0152-0153, U+02C6,
     U+02DA, U+02DC, U+0304, U+0308, U+2000-200B, U+2013-2014, U+2016, U+2018-201A,

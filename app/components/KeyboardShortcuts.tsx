@@ -138,6 +138,11 @@ export function KeyboardShortcuts() {
           // no branch here.
           target.focus({ preventScroll: true });
           target.scrollIntoView({ behavior: "auto", block: "start" });
+          document.dispatchEvent(
+            new CustomEvent("whether-section-jump", {
+              detail: { index: next + 1, total: sections.length },
+            }),
+          );
         }
         return;
       }

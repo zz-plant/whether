@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
 
 /**
@@ -9,10 +10,20 @@ import { RotateCcw } from "lucide-react";
  * print or screenshot mode).
  */
 export function ReplayMoveButton({ since }: { since: string }) {
+  const [replaying, setReplaying] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
   return (
     <button
       type="button"
       data-week-move-replay
+      data-replaying={replaying ? "" : undefined}
       aria-label={`Replay the move since ${since}`}
       title={`Replay the move since ${since}`}
       className="week-move-replay weather-hit ml-1.5 items-center gap-1 rounded-sm align-baseline text-fluid-sm font-medium text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
@@ -23,11 +34,14 @@ export function ReplayMoveButton({ since }: { since: string }) {
         /* Read layout so the browser drops the finished animations before they are asked for again. */
         void card.offsetWidth;
         card.dataset.weekMove = "again";
+        if (timerRef.current) clearTimeout(timerRef.current);
+        setReplaying(true);
+        timerRef.current = setTimeout(() => setReplaying(false), 900);
       }}
     >
       <RotateCcw size={14} aria-hidden="true" />
       {/* The glyph alone on a phone, where the word took a line of its own above the call. */}
-      <span className="max-sm:sr-only">Replay</span>
+      <span className="max-sm:sr-only">{replaying ? "Replaying" : "Replay"}</span>
     </button>
   );
 }

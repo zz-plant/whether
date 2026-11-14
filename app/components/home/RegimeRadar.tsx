@@ -150,6 +150,7 @@ export function RegimeRadar({
     riskAppetite: number;
     settling: boolean;
   } | null>(null);
+  const [inspectedTrailIndex, setInspectedTrailIndex] = useState<number | null>(null);
   const scrubRef = useRef(scrub);
 
   const updateScrub = (
@@ -341,9 +342,14 @@ export function RegimeRadar({
   const trailPoints = (trail ?? []).map((point) => ({
     x: xFor(point.riskAppetite),
     y: yFor(point.tightness),
+    label: point.label,
+    tightness: point.tightness,
+    riskAppetite: point.riskAppetite,
     /* A dated dot names its reading on hover, in the words the current marker uses. */
     title: point.label ? `${point.label}: Funding pressure ${point.tightness}, Risk appetite ${point.riskAppetite}` : undefined,
   }));
+  const inspectedTrail =
+    inspectedTrailIndex !== null ? trailPoints[inspectedTrailIndex] ?? null : null;
   /* A 2.4-unit dot is a 3px target at the card's size; the transparent ring is
      what the pointer has to find. Month-end readings can sit a couple of units
      apart, and full-size rings would let the later one swallow the earlier
@@ -460,6 +466,10 @@ export function RegimeRadar({
         {isScrubbing ? (
           <span className="tabular-nums text-slate-200" data-radar-scrub-readout>
             {`Funding pressure ${scrubTightness} (${formatSignedDelta(scrubTightness - tightness)}) · Risk appetite ${scrubRiskAppetite} (${formatSignedDelta(scrubRiskAppetite - riskAppetite)})`}
+          </span>
+        ) : inspectedTrail && inspectedTrail.label ? (
+          <span className="tabular-nums text-slate-200" data-radar-trail-readout>
+            {`${inspectedTrail.label} · Funding pressure ${inspectedTrail.tightness} · Risk appetite ${inspectedTrail.riskAppetite}`}
           </span>
         ) : compact ? null : (
           <span className="tabular-nums text-slate-400">
@@ -669,7 +679,11 @@ export function RegimeRadar({
               strokeOpacity="0.55"
             />
             {trailPoints.map((point, index) => (
-              <g key={`${point.x}-${point.y}-${index}`}>
+              <g
+                key={`${point.x}-${point.y}-${index}`}
+                onPointerEnter={point.label ? () => setInspectedTrailIndex(index) : undefined}
+                onPointerLeave={point.label ? () => setInspectedTrailIndex((prev) => (prev === index ? null : prev)) : undefined}
+              >
                 {point.title ? <title>{point.title}</title> : null}
                 <circle
                   cx={point.x}

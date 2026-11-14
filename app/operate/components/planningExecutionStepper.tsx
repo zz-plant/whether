@@ -115,6 +115,8 @@ function StepPanel({
   return (
     <section
       id={step.id}
+      data-page-section=""
+      data-frame-block=""
       // The current step is stated once, here, where assistive tech
       // reads it; an "Active" stamp beside the title was the same fact
       // drawn a second time for sighted readers only.
