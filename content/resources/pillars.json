@@ -98,7 +98,7 @@
             "heading": "H3: What an escalation rule must name",
             "paragraphs": [
               "Each escalation rule names four things: the trigger, the notification window, the document required, and who decides. For example: ‘If net revenue retention falls below 100% for two consecutive reporting cycles and the recovery signals are weak, management sends the board a packet addendum within five business days.’",
-              "A good rule tells the team exactly what to prepare before the review. A vague one produces last-minute storytelling and wasted review cycles."
+              "A good rule specifies what the team must prepare before the review. A vague one produces last-minute storytelling and wasted review cycles."
             ]
           },
           {
@@ -479,7 +479,7 @@
         "heading": "30-day confirmation logic as the bridge between volatility and commitment",
         "paragraphs": [
           "Weekly data is useful but noisy; quarterly reviews are stable but slow. A 30-day confirmation rule sits between them: an improvement must last 30 days before commitments expand, and a decline that lasts 30 days brings intervention forward.",
-          "Under reversibility governance, the rule decides between three paths: keep running reversible experiments, start a rollback, or ask the board to approve irreversible scaling. It is the clock the decision runs on.",
+          "Under reversibility governance, the rule determines one of three paths: keep running reversible experiments, start a rollback, or ask the board to approve irreversible scaling. It is the clock the decision runs on.",
           "Ask for a confirmation table in each monthly pack with five columns: indicator, current direction, confidence, days in the current state, and the date of the next decision checkpoint."
         ],
         "subsections": [

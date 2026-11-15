@@ -102,13 +102,7 @@ export const elapsedWeeksSuffix = (previousRecordDate: string, currentRecordDate
   return weeks !== null && weeks > 1 ? ` (${weeksAgo.format(-weeks, "week")})` : "";
 };
 
-export const compareHrefForRecordDate = (recordDate: string): string => {
-  const year = recordDate.slice(0, 4);
-  const rawMonth = Number.parseInt(recordDate.slice(5, 7), 10);
-  return /^\d{4}$/.test(year) && !Number.isNaN(rawMonth) && rawMonth >= 1 && rawMonth <= 12
-    ? `/history/compare?yearB=${year}&monthB=${rawMonth}`
-    : "/history/compare";
-};
+export const compareHrefForRecordDate = (_recordDate: string): string => "/history";
 
 /**
  * "Since you were last here", with nothing saved on purpose.

@@ -1,4 +1,4 @@
-import type { DecisionInput, DecisionOutput, GradedPlan, LifecycleStage } from "./decisionShield";
+import type { DecisionInput, DecisionOutput } from "./decisionShield";
 import type { RegimeAssessment } from "./regimeEngine";
 
 /**
@@ -88,27 +88,6 @@ export type DecisionMemoryPayload = {
    * the client; absent on entries written before it existed.
    */
   writeId?: string;
-};
-
-export type DecisionMemorySnapshotPayload = {
-  kind: "posture-snapshot";
-  clientId?: string;
-  teamId?: string;
-  department?: DecisionDepartment;
-  owner?: string;
-  recordDate: string;
-  regime: string;
-  /** The weekly operating call, recorded as the entry summary. */
-  primaryCall: string;
-  tightness?: number;
-  riskAppetite?: number;
-  boldnessScore?: number;
-  guardrail?: string;
-  reversalTrigger?: string;
-  sources?: string[];
-  /** Regime boundaries in force, so the assumption band is the operating watch line, not the reading itself. */
-  tightnessThreshold?: number;
-  riskAppetiteThreshold?: number;
 };
 
 const DECISION_MEMORY_KINDS = new Set(["decision", "posture-snapshot"]);
@@ -225,7 +204,7 @@ const isDecisionMemoryEntry = (value: unknown): value is DecisionMemoryEntry => 
 export const parseDecisionMemoryEntry = (value: unknown): DecisionMemoryEntry | null =>
   isDecisionMemoryEntry(value) ? value : null;
 
-export const newEntryId = () =>
+const newEntryId = () =>
   typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}`;
 
 export const buildDecisionMemoryEntry = (payload: DecisionMemoryPayload): DecisionMemoryEntry => {
@@ -271,62 +250,6 @@ const buildAssumptionSnapshot = ({
   tightnessThreshold: assessment.thresholds.tightnessRegime,
   riskAppetiteThreshold: assessment.thresholds.riskAppetiteRegime,
 });
-
-export const buildDecisionMemorySnapshotEntry = (
-  payload: DecisionMemorySnapshotPayload,
-): DecisionMemoryEntry => {
-  const snapshot = {
-    ...(payload.tightness === undefined ? {} : { tightness: payload.tightness }),
-    ...(payload.riskAppetite === undefined ? {} : { riskAppetite: payload.riskAppetite }),
-    ...(payload.boldnessScore === undefined ? {} : { boldnessScore: payload.boldnessScore }),
-  };
-
-  return {
-    id: newEntryId(),
-    createdAt: new Date().toISOString(),
-    kind: "posture-snapshot",
-    department: payload.department,
-    owner: payload.owner,
-    context: {
-      clientId: payload.clientId ?? "anonymous",
-      teamId: payload.teamId,
-      recordDate: payload.recordDate,
-    },
-    outcome: {
-      summary: payload.primaryCall,
-      guardrail: payload.guardrail ?? "",
-      reversalTrigger: payload.reversalTrigger ?? "",
-    },
-    regime: {
-      label: payload.regime,
-      scores: snapshot,
-    },
-    sources: [...new Set(payload.sources ?? [])],
-    assumptions: buildSnapshotAssumptions(payload),
-  };
-};
-
-const buildSnapshotAssumptions = (
-  payload: DecisionMemorySnapshotPayload,
-): DecisionAssumptionSnapshot | undefined => {
-  if (typeof payload.tightness !== "number" || typeof payload.riskAppetite !== "number") {
-    return undefined;
-  }
-  // Posture snapshots prefer the regime boundaries in force as the watch line;
-  // without them, the recorded reading itself is the band.
-  const tightnessThreshold = typeof payload.tightnessThreshold === "number"
-    ? payload.tightnessThreshold
-    : payload.tightness;
-  const riskAppetiteThreshold = typeof payload.riskAppetiteThreshold === "number"
-    ? payload.riskAppetiteThreshold
-    : payload.riskAppetite;
-  return {
-    tightness: payload.tightness,
-    riskAppetite: payload.riskAppetite,
-    tightnessThreshold,
-    riskAppetiteThreshold,
-  };
-};
 
 const escapeCsvCell = (value: string) => `"${value.replaceAll('"', '""')}"`;
 
@@ -468,42 +391,4 @@ export const auditCohortDecisions = (
  * on Planning writes, so the entry lands in the same list with the same
  * assumption snapshot, and the sentence that was tested travels as `context`.
  */
-export const buildPlanStressTestMemoryPayload = ({
-  clientId,
-  recordDate,
-  planText,
-  lifecycle,
-  result,
-  assessment,
-}: {
-  clientId: string;
-  recordDate: string;
-  planText: string;
-  lifecycle: LifecycleStage;
-  result: Pick<
-    GradedPlan,
-    "detectedCategory" | "detectedAction" | "verdict" | "headline" | "boundedGuardrail" | "reversalTrigger"
-  >;
-  assessment: Pick<RegimeAssessment, "regime" | "scores" | "thresholds" | "inputs">;
-}): DecisionMemoryPayload => ({
-  clientId,
-  recordDate,
-  decision: {
-    lifecycle,
-    category: result.detectedCategory,
-    action: result.detectedAction,
-    context: planText.trim(),
-  },
-  outcome: {
-    verdict: result.verdict,
-    summary: result.headline,
-    guardrail: result.boundedGuardrail,
-    reversalTrigger: result.reversalTrigger,
-  },
-  assessment: {
-    regime: assessment.regime,
-    scores: assessment.scores,
-    thresholds: assessment.thresholds,
-    inputs: assessment.inputs,
-  },
-});
+

@@ -13,17 +13,15 @@ const buildPermanentRedirects = (pairs) =>
   pairs.map(([source, destination]) => permanentRedirect(source, destination));
 
 export const solutionRedirectPairs = [
-  ["/solutions/engineering-capacity", "/toolkits/ops-capacity"],
-  ["/solutions/product-roadmapping", "/toolkits/focus"],
-  ["/solutions/market-regime-playbook", "/resolve/ops-risk"],
-  ["/solutions/career-paths", "/resolve/product"],
-  ["/solutions/career-paths/senior-product-manager", "/resolve/product"],
-  ["/solutions/career-paths/group-product-manager", "/resolve/product"],
-  ["/solutions/career-paths/director-of-product", "/resolve/product"],
-  ["/solutions/career-paths/vp-product", "/resolve/ceo"],
-  ["/solutions/career-paths/product-strategy-chief-of-staff", "/resolve/ops-risk"],
-  // /resolve stopped being a page on 2026-10-08; the role and situation pages it
-  // listed are Guides' "More tools", which is where a retired solution belongs.
+  ["/solutions/engineering-capacity", "/resources#more-tools"],
+  ["/solutions/product-roadmapping", "/resources#more-tools"],
+  ["/solutions/market-regime-playbook", "/resources#more-tools"],
+  ["/solutions/career-paths", "/resources#more-tools"],
+  ["/solutions/career-paths/senior-product-manager", "/resources#more-tools"],
+  ["/solutions/career-paths/group-product-manager", "/resources#more-tools"],
+  ["/solutions/career-paths/director-of-product", "/resources#more-tools"],
+  ["/solutions/career-paths/vp-product", "/resources#more-tools"],
+  ["/solutions/career-paths/product-strategy-chief-of-staff", "/resources#more-tools"],
   ["/solutions/:path*", "/resources#more-tools"],
 ];
 
@@ -100,12 +98,16 @@ export const canonicalSurfaceRedirectPairs = [
   // The ledger moved under history. Pointed straight there rather than at
   // /operate/memory, which would chain through a second redirect.
   ["/planning/memory", "/history"],
+  ["/planning/scenarios", "/operate"],
+  ["/operate/scenarios", "/operate"],
+  ["/decisions", "/operate"],
+  ["/history/compare", "/history"],
   // The same aliases one level down. Matching only the bare path left every
   // legacy sub-path a 404 — /answer/ceo and /evidence/capital-tightness-watch
   // among them — so external links and anything still pointing at the old names
   // died silently. Must stay below the specific /answer/* rules above, which a
   // wildcard would otherwise shadow.
-  ["/answer/:path*", "/resolve/:path*"],
+  ["/answer/:path*", "/resources#more-tools"],
   ["/evidence/:path*", "/signals/:path*"],
   ["/planning/:path*", "/operate/:path*"],
   /*
@@ -122,8 +124,9 @@ export const canonicalSurfaceRedirectPairs = [
   // The role × decision-area and toolkit × signal cluster pages (51 of them)
   // were retired on 2026-09-15. Each rendered the same site-wide call as its
   // parent, was noindex, and had no inbound link, so the parent is the page.
-  ["/resolve/:slug/:cluster", "/resolve/:slug"],
-  ["/toolkits/:slug/:cluster", "/toolkits/:slug"],
+  ["/resolve/ship-checklist", "/resources#answers"],
+  ["/resolve/:path+", "/resources#more-tools"],
+  ["/toolkits/:path+", "/resources#more-tools"],
   // Guides staging redirects. These pointed at `/guides`, which stopped existing in
   // 14258b64 — so every one of them was a 308 into a 404, which is worse than a plain
   // 404 because a permanent redirect gets cached and followed. The content itself moved
@@ -170,8 +173,6 @@ export const iaConsolidationRedirectPairs = [
   // without being asked is the call itself, which /history already holds.
   ["/operate/memory", "/history"],
   ["/history/decisions", "/history"],
-  // The ship checklist's one useful question is a direct answer now.
-  ["/resolve/ship-checklist", "/resources#answers"],
   // /state ran the brief's own pipeline and rendered a subset of the hero under
   // its own H1 — a view of `/` that read as a second, independently derived
   // answer, and competed with `/` and `/brief/[week]` for the same query.

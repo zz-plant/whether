@@ -8,7 +8,6 @@ import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
 import { SinceLastVisit } from "./components/home/SinceLastVisit";
-import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
 import { ConditionsLegend } from "./components/home/ConditionsLegend";
@@ -794,9 +793,6 @@ async function PageContent({
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
                 />
               ) : null}
-              {/* The reader's own decisions against this week's reading, for a browser
-                  that has recorded some: one line, and nothing at all for the rest. */}
-              {!historicalSelection ? <YourRecordNote tightness={tightness} riskAppetite={riskAppetite} recordDate={reportData.treasury.record_date} /> : null}
               {/* The one Copy Brief (DD-005), under the card and its two reader
                   notes (which render nothing for most visits) rather than in it:
                   the card is what people screenshot, so a button inside it would

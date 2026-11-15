@@ -151,7 +151,7 @@ export default async function CompsPage() {
           </div>
         ) : comps.status === "source-down" ? (
           <p className="text-sm text-slate-400">
-            None of our market data sources is answering right now, so there are no multiples to show.
+            Market data sources are unreachable right now, so no multiples are available.
             The figures are missing, not zero; the basket is unchanged.
           </p>
         ) : (

@@ -26,7 +26,6 @@ import { ConditionIcon, ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { buildPageMetadata } from "../../lib/seo";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
@@ -40,15 +39,13 @@ import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../.
 export const metadata: Metadata = buildPageMetadata({
   title: "Has it been right?",
   description:
-    "Every weekly brief we published, unedited, and the line that would have changed it. Funding conditions every month since 2012, scored the same way today.",
+    "Every published weekly brief, unedited, and the line that would have changed it. Funding conditions every month since 2012, scored the same way today.",
   path: "/history",
   imageAlt: "Whether history and track record",
   imageParams: { template: "record", eyebrow: "History" },
 });
 
-type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string; compare?: string; yearA?: string; monthA?: string; yearB?: string; monthB?: string };
-
-const COMPARE_KEYS = ["yearA", "monthA", "yearB", "monthB"] as const;
+type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string };
 
 /** "Sep and Oct 2026", or "Dec 2025 and Jan 2026" across a year's end. */
 const formatMonthList = (months: readonly string[]) => {
@@ -83,18 +80,6 @@ export default async function HistoryPage({
   searchParams?: Promise<HistorySearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  /* The comparison opened inside a fold here, a third way to /history/compare beside
-     the sub-tab and the explorer, and its period pickers left for that page anyway
-     (2026-11-11). A link kept from the fold still lands on the comparison. */
-  if (resolvedSearchParams?.compare === "1" || COMPARE_KEYS.some((key) => resolvedSearchParams?.[key])) {
-    const query = new URLSearchParams();
-    for (const key of COMPARE_KEYS) {
-      const value = resolvedSearchParams?.[key];
-      if (value) query.set(key, value);
-    }
-    const search = query.toString();
-    redirect(search ? `/history/compare?${search}` : "/history/compare");
-  }
   const regimeSeries = getTimeMachineRegimeSeries();
   const statsSeries = getTimeMachineRegimeSeries(60);
   // The whole record, not a trailing window. "Months on record: 60" next to
@@ -197,7 +182,7 @@ export default async function HistoryPage({
              shipped with the line that would have changed it, and none edited
              after publication. The numbers stay in the tiles below. */
           pageSummary:
-            "Has it been right? Every brief says what would have changed the guidance, and none has been edited since. Judge the record yourself.",
+            "Has it been right? Every brief records what would have changed the guidance, and none has been edited since. The record is published below.",
           sectionLinks: historySectionLinks,
           currentPath: "/history",
         },

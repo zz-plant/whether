@@ -19,7 +19,6 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/signals/capital-tightness-watch"), "Why it changed");
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Can I trust this?");
     assert.equal(resolveGlobalHeaderRouteLabel("/operate/financial"), "Runway planner");
-    assert.equal(resolveGlobalHeaderRouteLabel("/history/compare"), "Compare periods");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
     assert.equal(resolveGlobalHeaderRouteLabel("/concepts"), "Advice vs. market");
     assert.equal(resolveGlobalHeaderRouteLabel("/resources/capital-posture-template"), "Guides");
@@ -45,10 +44,7 @@ describe("global header navigation helpers", () => {
     // them — including /brief/<week>, the frozen, citable record.
     assert.equal(resolveGlobalHeaderRouteLabel("/brief/2026-w31"), "Published brief");
     assert.equal(resolveGlobalHeaderRouteLabel("/answers/should-startups-hire-engineers-right-now"), "Answer");
-    assert.equal(resolveGlobalHeaderRouteLabel("/resolve/ceo"), "More tools");
-    assert.equal(resolveGlobalHeaderRouteLabel("/toolkits/focus"), "Toolkit");
     assert.equal(resolveGlobalHeaderRouteLabel("/contact"), "Contact");
-    assert.equal(resolveGlobalHeaderRouteLabel("/decisions"), "Your decisions");
     assert.equal(resolveGlobalHeaderRouteLabel("/privacy"), "Privacy");
     assert.equal(resolveGlobalHeaderRouteLabel("/acceptable-use-policy"), "Acceptable Use");
     assert.equal(resolveGlobalHeaderRouteLabel("/terms-of-service"), "Terms");
@@ -61,20 +57,15 @@ describe("global header navigation helpers", () => {
     assert.equal(groupOf("/signals/capital-tightness-watch/hiring"), "this-week");
     assert.equal(groupOf("/trust"), "this-week");
     assert.equal(groupOf("/operate"), "decide");
-    assert.equal(groupOf("/operate/scenarios"), "decide");
     assert.equal(groupOf("/comps"), "decide");
     assert.equal(groupOf("/history"), "record");
     assert.equal(groupOf("/history/2024-q1"), "record");
-    assert.equal(groupOf("/history/compare"), "record");
     assert.equal(groupOf("/calibration"), "record");
-    assert.equal(groupOf("/concepts"), "record");
     assert.equal(groupOf("/brief/2026-w31"), "record");
     assert.equal(groupOf("/resources"), "guides");
     assert.equal(groupOf("/resources/reversibility-as-governance"), "guides");
     assert.equal(groupOf("/answers/should-startups-raise-capital-now"), "guides");
-    assert.equal(groupOf("/resolve/ceo"), "guides");
-    assert.equal(groupOf("/toolkits/focus"), "guides");
-    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy"]) {
+    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy", "/concepts"]) {
       assert.equal(groupOf(ungrouped), null, `${ungrouped} belongs to no group`);
     }
   });
@@ -92,15 +83,13 @@ describe("global header navigation helpers", () => {
 
 describe("sub-tabs", () => {
   it("draws the group's pages, the current one marked, with Record's cross-links after", () => {
-    const record = resolveSectionTabs("/history/compare");
+    const record = resolveSectionTabs("/calibration");
     assert.equal(record?.group.label, "History");
     assert.deepEqual(
       record?.links.map((link) => [link.label, link.placement, link.isActive]),
       [
         ["History", "tab", false],
-        ["How it held up", "tab", false],
-        ["Compare periods", "secondary", true],
-        ["Advice vs. market", "secondary", false],
+        ["How it held up", "tab", true],
         ["Sources", "cross", false],
         ["How the scores are built", "cross", false],
       ],
@@ -121,9 +110,7 @@ describe("sub-tabs", () => {
       [
         ["Plan", false],
         ["Runway planner", false],
-        ["Scenarios", false],
         ["SaaS multiples", true],
-        ["Your decisions", false],
       ],
     );
   });

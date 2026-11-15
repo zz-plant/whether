@@ -19,7 +19,7 @@
     ],
     "category": "climate",
     "shortAnswer": "Read startup funding conditions through rates and credit alongside your runway, investor conversations and the milestone a round must fund.",
-    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; the week's reading can't tell you whether a particular round will close.",
+    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; the week's reading cannot determine whether a particular round will close.",
     "audience": "Founders, finance leaders and board operators",
     "applyHeading": "What the reading changes in your financing plan",
     "mappedDecisionAreas": [
@@ -567,7 +567,7 @@
     ],
     "thresholdFocus": "risk",
     "contextHeading": "What the record can and cannot tell you",
-    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use. When risk appetite falls below its pause line, new commitments stop. A first salesperson who arrives just before that line is a bet made on the edge.",
+    "context": "The risk appetite score reflects how willing markets are to fund risk and faster expansion; it does not indicate whether deals convert. The hire is a bet on internal evidence, gated by the same line other new bets use. When risk appetite falls below its pause line, new commitments stop. A first salesperson who arrives just before that line is a bet made on the edge.",
     "companyInputs": [
       "Closed deals from founder-led sales: count, segment and cycle length.",
       "The fully loaded cost of the rep and the cash plan that carries it.",

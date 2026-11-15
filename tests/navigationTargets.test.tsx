@@ -155,18 +155,10 @@ describe("links into Plan and Resolve use the names the header prints", () => {
     { path: "/trust", name: /^Trust$/ },
   ];
 
-  const renderResolve = async (slug: string) => {
-    const ResolvePage = (await import("../app/resolve/[slug]/page")).default;
-    return renderToStaticMarkup(await ResolvePage({ params: Promise.resolve({ slug }) }));
-  };
-
-  it("on the 404 page, an answer page, the resource pages, the search dead end and the role guides", async () => {
+  it("on the 404 page, an answer page, the resource pages, and the search dead end", async () => {
     const NotFound = (await import("../app/not-found")).default;
     const DecisionShieldOverview = (await import("../app/resources/decision-shield-overview/page")).default;
-    const { decideStaticParams } = await import("../lib/decisionDomainCatalog");
     const { SearchResults } = await import("../app/search/searchResults");
-    const resolveSlug = decideStaticParams.at(0)?.slug;
-    assert.ok(resolveSlug, "the decision catalog carries at least one resolve slug");
     const surfaces: Array<{ name: string; html: string }> = [
       { name: "/404", html: renderToStaticMarkup(<NotFound />) },
       { name: `/answers/${answerPages[0].slug}`, html: await renderAnswer() },
@@ -177,7 +169,6 @@ describe("links into Plan and Resolve use the names the header prints", () => {
          "Trust" until 2026-10-23 — the recovery surface is the one place a
          reader cannot afford a name the header no longer prints. */
       { name: "/search (nothing matched)", html: renderToStaticMarkup(<SearchResults initialQuery="zzqx-no-such-entry" />) },
-      { name: `/resolve/${resolveSlug}`, html: await renderResolve(resolveSlug) },
     ];
 
     const stale = surfaces.flatMap(({ name, html }) =>

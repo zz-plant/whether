@@ -77,6 +77,6 @@ describe("/comps title and as-of date", () => {
     assert.match(html, /<h1[^>]*>\s*What a SaaS company is worth\s*<\/h1>/);
     assert.ok(!html.includes("<time"), "no read, so no read date");
     assert.ok(!html.includes("January 2027"));
-    assert.ok(visibleText(html).includes("None of our market data sources is answering right now"));
+    assert.ok(visibleText(html).includes("Market data sources are unreachable right now"));
   });
 });

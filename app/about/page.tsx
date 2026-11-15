@@ -82,7 +82,11 @@ export default function AboutPage() {
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
-          shows the room before a change is a distance, not a probability.
+          shows the room before a change is a distance, not a probability. We also track{" "}
+          <Link href="/concepts" className={inlineLinkClass}>
+            advice vs. market
+          </Link>{" "}
+          to see whether startup essays move with the cycle.
         </p>
       </section>
 

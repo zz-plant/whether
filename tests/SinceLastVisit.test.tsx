@@ -46,14 +46,8 @@ describe("SinceLastVisit", () => {
   });
 
   it("builds compare target for a valid past date and falls back safely", () => {
-    assert.equal(
-      compareHrefForRecordDate("2026-06-15"),
-      "/history/compare?yearB=2026&monthB=6",
-    );
-    assert.equal(
-      compareHrefForRecordDate("2024-11-01"),
-      "/history/compare?yearB=2024&monthB=11",
-    );
-    assert.equal(compareHrefForRecordDate("invalid-date"), "/history/compare");
+    assert.equal(compareHrefForRecordDate("2026-06-15"), "/history");
+    assert.equal(compareHrefForRecordDate("2024-11-01"), "/history");
+    assert.equal(compareHrefForRecordDate("invalid-date"), "/history");
   });
 });

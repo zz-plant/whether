@@ -82,7 +82,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
     notes: { riskAppetite: "How willing investors are to fund hiring ahead of revenue" },
     instruments: [
       { label: "Past changes", why: "How long conditions have held; a hiring plan outlasts one week's number", href: "#regime-timeline" },
-      { label: "Past months", why: "What the guidance said in past months, to test a hiring plan against", href: "#time-machine" },
+      { label: "Past months", why: "Guidance across past months, to test a hiring plan against", href: "#time-machine" },
     ],
   },
   financial: {

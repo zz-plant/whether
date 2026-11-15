@@ -216,7 +216,6 @@ export default async function ResourcesHubPage({
               on a phone, the second reaches up only across the gap (`--weather-hit-up`). */}
           <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5 gap-y-2 [--weather-hit-up:8px]">
             <ActionLink href="/comps" variant="inline">SaaS valuation multiples</ActionLink>
-            <ActionLink href="/history/compare" variant="inline">Compare historical funding conditions</ActionLink>
           </nav>
         </section>
 
@@ -263,7 +262,7 @@ export default async function ResourcesHubPage({
               {toolkitDefinitions.map((toolkit, index) => (
                 <Fragment key={toolkit.slug}>
                   {index > 0 ? <span aria-hidden="true"> · </span> : null}
-                  <Link href={`/toolkits/${toolkit.slug}`} className="text-[var(--accent-action)] underline underline-offset-4">
+                  <Link href={`/resources?toolkitQuery=${encodeURIComponent(toolkit.slug)}#toolkit-library`} className="text-[var(--accent-action)] underline underline-offset-4">
                     {toolkit.title.replace(/ toolkit$/i, "")}
                   </Link>
                 </Fragment>
@@ -314,7 +313,7 @@ export default async function ResourcesHubPage({
                   <h3 className="text-sm type-eyebrow text-slate-300">Help by situation</h3>
                   <div className="flex flex-wrap gap-2">
                     {situationUseCaseDefinitions.map((situation) => (
-                      <Link key={situation.slug} href={`/resolve/${situation.slug}`} className="weather-hub-chip">
+                      <Link key={situation.slug} href={`/resources?toolkitQuery=${encodeURIComponent(situation.title)}#toolkit-library`} className="weather-hub-chip">
                         {situation.title}
                       </Link>
                     ))}

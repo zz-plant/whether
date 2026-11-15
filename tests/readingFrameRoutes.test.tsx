@@ -51,7 +51,6 @@ const routes: Array<[string, () => Promise<ReactElement>]> = [
   ],
   ["/calibration", async () => (await import("../app/calibration/page")).default()],
   ["/concepts", async () => (await import("../app/concepts/page")).default()],
-  ["/decisions", async () => (await import("../app/decisions/page")).default()],
   ["/404", async () => (await import("../app/not-found")).default()],
 ];
 

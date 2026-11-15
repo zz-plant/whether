@@ -25,13 +25,9 @@ type NavigationPageKey =
   | "trust"
   | "planning"
   | "runway"
-  | "scenarios"
   | "comps"
-  | "decisions"
   | "history"
-  | "compare"
   | "calibration"
-  | "concepts"
   | "guides"
   | "roles"
   | "companies";
@@ -78,7 +74,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     key: "this-week",
     href: "/",
     label: "This week",
-    description: "What this week's guidance says, why it changed and how much to trust it.",
+    description: "What this week's guidance is, why it changed and how much to trust it.",
     shortcut: "w",
     memberPrefixes: [],
     crossLinks: [],
@@ -187,14 +183,6 @@ export const navigationPages: readonly NavigationPage[] = [
     description: "Work out runway, a raise window and a memo from your cash, burn and revenue.",
     placement: "tab",
   },
-  {
-    key: "scenarios",
-    group: "decide",
-    href: "/operate/scenarios",
-    label: "Scenarios",
-    description: "See what the guidance and the rules would be under different rates.",
-    placement: "tab",
-  },
   /* Decide rather than Record: the multiples are this month's market input to a
      raise (what a round may be priced against), read beside the runway planner.
      Record holds the product's own past calls; the basket is not one of them. */
@@ -204,17 +192,6 @@ export const navigationPages: readonly NavigationPage[] = [
     href: "/comps",
     label: "SaaS multiples",
     description: "Median EV/Revenue multiple across a basket of public SaaS companies",
-    placement: "tab",
-  },
-  /* Secondary in Plan since 2026-11-04: what the test on the hub records goes here, and
-     a footer link beside Privacy was the one fixed way to it, so a reader who recorded a
-     decision had no path back the next week. */
-  {
-    key: "decisions",
-    group: "decide",
-    href: "/decisions",
-    label: "Your decisions",
-    description: "The decisions you recorded from this browser, checked against each week's reading.",
     placement: "secondary",
   },
   {
@@ -234,22 +211,6 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
   {
-    key: "compare",
-    group: "record",
-    href: "/history/compare",
-    label: "Compare periods",
-    description: "This week's scores against past downturns: 2001, 2008 and 2022",
-    placement: "secondary",
-  },
-  {
-    key: "concepts",
-    group: "record",
-    href: "/concepts",
-    label: "Advice vs. market",
-    description: "Does startup advice follow the market? Widely read essays and investor memos, placed on the record since 2012",
-    placement: "secondary",
-  },
-  {
     key: "guides",
     group: "guides",
     href: "/resources",
@@ -257,19 +218,13 @@ export const navigationPages: readonly NavigationPage[] = [
     description: "Direct answers and long-form guides for each decision area, and the governance frameworks behind them.",
     placement: "tab",
   },
-  /* Guides' own tabs since 2026-11-06. The role and company pages, ten roles and fifty
-     companies with a page for each role at each, sat outside the IA: two links in Guides'
-     "More tools" at the foot of the page were the one way in, and each family had three
-     names, "Role guidance" over the wordmark, "Roles" in the trail and "This week's
-     conditions by role" as its title. As pages they take one name, a tab row, an entry in
-     the phone's More sheet, the footer and the palette. */
   {
     key: "roles",
     group: "guides",
     href: "/roles",
     label: "Roles",
     description: "What each kind of tech worker can ask for this week, and what to ask leadership, at any company.",
-    placement: "tab",
+    placement: "secondary",
   },
   {
     key: "companies",
@@ -277,7 +232,7 @@ export const navigationPages: readonly NavigationPage[] = [
     href: "/companies",
     label: "Companies",
     description: "This week's conditions beside what 50 public tech companies have filed, for each role there.",
-    placement: "tab",
+    placement: "secondary",
   },
 ];
 
@@ -361,8 +316,7 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
-  { prefix: "/resolve", label: "More tools" },
-  { prefix: "/toolkits", label: "Toolkit" },
+  { prefix: "/concepts", label: "Advice vs. market" },
   { prefix: "/privacy", label: "Privacy" },
   { prefix: "/acceptable-use-policy", label: "Acceptable Use" },
   { prefix: "/terms-of-service", label: "Terms" },

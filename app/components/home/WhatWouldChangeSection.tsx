@@ -229,8 +229,8 @@ export function WhatWouldChangeSection({
           just been told these lines are unusual should be able to check how often
           they held and read every brief behind them in one click, or the sentence
           is marketing rather than a claim the product stands behind. */}
-      <p className="text-fluid-sm text-slate-400">
-        We publish how often these held, and every brief behind them:{" "}
+      <p className="max-w-none border-t border-[color:var(--border-subtle)] pt-3 text-fluid-sm text-slate-400">
+        How often these lines held, and every brief behind them:{" "}
         <Link href="/calibration" className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
           the calibration study
         </Link>{" "}

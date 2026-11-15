@@ -3,11 +3,9 @@ import { isRegimeKey } from "../../../lib/regimePresentation";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { toImageSafeProps, toImageSafeText } from "../../../lib/image/ogFonts";
 import { loadHomeSharePreview } from "../../../lib/report/homeSharePreview";
-import { loadComparePreview } from "../../../lib/image/compareImagePayload";
 import { canonicalPositioningLine, ogImageRatioSizes, type OgImageRatio } from "../../../lib/seo";
 import { renderReportOgImage } from "./reportImageTemplate";
 import { renderBriefChartOgImage, type BriefChartPoint } from "./briefChartTemplate";
-import { renderCompareOgImage } from "./compareTemplate";
 import { renderStaticOgImage, type OgRegimeMix, type StaticOgTemplate } from "./staticTemplate";
 import { renderAnswerOgImage } from "./answerImageTemplate";
 import postureTimeline from "../../../data/posture_og_timeline.json";
@@ -24,7 +22,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
  * page's `og:image` URL and read the card it gets.
  */
 
-type OgTemplate = "report" | StaticOgTemplate | "brief-chart" | "compare" | "answers";
+type OgTemplate = "report" | StaticOgTemplate | "brief-chart" | "answers";
 
 const STATIC_TEMPLATES: ReadonlySet<string> = new Set<StaticOgTemplate>([
   "operations",
@@ -45,7 +43,7 @@ const DEFAULT_KICKER = "Whether — weekly operating guidance";
 const readTemplate = (searchParams: URLSearchParams): OgTemplate => {
   const template = searchParams.get("template")?.trim() ?? "";
   if (isStaticTemplate(template)) return template;
-  if (template === "brief-chart" || template === "compare" || template === "answers") return template;
+  if (template === "brief-chart" || template === "answers") return template;
   return "report";
 };
 
@@ -125,17 +123,6 @@ export const renderOgElement = async (searchParams: URLSearchParams): Promise<Re
         regime: readRegime(searchParams) ?? "VOLATILE",
         points: buildPostureTimelinePoints(),
         canvasHeight: readOgSize(searchParams).height,
-      }),
-    );
-  }
-
-  if (template === "compare") {
-    return renderCompareOgImage(
-      await loadComparePreview({
-        yearA: searchParams.get("yearA") ?? undefined,
-        monthA: searchParams.get("monthA") ?? undefined,
-        yearB: searchParams.get("yearB") ?? undefined,
-        monthB: searchParams.get("monthB") ?? undefined,
       }),
     );
   }

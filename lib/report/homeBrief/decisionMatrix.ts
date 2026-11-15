@@ -73,10 +73,10 @@ export const buildDecisionMatrixPayload = ({
       cells: {
         approve: {
           text: compactMatrixText(rule ? formatBoundedDecisionAction(rule) : "", fallbackApprove),
-          detail: rule?.rationale ?? "Use current posture until signal quality improves.",
+          detail: rule?.rationale ?? "Use current guidance until signal quality improves.",
           action: rule ? formatBoundedDecisionAction(rule) : fallbackApprove,
           threshold: rule ? formatBoundedDecisionThreshold(rule) : FALLBACK_PAUSE_THRESHOLD,
-          reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",
+          reversal: rule ? formatBoundedDecisionReverse(rule) : "Restart only after conditions recover",
         },
         delay: {
           text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),

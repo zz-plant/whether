@@ -110,7 +110,7 @@ export const describeWhatMovesPaybackBar = ({
   if (!isSunny(scores, lines)) return "";
   const missed = sized.filter((project) => (project.breakEvenMonth ?? 0) > ROADMAP_PAYBACK_BAR_MONTHS).length;
   const effect = missed > 0 ? `, and ${missed} of your projects would miss it` : "";
-  return `The market sets whether there is a bar. If funding pressure rises above ${lines.tightness} or risk appetite falls to ${lines.riskAppetite} or below ${today}, a ${ROADMAP_PAYBACK_BAR_MONTHS}-month bar returns${effect}.`;
+  return `Market conditions determine whether a payback bar applies. If funding pressure rises above ${lines.tightness} or risk appetite falls to ${lines.riskAppetite} or below ${today}, a ${ROADMAP_PAYBACK_BAR_MONTHS}-month bar returns${effect}.`;
 };
 
 export type ProjectPaybackContext = {

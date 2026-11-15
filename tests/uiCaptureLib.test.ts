@@ -66,14 +66,14 @@ describe("ui capture helpers", () => {
     const targets = resolveCaptureTargets();
 
     assert.ok(targets.length >= 4);
-    assert.ok(targets.some((target: { id: string }) => target.id === "operator-brief-mobile"));
-    assert.ok(targets.some((target: { id: string }) => target.id === "operator-brief-desktop"));
+    assert.ok(targets.some((target: { id: string }) => target.id === "home-mobile"));
+    assert.ok(targets.some((target: { id: string }) => target.id === "home-desktop"));
   });
 
   it("filters capture targets by requested id", () => {
-    const targets = resolveCaptureTargets(["operator-brief-mobile"]);
+    const targets = resolveCaptureTargets(["home-mobile"]);
 
-    assert.deepEqual(targets.map((target: { id: string }) => target.id), ["operator-brief-mobile"]);
+    assert.deepEqual(targets.map((target: { id: string }) => target.id), ["home-mobile"]);
   });
 
   it("waits for streamed capture readiness on the homepage brief before screenshots", async () => {

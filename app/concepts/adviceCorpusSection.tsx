@@ -339,7 +339,7 @@ export function AdviceCorpusSection() {
             </>
           }
           limit={finding.limit}
-          source={{ label: "The results", href: RESULTS_URL, note: "§3 and §4" }}
+          source={{ label: "The results", href: RESULTS_URL, note: "Sections 3 and 4" }}
         />
         <p className="mt-2 max-w-prose text-fluid-nano text-slate-400">
           What would change this: a second crossing with more posts after it, or labels that clear the study&apos;s

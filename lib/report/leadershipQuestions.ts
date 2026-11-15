@@ -12,8 +12,8 @@ import { stageForWorkers } from "./roleStages";
 import { RUNWAY_BAND_OPTIONS, runwayBandPhrase, type RunwayBand } from "./operatorRunway";
 
 const BAND_MEANINGS: Record<RunwayBand, string> = {
-  critical: "the rules put cash first and hold new commitments, whatever this week's guidance says.",
-  tight: `the rules want every new hire and campaign to pay back inside ${TIGHT_RUNWAY_PAYBACK_BAR_MONTHS} months.`,
+  critical: "the rules put cash first and hold new commitments, regardless of this week's guidance.",
+  tight: `the rules require every new hire and campaign to pay back inside ${TIGHT_RUNWAY_PAYBACK_BAR_MONTHS} months.`,
   balanced: "the rules follow this week's guidance.",
   abundant: "the rules leave room to move against the cycle, at the same payback bar.",
 };

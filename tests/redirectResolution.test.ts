@@ -72,12 +72,10 @@ const resolve = (pathname: string) => {
 describe("redirect resolution", () => {
   it("sends legacy alias sub-paths to their renamed route", () => {
     for (const [from, to] of [
-      ["/resolve/ceo", "/resolve/ceo"],
-      // The role × decision-area cluster pages were retired on 2026-09-15; the
-      // parent role page is where they land, one hop from the legacy alias too.
-      ["/resolve/ceo/capital-raising", "/resolve/ceo"],
-      ["/answer/ceo/capital-raising", "/resolve/ceo"],
-      ["/toolkits/pmf/risk-appetite-watch", "/toolkits/pmf"],
+      ["/resolve/ceo", "/resources#more-tools"],
+      ["/resolve/ceo/capital-raising", "/resources#more-tools"],
+      ["/answer/ceo/capital-raising", "/resources#more-tools"],
+      ["/toolkits/pmf/risk-appetite-watch", "/resources#more-tools"],
       ["/resolve/ship-checklist", "/resources#answers"],
       ["/evidence/capital-tightness-watch", "/signals/capital-tightness-watch"],
       ["/evidence/capital-tightness-watch/hiring", "/signals/capital-tightness-watch/hiring"],
@@ -239,10 +237,8 @@ describe("redirect resolution", () => {
 
   it("holds a destination on a dynamic route to the values that route generates", async () => {
     const { serves } = await routeTable;
-    assert.ok(serves("/resolve/ceo"));
-    assert.ok(!serves("/resolve/not-a-real-slug"), "/resolve/[slug] sets dynamicParams = false");
-    assert.ok(serves("/toolkits/focus"));
-    assert.ok(!serves("/toolkits/not-a-real-slug"), "/toolkits/[slug] calls notFound() for it");
+    assert.ok(serves("/operate/financial"));
+    assert.ok(!serves("/operate/not-a-real-workstream"));
   });
 
   /*

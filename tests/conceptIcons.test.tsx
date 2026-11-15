@@ -271,11 +271,10 @@ describe("a glyph sits beside its words and is hidden from assistive tech", () =
     assert.match(html, /<svg viewBox="0 0 200 184"[^>]*aria-hidden="true"/, "the chart's glyphs sit in a graphic hidden as a whole");
   });
 
-  it("on the pages that render offline: Guides, a published week, a year, a quarter, an answer, the comparison", async () => {
+  it("on the pages that render offline: Guides, a published week, a year, a quarter, an answer", async () => {
     const { default: GuidesPage } = await import("../app/resources/page");
     const brief = await import("../app/brief/[week]/page");
     const period = await import("../app/history/[period]/page");
-    const compare = await import("../app/history/compare/page");
     const history = await import("../app/history/page");
     const { DecisionAnswerPageContent } = await import("../app/answers/decisionAnswerPageContent");
     const [week] = brief.generateStaticParams();
@@ -285,7 +284,6 @@ describe("a glyph sits beside its words and is hidden from assistive tech", () =
       "/history/2022": renderToStaticMarkup(await period.default({ params: Promise.resolve({ period: "2022" }) })),
       "/history/2022-q3": renderToStaticMarkup(await period.default({ params: Promise.resolve({ period: "2022-q3" }) })),
       "/history": renderToStaticMarkup(await history.default({ searchParams: Promise.resolve({}) })),
-      "/history/compare": renderToStaticMarkup(await compare.default({ searchParams: Promise.resolve({}) })),
       "/answers/should-startups-hire-engineers-right-now": renderToStaticMarkup(
         await DecisionAnswerPageContent({
           slug: "should-startups-hire-engineers-right-now",
