@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Forecast (bolder)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+:root{
+  --sky:#6a8aaa; --sky-deep:#6a8aaa; --ink:#0f1419; --muted:#162028; --paper:#f0f3f7;
+  --accent:#2a4fa8; --red:#c4242b; --line:#d8dde4; --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Source Sans 3',system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5;transition:background .5s ease,color .5s ease}
+h1,.guidance,.condword,.fig,.word{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.shell{min-height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--paper);border-bottom:1px solid var(--line);font-size:13px;transition:background .5s ease,border-color .5s ease}
+.top .word{font-weight:800;letter-spacing:-.02em;font-size:18px}
+.top a{color:var(--muted);text-decoration:none;font-weight:500}
+.top a.cur{color:var(--ink);font-weight:700}
+.top .right{margin-left:auto;color:var(--muted);font-size:12px}
+.sky{background:linear-gradient(180deg,var(--sky) 0%,var(--sky-deep) 100%);color:var(--ink);padding:48px 28px 56px;transition:background .5s ease,color .5s ease;position:relative;overflow:hidden}
+.sky::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.25) 0%,transparent 60%);pointer-events:none}
+.sky .row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;position:relative}
+.glyph{font-size:72px;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.15))}
+.condword{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px}
+.guidance{font-size:clamp(28px,3.5vw,40px);font-weight:800;line-height:1.05;letter-spacing:-.02em;max-width:20ch;margin:12px 0 16px}
+.meta{font-size:12px;color:var(--muted);margin-bottom:20px;font-weight:500}
+.scores{display:flex;gap:40px;flex-wrap:wrap;margin-top:12px}
+.score .fig{font-size:64px;font-weight:900;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
+.score .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:2px}
+.score .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.body{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
+.sec{margin-bottom:32px}
+.sec h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:12px}
+.area{display:grid;grid-template-columns:36px 1fr auto;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center;transition:border-color .5s ease}
+.area .n{font-size:12px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.area .name{font-weight:600;font-size:16px}
+.area .act{font-size:13px;font-weight:600}
+.area.hold .act{color:var(--red)}
+.narrative{font-size:15px;line-height:1.6;max-width:64ch;margin-bottom:20px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;transition:background .5s ease,border-color .5s ease}
+.fact .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.fact .val{font-size:13px;font-weight:500}
+.cta{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.btn{padding:11px 18px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:all .2s}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn:hover{transform:translateY(-1px)}
+.switches{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;align-items:center}
+.sw{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.sw.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.note{font-size:12px;color:var(--muted);margin-top:12px;max-width:64ch}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span class="right">Share · About · Search</span>
+  </div>
+  <div class="sky" id="sky">
+    <div class="row">
+      <div class="glyph" id="glyph">☁️</div>
+      <div>
+        <div class="condword" id="condword">Cloudy</div>
+        <div class="meta" id="meta">No. 2026-W45 · Week of 3 Nov 2026 · 177 months on the record</div>
+        <h1 class="guidance">Pause hiring and hold the roadmap.</h1>
+        <div class="scores">
+          <div class="score"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">of 100 · higher is worse · pause 76</div></div>
+          <div class="score"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">of 100 · higher is better · restart 66</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="sec">
+      <h2>Five areas</h2>
+      <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · restart at 66</span></div>
+    </div>
+    <p class="narrative">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line. The hold lifts when funding pressure falls to 66 or risk appetite rises past 72.</p>
+    <div class="facts">
+      <div class="fact"><div class="label">Files</div><div class="val">177 weekly briefs · 156 month-end readings · since Jan 2012</div></div>
+      <div class="fact"><div class="label">Rules</div><div class="val">Rules for this company · change</div></div>
+      <div class="fact"><div class="label">Source</div><div class="val">FRED, U.S. Treasury · last fetch ok</div></div>
+    </div>
+    <div class="cta">
+      <button class="btn primary">Copy this week's brief</button>
+      <button class="btn">Subscribe</button>
+      <button class="btn">Share link</button>
+    </div>
+    <div class="switches">
+      <span style="font-size:12px;color:var(--muted);align-self:center;margin-right:4px">Switch weather:</span>
+      <button class="sw" data-w="sunny">☀️ Sunny</button>
+      <button class="sw on" data-w="cloudy">☁️ Cloudy</button>
+      <button class="sw" data-w="stormy">⛈️ Stormy</button>
+      <button class="sw" data-w="freezing">❄️ Freezing</button>
+    </div>
+    <p class="note">Bolder color: the sky is the page's dominant region — vivid, saturated, immersive. The body paper tints to match. Condition drives everything: ground, ink, muted, accent, and the sky band's gradient. Controls stay in the ink in every week.</p>
+  </div>
+</div>
+<script>
+const W={
+  sunny:{sky:'#f5b800',deep:'#d49800',ink:'#1a1408',muted:'#5a4a1a',paper:'#f4f6fa',card:'#fafcff',line:'#d8dce8',glyph:'☀️',word:'Sunny'},
+  cloudy:{sky:'#6a8aaa',deep:'#6a8aaa',ink:'#0f1419',muted:'#162028',paper:'#eef1f6',card:'#f8fafc',line:'#c8d0dc',glyph:'☁️',word:'Cloudy'},
+  stormy:{sky:'#1a1f3a',deep:'#0a0f28',ink:'#e8ecf4',muted:'#9aa8c0',paper:'#10141c',card:'#1a1f2a',line:'#2a3040',glyph:'⛈️',word:'Stormy'},
+  freezing:{sky:'#7ab8e8',deep:'#4a90c8',ink:'#0a1a3a',muted:'#1a3a6a',paper:'#eaf0f8',card:'#f5f9fd',line:'#b0c8e0',glyph:'❄️',word:'Freezing'}
+};
+document.querySelectorAll('.sw').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const w=W[b.dataset.w];
+    const sky=document.getElementById('sky');
+    sky.style.background=`linear-gradient(180deg,${w.sky} 0%,${w.deep} 100%)`;
+    sky.style.color=w.ink;
+    document.getElementById('glyph').textContent=w.glyph;
+    document.getElementById('condword').textContent=w.word;
+    document.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const r=document.documentElement.style;
+    r.setProperty('--sky',w.sky);r.setProperty('--sky-deep',w.deep);
+    r.setProperty('--ink',w.ink);r.setProperty('--muted',w.muted);
+    r.setProperty('--paper',w.paper);r.setProperty('--card',w.card);r.setProperty('--line',w.line);
+    document.body.style.background=w.paper;document.body.style.color=w.ink;
+  });
+});
+</script>
+</body>
+</html>

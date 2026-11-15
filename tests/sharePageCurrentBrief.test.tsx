@@ -153,13 +153,8 @@ describe("/share current weekly artifact", () => {
      draw one slide, so they are one card with one picture; the brief card has its own. */
   it("shows each picture once, sized before it loads", async () => {
     const html = renderToStaticMarkup(await SharePage());
-    const tags = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
-    /* The embed section's status badge is its own picture, a line tall; the cards are the rest. */
-    const badges = tags.filter((tag) => tag.includes('src="/api/badge"'));
-    const images = tags.filter((tag) => !badges.includes(tag));
+    const images = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
 
-    assert.equal(badges.length, 1, "the badge is shown once");
-    assert.match(badges[0] ?? "", /height="20"/);
     assert.equal(images.length, 2, "one picture per distinct image");
     for (const tag of images) {
       assert.match(tag, /src="\/api\/image\/(slide|brief)\?stage=series-a"/);
@@ -205,7 +200,7 @@ describe("/share current weekly artifact", () => {
     const preview = html.indexOf("data-chat-preview");
     const readings = html.indexOf("This week&#x27;s scores");
     assert.ok(copy > 0 && copy < preview && preview < readings, "copy is beside the preview heading, with readings below the preview");
-    for (const id of ["formats", "image-artifacts", "embed"]) assert.match(html, new RegExp(`id="${id}"`));
+    for (const id of ["formats", "image-artifacts"]) assert.match(html, new RegExp(`id="${id}"`));
     // The stacked page's anchors, and the formats folded on 2026-11-03, open the format that carries them.
     for (const id of ["slack-post", "ticket-brief", "agenda", "email"]) {
       assert.ok(options.some((option) => option.id === id), `${id} is still a format`);

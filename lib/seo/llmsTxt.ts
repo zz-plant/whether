@@ -38,8 +38,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     ...navigationGroups.flatMap((group) => [
       `- ${group.label}: ${baseUrl}${group.href} — ${group.description}`,
       ...pagesInGroup(group.key)
-        /* /decisions is one browser's own record: an agent reading this has none. */
-        .filter((page) => page.href !== group.href && page.href !== "/decisions")
+        .filter((page) => page.href !== group.href)
         .map((page) => `  - ${page.label}: ${baseUrl}${page.href}`),
     ]),
     ...utilityLinks
@@ -64,8 +63,8 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "",
     "Two things make a reading quotable rather than just readable, and both travel with it:",
     "",
-    "- **It carries the line that would change it.** Every reading names the condition that would overturn it, so you can tell the user what would have to move instead of asserting a conclusion.",
-    "- **The published record is immutable.** No brief is edited after publication: /history holds every one, and /trust says what would make this week's guidance wrong.",
+    "- **It carries the line that would change it.** Every reading names the condition that would overturn it, showing what would have to move instead of asserting a conclusion.",
+    "- **The published record is immutable.** No brief is edited after publication: /history holds every one, and /trust shows what would make this week's guidance wrong.",
     "",
     "## Start here",
     "",
@@ -127,8 +126,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     `- GET ${baseUrl}/api/cli/status — this week's conditions and guidance. \`?asOf=YYYY-MM\` reads a past month; \`&view=expanded\` adds what would change the guidance and the signals that moved.`,
     `- GET ${baseUrl}/api/cli/history — the conditions at each month-end in the last 52 weeks, newest first, each with its own margin and trend. Takes \`?asOf=YYYY-MM\`; \`&weeks=<n>\` (at most 52) narrows the window.`,
     "",
-    "### Badge, calendar and full text",
-    `- GET ${baseUrl}/api/badge — this week's conditions as an SVG badge for a README or a data room.`,
+    "### Calendar and full text",
     `- GET ${baseUrl}/calendar.ics — a calendar to subscribe to, with each Monday's guidance on that day.`,
     `- GET ${baseUrl}/llms-full.txt — the answer pages, guides and terms in one Markdown file.`,
     "",

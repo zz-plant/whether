@@ -316,7 +316,7 @@ export const buildStartRouteDeltaBlock = ({
       isReturningUser: false,
       hasMeaningfulDelta: false,
       fallbackCopy:
-        "First review this cycle. Start with this week's guidance, then set your first bounded operating decision.",
+        "First review this cycle. Start with this week's guidance, then set your first operating decision.",
       items: [],
     };
   }

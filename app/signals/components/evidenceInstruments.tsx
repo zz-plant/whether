@@ -134,8 +134,8 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
         </dl>
         <p className="text-fluid-nano text-slate-500">
           Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.{" "}
-          <Link href="/history/compare" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-            Compare against any past month →
+          <Link href="/history" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+            See the historical record →
           </Link>
         </p>
       </div>

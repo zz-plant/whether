@@ -93,12 +93,6 @@ describe("one close key", () => {
 });
 
 describe("buttons the size of a finger", () => {
-  it("draws the browser-alert toggle as the site's secondary button, 44px tall", () => {
-    const toggle = source("app/components/regimeAlertToggle.tsx");
-    assert.match(toggle, /className="weather-button inline-flex min-h-11/);
-    assert.doesNotMatch(toggle, /bg-slate-900 px-4 py-2/);
-  });
-
   it("makes the share panel's switch rows the target, not the 20px switch", () => {
     const rail = source("app/components/shareRail.tsx");
     assert.equal(rail.match(/<label className="flex min-h-11 cursor-pointer/g)?.length, 2);

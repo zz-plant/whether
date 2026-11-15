@@ -237,7 +237,7 @@ describe("report route page summaries", () => {
     // and that none was edited), not the outline of sections beneath it.
     assert.match(
       history,
-      /"Has it been right\? Every brief says what would have changed the guidance, and none has been edited since\./,
+      /"Has it been right\? Every brief records what would have changed the guidance, and none has been edited since\./,
     );
     assert.doesNotMatch(history, /Look up the guidance for any past month/);
     assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);

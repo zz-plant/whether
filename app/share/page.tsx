@@ -7,10 +7,7 @@ import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
 import { ReusableVisuals } from "./reusableVisuals";
-import { findBriefVideo } from "../../lib/export/briefVideo";
-import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
-import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument } from "../../lib/report/briefDocument";
@@ -331,7 +328,6 @@ const apiLink = utilityLinks.find((link) => link.href === "/api-docs");
 
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
-  const video = latestPublishedBrief ? await findBriefVideo(latestPublishedBrief) : undefined;
 
   return (
     <PageShell backdropVariant="default">
@@ -387,12 +383,7 @@ export default async function SharePage() {
 
         {/* Text formats first, then the same call as a picture or a file. */}
         <ShareImageArtifacts />
-        <ReusableVisuals video={video} weekLabel={latestPublishedBrief ? publishedBriefWeekLabel(latestPublishedBrief) : undefined} />
-
-        {/* Anchored so the retired /embed route lands on it. */}
-        <section id="embed" className="weather-panel weather-section-stack p-0">
-          <EmbedBuilder />
-        </section>
+        <ReusableVisuals />
         {/* The rest of "Use it elsewhere": the same reading for an agent, a
             script or a feed reader. The API page was a header menu item of its
             own until 2026-10-08. */}

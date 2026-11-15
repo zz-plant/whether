@@ -5,7 +5,6 @@ import * as nextNavigation from "next/navigation";
 
 import { answerPages } from "../app/answers/decisionPages";
 import { signalScenarioRoutes } from "../app/seoRouteClusters";
-import { toolkitDefinitions } from "../lib/decisionDomainCatalog";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
@@ -225,13 +224,6 @@ const routeSurfaces: Surface[] = [
     text: async () => {
       const { DecisionAnswerPageContent } = await import("../app/answers/decisionAnswerPageContent");
       return visibleText(renderToStaticMarkup(await DecisionAnswerPageContent({ slug: page.slug, route: `/answers/${page.slug}` })));
-    },
-  })),
-  ...toolkitDefinitions.map((toolkit) => ({
-    name: `/toolkits/${toolkit.slug}`,
-    text: async () => {
-      const page = await import("../app/toolkits/[slug]/page");
-      return visibleText(renderToStaticMarkup(await page.default({ params: Promise.resolve({ slug: toolkit.slug }) })));
     },
   })),
   /* The engine key reached these as "Call SCARCITY" while no guard rendered them. */

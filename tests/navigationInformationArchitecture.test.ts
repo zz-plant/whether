@@ -47,8 +47,8 @@ describe("navigation groups", () => {
       Object.fromEntries(navigationGroups.map((group) => [group.key, pagesInGroup(group.key).map((page) => page.href)])),
       {
         "this-week": ["/", "/signals", "/trust"],
-        decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps", "/decisions"],
-        record: ["/history", "/calibration", "/history/compare", "/concepts"],
+        decide: ["/operate", "/operate/financial", "/comps"],
+        record: ["/history", "/calibration"],
         guides: ["/resources", "/roles", "/companies"],
       },
     );
@@ -69,20 +69,19 @@ describe("navigation groups", () => {
     assert.equal(navigationLabelByPath["/trust"], "Can I trust this?");
   });
 
-  it("files Advice vs. market under History as a secondary page, not a tab", () => {
+  it("keeps Advice vs. market outside the primary History tabs", () => {
     const concepts = navigationPages.find((page) => page.href === "/concepts");
-    assert.equal(concepts?.group, "record");
-    assert.equal(concepts?.placement, "secondary");
+    assert.equal(concepts, undefined);
     assert.ok(!utilityLinks.some((link) => String(link.href) === "/concepts"), "not a utility link");
   });
 
-  it("gives Guides its role and company pages as tabs, with one name each", () => {
+  it("keeps Roles and Companies as secondary pages under Guides, not primary tabs", () => {
     assert.deepEqual(
       pagesInGroup("guides").map((page) => [page.href, page.label, page.placement]),
       [
         ["/resources", "Guides", "tab"],
-        ["/roles", "Roles", "tab"],
-        ["/companies", "Companies", "tab"],
+        ["/roles", "Roles", "secondary"],
+        ["/companies", "Companies", "secondary"],
       ],
     );
     // Their pages under them are the group's through the page, not a member prefix or a content section.
@@ -207,7 +206,7 @@ describe("footer mirrors the groups and the utility links", () => {
 describe("content sections", () => {
   it("names every routed content family the pages and utilities do not", () => {
     const named = new Set<string>(contentSections.map((section) => section.prefix));
-    for (const prefix of ["/answers", "/brief", "/resolve", "/toolkits"]) {
+    for (const prefix of ["/answers", "/brief", "/concepts"]) {
       assert.ok(named.has(prefix), `${prefix} must be a named content section`);
     }
     // Contact is a utility link since 2026-10-23, so it reaches the footer, the

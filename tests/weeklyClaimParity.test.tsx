@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { afterEach, describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
 import type { unstable_cache } from "next/cache";
-import { buildBriefEmbedData, buildBriefEmbedText } from "../app/api/embed/route";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { buildBriefMarkdown } from "../app/brief.md/route";
 import SharePage from "../app/share/page";
@@ -29,7 +28,6 @@ import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { assembleCurrentWeekBrief } from "../lib/report/publishedBriefRecord";
 import { publishedBriefHeadline } from "../lib/report/publishedBriefs";
 import { describePolicyHold } from "../lib/report/regimeDescription";
-import { formatMarginStamp } from "../lib/report/reportFormatting";
 import {
   anyPauseLineMet,
   buildCallChangeLine,
@@ -119,7 +117,6 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
   const home = await assembleHomePage({}, { loadHomePageReportData: createHomePageReportDataLoader({ unstableCache: uncached }) });
   assert.ok(home.reportResult.ok, "the stored snapshot is a live reading");
   const reportData = home.reportResult.data;
-  const embed = buildBriefEmbedData(home, { ticker: "", ref: "parity", companyStage: null });
   const share = propsHandedTo(await SharePage(), SharePageFormats)[0];
   assert.ok(share, "/share renders its format picker");
   const frozen = await assembleCurrentWeekBrief({ now: NOW });
@@ -129,7 +126,6 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
     reportData,
     document: buildBriefDocument(briefSourceFromReportData(reportData), home.weeklyCall),
     markdown: buildBriefMarkdown(home),
-    embedText: buildBriefEmbedText(embed),
     card: buildBriefImagePayload(home),
     ...(await (async () => {
       const context = await loadAgentInterfaceContext("claim-parity");
@@ -167,7 +163,7 @@ describe("one week, one set of claims, every surface", () => {
       });
 
       it("names the same conditions everywhere", async () => {
-        const { reportData, home, document, markdown, embedText, card, agent, slack, email } = await render(week);
+        const { reportData, home, document, markdown, card, agent, slack, email } = await render(week);
         const conditions = getRegimePublicLabel(reportData.assessment.regime);
 
         assert.ok((home.weeklyDecisionCardModel.status.postureWithStageLabel ?? "").startsWith(conditions));
@@ -175,7 +171,6 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(agent.conditions.label, conditions);
         assert.equal(getRegimePublicLabel(card.regime), conditions);
         assert.match(markdown, new RegExp(`\\*\\*Conditions:\\*\\* ${conditions}`));
-        assert.match(embedText, new RegExp(`^Conditions: ${conditions} `, "m"));
         assert.match(slack, new RegExp(`^Conditions: ${conditions} `, "m"), "the Monday post");
         assert.match(email, new RegExp(`^Conditions: ${conditions} `, "m"), "the Monday email");
       });
@@ -189,7 +184,7 @@ describe("one week, one set of claims, every surface", () => {
          to "Freeze new commitments and keep spend flexible" under a page and a Slack
          post that said "Commit to what protects income you have". */
       it("gives the same guidance everywhere", async () => {
-        const { home, document, markdown, embedText, card, agent, cli, memo, investorUpdate, record, slack, email } = await render(week);
+        const { home, document, markdown, card, agent, cli, memo, investorUpdate, record, slack, email } = await render(week);
         const { actionNow } = home.weeklyCall;
         const headline = weeklyHeadline(home.weeklyCall);
         const guidance = formatGuidance(home.weeklyCall);
@@ -202,7 +197,6 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(guidance, headline.composed, "a paste leads with the headline");
         assert.equal(formatGuidance(document.slots), guidance, "the brief document every paste renders");
         assert.ok(markdown.includes(guidance), "/brief.md");
-        assert.ok(embedText.includes(`Guidance: ${guidance}`), `the embed:\n${embedText}\nexpected: ${guidance}`);
         assert.equal(
           deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).primaryCall,
           guidance,
@@ -231,18 +225,16 @@ describe("one week, one set of claims, every surface", () => {
       });
 
       it("dates and grades the reading the same everywhere", async () => {
-        const { reportData, home, document, markdown, embedText, agent, memo, record, slack } = await render(week);
+        const { reportData, home, document, markdown, agent, memo, record, slack } = await render(week);
         const recordDate = reportData.treasury.record_date;
         const confidence = home.weeklyDecisionCardModel.status.confidenceLabel;
 
         assert.equal(document.provenance.recordDate, recordDate);
         assert.equal(agent.recordDate, recordDate);
         assert.match(markdown, new RegExp(`^# Whether Weekly Brief — ${recordDate}$`, "m"));
-        assert.match(embedText, new RegExp(`Data as of ${recordDate}`));
         assert.equal(record.recordDate, recordDate, "the frozen record");
         assert.match(slack, new RegExp(`^Whether Weekly Brief — ${recordDate}$`, "m"), "the Monday post");
         assert.equal(agent.confidence.label, confidence);
-        assert.ok(embedText.includes(formatMarginStamp(confidence)));
         assert.equal(memo.confidence, confidence, "the /api/decision memo");
         assert.equal(record.confidenceLabel, confidence, "the frozen record");
       });
@@ -253,12 +245,11 @@ describe("one week, one set of claims, every surface", () => {
          every paste's "Favour releases that pay back quickly and can be rolled back.",
          because the stored call was composed without the week's change of conditions. */
       it("states the same call everywhere", async () => {
-        const { reportData, home, document, markdown, embedText, memo, record, slack } = await render(week);
+        const { reportData, home, document, markdown, memo, record, slack } = await render(week);
         const { currentCall } = home.weeklyCall;
 
         assert.equal(document.slots.currentCall, currentCall, "the brief document every paste renders");
         assert.ok(markdown.includes(currentCall), "/brief.md");
-        assert.ok(embedText.includes(currentCall), "the embed");
         assert.equal(home.weeklyDecisionCardModel.decision.operatingStanceLine, currentCall, "the homepage card");
         assert.equal(memo.weeklyMemoLines[1], currentCall, "the /api/decision memo");
         assert.equal(record.summary, currentCall, "the frozen record");
@@ -349,7 +340,7 @@ describe("one week, one set of claims, every surface", () => {
       });
 
       it("says what would change the guidance through one builder", async () => {
-        const { reportData, home, document, markdown, embedText, agent, cli, memo, standup, record, slack, email } =
+        const { reportData, home, document, markdown, agent, cli, memo, standup, record, slack, email } =
           await render(week);
         const { assessment } = reportData;
         const { callChangesIf } = home.weeklyCall;
@@ -362,7 +353,6 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(callChangesIf, buildWeekCallChangesIf(assessment), "the contract states the claim's builder");
         assert.equal(document.slots.callChangesIf, callChangesIf, "the brief document every paste renders");
         assert.ok(markdown.includes(`**${label}:** ${callChangesIf}`), "/brief.md");
-        assert.ok(embedText.includes(`${label}: ${callChangesIf}`), "the embed");
         assert.equal(slot(slack, label), callChangesIf, "the Monday post");
         assert.equal(slot(email, label), callChangesIf, "the Monday email");
         const decision = home.weeklyDecisionCardModel.decision;
@@ -388,7 +378,7 @@ describe("one week, one set of claims, every surface", () => {
           /* No surface says what moves the conditions in place of the hold. */
           assert.deepEqual(buildFlipProximity(assessment), [], "the homepage's interest-rate terms");
           const lines = buildFlipThreshold(assessment);
-          for (const [surface, text] of Object.entries({ markdown, embedText, slack, email, standup, memo: JSON.stringify(memo), agent: JSON.stringify(agent) })) {
+          for (const [surface, text] of Object.entries({ markdown, slack, email, standup, memo: JSON.stringify(memo), agent: JSON.stringify(agent) })) {
             assert.ok(!text.includes(lines), `${surface} prints the conditions' lines where the hold's condition belongs`);
           }
           return;
@@ -411,11 +401,11 @@ describe("one week, one set of claims, every surface", () => {
       });
 
       it(week.held ? "says why the week holds in the hold's own words" : "states no hold", async () => {
-        const { reportData, home, document, markdown, embedText, card, agent, memo, standup, record, slack, email } = await render(week);
+        const { reportData, home, document, markdown, card, agent, memo, standup, record, slack, email } = await render(week);
         const { refusal } = reportData.assessment.policyAssessment;
         if (!week.held) {
           assert.equal(home.weeklyCall.policyOverrideActive, false);
-          for (const text of [markdown, embedText, slack, email, standup]) assert.doesNotMatch(text, /not changing this week|on hold/);
+          for (const text of [markdown, slack, email, standup]) assert.doesNotMatch(text, /not changing this week|on hold/);
           return;
         }
         const hold = describePolicyHold(refusal);
@@ -427,7 +417,6 @@ describe("one week, one set of claims, every surface", () => {
         );
         assert.equal(document.slots.whyCouldBeWrong, hold.whyCouldBeWrong, "the brief document every paste renders");
         assert.ok(markdown.includes(hold.currentCall) && markdown.includes(hold.holdsUntil), "/brief.md");
-        assert.ok(embedText.includes(hold.currentCall), "the embed");
         /* The post's section stops at Slack's limit before its "Why this could be
            wrong" block on this week, so the hold's reason is the call's. */
         assert.ok(slack.includes(hold.currentCall), "the Monday post");

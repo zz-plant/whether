@@ -205,23 +205,6 @@ describe("/history dates what it is showing", () => {
   });
 });
 
-describe("a sample brief says it is one", () => {
-  /*
-   * The mockup route is gated off production, but what its copy button put on
-   * the clipboard was not: branded "Whether", with a posture, an action and a
-   * pause condition, it read exactly like the Monday brief once it was in a
-   * channel. Same rule as the downloadable artifacts — a thing that looks like
-   * the product says in itself that its figures are illustrative.
-   */
-  it("marks the mockup's copyable brief as a concept", () => {
-    const source = repoFile("app/mockups/operator-brief/page.tsx");
-    const copyBlock = /const copyBriefText = \[([\s\S]*?)\]\.join/.exec(source);
-
-    assert.ok(copyBlock, "expected the mockup to build its copyable text from a list");
-    assert.match(copyBlock[1], /SAMPLE/, "the copied brief carries no marker that it is not a reading");
-  });
-});
-
 describe("the site gives one account of what is new and what the scores read", () => {
   /*
    * Found 2026-10-01 by reading the live routes for what each claimed as the

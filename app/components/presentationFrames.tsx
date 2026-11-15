@@ -171,7 +171,7 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
               <div className="mt-4 space-y-5">
                 {conditions.length === 0 ? (
                   <p className="text-[clamp(1.5rem,4vw,2.5rem)] font-semibold leading-tight text-white">
-                    No bounded condition is published for this week.
+                    No pause or restart line is published for this week.
                   </p>
                 ) : (
                   <dl className="space-y-5">

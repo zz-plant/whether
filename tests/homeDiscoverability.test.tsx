@@ -6,7 +6,6 @@ import { AlertSection } from "../app/components/home/AlertSection";
 import { isActivationEvent } from "../lib/activationFunnel";
 import { stressTestDecisionPlan } from "../lib/decisionShield";
 import { buildPlanTestHref } from "../lib/navigation/planningNavigation";
-import { navigationPages } from "../lib/navigation/informationArchitecture";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { AREA_TEST_PLANS, HOME_MONDAY_EMAIL_HASH, ROLE_FORMAT_LINKS } from "../lib/report/home/homeSectionModel";
 import { evaluateRegime } from "../lib/regimeEngine";
@@ -66,14 +65,6 @@ describe("the formats a role came for", () => {
       const hash = href.split("#")[1] ?? "";
       assert.ok(share.includes(`id: "${hash}"`) || files.includes(`id="${hash}"`), `${href} opens nothing on /share`);
     }
-  });
-});
-
-describe("Your decisions", () => {
-  it("is reachable from the Plan group, in lighter type after the tabs", () => {
-    const page = navigationPages.find((entry) => entry.href === "/decisions");
-    assert.equal(page?.group, "decide");
-    assert.equal(page?.placement, "secondary");
   });
 });
 

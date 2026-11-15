@@ -72,7 +72,7 @@ export const OPERATING_LATITUDE_GLOSS = "how much you can hire, spend and commit
  * Homepage only: an answer page or an archived week draws as before.
  */
 export const BOUNDED_CALL_CONTRAST =
-  "Most guidance tells you what's happening. This tells you what would make it wrong.";
+  "Most guidance reports current conditions. This states what would make the guidance wrong.";
 
 export const DECISION_CONTRACT_LABELS = {
   /* Noun slots for exports. "Threshold" and "Reversal" were retired on
@@ -237,7 +237,7 @@ export const NO_LIVE_READING_CALL = {
  * record's and not as a page that failed to load. `period` names the month
  * where the cell does not sit under it.
  */
-export const describeMacroNotOnRecord = (period = "this month") => `Not on record for ${period}`;
+
 
 export const PRIMARY_AUDIENCE_SUMMARY =
   "The guidance is decision support, not an authority. It starts from U.S. rates, inflation, labor, credit, and funding conditions.";

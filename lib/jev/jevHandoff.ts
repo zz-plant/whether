@@ -47,8 +47,8 @@ const PLAN_QUESTIONS: Record<string, JevQuestion> = {
     instructions:
       "Does the plan in state.plan go against this week's operating guidance in state.whether (its constraints and decision rules)?",
     criteria: {
-      true: "The plan does something the guidance says to pause, hold, or avoid right now",
-      false: "The plan fits within what the guidance allows, or the guidance says nothing about it",
+      true: "The plan includes an action the guidance pauses, holds, or avoids right now",
+      false: "The plan fits within what the guidance permits, or the guidance leaves it open",
     },
   },
   decision_area: {

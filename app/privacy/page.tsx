@@ -98,7 +98,7 @@ export default function PrivacyPage() {
               Cloudflare KV and used to send you those emails and nothing else. Nothing is sent until you
               confirm. Any later request for your address changes nothing until you open the link it sends
               and press Confirm on the page that link shows. That holds for turning alerts or the Monday brief
-              on or off, setting plan lines, and subscribing again after leaving. The email and that page say
+              on or off, setting plan lines, and subscribing again after leaving. The email and confirmation page state
               what the request would change. A confirmation link works once, for 7 days, and stops working
               when a newer request is made for your address. Every email carries an unsubscribe link. It
               opens a page with one button, so a mail filter that opens links to scan them cannot unsubscribe
@@ -187,8 +187,8 @@ export default function PrivacyPage() {
               Your browser keeps a copy of the pages you have opened, and of the fonts and scripts they
               need, so the brief still opens without a connection. It is a copy of what this site already
               sent you. No record of what you read is made here or anywhere else, and nothing about it is
-              sent back. When you are offline the page says which reading it is showing you rather than
-              letting an old one pass for the current one. Clearing site data removes it.
+              sent back. When offline, the page identifies which reading is displayed rather than
+              letting an earlier reading pass for the current one. Clearing site data removes it.
             </p>
           </div>
 

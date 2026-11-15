@@ -4,10 +4,8 @@ import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 import { pagesInGroup } from "../lib/navigation/informationArchitecture";
 
 describe("operations navigation", () => {
-  it("keeps Decide focused on the plan, its two tools and the market multiples", () => {
-    // No /operate/memory: the ledger was retired; the record the product keeps is /history.
-    // The planning switcher's three links are the Decide group's tabs since 2026-10-08.
-    assert.deepEqual(pagesInGroup("decide").map((page) => page.href), ["/operate", "/operate/financial", "/operate/scenarios", "/comps", "/decisions"]);
+  it("keeps Decide focused on the plan, the runway planner and the market multiples", () => {
+    assert.deepEqual(pagesInGroup("decide").map((page) => page.href), ["/operate", "/operate/financial", "/comps"]);
   });
 
   it("indexes the plan page in page order, one entry per section", () => {

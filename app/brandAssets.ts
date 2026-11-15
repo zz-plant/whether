@@ -24,7 +24,7 @@ export const WHETHER_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="
   </g>
   <g fill="#E2E8F0" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" letter-spacing="2.2">
     <text x="72" y="33" font-size="24" font-weight="700">WHETHER</text>
-    <text x="72" y="54" font-size="12" font-weight="500" opacity="0.78">REGIME STATION</text>
+    <text x="72" y="54" font-size="12" font-weight="500" opacity="0.78">OPERATING GUIDANCE</text>
   </g>
 </svg>`;
 

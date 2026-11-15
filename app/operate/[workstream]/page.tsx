@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { buildBreadcrumbList, buildPageMetadata } from "../../../lib/seo";
 import { buildWorkstreamStructuredData, graph } from "../../../lib/seo/pageStructuredData";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
-import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 import { buildGroupBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 
@@ -89,15 +87,9 @@ export default async function OperateWorkstreamPage({
       }}
     >
       <div className="space-y-6">
-        {entry.slug === "financial" ? (
-          <div id="ops-runway-planner">
-            <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
-          </div>
-        ) : (
-          <Suspense fallback={null}>
-            <ScenarioStudioSimulator liveTreasury={treasury} liveAssessment={assessment} />
-          </Suspense>
-        )}
+        <div id="ops-runway-planner">
+          <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
+        </div>
       </div>
     </ReportShell>
   );

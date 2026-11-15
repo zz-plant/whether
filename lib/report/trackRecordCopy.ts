@@ -59,7 +59,7 @@ export const describeSlideRecord = (
  * of the oldest published brief.
  */
 export const describeReconstructedPeriod = (periodTitle: string, firstPublishedWeek: string): string =>
-  `This is a reconstruction: what today's published formula says about ${periodTitle}, not guidance we published at the time. ` +
+  `This is a reconstruction: how today's published formula scores ${periodTitle}, not guidance we published at the time. ` +
   `Whether began publishing weekly briefs in the week of ${firstPublishedWeek}.`;
 
 /*

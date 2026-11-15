@@ -31,12 +31,12 @@ export const homeDecisionFaqItems = [
   {
     question: "What changed this week?",
     answer:
-      "Each brief compares both scores with the previous reading and names any pause, resume or change line that was crossed. Most weeks none is, and the brief says so.",
+      "Each brief compares both scores with the previous reading and names any pause, restart or change line that was crossed. Most weeks none is crossed.",
   },
   {
     question: "What should we do differently right now?",
     answer:
-      "The brief gives each area one action, the pause line that holds it and the restart line that restarts it, scaled to your company stage and cash runway.",
+      "The brief gives each area one action, the pause line that holds it and the restart line that reopens it, scaled to your company stage and cash runway.",
   },
   {
     question: "How close is the guidance to changing?",

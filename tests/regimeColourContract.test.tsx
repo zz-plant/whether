@@ -206,7 +206,7 @@ describe("regime colour contract", () => {
       assert.match(source, /regime[:=]\s*\{?\s*(\w+\??\.)*(assessment\.regime|currentRegime)/, `${path} passes the week's regime into its shell`);
     }
 
-    for (const path of ["app/history/page.tsx", "app/history/compare/page.tsx"]) {
+    for (const path of ["app/history/page.tsx"]) {
       const source = readRepoFile(path);
       assert.doesNotMatch(
         source,

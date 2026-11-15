@@ -9,14 +9,14 @@
  * indexable routes were submitted nowhere because nothing else could see them.
  */
 type Workstream = {
-  slug: "financial" | "scenarios";
+  slug: "financial";
   title: string;
   description: string;
   imageAlt: string;
   pageTitle: string;
   pageSummary: string;
   /** schema.org's name for the kind of tool this is. */
-  applicationCategory: "FinanceApplication" | "BusinessApplication";
+  applicationCategory: "FinanceApplication";
   /** The term people search, where the heading keeps the tool's own name. */
   alternateName?: string;
 };
@@ -33,15 +33,6 @@ export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
     pageSummary: "A startup runway calculator: burn, raise timing and a memo, sized to this week's guidance.",
     applicationCategory: "FinanceApplication",
     alternateName: "Startup runway calculator",
-  },
-  scenarios: {
-    slug: "scenarios",
-    title: "What if rates change? Test this week's guidance",
-    description: "Set a different short-term rate and yield curve and see what the guidance and the rules would be.",
-    imageAlt: "Whether scenario studio view",
-    pageTitle: "Scenarios",
-    pageSummary: "Move two sliders to see what the guidance would be in a different week.",
-    applicationCategory: "BusinessApplication",
   },
 };
 
