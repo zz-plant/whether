@@ -1,0 +1,228 @@
+{
+  "title": "Choose the visual world",
+  "question": "The roll assigned the Data Room. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Data Room",
+      "kicker": "THE ROLL",
+      "lineage": "due-diligence binders and filing cabinets",
+      "thesis": "The brief as a file in a cabinet that changes its whole colour with the weather: every week a folder, every area a document, the record an index.",
+      "palette": [
+        "#d4c4a8",
+        "#f5f0e8",
+        "#2a2a2a",
+        "#4a6fa5",
+        "#5a7a5a",
+        "#a0302a"
+      ],
+      "materials": [
+        "manila folders",
+        "paper index cards",
+        "dividers"
+      ],
+      "viewport": "Folder tree left, the week's file open in the centre, scores as index cards right; the folder tint and paper ground shift with the condition.",
+      "risk": "Reads as a file manager, not a brief, if the document does not lead.",
+      "raised": [
+        {
+          "from": "challenger-brick",
+          "raise": "Numbered step numerals: the brief's sections carry large step numbers as wayfinding."
+        },
+        {
+          "from": "challenger-crouwel",
+          "raise": "Visible construction grid: the page's grid is a real armature, not hidden."
+        },
+        {
+          "from": "challenger-lexicon",
+          "raise": "Guide words: the first and last item in view name the span you are inside."
+        },
+        {
+          "from": "challenger-jackfield",
+          "raise": "Link-line state: standing carries through stroke pattern, not hue."
+        },
+        {
+          "from": "challenger-cutting-bench",
+          "raise": "Snap-to-pitch: the record's week scrub snaps to month pitch."
+        }
+      ],
+      "html": ".impeccable/mocks/decision/assigned.html"
+    },
+    {
+      "id": "model-pick",
+      "label": "Investor Update",
+      "kicker": "IMPECCABLE\u2019S PICK",
+      "lineage": "weekly investor updates and board letters",
+      "thesis": "The week's guidance as an investor update whose header, accent and paper shift with the weather.",
+      "palette": [
+        "#f3efe6",
+        "#1a1612",
+        "#a02820",
+        "#1f3a6b",
+        "#c9c0b0"
+      ],
+      "materials": [
+        "email paper",
+        "section rules",
+        "metric rows"
+      ],
+      "viewport": "A letter with a weather-tinted header, sections for each area, and scores in the margin.",
+      "risk": "Also the direction most runs in this category land on: reads as an email template if the weather shift is timid.",
+      "html": ".impeccable/mocks/decision/model-pick.html"
+    },
+    {
+      "id": "challenger-alphabet-storm",
+      "label": "Alphabet Storm",
+      "verdict": "competitive",
+      "lineage": "typographic weather and letter-as-matter",
+      "thesis": "Letters condense into the week's weather: words break into rain and reshape the guidance on the page.",
+      "palette": [
+        "#f7f7f4",
+        "#1a1a1a",
+        "#c0c0c0",
+        "#a8c8e8"
+      ],
+      "materials": [
+        "paper white ground",
+        "storm-letter black",
+        "silver flash",
+        "rain gray"
+      ],
+      "viewport": "One monumental grotesk that gathers into CLOUD, breaks into rain, and carves the week's call across the page.",
+      "case": "Fuses on the user's weather steer: the whole page is weather by construction. Loses on clarity, since letter-as-weather can obscure the data and the five areas.",
+      "risk": "Reads as a poster, not a brief, if the typography performs instead of informing.",
+      "html": ".impeccable/mocks/decision/challenger-alphabet-storm.html"
+    },
+    {
+      "id": "challenger-brick",
+      "label": "Brick Instructions",
+      "verdict": "declined",
+      "lineage": "numbered build-instruction booklets",
+      "thesis": "The week as a build sheet: numbered steps, a stud grid, and a 1:1 call-out for each new part.",
+      "palette": [
+        "#a8c8e8",
+        "#1a1a1a",
+        "#c4242b",
+        "#f5c842"
+      ],
+      "materials": [
+        "sky-blue pages",
+        "black keyline",
+        "brick red",
+        "yellow inventory"
+      ],
+      "viewport": "Numbered spreads in sequence, a parts inventory up front, call-outs zooming the pieces a step introduces.",
+      "case": "Fuses poorly: the founder does not identify with a toy manual, and a build sequence misrepresents a brief.",
+      "kept": "Numbered step numerals and a visible stud grid as the page's armature."
+    },
+    {
+      "id": "challenger-crouwel",
+      "label": "Crouwel Grid",
+      "verdict": "declined",
+      "lineage": "gridded type specimens",
+      "thesis": "Letterforms built cell by cell on a visible construction grid, the poster as the proof.",
+      "palette": [
+        "#ffffff",
+        "#1a1a1a",
+        "#e8452c"
+      ],
+      "materials": [
+        "white ground",
+        "construction grid",
+        "one accent plane"
+      ],
+      "viewport": "Monumental grid-constructed letterforms over small neutral grotesk, the grid visible as part of the design.",
+      "case": "Fuses poorly: a specimen is a specimen, and monumental letters crowd out the brief.",
+      "kept": "A visible construction grid as the page's literal armature."
+    },
+    {
+      "id": "challenger-lexicon",
+      "label": "Lexicon Page",
+      "verdict": "declined",
+      "lineage": "nineteenth-century lexicon spreads",
+      "thesis": "Black text to a fixed measure, a shoulder margin, guide words naming the span in view.",
+      "palette": [
+        "#f3efe6",
+        "#1a1612",
+        "#c4242b",
+        "#2a4fa8",
+        "#3a6b3a"
+      ],
+      "materials": [
+        "cream stock",
+        "engraving black",
+        "bordered plates"
+      ],
+      "viewport": "A spread with guide words at the head and a bordered plate carrying the foreign colour.",
+      "case": "Fuses poorly: scholarly apparatus is not the founder's world, and colour quarantined in plates fights condition-driven theming.",
+      "kept": "Guide words and bordered plates for foreign media."
+    },
+    {
+      "id": "challenger-jackfield",
+      "label": "Jackfield Schedule",
+      "verdict": "declined",
+      "lineage": "patch-bay normalling schedules",
+      "thesis": "Numbered lanes on black glass, each item tied to its default by an amber link line.",
+      "palette": [
+        "#0a0a0a",
+        "#d4a030",
+        "#f2efe8"
+      ],
+      "materials": [
+        "black glass",
+        "signal amber",
+        "condensed grotesque"
+      ],
+      "viewport": "An endless lane grid under a fixed legend strip, link lines drawn by stroke pattern.",
+      "case": "Fuses poorly: audio engineering is not the founder's world, and amber-on-black fights a condition-driven palette.",
+      "kept": "Link-line state marks and lane numbers as durable anchors."
+    },
+    {
+      "id": "challenger-cutting-bench",
+      "label": "Cutting Bench",
+      "verdict": "declined",
+      "lineage": "film editing benches and select rails",
+      "thesis": "The weeks as frames on a select rail: scrub, flag where you stopped, trims hang below.",
+      "palette": [
+        "#0a0a0a",
+        "#e8743a",
+        "#f2efe8",
+        "#8a8278"
+      ],
+      "materials": [
+        "film grain",
+        "perforated rail",
+        "tape flags"
+      ],
+      "viewport": "A perforated rail of weeks across the top, the current frame open below.",
+      "case": "Fuses poorly: film editing is not the founder's world, and a fixed orange accent fights condition-driven theming.",
+      "kept": "A perforated rail that snaps to pitch and a folded flag where you stopped."
+    }
+  ],
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "What a documentation-grade weekly brief ships, executed impeccably.",
+    "palette": [
+      "#ffffff",
+      "#111827",
+      "#2563eb"
+    ],
+    "materials": [
+      "clean grid",
+      "product photography"
+    ],
+    "viewport": "The arrangement a visitor expects, at full craft: nav, hero, sections, footer.",
+    "risk": "Indistinguishable from the competition by design."
+  },
+  "steer": true
+}

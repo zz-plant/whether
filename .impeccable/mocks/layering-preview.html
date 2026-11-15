@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Visual layering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+:root{
+  --sky:#6a8aaa; --ink:#0f1419; --muted:#162028; --paper:#eef1f6;
+  --card:#f8fafc; --line:#c8d0dc; --red:#c4242b; --accent:#2a4fa8;
+  --ff:'Source Sans 3',system-ui,sans-serif;
+  --ff-display:'Bricolage Grotesque',system-ui,sans-serif;
+  --layer: flat;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--ff);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+.shell{min-height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--paper);border-bottom:1px solid var(--line);font-size:13px;position:relative;z-index:10}
+.top .word{font-weight:800;letter-spacing:-.02em;font-size:18px;font-family:var(--ff-display)}
+.top a{color:var(--muted);text-decoration:none;font-weight:500}
+.top a.cur{color:var(--ink);font-weight:700}
+.top .right{margin-left:auto;color:var(--muted);font-size:12px}
+.sky{background:#6a8aaa;color:var(--ink);padding:48px 28px 80px;position:relative;overflow:hidden;min-height:220px}
+.sky .row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;position:relative;z-index:2}
+.glyph{font-size:72px;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.15))}
+.condword{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px;font-family:var(--ff-display)}
+.guidance{font-size:clamp(28px,3.5vw,40px);font-weight:800;line-height:1.05;letter-spacing:-.02em;max-width:20ch;margin:12px 0 16px;font-family:var(--ff-display)}
+.meta{font-size:12px;color:var(--muted);margin-bottom:20px;font-weight:500}
+.scores{display:flex;gap:40px;flex-wrap:wrap;margin-top:12px}
+.score .fig{font-size:64px;font-weight:900;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums;font-family:var(--ff-display)}
+.score .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:2px}
+.score .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.clouds{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.clouds span{position:absolute;background:rgba(255,255,255,.12);border-radius:50%;filter:blur(20px);animation:drift 20s ease-in-out infinite alternate}
+.clouds span:nth-child(2){animation-duration:28s;animation-delay:-5s}
+.clouds span:nth-child(3){animation-duration:24s;animation-delay:-10s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-15px) scale(1.1)}100%{transform:translate(-20px,10px) scale(.95)}}
+.body{max-width:1100px;margin:0 auto;padding:32px 28px 60px;position:relative;z-index:3}
+.sec{margin-bottom:32px}
+.sec h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:12px}
+.area{display:grid;grid-template-columns:36px 1fr auto;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:center;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.08),0 12px 24px rgba(0,0,0,.06);transition:all .3s}
+.area .n{font-size:12px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.area .name{font-weight:600;font-size:16px}
+.area .act{font-size:13px;font-weight:600}
+.area.hold .act{color:var(--red)}
+.narrative{font-size:15px;line-height:1.6;max-width:64ch;margin-bottom:20px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.08),0 12px 24px rgba(0,0,0,.06);transition:all .3s}
+.fact .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.fact .val{font-size:13px;font-weight:500}
+.switches{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.sw{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.sw.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ls{padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--card);font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.ls.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.note{font-size:12px;color:var(--muted);margin-top:12px;max-width:72ch}
+.tl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:6px;margin-top:12px}
+
+/* Layering approaches */
+.layer-flat .sky{padding-bottom:56px}
+.layer-flat .body{margin-top:0}
+
+.layer-overlap .sky{padding-bottom:100px}
+.layer-overlap .body{margin-top:-48px;position:relative;z-index:5}
+.layer-overlap .body .sec:first-child{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+
+.layer-frost .sky{padding-bottom:80px}
+.layer-frost .body{margin-top:-32px}
+.layer-frost .fact{background:rgba(248,250,252,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(200,208,220,.5)}
+
+.layer-stack .area{transform:translateX(0);transition:transform .3s}
+.layer-stack .area:nth-child(odd){transform:translateX(4px)}
+.layer-stack .area:nth-child(even){transform:translateX(-2px)}
+.layer-stack .fact{transform:rotate(-.5deg)}
+.layer-stack .fact:nth-child(2){transform:rotate(.3deg)}
+.layer-stack .fact:nth-child(3){transform:rotate(-.2deg)}
+
+.layer-atmosphere .clouds{display:block}
+.layer-atmosphere .clouds span:nth-child(1){width:200px;height:80px;top:10%;left:5%}
+.layer-atmosphere .clouds span:nth-child(2){width:300px;height:120px;top:30%;right:10%}
+.layer-atmosphere .clouds span:nth-child(3){width:150px;height:60px;top:60%;left:40%}
+
+.layer-parallax .sky{background-attachment:fixed}
+.layer-parallax .body{background:var(--paper);position:relative}
+</style>
+</head>
+<body>
+<div class="shell layer-atmosphere" id="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span class="right">Share · About · Search</span>
+  </div>
+  <div class="sky" id="sky">
+    <div class="clouds"><span></span><span></span><span></span></div>
+    <div class="row">
+      <div class="glyph">☁️</div>
+      <div>
+        <div class="condword">Cloudy</div>
+        <div class="meta">No. 2026-W45 · Week of 3 Nov 2026 · 177 months on the record</div>
+        <h1 class="guidance">Pause hiring and hold the roadmap.</h1>
+        <div class="scores">
+          <div class="score"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">of 100 · higher is worse · pause 76</div></div>
+          <div class="score"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">of 100 · higher is better · restart 66</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <p class="tl">Layering approach</p>
+    <div class="switches" style="flex-wrap:wrap">
+      <button class="ls" data-l="flat">Flat (no layering)</button>
+      <button class="ls" data-l="overlap">Overlap (cards break sky boundary)</button>
+      <button class="ls" data-l="frost">Frost (glassmorphism cards)</button>
+      <button class="ls" data-l="stack">Stack (offset + tilt)</button>
+      <button class="ls on" data-l="atmosphere">Atmosphere (depth in sky)</button>
+      <button class="ls" data-l="parallax">Parallax (fixed sky)</button>
+    </div>
+    <p class="note" id="layernote">Atmosphere: the sky has depth layers — soft cloud shapes drifting slowly at different speeds. Adds sky depth without changing the layout. Most subtle.</p>
+
+    <div class="sec" style="margin-top:28px">
+      <h2>Five areas</h2>
+      <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · restart at 66</span></div>
+    </div>
+    <p class="narrative">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line.</p>
+    <div class="facts">
+      <div class="fact"><div class="label">Files</div><div class="val">177 weekly briefs · 156 month-end readings</div></div>
+      <div class="fact"><div class="label">Rules</div><div class="val">Rules for this company · change</div></div>
+      <div class="fact"><div class="label">Source</div><div class="val">FRED, U.S. Treasury · last fetch ok</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const LAYERS={
+  flat:{note:'Flat: everything on one plane. Clean, honest, no depth tricks. The baseline.'},
+  overlap:{note:'Overlap: cards break the sky/body boundary, creating a layered feel. The body content floats over the sky edge. More depth, but risks looking busy.'},
+  frost:{note:'Frost: glassmorphism cards over the sky. Backdrop blur creates a frosted-glass effect. Atmospheric, but can look muddy and has performance costs.'},
+  stack:{note:'Stack: cards and rows offset slightly, creating a physical, paper-on-desk feel. Subtle but adds tactile depth. Can look messy if overdone.'},
+  atmosphere:{note:'Atmosphere: the sky has depth layers — soft cloud shapes at different positions. Adds sky depth without changing the layout. Most subtle.'},
+  parallax:{note:'Parallax: the sky stays fixed while content scrolls. Creates a sense of depth through movement. Can be disorienting.'}
+};
+document.querySelectorAll('.ls').forEach(b=>b.addEventListener('click',()=>{
+  const l=b.dataset.l;
+  const shell=document.getElementById('shell');
+  shell.className='shell layer-'+l;
+  document.getElementById('layernote').textContent=LAYERS[l].note;
+  document.querySelectorAll('.ls').forEach(x=>x.classList.toggle('on',x.dataset.l===l));
+}));
+</script>
+</body>
+</html>

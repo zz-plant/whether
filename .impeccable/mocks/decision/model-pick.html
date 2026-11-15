@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Investor Update</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root{--paper:#f3efe6;--ink:#1a1612;--muted:#5a5248;--accent:#2a4fa8;--red:#a02820;--line:#c9c0b0;--tint:#e8ecf4}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+.shell{display:grid;grid-template-rows:52px 1fr;height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:0 28px;background:var(--tint);border-bottom:2px solid var(--accent);font-size:13px}
+.top .word{font-weight:700;letter-spacing:-.01em;color:var(--accent)}
+.top a{color:var(--muted);text-decoration:none}
+.top a.cur{color:var(--ink);font-weight:600}
+.body{display:grid;grid-template-columns:1fr 260px;overflow:hidden}
+.main{padding:28px 36px;overflow:auto;max-width:72ch}
+.kicker{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600;margin-bottom:6px}
+h1{font-size:26px;font-weight:700;line-height:1.2;margin-bottom:4px}
+.meta{font-size:13px;color:var(--muted);margin-bottom:16px}
+.cond{display:inline-block;padding:3px 10px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;border-radius:4px;margin-bottom:14px}
+.guidance{font-size:16px;line-height:1.5;margin-bottom:16px}
+.sec{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.sec h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.area{display:grid;grid-template-columns:24px 1fr auto;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);align-items:center}
+.area .n{font-size:12px;color:var(--muted);font-weight:600}
+.area .name{font-weight:500}
+.area .act{font-size:12px}
+.area.hold .act{color:var(--red);font-weight:600}
+.side{padding:24px;border-left:1px solid var(--line);background:var(--tint)}
+.side .block{margin-bottom:18px}
+.side .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.side .fig{font-size:34px;font-weight:700;line-height:1;color:var(--accent)}
+.side .sub{font-size:12px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span style="margin-left:auto;color:var(--muted)">Share · About · Search</span>
+  </div>
+  <div class="body">
+    <div class="main">
+      <div class="kicker">Weekly Brief · No. 2026-W45 · 3 Nov 2026</div>
+      <h1>Pause hiring and hold the roadmap.</h1>
+      <div class="meta">Conditions as of 31 Oct 2026 · 177 months scored</div>
+      <div class="cond">Cloudy</div>
+      <p class="guidance">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line.</p>
+      <div class="sec">
+        <h2>Five areas</h2>
+        <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · 76</span></div>
+        <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · 76</span></div>
+        <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · 66</span></div>
+        <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · 66</span></div>
+        <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · 66</span></div>
+      </div>
+      <p style="margin-top:16px;font-size:13px;color:var(--muted)">Rules for this company · change · Whether Weekly Brief, published as written.</p>
+    </div>
+    <div class="side">
+      <div class="block"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">of 100 · higher is worse</div></div>
+      <div class="block"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">of 100 · higher is better</div></div>
+      <div class="block"><div class="label">Record</div><div class="sub">177 weekly briefs · 156 month-end readings</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
