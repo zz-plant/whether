@@ -162,12 +162,6 @@ export const TOOL_HINTS = [
     command: "python3 scripts/perf/audit_page_load_times.py",
     why: "curl timings for production routes, printed as JSON.",
   },
-  {
-    id: "ledger-token",
-    keywords: ["ledger token", "client token"],
-    command: "WHETHER_LEDGER_SECRET=<secret> bun scripts/issue-ledger-token.ts <client-id>",
-    why: "Mints the x-whether-client-token an integrator sends for verified ledger writes.",
-  },
 ];
 
 /** The canonical product surfaces the repo index lists as their own category. */

@@ -19,7 +19,7 @@ const EXAMPLE_LINES = sharedDecisionLines({
  * its rules block. Plain utilities on purpose: `.type-eyebrow` is unlayered and
  * its own colour beats any `text-*` utility placed beside it.
  */
-export const DECISION_SLOT_TONE = {
+const DECISION_SLOT_TONE = {
   action: "text-semantic-easing-fg",
   threshold: "text-semantic-caution-fg",
   reversal: "text-semantic-reversal-fg",

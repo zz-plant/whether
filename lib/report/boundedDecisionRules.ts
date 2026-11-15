@@ -846,11 +846,11 @@ const scaleAdjustmentToRunway = (
         ...base.doNowAdjustments,
       ],
       avoidAdjustments: [
-        "Don't make a commitment or hire that needs follow-on financing to finish.",
+        "Avoid commitments or hires that need follow-on financing to finish.",
         ...base.avoidAdjustments,
       ],
       watchAdjustments: [
-        "Cash gate: under six months of runway, hold every new commitment whatever this week's guidance says.",
+        "Cash gate: under six months of runway, hold every new commitment regardless of this week's guidance.",
         ...base.watchAdjustments,
       ],
       thresholdEmphasis: "Runway is what limits you this week, not the guidance. The pause and restart lines apply again once cash clears six months.",

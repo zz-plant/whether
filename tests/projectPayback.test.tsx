@@ -257,7 +257,7 @@ describe("whether the market can move the bar", () => {
     const paybacks = buildProjectPaybacks([importer, rewrite], context({ regime: "EXPANSION" }));
     assert.equal(
       describeWhatMovesPaybackBar({ bar, scores: { tightness: 40, riskAppetite: 61 }, lines, paybacks }),
-      "The market sets whether there is a bar. If funding pressure rises above 70 or risk appetite falls to 50 or below (40 and 61 today), a 12-month bar returns, and 1 of your projects would miss it.",
+      "Market conditions determine whether a payback bar applies. If funding pressure rises above 70 or risk appetite falls to 50 or below (40 and 61 today), a 12-month bar returns, and 1 of your projects would miss it.",
     );
   });
 

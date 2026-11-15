@@ -60,7 +60,7 @@ describe("robots.txt against every document that advertises an API path", () => 
 
   it("allows every /api path /api-docs documents or links", () => {
     const paths = apiPathsIn(renderToStaticMarkup(ApiDocsPage()));
-    for (const expected of ["/api/cli/status", "/api/embed", "/api/image/brief-screenshot", "/api/badge", "/api/decision"]) {
+    for (const expected of ["/api/cli/status", "/api/image/brief-screenshot", "/api/decision"]) {
       assert.ok(paths.has(expected), `/api-docs documents ${expected}`);
     }
     assertAllAllowed(paths, "/api-docs");

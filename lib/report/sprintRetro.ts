@@ -177,7 +177,7 @@ export const auditSprintDecisions = ({
         category: candidate.category,
         action: candidate.action,
         area,
-        status: `Aligned with ${regime} operating lines.`,
+        status: `Aligned with ${getRegimePublicLabel(regime)} operating lines.`,
       });
     }
   });
@@ -192,7 +192,7 @@ export const auditSprintDecisions = ({
   } else if (violationCount === 0) {
     headline = `All ${totalDecisions} sprint decision(s) align with current ${getRegimePublicLabel(regime)} guidance.`;
   } else {
-    headline = `${violationCount} of ${totalDecisions} sprint decision(s) crossed active pause triggers in ${getRegimePublicLabel(regime)} regime.`;
+    headline = `${violationCount} of ${totalDecisions} sprint decision(s) crossed active pause triggers in ${getRegimePublicLabel(regime)} conditions.`;
   }
 
   const markdownLines = [

@@ -301,13 +301,6 @@ export default function ApiDocsPage() {
               Linear issue. The Slack channel and the Notion database it names are placeholders; set your
               own before you send it.
             </Endpoint>
-            <Endpoint signature="GET /api/decision-memory?format=records|csv">
-              Past guidance in NDJSON, shaped by the Revisable Delegation record schema: one
-              belief record per week of published guidance. <code className="font-mono">format=csv</code> returns
-              the same entries as a spreadsheet. Scoped to the caller: it reads your own decision
-              memory, so it needs an <span className="font-mono text-slate-100">x-whether-client-id</span> header
-              and answers 401 without one. No &quot;Try it&quot; link for that reason.
-            </Endpoint>
           </div>
         </section>
 
@@ -346,15 +339,6 @@ export default function ApiDocsPage() {
               months; a date with none stored answers 404.
             </Endpoint>
             <Endpoint
-              signature="GET /api/badge"
-              tryHref="/api/badge"
-              tryLabel="View badge"
-              tryAriaLabel="View badge: this week's conditions as an SVG badge"
-            >
-              This week&apos;s conditions as an SVG badge for a README, a data room or an investor page, in the
-              conditions&apos; color. It says so when the reading is a saved copy.
-            </Endpoint>
-            <Endpoint
               signature="GET /api/image/slide?stage=seed"
               tryHref="/api/image/slide?stage=seed"
               tryLabel="View slide"
@@ -374,20 +358,6 @@ export default function ApiDocsPage() {
               one-page widescreen PDF for a pre-read. Served as an attachment. Takes the same stage
               values as the SVG. With <code className="font-mono">week</code>, the slide is the frozen brief as
               published. It takes no stage, and a brief from before scores were stored prints no scores.
-            </Endpoint>
-            <Endpoint
-              signature="GET /api/embed?format=html|text|json|page&mode=call-strip"
-              tryHref="/api/embed?format=text"
-              tryLabel="Try it"
-            >
-              The brief as a snippet a newsletter build step can insert at send time: ready-to-paste HTML (the
-              default), plain text, JSON, or <code className="font-mono">page</code>, a whole document for an
-              iframe. <code className="font-mono">mode=call-strip</code> shortens it to one line.{" "}
-              <code className="font-mono">stage</code> and <code className="font-mono">runway</code> (a band:{" "}
-              <code className="font-mono">critical</code>, <code className="font-mono">tight</code>,{" "}
-              <code className="font-mono">balanced</code> or <code className="font-mono">abundant</code>; or a
-              number of months) calibrate the guidance to one company, and{" "}
-              <code className="font-mono">ticker</code> adds a label and changes nothing else.
             </Endpoint>
             <Endpoint
               signature="GET /brief.md"

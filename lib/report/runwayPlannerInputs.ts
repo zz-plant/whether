@@ -84,4 +84,4 @@ export const describeMissingRunwayInputs = (missing: RunwayPlannerRequiredField[
 
 /** What the planner says instead of a plan when no cash is being spent down. */
 export const CASH_FLOW_POSITIVE_PLANNER_NOTE =
-  "Revenue covers your spending, so cash is not running down and there is no runway to size a raise or a cut against. The rules on the brief still apply to new commitments.";
+  "Revenue covers your spending, so cash is not running down and no runway limit sizes a raise or a cut. The rules on the brief still apply to new commitments.";

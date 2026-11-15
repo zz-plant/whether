@@ -93,7 +93,7 @@ export async function buildPlanningPageModel(
           name: "What changes when I set my stage and runway?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "The rules scale to your cash, so the same guidance becomes a specific rule for your company.",
+            text: "The thresholds scale to your cash, turning shared market guidance into concrete limits for your company.",
           },
         },
         {
@@ -101,7 +101,7 @@ export async function buildPlanningPageModel(
           name: "How often does the plan change?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "The guidance refreshes each week, and the plan follows it. Set your own rules once and the alert tells you the day an area pauses or restarts.",
+            text: "The guidance refreshes each week, and the plan follows it. Set rules once to trigger an alert the day an area pauses or restarts.",
           },
         },
       ],
@@ -180,7 +180,7 @@ export async function buildPlanningPageModel(
            tools — while the stance it enacts (`AGENTS.md`, "A policy agreed in
            advance") was stated nowhere on it. */
         pageSummary:
-          "The rules you set in advance. Write your own pause and restart lines, so changing course later is a line being crossed, not a meeting.",
+          "Rules set in advance. Agreed pause and restart lines make changing course a line being crossed, not a meeting.",
         /* The warnings section exists only in a week that has warnings, so its link does too. */
         sectionLinks: failureModes.length > 0
           ? operationsSectionLinks.plan

@@ -108,7 +108,7 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
          shows only its successes is asking to be trusted rather than checked.
          The description said what the log was ("read from the log each run
          writes") and never why a reader is being shown it. */
-      description="Every job that keeps this brief current, and every run that failed. Published because a brief that shows only its successes is asking to be trusted rather than checked."
+      description="Every job that keeps this brief current, and every run that failed. Published because showing only successes asks for trust rather than verification."
     >
       {runHistory.status === "unavailable" ? (
         <p className="text-sm text-slate-300">

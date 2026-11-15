@@ -19,7 +19,6 @@ import { SegmentedControl, type SegmentedOption } from "../../components/ui/segm
 import { SpinnerIcon } from "../../components/uiIcons";
 import { getClipboardUiState } from "../../components/useClipboardCopy";
 import { ComparePlansMode, PlanStressTestMode } from "./decisionShieldPlanModes";
-import { RecordDecisionButton } from "./recordDecisionButton";
 import { DecisionShieldPresetsSection } from "./decisionShieldPresetsSection";
 import { useDecisionShieldState, type PlanMode } from "./useDecisionShieldState";
 import {
@@ -81,7 +80,6 @@ export const DecisionShieldPanel = ({
     stressTestResult,
     comparisonResult,
     output,
-    buildLedgerPayload,
     shareText,
     handleCopy,
     handleCopyLink,
@@ -269,13 +267,6 @@ export const DecisionShieldPanel = ({
                 buttonLabels={{ copied: "Link copied" }}
                 onClick={handleCopyLink}
               />
-              {/* Not in compare mode: two plans are not one decision, and the
-                  ledger payload there was the hidden list mode's verdict. A
-                  plan is recorded by testing it on its own, and one with no
-                  verdict has nothing to record. */}
-              {planMode === "compare" || (planMode === "natural_language" && stressTestResult.verdict === null) ? null : (
-                <RecordDecisionButton buildPayload={buildLedgerPayload} />
-              )}
             </div>
           ) : null}
         </div>

@@ -1,21 +1,9 @@
-import type { BriefVideoAsset } from "../../lib/export/briefVideo";
-import { BriefVideoPreview } from "../components/briefVideoPreview";
 import { ActionLink } from "../components/ui/actionLink";
 
-export function ReusableVisuals({ video, weekLabel }: { video?: BriefVideoAsset; weekLabel?: string }) {
+export function ReusableVisuals() {
   return (
     <section id="reusable-visuals" className="weather-panel weather-section-stack p-0" aria-labelledby="reusable-visuals-heading">
       <h2 id="reusable-visuals-heading" className="type-section">Visuals for your own decks and docs</h2>
-      {video && weekLabel ? (
-        <details className="border-b border-[color:var(--border-subtle)] pb-4">
-          <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-semibold text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
-            Video · week of {weekLabel}
-          </summary>
-          <div className="pt-3">
-            <BriefVideoPreview asset={video} label={`Published guidance for the week of ${weekLabel}`} />
-          </div>
-        </details>
-      ) : null}
       <details>
         <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-semibold text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
           Reusable diagrams, charts and slide templates

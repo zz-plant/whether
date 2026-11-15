@@ -6,7 +6,6 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
-import { sendRegimeChangePush } from "../push/sendRegimePush";
 import { evaluateFlashMoves, FLASH_EXPEDITE_LINE, FLASH_GUIDANCE, flashInputsFrom, type FlashMove } from "./flashMoves";
 import { formatExportConfidenceWord } from "../export/exportTerms";
 import { resolvePublishedConfidence } from "../report/confidence";
@@ -96,7 +95,6 @@ export const checkRegimeChange = async (options?: {
   const prevWeeksToFlip = await kv.get("regime:weeks-to-flip");
   const previousRegime = lastKnown ?? null;
   const alerts: string[] = [];
-  let pushOutcome: Awaited<ReturnType<typeof sendRegimeChangePush>> | null = null;
 
   /* 1. Regime change — highest priority alert */
   if (previousRegime && previousRegime !== currentRegime) {
@@ -108,17 +106,6 @@ export const checkRegimeChange = async (options?: {
     alerts.push(
       `Conditions changed from ${getRegimePublicLabel(previousRegime)} to ${getRegimePublicLabel(currentRegime)}.${recordBasisCause ? ` ${recordBasisCause}` : ""} Read the brief before acting on last week's plan.`,
     );
-    /*
-     * Here and nowhere else. A notification that fires on every cron run,
-     * whether or not anything happened, is one people turn off — and then the
-     * one that mattered never arrives. This is the only branch that knows the
-     * published regime actually moved.
-     *
-     * Not awaited into the result and never allowed to throw: a push service
-     * being slow or down must not fail the regime check, which has KV state to
-     * write after this.
-     */
-    pushOutcome = await sendRegimeChangePush().catch(() => null);
     await postSlackAlerts(
       "Conditions changed",
       `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\n${recordBasisCause ? `${recordBasisCause}\n` : ""}Read this week's guidance before acting on last week's plan.`,
@@ -189,11 +176,5 @@ export const checkRegimeChange = async (options?: {
     velocityLabel: projection.velocityLabel,
     alerts: alerts.length > 0 ? alerts : undefined,
     ...(flashMoves.length > 0 ? { flashMoves } : {}),
-    /* Absent on a run where the regime did not move, rather than a cheerful
-       "0 sent": a step that reports on work it did not do gets read as
-       evidence that it did it. */
-    push: pushOutcome
-      ? { sent: pushOutcome.sent, pruned: pushOutcome.pruned, failed: pushOutcome.failed, reason: pushOutcome.reason }
-      : undefined,
   };
 };

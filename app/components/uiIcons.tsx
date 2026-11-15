@@ -9,7 +9,6 @@ import {
   Copy,
   Moon,
   Share2,
-  SlidersHorizontal,
   Sun,
   TriangleAlert,
   Loader2,
@@ -62,9 +61,7 @@ export const ChevronRightIcon = ({ className = "h-4 w-4", title: _title, ...prop
   <ChevronRight className={className} {...baseProps} {...props} />
 );
 
-export const SlidersIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <SlidersHorizontal className={className} {...baseProps} {...props} />
-);
+
 
 export const SunIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
   <Sun className={className} {...baseProps} {...props} />

@@ -137,11 +137,11 @@ export function SubscribeForm({
     <div className={compact
       ? "space-y-2 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-4 py-3"
       : "weather-section-border space-y-3"}>
-      {/* The channel control sits on the title line, and the description runs
-          the full width under both. Centred beside a four-line paragraph it
-          floated in the card's top-right corner with the text squeezed to half. */}
+      {/* The channel control sits on the title line (or beside the lead when the
+          enclosing section already provides the heading) so the card has no
+          empty top-left corner above the description. */}
       <div className="space-y-1">
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
           {showTitle ? (
             <p className="text-fluid-sm font-medium text-slate-50">
               {channel === "slack"
@@ -151,7 +151,17 @@ export function SubscribeForm({
                   : "Get the guidance every Monday, and a note the day it changes"}
             </p>
           ) : (
-            <span />
+            <p className="max-w-[54ch] text-fluid-sm text-slate-400">
+              {channel === "slack"
+                ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
+                : alertsOnly
+                  ? <>
+                      {condition ? <>Next change to watch: {condition} </> : null}
+                      We&rsquo;ll email you the day the guidance changes, an area pauses or restarts, or a market input
+                      jumps.
+                    </>
+                  : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
+            </p>
           )}
 
           {/* The one segmented control (segmentedControl.tsx): a radio group,
@@ -168,17 +178,19 @@ export function SubscribeForm({
             }}
           />
         </div>
-        <p className="max-w-[60ch] text-fluid-sm text-slate-400">
-          {channel === "slack"
-            ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
-            : alertsOnly
-              ? <>
-                  {condition ? <>Next change to watch: {condition} </> : null}
-                  We&rsquo;ll email you the day the guidance changes, an area pauses or restarts, or a market input
-                  jumps.
-                </>
-              : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
-        </p>
+        {showTitle ? (
+          <p className="max-w-[60ch] text-fluid-sm text-slate-400">
+            {channel === "slack"
+              ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
+              : alertsOnly
+                ? <>
+                    {condition ? <>Next change to watch: {condition} </> : null}
+                    We&rsquo;ll email you the day the guidance changes, an area pauses or restarts, or a market input
+                    jumps.
+                  </>
+                : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
+          </p>
+        ) : null}
       </div>
 
       {channel === "email" ? (

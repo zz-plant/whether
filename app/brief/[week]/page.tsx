@@ -53,8 +53,6 @@ import {
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { AreaLabel, LineStateIcon } from "../../components/ui/conceptIcons";
 import { isDecisionArea } from "../../../lib/report/boundedDecisionRules";
-import { briefVideoOpenGraph, findBriefVideo } from "../../../lib/export/briefVideo";
-import { BriefVideoPreview } from "../../components/briefVideoPreview";
 
 /* A frozen record stores its area as a string; a known area prints with its glyph. */
 const BriefAreaName = ({ area }: { area: string }) =>
@@ -94,8 +92,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!brief) return {};
 
-  const video = await findBriefVideo(brief);
-
   const metadata = buildPageMetadata({
     title: briefTitle(brief),
     description: buildPublishedBriefDescription(brief),
@@ -120,15 +116,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     publishedTime: brief.publishedAt,
     modifiedTime: publishedBriefModifiedAt(brief),
     authors: [buildCanonicalUrl("/about")],
-    ...(video ? {
-      videos: [briefVideoOpenGraph(video)],
-      images: [{
-        url: buildCanonicalUrl(video.poster),
-        width: video.width,
-        height: video.height,
-        alt: `The published weekly guidance for ${publishedBriefWeekLabel(brief)}`,
-      }],
-    } : {}),
   };
 
   return metadata;
@@ -145,12 +132,6 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
   if (!brief) notFound();
 
-  const video = await findBriefVideo(brief);
-  /* The metadata shim emits og:video with its width and height but leaves out
-     the type and the secure URL the OpenGraph video spec carries, so the page
-     renders those two itself; React hoists meta tags into the document head
-     during server rendering. */
-  const videoOpenGraph = video ? briefVideoOpenGraph(video) : undefined;
   const display = publishedBriefDisplay(brief);
   const headline = publishedBriefHeadline(brief);
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
@@ -298,15 +279,15 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               {outcome.held ? (
                 <>
                   The next published brief, for the week of {outcome.weekLabel}, read{" "}
-                  <span className="font-semibold text-slate-100">{outcome.to}</span> as well. This
-                  brief said conditions would change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
+                  <span className="font-semibold text-slate-100">{outcome.to}</span> as well. Conditions
+                  were set to change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
                 </>
               ) : (
                 <>
                   The next published brief, for the week of {outcome.weekLabel}, read{" "}
                   <span className="font-semibold text-slate-100">{outcome.to}</span> — a change from{" "}
-                  <span className="font-semibold text-slate-100">{outcome.from}</span>. This brief said
-                  conditions would change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
+                  <span className="font-semibold text-slate-100">{outcome.from}</span>. Conditions were
+                  set to change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
                 </>
               )}
             </p>
@@ -314,19 +295,6 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               Read that week
             </ActionLink>
           </section>
-        ) : null}
-
-        {video && videoOpenGraph ? (
-          <>
-            <meta property="og:video:type" content={videoOpenGraph.type} />
-            <meta property="og:video:secure_url" content={videoOpenGraph.secureUrl} />
-            <details className="weather-panel space-y-4 px-6 py-6 max-sm:px-0">
-              <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-semibold text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
-                Watch or download this brief
-              </summary>
-              <BriefVideoPreview asset={video} label={`Published guidance for the week of ${publishedBriefWeekLabel(brief)}`} />
-            </details>
-          </>
         ) : null}
 
         {readings.length > 0 ? (

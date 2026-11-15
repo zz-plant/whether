@@ -28,8 +28,6 @@ const DOCUMENTED_API_PATHS = [
   "/api/brief/slack",
   "/api/image/",
   "/api/export/board-slide",
-  "/api/embed",
-  "/api/badge",
   "/api/cli/",
 ];
 

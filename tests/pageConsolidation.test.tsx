@@ -63,9 +63,9 @@ describe("/glossary retired", () => {
 });
 
 describe("mockups", () => {
-  it("keeps only the one the weekly-brief spec cites", () => {
-    assert.ok(existsSync(appPath("/mockups/operator-brief/page.tsx")));
-    assert.equal(existsSync(appPath("/mockups/page.tsx")), false, "a one-item index is portal chrome around a single destination");
+  it("removes internal mockup routes from app/", () => {
+    assert.equal(existsSync(appPath("/mockups/operator-brief/page.tsx")), false);
+    assert.equal(existsSync(appPath("/mockups/page.tsx")), false);
     assert.equal(existsSync(appPath("/mockups/identicons/page.tsx")), false);
     assert.equal(existsSync(appPath("/mockups/visual-system/page.tsx")), false);
   });
@@ -96,12 +96,10 @@ describe("routes folded into the surface that owned them", () => {
     assert.match(config, /\["\/planning\/memory", "\/history"\]/);
   });
 
-  it("folds the embed builder into the share page", () => {
+  it("retires the standalone embed builder", () => {
     assert.equal(existsSync(appPath("/embed/page.tsx")), false);
-    assert.ok(existsSync(appPath("/share/embedBuilder.tsx")));
+    assert.equal(existsSync(appPath("/share/embedBuilder.tsx")), false);
     assert.match(config, /\["\/embed", "\/share#embed"\]/);
-    const share = readFileSync(appPath("/share/page.tsx"), "utf8");
-    assert.match(share, /id="embed"/, "the redirect target anchor must exist");
     const hrefs: readonly string[] = utilityLinks.map((link) => link.href);
     assert.equal(hrefs.includes("/embed"), false);
   });

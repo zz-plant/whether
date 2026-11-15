@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
-import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal, History, Columns2 } from "lucide-react";
+import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal, History } from "lucide-react";
 import { navigationGroups, navigationPages, utilityLinks } from "../../lib/navigation/informationArchitecture";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { openShareRail } from "./globalShareRail";
@@ -113,13 +113,6 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         },
       },
       {
-        id: "compare-periods",
-        label: "Compare two months",
-        description: "Two months side by side — conditions, scores, and the rules in force",
-        icon: Columns2,
-        action: () => navigateTo("/history/compare"),
-      },
-      {
         id: "board-annex",
         label: "Copy the record summary",
         description: "What the monthly record shows, as a short memo",
@@ -150,16 +143,6 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         description: "Browse past briefs and the monthly record",
         icon: Archive,
         action: () => navigateTo("/history"),
-      },
-      /* Deliberately here and in the footer rather than in the nav: the page is
-         noindex and per-browser, so it is something a reader goes looking for
-         rather than a section of the site. */
-      {
-        id: "decision-record",
-        label: "Open your decision record",
-        description: "Decisions recorded from this browser, checked against this week's reading",
-        icon: Archive,
-        action: () => navigateTo("/decisions"),
       },
     ];
     const actionCommands = allActionCommands.filter(

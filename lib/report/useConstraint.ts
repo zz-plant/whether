@@ -27,7 +27,7 @@ const ACCEPTABLE_USE_PATH = "/acceptable-use-policy";
 const acceptableUseUrl = () => `${siteUrl}${ACCEPTABLE_USE_PATH}`;
 
 /** One line, for a payload field or a footer. */
-export const USE_CONSTRAINT_SUMMARY =
+const USE_CONSTRAINT_SUMMARY =
   "Informational only. Not investment, legal, tax or employment advice, and not a forecast.";
 
 /**

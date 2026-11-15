@@ -31,7 +31,6 @@ import {
   describeScoreAlignment,
 } from "../../lib/productCanonMeasures";
 import { ContentPageShell } from "../components/ui/contentPageShell";
-import { SectionTabs } from "../components/sectionTabs";
 import { AdvicePlane, type AdvicePlanePoint } from "./advicePlane";
 import { AdviceCorpusSection } from "./adviceCorpusSection";
 
@@ -243,7 +242,6 @@ export default function ProductCanonPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
-      <SectionTabs currentPath="/concepts" />
 
       <SecondaryPageHeader
         title="Does startup advice follow the market?"
@@ -345,7 +343,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="The list, oldest first"
-        description="The date is first publication. If an essay later became a book, the note says which version the date refers to."
+        description="The date is first publication. If an essay later became a book, the note identifies which version the date refers to."
       >
         <EssayYearStrip timeline={timeline} recordStart={recordStart} />
         {/* A jump rail for a list that runs to ten thousand pixels: the strip
