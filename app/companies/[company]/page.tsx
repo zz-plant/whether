@@ -11,7 +11,7 @@ import { JsonLdScript } from "../../components/jsonLdScript";
 import { buildCompanyPageStructuredData } from "../../../lib/seo/pageStructuredData";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
-import { CompanyPositionSection, WeekConditionsLines } from "../companyPageSections";
+import { CompanyCalendarSection, CompanyPositionSection, WeekConditionsLines } from "../companyPageSections";
 import { loadCompanyPage } from "../loadCompanyPage";
 
 type Params = { company: string };
@@ -20,7 +20,7 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 const companyDescription = (company: CompanyEntry) =>
-  `Is ${company.name} hiring, holding or cutting? This week's conditions, its latest filed revenue, cash flow and debt, and what they mean by role.`;
+  `When ${company.name} sets next year's budgets and files its next report, its latest filed revenue, R&D, cash flow and debt, and what each role can bring to planning.`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const company = findCompany((await params).company);
@@ -70,16 +70,19 @@ export default async function CompanyPage({ params }: { params: Promise<Params> 
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">{company.name}: this week&apos;s conditions and its latest filings</h1>
-        <WeekConditionsLines conditions={conditions} />
         <ul className="space-y-1 text-sm">
           {COMPANY_ROLES.map((role) => (
             <li key={role.slug}>
               <Link href={`/companies/${company.slug}/${role.slug}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
-                What {role.label} at {company.name} can ask for this week
+                What {role.label} at {company.name} can bring to planning
               </Link>
             </li>
           ))}
         </ul>
+      </section>
+      {situation ? <CompanyCalendarSection company={company} situation={situation} /> : null}
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+        <WeekConditionsLines conditions={conditions} />
       </section>
       {situation ? <CompanyPositionSection company={company} situation={situation} /> : null}
     </ContentPageShell>
