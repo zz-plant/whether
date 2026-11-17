@@ -42,3 +42,42 @@ export const OG_CONDITION_INK: Record<RegimeKey, string> = {
   VOLATILE: "#aab4ec",
   SCARCITY: "#a3d6fa",
 };
+
+/**
+ * The homepage's sky on a card: the eight gradients and their inks, the same values as
+ * `--regime-sky-top`, `--regime-sky`, `--regime-sky-ink` and `--regime-sky-muted` per
+ * condition and theme in app/styles/tokens.css (tests/regimeColourContract.test.tsx holds
+ * the two together). The weekly card and the brief card sit on it, so the picture that
+ * leaves the site shows which weather it is before a word of it is read, as the first
+ * screen does; their figures stand on a panel of paper (`OG_SKY_PAPER`).
+ */
+type OgSky = { top: string; base: string; ink: string; muted: string };
+
+export const OG_SKY: Record<"dark" | "light", Record<RegimeKey, OgSky>> = {
+  dark: {
+    EXPANSION: { top: "#5a4310", base: "#3d2e0b", ink: "#f6e7c4", muted: "#d8c79c" },
+    DEFENSIVE: { top: "#2b3a4c", base: "#1f2a37", ink: "#e3eaf2", muted: "#b4c2d2" },
+    VOLATILE: { top: "#252e52", base: "#171d33", ink: "#e8ecf4", muted: "#b8c2dc" },
+    SCARCITY: { top: "#1f4466", base: "#16324d", ink: "#e2f1ff", muted: "#a9cbe8" },
+  },
+  light: {
+    EXPANSION: { top: "#f7c53a", base: "#e8a81c", ink: "#1a1408", muted: "#4a3c12" },
+    DEFENSIVE: { top: "#a5b7c9", base: "#8a9fb6", ink: "#0f1419", muted: "#24313e" },
+    VOLATILE: { top: "#34406b", base: "#232b4a", ink: "#eef1f6", muted: "#c3cbe0" },
+    SCARCITY: { top: "#b5dcf5", base: "#8ac2ec", ink: "#0a1a3a", muted: "#1d3c66" },
+  },
+};
+
+/**
+ * The paper a card's figures stand on, and its inks: the panel, text and crossed-line
+ * roles of each theme in tokens.css. A line state is printed on the paper, never on the
+ * sky: the front red is under 4.5:1 on every day sky (2.4:1 at the foot of Cloudy's).
+ */
+export const OG_SKY_PAPER = {
+  dark: { panel: OG_PANEL, border: OG_BORDER_STRONG, text: OG_TEXT, secondary: OG_TEXT_SECONDARY, muted: OG_TEXT_MUTED, crossed: OG_LINE_CROSSED },
+  light: { panel: "#f8fafc", border: "rgba(15, 20, 25, 0.16)", text: "#0f1419", secondary: "#2a3442", muted: "#4a5568", crossed: "#b81f27" },
+} as const;
+
+/** A card's ground: the condition's sky, or the theme's plain ground for a reading that names none. */
+export const ogSkyGround = (sky: OgSky | null, plain: string): string =>
+  sky ? `linear-gradient(180deg, ${sky.top}, ${sky.base})` : plain;

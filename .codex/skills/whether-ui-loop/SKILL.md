@@ -23,7 +23,7 @@ bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
 
 `bun run ui:iterate:list` shows the available targets. If you already own a running dev server and only want raw capture, `bun run ui:shots` skips the server management.
 
-After layout work, also run `bun run ui:frames -- --base-url http://localhost:<port>`. It walks every live route frame by frame at a laptop and a phone and fails a frame that does not name the site (and, where the page reports a reading, the date and conditions) or a block taller than a phone frame. Open `artifacts/ui/frames/index.html` to see the frames. ui-ux-standards §XXVIII.
+After layout work, also run `bun run ui:frames -- --base-url http://localhost:<port>`. It walks every live route frame by frame at a laptop and a phone and fails a frame that does not name the site (and, where the page reports a reading, the date and conditions) or a block taller than a phone frame. Open `artifacts/ui/frames/index.html` to see the frames. Its default run is dark too: add `--theme light` for the light set, written to `artifacts/ui/frames-light/`. ui-ux-standards §XXVIII.
 
 Before calling the change done, run `bun run ci:screenshot-smoke` against the same server (`UI_CAPTURE_BASE_URL`, default `http://127.0.0.1:3000`). It loads `/` and `/signals` at a phone and a desktop and fails on any console error or uncaught exception (§VII). `.github/workflows/ci.yml` is its only other caller, and that workflow is manual-only, so this is the one place it runs.
 

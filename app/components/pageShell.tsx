@@ -16,7 +16,7 @@ type PageShellProps = {
   showFooter?: boolean;
   /** Extra classes on the main element */
   className?: string;
-  /** Whether to include the hub-style backdrop */
+  /** `default` draws the climate backdrop; `hub` and `none` leave the page ground bare. */
   backdropVariant?: "default" | "hub" | "none";
 };
 
@@ -36,7 +36,6 @@ export function PageShell({
         data-regime={regimeDataAttribute(regime)}
         style={regimeAccentStyle(regime)}
       >
-        {backdropVariant === "hub" ? <div className="weather-hub-backdrop" aria-hidden="true" /> : null}
         {backdropVariant === "default" ? <ClimateBackdrop /> : null}
         <WebVitalsTracker />
         {structuredData ? <JsonLdScript data={structuredData} /> : null}

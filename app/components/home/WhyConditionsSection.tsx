@@ -96,7 +96,9 @@ export function WhyConditionsSection({
     >
       <div className="min-w-0">
         {notCounted.length > 0 ? (
-          <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
+          /* The band hugs its paragraph (2026-11-17): prose stops at 60ch, and a band
+             held to `max-w-3xl` ran 300px past it, a box half empty in a laptop frame. */
+          <div className="weather-caveat-band w-fit max-w-3xl px-4 py-3" data-excluded-inputs>
             <p className="weather-caveat-mark text-fluid-sm font-semibold">
               {countedRegimeLabel !== readingLabel ? `Why it feels like ${countedRegimeLabel}` : "What the headline reading leaves out"}
             </p>
