@@ -43,6 +43,7 @@ import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
 import { AlertSection } from "../app/components/home/AlertSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+import { presupposedObjections, sentencesIn } from "./fixtures/presupposedObjections";
 
 serveUnreachableUpstreams();
 
@@ -535,6 +536,19 @@ describe("reader vocabulary", () => {
         if (!short) continue;
         const long = rule.long.exec(text);
         if (!long || long.index > short.index) violations.push(`${surface.name}: "${short[0]}" before any expansion`);
+      }
+    }
+    assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);
+  });
+
+  /* docs/objections.md (2026-11-17): a route or an artifact answers only the objections a
+     visitor raised, and only where it is asked. The patterns and allowances are in
+     tests/fixtures/presupposedObjections.ts. */
+  it("presupposes no objection a visitor has not raised, on every route and artifact", async () => {
+    const violations: string[] = [];
+    for (const surface of allSurfaces) {
+      for (const sentence of sentencesIn(await surface.text())) {
+        for (const why of presupposedObjections(surface.name, sentence)) violations.push(`${surface.name}: ${why}\n    ${sentence.slice(0, 160)}`);
       }
     }
     assert.deepEqual(violations, [], `\n${violations.join("\n")}\n`);

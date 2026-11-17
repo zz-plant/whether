@@ -101,7 +101,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     ...toolLines,
     "### POST /api/mcp?tool=subscribe",
     '- Body: `{ "email": "user@company.com" }`',
-    "- Subscribes an email to the weekly brief. Returns confirmation. Not an MCP tool.",
+    "- Subscribes an email to the weekly brief and returns a confirmation. HTTP only: the MCP tool list leaves it out.",
     "",
     "## Machine-readable endpoints",
     "",

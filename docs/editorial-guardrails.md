@@ -75,6 +75,18 @@ What this rules out: a meaning line that is a constant (the same words every wee
 for one regime), a claim whose evidence is only a chart, and a second surface
 answering a question the answer pages already answer.
 
+## Objections a visitor raised (2026-11-17)
+- Copy answers an objection only when a visitor raised it, and only where it is asked: an FAQ
+  entry or the control it concerns, never a hero, intro, lede or meta description.
+- No mind-reading ("you might be wondering"), reassurance ("don't worry", "no hidden fees"),
+  motive denials ("not another dashboard"), "Not a … ." fragment openers, "unlike other tools", or
+  "We don't X, because …" where the reader did not ask. State what the thing does, answer first.
+- A required disclosure (not advice, illustrative figures, "a distance, not a probability") stays,
+  once, after the answer.
+- The ledger and its evidence rule are in [objections.md](objections.md); the patterns in
+  `tests/fixtures/presupposedObjections.ts` run in `tests/readerVocabulary.test.tsx`,
+  `tests/readerClauseShapes.test.tsx` and `tests/contentVocabulary.test.ts`.
+
 ## CTA policy
 - Every long-form pillar should include a midpoint CTA and end CTA.
 - CTA language should map to clear operator outcomes:
