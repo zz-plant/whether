@@ -1707,6 +1707,18 @@ site its standing. Grow it only after these are indexed and earn clicks.
   and no page predicts layoffs, scores risk, or speaks to the company's stock.
 - **Measured page by page** (`ContentMeasurementTracker`), so growing the list rests on which pages
   earn visits. Each page declares a `WebPage` about the company, with no review or rating.
+- **Built around the company's planning year (2026-11-17).** A role page asked "what to ask for this
+  week" and answered with the startup call, which a reader at Microsoft does not plan by; the pages
+  were 89–93% the same words. A role page now leads with the company's calendar (next fiscal year,
+  budget season as its four months before, the next report's due date at 40 days after a quarter and
+  60 after the year), then what the role brings to planning, to a 1:1 and to the next report. The
+  planning line quotes R&D against revenue growth, or a restructuring filing first
+  (`PlanningPressure` in `companySituation.ts`), and is left out when the filings carry neither. Each
+  role's lines are `CompanyRole.planning`. The page copies as a plain planning note
+  (`buildPlanningNote`), and `/companies/<company>/calendar.ics` subscribes to the dates
+  (`buildCompanyCalendarFeed`). The startup week follows as "This week's market", labelled as
+  guidance for startups, its rules as one line each with the answer that argues them; their pause and
+  restart scores stay on the answer pages, since they are a startup's lines.
 
 ### 1.1.22d Guidance by role, with no company (2026-11-05)
 

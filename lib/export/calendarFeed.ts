@@ -19,6 +19,8 @@ import {
   type PublishedBrief,
 } from "../report/publishedBriefs";
 import { buildCanonicalUrl } from "../seo";
+import { formatDateUTC } from "../formatters";
+import type { CompanySituation } from "../report/companySituation";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** About six months of Mondays: enough to scroll back through, small enough to refresh quickly. */
@@ -61,14 +63,14 @@ const mondayOf = (value: string | Date) => {
 const allDayEvent = ({
   uid,
   stamp,
-  monday,
+  day,
   summary,
   description,
   url,
 }: {
   uid: string;
   stamp: Date;
-  monday: Date;
+  day: Date;
   summary: string;
   description: string;
   url: string;
@@ -76,8 +78,8 @@ const allDayEvent = ({
   "BEGIN:VEVENT",
   `UID:${uid}`,
   `DTSTAMP:${compactStamp(stamp)}`,
-  `DTSTART;VALUE=DATE:${compactDate(monday)}`,
-  `DTEND;VALUE=DATE:${compactDate(new Date(monday.valueOf() + DAY_MS))}`,
+  `DTSTART;VALUE=DATE:${compactDate(day)}`,
+  `DTEND;VALUE=DATE:${compactDate(new Date(day.valueOf() + DAY_MS))}`,
   `SUMMARY:${escapeText(summary)}`,
   `DESCRIPTION:${escapeText(description)}`,
   `URL:${url}`,
@@ -93,7 +95,7 @@ const briefEvent = (brief: PublishedBrief) => {
   return allDayEvent({
     uid: `${brief.slug}@whether.work`,
     stamp,
-    monday: mondayOf(brief.recordDate),
+    day: mondayOf(brief.recordDate),
     summary: `Whether: ${display.conditions}. ${guidance}`,
     description: [
       `Conditions: ${display.conditions}`,
@@ -131,28 +133,86 @@ export const buildBriefCalendarFeed = (briefs: readonly PublishedBrief[], now: D
       allDayEvent({
         uid: `upcoming-${compactDate(monday)}@whether.work`,
         stamp: now,
-        monday,
+        day: monday,
         summary: "Whether: this week's guidance is out",
         description: `The week's conditions, guidance, and pause and restart lines.\n\n${buildCanonicalUrl("/")}`,
         url: buildCanonicalUrl("/"),
       }),
     );
 
-  return [
+  return calendar({
+    name: "Whether weekly guidance",
+    description: "Each Monday's operating conditions and guidance for startup leaders.",
+    events: [...upcoming, ...recent.flatMap(briefEvent)],
+  });
+};
+
+const calendar = ({ name, description, events }: { name: string; description: string; events: string[] }) =>
+  [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Whether//Weekly guidance//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    "X-WR-CALNAME:Whether weekly guidance",
-    `X-WR-CALDESC:${escapeText("Each Monday's operating conditions and guidance for startup leaders.")}`,
+    `X-WR-CALNAME:${escapeText(name)}`,
+    `X-WR-CALDESC:${escapeText(description)}`,
     "REFRESH-INTERVAL;VALUE=DURATION:PT12H",
     "X-PUBLISHED-TTL:PT12H",
-    ...upcoming,
-    ...recent.flatMap(briefEvent),
+    ...events,
     "END:VCALENDAR",
   ]
     .map(foldLine)
     .join("\r\n")
     .concat("\r\n");
+
+export const companyCalendarPath = (slug: string) => `/companies/${slug}/calendar.ics`;
+
+/**
+ * One company's planning year as a subscribed calendar: when budget season opens, when the fiscal
+ * year starts, and the dates its next reports are due by. The dates come from the filings
+ * (`buildCompanySituation`), and the calendar app re-reads the feed, so each refresh rolls them on.
+ */
+export const buildCompanyCalendarFeed = (
+  company: { slug: string; name: string },
+  situation: Pick<CompanySituation, "fiscalYear" | "nextReports">,
+  now: Date,
+): string => {
+  const url = buildCanonicalUrl(`/companies/${company.slug}`);
+  const at = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
+  const year = situation.fiscalYear;
+  const planningEvents = year
+    ? [
+        ...allDayEvent({
+          uid: `${company.slug}-budget-season-${year.startIso}@whether.work`,
+          stamp: now,
+          day: at(year.budgetSeasonOpensIso),
+          summary: `${company.name}: budget season opens`,
+          description: `Budgets for the fiscal year starting around ${formatDateUTC(year.startIso)} are usually set in the four months before it. What each role can bring to planning:\n\n${url}`,
+          url,
+        }),
+        ...allDayEvent({
+          uid: `${company.slug}-fiscal-year-${year.startIso}@whether.work`,
+          stamp: now,
+          day: at(year.startIso),
+          summary: `${company.name}: fiscal year starts`,
+          description: `${company.name}'s fiscal year starts around this date.\n\n${url}`,
+          url,
+        }),
+      ]
+    : [];
+  const reportEvents = situation.nextReports.flatMap((report) =>
+    allDayEvent({
+      uid: `${company.slug}-report-${report.quarterEndIso}@whether.work`,
+      stamp: now,
+      day: at(report.dueByIso),
+      summary: `${company.name}: ${report.annual ? "annual" : "quarterly"} report due`,
+      description: `The report for the quarter ending around ${formatDateUTC(report.quarterEndIso)} is due by about this date. Whether's page reads the new figures within a week of the filing:\n\n${url}`,
+      url,
+    }),
+  );
+  return calendar({
+    name: `${company.name} planning calendar`,
+    description: `${company.name}'s budget season, fiscal year and report dates, from its SEC filings. Whether isn't affiliated with ${company.name}.`,
+    events: [...planningEvents, ...reportEvents],
+  });
 };
