@@ -1,10 +1,9 @@
 import type { CSSProperties, ReactElement } from "react";
 import { scoreReadingDetail, type ScoreReadingParts } from "../export/scoreReference";
-import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import { formatMarginStamp } from "../report/reportFormatting";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "./ogFonts";
-import { OG_BG, OG_BORDER, OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
+import { OG_BG, OG_SKY, OG_SKY_PAPER, OG_TEXT, OG_TEXT_MUTED, ogSkyGround } from "./ogTheme";
 import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "./textFit";
 
 export type BriefImageProps = {
@@ -68,6 +67,14 @@ export const parseBriefImageVariant = (source: { get(name: string): string | nul
  * the footer, chip row then source line (14 + 40 + 8 + 28) come to 769px. A
  * reading draws two lines since 2026-11-03 (its restart line no longer takes a
  * third), so that is a ceiling now.
+ *
+ * The card sits on the week's sky since 2026-11-17, as the homepage's first
+ * screen does (`OG_SKY`, lib/image/ogTheme.ts): the condition is the ground, its
+ * word is set boxless in the display voice, and the two readings and the margin
+ * stamp stand on paper. It was the flat page colour under an 8px rule, with the
+ * word in a ruled box, so every week's card was the same picture at feed size;
+ * the light card also still wore the green paper the site left on 2026-11-12.
+ * The word takes the stamp's rows (22 + 54 above), so the budget is unchanged.
  */
 const WIDTH = 1200;
 const HEIGHT = 800;
@@ -83,12 +90,81 @@ const VALUE_GLYPH_WIDTH = 54;
 /* The source has a line of its own under the chip: the label names three inputs, and
    "Source: " takes about 90px of the row. */
 const SOURCE_WIDTH = CONTENT_WIDTH - 90;
-/* The weather stamp takes about 190px of its row; the scope beside it gets the rest, on one line. */
+/* The weather word takes up to about 220px of its row ("Freezing" at 44px); the scope beside it gets the rest, on one line. */
 const CONTEXT_WIDTH = CONTENT_WIDTH - 230;
+const WEATHER_SIZE = 44;
+
+/**
+ * What a card is painted with: the sky and its two inks for everything set on it, and
+ * the paper the readings and the margin stamp stand on. A reading that names no
+ * condition gets the theme's plain ground and inks.
+ */
+type CardPalette = {
+  ground: string;
+  ink: string;
+  muted: string;
+  paper: { panel: string; border: string; text: string; secondary: string; muted: string; crossed: string };
+};
+
+const PLAIN_GROUND = {
+  dark: { ground: OG_BG, ink: OG_TEXT, muted: OG_TEXT_MUTED },
+  /* The light theme's page and inks (--bg-body, --app-text, --app-text-muted in tokens.css). */
+  light: { ground: "#eef1f6", ink: "#0f1419", muted: "#4a5568" },
+} as const;
+
+const cardPalette = (theme: BriefImageTheme, regime: string): CardPalette => {
+  const sky = isRegimeKey(regime) ? OG_SKY[theme][regime] : null;
+  const plain = PLAIN_GROUND[theme];
+  return {
+    ground: ogSkyGround(sky, plain.ground),
+    ink: sky?.ink ?? plain.ink,
+    muted: sky?.muted ?? plain.muted,
+    paper: OG_SKY_PAPER[theme],
+  };
+};
 
 /* A wide margin is the clear state (the ink); a medium or narrow one is close
    to a line, the crossed state's red, as the site prints it. */
-const confidenceColor = (label: string, palette: typeof DARK_PALETTE) => (label === "HIGH" ? palette.text : palette.crossed);
+const confidenceColor = (label: string, palette: CardPalette) => (label === "HIGH" ? palette.paper.text : palette.paper.crossed);
+
+/* The condition, as the site's first screen sets it: a word in the display voice on the sky, no box. */
+const weatherWord = (regime: string, palette: CardPalette): ReactElement => (
+  <div
+    style={{
+      display: "flex",
+      color: palette.ink,
+      fontSize: WEATHER_SIZE,
+      fontWeight: 700,
+      fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
+      letterSpacing: "-0.02em",
+      lineHeight: 1.16,
+    }}
+  >
+    {getRegimePublicLabel(regime)}
+  </div>
+);
+
+/* How much room the reading has, as a stamp: sharp-cornered, on paper, in the line's ink (§XIV). */
+const marginStamp = (label: string, palette: CardPalette): ReactElement => {
+  const ink = confidenceColor(label, palette);
+  return (
+    <div
+      style={{
+        display: "flex",
+        padding: "4px 14px",
+        borderRadius: 4,
+        backgroundColor: palette.paper.panel,
+        border: `1px solid ${ink}`,
+        color: ink,
+        fontSize: 22,
+        fontWeight: 600,
+        letterSpacing: "0.06em",
+      }}
+    >
+      {toImageSafeText(formatMarginStamp(label)).toUpperCase()}
+    </div>
+  );
+};
 
 const frameStyle: CSSProperties = {
   display: "flex",
@@ -116,7 +192,7 @@ const layoutCall = (decision: string): { size: number; text: string } => {
  * body rather than an error. So text that reads as one line is built as one
  * string here instead of several adjacent JSX children.
  */
-const readingRow = (reading: ScoreReadingParts, valueWidth: number, palette: typeof DARK_PALETTE) => {
+const readingRow = (reading: ScoreReadingParts, valueWidth: number, palette: CardPalette["paper"]) => {
   /* The order every surface prints: the earlier reading, then what would change things. */
   const detail = scoreReadingDetail(reading);
   return (
@@ -169,7 +245,7 @@ const toImageSafeReading = (reading: ScoreReadingParts): ScoreReadingParts => ({
   condition: toImageSafeText(reading.condition),
 });
 
-const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_PALETTE): ReactElement => {
+const renderStandardBriefImage = (props: BriefImageProps, palette: CardPalette): ReactElement => {
   /* One stray glyph outside the faces' subset aborts the whole render, so
      everything headed for the canvas goes through toImageSafeText. */
   const decision = toImageSafeText(props.decision);
@@ -178,23 +254,14 @@ const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_P
   const sourceLabel = props.sourceLabel === undefined ? undefined : toImageSafeText(props.sourceLabel);
   const readings = props.readings.map(toImageSafeReading);
 
-  const regimeColor = isRegimeKey(props.regime) ? REGIME_HEX_COLORS[props.regime] : palette.text;
-  const weather = getRegimePublicLabel(props.regime).toUpperCase();
   const call = layoutCall(decision);
   const valueWidth = Math.max(2, ...readings.map((reading) => reading.value.length)) * VALUE_GLYPH_WIDTH;
   const eyebrow = ["WHETHER", toImageSafeText(props.briefLabel ?? "Weekly Brief")].join(" \u00b7 ").toUpperCase();
-  /* The card that lands in someone else's Slack channel said "MED CONFIDENCE".
-     The colour keys off the raw code, which is what the engine stores; only
-     the words a reader sees change. */
-  const confidenceColour = confidenceColor(props.confidenceLabel, palette);
-  const confidenceBadge = toImageSafeText(formatMarginStamp(props.confidenceLabel)).toUpperCase();
   const source = sourceLabel ? `Source: ${fitLines(sourceLabel, 22, SOURCE_WIDTH, SANS_EM, 1)}` : "";
   const context = contextLabel ? fitLines(contextLabel, 22, CONTEXT_WIDTH, SANS_EM, 1) : "";
 
   return (
-    <div style={{ ...frameStyle, background: palette.background, color: palette.text }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 8, background: regimeColor }} />
-
+    <div style={{ ...frameStyle, background: palette.ground, color: palette.ink }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", fontSize: 22, fontWeight: 600, letterSpacing: "0.12em", color: palette.muted }}>
           {eyebrow}
@@ -202,23 +269,9 @@ const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_P
         <div style={{ display: "flex", fontSize: 22, color: palette.muted }}>{`Data as of ${recordDate}`}</div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 22 }}>
-        <div
-          style={{
-            display: "flex",
-            padding: "8px 16px",
-            borderRadius: 4,
-            border: `2px solid ${regimeColor}`,
-            color: isRegimeKey(props.regime) ? palette.conditionInk[props.regime] : palette.text,
-            fontSize: 26,
-            fontWeight: 700,
-            fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
-            letterSpacing: "0.06em",
-          }}
-        >
-          {weather}
-        </div>
-        {context ? <div style={{ display: "flex", fontSize: 22, fontWeight: 600, color: palette.text }}>{context}</div> : null}
+      <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 22 }}>
+        {weatherWord(props.regime, palette)}
+        {context ? <div style={{ display: "flex", fontSize: 22, fontWeight: 600, color: palette.ink }}>{context}</div> : null}
       </div>
 
       <div
@@ -238,27 +291,13 @@ const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_P
       <div style={{ display: "flex", flex: 1, minHeight: 20 }} />
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {readings.map((reading) => readingRow(reading, valueWidth, palette))}
+        {readings.map((reading) => readingRow(reading, valueWidth, palette.paper))}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div
-            style={{
-              display: "flex",
-              padding: "4px 14px",
-              borderRadius: 999,
-              backgroundColor: `${confidenceColour}20`,
-              border: `1px solid ${confidenceColour}50`,
-              color: confidenceColour,
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-            }}
-          >
-            {confidenceBadge}
-          </div>
-          <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: palette.secondary }}>whether.work</div>
+          {marginStamp(props.confidenceLabel, palette)}
+          <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: palette.ink }}>whether.work</div>
         </div>
         {source ? <div style={{ display: "flex", fontSize: 22, color: palette.muted }}>{source}</div> : null}
       </div>
@@ -266,27 +305,10 @@ const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_P
   );
 };
 
-/* Mirrors the light overrides in app/styles/tokens.css. Generated images cannot
-   resolve CSS variables, so the same roles are supplied as actual colours. */
-const LIGHT_PALETTE = {
-  background: "#ecf0e8",
-  panel: "#f4f7f1",
-  border: "rgba(16, 32, 26, 0.24)",
-  text: "#10201a",
-  secondary: "#2b3b33",
-  muted: "#40524a",
-  crossed: "#b81f27",
-  conditionInk: { EXPANSION: "#765600", DEFENSIVE: "#8a4f16", VOLATILE: "#3f47b5", SCARCITY: "#1f3f8f" },
-};
-const DARK_PALETTE = {
-  background: OG_BG, panel: OG_PANEL, border: OG_BORDER, text: OG_TEXT,
-  secondary: OG_TEXT_SECONDARY, muted: OG_TEXT_MUTED, crossed: OG_LINE_CROSSED,
-  conditionInk: OG_CONDITION_INK,
-};
-
 /** The same complete reading, reflowed rather than cropped for each destination. */
 const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVariant): ReactElement => {
-  const palette = variant.theme === "light" ? LIGHT_PALETTE : DARK_PALETTE;
+  const palette = cardPalette(variant.theme, props.regime);
+  const paper = palette.paper;
   const landscape = variant.layout === "landscape";
   const portrait = variant.layout === "portrait";
   const padding = landscape ? 40 : 48;
@@ -295,10 +317,6 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
   const readings = props.readings.map(toImageSafeReading);
   const decision = toImageSafeText(props.decision);
   const context = props.contextLabel ? toImageSafeText(props.contextLabel) : null;
-  const regime = props.regime;
-  const regimeColour = isRegimeKey(regime) ? REGIME_HEX_COLORS[regime] : palette.text;
-  const regimeInk = isRegimeKey(regime) ? palette.conditionInk[regime] : palette.text;
-  const confidenceInk = props.confidenceLabel === "HIGH" ? palette.text : palette.crossed;
   const callSizes = landscape ? [54, 50, 46, 42, 38, 34, 30] : portrait ? [80, 72, 66, 60, 54, 48] : [66, 60, 56, 52, 48, 44, 40];
   const callHeight = landscape ? 310 : portrait ? 430 : variant.layout === "standard" ? 200 : 250;
   const callSize = callSizes.find((size) => wrappedLines(decision, size, columnWidth, DISPLAY_EM).length * size * 1.08 <= callHeight)
@@ -306,14 +324,14 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
   const readingSize = landscape ? 22 : portrait ? 28 : 24;
   const readingValueSize = landscape ? 40 : portrait ? 104 : 88;
   const valueWidth = Math.max(2, ...readings.map((reading) => reading.value.length)) * (portrait ? 62 : 52);
+  const figureFace = `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`;
 
   return (
     <div style={{
       display: "flex", flexDirection: "column", width: variant.width, height: variant.height,
-      padding, background: palette.background, color: palette.text, position: "relative",
+      padding, background: palette.ground, color: palette.ink, position: "relative",
       fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`,
     }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 8, background: regimeColour }} />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
         <div style={{ display: "flex", fontSize: 22, fontWeight: 600, letterSpacing: "0.1em", color: palette.muted }}>
           {["WHETHER", toImageSafeText(props.briefLabel ?? "Weekly Brief")].join(" · ").toUpperCase()}
@@ -323,14 +341,8 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
 
       <div style={{ display: "flex", flexDirection: landscape ? "row" : "column", flex: 1, gap: landscape ? 36 : 28, marginTop: 24, justifyContent: "space-between" }}>
         <div style={{ display: "flex", flexDirection: "column", width: landscape ? columnWidth : "100%", gap: 16 }}>
-          <div style={{ display: "flex" }}>
-            <div style={{
-              display: "flex", padding: "8px 14px", borderRadius: 2, border: `2px solid ${regimeColour}`,
-              fontSize: 26, fontWeight: 700, letterSpacing: "0.06em", color: regimeInk,
-              fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
-            }}>{getRegimePublicLabel(props.regime).toUpperCase()}</div>
-          </div>
-          {context ? <div style={{ display: "flex", fontSize: 22, lineHeight: 1.25, color: palette.secondary }}>{context}</div> : null}
+          <div style={{ display: "flex" }}>{weatherWord(props.regime, palette)}</div>
+          {context ? <div style={{ display: "flex", fontSize: 22, lineHeight: 1.25, color: palette.muted }}>{context}</div> : null}
           <div style={{
             display: "flex", fontSize: callSize, lineHeight: 1.08, fontWeight: 700, letterSpacing: "-0.01em",
             fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`,
@@ -343,17 +355,17 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
             return (
               <div key={reading.metric} style={{
                 display: "flex", flexDirection: landscape ? "column" : "row", alignItems: landscape ? "stretch" : "center",
-                gap: landscape ? 4 : 24, padding: landscape ? "12px 18px" : "16px 24px", borderRadius: 4,
-                background: palette.panel, border: `1px solid ${palette.border}`,
+                gap: landscape ? 4 : 24, padding: landscape ? "12px 18px" : "16px 24px", borderRadius: 8,
+                background: paper.panel, border: `1px solid ${paper.border}`, color: paper.text,
               }}>
-                {landscape ? null : <div style={{ display: "flex", justifyContent: "flex-end", width: valueWidth, flexShrink: 0, fontSize: readingValueSize, lineHeight: 1, fontWeight: 600 }}>{reading.value}</div>}
+                {landscape ? null : <div style={{ display: "flex", justifyContent: "flex-end", width: valueWidth, flexShrink: 0, fontSize: readingValueSize, lineHeight: 1, fontWeight: 700, fontFamily: figureFace, letterSpacing: "-0.03em" }}>{reading.value}</div>}
                 <div style={{ display: "flex", flexDirection: "column", ...(landscape ? {} : { flex: 1 }), minWidth: 0, gap: 4 }}>
                   <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
                     <div style={{ display: "flex", fontSize: landscape ? 28 : 32, fontWeight: 600 }}>{reading.label}</div>
-                    {landscape ? <div style={{ display: "flex", fontSize: readingValueSize, lineHeight: 1, fontWeight: 600 }}>{reading.value}</div> : null}
+                    {landscape ? <div style={{ display: "flex", fontSize: readingValueSize, lineHeight: 1, fontWeight: 700, fontFamily: figureFace, letterSpacing: "-0.03em" }}>{reading.value}</div> : null}
                   </div>
-                  <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: palette.muted }}>{reading.meaning}</div>
-                  <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: palette.secondary }}>{detail}</div>
+                  <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: paper.muted }}>{reading.meaning}</div>
+                  <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: paper.secondary }}>{detail}</div>
                 </div>
               </div>
             );
@@ -363,10 +375,8 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 24 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
-          <div style={{ display: "flex", padding: "4px 12px", borderRadius: 2, border: `1px solid ${confidenceInk}`, color: confidenceInk, fontSize: 22, fontWeight: 600, letterSpacing: "0.04em" }}>
-            {toImageSafeText(formatMarginStamp(props.confidenceLabel)).toUpperCase()}
-          </div>
-          <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: palette.secondary }}>whether.work</div>
+          {marginStamp(props.confidenceLabel, palette)}
+          <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: palette.ink }}>whether.work</div>
         </div>
         {props.sourceLabel ? <div style={{ display: "flex", fontSize: 22, lineHeight: 1.2, color: palette.muted }}>{`Source: ${toImageSafeText(props.sourceLabel)}`}</div> : null}
       </div>
@@ -378,5 +388,5 @@ export const renderBriefImage = (
   props: BriefImageProps,
   variant: BriefImageVariant = parseBriefImageVariant(new URLSearchParams()),
 ): ReactElement => variant.layout === "standard"
-  ? renderStandardBriefImage(props, variant.theme === "light" ? LIGHT_PALETTE : DARK_PALETTE)
+  ? renderStandardBriefImage(props, cardPalette(variant.theme, props.regime))
   : renderVariantBriefImage(props, variant);

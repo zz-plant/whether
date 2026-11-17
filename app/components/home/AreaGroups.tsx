@@ -69,15 +69,25 @@ export function AreaGroups({
   rulesAbove?: boolean;
 }) {
   if (groups.length === 0) return null;
+  /* Where the block above carries each area's sentence, a group here is its line and a
+     short column of names, a third of a laptop frame wide with the rest of it empty. From
+     `xl` the groups then stand side by side (ui-ux-standards §XXVIII: parallel blocks, one
+     frame), ruled apart as they are when stacked. */
+  const sideBySide = rulesAbove && groups.length > 1;
   return (
-    <div data-area-groups className="divide-y divide-[color:var(--border-subtle)] border-y border-[color:var(--border-subtle)]">
+    <div
+      data-area-groups
+      className={`divide-y divide-[color:var(--border-subtle)] border-y border-[color:var(--border-subtle)] ${
+        sideBySide ? "xl:grid xl:auto-cols-fr xl:grid-flow-col xl:divide-x xl:divide-y-0" : ""
+      }`.trim()}
+    >
       {groups.map((group) => {
         const names = joinAnd(group.areas.map((entry) => entry.label));
         return (
           <section
             key={`${group.state}-${group.condition ?? ""}-${group.history ?? ""}`}
             aria-label={`${group.status}: ${names}`}
-            className="space-y-2 py-4"
+            className={`space-y-2 py-4 ${sideBySide ? "xl:px-6 xl:first:pl-0 xl:last:pr-0" : ""}`.trim()}
           >
             <h3 className={`flex items-center gap-2 text-fluid-lg font-semibold leading-snug ${HEADING_INK[group.state]}`}>
               <LineStateIcon state={group.state} className="shrink-0" />

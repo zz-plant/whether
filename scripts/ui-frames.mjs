@@ -5,9 +5,11 @@
  *   bun run ui:frames                          # against UI_CAPTURE_BASE_URL or :3000
  *   bun run ui:frames -- --base-url http://localhost:3163 --only /signals,/history
  *   bun run ui:frames -- --strict              # exit 1 on any failing route
+ *   bun run ui:frames -- --theme light         # the light theme, into artifacts/ui/frames-light/
  *
  * Writes artifacts/ui/frames/: one PNG per frame, report.json, and index.html (one row of
- * frames per route, each captioned with what it lacks). Not in `bun run check`: the gate has
+ * frames per route, each captioned with what it lacks). The default run is dark, as
+ * `ui:iterate`'s is; light is the site's identity, so a layout pass walks both. Not in `bun run check`: the gate has
  * no browser. Run it after layout work, beside `bun run ui:iterate`.
  *
  * A reader scrolls down to a frame rather than jumping to it, so the walk scrolls in steps:
@@ -31,7 +33,11 @@ import { buildFramesGalleryHtml, frameGaps, frameOffsets, hasThumbnailFocal, rou
 
 const args = process.argv.slice(2);
 const baseUrl = readArgValue(args, "--base-url", DEFAULT_UI_CAPTURE_BASE_URL);
-const outDir = path.resolve(process.cwd(), readArgValue(args, "--out", "artifacts/ui/frames"));
+const theme = readArgValue(args, "--theme", "dark") === "light" ? "light" : "dark";
+const outDir = path.resolve(
+  process.cwd(),
+  readArgValue(args, "--out", theme === "light" ? "artifacts/ui/frames-light" : "artifacts/ui/frames"),
+);
 const only = readArgValue(args, "--only", "");
 const onlyPaths = only ? only.split(",").map((item) => item.trim()).filter(Boolean) : null;
 const routes = onlyPaths ? frameAuditRoutes.filter(({ path: route }) => onlyPaths.includes(route)) : frameAuditRoutes;
@@ -167,7 +173,7 @@ const run = async () => {
   try {
     for (const { name, viewport, deviceScaleFactor, isMobile = false } of frameAuditViewports) {
       const context = await browser.newContext({ viewport, deviceScaleFactor, isMobile, hasTouch: isMobile, reducedMotion: "reduce" });
-      for (const seed of captureStorageSeeds({ theme: "dark", visitor: "returning" })) {
+      for (const seed of captureStorageSeeds({ theme, visitor: "returning" })) {
         await context.addInitScript(([key, value]) => window.localStorage.setItem(key, value), seed);
       }
       const page = await context.newPage();

@@ -4762,6 +4762,37 @@ restructure), and `/compare`'s full A/B toggle.
   table, the signals table, the share formats, the presets and the scenario rules each drew their
   own copy of it before.
 
+### 1.1.107 The pictures that leave the site (2026-11-17)
+
+A pass over how the prominent views read as screenshots, on the owner's request, which overrode
+maintenance mode for it. `bun run ui:frames` passed every route before and after; these are what
+looking at the frames found.
+
+- **The cards sit on the week's sky.** The weekly link-preview card (`/api/og`) and the brief card
+  (`/api/image/brief`, all four shapes, both themes) take the homepage's sky as their ground
+  (`OG_SKY` in `lib/image/ogTheme.ts`, the eight gradients and inks of `--regime-sky-*`), set the
+  condition as a boxless word in the display voice, and stand their figures and the margin stamp on
+  paper. They were the flat page colour under an 8px rule with the word in a ruled box, so every
+  week's card was the same picture at feed size. The stamp is square-cornered and on paper: it was
+  a pill on the standard card, and the front red is under 4.5:1 on every day sky.
+- **The light brief card is the light theme again.** Its palette was still Covenant's green paper
+  and inks, with Cloudy in brown, five days after the site moved to Forecast.
+  `tests/regimeColourContract.test.tsx` now holds the cards' skies and paper to `tokens.css`.
+- **"Your decisions this week" at a laptop.** From `xl` the groups (On hold, Clear) stand side by
+  side where the block above carries each area's sentence (§XXVIII's SHOULD). Stacked, the frame
+  was a 300px column of names with the rest empty.
+- **The first screen's delta line.** The separator before "Feels like" touched the caveat's
+  diamond ("·◇"); it now carries the space the diamond's turned corner takes.
+- **"Why it feels like …" hugs its paragraph.** The band ran 300px past prose that stops at 60ch.
+- **`/history` lost an empty band.** The record-plate marker is a hidden element mounted as a
+  section, so its row drew 49px of nothing between two rules under the intro (33px on a phone). A
+  row that holds only hidden elements takes no room (`layout-shells.css`).
+- **The frame audit walks light.** `bun run ui:frames -- --theme light`; it had only walked dark.
+
+Left as it is, each for a stated reason: "What changed" gives its two ladders up from `md`
+(`tests/onePlacePerFact.test.tsx`), which leaves "Where it stands" empty beside the two scores on a
+laptop; the "#" beside a report heading stays visible on touch (`reportSection.tsx`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

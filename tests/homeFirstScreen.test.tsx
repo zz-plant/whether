@@ -217,7 +217,7 @@ describe("the first screen keeps the week's statement on one screen", () => {
 
   it("runs 'Feels like' in the delta line, never as a row of its own", () => {
     const delta = withMargin.slice(withMargin.indexOf("data-conditions-since"));
-    assert.match(delta.slice(0, delta.indexOf("weekly-call-title")), / · <a[^>]*data-feels-like/);
+    assert.match(delta.slice(0, delta.indexOf("weekly-call-title")), / ·<\/span> <a[^>]*data-feels-like/);
     assert.equal((withMargin.match(/data-feels-like/g) ?? []).length, 1);
   });
 });

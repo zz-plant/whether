@@ -118,7 +118,7 @@ Details: [docs/agents/mcp-and-skills-playbook.md](mcp-and-skills-playbook.md).
 | --- | --- |
 | `bun run ui:iterate` | Screenshot-driven UI loop — starts dev server if needed, captures targets, writes a gallery to `artifacts/ui/`. Use with `-- --only <targets>` to narrow. |
 | `bun run ui:iterate:list` | Lists available capture targets. |
-| `bun run ui:frames` | Frame audit: every screen-height frame of each live route at a laptop and a phone, checked for the site, date and conditions and for blocks taller than a frame, with an advisory count of frames that keep a focal point at Slack's preview size. Writes `artifacts/ui/frames/`; `-- --strict` exits 1 on a failure. ui-ux-standards §XXVIII. |
+| `bun run ui:frames` | Frame audit: every screen-height frame of each live route at a laptop and a phone, checked for the site, date and conditions and for blocks taller than a frame, with an advisory count of frames that keep a focal point at Slack's preview size. Writes `artifacts/ui/frames/`; `-- --theme light` walks the light theme into `artifacts/ui/frames-light/`; `-- --strict` exits 1 on a failure. ui-ux-standards §XXVIII. |
 | `bun run ui:shots` | Raw capture only (skips dev-server management) — use if you already have one running. |
 | `bun run ui:mockups` | Prints mockup URLs for local exploration. |
 

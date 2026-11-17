@@ -2,7 +2,7 @@ import type { CSSProperties, ReactElement } from "react";
 import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { formatMarginStamp } from "../../../lib/report/reportFormatting";
-import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
+import { OG_SKY, ogSkyGround } from "../../../lib/image/ogTheme";
 import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "../../../lib/image/textFit";
 import {
   GlyphMotif,
@@ -12,8 +12,6 @@ import {
   OG_FONT_DISPLAY,
   OG_FONT_STAMP,
   OG_BORDER_STRONG,
-  OG_CONDITION_INK,
-  OG_LINE_CROSSED,
   OG_PANEL,
   OG_TEXT,
   OG_TEXT_MUTED,
@@ -31,6 +29,12 @@ import {
  * tiles and a freshness line with a UTC timestamp. What remains is what a
  * reader decides on: the conditions, the call, why, what moved, and what would
  * change it, with nothing smaller than 22px.
+ *
+ * It sits on the week's sky since 2026-11-17 (`OG_SKY`, the night skies: these
+ * formats are drawn dark), with the condition as a word in the display voice and
+ * the two boxes as panels on it, the way the homepage's first screen is built.
+ * Until then it was the page colour under an 8px rule with the word in a ruled
+ * box, and a Sunny week's unfurl and a Freezing week's were the same picture.
  */
 const frameStyle: CSSProperties = {
   display: "flex",
@@ -62,7 +66,7 @@ const BOX_TEXT_WIDTH = (CONTENT_WIDTH - 16) / 2 - 22 * 2 - 2;
    spacer between them takes whatever the budget leaves over. */
 const BOX_ROW_GAP = 12;
 /* What the rows other than the headline, the sentence under it and the boxes
-   take: padding (44 + 38), the header row (32), the status chip and its margin
+   take: padding (44 + 38), the header row (32), the condition word and its margin
    (26 + 52), the gap above the boxes, and the source line and its margin
    (16 + 24). */
 const VARIABLE_HEIGHT = 630 - (44 + 38) - 32 - (26 + 52) - BOX_ROW_GAP - (16 + 24);
@@ -112,10 +116,6 @@ export const layoutReportCard = (
   return { headlineSize, whyItMatters, boxValueSize, changeSummary, flipCondition };
 };
 
-/* Only when the card is not this week's live reading, and why: a caution, so
-   the front red, whether the card is an archived week or a saved copy. */
-const contextTone = OG_LINE_CROSSED;
-
 const box = (label: string, value: string, valueSize: number, labelColor: string, background: string, border: string) => (
   <div
     style={{
@@ -135,46 +135,46 @@ const box = (label: string, value: string, valueSize: number, labelColor: string
 );
 
 export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => {
-  const regimeColor = REGIME_HEX_COLORS[preview.regime];
+  const sky = OG_SKY.dark[preview.regime];
   /* The card travels furthest of anything the site makes; "MED" is the engine's code, not a word. */
   const confidence = formatMarginStamp(preview.confidenceLabel);
   const layout = layoutReportCard(preview);
 
   return (
-    <div style={frameStyle}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 8, background: regimeColor }} />
-
+    <div style={{ ...frameStyle, background: ogSkyGround(sky, OG_BG), color: sky.ink }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <GlyphMotif tone={regimeColor} size={32} />
-          <div style={{ display: "flex", fontSize: 22, fontWeight: 600, letterSpacing: "0.12em", color: OG_TEXT_MUTED }}>
+          <GlyphMotif tone={sky.ink} size={32} />
+          <div style={{ display: "flex", fontSize: 22, fontWeight: 600, letterSpacing: "0.12em", color: sky.muted }}>
             {preview.eyebrow.toUpperCase()}
           </div>
         </div>
         {/* The week-ending Friday (`formatWeekEndingUTC`), not the record date: printed
             bare, a Monday card read "Sep 25" two days before it, which looked like a
             reading from the future. */}
-        <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{`Week of ${preview.weekLabel}`}</div>
+        <div style={{ display: "flex", fontSize: 22, color: sky.muted }}>{`Week of ${preview.weekLabel}`}</div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 26 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginTop: 26 }}>
+        {/* The condition as the first screen sets it: a word in the display voice, no box. */}
         <div
           style={{
             display: "flex",
-            padding: "8px 16px",
-            borderRadius: 4,
-            border: `2px solid ${regimeColor}`,
-            color: OG_CONDITION_INK[preview.regime],
-            fontSize: 26,
+            color: sky.ink,
+            fontSize: 44,
+            lineHeight: 1.16,
             fontWeight: 700,
             fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
-            letterSpacing: "0.06em",
+            letterSpacing: "-0.02em",
           }}
         >
-          {preview.statusLabel.toUpperCase()}
+          {preview.statusLabel}
         </div>
+        {/* Only when the card is not this week's live reading, and why. A caution, in
+            the sky's ink as cautions on the homepage's sky are: the front red is a
+            line's colour and falls under 4.5:1 on Sunny's night sky. */}
         {preview.contextLabel ? (
-          <div style={{ display: "flex", fontSize: 22, fontWeight: 600, color: contextTone }}>
+          <div style={{ display: "flex", fontSize: 22, fontWeight: 600, color: sky.ink }}>
             {preview.contextLabel}
           </div>
         ) : null}
@@ -193,7 +193,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
       >
         {preview.headline}
       </div>
-      <div style={{ display: "flex", marginTop: 14, fontSize: WHY_SIZE, lineHeight: 1.3, color: OG_TEXT_SECONDARY }}>
+      <div style={{ display: "flex", marginTop: 14, fontSize: WHY_SIZE, lineHeight: 1.3, color: sky.muted }}>
         {layout.whyItMatters}
       </div>
 
@@ -209,7 +209,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
 
       {/* Single expression on purpose: satori rejects a div holding mixed text
           and expression children unless it declares flex. */}
-      <div style={{ display: "flex", marginTop: 16, fontSize: 20, color: OG_TEXT_MUTED }}>
+      <div style={{ display: "flex", marginTop: 16, fontSize: 20, color: sky.muted }}>
         {`${confidence} · Source: ${preview.sourceLabel}`}
       </div>
     </div>

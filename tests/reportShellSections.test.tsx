@@ -247,3 +247,17 @@ describe("report route page summaries", () => {
     assert.doesNotMatch(plan, /Set the rules, check runway/);
   });
 });
+
+describe("ReportShell section rows", () => {
+  /* /history mounts a hidden marker as a section (`RecordPlateCanvas`). `empty:hidden`
+     does not match a row holding a hidden element, so the row drew its padding and its
+     rule: an empty band under the intro in every screenshot of the page's top. */
+  it("take no room when all they hold is hidden", async () => {
+    const shell = await readFile("app/components/reportShell.tsx", "utf8");
+    assert.match(shell, /className="weather-report-section-row empty:hidden"/);
+    const css = await readFile("app/styles/layout-shells.css", "utf8");
+    assert.match(css, /\.weather-report-section-row:not\(:has\(> :not\(\[hidden\]\)\)\) \{\s*display: none;/);
+    const plate = await readFile("app/history/recordPlateCanvas.tsx", "utf8");
+    assert.match(plate, /<span hidden data-record-plate \/>/, "the marker the rule exists for is still a hidden element");
+  });
+});

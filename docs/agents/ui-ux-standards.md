@@ -918,7 +918,9 @@ ways. On a phone it is the whole screen, wherever they stopped scrolling. On a l
 dragged around one block. A page reads well as a screenshot only if both pictures name their source
 and hold their unit whole. `bun run ui:frames` (scripts/ui-frames.mjs) walks every live route at a
 1440×900 laptop and a 390×844 phone, frame by frame, and fails a route on either. It is not in the
-gate, which has no browser: run it after layout work, beside `bun run ui:iterate`.
+gate, which has no browser: run it after layout work, beside `bun run ui:iterate`. The default run
+is dark; `-- --theme light` walks the light theme into `artifacts/ui/frames-light/` (2026-11-17:
+the audit had only ever walked dark, the second theme).
 
 - MUST: name the site in every frame, and on a page that reports a reading, the date and the
   conditions too. The header hides on scroll, so past the first screen this is the running head's
