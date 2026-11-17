@@ -52,6 +52,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `feature-specs-current.md` — short index by surface; the dated record is in `decisions/feature-log/`
 - `current-jtbd-click-paths.md` — current jobs-to-be-done inventory with click-level fulfillment paths
 - `editorial-guardrails.md` — copy, claims, and long-form guardrails
+- `objections.md` — objections visitors actually raised, with evidence; copy answers only these
 - `claims-ledger.md` — each claim a week makes, the one function that builds it, and the surfaces that print it
 - `design/palette-directions.md` — the October 2026 palette and type decision (Synoptic), with the options it rejected
 
