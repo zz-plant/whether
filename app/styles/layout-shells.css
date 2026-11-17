@@ -233,14 +233,10 @@ html[data-focus-mode] [data-home-shell-main] {
   z-index: 1;
 }
 
-.weather-hub-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: var(--radius-xl);
-  background: var(--bg-nested-light);
-  pointer-events: none;
-}
+/* The hub pages (Guides, Search, the legal pages) stand on the page ground like every
+   other route. `.weather-hub-backdrop` laid `--bg-nested-light` over the whole of
+   <main> behind them until 2026-11-17: a grey slab from the record band to the footer on
+   the light theme, and a wash over the page ground, which ui-ux-standards §XXV rules out. */
 
 /* Ink from the text roles, never a literal white: these shells render on
    both themes, and until 2026-09-15 every title and description here was

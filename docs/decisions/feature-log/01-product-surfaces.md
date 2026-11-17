@@ -4787,6 +4787,13 @@ looking at the frames found.
 - **`/history` lost an empty band.** The record-plate marker is a hidden element mounted as a
   section, so its row drew 49px of nothing between two rules under the intro (33px on a phone). A
   row that holds only hidden elements takes no room (`layout-shells.css`).
+- **Guides stands on the page ground.** `/resources`, `/search` and the legal pages lost
+  `.weather-hub-backdrop`, a wash of `--bg-nested-light` over the whole of `<main>`: a grey slab
+  under the one top-navigation page that had it, and a wash over the page ground (§XXV). On
+  Guides the title and lists now start on the edge its tabs start on (the page sat 20px right of
+  them), and each row runs the width of its column: the base layer's 60ch measure read a row whose
+  one child is a link as prose, so rows and their rules stopped short of the group's rule above
+  them, with the chevron adrift mid-column.
 - **The frame audit walks light.** `bun run ui:frames -- --theme light`; it had only walked dark.
 
 Left as it is, each for a stated reason: "What changed" gives its two ladders up from `md`
