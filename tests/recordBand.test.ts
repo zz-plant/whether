@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { describe, it } from "bun:test";
+import { describe, it, mock } from "bun:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import * as nextNavigation from "next/navigation";
+
+import { RecordBand } from "../app/components/recordBand";
 
 import { RECORD_BAND_HEIGHT, buildRecordBand, findRecordDifferences } from "../lib/report/recordBand";
 import {
@@ -27,6 +32,14 @@ const month = (index: number) => {
 
 const series = (regimes: readonly RegimeKey[], scores: (index: number) => { tightness: number; riskAppetite: number }) =>
   regimes.map((regime, index) => ({ recordDate: month(index), regime, ...scores(index) }));
+
+/* The readout island asks for the router; a static render has none. Spread the real
+   module: `mock.module` is process-wide. */
+const mockAny: any = mock;
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+}));
 
 const calm = { tightness: 0, riskAppetite: 100 };
 const tight = { tightness: 100, riskAppetite: 0 };
@@ -187,5 +200,35 @@ describe("the band is the frame's, and takes nothing a route did not already hol
     assert.match(readFileSync("app/styles/record-band.css", "utf8"), /\.record-band-plate \{[^}]*touch-action: pan-y/);
     assert.match(plate, /prefers-reduced-motion: reduce/);
     assert.match(plate, /width < MIN_WIDTH/);
+  });
+});
+
+/*
+ * The band's foot (2026-11-18). A first visit met the band, then a weather word, with
+ * nothing saying whose guidance it was: the category line was a dismissible first-visit
+ * line on the homepage, under the band. And the fills had no key at any width; on a
+ * phone, where the lines are drawn plain, the colour was the only cue.
+ */
+describe("the band says what the site is and names its colours", () => {
+  const html = renderToStaticMarkup(createElement(RecordBand));
+  const css = readFileSync("app/styles/record-band.css", "utf8");
+
+  it("prints the category line under the band, with nothing to dismiss it", () => {
+    assert.match(html, /<p class="record-band-what" data-category-line="true">Weekly operating guidance for startup leaders\.<\/p>/);
+    assert.doesNotMatch(html, /Dismiss|data-weather-first-run-orientation/);
+  });
+
+  it("names each condition the band draws beside its fill, at every width", () => {
+    const key = /<ul class="record-band-key"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? "";
+    for (const [regime, label] of [["EXPANSION", "Sunny"], ["DEFENSIVE", "Cloudy"], ["VOLATILE", "Stormy"], ["SCARCITY", "Freezing"]]) {
+      assert.match(key, new RegExp(`<li data-regime="${regime}"><i class="record-band-key-swatch"></i>${label}</li>`), label);
+    }
+    assert.match(css, /\.record-band-key-swatch \{[^}]*background: var\(--regime-accent\)/, "the field's own fill, from the data-regime map");
+    assert.doesNotMatch(css, /\.record-band-key[^{]*\{[^}]*display: none/, "not hidden on a phone");
+  });
+
+  it("keeps the two counts after the key, under their own names", () => {
+    assert.ok(html.indexOf("data-record-band-key") < html.indexOf("data-record-band-readout"));
+    assert.match(html, /month-end readings since/);
   });
 });

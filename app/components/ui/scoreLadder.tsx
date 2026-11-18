@@ -13,6 +13,7 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { ConditionIcon, LineStateIcon } from "./conceptIcons";
 import type { RegimeKey } from "../../../lib/types";
 import { travelTimeAt } from "../../../lib/report/home/weekMove";
+import type { ScoreFigureStanding } from "../../../lib/report/home/homeSectionModel";
 
 /**
  * A score drawn against its lines.
@@ -73,6 +74,12 @@ type ScoreLadderProps = {
    * "compact" drops the ruled line, for two figures side by side on a phone.
    */
   figure?: boolean | "compact";
+  /**
+   * The figure's sentence, when the caller knows whose lines these are
+   * (`describeScoreFigureStanding`: "Hiring paused above 76."). Without it the figure
+   * says where the score stands against the lines alone.
+   */
+  standing?: ScoreFigureStanding | null;
   className?: string;
 };
 
@@ -324,6 +331,7 @@ export function ScoreLadder({
   onScrubValue,
   travel = false,
   figure = false,
+  standing: knownStanding = null,
   className = "",
 }: ScoreLadderProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -557,7 +565,7 @@ export function ScoreLadder({
     const resume = lines.find((line) => line.kind === "resume");
     const change = lines.find((line) => line.kind === "callChange");
     const pauseZone = zones.find((zone) => zone.kind === "pause");
-    const standing = describeFigureStanding(value, lines);
+    const standing = knownStanding ?? describeFigureStanding(value, lines);
     /* A line's name reads away from the other line, so the two never meet. */
     const pauseReadsLeft = pause && resume ? at(pause.value) <= at(resume.value) : true;
     const named = (line: LadderLine, readsLeft: boolean, text: string, ink: string) => (

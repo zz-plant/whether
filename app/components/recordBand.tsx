@@ -7,6 +7,7 @@ import { ConditionIcon } from "./ui/conceptIcons";
 import { getPublishedBriefs } from "../../lib/report/publishedBriefs";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { RecordBandReadout } from "./recordBandReadout";
+import { categorySentence } from "../../lib/seo";
 
 const CONDITIONS: readonly RegimeKey[] = ["EXPANSION", "DEFENSIVE", "VOLATILE", "SCARCITY"];
 
@@ -48,6 +49,7 @@ export function RecordBand() {
   const summary = `${readings}, scored with today’s formula`;
   const briefsCounted = briefCount > 0 ? `${briefCount} ${briefCount === 1 ? "brief" : "briefs"}` : null;
   const published = briefsCounted ? `${briefsCounted}, published as written` : null;
+  const keyed = CONDITIONS.filter((regime) => model.runs.some((run) => run.regime === regime));
   return (
     <aside className="record-band" aria-label="The record" data-record-band data-first={model.firstDate} data-months={model.encoded}>
       <p className="sr-only">
@@ -172,24 +174,46 @@ export function RecordBand() {
           <i key={mark.slug} className="record-band-brief" style={{ left: `${mark.at * 100}%` }} />
         ))}
       </div>
-      <p className="record-band-caption">
-        <span data-record-band-readout data-default={published ? `${summary} · ${published}` : summary}>
-          {/* The qualifiers give way on a phone, where the caption would take two lines. */}
-          {readings}
-          <span className="record-band-caption-long">, scored with today&rsquo;s formula</span>
-          {briefsCounted ? (
-            <>
-              {" "}
-              &middot; {briefsCounted}
-              <span className="record-band-caption-long">, published as written</span>
-            </>
-          ) : null}
-        </span>
-        <span aria-hidden="true"> &middot; </span>
-        <Link href="/history" className="record-band-link">
-          History
-        </Link>
-      </p>
+      <div className="record-band-foot">
+        {/* What the site is, before the week's guidance (2026-11-18). It was a dismissible
+            line on the homepage, for a first visit only, under this band: the first thing a
+            new reader met was the band and then a weather word, with nothing saying whose
+            guidance it was. Here it is on every route and every visit, as the frame's words. */}
+        <p className="record-band-what" data-category-line>
+          {categorySentence}
+        </p>
+        {/* The band's colours named (2026-11-18). On a phone the lines are drawn plain, so the
+            fill is the only cue, and there was no key at any width. Only the conditions the
+            record holds (§XVI: a legend lists only what is on the surface). Hidden from
+            assistive tech, as the drawing it decodes is: a screen reader gets the band as
+            the sentence at its top. */}
+        <ul className="record-band-key" aria-hidden="true" data-record-band-key>
+          {keyed.map((regime) => (
+            <li key={regime} data-regime={regime}>
+              <i className="record-band-key-swatch" />
+              {REGIME_LABELS[regime]}
+            </li>
+          ))}
+        </ul>
+        <p className="record-band-caption">
+          <span data-record-band-readout data-default={published ? `${summary} · ${published}` : summary}>
+            {/* The qualifiers give way on a phone, where the caption would take two lines. */}
+            {readings}
+            <span className="record-band-caption-long">, scored with today&rsquo;s formula</span>
+            {briefsCounted ? (
+              <>
+                {" "}
+                &middot; {briefsCounted}
+                <span className="record-band-caption-long">, published as written</span>
+              </>
+            ) : null}
+          </span>
+          <span aria-hidden="true"> &middot; </span>
+          <Link href="/history" className="record-band-link">
+            History
+          </Link>
+        </p>
+      </div>
       <RecordBandReadout />
     </aside>
   );
