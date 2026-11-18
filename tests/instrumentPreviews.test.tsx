@@ -70,7 +70,10 @@ describe("the pictures beside the closed questions", () => {
       summary.order,
     );
     const counts = { spread10Y2Y: summary.inverted10Y2Y, spread2Y3M: summary.inverted2Y3M };
-    for (const strip of strips) assert.equal(strip.filled, counts[strip.key as keyof typeof counts], strip.key);
+    for (const strip of strips) {
+      const expected = strip.key === "spread10Y2Y" ? counts.spread10Y2Y : strip.key === "spread2Y3M" ? counts.spread2Y3M : undefined;
+      assert.equal(strip.filled, expected, strip.key);
+    }
   });
 
   it("draws one cell per month-end the conditions answer counts across, each with its conditions", () => {

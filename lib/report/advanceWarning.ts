@@ -1,4 +1,3 @@
-import type { RegimeKey } from "../types";
 import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "../regimeEngineCore";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { formatMonthYearShortFromValue } from "../formatters";
@@ -49,8 +48,8 @@ export const describeAdvanceWarning = (
 
 type AdvanceWarningMark = {
   atDate: string;
-  from: RegimeKey | string;
-  to: RegimeKey | string;
+  from: string;
+  to: string;
   signaled: boolean;
   /** "Sep 2022". */
   monthLabel: string;
