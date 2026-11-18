@@ -32,10 +32,33 @@ const FOLLOW_THROUGH_MONTHS = 3;
 
 type MonthRef = { year: number; month: number; recordDate: string };
 
+/**
+ * The query key for the change the card compares with (`/?compare=2022-09`), the URL's
+ * like every view of `/` (ui-ux-standards §V): a link copied while comparing with Mar 2022
+ * opens on Mar 2022. Absent, the card compares with the last change the same way.
+ */
+export const COMPARE_PARAM = "compare";
+
+/** One change in conditions on the record, as the card's row of links names it. */
+type CallChangeChoice = {
+  /** "2022-09", the value `?compare=` carries and the month's `<time>` value. */
+  key: string;
+  /** "Sep 2022". */
+  month: string;
+  /** "Stormy to Freezing". */
+  change: string;
+  /** The one the card draws. */
+  current: boolean;
+  /** The last change the same way as this week's: the card's default, whose link carries no key. */
+  lastSameWay: boolean;
+};
+
 export type LastTimeCallChanged = {
+  /** Which way the change the card draws went: toward tighter money or easier. */
   direction: "tightening" | "easing";
   changedAt: MonthRef & { from: RegimeKey; to: RegimeKey; fromLabel: string; toLabel: string };
   after: MonthRef;
+  /** Months from the change to `after`: three, or fewer for a change the record has not yet run three months past. */
   monthsLater: number;
   tightness: { atChange: number; later: number };
   riskAppetite: { atChange: number; later: number };
@@ -48,6 +71,12 @@ export type LastTimeCallChanged = {
   path: (MonthRef & { monthsSince: number; tightness: number; riskAppetite: number })[];
   /** This week's change and scores, for the comparison with the month that was found. */
   today: { from: RegimeKey; to: RegimeKey; tightness: number; riskAppetite: number };
+  /**
+   * Every change in conditions on the record with a month-end after it, oldest first, for
+   * the row of links over the panels (2026-11-18). The card draws the one marked `current`:
+   * the change `?compare=` names, else the last one the same way as this week's.
+   */
+  choices: CallChangeChoice[];
 };
 
 const severityStep = (from: RegimeKey, to: RegimeKey) =>
@@ -59,11 +88,28 @@ const monthRef = (entry: TimeMachineRegimeEntry): MonthRef => ({
   recordDate: entry.recordDate,
 });
 
+/** "2022-09": a month's `?compare=` value, from its record date. */
+const monthKey = (entry: Pick<MonthRef, "recordDate">) => entry.recordDate.slice(0, 7);
+
+/** A `?compare=` value, or undefined for anything that is not a year and a month. */
+export const parseCompareMonth = (value: string | undefined): string | undefined =>
+  value !== undefined && /^\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : undefined;
+
+/**
+ * This week's change set beside one earlier change on the record.
+ *
+ * Every change in conditions on the walk is offered (`choices`), oldest first; each needs
+ * one month-end after it, so its scores have somewhere to go. The one drawn is the change
+ * `compare` names or, by default, the most recent change in the same direction as this
+ * week's with three month-ends after it. The panels, the cells and the sentence under them
+ * all read the change drawn, so a reader who picks Mar 2022 sees Mar 2022 throughout.
+ */
 export const findLastTimeCallChanged = ({
   series,
   currentRegime,
   previousRegime,
   currentScores,
+  compare,
 }: {
   /** The month-end walk, any order; only entries with both scores count. */
   series: readonly TimeMachineRegimeEntry[];
@@ -72,6 +118,8 @@ export const findLastTimeCallChanged = ({
   previousRegime: RegimeKey | null | undefined;
   /** Where the two scores stand this week. */
   currentScores: { tightness: number; riskAppetite: number };
+  /** The change to compare with (`?compare=2022-09`); a month the walk holds no change in is ignored. */
+  compare?: string;
 }): LastTimeCallChanged | null => {
   if (!previousRegime || previousRegime === currentRegime) return null;
   const step = severityStep(previousRegime, currentRegime);
@@ -81,51 +129,94 @@ export const findLastTimeCallChanged = ({
     .filter((entry) => Number.isFinite(entry.tightness) && Number.isFinite(entry.riskAppetite))
     .sort((a, b) => a.recordDate.localeCompare(b.recordDate));
 
-  for (let index = ordered.length - 1 - FOLLOW_THROUGH_MONTHS; index >= 1; index -= 1) {
-    const entry = ordered[index];
+  /* Every change with a month-end after it, oldest first, with the month before it. */
+  const changes = ordered.flatMap((entry, index) => {
     const before = ordered[index - 1];
-    if (entry.regime === before.regime) continue;
-    if (severityStep(before.regime, entry.regime) !== step) continue;
-    const after = ordered[index + FOLLOW_THROUGH_MONTHS];
-    const path = ordered.slice(index, index + FOLLOW_THROUGH_MONTHS + 1).map((step, monthsSince) => ({
-      ...monthRef(step),
-      monthsSince,
-      tightness: step.tightness,
-      riskAppetite: step.riskAppetite,
-    }));
-    return {
-      direction: step > 0 ? "tightening" : "easing",
-      changedAt: {
-        ...monthRef(entry),
-        from: before.regime,
-        to: entry.regime,
-        fromLabel: getRegimePublicLabel(before.regime),
-        toLabel: getRegimePublicLabel(entry.regime),
-      },
-      after: monthRef(after),
-      monthsLater: FOLLOW_THROUGH_MONTHS,
-      tightness: { atChange: entry.tightness, later: after.tightness },
-      riskAppetite: { atChange: entry.riskAppetite, later: after.riskAppetite },
-      path,
-      today: { from: previousRegime, to: currentRegime, ...currentScores },
-    };
+    return before && before.regime !== entry.regime && index < ordered.length - 1 ? [{ entry, before, index }] : [];
+  });
+  /* The default: the latest change the same way with three months after it. */
+  const sameWay = changes
+    .filter((change) => change.index + FOLLOW_THROUGH_MONTHS < ordered.length && severityStep(change.before.regime, change.entry.regime) === step)
+    .at(-1);
+  const chosen = (compare === undefined ? undefined : changes.find((change) => monthKey(change.entry) === compare)) ?? sameWay;
+  if (!chosen || !sameWay) return null;
+
+  const { entry, before, index } = chosen;
+  const path = ordered.slice(index, index + FOLLOW_THROUGH_MONTHS + 1).map((month, monthsSince) => ({
+    ...monthRef(month),
+    monthsSince,
+    tightness: month.tightness,
+    riskAppetite: month.riskAppetite,
+  }));
+  const after = path.at(-1) ?? { ...monthRef(entry), monthsSince: 0, tightness: entry.tightness, riskAppetite: entry.riskAppetite };
+  return {
+    direction: severityStep(before.regime, entry.regime) > 0 ? "tightening" : "easing",
+    changedAt: {
+      ...monthRef(entry),
+      from: before.regime,
+      to: entry.regime,
+      fromLabel: getRegimePublicLabel(before.regime),
+      toLabel: getRegimePublicLabel(entry.regime),
+    },
+    after: { year: after.year, month: after.month, recordDate: after.recordDate },
+    monthsLater: after.monthsSince,
+    tightness: { atChange: entry.tightness, later: after.tightness },
+    riskAppetite: { atChange: entry.riskAppetite, later: after.riskAppetite },
+    path,
+    today: { from: previousRegime, to: currentRegime, ...currentScores },
+    choices: changes.map((change) => ({
+      key: monthKey(change.entry),
+      month: formatMonthLabel(change.entry.year, change.entry.month),
+      change: `${getRegimePublicLabel(change.before.regime)} to ${getRegimePublicLabel(change.entry.regime)}`,
+      current: change === chosen,
+      lastSameWay: change === sameWay,
+    })),
+  };
+};
+
+/**
+ * The card for every change it offers, keyed by `?compare=` value, from one walk each:
+ * the page renders them all so a choice shows in place, without asking the server again.
+ * Null where the card has nothing to show (`findLastTimeCallChanged`).
+ */
+export const findCallChangeComparisons = (
+  args: Omit<Parameters<typeof findLastTimeCallChanged>[0], "compare">,
+): { byKey: Record<string, LastTimeCallChanged>; defaultKey: string } | null => {
+  const fallback = findLastTimeCallChanged(args);
+  const defaultKey = fallback?.choices.find((choice) => choice.current)?.key;
+  if (!fallback || defaultKey === undefined) return null;
+  const byKey: Record<string, LastTimeCallChanged> = {};
+  for (const choice of fallback.choices) {
+    const record = choice.key === defaultKey ? fallback : findLastTimeCallChanged({ ...args, compare: choice.key });
+    if (record) byKey[choice.key] = record;
   }
-  return null;
+  return { byKey, defaultKey };
 };
 
 /* Inside this many points a score is "about where it was": the walk is monthly and the
    scores are whole numbers, so a gap this small is not a difference worth naming. */
 const ABOUT_THE_SAME = 5;
 
+/** "tightened" or "eased": which way a change went, by the severity order of the weather words. */
+const lastTimeVerb = (record: Pick<LastTimeCallChanged, "direction">) =>
+  record.direction === "tightening" ? "tightened" : "eased";
+
 /**
- * The month that was found, set against this week: the change it was and the one this
- * week is, then each score with what it meant, then and now. Each score carries its
- * meaning (`signalReadingMeaning`), once where both readings share it, so "7" and "43"
- * say "avoiding risk" and "selective about risk" without the reader knowing which end
- * of the scale is which.
- * `alike` is where the two are the same change with both scores about where they were;
- * anything else says it is one earlier outcome and not a forecast, because that is what
- * a reader who sees "3 months on, the scores stood here" is most likely to take it for.
+ * The change the card draws, set against this week, answer first (2026-11-18): how alike
+ * the two changes were, then each score with what it meant, then and now.
+ *
+ * The lead answers before any number: "The same change", "Tightened both times" (or
+ * "Eased"), or "The other way" when one went toward tighter money and the other toward
+ * easier. A reader who picks a change from the row should not have to work out from two
+ * pairs of weather words that it went the opposite way. It names the month, so the
+ * sentence still says which change it means when it is copied out alone.
+ *
+ * Each score carries its meaning (`signalReadingMeaning`), once where both readings share
+ * it, so "7" and "43" say "avoiding risk" and "selective about risk" without the reader
+ * knowing which end of the scale is which. `alike` is where the two are the same change
+ * with both scores about where they were; anything else says it is one earlier outcome and
+ * not a forecast, because that is what a reader who sees "3 months on" is most likely to
+ * take it for.
  */
 export const describeAgainstToday = (record: LastTimeCallChanged): { alike: boolean; text: string } => {
   const { today, changedAt } = record;
@@ -145,20 +236,23 @@ export const describeAgainstToday = (record: LastTimeCallChanged): { alike: bool
       ? `${label} was ${then} then and is ${now} now; at both readings, ${meaningThen}.`
       : `${label} was ${then} then (${meaningThen}) and is ${now} now (${meaningNow}).`;
   };
+  const then = formatMonthLabel(changedAt.year, changedAt.month);
+  const thenPair = `${changedAt.fromLabel} to ${changedAt.toLabel}`;
+  const nowPair = `${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}`;
+  const thisWeek = lastTimeVerb({ direction: severityStep(today.from, today.to) > 0 ? "tightening" : "easing" });
+  const lead = samePair
+    ? `The same change: ${then} also went ${thenPair}.`
+    : lastTimeVerb(record) === thisWeek
+      ? `${thisWeek === "tightened" ? "Tightened" : "Eased"} both times: ${then} went ${thenPair}; this week went ${nowPair}.`
+      : `The other way: ${then} ${lastTimeVerb(record)} from ${thenPair}; this week ${thisWeek} from ${nowPair}.`;
   const sentences = [
-    ...(samePair
-      ? []
-      : [`That change was ${changedAt.fromLabel} to ${changedAt.toLabel}; this week's is ${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}.`]),
+    lead,
     scoreSentence("tightness", "Funding pressure", record.tightness.atChange, today.tightness),
     scoreSentence("riskAppetite", "Risk appetite", record.riskAppetite.atChange, today.riskAppetite),
     ...(alike ? [] : ["One earlier outcome, not a forecast."]),
   ];
   return { alike, text: sentences.join(" ") };
 };
-
-/** "tightened" or "eased": what the found month has in common with this week. */
-export const lastTimeVerb = (record: Pick<LastTimeCallChanged, "direction">) =>
-  record.direction === "tightening" ? "tightened" : "eased";
 
 /** The comparison page for the change month against the month three later. */
 type RecentCallChange = MonthRef & { fromLabel: string; toLabel: string };

@@ -8,13 +8,13 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import { areasGovernedBy } from "../lib/report/boundedDecisionRules";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildSignalReferenceRows } from "../lib/report/evidenceReaderModel";
-import { buildInputTrails } from "../lib/report/home/inputTrail";
+import { buildInputTrails, parseInputTrailSpan } from "../lib/report/home/inputTrail";
 import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
 import { describeConditionFacts, describeScoreDistribution } from "../lib/report/lastTimeCallChanged";
 import type { ReportDynamics } from "../lib/report/reportDataTypes";
 import { buildSignalFlow } from "../lib/report/signalFlow";
 import { snapshotData } from "../lib/snapshot";
-import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
+import type { TimeMachineRegimeEntry, TimeMachineYieldCurveEntry } from "../lib/timeMachine/timeMachineCache";
 
 /*
  * Readings over time (2026-11-18). Each graphic here sits beside the sentence that states
@@ -95,9 +95,11 @@ describe("the trailing readings of the two market inputs", () => {
     assert.equal(trails.baseRate?.lineCaption, "Counts against you above 3.50, under this range");
   });
 
-  it("states the drawn range and its days", () => {
-    assert.equal(trails.baseRate?.caption, "Daily, Oct 8 to Oct 13 · 4.04–4.14");
-    assert.equal(trails.curveSlope?.caption, "Daily, Oct 8 to Oct 13 · 0.00–0.47");
+  it("states the drawn range, and names its days by the time they cover", () => {
+    assert.equal(trails.baseRate?.caption, "Range 4.04–4.14");
+    assert.equal(trails.curveSlope?.caption, "Range 0.00–0.47");
+    assert.deepEqual(trails.baseRate?.spans, [{ span: "daily", label: "Last 6 days" }], "six days, and no month-ends handed in");
+    assert.match(trails.baseRate?.summary ?? "", /6 daily readings from Oct 8 to Oct 13/, "the exact days stay in the summary");
   });
 
   it("draws nothing it cannot draw honestly", () => {
@@ -139,7 +141,7 @@ describe("the trailing readings of the two market inputs", () => {
     assert.match(text, /4\.10 Oct 11: 4\.04/, "the figure and the earlier reading stay as its label");
     assert.match(rate, /<input type="range"[^>]*aria-label="Short-term borrowing rate, daily readings"/);
     assert.match(rate, /aria-valuetext="Oct 13: 4\.10"/);
-    assert.match(text, /Daily, Oct 8 to Oct 13 · 4\.04–4\.14/);
+    assert.match(text, /Last 6 days Range 4\.04–4\.14/);
     assert.match(text, /↓ Counts against you above 3\.50, under this range/);
     assert.match(rate, /data-sparkline-mark/);
     assert.doesNotMatch(rate, /data-sparkline-reference=/, "a line off the range is named, not drawn");
@@ -148,6 +150,74 @@ describe("the trailing readings of the two market inputs", () => {
 
     const without = renderToStaticMarkup(<WhatChangedSection rows={inputRows()} comparisonUnavailable={false} />);
     assert.doesNotMatch(without, /data-input-trail/);
+  });
+});
+
+/*
+ * Longer trails (2026-11-18): every month-end on the record since 2012 with this week's
+ * reading last, as the second reach of a trail the row already draws, chosen by a link.
+ */
+describe("the market inputs' trails since 2012", () => {
+  const monthEnd = (year: number, month: number, oneMonth: number, twoYear: number, tenYear: number): TimeMachineYieldCurveEntry => ({
+    year,
+    month,
+    recordDate: `${year}-${String(month).padStart(2, "0")}-28`,
+    oneMonth,
+    threeMonth: null,
+    twoYear,
+    tenYear,
+    spread10Y2Y: tenYear - twoYear,
+    spread2Y3M: null,
+  });
+  const monthEnds = [
+    monthEnd(2012, 1, 0.03, 0.22, 1.83),
+    monthEnd(2019, 6, 2.18, 1.75, 2.0),
+    monthEnd(2023, 7, 5.5, 4.88, 3.96),
+    monthEnd(2026, 9, 4.2, 4.9, 5.15),
+    monthEnd(2026, 10, 4.15, 4.85, 5.13),
+  ];
+  const build = (span: "daily" | "since-2012", overrides: Partial<Parameters<typeof buildInputTrails>[0]> = {}) =>
+    buildInputTrails({ treasury, materializedSignals, rows: inputRows(), baseRateLine: 3.5, comparedWith: { recordDate: "2026-10-11" }, span, monthEnds, ...overrides });
+
+  it("draws the month-ends before the reading, then the reading the row prints", () => {
+    const long = build("since-2012");
+    assert.equal(long.baseRate?.span, "since-2012");
+    assert.deepEqual(long.baseRate?.points.map((point) => point.label), ["Jan 2012", "Jun 2019", "Jul 2023", "Sep 2026", "Oct 14"], "Oct 2026's month-end falls after the reading");
+    assert.equal(long.baseRate?.points.at(-1)?.value, 4.1);
+    assert.deepEqual(long.baseRate?.points.map((point) => point.dateTime), ["2012-01", "2019-06", "2023-07", "2026-09", "2026-10-14"]);
+    assert.equal(long.curveSlope?.points.at(-1)?.value, 0.29);
+    assert.equal(long.curveSlope?.points[2]?.value, -0.92, "the 10-year less the 2-year, at each month-end");
+    assert.equal(long.baseRate?.pointsLabel, "month-end readings");
+    assert.match(long.baseRate?.summary ?? "", /4 month-end readings from Jan 2012 to Sep 2026, then Oct 14/);
+  });
+
+  it("names both reaches by the time they cover, and carries the other for switching in place", () => {
+    const daily = build("daily");
+    assert.deepEqual(daily.baseRate?.spans, [{ span: "daily", label: "Last 6 days" }, { span: "since-2012", label: "Since 2012" }]);
+    assert.equal(daily.baseRate?.span, "daily");
+    assert.equal(daily.baseRate?.other?.span, "since-2012");
+    assert.equal(build("since-2012").baseRate?.other?.span, "daily");
+    assert.equal(build("daily").baseRate?.line.value, build("since-2012").baseRate?.line.value, "the same line on both");
+  });
+
+  it("draws nothing longer where the row draws no trail, so the page gains no drawing it did not have", () => {
+    const noDaily = build("since-2012", { treasury: { ...treasury, oneMonthHistory: [] }, materializedSignals: null });
+    assert.deepEqual(noDaily, {});
+    assert.equal(parseInputTrailSpan("since-2012"), "since-2012");
+    assert.equal(parseInputTrailSpan("forever"), "daily");
+    assert.equal(parseInputTrailSpan(undefined), "daily");
+  });
+
+  it("offers the two reaches as links to views of the page, the one shown current", () => {
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={inputRows()} inputTrails={build("daily")} comparisonUnavailable={false} followsArea query={{ decision: "hiring" }} />,
+    );
+    const rate = html.slice(html.indexOf('data-signal="baseRate"'), html.indexOf('data-signal="curveSlope"'));
+    assert.match(rate, /href="\/\?decision=hiring&amp;trail=since-2012#signal-base-rate"/);
+    assert.match(rate, /href="\/\?decision=hiring#signal-base-rate"[^>]*>|aria-current="page"[^>]*href="\/\?decision=hiring#signal-base-rate"/);
+    assert.match(rate, /aria-label="Short-term borrowing rate, since 2012"/);
+    assert.match(rate, /Since <time dateTime="2012">2012<\/time>/);
+    assert.match(rate, /data-input-trail-span="daily"/);
   });
 });
 

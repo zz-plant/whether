@@ -91,6 +91,7 @@ export function ScoreMoveBars({ move }: { move: ScoreMoveHistogram }) {
                   aria-label={bin.label}
                   data-mark={bin.label}
                   data-score-move-bin={bin.size}
+                  data-month={bin.latest.slice(0, 7)}
                   className={`${column} hover:[&>span]:opacity-80`}
                 >
                   {bar}

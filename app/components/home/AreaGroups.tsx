@@ -75,10 +75,15 @@ export function AreaGroups({
      `xl` the groups then stand side by side (ui-ux-standards §XXVIII: parallel blocks, one
      frame), ruled apart as they are when stacked. */
   const sideBySide = rulesAbove && groups.length > 1;
-  /* The record's moves are drawn once, beside the first group that sizes one: the held
-     group's restart, where there is one. A second set of bars for another score asked the
-     reader to learn a second scale for one idea. */
-  const drawnMove = groups.find((group) => group.move && group.distance)?.move ?? null;
+  /* The record's moves are drawn once, beside the group of the area the reader has open
+     where its group sizes one (2026-11-18), else beside the first group that does: the
+     held group's restart, where there is one. A second set of bars for another score
+     asked the reader to learn a second scale for one idea. */
+  const sizes = (group: AreaGroup) => Boolean(group.move && group.distance);
+  const drawnMove =
+    groups.find((group) => sizes(group) && group.areas.some((entry) => entry.area === selected))?.move
+    ?? groups.find(sizes)?.move
+    ?? null;
   return (
     <div
       data-area-groups

@@ -25,8 +25,14 @@ export function RecordSection({
   turningPoints,
   spellLengths,
   record,
+  comparisons,
+  query,
 }: {
   lastTime: LastTimeCallChanged | null;
+  /** Every change the card offers, for switching in place (`findCallChangeComparisons`). */
+  comparisons?: { byKey: Readonly<Record<string, LastTimeCallChanged>>; defaultKey: string } | null;
+  /** The page's query, for the card's compare links (`?compare=`). */
+  query?: Readonly<Record<string, string | undefined>>;
   callChangeLines: { tightness: number; riskAppetite: number };
   turningPoints: readonly { label: string; href: string }[];
   /**
@@ -43,7 +49,7 @@ export function RecordSection({
        that is its evidence. It sat under the band and a sampling note, so a frame of
        the section showed the band and the question, and the answer was a scroll away. */
     <HomeSection id={HOME_SECTIONS.record.id} heading={HOME_SECTIONS.record.heading} lead={spellLengths?.lead}>
-      {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
+      {lastTime ? <LastTimeCallChangedCard record={lastTime} comparisons={comparisons} callChangeLines={callChangeLines} query={query} /> : null}
       {/* Every stretch by how long it lasted (2026-11-18), with the months under each
           condition on its rows: the count the key printed, so the key is not printed too. */}
       {spellLengths?.plot ? (

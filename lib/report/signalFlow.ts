@@ -17,14 +17,32 @@ import type { RegimeSignalKey } from "./reportFormatting";
 type InputKey = Extract<RegimeSignalKey, "baseRate" | "curveSlope">;
 type ScoreKey = Extract<RegimeSignalKey, "tightness" | "riskAppetite">;
 
-const SIGNAL_FEEDS: readonly { from: InputKey; to: ScoreKey; condition: string | null }[] = [
+const SIGNAL_FEEDS: readonly { from: InputKey; to: ScoreKey; condition: string | null; onlyBelowZero?: true }[] = [
   { from: "baseRate", to: "tightness", condition: null },
   { from: "curveSlope", to: "riskAppetite", condition: null },
-  { from: "curveSlope", to: "tightness", condition: "once inverted (short-term rates above long-term)" },
+  { from: "curveSlope", to: "tightness", condition: "once inverted (short-term rates above long-term)", onlyBelowZero: true },
 ];
 
 const SCORE_KEYS: readonly ScoreKey[] = ["tightness", "riskAppetite"];
 const INPUT_KEYS: readonly InputKey[] = ["baseRate", "curveSlope"];
+
+const isScoreKey = (key: RegimeSignalKey): key is ScoreKey => key === "tightness" || key === "riskAppetite";
+const isInputKey = (key: RegimeSignalKey): key is InputKey => key === "baseRate" || key === "curveSlope";
+
+/**
+ * The areas a signal moves this week, by the feeds the diagram draws (2026-11-18): a
+ * score's own areas, and an input's through the scores it feeds. The curve's feed into
+ * funding pressure counts only while the curve is below zero, as the score reads it. The
+ * brief's "What changed" marks the rows that move the area a reader has open with this.
+ */
+export const areasMovedBy = (key: RegimeSignalKey, value?: number | null): DecisionArea[] => {
+  if (isScoreKey(key)) return areasGovernedBy(key);
+  if (!isInputKey(key)) return [];
+  const scores = SIGNAL_FEEDS
+    .filter((feed) => feed.from === key && (!feed.onlyBelowZero || (typeof value === "number" && value < 0)))
+    .map((feed) => feed.to);
+  return decisionAreaOrder.filter((area) => scores.some((score) => areasGovernedBy(score).includes(area)));
+};
 
 /** Where an area's link goes from an evidence page: the brief, opened on that area. */
 const areaBriefHref = (area: DecisionArea) => `/?${HOME_DECISION_PARAM}=${area}#${HOME_SECTIONS.areas.id}`;

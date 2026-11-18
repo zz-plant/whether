@@ -64,10 +64,9 @@ import {
 import { ShareBriefButton } from "./components/shareBriefButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
-  HOME_DECISION_PARAM,
   HOME_MONDAY_EMAIL_HASH,
   ROLE_FORMAT_LINKS,
-  parseHomeDecision,
+  resolveHomeDecision,
   buildAreaGroups,
   buildHomeAreaRows,
   buildSignalChangeRows,
@@ -79,9 +78,9 @@ import {
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
 import { buildWeekMove } from "../lib/report/home/weekMove";
-import { buildInputTrails } from "../lib/report/home/inputTrail";
+import { INPUT_TRAIL_PARAM, buildInputTrails, parseInputTrailSpan } from "../lib/report/home/inputTrail";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
-import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
+import { COMPARE_PARAM, findCallChangeComparisons, parseCompareMonth } from "../lib/report/lastTimeCallChanged";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs, publishedBriefWeekLabel, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
@@ -337,7 +336,10 @@ async function PageContent({
   /* The selected horizon, the artifact every share format renders, and the one Slack
      paste. The builders live in `homePageArtifact.ts` so this route does not decide the
      artifact's shape a second time. */
-  const { cadenceCall, cadenceTitle, briefArtifact, briefSlackBlock } = buildHomePageArtifact({
+  /* The area open on the page, which the sections below the card follow and a copied
+     brief's link carries: `?decision=`, else the one the reader last picked. */
+  const chosenArea = resolveHomeDecision(searchParams, data.operatorContext.decisionArea);
+  const { cadenceCall, cadenceTitle, briefArtifact, briefSlackBlock, briefShareUrl } = buildHomePageArtifact({
     homepage,
     reportData,
     activeCadence,
@@ -420,14 +422,20 @@ async function PageContent({
      what the scores did over the three months after. Null otherwise, and the
      section renders nothing rather than reaching for the nearest analogue. */
   const previousRegime = reportData.regimeAlert?.previousRegime;
-  const lastTimeCallChanged = historicalSelection || !isRegimeKey(regime)
+  /* Every change the card offers to compare with, each from the same walk, so a choice
+     shows in place; the one drawn first is `?compare=`'s, else the last one the same way. */
+  const changeComparisons = historicalSelection || !isRegimeKey(regime)
     ? null
-    : findLastTimeCallChanged({
+    : findCallChangeComparisons({
         series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
         currentRegime: regime,
         previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
         currentScores: { tightness, riskAppetite },
       });
+  const compareKey = parseCompareMonth(searchParams?.[COMPARE_PARAM]);
+  const lastTimeCallChanged = changeComparisons
+    ? (compareKey ? changeComparisons.byKey[compareKey] : undefined) ?? changeComparisons.byKey[changeComparisons.defaultKey] ?? null
+    : null;
   /* The verdict's one line on why: the lines the scores crossed since the
      earlier reading ("Risk appetite fell through 54."), or that none was.
      Nothing on a week with no comparison, which the stamp line already says. */
@@ -843,7 +851,7 @@ async function PageContent({
                   one thing a first visit is asked. */}
               <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} showLabel />
+                  <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} url={briefShareUrl} carryArea={{ initial: chosenArea ?? null }} showLabel />
                   <CopyImageCardButton />
                   {/* The core loop, beside the artifact rather than 4,000px below
                       it: the alert is what a quiet week is for. */}
@@ -865,7 +873,7 @@ async function PageContent({
                 and the one plan link. */}
             <DecisionPicker
               options={decisionPickerOptions}
-              initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM]) ?? data.operatorContext.decisionArea ?? undefined}
+              initialSelected={chosenArea}
               regime={regime}
               stageLabel={stageLabel}
               activeRunway={activeRunway}
@@ -943,7 +951,12 @@ async function PageContent({
                   rows: signalChangeRows,
                   baseRateLine: reportData.assessment.thresholds.baseRateTightness,
                   comparedWith: comparisonUnavailable ? null : homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith,
+                  span: parseInputTrailSpan(searchParams?.[INPUT_TRAIL_PARAM]),
+                  monthEnds: getTimeMachineYieldCurveSeries(Number.MAX_SAFE_INTEGER),
                 })}
+                followsArea
+                chosenArea={chosenArea}
+                query={searchParams}
                 lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
                 comparisonUnavailable={comparisonUnavailable}
                 basis={basis}
@@ -986,8 +999,12 @@ async function PageContent({
               {/* 8. How unusual is this? */}
               <RecordSection
                 lastTime={lastTimeCallChanged}
+                comparisons={changeComparisons}
                 callChangeLines={callChangeLines}
-                turningPoints={turningPoints}
+                query={searchParams}
+                /* The card's row of links names every change on the record, so the "Last
+                   changes:" line would list the same months a second time. */
+                turningPoints={lastTimeCallChanged ? [] : turningPoints}
                 spellLengths={spellLengths}
                 record={historicalSelection ? undefined : recordSeries}
               />

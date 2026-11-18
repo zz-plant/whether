@@ -96,6 +96,7 @@ function FollowThroughPanel({
                 aria-label={text}
                 data-mark={text}
                 data-follow-through-month={month.recordDate}
+                data-month={month.recordDate.slice(0, 7)}
                 className="group absolute flex h-11 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
                 style={{ left: `${x(month.monthsSince)}%`, top: `${toTop(score, month[score])}%` }}
               >
@@ -119,7 +120,7 @@ function FollowThroughPanel({
         <div aria-hidden="true" />
         <div aria-hidden="true" className="mx-1.5 flex justify-between pt-1 leading-none">
           <span>At the change</span>
-          <span>{record.monthsLater} months on</span>
+          <span>{record.monthsLater === 1 ? "1 month on" : `${record.monthsLater} months on`}</span>
         </div>
       </div>
     </div>
@@ -133,8 +134,6 @@ export function ChangeFollowThrough({
   record: LastTimeCallChanged;
   callChangeLines: { tightness: number; riskAppetite: number };
 }) {
-  const changedAt = formatMonthLabel(record.changedAt.year, record.changedAt.month);
-  const after = formatMonthLabel(record.after.year, record.after.month);
   return (
     <figure className="space-y-2" data-change-follow-through>
       <MarkReadout className="flex flex-wrap gap-x-10 gap-y-4">
@@ -148,7 +147,8 @@ export function ChangeFollowThrough({
             <span className="block size-2 rounded-full bg-[var(--app-text-secondary)]" />
             <span className="block h-px w-2 bg-[var(--app-text-secondary)]" />
           </span>
-          {changedAt} to {after}, each month-end
+          {/* The months themselves are the chosen link's over the panels and the axis' under them. */}
+          Each month-end
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden="true" className="block size-3 rounded-full border-2 border-[color:var(--app-text)]" />

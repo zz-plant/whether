@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, type ReactNode } from "react";
+import { announceDecision, showHomeView, useHomeView } from "./homeView";
 import {
   decisionAreaCorporateTransmission,
   decisionAreaLabel,
@@ -13,6 +14,7 @@ import {
   HOME_SECTIONS,
   buildHomeDecisionCookie,
   describePauseLineCount,
+  parseHomeDecision,
   type AreaGroup,
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
@@ -53,16 +55,20 @@ export type DecisionPickerOption = HomeAreaRow & {
 
 /* The choice rides in the URL (`/?decision=hiring`), so a link copied after
    picking opens on the same answer, server-rendered. Replace, not push: picking
-   another decision is not a step Back should retrace. The router's own state
-   object is passed through so the app router keeps its entry. Closing the area
-   takes it out of the URL and forgets it. */
-const recordDecisionInUrl = (area: DecisionArea | null) => {
-  const url = new URL(window.location.href);
-  if (area) url.searchParams.set(HOME_DECISION_PARAM, area);
-  else url.searchParams.delete(HOME_DECISION_PARAM);
-  window.history.replaceState(window.history.state, "", url);
-  /* And for the next visit, so a reader with one decision in flight opens on it. */
+   another decision is not a step Back should retrace. Closing the area takes it
+   out of the URL and forgets it.
+
+   Since 2026-11-18 the area runs through the page below the card: "What changed"
+   marks the rows that move it, the one-month bars mark its move, and Copy brief's
+   link opens on it. They follow the choice in place (`showHomeView`). The conditions
+   chart hears a picked area through `whether:decision`, and the picker hears the
+   chart's the same way (`homeView.tsx`). Closing an area sends nothing: the chart
+   always shades one, and keeps the one it has. */
+const recordDecision = (area: DecisionArea | null) => {
+  /* For the next visit, so a reader with one decision in flight opens on it. */
   document.cookie = buildHomeDecisionCookie(area);
+  showHomeView(HOME_DECISION_PARAM, area);
+  if (area) announceDecision(area);
 };
 
 export function DecisionPicker({
@@ -97,7 +103,8 @@ export function DecisionPicker({
   /** What follows the groups inside the section: the fold behind the rules, and the plan link. */
   children?: ReactNode;
 }) {
-  const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
+  /* The URL's area, or the remembered one the server opened on (2026-11-18). */
+  const selected = parseHomeDecision(useHomeView(HOME_DECISION_PARAM, initialSelected ?? null) ?? undefined);
   const active = options.find((option) => option.area === selected);
   /* One side of the rule, the one that can change the area's state (2026-11-03), as the
      rules table and every paste print it: an area on hold shows when it restarts, any
@@ -245,11 +252,7 @@ export function DecisionPicker({
           groups={groups}
           rulesAbove={rulesAbove}
           selected={selected}
-          onToggle={(area) => {
-            const next = area === selected ? undefined : area;
-            setSelected(next);
-            recordDecisionInUrl(next ?? null);
-          }}
+          onToggle={(area) => recordDecision(area === selected ? null : area)}
           detail={renderDetail}
           note={isHistorical ? undefined : (area) => <RunwayAreaNote regime={regime} area={area} />}
           alerts={!isHistorical}
