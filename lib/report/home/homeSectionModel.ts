@@ -13,7 +13,7 @@ import {
   type RuleThresholdDistance,
 } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, isRuleConditionMet, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -282,9 +282,11 @@ export type HomeAreaRow = {
   /** Non-numeric conditions the rule states beside its lines. */
   pauseQualifier?: string;
   resumeQualifier?: string;
+  /** What the pause stops, as the rule's own verb: "Pause long-payback bets". */
+  pauseAction?: string;
 };
 
-const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "resume"): HomeAreaLineSlot | undefined =>
+const lineSlot =(distance: RuleThresholdDistance | undefined, kind: "pause" | "resume"): HomeAreaLineSlot | undefined =>
   distance
     ? {
         line: distance.label,
@@ -315,16 +317,44 @@ export const formatPoints = (points: number) =>
 const describeSlotDistance = (slot: Pick<HomeAreaLineSlot, "metric" | "points">): string =>
   describeScoreMoveBand(slot.metric, slot.points) ?? formatPoints(slot.points);
 
+/** Points as a sentence says them: "1 point", "4 points", "10.5 points". */
+const formatPointsInWords = (points: number) =>
+  `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "point" : "points"}`;
+
 /**
- * The exception band's sentence for an area close to its pause line: the size of
- * the move, the score that would make it, and what it does ("A common risk-appetite
- * move would pause Roadmap."). It read "Roadmap — a common move from pausing.", a
- * fragment that named neither the score nor who moves (2026-11-09). The points,
- * where the record cannot size the move.
+ * How far a score is from a line, said plainly (2026-11-18): the points, then how big a
+ * one-month move that is on the record ("4 points away, a common one-month move").
+ * "A common move away" named neither what was measured nor over what time, and the
+ * trend after it ("5 points closer since Nov 9") counted points the sentence never gave.
+ * The points alone, where the record cannot size the move.
  */
-const describeNearPause = (area: string, pause: Pick<HomeAreaLineSlot, "metric" | "points">): string => {
-  const move = describeScoreMoveBand(pause.metric, pause.points, { named: true });
-  return move ? `${capitalize(move)} would pause ${area}.` : `${area} is ${formatPoints(pause.points)} from pausing.`;
+const describeSlotGap = (slot: Pick<HomeAreaLineSlot, "metric" | "points">): string => {
+  const band = describeScoreMoveBand(slot.metric, slot.points);
+  const away = `${formatPointsInWords(slot.points)} away`;
+  return band ? `${away}, ${band.replace(/ move$/, " one-month move")}` : away;
+};
+
+/**
+ * The exception band's sentence for an area close to its pause line, in what the reader
+ * would do (2026-11-18): the area, the rule's own pause, the score that sets it off and
+ * where that score is now ("Roadmap: pause long-payback bets if risk appetite falls below
+ * 44. It is 48 now."). It read "A common risk-appetite move would pause Roadmap.", which
+ * named a size of move but not what pausing Roadmap means for the company or the number
+ * to watch; and before 2026-11-09, "Roadmap — a common move from pausing.". The size of
+ * the move is in the area's group below (`describeSlotGap`).
+ */
+const describeNearPause = (row: Pick<HomeAreaRow, "area" | "pauseAction">, pause: HomeAreaLineSlot): string => {
+  const area = decisionAreaLabel(row.area);
+  const phrase = slotPhrase(pause);
+  if (!phrase || pause.value === undefined) {
+    return pause.points > 0 ? `${area} is ${formatPoints(pause.points)} from pausing.` : `${area} is on the edge of pausing.`;
+  }
+  const action = row.pauseAction
+    ? `${area}: ${row.pauseAction.charAt(0).toLowerCase()}${row.pauseAction.slice(1)} if ${phrase}.`
+    : `${area} pauses if ${phrase}.`;
+  /* The score, from the line and the distance the slot carries, rounded as the groups print it. */
+  const score = pause.holdsAbove ? pause.value - pause.points : pause.value + pause.points;
+  return `${action} It is ${Math.round(score)} now.`;
 };
 
 const capitalize = (text: string) => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
@@ -402,7 +432,7 @@ export type LineStateBandModel = {
 };
 
 export const describeLineStateBand = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "changedKind">[],
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "changedKind" | "pauseAction">[],
   basis: ComparisonBasis = comparisonBasis(),
   movement?: Pick<DecisionMovement, "groups" | "comparedWith"> | null,
 ): LineStateBandModel | null => {
@@ -442,10 +472,63 @@ export const describeLineStateBand = (
   return band(
     "near",
     binding,
-    pause && pause.points > 0
-      ? describeNearPause(decisionAreaLabel(binding.area), pause)
-      : `${decisionAreaLabel(binding.area)} is on the edge of pausing.`,
+    pause ? describeNearPause(binding, pause) : `${decisionAreaLabel(binding.area)} is on the edge of pausing.`,
   );
+};
+
+/**
+ * What a score's figure beside the guidance says (2026-11-18): where the score stands
+ * against the lines the figure draws, which are one area's (the first rule's, hiring),
+ * named as that area. "Paused above 76" and "Clear. Pauses below 44" did not say what
+ * was paused or clear, so under "Freezing" a score reading "Clear" looked like a
+ * contradiction: the clear was hiring's pause line, not the conditions. And each figure
+ * gave its own restart line alone, though a restart needs every one of them (the rule
+ * joins them with "and"), so 48 read as fine when it was still short of 54.
+ *
+ * Crossed: the area is paused, and the restart is said whole. Clear while another score
+ * holds the area: clear of this pause, and what this score still owes the restart.
+ * Clear and the area running: the pause line alone, as a restart line lifts nothing then.
+ */
+export type ScoreFigureStanding = { crossed: boolean; lead: string; rest: string };
+
+export const describeScoreFigureStanding = ({
+  area,
+  metric,
+  pause,
+  resume,
+  scores,
+}: {
+  area: DecisionArea;
+  metric: RuleConditionMetric;
+  pause: readonly RuleCondition[];
+  resume: readonly RuleCondition[];
+  scores: { tightness: number; riskAppetite: number };
+}): ScoreFigureStanding | null => {
+  const own = pause.find((condition) => condition.metric === metric);
+  if (!own) return null;
+  const name = decisionAreaLabel(area);
+  const side = (condition: RuleCondition) => `${condition.operator.startsWith(">") ? "above" : "below"} ${condition.value}`;
+  const restart = resume.find((condition) => condition.metric === metric);
+  if (isRuleConditionMet(own, scores[metric])) {
+    const others = resume
+      .filter((condition) => condition.metric !== metric)
+      .map((condition) => `${ruleMetricLabel[condition.metric].toLowerCase()} is ${side(condition)}`);
+    const rest = !restart
+      ? ""
+      : others.length > 0
+        ? `Restarts only when ${side(restart)} and ${others.join(" and ")}.`
+        : `Restarts ${side(restart)}.`;
+    return { crossed: true, lead: `${name} paused ${side(own)}`, rest };
+  }
+  if (pause.some((condition) => isRuleConditionMet(condition, scores[condition.metric]))) {
+    const rest = !restart
+      ? ""
+      : isRuleConditionMet(restart, scores[metric])
+        ? `Restart needs ${side(restart)}, as now.`
+        : `Restart also needs ${side(restart)}.`;
+    return { crossed: false, lead: `Clear of ${name.toLowerCase()}’s pause at ${own.value}`, rest };
+  }
+  return { crossed: false, lead: `${name} clear`, rest: `Pauses ${side(own)}.` };
 };
 
 export type AreaStripModel = {
@@ -609,6 +692,8 @@ export const buildHomeAreaRows = ({
         ...changedFor(area),
         pauseQualifier: item.pauseQualifier,
         resumeQualifier: item.resumeQualifier,
+        /* The strip carries the sentence, not the verb; the rule it was built from has it. */
+        pauseAction: decisionRules.find((rule) => rule.area === area)?.pause.verb,
       };
     }).map(withIdleRestart);
   }
@@ -621,6 +706,7 @@ export const buildHomeAreaRows = ({
     ...changedFor(rule.area),
     pauseQualifier: rule.pause.qualifier,
     resumeQualifier: rule.resume.qualifier,
+    pauseAction: rule.pause.verb,
   })).map(withIdleRestart);
 };
 
@@ -651,7 +737,7 @@ export type AreaGroup = {
   status: string;
   /** "No restart until funding pressure falls below 66." */
   condition: string | null;
-  /** Today's score, how big a move the condition is, and which way it went: "It is 90 today, a rare move away, unchanged since Oct 19." */
+  /** How far the score is from the condition, how big a move that is, and which way it went: "It is 4 points away, a common one-month move, and 5 points closer since Nov 9." */
   distance: string | null;
   /** A held group's record: "It rose above 76 in Sep 2026. The last time, in Sep 2022, it took 39 months to fall below 66." */
   history: string | null;
@@ -708,12 +794,13 @@ export const buildAreaGroups = (
     const phrase = slot ? slotPhrase(slot) : null;
     const condition = phrase ? `${held ? "No restart until" : "Pauses if"} ${phrase}.` : null;
     /* The score the condition just named, so "it": the name twice in two sentences was
-       the page's most repeated term. At the line there is no move to size. */
-    const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;
+       the page's most repeated term. Its distance in points and as a one-month move
+       (`describeSlotGap`), then which way it went in the same points. At the line there
+       is no move to size. */
     const trend = slot && comparison ? describeTrend(slot, scores[slot.metric], comparison.scores[slot.metric], comparison.since) : null;
     const distance = slot && phrase
-      ? band
-        ? `${[`${band.charAt(0).toUpperCase()}${band.slice(1)} away`, trend].filter(Boolean).join(", ")}.`
+      ? slot.points > 0
+        ? `It is ${describeSlotGap(slot)}${trend ? `, and ${trend}` : ""}.`
         : `It is ${Math.round(scores[slot.metric])} today${trend ? `, ${trend}` : ""}.`
       : null;
     /* The record reads the lines the group shows, so both must be on one score. */

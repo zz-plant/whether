@@ -7,7 +7,8 @@ import { buildDecisionMovement } from "../lib/report/decisionMovement";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { LineStateBand } from "../app/components/home/LineStateBand";
 import { DecisionHero } from "../app/components/DecisionHero";
-import { describeLineStateBand, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
+import { describeLineStateBand, describeScoreFigureStanding, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
+import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 
 /*
  * The page's silhouette changes with the weather (2026-10-31).
@@ -34,12 +35,21 @@ describe("the band states the week's exception, or nothing", () => {
     assert.equal(describeLineStateBand([{ area: "hiring" }]), null);
   });
 
-  /* The distance is how big a move it takes against the month-end record
-     (2026-11-03), not points of a score no reader has a feel for. */
-  it("names the area and how big a move would pause it when a line is close", () => {
-    const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 3) }]);
+  /* In what the reader would do (2026-11-18): the area, the rule's own pause, the score
+     that sets it off and where it is now. "A common risk-appetite move would pause
+     Roadmap." named neither what pausing Roadmap means nor the number to watch. */
+  it("names the area, what its pause stops, the score that sets it off and where it is", () => {
+    const close = { line: "Risk appetite < 44", distance: "4 pts away", points: 4, met: false, metric: "riskAppetite" as const, value: 44, holdsAbove: false };
+    const model = describeLineStateBand([{ area: "product-tempo", pause: close, pauseAction: "Pause long-payback bets" }]);
     assert.equal(model?.state, "near");
-    assert.equal(model?.text, "An unusual funding-pressure move would pause Hiring.");
+    assert.equal(model?.text, "Roadmap: pause long-payback bets if risk appetite falls below 44. It is 48 now.");
+    assert.doesNotMatch(model?.text ?? "", /common|unusual|rare|move/, "the size of the move is the group's, below");
+    assert.equal(
+      describeLineStateBand([{ area: "hiring", pause: { ...pauseSlot(false, 0), value: 76, holdsAbove: true } }])?.text,
+      "Hiring pauses if funding pressure rises above 76. It is 76 now.",
+      "at the line, and with no verb to quote, the area's own",
+    );
+    assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 3) }])?.text, "Hiring is 3 pts from pausing.", "no number to name");
     assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 0) }])?.text, "Hiring is on the edge of pausing.");
   });
 
@@ -104,6 +114,24 @@ describe("the band is drawn in the line state's ink", () => {
     assert.match(html, /data-line-state-band="near"/);
     assert.ok(html.includes("A common risk-appetite move would pause Hiring."));
     assert.doesNotMatch(html, /href=/);
+  });
+
+  /* 2026-11-18: a close line is a note about what would pause an area, and the red box,
+     rule and words read it as an error. The close badge's neutral edge, the page's ink;
+     the dashed ring stays in the line-state ink (§XXIV). A crossed line keeps the red. */
+  it("draws a close line as a note, not an error, and keeps its dashed ring", () => {
+    const html = renderToStaticMarkup(
+      <LineStateBand model={{ state: "near", area: "product-tempo", text: "Roadmap: pause long-payback bets if risk appetite falls below 44. It is 48 now." }} />,
+    );
+    assert.match(html, /<svg[^>]*lucide-circle-dashed[^>]*text-line-crossed-fg/);
+    const css = readFileSync("app/styles/feedback.css", "utf8");
+    const near = /\.weather-line-band\[data-line-state-band="near"\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    assert.match(near, /border-color:\s*var\(--border-strong\)/);
+    assert.match(near, /background-color:\s*transparent/);
+    assert.match(near, /(?:^|\s)color:\s*var\(--app-text\)/);
+    assert.doesNotMatch(near, /line-crossed/, "no front red on the box or the words");
+    const crossed = /\.weather-line-band\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    assert.match(crossed, /background-color:\s*var\(--line-crossed-bg\)/, "a crossed line keeps the red");
   });
 
   it("mounts above the card and nowhere else on the route", () => {
@@ -219,5 +247,54 @@ describe("the first screen keeps the week's statement on one screen", () => {
     const delta = withMargin.slice(withMargin.indexOf("data-conditions-since"));
     assert.match(delta.slice(0, delta.indexOf("weekly-call-title")), / ·<\/span> <a[^>]*data-feels-like/);
     assert.equal((withMargin.match(/data-feels-like/g) ?? []).length, 1);
+  });
+});
+
+/*
+ * The two figures beside the guidance draw hiring's lines (the first rule's), and until
+ * 2026-11-18 said "Paused above 76." and "Clear. Pauses below 44." without saying what
+ * was paused or clear: under "Freezing", a score reading "Clear" looked like a
+ * contradiction, and risk appetite at 48 read as fine though hiring's restart also
+ * needs it above 54.
+ */
+describe("the figures say whose lines they draw, and that a restart needs both", () => {
+  const hiring = (scores: { tightness: number; riskAppetite: number }) => {
+    const rule = buildCanonicalBoundedDecisionRules({ regime: "SCARCITY", thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 }, scores })[0];
+    assert.equal(rule?.area, "hiring");
+    return (metric: "tightness" | "riskAppetite") =>
+      rule ? describeScoreFigureStanding({ area: rule.area, metric, pause: rule.pause.conditions, resume: rule.resume.conditions, scores }) : null;
+  };
+
+  it("names hiring as paused on the score past its line, with the whole restart", () => {
+    const standing = hiring({ tightness: 90, riskAppetite: 48 });
+    assert.deepEqual(standing("tightness"), {
+      crossed: true,
+      lead: "Hiring paused above 76",
+      rest: "Restarts only when below 66 and risk appetite is above 54.",
+    });
+    assert.deepEqual(standing("riskAppetite"), {
+      crossed: false,
+      lead: "Clear of hiring’s pause at 44",
+      rest: "Restart also needs above 54.",
+    });
+  });
+
+  it("says a score already past its restart line is, while the other holds the pause", () => {
+    assert.deepEqual(hiring({ tightness: 60, riskAppetite: 40 })("tightness"), {
+      crossed: false,
+      lead: "Clear of hiring’s pause at 76",
+      rest: "Restart needs below 66, as now.",
+    });
+  });
+
+  it("gives a running area its pause line alone, as a restart line lifts nothing", () => {
+    const standing = hiring({ tightness: 60, riskAppetite: 60 });
+    assert.deepEqual(standing("tightness"), { crossed: false, lead: "Hiring clear", rest: "Pauses above 76." });
+    assert.deepEqual(standing("riskAppetite"), { crossed: false, lead: "Hiring clear", rest: "Pauses below 44." });
+  });
+
+  it("is what both figures on the route print, at either width", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    assert.equal((routeSource.match(/standing=\{figureStanding\(ladder\.metric\)\}/g) ?? []).length, 2);
   });
 });

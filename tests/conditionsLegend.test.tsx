@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import type { RegimeKey } from "../lib/regimeEngine";
 import { regimeAtCoordinates } from "../lib/regimePhaseSpace";
@@ -97,9 +98,15 @@ describe("conditions legend", () => {
   });
 });
 
-it("keeps the homepage introduction to its category line without repeating condition definitions", () => {
-  const html = renderToStaticMarkup(<ConditionsLegend compact thresholds={THRESHOLDS} currentRegime="DEFENSIVE" orientation="Long introduction." />);
-  assert.match(html, /Weekly operating guidance for startup leaders/);
-  assert.doesNotMatch(html, /data-conditions-definitions|Long introduction/);
-  assert.match(html, /Dismiss this introduction/);
+/* 2026-11-18: the category line is in the caption under the record band, on every visit
+   and route (recordBand.tsx), where no dismissal hides it before it is read. The homepage
+   mounts the legend for a shared arrival's greeting alone, with no definitions. */
+it("keeps the homepage's legend to the share greeting, and leaves the category line to the band", () => {
+  const html = renderToStaticMarkup(<ConditionsLegend compact arrival="share" thresholds={THRESHOLDS} currentRegime="DEFENSIVE" />);
+  assert.match(text(html), /^This is this week's guidance from Whether\./);
+  assert.doesNotMatch(html, /data-conditions-definitions|data-orientation-line/);
+  const route = readFileSync("app/page.tsx", "utf8");
+  assert.match(route, /\{arrivedFromShare \? \(\s*<ConditionsLegend\s+compact\s+arrival="share"/, "mounted for a shared arrival only");
+  assert.doesNotMatch(route, /orientation=\{/, "the homepage passes no orientation line");
+  assert.match(readFileSync("app/components/recordBand.tsx", "utf8"), /\{categorySentence\}/);
 });

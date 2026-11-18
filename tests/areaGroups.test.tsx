@@ -60,12 +60,14 @@ describe("buildAreaGroups", () => {
     assert.equal(near?.condition, "Pauses if risk appetite falls below 44.");
   });
 
-  it("puts the size of the move beside each condition", () => {
+  /* The points and what they are measured as (2026-11-18): "A rare move away" said
+     neither, and the trend after it counted points the sentence never gave. */
+  it("puts the distance in points beside each condition, and how big a one-month move that is", () => {
     const [held, near] = groups;
     const band = describeScoreMoveBand("tightness", 24);
     assert.ok(band, "the record sizes a 24-point move");
-    assert.equal(held?.distance, `${band?.charAt(0).toUpperCase()}${band?.slice(1)} away.`);
-    assert.match(near?.distance ?? "", /^An? .+ away\.$/);
+    assert.equal(held?.distance, `It is 24 points away, ${band?.replace(/ move$/, " one-month move")}.`);
+    assert.match(near?.distance ?? "", /^It is 4 points away, an? (?:common|unusual|rare|record) one-month move\.$/);
   });
 
   it("keeps a pause or a lift with the area it moved, and drops what the group already says", () => {
@@ -85,8 +87,8 @@ describe("buildAreaGroups", () => {
     const trend = (tightness: number) =>
       buildAreaGroups(ROWS, SCORES, { comparison: { scores: { tightness, riskAppetite: 48 }, since: "since Oct 19" } }).at(0)?.distance ?? "";
     assert.doesNotMatch(trend(90), /unchanged/, "the stamp line already says nothing moved");
-    assert.match(trend(94), /, 4 points closer since Oct 19\.$/, "falling toward a restart below 66");
-    assert.match(trend(89), /, 1 point farther since Oct 19\.$/);
+    assert.match(trend(94), /one-month move, and 4 points closer since Oct 19\.$/, "falling toward a restart below 66");
+    assert.match(trend(89), /one-month move, and 1 point farther since Oct 19\.$/);
     assert.doesNotMatch(buildAreaGroups(ROWS, SCORES).at(0)?.distance ?? "", /closer|farther|unchanged/, "nothing compared, no direction");
   });
 
@@ -194,12 +196,14 @@ describe("AreaGroups", () => {
     assert.match(opened, /aria-expanded="true" aria-controls="area-hiring-detail"[^>]*>Hiring<svg/);
     assert.ok(opened.indexOf("data-detail") > opened.indexOf("Rule for hiring"), "under the rule");
     assert.equal((opened.match(/data-detail/g) ?? []).length, 1, "one area open");
-    /* The glyph and the rule answer a tap too: the button's ::after spans the row's
-       header, which holds both, and not the detail under it, whose links must work. */
+    /* The rule answers a tap too: the button's ::after spans the row's header, which
+       holds it, and not the detail under it, whose links must work. */
     const row = opened.slice(opened.indexOf('id="area-hiring"'), opened.indexOf('id="area-capital-raising"'));
-    const header = row.slice(row.indexOf('<div class="col-span-2 grid grid-cols-subgrid group relative">'), row.indexOf("data-detail"));
-    /* The area's number since 2026-11-10, as the rows under the guidance give it; it was a stock stroke icon. */
-    assert.match(header, /^<div class="col-span-2 grid grid-cols-subgrid group relative"><span aria-hidden="true"[^>]*>1<\/span>/, "the number is inside the header");
+    const header = row.slice(row.indexOf('<div class="group relative">'), row.indexOf("data-detail"));
+    /* No number since 2026-11-18: split across groups, the rows' 1 to 5 read "1, 3, 4, 5"
+       under one heading and "2" under another, as if items were missing. */
+    assert.match(header, /^<div class="group relative"><p><button/, "the name opens the header");
+    assert.doesNotMatch(opened, /tabular-nums[^>]*>\d<\/span>/, "no area number in the groups");
     assert.match(header, /<button[^>]*class="[^"]*after:absolute after:inset-0[^"]*"/);
     assert.ok(header.indexOf("Rule for hiring") > 0 && header.indexOf("Rule for hiring") < header.lastIndexOf("</div>"), "and so is the rule");
     assert.doesNotMatch(header, /weather-hit/, "a positioned button would pin the ::after to itself");

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { LineStateIcon } from "../ui/conceptIcons";
 import { ActionLink } from "../ui/actionLink";
-import { decisionAreaOrder, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import type { AreaGroup } from "../../../lib/report/home/homeSectionModel";
 import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigation";
 
@@ -110,18 +110,16 @@ export function AreaGroups({
                   <li
                     key={entry.area}
                     id={`area-${entry.area}`}
-                    className="grid max-w-[68ch] grid-cols-[auto_minmax(0,1fr)] gap-x-2.5 gap-y-1 text-fluid-base leading-snug text-slate-200"
+                    className="max-w-[68ch] space-y-1 text-fluid-base leading-snug text-slate-200"
                   >
-                    {/* The glyph and the rule answer a tap as the name does (2026-11-03): only
-                        the name was the button, and a reader who learned the row opens tapped
-                        the glyph or the sentence and got nothing. The button's ::after spans
-                        this header, not the detail under it, so the detail's own links work. */}
-                    <div className={`col-span-2 grid grid-cols-subgrid ${onToggle ? "group relative" : ""}`}>
-                      {/* Centred on the bordered name when it is a button, on the first line of text when not. */}
-                      {/* The area's number, as the rows under the guidance give it. */}
-                      <span aria-hidden="true" className={`w-3 shrink-0 text-xs tabular-nums text-slate-400 ${onToggle ? "mt-2" : "mt-1.5"}`}>
-                        {decisionAreaOrder.indexOf(entry.area) + 1}
-                      </span>
+                    {/* The rule answers a tap as the name does (2026-11-03): only the name was
+                        the button, and a reader who learned the row opens tapped the sentence
+                        and got nothing. The button's ::after spans this header, not the detail
+                        under it, so the detail's own links work. */}
+                    {/* No number (2026-11-18). The rows under the guidance number the areas
+                        1 to 5; split across groups here, "1, 3, 4, 5" under one heading and
+                        "2" under another read as missing items. The names are the same. */}
+                    <div className={onToggle ? "group relative" : undefined}>
                       <p>
                         {onToggle ? (
                           <button
@@ -143,10 +141,10 @@ export function AreaGroups({
                         <span className={rulesAbove ? "lg:hidden" : undefined} data-area-group-rule>{sentence(entry.rule)}</span>
                       </p>
                     </div>
-                    {entry.changed ? <p className="col-start-2 text-fluid-sm text-slate-400">{entry.changed}</p> : null}
-                    {note ? <div className="col-start-2 empty:hidden">{note(entry.area)}</div> : null}
+                    {entry.changed ? <p className="text-fluid-sm text-slate-400">{entry.changed}</p> : null}
+                    {note ? <div className="empty:hidden">{note(entry.area)}</div> : null}
                     {open && detail ? (
-                      <div id={`area-${entry.area}-detail`} aria-live="polite" className="col-start-2">
+                      <div id={`area-${entry.area}-detail`} aria-live="polite">
                         {detail(entry.area)}
                       </div>
                     ) : null}

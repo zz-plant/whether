@@ -582,3 +582,28 @@ same thing every week.
 “By role →” opens the lead role's thread on Guides, with the remaining roles listed below
 it. The copy and the selection rule are in `app/guides/stakeholderGuides.ts`; the pairs are
 drawn by the same `HearingBubbles` component the role panels use.
+
+### First-screen clarity (2026-11-18)
+
+Six fixes to what a first visit could not read, from the owner's review of the live page.
+
+- **What the site is.** The category line (`categorySentence`, derived from `websiteName` in
+  `lib/seo.ts`) is in the record band's caption on every route and every visit, before the
+  week's guidance. It was a first-visit line under the band that a reader could dismiss
+  before reading it; the homepage now mounts `ConditionsLegend` only for a shared arrival's
+  greeting.
+- **A key to the band.** The caption names each condition the band draws beside a swatch of
+  its fill (§XXX), at every width: on a phone the lines are plain and the fill is the only cue.
+- **A close line is a note.** The band above the card draws a close pause line with the close
+  badge's neutral edge and the page's ink, keeping the dashed ring in the line-state ink; a
+  newly crossed line keeps the red. Its sentence is the rule in the reader's terms: "Roadmap:
+  pause long-payback bets if risk appetite falls below 44. It is 48 now."
+- **Whose lines the figures draw.** The two figures beside the guidance draw hiring's lines (the
+  first rule's), and say so: "Hiring paused above 76. Restarts only when below 66 and risk
+  appetite is above 54." beside "Clear of hiring’s pause at 44. Restart also needs above 54."
+  (`describeScoreFigureStanding`). "Clear" under "Freezing" read as a contradiction.
+- **No split numbering.** "Your decisions this week" groups the areas by condition and no
+  longer prints the strip's 1–5 beside them, which read as missing items once split.
+- **Distances in points.** A group's distance gives the points and what they are measured as:
+  "It is 4 points away, a common one-month move, and 5 points closer since Nov 9." It read
+  "A common move away, 5 points closer since Nov 9."

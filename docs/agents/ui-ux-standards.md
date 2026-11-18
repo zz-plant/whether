@@ -1087,7 +1087,13 @@ the frame.
 - MUST: keep the two records apart. The fields and lines are the month-end readings, scored with
   today's formula. The marks under the band are the briefs as published, one each, from a dashed
   line where publication began; a week with no brief has no mark. The caption counts each record
-  under its own name. Where a brief and its month-end name different conditions,
+  under its own name.
+- MUST: say what the site is and name the band's colours in its foot (2026-11-18), at every
+  width: the category line (`categorySentence`, `lib/seo.ts`), then a key with a swatch of each
+  condition's fill from the data-regime map, listing only the conditions the record holds, then
+  the two counts. On a phone the lines are plain, so the fill is the only cue; there was no key
+  at any width, and the category line was a dismissible first-visit line on the homepage under
+  the band, read after the band if at all. Where a brief and its month-end name different conditions,
   `findRecordDifferences` states both facts and claims no cause.
 - MUST: draw the still band on the server from the bundled month-end series, with no request and
   no script. The two client pieces read the band's own `data-months` attribute and take their

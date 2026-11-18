@@ -3,7 +3,6 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
-import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -67,6 +66,7 @@ import {
   describeEarlierConditions,
   buildAreaStrip,
   describeLineStateBand,
+  describeScoreFigureStanding,
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
@@ -393,6 +393,20 @@ async function PageContent({
       ],
     },
   ];
+  /* The two figures' sentences name the area whose lines they draw, the first rule's
+     (hiring), and say its restart whole: "Hiring paused above 76. Restarts only when
+     below 66 and risk appetite is above 54." Without the rule's lines the figures keep
+     their own wording. */
+  const figureStanding = (metric: "tightness" | "riskAppetite") =>
+    corridorRule && boundedConditions
+      ? describeScoreFigureStanding({
+          area: corridorRule.area,
+          metric,
+          pause: boundedConditions.pause,
+          resume: boundedConditions.resume,
+          scores: { tightness, riskAppetite },
+        })
+      : null;
   /* Only on a week the call moved: the last time it moved the same way, and
      what the scores did over the three months after. Null otherwise, and the
      section renders nothing rather than reaching for the nearest analogue. */
@@ -654,17 +668,17 @@ async function PageContent({
           <PublishedCallWatcher
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
-          <ConditionsLegend
-            compact
-            arrival={arrivedFromShare ? "share" : undefined}
-            /* On an archived week too (2026-10-27): the sentence is as true of March 2020
-               as of this week, a first visit can arrive on a shared archive link, and
-               leaving it out shrank the legend by a line, so on a first visit the week
-               stepper under it jumped up 62px on the first step back. */
-            orientation={homeOrientationLine}
-            currentRegime={historicalSelection ? undefined : regime}
-            thresholds={reportData.assessment.thresholds}
-          />
+          {/* The share greeting alone (2026-11-18). The category line it also carried for a
+              first visit is in the caption under the record band, on every visit, where no
+              dismissal can hide it before it is read and it comes before the week's data. */}
+          {arrivedFromShare ? (
+            <ConditionsLegend
+              compact
+              arrival="share"
+              currentRegime={historicalSelection ? undefined : regime}
+              thresholds={reportData.assessment.thresholds}
+            />
+          ) : null}
           {/* Browse the week before the call. Horizon and confidence details
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}
@@ -739,7 +753,7 @@ async function PageContent({
                 aside={
                   <div className="space-y-8" data-hero-scores>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)} />
                     ))}
                   </div>
                 }
@@ -767,7 +781,7 @@ async function PageContent({
                 phoneFigure={
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1" data-hero-scores-compact>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)} />
                     ))}
                     {/* The facts line's one link to the basis, which it carries from md up. */}
                     <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4">
