@@ -10,6 +10,8 @@ import {
   smoothRecordSeries,
 } from "../../lib/report/recordBandCodec";
 import type { RegimeKey } from "../../lib/types";
+import { monthsAfter } from "../../lib/monthCursor";
+import { followPageMonth } from "../components/monthCursor";
 
 /* Fourteen lines a bundle against the band's five, held to about the same depth. */
 const LINES = 14;
@@ -36,6 +38,10 @@ const MIN_WIDTH = 736;
  *
  * The element it renders is the marker record-band.css keys on (`data-record-plate`)
  * to give the band its height on this route, so the height is in the first paint.
+ *
+ * A month read elsewhere on the page (the year grid, the room-to-move chart, `[` and
+ * `]`) opens the plate at that month, as the pointer would, and lets it close when the
+ * month is let go (`monthCursor.tsx`). The pointer wins while it is over the plate.
  */
 export function RecordPlateCanvas() {
   useEffect(() => {
@@ -80,6 +86,7 @@ export function RecordPlateCanvas() {
     let lens = 0;
     let lensTarget = 0;
     let frame = 0;
+    let pointing = false;
 
     const draw = () => {
       frame = 0;
@@ -145,17 +152,32 @@ export function RecordPlateCanvas() {
     };
 
     const onMove = (event: PointerEvent) => {
+      pointing = true;
       pointerX = event.clientX - plate.getBoundingClientRect().left;
       lensTarget = 1;
       schedule();
     };
     const onLeave = () => {
+      pointing = false;
       lensTarget = 0;
+      schedule();
+    };
+    const firstDate = band.dataset.first ?? "";
+    const follow = (month: string | null) => {
+      if (pointing) return;
+      const index = month && firstDate ? monthsAfter(firstDate, month) : -1;
+      if (index >= 0 && index < months) {
+        pointerX = ((index + 0.5) / months) * plate.getBoundingClientRect().width;
+        lensTarget = 1;
+      } else {
+        lensTarget = 0;
+      }
       schedule();
     };
 
     const observer = new ResizeObserver(schedule);
     observer.observe(plate);
+    const stopFollowing = still ? () => undefined : followPageMonth(follow);
     if (!still) {
       plate.addEventListener("pointermove", onMove);
       plate.addEventListener("pointerleave", onLeave);
@@ -164,6 +186,7 @@ export function RecordPlateCanvas() {
     schedule();
 
     return () => {
+      stopFollowing();
       observer.disconnect();
       plate.removeEventListener("pointermove", onMove);
       plate.removeEventListener("pointerleave", onLeave);

@@ -4,6 +4,7 @@ import { formatMonthShortUtc } from "../../../lib/formatters";
 import { ConditionIcon, ConditionWord } from "../ui/conceptIcons";
 import { HistoryReadout } from "./historyReadout";
 import { ScreenshotCaption } from "../screenshotCaption";
+import { toMonthKey } from "../../../lib/monthCursor";
 
 const MONTHS = Array.from({ length: 12 }, (_unused, index) => index + 1);
 const MONTH_LONG = new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" });
@@ -32,6 +33,10 @@ const glyphInk = (regime: Parameters<typeof isLightField>[0]) =>
  * the line above the grid (`HistoryReadout`). One tab stop, the newest month; the
  * arrow keys move through the rest. The key under it is also the count of months
  * under each condition, which the page printed as its own line.
+ *
+ * Each cell carries its month (`data-month`, `lib/monthCursor.ts`), so a month read
+ * anywhere on the page (the record band, the room-to-move chart, `[` and `]`) is
+ * outlined here and named in the line above, as if pointed at (month-active.css).
  */
 export function ConditionsByYear({
   calendar,
@@ -104,8 +109,7 @@ export function ConditionsByYear({
                         aria-label={cell.label}
                         data-readout-text={cell.label}
                         data-date={cell.recordDate}
-                        data-year={cell.year}
-                        data-month={cell.month}
+                        data-month={toMonthKey(cell.year, cell.month)}
                         tabIndex={cell.recordDate === newest ? 0 : -1}
                         className="group block touch-manipulation px-[1.5px] py-[3px] pointer-coarse:py-1"
                       >

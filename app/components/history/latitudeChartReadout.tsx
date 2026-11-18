@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { MonthKey } from "../../../lib/monthCursor";
+import { followPageMonth, setPageMonth } from "../monthCursor";
 
 /**
  * The room-to-move chart as a slider (2026-11-18), on the record band's model
@@ -13,6 +15,10 @@ import { useEffect, useRef } from "react";
  * and height are on its link in the server-drawn chart (`data-readout-text`, `href`,
  * `data-top`). With scripts off the chart is a picture whose months are links. The
  * plot keeps `touch-action: pan-y`, so a vertical swipe on a phone still scrolls.
+ *
+ * Its month is the page's (`monthCursor.tsx`): moving along the plot sets it, and a
+ * month set anywhere else (the record band, the year grid, `[` and `]`) reads out
+ * here as if pointed at, and goes when that month is let go.
  */
 export function LatitudeChartReadout() {
   const anchor = useRef<HTMLSpanElement>(null);
@@ -31,6 +37,11 @@ export function LatitudeChartReadout() {
 
     const imageLabel = plot.getAttribute("aria-label");
     let current = count - 1;
+    /* The month read out now, if any. */
+    let shown: MonthKey | null = null;
+    /* True while the chart follows a month set elsewhere: it moves and says nothing back. */
+    let following = false;
+    const monthAt = (index: number) => months[index]?.dataset.month ?? null;
 
     const textAt = (index: number) => months[index]?.dataset.readoutText ?? "";
     const show = (index: number) => {
@@ -47,12 +58,25 @@ export function LatitudeChartReadout() {
       dot.hidden = false;
       plot.setAttribute("aria-valuenow", String(current + 1));
       plot.setAttribute("aria-valuetext", text);
+      shown = monthAt(current);
+      if (!following) setPageMonth(shown);
     };
     const clear = () => {
       live.hidden = true;
       rest.hidden = false;
       cursor.hidden = true;
       dot.hidden = true;
+      const had = shown;
+      shown = null;
+      if (!following && had) setPageMonth(null);
+    };
+    const follow = (month: MonthKey | null) => {
+      if (month === shown) return;
+      const index = month ? months.findIndex((item) => item.dataset.month === month) : -1;
+      following = true;
+      if (index < 0) clear();
+      else show(index);
+      following = false;
     };
     const open = () => {
       const href = months[current]?.getAttribute("href");
@@ -85,6 +109,7 @@ export function LatitudeChartReadout() {
     };
     const onFocus = () => show(current);
 
+    const stopFollowing = followPageMonth(follow);
     plot.addEventListener("pointermove", onMove);
     plot.addEventListener("pointerdown", onMove);
     plot.addEventListener("pointerleave", clear);
@@ -93,6 +118,7 @@ export function LatitudeChartReadout() {
     plot.addEventListener("focus", onFocus);
     plot.addEventListener("blur", clear);
     return () => {
+      stopFollowing();
       plot.removeEventListener("pointermove", onMove);
       plot.removeEventListener("pointerdown", onMove);
       plot.removeEventListener("pointerleave", clear);
@@ -105,6 +131,7 @@ export function LatitudeChartReadout() {
       }
       plot.setAttribute("role", "img");
       if (imageLabel) plot.setAttribute("aria-label", imageLabel);
+      following = true;
       clear();
     };
   }, []);

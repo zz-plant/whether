@@ -95,6 +95,7 @@ export function LatitudeChart({ chart }: { chart: LatitudeChartModel }) {
                     tabIndex={-1}
                     aria-label={point.readout}
                     data-index={index}
+                    data-month={point.recordDate.slice(0, 7)}
                     data-top={topShare(point.value).toFixed(2)}
                     data-readout-text={point.readout}
                   >

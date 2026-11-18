@@ -3,6 +3,7 @@ import { ConditionLabel } from "../ui/conceptIcons";
 import { MarkReadout } from "../ui/markReadout";
 import type { SpellLengthPlot as SpellLengthPlotModel } from "../../../lib/report/lastTimeCallChanged";
 import { buildTimeMachineHref } from "../../../lib/timeMachine/timeMachineSelection";
+import { shiftMonthKey, toMonthKey } from "../../../lib/monthCursor";
 
 /**
  * How long each stretch of conditions lasted, drawn (2026-11-18): one row per
@@ -22,6 +23,11 @@ import { buildTimeMachineHref } from "../../../lib/timeMachine/timeMachineSelect
  * (§XVII), and a mark is placed by its share of the axis. Each mark is a link to the
  * stretch's first month in the time machine; hover, focus or a tap names it
  * (`MarkReadout`).
+ *
+ * Each mark carries the months its stretch held (`data-month-from`, `data-month-to`,
+ * `lib/monthCursor.ts`): pointing at one shows its first month across the page, and
+ * a month read anywhere else (the record band, `[` and `]`) rings the stretch that
+ * held it (month-active.css).
  */
 
 /** Marks closer than this share of the axis share a row's width, so they split it top and bottom. */
@@ -82,6 +88,8 @@ export function SpellLengthPlot({ plot }: { plot: SpellLengthPlotModel }) {
                     const lane = lanes[index] ?? "middle";
                     /* The plot's one tab stop is its first mark; arrow keys reach the rest. */
                     const tabIndex = rowIndex === 0 && index === 0 ? 0 : -1;
+                    /* The record is a month-end a month, so a stretch of n months ends n - 1 after it starts. */
+                    const from = toMonthKey(stretch.start.year, stretch.start.month);
                     return (
                       <a
                         key={`${stretch.start.year}-${stretch.start.month}`}
@@ -90,6 +98,8 @@ export function SpellLengthPlot({ plot }: { plot: SpellLengthPlotModel }) {
                         aria-label={stretch.label}
                         data-mark={stretch.label}
                         data-spell-plot-mark={stretch.latest ? "latest" : "ended"}
+                        data-month-from={from}
+                        data-month-to={shiftMonthKey(from, stretch.months - 1)}
                         className={`group absolute flex w-5 -translate-x-1/2 justify-center ${LANE_BOX[lane]} ${lane === "middle" ? "items-center" : ""}`}
                         style={{ left: share(stretch.months, plot.axisMax) }}
                       >
