@@ -6,7 +6,21 @@ import { DecisionPicker, type DecisionPickerOption } from "../app/components/hom
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
-import { buildAreaGroups, buildHomeDecisionCookie, parseHomeDecision, readHomeDecisionCookie } from "../lib/report/home/homeSectionModel";
+import {
+  buildAreaGroups,
+  buildHomeDecisionCookie,
+  buildHomeViewHref,
+  buildSharedBriefQuery,
+  parseHomeDecision,
+  readHomeDecisionCookie,
+  resolveHomeDecision,
+} from "../lib/report/home/homeSectionModel";
+import { carrySharedView } from "../lib/report/briefArtifact";
+import { areasMovedBy } from "../lib/report/signalFlow";
+import { AreaGroups } from "../app/components/home/AreaGroups";
+import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
+import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import type { ScoreMoveHistogram } from "../lib/report/marketMoveScale";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
 
@@ -191,17 +205,22 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     assert.equal(parseHomeDecision("hiring"), "hiring");
     assert.equal(parseHomeDecision("payroll"), undefined);
     assert.equal(parseHomeDecision(undefined), undefined);
+    /* A link's decision wins, then the reader's last choice. */
+    assert.equal(resolveHomeDecision({ decision: "roadmap" }, "hiring"), "hiring", "a slug that is not an area falls to the cookie");
+    assert.equal(resolveHomeDecision({ decision: "product-tempo" }, "hiring"), "product-tempo");
+    assert.equal(resolveHomeDecision({}, "hiring"), "hiring");
+    assert.equal(resolveHomeDecision(undefined, null), undefined);
     const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
-    assert.match(
-      page,
-      /initialSelected=\{parseHomeDecision\(searchParams\?\.\[HOME_DECISION_PARAM\]\) \?\? data\.operatorContext\.decisionArea \?\? undefined\}/,
-      "a link's decision wins, then the reader's last choice",
-    );
+    assert.match(page, /const chosenArea = resolveHomeDecision\(searchParams, data\.operatorContext\.decisionArea\);/);
+    assert.match(page, /initialSelected=\{chosenArea\}/, "the picker opens on the area the rest of the page follows");
     const picker = readFileSync(new URL("../app/components/home/DecisionPicker.tsx", import.meta.url), "utf8");
-    assert.match(picker, /url\.searchParams\.set\(HOME_DECISION_PARAM, area\)/);
-    assert.match(picker, /url\.searchParams\.delete\(HOME_DECISION_PARAM\)/, "closing the area takes it out of the URL");
-    assert.match(picker, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
+    const views = readFileSync(new URL("../app/components/home/homeView.tsx", import.meta.url), "utf8");
+    assert.match(picker, /showHomeView\(HOME_DECISION_PARAM, area\)/, "a choice goes to the URL through the page's views");
+    assert.match(views, /url\.searchParams\.set\(key, value\)/);
+    assert.match(views, /url\.searchParams\.delete\(key\)/, "closing the area takes it out of the URL");
+    assert.match(views, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
     assert.match(picker, /document\.cookie = buildHomeDecisionCookie\(area\)/, "and is kept for the next visit");
+    assert.match(picker, /if \(area\) announceDecision\(area\)/, "and the conditions chart hears it");
     assert.match(picker, /calibrationParts/, "includes stage and runway calibration context in the Slack takeaway artifact");
   });
 
@@ -212,5 +231,105 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     assert.equal(readHomeDecisionCookie(null), null);
     assert.match(buildHomeDecisionCookie("hiring"), /^whether-home-decision=hiring; path=\/; max-age=\d+; SameSite=Lax$/);
     assert.equal(buildHomeDecisionCookie(null), "whether-home-decision=; path=/; max-age=0; SameSite=Lax", "closing it forgets it");
+  });
+});
+
+/*
+ * One area through the page (2026-11-18). The area open on `/` (`?decision=`, else the
+ * cookie) is what the sections below the card follow: the rows of "What changed" that move
+ * it say so and the rest take the lower ink, the one-month bars mark its move, and Copy
+ * brief's link opens on it. Nothing hypothetical rides along.
+ */
+describe("the area open runs through the page", () => {
+  it("names the areas each row of signals moves, by the feeds the /signals diagram draws", () => {
+    assert.deepEqual(areasMovedBy("tightness"), ["hiring", "capital-raising", "burn-discipline"]);
+    assert.deepEqual(areasMovedBy("riskAppetite"), ["product-tempo", "capital-raising", "expansion-bets"]);
+    assert.deepEqual(areasMovedBy("baseRate", 4.1), areasMovedBy("tightness"), "the rate moves what funding pressure sets");
+    assert.deepEqual(areasMovedBy("curveSlope", 0.29), areasMovedBy("riskAppetite"), "the curve sets risk appetite");
+    assert.deepEqual(
+      [...areasMovedBy("curveSlope", -0.4)].sort(),
+      [...new Set([...areasMovedBy("riskAppetite"), ...areasMovedBy("tightness")])].sort(),
+      "and adds to funding pressure only below zero",
+    );
+  });
+
+  const rows: SignalChangeRow[] = [
+    { key: "riskAppetite", label: "Risk appetite", value: 44, valueLabel: "44", previous: 53, previousLabel: "53", delta: -9, increaseIsPositive: true },
+    { key: "tightness", label: "Funding pressure", value: 90, valueLabel: "90", previous: 88, previousLabel: "88", delta: 2, increaseIsPositive: false },
+    { key: "curveSlope", label: "Recession warning gauge", value: 0.29, valueLabel: "0.29", previous: 0.32, previousLabel: "0.32", delta: -0.03, increaseIsPositive: true },
+  ];
+
+  it("marks the rows of What changed that move the open area, quiets the rest, and hides nothing", () => {
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={rows} comparisonUnavailable={false} compact followsArea chosenArea="product-tempo" />,
+    );
+    assert.match(html, /class="group\/chosen" data-chosen="product-tempo"/);
+    const funding = html.slice(html.indexOf('data-signal="tightness"'), html.indexOf('data-signal="curveSlope"'));
+    assert.match(funding, /group-data-\[chosen=product-tempo\]\/chosen:text-slate-400/, "funding pressure does not move Roadmap, so it takes the lower ink then");
+    assert.doesNotMatch(funding, /group-data-\[chosen=hiring\]\/chosen:text-slate-400/, "and keeps its ink for an area it moves");
+    const curve = html.slice(html.indexOf('data-signal="curveSlope"'));
+    assert.match(curve, /data-moves-area="product-tempo"[^>]*>Moves <a href="#area-product-tempo"/, "an input that moves the area says so in its own line");
+    assert.equal((html.match(/data-signal=/g) ?? []).length, 3, "no row is hidden");
+    assert.match(html, /group-data-\[chosen=product-tempo\]\/chosen:font-semibold/, "the area's name in an Affects line takes full weight while open");
+  });
+
+  it("changes nothing in What changed while no area is open, and nothing off the brief", () => {
+    const none = renderToStaticMarkup(<WhatChangedSection rows={rows} comparisonUnavailable={false} compact followsArea />);
+    assert.match(none, /data-chosen=""/);
+    assert.doesNotMatch(none, /data-moves-area/);
+    const elsewhere = renderToStaticMarkup(<WhatChangedSection rows={rows} comparisonUnavailable={false} compact />);
+    assert.doesNotMatch(elsewhere, /data-chosen|group-data-\[chosen/);
+  });
+
+  const move = (points: number): ScoreMoveHistogram => ({
+    score: "tightness",
+    points,
+    band: "a rare",
+    changes: 4,
+    atLeast: 1,
+    since: 2012,
+    bins: [
+      { size: 0, count: 2, label: "2 months did not move", latest: null },
+      { size: 1, count: 1, label: "1 month moved 1 point", latest: "2020-03-31" },
+      { size: 2, count: 1, label: "1 month moved 2 points", latest: "2022-06-30" },
+    ],
+    caption: "4 one-month moves since 2012",
+  });
+
+  it("draws the one-month bars beside the open area's group, else beside the first that sizes a move", () => {
+    const groups = [
+      { state: "crossed" as const, status: "On hold", condition: "No restart until funding pressure falls below 66.", distance: "It is 2 points away.", history: null, move: move(2), areas: [{ area: "hiring" as const, label: "Hiring", rule: "Hold" }] },
+      { state: "near" as const, status: "Close to pausing", condition: "Pauses if risk appetite falls below 44.", distance: "It is 1 point away.", history: null, move: move(1), areas: [{ area: "product-tempo" as const, label: "Roadmap", rule: "Ship" }] },
+    ];
+    const beside = (selected?: "hiring" | "product-tempo") => {
+      const html = renderToStaticMarkup(<AreaGroups groups={groups} selected={selected} />);
+      return html.slice(0, html.indexOf("data-score-move-bars")).lastIndexOf("<section") === html.indexOf("<section") ? "first" : "second";
+    };
+    assert.equal(beside(), "first");
+    assert.equal(beside("product-tempo"), "second");
+    assert.equal(beside("hiring"), "first");
+    const html = renderToStaticMarkup(<AreaGroups groups={groups} selected="hiring" />);
+    assert.match(html, /data-month="2020-03"/, "each linked bar carries its month");
+    assert.match(html, /data-month="2022-06"/);
+  });
+
+  it("carries the open area on the shared link as the copy is made, and nothing else", () => {
+    const sharedUrl = "https://whether.work/brief/2026-w46?ref=share";
+    const block = `*Whether Weekly Brief — Nov 16, 2026*\n> *Guidance:* Hold hiring.\nFull brief: ${sharedUrl}`;
+    const carried = carrySharedView(block, sharedUrl, buildSharedBriefQuery("hiring"));
+    assert.equal(carried.url, "https://whether.work/brief/2026-w46?ref=share&decision=hiring");
+    assert.equal(carried.text, block.replace(sharedUrl, carried.url), "the words do not change");
+    assert.deepEqual(carrySharedView(block, sharedUrl, buildSharedBriefQuery(undefined)), { text: block, url: sharedUrl });
+    assert.deepEqual(buildSharedBriefQuery("product-tempo"), { decision: "product-tempo" });
+    assert.equal(carrySharedView(block, sharedUrl, { ref: "elsewhere" }).url, sharedUrl, "the share mark is not overwritten");
+    const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+    assert.match(page, /carryArea=\{\{ initial: chosenArea \?\? null \}\}/);
+    assert.doesNotMatch(page, /carryArea=[^\n]*counted/, "the chart's counted reading never rides along");
+  });
+
+  it("links a view of the page while keeping the rest of its query", () => {
+    assert.equal(buildHomeViewHref({ decision: "hiring", cadence: "monthly" }, { compare: "2022-03" }, "last-change"), "/?decision=hiring&cadence=monthly&compare=2022-03#last-change");
+    assert.equal(buildHomeViewHref({ decision: "hiring", trail: "since-2012" }, { trail: null }), "/?decision=hiring");
+    assert.equal(buildHomeViewHref(undefined, { trail: null }), "/");
   });
 });

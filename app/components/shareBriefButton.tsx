@@ -1,5 +1,8 @@
 "use client";
 
+import { carrySharedView } from "../../lib/report/briefArtifact";
+import { HOME_DECISION_PARAM, buildSharedBriefQuery, parseHomeDecision } from "../../lib/report/home/homeSectionModel";
+import { useHomeView } from "./home/homeView";
 import { useHydrated } from "./browserSource";
 import { ClipboardActionRow } from "./clipboardActionRow";
 import { CheckIcon, ShareIcon, SpinnerIcon } from "./uiIcons";
@@ -27,6 +30,13 @@ type Props = {
    *  `/`, and a second control under that same name is the duplicate it ruled out. */
   label?: string;
   copiedLabel?: string;
+  /**
+   * On `/` (2026-11-18): the link opens on the area the reader has open (`?decision=`),
+   * read as the copy is made, since the picker can open another after the page loads.
+   * `initial` is the area the server rendered open. Only the area: nothing else the page
+   * shows (a compared change, the chart's counted reading) travels in a paste.
+   */
+  carryArea?: { initial: string | null };
 };
 
 export function ShareBriefButton({
@@ -39,7 +49,9 @@ export function ShareBriefButton({
   showLabel = false,
   label = "Copy brief",
   copiedLabel = "Brief copied",
+  carryArea,
 }: Props) {
+  const areaOpen = parseHomeDecision(useHomeView(carryArea ? HOME_DECISION_PARAM : "", carryArea?.initial ?? null) ?? undefined);
   /*
    * The copy path was `void navigator.clipboard.writeText(text)` in a try/catch
    * whose catch could never fire — `void` makes a rejected write an unhandled
@@ -75,17 +87,21 @@ export function ShareBriefButton({
     // "Whether Weekly Brief" — the wrong horizon on a message people act on.
     const formattedSlackBrief =
       slackBlock ?? `*${title}*\n> *Guidance:* ${payload.text}\n\n*Full brief:* ${url || "https://whether.work"}`;
+    /* The link opens on the area open now; the words are the brief's, unchanged. */
+    const carried = carryArea ? carrySharedView(formattedSlackBrief, url, buildSharedBriefQuery(areaOpen)) : null;
+    const copied = carried?.text ?? formattedSlackBrief;
     if (offersShare) {
       /* Closing the sheet is a choice, not a failure. Any other refusal (no user
          gesture left, a share target that errored) falls back to the copy, which
          reports its own outcome. */
-      navigator.share(payload).catch((error: unknown) => {
+      const sharePayload = carried ? { ...payload, text: carrySharedView(payload.text, url, buildSharedBriefQuery(areaOpen)).text, url: carried.url } : payload;
+      navigator.share(sharePayload).catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
-        void copyToClipboard(formattedSlackBrief, "share-brief");
+        void copyToClipboard(copied, "share-brief");
       });
       return;
     }
-    void copyToClipboard(formattedSlackBrief, "share-brief");
+    void copyToClipboard(copied, "share-brief");
   };
 
   /* The shared row, so this button and the slide button beside it are one
