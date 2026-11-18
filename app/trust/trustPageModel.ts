@@ -14,6 +14,8 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { loadCronRunHistory } from "../../lib/telemetry/runHistory";
 import { formatActivationFunnelLine } from "../../lib/telemetry/activationFunnelReport";
 import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivationFunnel";
+import { evaluateRegime } from "../../lib/regimeEngine";
+import { buildScoreComposition } from "../../lib/report/scoreComposition";
 
 
 export async function buildTrustPageModel() {
@@ -144,8 +146,24 @@ export async function buildTrustPageModel() {
     },
   };
 
+  /* This week's scores split by input, for "How the scores are built": the
+     engine's own stages over the inputs this reading was scored from, and the
+     source board's Treasury link for the rate terms. */
+  const scoreComposition = buildScoreComposition({
+    assessment: reportData.assessment,
+    treasury: reportData.treasury,
+    macroSeries: reportData.macroSeries,
+    treasurySource: {
+      label: reportData.treasuryProvenance.sourceLabel,
+      url: reportData.treasuryProvenance.sourceUrl,
+    },
+    scoringBasis: reportData.scoringBasis,
+    evaluate: evaluateRegime,
+  });
+
   return {
     reportData,
+    scoreComposition,
     isFallback,
     degradedSourceRows,
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),

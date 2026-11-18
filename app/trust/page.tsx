@@ -37,6 +37,7 @@ export default async function MethodPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const {
     reportData,
+    scoreComposition,
     isFallback,
     sourceBoardRows,
     warnings,
@@ -155,6 +156,7 @@ export default async function MethodPage({
         />
         <FormulaReference
           scoringBasis={reportData.scoringBasis}
+          composition={scoreComposition}
           plainLanguageFolded={!isFallback && warnings.length === 0}
           plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
         />
