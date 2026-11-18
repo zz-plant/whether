@@ -99,6 +99,7 @@ Machine-discovery routes:
 
 - `GET /llms.txt` provides a plain-text integration guide for autonomous agents.
 - `GET /.well-known/whether-agent.json` provides a machine-readable JSON manifest (endpoints, cadences, MCP tools).
+- `GET /.well-known/api-catalog` is the RFC 9727 catalog: it points to `/openapi.json` (OpenAPI 3.1 for the HTTP reads) and `/api-docs`, and to the manifest for the MCP server. Served by `worker/index.ts` from `lib/agent/apiCatalog.ts`.
   It is served from `worker/index.ts`, not from a route under `app/` — vinext enumerates App Router
   files with Node's `glob`, where `*` skips a leading dot, so a route under `app/.well-known/` is
   never registered and 404s. It did, in production, for as long as it existed. The manifest body

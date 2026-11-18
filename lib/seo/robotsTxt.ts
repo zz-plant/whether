@@ -1,4 +1,4 @@
-import { WHETHER_AGENT_MANIFEST_PATH, buildAgentEndpoints } from "../agent/discovery";
+import { API_CATALOG_PATH, WHETHER_AGENT_MANIFEST_PATH, buildAgentEndpoints } from "../agent/discovery";
 import { siteUrl } from "../siteUrl";
 
 /*
@@ -39,6 +39,7 @@ const ALLOWED_PATHS = [
     WHETHER_AGENT_MANIFEST_PATH,
     "/.well-known/webmcp.json",
     "/.well-known/mcp.json",
+    API_CATALOG_PATH,
     "/llms.txt",
     "/llms-full.txt",
     "/auth.md",

@@ -13,6 +13,12 @@
 
 export const WHETHER_AGENT_MANIFEST_PATH = "/.well-known/whether-agent.json";
 
+/* The RFC 9727 API catalog, served by the Worker (`lib/agent/apiCatalog.ts`), and the OpenAPI
+   document it names as the HTTP API's `service-desc` (`lib/agent/openApi.ts`). */
+export const API_CATALOG_PATH = "/.well-known/api-catalog";
+export const OPENAPI_PATH = "/openapi.json";
+export const API_DOCS_PATH = "/api-docs";
+
 /* `full` is the whole brief and stays the default; `state` is the compact answer an agent
    decides from (`lib/agentState.ts`), about a tenth the size; `changes` is whether the
    published call changed since a week the caller names (`lib/agent/publishedChanges.ts`). */
@@ -41,6 +47,7 @@ export const buildAgentEndpoints = (baseUrl: string) => ({
   yearly: `${baseUrl}/api/yearly`,
   cadence: `${baseUrl}/api/cadence`,
   treasury: `${baseUrl}/api/treasury`,
+  openapi: `${baseUrl}${OPENAPI_PATH}`,
 });
 
 /* Where to begin, by surface. The state is a tenth the size of the full brief and is what to

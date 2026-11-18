@@ -139,11 +139,13 @@ describe("every place an agent learns what to call", () => {
     assert.equal(manifest.start.mcp, `tools/call ${AGENT_START_TOOL}`);
     assert.ok(startHere.includes(`${manifest.mcp.endpoint} (`) && startHere.includes(`Call ${AGENT_START_TOOL} first.`));
 
-    // Every place /llms.txt's discovery list names is the manifest, the homepage, or a manifest endpoint.
+    // Every place /llms.txt's discovery list names is the manifest, the API catalog, the homepage, or a manifest endpoint.
     const discovery = [...llms.slice(llms.indexOf("## Discovery")).matchAll(/^- [^:]+: (\S+)$/gm)].map((match) => match[1]);
     assert.deepEqual(discovery, [
       `https://whether.work${WHETHER_AGENT_MANIFEST_PATH}`,
       "https://whether.work/.well-known/webmcp.json",
+      "https://whether.work/.well-known/api-catalog",
+      manifest.endpoints.openapi,
       "https://whether.work/",
       manifest.endpoints.brief,
       manifest.endpoints.agent,
