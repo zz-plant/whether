@@ -3,6 +3,7 @@ import { ReportSection } from "../reportSection";
 import {
   confidenceCalibration,
   confidenceCalibrationTotals,
+  formatCalibrationGroup,
 } from "../../../lib/report/confidenceCalibration";
 import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift";
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
@@ -36,8 +37,8 @@ const CONFIDENCE_RECORD_TITLE = "How often conditions held near a change";
 
 const percentFormat = (value: number) => `${Math.round(value)}%`;
 
-const bandLabel = (from: number, to: number | null) =>
-  to === null ? `${from} or more` : `${from} to ${to}`;
+/* "0 to 5", "37 or more": the wording /trust's choice of distances prints too. */
+const bandLabel = (from: number, to: number | null) => formatCalibrationGroup({ from, to });
 
 /** "2 of 2", "8 of 9" — with "and" before the last item when there is more than one. */
 const listClauses = (clauses: string[]) => {

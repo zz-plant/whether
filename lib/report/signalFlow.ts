@@ -20,7 +20,7 @@ type ScoreKey = Extract<RegimeSignalKey, "tightness" | "riskAppetite">;
 const SIGNAL_FEEDS: readonly { from: InputKey; to: ScoreKey; condition: string | null; onlyBelowZero?: true }[] = [
   { from: "baseRate", to: "tightness", condition: null },
   { from: "curveSlope", to: "riskAppetite", condition: null },
-  { from: "curveSlope", to: "tightness", condition: "once inverted (short-term rates above long-term)", onlyBelowZero: true },
+  { from: "curveSlope", to: "tightness", condition: "only while the 10-year rate is below the 2-year", onlyBelowZero: true },
 ];
 
 const SCORE_KEYS: readonly ScoreKey[] = ["tightness", "riskAppetite"];
@@ -145,7 +145,7 @@ export const buildSignalFlow = (rows: readonly SignalReferenceRow[], since: stri
     edges,
     reach,
     caption:
-      "Each market input feeds a score, and each score sets the pause and restart lines of three areas. Dashed: only once the curve is inverted." +
+      "Each market input feeds a score, and three areas pause or restart on each score. Dashed: only while the Recession warning gauge is below zero." +
       (moved ? ` An arrow beside a signal is its move since ${since}.` : ""),
   };
 };

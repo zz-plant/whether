@@ -372,7 +372,9 @@ describe("inputs to scores to areas", () => {
     assert.match(html, /<a href="#baseRate"[^>]*data-signal-flow-node="baseRate"/);
     assert.doesNotMatch(html, /data-governs=/, "no visible Affects line beside the diagram");
     assert.match(html, /<span class="sr-only">Affects: Hiring, Fundraising, Spending\.<\/span>/);
-    assert.match(html, /<span class="sr-only">Feeds into Risk appetite, and Funding pressure once inverted \(short-term rates above long-term\)\.<\/span>/);
+    /* The feed's condition as a relation between two rates a reader can check, not "once inverted" (2026-11-18). */
+    assert.match(html, /<span class="sr-only">Feeds into Risk appetite, and Funding pressure only while the 10-year rate is below the 2-year\.<\/span>/);
+    assert.match(html, /three areas pause or restart on each score\. Dashed: only while the Recession warning gauge is below zero\./);
     /* Moved since Nov 9: risk appetite and the rate carry their arrow; funding pressure did not move. */
     const node = (key: string) => html.slice(html.indexOf(`data-signal-flow-node="${key}"`), html.indexOf("</a>", html.indexOf(`data-signal-flow-node="${key}"`)));
     assert.match(node("riskAppetite"), /, fell since Nov 9/);

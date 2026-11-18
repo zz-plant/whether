@@ -344,7 +344,7 @@ const MARKS_PER_ROW = 30;
  * shows that month on the record band, and a month read on the band, or stepped to
  * with `[` and `]`, rings its square here (month-active.css).
  */
-function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
+export function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
   const firstYear = marks[0]?.asOf.slice(0, 4);
   const oneRow = marks.length <= MARKS_PER_ROW;
   return (

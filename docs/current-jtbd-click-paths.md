@@ -52,7 +52,7 @@ Navigation (regrouped 2026-10-08; see `docs/decisions/feature-log/01-product-sur
 **Clicks**
 1. Click `Why it changed` in the `This week` tab row (`/signals`), or follow the link from `What changed this week` on `/`.
 2. Read `What changed` and `What would change our mind`.
-3. Under `Deeper evidence`, open the question you need, such as `What are interest rates doing?`, `How have the two scores moved this year?` or `What would conditions be with different lines?`.
+3. Under `Deeper evidence`, open the question you need, such as `What are interest rates doing?`, `How have the two scores moved this year?` or `What would conditions be with different lines or inputs?` (which inputs count, as well as the lines).
 4. For provenance, click `How much to trust this week` in the tab row, or `How this is judged` on the call card.
 5. On `/trust`, read `How the scores are built` and `Sources and last update`. In a week with live data and no active warning, `Limits, and what would change the guidance` folds `Margin and reliability limits` and `What would make this recommendation wrong?`; in any other week they render open. The citation and the meeting snippet are `/share` formats.
 

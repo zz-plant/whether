@@ -2,9 +2,14 @@ import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
+  buildCalibrationChoice,
+  buildCalibrationChoiceHref,
   calibrationForDistance,
+  calibrationGroupFor,
   confidenceCalibration,
   confidenceCalibrationTotals,
+  formatCalibrationDistance,
+  formatCalibrationGroup,
 } from "../lib/report/confidenceCalibration";
 import { resolveConfidencePercentFromDistance } from "../lib/report/confidence";
 
@@ -77,6 +82,81 @@ describe("confidence calibration", () => {
     const rates = populated.map((bucket) => bucket.held / bucket.months);
     const monotone = rates.every((rate, index) => index === 0 || rate >= rates[index - 1]);
     assert.ok(!monotone, "hold rate now rises with distance; the /trust copy needs revisiting");
+  });
+});
+
+/*
+ * /trust lets a reader pick a distance and see how often conditions held there, beside the
+ * strip that quotes this week's distance alone. The groups are the strip's own: picked by
+ * default where the strip looks, counted from the same entries, and said in its words.
+ */
+describe("buildCalibrationChoice", () => {
+  const populated = confidenceCalibration().filter((bucket) => bucket.months > 0);
+
+  it("offers every group with month-ends, named as /calibration's table names them", () => {
+    const choice = buildCalibrationChoice({ distance: 12, requested: undefined });
+    assert.deepEqual(choice.map((group) => group.from), populated.map((bucket) => bucket.from));
+    assert.equal(formatCalibrationGroup({ from: 10, to: 20 }), "10 to 20");
+    assert.equal(formatCalibrationDistance({ from: 10, to: 20 }), "10 to 20 points");
+    assert.equal(formatCalibrationDistance({ from: 37, to: null }), "37 or more points");
+    for (const group of choice) {
+      assert.equal(group.entries.length, group.months, "one entry per month counted");
+      assert.equal(group.entries.filter((entry) => entry.next === entry.regime).length, group.held);
+      assert.match(group.sentence, new RegExp(`^[A-Z][a-z ]+: conditions held ${group.held} of ${group.months} months at ${group.label}\\.$`));
+    }
+  });
+
+  /* The answer first, as a person would say it, then the count: never a chance. */
+  it("answers how often in a word before the count", () => {
+    for (const group of buildCalibrationChoice({ distance: 0, requested: undefined })) {
+      const lead = group.sentence.split(":")[0];
+      if (group.held === group.months) assert.equal(lead, "Every month");
+      else if (group.held / group.months >= 0.7) assert.equal(lead, "Mostly");
+      assert.doesNotMatch(group.sentence, /\b(likely|chance|odds|probability|confidence)\b/i);
+    }
+  });
+
+  it("links each group to its URL, the default one without the key, keeping the rest of the query", () => {
+    const [first, second] = buildCalibrationChoice({ distance: 0, requested: undefined });
+    assert.ok(first && second);
+    assert.equal(first.isDefault, true);
+    assert.equal(
+      buildCalibrationChoiceHref({ path: "/trust", params: { derivation: "1", distance: String(second.from) }, group: first, extra: { sources: "1" } }),
+      "/trust?derivation=1&sources=1#distance-held",
+    );
+    assert.equal(
+      buildCalibrationChoiceHref({ path: "/trust", params: undefined, group: second }),
+      `/trust?distance=${second.from}#distance-held`,
+    );
+  });
+
+  it("picks this week's group, the one the strip quotes, unless the URL names another", () => {
+    const strip = calibrationForDistance(12);
+    const byDefault = buildCalibrationChoice({ distance: 12, requested: undefined });
+    const picked = byDefault.filter((group) => group.selected);
+    assert.equal(picked.length, 1);
+    assert.equal(picked[0]?.from, strip?.from);
+    assert.equal(picked[0]?.thisWeek, true);
+    assert.equal(calibrationGroupFor(12), strip?.from);
+
+    const other = populated.find((bucket) => bucket.from !== strip?.from);
+    assert.ok(other);
+    const asked = buildCalibrationChoice({ distance: 12, requested: String(other.from) });
+    assert.deepEqual(asked.filter((group) => group.selected).map((group) => group.from), [other.from]);
+    assert.ok(asked.some((group) => group.thisWeek && !group.selected), "this week's group stays marked");
+
+    for (const nonsense of ["7", "abc", ""]) {
+      assert.deepEqual(
+        buildCalibrationChoice({ distance: 12, requested: nonsense }).filter((group) => group.selected).map((group) => group.from),
+        [strip?.from],
+        nonsense,
+      );
+    }
+    const unmeasured = buildCalibrationChoice({ distance: null, requested: undefined });
+    assert.ok(unmeasured.every((group) => !group.thisWeek));
+    assert.equal(unmeasured.filter((group) => group.selected).length, 1);
+    assert.deepEqual(unmeasured.filter((group) => group.isDefault).map((group) => group.from), [populated[0]?.from]);
+    assert.deepEqual(asked.filter((group) => group.isDefault).map((group) => group.from), [strip?.from], "the default stays this week's");
   });
 });
 

@@ -20,6 +20,9 @@ import { resolvePublishedConfidence } from "../../lib/report/confidence";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildSignalFlow } from "../../lib/report/signalFlow";
+import { evaluateRegime } from "../../lib/regimeEngine";
+import { buildScoreComposition } from "../../lib/report/scoreComposition";
+import { buildInputChoiceModel, parseInputChoice } from "../../lib/report/countedInputs";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
@@ -209,6 +212,24 @@ const deriveSignalsPageModel = (
   const basis = comparisonBasis(reportDynamics.comparedWith);
   /* Every row is in the table only unfiltered, and every node links to its row. */
   const signalFlow = activeFocus === "all" ? buildSignalFlow(signalRows, basis.reference) : null;
+  /* Which inputs count, for the line settings: /trust's arithmetic names the inputs, and the
+     engine answers for the choice the URL names. It changes the sentence in that panel and
+     nothing else on the page. */
+  const inputChoice = buildInputChoiceModel({
+    composition: buildScoreComposition({
+      assessment,
+      treasury,
+      macroSeries: reportData.macroSeries,
+      treasurySource: { label: treasuryProvenance.sourceLabel, url: treasuryProvenance.sourceUrl },
+      scoringBasis: reportData.scoringBasis,
+      evaluate: evaluateRegime,
+    }),
+    assessment,
+    treasury,
+    macroSeries: reportData.macroSeries,
+    evaluate: evaluateRegime,
+    choice: parseInputChoice(resolvedSearchParams),
+  });
 
   return {
     structuredData: buildStructuredData(),
@@ -234,6 +255,7 @@ const deriveSignalsPageModel = (
     focusInstruments: focusFilter.instruments,
     changedSignalRows,
     signalFlow,
+    inputChoice,
     /* What the "since" column compares with; the rows carry the same label. */
     basis,
     sectionLinks: signalsSectionLinks,
