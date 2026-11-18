@@ -75,6 +75,34 @@ What this rules out: a meaning line that is a constant (the same words every wee
 for one regime), a claim whose evidence is only a chart, and a second surface
 answering a question the answer pages already answer.
 
+## Questions and answers, as people say them (2026-11-18)
+
+The owner's rule: the site asks and answers the way an operator would out loud or in a Slack
+message. The register above says where the question comes from; this says how it sounds.
+
+- **A question is what someone would type to a cofounder or say in a meeting.** Short, everyday
+  words, "we" or "I" where a person would use them, contractions fine. "Can we hire yet?", "What
+  would get hiring going again?", "What if the Fed cuts?", "How long do these usually last?",
+  "Is that a big move?" — not "Restart conditions", "Rate scenario" or "Spell length
+  distribution". A label that names a thing is still fine where a person would name it ("Sources",
+  "Hiring"); a nominalised process is not.
+- **An answer starts with the answer.** The first words are the reply a person would give —
+  "Yes", "No", "Not yet", "About two quarter-point Fed cuts", "Usually longer than six months" —
+  then the number, then the reason, each a short sentence. "Not yet. Hiring restarts when funding
+  pressure falls below 66; it is 90." The explanation, the drawing and the method follow it.
+- **It still uses this guide's words.** Conditions, the five areas, the three scores' names, the
+  verbs pause and restart, sizes as Fed steps or common/unusual/rare moves, counts not odds. A
+  conversational question does not license a synonym: "Is it still Freezing?" is fine, "Is the
+  regime still risk-off?" is not.
+- **Spoken, not chatty.** No exclamation marks, emoji, slang, or a narrator ("Great question",
+  "Let's look at…"). A question a thing cannot ask keeps its subject honest: "What was the
+  guidance in March?", not "What did the brief say?" (Headings, above).
+- **A question earns its "?"** A heading phrased as a question has an answer directly under it,
+  in the first sentence. A question the page cannot answer this week is not asked.
+- **Pastes are messages.** The Slack and email formats are read in a channel between other
+  people's messages: they lead with the answer to "what do we do this week?" in one line a person
+  could have typed, and keep the numbers beside it.
+
 ## Objections a visitor raised (2026-11-17)
 - Copy answers an objection only when a visitor raised it, and only where it is asked: an FAQ
   entry or the control it concerns, never a hero, intro, lede or meta description.
