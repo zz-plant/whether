@@ -130,6 +130,9 @@ export const calibrationBuckets = (months: CalibrationMonth[]): ConfidenceCalibr
 
   for (let index = 0; index + 1 < months.length; index += 1) {
     const month = months[index];
+    const following = months[index + 1];
+    /* Both exist inside the loop's bounds; the guard keeps the reads checked. */
+    if (!month || !following) continue;
     const distance = resolveDistanceToFlip({
       scores: { tightness: month.tightness, riskAppetite: month.riskAppetite },
       thresholds: {
@@ -138,7 +141,8 @@ export const calibrationBuckets = (months: CalibrationMonth[]): ConfidenceCalibr
       },
     });
     const bucket = buckets[bucketFor(distance)];
-    const next = months[index + 1].regime;
+    if (!bucket) continue;
+    const next = following.regime;
     bucket.months += 1;
     if (next === month.regime) bucket.held += 1;
     bucket.entries.push({ asOf: month.asOf, regime: month.regime, next });

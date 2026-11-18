@@ -250,7 +250,7 @@ const describeChangeReason = ({ regimeTransition, scores, thresholds }: TrustAss
  * squares and "held 7 of 10" are the same ten months.
  */
 const describeBaseRateMonth = (entry: CalibrationEntry): BaseRateMark => {
-  const [year, month] = entry.asOf.split("-").map(Number);
+  const [year = Number.NaN, month = Number.NaN] = entry.asOf.split("-").map(Number);
   const held = entry.next === entry.regime;
   const conditions = getRegimePublicLabel(entry.regime);
   return {
