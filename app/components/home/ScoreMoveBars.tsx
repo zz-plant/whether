@@ -65,7 +65,7 @@ export function ScoreMoveBars({ move }: { move: ScoreMoveHistogram }) {
               const bar = (
                 <span
                   aria-hidden="true"
-                  className={`relative block w-full min-h-[2px] ${tail ? "bg-[var(--app-text)]" : "bg-[color:var(--border-strong)]"} group-hover:opacity-80`}
+                  className={`relative block w-full min-h-[2px] ${tail ? "bg-[var(--app-text)]" : "bg-[color:var(--border-strong)]"}`}
                   style={{ height: `${height}%` }}
                 >
                   {bin.size === 0 && broken ? (
@@ -73,7 +73,7 @@ export function ScoreMoveBars({ move }: { move: ScoreMoveHistogram }) {
                   ) : null}
                 </span>
               );
-              const column = "group relative flex h-full min-w-0 flex-1 items-end";
+              const column = "relative flex h-full min-w-0 flex-1 items-end";
               if (bin.count === 0) return <span key={bin.size} aria-hidden="true" className="h-full flex-1" />;
               /* The months that did not move: no single month to open, so a pointer names it and the caption counts it. */
               if (!bin.latest) {
@@ -91,7 +91,7 @@ export function ScoreMoveBars({ move }: { move: ScoreMoveHistogram }) {
                   aria-label={bin.label}
                   data-mark={bin.label}
                   data-score-move-bin={bin.size}
-                  className={column}
+                  className={`${column} hover:[&>span]:opacity-80`}
                 >
                   {bar}
                 </a>
