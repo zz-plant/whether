@@ -194,7 +194,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             >
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px] data-[checked]:bg-[var(--bg-body)]" />
             </Switch.Root>
-            <span id={slackOverlayLabelId}>Slack preview overlay</span>
+            <span id={slackOverlayLabelId}>Preview in Slack</span>
           </label>
 
           <div className="border-t border-slate-800/60 pt-3">
