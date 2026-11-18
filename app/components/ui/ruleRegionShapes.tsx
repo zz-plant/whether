@@ -1,5 +1,46 @@
 import type { AreaRuleRegions, RuleRegion } from "../../../lib/report/ruleRegions";
 
+type Scale = { x: (riskAppetite: number) => number; y: (tightness: number) => number };
+
+const edgeSegments = (region: RuleRegion, { x, y }: Scale) =>
+  region.edges.map((edge) =>
+    edge.metric === "tightness"
+      ? { key: `t${edge.value}:${edge.span.join("-")}`, x1: x(edge.span[0]), x2: x(edge.span[1]), y1: y(edge.value), y2: y(edge.value) }
+      : { key: `r${edge.value}:${edge.span.join("-")}`, x1: x(edge.value), x2: x(edge.value), y1: y(edge.span[0]), y2: y(edge.span[1]) },
+  );
+
+/**
+ * A reader's own lines over the published regions: each edge of their region, dashed, in the
+ * ink. Their lines are theirs, not a line state, so they take no line-state colour (§XVI);
+ * the published fills under them keep theirs. Edges only, no fill, so the published shading
+ * reads through, and the dash tells the two apart in greyscale.
+ */
+export function RuleRegionOutline({
+  regions,
+  x,
+  y,
+  edgeWidth = 1.25,
+  dash = "4 3",
+}: {
+  regions: readonly RuleRegion[];
+  x: (riskAppetite: number) => number;
+  y: (tightness: number) => number;
+  edgeWidth?: number;
+  /** The dash pattern, in the drawing's units. */
+  dash?: string;
+}) {
+  if (regions.length === 0) return null;
+  return (
+    <g data-rule-outline="">
+      {regions.flatMap((region, index) =>
+        edgeSegments(region, { x, y }).map(({ key, ...edge }) => (
+          <line key={`${index}-${key}`} {...edge} stroke="var(--app-text)" strokeWidth={edgeWidth} strokeDasharray={dash} strokeLinecap="butt" />
+        )),
+      )}
+    </g>
+  );
+}
+
 /**
  * An area's pause and restart regions, drawn inside a conditions chart's SVG.
  *
@@ -44,12 +85,7 @@ export function RuleRegionShapes({
         height: Math.abs(bottom - top),
       };
     });
-  const edges = (region: RuleRegion) =>
-    region.edges.map((edge) =>
-      edge.metric === "tightness"
-        ? { key: `t${edge.value}:${edge.span.join("-")}`, x1: x(edge.span[0]), x2: x(edge.span[1]), y1: y(edge.value), y2: y(edge.value) }
-        : { key: `r${edge.value}:${edge.span.join("-")}`, x1: x(edge.value), x2: x(edge.value), y1: y(edge.span[0]), y2: y(edge.span[1]) },
-    );
+  const edges = (region: RuleRegion) => edgeSegments(region, { x, y });
   const pauseRects = rects(regions.pause);
   const resumeRects = rects(regions.resume);
   return (

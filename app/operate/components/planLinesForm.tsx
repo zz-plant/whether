@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { requestSubscription } from "../../components/subscribeRequest";
@@ -9,7 +9,11 @@ import { decisionAreaLabel, ruleMetricLabel, type DecisionArea } from "../../../
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { PlanLineCondition, PlanLines } from "../../../lib/alert/planLines";
 import { runwayBandLabel } from "../../../lib/report/operatorRunway";
+import { compareOwnRule } from "../../../lib/report/ruleRegions";
 import { useOperatorRunway } from "../../components/useOperatorRunway";
+import { RuleRegionMap } from "../../components/ui/ruleRegionMap";
+
+type Scores = { tightness: number; riskAppetite: number };
 
 /**
  * "Set this plan's lines": the step where a plan's pause and restart lines are
@@ -29,6 +33,13 @@ import { useOperatorRunway } from "../../components/useOperatorRunway";
  * ticked: every company keeping the published lines is emailed on the same day,
  * and the band is what lets that email say what the crossing means for this one
  * (`describePlanLineCrossing`). The band, never a cash or runway figure.
+ *
+ * Given this week's reading, each area draws the rules table's small chart beside its
+ * numbers (2026-11-18): the published rule shaded as the table draws it, and the reader's
+ * moved numbers as a dashed outline in the ink over it, redrawn as they type. Under it, in
+ * words, what they moved and whether their numbers would put the area somewhere else this
+ * week (`compareOwnRule`, judged by the table's own predicates). The published rule and
+ * the page's other drawings never move with these numbers.
  */
 
 const clampLine = (raw: string): number | null => {
@@ -80,10 +91,13 @@ function ConditionInputs({
 export function PlanLinesForm({
   defaults,
   watch = [],
+  reading,
 }: {
   defaults: readonly PlanLines[];
   /** The areas a link asked to watch (`?watch=`); every area when it names none of these. */
   watch?: readonly DecisionArea[];
+  /** This week's scores and change lines, for the small chart beside each area; no charts without them. */
+  reading?: { scores: Scores; changeLines: Scores };
 }) {
   const [lines, setLines] = useState<PlanLines[]>(() =>
     defaults.map((line) => ({ ...line, pause: [...line.pause], resume: [...line.resume] })),
@@ -97,6 +111,9 @@ export function PlanLinesForm({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  /* Sent with no area ticked: the button stays live (§III), and this says why nothing went. */
+  const [noAreas, setNoAreas] = useState(false);
+  const firstArea = useRef<HTMLInputElement>(null);
 
   const updateCondition = (area: DecisionArea, side: "pause" | "resume", index: number, value: number) => {
     setLines((current) =>
@@ -109,6 +126,7 @@ export function PlanLinesForm({
   };
 
   const toggleArea = (area: DecisionArea) => {
+    setNoAreas(false);
     setWatched((current) => {
       const next = new Set(current);
       if (next.has(area)) next.delete(area);
@@ -120,6 +138,11 @@ export function PlanLinesForm({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const planLines = lines.filter((line) => watched.has(line.area));
+    if (planLines.length === 0) {
+      setNoAreas(true);
+      firstArea.current?.focus();
+      return;
+    }
     setStatus("loading");
     const result = await requestSubscription(email, {
       alerts: true,
@@ -141,14 +164,47 @@ export function PlanLinesForm({
         For example, release the second half of a hiring plan only once funding pressure falls below 60. Untick
         any area you are not planning.
       </p>
+      {/* The small charts' domain, once for the five (§XV), as the rules table states it. */}
+      {reading ? (
+        <p className="max-w-[60ch] text-xs leading-5 text-slate-400" data-rule-map-key="">
+          Each chart runs risk appetite 0–100 across and funding pressure 0–100 down. Our rule is shaded; yours is
+          drawn dashed once you move a number. The dot is this week&apos;s reading.
+        </p>
+      ) : null}
 
       <ul className="space-y-3">
-        {lines.map((line) => {
+        {lines.map((line, index) => {
           const on = watched.has(line.area);
+          const published = defaults.find((candidate) => candidate.area === line.area);
+          const comparison = reading && published ? compareOwnRule({ published, own: line, scores: reading.scores }) : null;
+          const fieldset = (
+            <fieldset disabled={!on} className="space-y-2 text-xs text-slate-300 disabled:opacity-50">
+              <legend className="sr-only">{decisionAreaLabel(line.area)} rule</legend>
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</span>
+                <ConditionInputs
+                  area={line.area}
+                  side="pause"
+                  conditions={line.pause}
+                  onChange={(at, value) => updateCondition(line.area, "pause", at, value)}
+                />
+              </p>
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</span>
+                <ConditionInputs
+                  area={line.area}
+                  side="resume"
+                  conditions={line.resume}
+                  onChange={(at, value) => updateCondition(line.area, "resume", at, value)}
+                />
+              </p>
+            </fieldset>
+          );
           return (
-            <li key={line.area} className="space-y-2 border-t border-slate-800/70 pt-3">
+            <li key={line.area} className="space-y-2 border-t border-slate-800/70 pt-3" data-plan-area={line.area}>
               <label className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-100">
                 <input
+                  ref={index === 0 ? firstArea : undefined}
                   type="checkbox"
                   checked={on}
                   onChange={() => toggleArea(line.area)}
@@ -156,31 +212,40 @@ export function PlanLinesForm({
                 />
                 {decisionAreaLabel(line.area)}
               </label>
-              <fieldset disabled={!on} className="space-y-2 text-xs text-slate-300 disabled:opacity-50">
-                <legend className="sr-only">{decisionAreaLabel(line.area)} rule</legend>
-                <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</span>
-                  <ConditionInputs
-                    area={line.area}
-                    side="pause"
-                    conditions={line.pause}
-                    onChange={(index, value) => updateCondition(line.area, "pause", index, value)}
-                  />
-                </p>
-                <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</span>
-                  <ConditionInputs
-                    area={line.area}
-                    side="resume"
-                    conditions={line.resume}
-                    onChange={(index, value) => updateCondition(line.area, "resume", index, value)}
-                  />
-                </p>
-              </fieldset>
+              {comparison && reading ? (
+                <>
+                  {/* The numbers and, beside them, the chart they draw: held to the numbers'
+                      width, so on a wide screen the chart sits by them, not at the far edge. */}
+                  <div className="weather-sidebar max-w-[36rem] items-start gap-x-4 gap-y-2 [--aside:4.5rem] [--main-min:12rem]">
+                    {fieldset}
+                    <div className={on ? undefined : "opacity-50"}>
+                      <RuleRegionMap
+                        area={line.area}
+                        idPrefix={`plan-map-${line.area}`}
+                        regions={comparison.regions}
+                        outline={comparison.outline}
+                        scores={reading.scores}
+                        changeLines={reading.changeLines}
+                        label={comparison.description}
+                      />
+                    </div>
+                  </div>
+                  {/* Present while empty, so a screen reader hears the words once a number moves. */}
+                  <div aria-live="polite" className="max-w-[60ch] space-y-0.5 text-xs leading-5" data-plan-difference="">
+                    {on && comparison.thisWeek ? <p className="font-semibold text-slate-100">{comparison.thisWeek}</p> : null}
+                    {on ? comparison.changes.map((change) => <p key={change} className="text-slate-300">{change}</p>) : null}
+                  </div>
+                </>
+              ) : (
+                fieldset
+              )}
             </li>
           );
         })}
       </ul>
+      {noAreas ? (
+        <p role="alert" className="text-xs text-rose-300">Tick at least one area first.</p>
+      ) : null}
 
       {runwayBand ? (
         <label className="flex min-h-11 items-start gap-2 text-xs text-slate-300">
@@ -228,7 +293,7 @@ export function PlanLinesForm({
             />
             <button
               type="submit"
-              disabled={status === "loading" || watched.size === 0}
+              disabled={status === "loading"}
               className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 grow items-center justify-center px-4 py-2 text-xs font-semibold disabled:opacity-50"
             >
               {status === "loading" ? "Sending…" : "Email me when these change"}
