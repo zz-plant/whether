@@ -1,4 +1,5 @@
 import type { RegimeKey, RegimeThresholds } from "../regimeEngine";
+import { formatMonthLabel, toMonthInput } from "../timeMachine/monthFormatting";
 import { buildComparedWith } from "./comparisonBasis";
 
 /**
@@ -31,17 +32,120 @@ export const describeRatesSummary = ({
   current: { recordDate: string; oneMonth: number | null | undefined };
   series: ReadonlyArray<{ recordDate: string; oneMonth: number | null }>;
 }): string | null => {
-  if (typeof current.oneMonth !== "number") return null;
-  const now = `1-month rate ${PERCENT(current.oneMonth)}`;
-  const earlier = [...series]
-    .reverse()
-    .find((point) => point.recordDate < current.recordDate && typeof point.oneMonth === "number");
-  const label = earlier ? buildComparedWith(earlier.recordDate, current.recordDate)?.label : undefined;
-  if (!earlier || typeof earlier.oneMonth !== "number" || !label) return now;
-  const before = PERCENT(earlier.oneMonth);
-  const after = PERCENT(current.oneMonth);
+  const trail = buildRatesTrail({ current, series });
+  const latest = trail?.at(-1);
+  if (!trail || !latest) return null;
+  const now = `1-month rate ${PERCENT(latest.value)}`;
+  const earlier = trail.at(-2);
+  const label = earlier ? buildComparedWith(earlier.recordDate, latest.recordDate)?.label : undefined;
+  if (!earlier || !label) return now;
+  const before = PERCENT(earlier.value);
+  const after = PERCENT(latest.value);
   if (before === after) return `${now}, unchanged from ${label}`;
-  return `${now}, ${current.oneMonth > earlier.oneMonth ? "up" : "down"} from ${before} on ${label}`;
+  return `${now}, ${latest.value > earlier.value ? "up" : "down"} from ${before} on ${label}`;
+};
+
+/** How many month-ends the rates trail carries before this reading: a year. */
+const RATES_TRAIL_MONTHS = 12;
+
+/**
+ * The 1-month rate the rates answer reads: the last twelve month-ends the rate
+ * charts draw before this reading, then this reading. The answer quotes its
+ * last two points and the sparkline over the question draws all of them, so
+ * the line ends on the two numbers the sentence beside it names. Null without
+ * a reading this week.
+ */
+export const buildRatesTrail = ({
+  current,
+  series,
+}: {
+  current: { recordDate: string; oneMonth: number | null | undefined };
+  series: ReadonlyArray<{ recordDate: string; oneMonth: number | null }>;
+}): Array<{ recordDate: string; value: number; isCurrent: boolean }> | null => {
+  if (typeof current.oneMonth !== "number") return null;
+  const earlier = series
+    .flatMap((point) =>
+      point.recordDate < current.recordDate && typeof point.oneMonth === "number"
+        ? [{ recordDate: point.recordDate, value: point.oneMonth, isCurrent: false }]
+        : [],
+    )
+    .slice(-RATES_TRAIL_MONTHS);
+  return [...earlier, { recordDate: current.recordDate, value: current.oneMonth, isCurrent: true }];
+};
+
+type SpreadKey = "spread10Y2Y" | "spread2Y3M";
+
+/**
+ * The order the inversion answer names the two spreads in: the one below zero
+ * in more months first, the short end on a tie. The strips drawn beside the
+ * answer follow it, so the first strip is the first clause.
+ */
+export const inversionSpreadOrder = ({
+  inverted10Y2Y,
+  inverted2Y3M,
+}: {
+  inverted10Y2Y: number;
+  inverted2Y3M: number;
+}): [SpreadKey, SpreadKey] => (inverted2Y3M >= inverted10Y2Y ? ["spread2Y3M", "spread10Y2Y"] : ["spread10Y2Y", "spread2Y3M"]);
+
+const INVERSION_MONTHS = 12;
+
+const meanOf = (values: ReadonlyArray<number | null>) => {
+  const numeric = values.filter((value): value is number => typeof value === "number");
+  return numeric.length ? numeric.reduce((sum, value) => sum + value, 0) / numeric.length : null;
+};
+
+/**
+ * The months the inversion chart draws: the last twelve calendar months in the
+ * series, each its readings' mean spreads and whether each sat below zero, and
+ * the two counts its caption and the question's answer print. The chart, the
+ * strips over the question and the month row in the panel all read this.
+ */
+export const summarizeInversionMonths = (
+  series: ReadonlyArray<{ recordDate: string; spread10Y2Y: number | null; spread2Y3M: number | null }>,
+) => {
+  const grouped = new Map<string, { year: number; month: number; points: typeof series[number][] }>();
+  for (const point of series) {
+    const date = new Date(point.recordDate);
+    if (Number.isNaN(date.valueOf())) continue;
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1;
+    const key = toMonthInput(year, month);
+    const entry = grouped.get(key) ?? { year, month, points: [] };
+    entry.points.push(point);
+    grouped.set(key, entry);
+  }
+  const months = [...grouped.entries()]
+    .map(([key, { year, month, points }]) => {
+      const spread10Y2Y = meanOf(points.map((point) => point.spread10Y2Y));
+      const spread2Y3M = meanOf(points.map((point) => point.spread2Y3M));
+      return {
+        key,
+        year,
+        month,
+        label: formatMonthLabel(year, month),
+        spread10Y2Y,
+        spread2Y3M,
+        inverted10Y2Y: typeof spread10Y2Y === "number" && spread10Y2Y < 0,
+        inverted2Y3M: typeof spread2Y3M === "number" && spread2Y3M < 0,
+      };
+    })
+    .slice(-INVERSION_MONTHS);
+  const inverted10Y2Y = months.filter((month) => month.inverted10Y2Y).length;
+  const inverted2Y3M = months.filter((month) => month.inverted2Y3M).length;
+  return { months, inverted10Y2Y, inverted2Y3M, order: inversionSpreadOrder({ inverted10Y2Y, inverted2Y3M }) };
+};
+
+/**
+ * The year and month a month label names ("Oct 2026", as `formatMonthLabel`
+ * prints it), for a series that carries its months only as labels. Null for a
+ * label no month of that year prints.
+ */
+export const monthOfLabel = (label: string): { year: number; month: number } | null => {
+  const year = Number(label.match(/(\d{4})$/)?.[1]);
+  if (!Number.isInteger(year)) return null;
+  const month = Array.from({ length: 12 }, (_, index) => index + 1).find((candidate) => formatMonthLabel(year, candidate) === label);
+  return month ? { year, month } : null;
 };
 
 /**
@@ -63,10 +167,12 @@ export const describeInversionSummary = ({
   /* In words, not "2Y−3M" and "10Y−2Y" (2026-10-28): the naming table asks for the
      gauge's full name on first use, and this summary is the question's first line. */
   const count = (inverted: number) => (inverted === 0 ? "none" : `${inverted} of ${months} months`);
-  const shortCurve = `the 2-year rate below the 3-month rate in ${count(inverted2Y3M)}`;
-  const longCurve = `the 10-year rate below the 2-year rate in ${count(inverted10Y2Y)}`;
-  const [first, second] = inverted2Y3M >= inverted10Y2Y ? [shortCurve, longCurve] : [longCurve, shortCurve];
-  return `Yes: ${first}, and ${second}`;
+  const clauses: Record<SpreadKey, string> = {
+    spread2Y3M: `the 2-year rate below the 3-month rate in ${count(inverted2Y3M)}`,
+    spread10Y2Y: `the 10-year rate below the 2-year rate in ${count(inverted10Y2Y)}`,
+  };
+  const [first, second] = inversionSpreadOrder({ inverted10Y2Y, inverted2Y3M });
+  return `Yes: ${clauses[first]}, and ${clauses[second]}`;
 };
 
 /**

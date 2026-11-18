@@ -1,9 +1,11 @@
 import { scaleLinear } from "d3-scale";
-import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { CURVE_SPREAD_LABELS, CurveTermsKey, formatSpread } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 import { InstrumentQuestion } from "./instrumentQuestion";
-import { describeInversionSummary } from "../../../lib/report/evidenceInstrumentSummaries";
+import { InversionCell, InversionCells } from "./instrumentPreviews";
+import { MonthReadoutStrip } from "./monthReadoutStrip";
+import { columnMonthLabel, columnYearLabel } from "./instrumentMonthHref";
+import { describeInversionSummary, summarizeInversionMonths } from "../../../lib/report/evidenceInstrumentSummaries";
 import { UrlDetails } from "../../components/ui/urlDetails";
 
 type YieldCurvePoint = {
@@ -14,69 +16,35 @@ type YieldCurvePoint = {
   spread2Y3M: number | null;
 };
 
-type MonthlyPoint = {
-  key: string;
-  label: string;
-  spread10Y2Y: number | null;
-  spread2Y3M: number | null;
-};
-
 const CHART_WIDTH = 100;
 const CHART_HEIGHT = 44;
-
-const mean = (values: Array<number | null>) => {
-  const numeric = values.filter((value): value is number => typeof value === "number");
-  if (!numeric.length) {
-    return null;
-  }
-
-  return numeric.reduce((sum, value) => sum + value, 0) / numeric.length;
-};
-
-const toMonthlyPoints = (series: YieldCurvePoint[]): MonthlyPoint[] => {
-  const grouped = new Map<string, YieldCurvePoint[]>();
-
-  series.forEach((point) => {
-    const date = new Date(point.recordDate);
-    if (Number.isNaN(date.valueOf())) {
-      return;
-    }
-
-    const key = toMonthInput(date.getUTCFullYear(), date.getUTCMonth() + 1);
-    grouped.set(key, [...(grouped.get(key) ?? []), point]);
-  });
-
-  return Array.from(grouped.entries())
-    .map(([key, points]) => ({
-      key,
-      label: formatMonthLabel(points[0].year, points[0].month),
-      spread10Y2Y: mean(points.map((point) => point.spread10Y2Y)),
-      spread2Y3M: mean(points.map((point) => point.spread2Y3M)),
-    }))
-    .slice(-12);
-};
-
-const countMonthsBelowZero = (values: Array<number | null>) =>
-  values.filter((value): value is number => typeof value === "number" && value < 0).length;
 
 /**
  * One of the evidence page's instruments: a disclosure titled with the
  * question the chart answers, closed until the reader asks it. The page passes
  * the list's shared frame and summary classes.
+ *
+ * The months, their spreads and the two counts come from
+ * `summarizeInversionMonths`, which the answer, the strips beside it and the
+ * month row in the panel all read.
  */
 export function SignalInversionPreview({
   yieldCurveSeries,
   className,
   summaryClassName,
   open = false,
+  monthHref,
 }: {
   yieldCurveSeries: YieldCurvePoint[];
   className?: string;
   summaryClassName?: string;
   /** Opened by a link carrying `curve=1`, the key the panel writes when a reader opens it. */
   open?: boolean;
+  /** Where each month in the panel's month row opens (`instrumentMonthHref`); without it the row is not drawn. */
+  monthHref?: (month: { year: number; month: number }) => string | null;
 }) {
-  const monthlyPoints = toMonthlyPoints(yieldCurveSeries);
+  const inversion = summarizeInversionMonths(yieldCurveSeries);
+  const monthlyPoints = inversion.months;
   if (monthlyPoints.length === 0) {
     return null;
   }
@@ -106,8 +74,9 @@ export function SignalInversionPreview({
     curve: "monotone",
   });
   const midPoint = monthlyPoints[Math.floor((monthlyPoints.length - 1) / 2)] ?? latest;
-  const monthsInverted10Y2Y = countMonthsBelowZero(monthlyPoints.map((point) => point.spread10Y2Y));
-  const monthsInverted2Y3M = countMonthsBelowZero(monthlyPoints.map((point) => point.spread2Y3M));
+  const monthsInverted10Y2Y = inversion.inverted10Y2Y;
+  const monthsInverted2Y3M = inversion.inverted2Y3M;
+  const [firstSpread, secondSpread] = inversion.order;
   const hasGaps = spread10Y2YSeries.missingColumns.length > 0 || spread2Y3MSeries.missingColumns.length > 0;
 
   return (
@@ -126,6 +95,7 @@ export function SignalInversionPreview({
             inverted10Y2Y: monthsInverted10Y2Y,
             inverted2Y3M: monthsInverted2Y3M,
           })}
+          preview={<InversionCells summary={inversion} />}
         />
       }
     >
@@ -193,6 +163,40 @@ export function SignalInversionPreview({
             <span>{midPoint?.label}</span>
             <span>{latest?.label}</span>
           </div>
+          {/* The strips over the question, month by month and open: each month
+              a link to the guidance as it read then, its two spreads printed
+              on hover or focus. */}
+          {monthHref ? (
+            <div className="mt-4 border-t border-slate-800/80 pt-3">
+              <MonthReadoutStrip
+                label={`Months, ${monthlyPoints[0]?.label} to ${latest?.label}`}
+                caption={
+                  <>
+                    Top row {CURVE_SPREAD_LABELS[firstSpread].toLowerCase()}, bottom row{" "}
+                    {CURVE_SPREAD_LABELS[secondSpread].toLowerCase()}; filled where it sat below zero. A month opens
+                    the guidance as it read then.
+                  </>
+                }
+                months={monthlyPoints.map((point, index) => ({
+                  key: point.key,
+                  label: point.label,
+                  shortLabel: columnMonthLabel(point.year, point.month),
+                  yearLabel: columnYearLabel(point.year, point.month, index),
+                  readout: `${CURVE_SPREAD_LABELS[firstSpread]} ${formatSpread(point[firstSpread])}, ${CURVE_SPREAD_LABELS[
+                    secondSpread
+                  ].toLowerCase()} ${formatSpread(point[secondSpread])}`,
+                  href: monthHref(point),
+                  mark: (
+                    <span className="grid w-full max-w-4 gap-1">
+                      {inversion.order.map((key) => (
+                        <InversionCell key={key} month={point} spread={key} className="h-2.5 w-full" />
+                      ))}
+                    </span>
+                  ),
+                }))}
+              />
+            </div>
+          ) : null}
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-3 border-t-2 border-[var(--color-semantic-easing-border)]" aria-hidden="true" />

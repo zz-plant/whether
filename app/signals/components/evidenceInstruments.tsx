@@ -15,12 +15,18 @@ import { FossilRecordSection } from "./fossilRecordSection";
 import type { SignalsPageSearchParams } from "../evidencePageModel";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import {
+  buildRatesTrail,
   describeConditionChanges,
   describeRatesSummary,
   describeScoreTrendSummary,
+  monthOfLabel,
   summarizeConditionRuns,
 } from "../../../lib/report/evidenceInstrumentSummaries";
 import { InstrumentQuestion } from "./instrumentQuestion";
+import { ConditionCellsPreview, RatesSparklinePreview, ScoreSparklinesPreview } from "./instrumentPreviews";
+import { MonthReadoutStrip } from "./monthReadoutStrip";
+import { columnMonthLabel, columnYearLabel, instrumentMonthHref } from "./instrumentMonthHref";
+import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
 
 /**
  * The fourth section of the evidence page: the instruments. Charts, the line
@@ -178,16 +184,26 @@ export const SignalsInstrumentsSection = ({
      under it draws: this week's rates beside the month-end archive the rate
      charts plot, the two series the score cells print, and the runs the
      month-by-month timeline counts. */
-  const ratesAnswer = describeRatesSummary({
+  const ratesInputs = {
     current: { recordDate: treasury.record_date, oneMonth: treasury.yields.oneMonth },
     series: yieldCurveSeries,
-  });
+  };
+  const ratesAnswer = describeRatesSummary(ratesInputs);
+  /* The points the rates answer quotes its last two of: the sparkline beside it and the month row in the panel draw them. */
+  const ratesTrail = buildRatesTrail(ratesInputs);
   const scoreSeries = [
     { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend },
     { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true },
   ];
   const trendsAnswer = describeScoreTrendSummary(scoreSeries);
   const pastMonthsAnswer = regimeSeries.length > 0 ? describeConditionChanges(summarizeConditionRuns(regimeSeries)) : null;
+  const ratesMonths = (ratesTrail ?? []).flatMap((point) => {
+    const reading = point.isCurrent ? undefined : yieldCurveSeries.find((entry) => entry.recordDate === point.recordDate);
+    return reading ? [{ ...reading, label: formatMonthLabel(reading.year, reading.month) }] : [];
+  });
+  const ratesMonthHref = instrumentMonthHref({ searchParams, panelKey: "rates", anchor: "signal-diagnostics" });
+  const trendsMonthHref = instrumentMonthHref({ searchParams, panelKey: "trends", anchor: "trends" });
+  const percent = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}%` : "n/a");
   return (
   /* Ruled off from "What would change this guidance" by the report rows' own divider.
      It drew a second rule 24px under that one, and kept the 20px inset the report
@@ -211,8 +227,31 @@ export const SignalsInstrumentsSection = ({
         initialOpen={isDisclosureOpenInParams(searchParams, "rates")}
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
-        summary={<InstrumentQuestion question="What are interest rates doing?" answer={ratesAnswer} />}
+        summary={
+          <InstrumentQuestion
+            question="What are interest rates doing?"
+            answer={ratesAnswer}
+            preview={ratesTrail ? <RatesSparklinePreview trail={ratesTrail} /> : null}
+          />
+        }
       >
+        {/* The month-ends the line beside the question draws, each one open. */}
+        {ratesMonths.length > 0 ? (
+          <div className="mb-4">
+            <MonthReadoutStrip
+              label={`Rates at each month-end, ${ratesMonths[0]?.label ?? ""} to ${ratesMonths.at(-1)?.label ?? ""}`}
+              caption="The month-ends the line beside the question draws. Each shows its four rates and opens the guidance as it read then."
+              months={ratesMonths.map((reading, index) => ({
+                key: reading.recordDate,
+                label: reading.label,
+                shortLabel: columnMonthLabel(reading.year, reading.month),
+                yearLabel: columnYearLabel(reading.year, reading.month, index),
+                readout: `1-month ${percent(reading.oneMonth)}, 3-month ${percent(reading.threeMonth)}, 2-year ${percent(reading.twoYear)}, 10-year ${percent(reading.tenYear)}`,
+                href: ratesMonthHref(reading),
+              }))}
+            />
+          </div>
+        ) : null}
         <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
       </UrlDetails>
 
@@ -221,6 +260,7 @@ export const SignalsInstrumentsSection = ({
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
         open={isDisclosureOpenInParams(searchParams, "curve")}
+        monthHref={instrumentMonthHref({ searchParams, panelKey: "curve", anchor: "curve-context" })}
       />
 
       <UrlDetails
@@ -229,7 +269,13 @@ export const SignalsInstrumentsSection = ({
         initialOpen={isDisclosureOpenInParams(searchParams, "trends")}
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
-        summary={<InstrumentQuestion question="How have the two scores moved this year?" answer={trendsAnswer} />}
+        summary={
+          <InstrumentQuestion
+            question="How have the two scores moved this year?"
+            answer={trendsAnswer}
+            preview={<ScoreSparklinesPreview series={scoreSeries} />}
+          />
+        }
       >
         <div className="space-y-4">
           {/* The table above publishes *this week's* reading and this series is
@@ -241,6 +287,26 @@ export const SignalsInstrumentsSection = ({
             completed month rather than this week&rsquo;s score above.
           </p>
           <SignalSparklineStrip series={scoreSeries} />
+          {/* The same points, a month at a time: the series carry their months as
+              labels, which name the month each one opens. */}
+          <MonthReadoutStrip
+            label={`Month-end scores, ${tightnessTrend[0]?.label ?? ""} to ${tightnessTrend.at(-1)?.label ?? ""}`}
+            caption="Each month-end shows its two scores and opens the guidance as it read then."
+            months={tightnessTrend.map((point, index) => {
+              const month = monthOfLabel(point.label);
+              const riskAppetite = riskAppetiteTrend.find((candidate) => candidate.label === point.label);
+              return {
+                key: point.label,
+                label: point.label,
+                shortLabel: month ? columnMonthLabel(month.year, month.month) : point.label,
+                yearLabel: month ? columnYearLabel(month.year, month.month, index) : null,
+                readout: `${regimeSignalLabel.tightness} ${Math.round(point.value)}${
+                  riskAppetite ? `, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${Math.round(riskAppetite.value)}` : ""
+                }`,
+                href: month ? trendsMonthHref(month) : null,
+              };
+            })}
+          />
         </div>
       </UrlDetails>
 
@@ -252,7 +318,13 @@ export const SignalsInstrumentsSection = ({
         initialOpen={monthPickerOpen}
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
-        summary={<InstrumentQuestion question="What was the guidance in an earlier month?" answer={pastMonthsAnswer} />}
+        summary={
+          <InstrumentQuestion
+            question="What was the guidance in an earlier month?"
+            answer={pastMonthsAnswer}
+            preview={<ConditionCellsPreview series={regimeSeries} />}
+          />
+        }
       >
         <TimeMachinePanel
           selectedYear={selectedYear}
