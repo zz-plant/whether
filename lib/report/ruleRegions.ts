@@ -64,7 +64,7 @@ export type RuleRegion = { rects: ScoreRect[]; edges: ScoreEdge[] };
 export type AreaRuleRegions = { pause: RuleRegion; resume: RuleRegion };
 
 /** Where a reading sits against one area's rule. */
-export type RegionState = "pause" | "restart" | "between";
+type RegionState = "pause" | "restart" | "between";
 
 const DOMAIN: Range = [0, 100];
 
@@ -168,10 +168,10 @@ const restartMet = (rule: AreaRule, scores: Scores) =>
     ? rule.resume.conditions.some((condition) => isRuleConditionMet(condition, scores[condition.metric]))
     : rule.resume.conditions.every((condition) => isRuleConditionMet(condition, scores[condition.metric])));
 
-export const regionAt = (rule: AreaRule, scores: Scores): RegionState =>
+const regionAt = (rule: AreaRule, scores: Scores): RegionState =>
   pauseMet(rule, scores) ? "pause" : restartMet(rule, scores) ? "restart" : "between";
 
-export type AreaChanges = { pauses: DecisionArea[]; restarts: DecisionArea[] };
+type AreaChanges = { pauses: DecisionArea[]; restarts: DecisionArea[] };
 
 /**
  * Which areas another reading would move, each by the one side that can change it
@@ -249,7 +249,7 @@ const listAreas = (areas: readonly DecisionArea[]) => listFormat.format(areas.ma
 const clauseLabel = (clause: RuleClause) => clause.conditions.map((condition) => condition.label).join(` ${clause.join} `);
 
 /** The rule as a sentence, the same for every reading: "Hiring pauses where … and restarts where …." */
-export const describeRuleSides = (rule: AreaRule): string => {
+const describeRuleSides = (rule: AreaRule): string => {
   const label = decisionAreaLabel(rule.area);
   const sides = [
     rule.pause.conditions.length > 0 ? `pauses where ${clauseLabel(rule.pause)}` : null,

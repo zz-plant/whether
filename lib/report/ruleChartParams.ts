@@ -25,7 +25,7 @@ export const RULE_CHART_COUNTED_PARAM = "counted";
 const RULE_CHART_SECTION = "what-would-change";
 
 /** The readings the chart can plot besides this week's, in the order the choices print. */
-export const RULE_CHART_READING_KEYS = ["counted", "cut-1", "cut-2", "cut-3", "hike-1"] as const;
+const RULE_CHART_READING_KEYS = ["counted", "cut-1", "cut-2", "cut-3", "hike-1"] as const;
 export type RuleChartReadingKey = (typeof RULE_CHART_READING_KEYS)[number];
 
 const isReadingKey = (value: string | undefined): value is RuleChartReadingKey =>

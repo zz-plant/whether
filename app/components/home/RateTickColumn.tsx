@@ -26,7 +26,7 @@ const STROKE: Record<RateTick["kind"], string> = {
 };
 
 /** Each label's height: at its line, pushed apart, then the column moved back inside `[minY, maxY]`. */
-export const placeRateTicks = <T extends { y: number }>(ticks: readonly T[], minY: number, maxY: number): Array<T & { labelY: number }> => {
+const placeRateTicks = <T extends { y: number }>(ticks: readonly T[], minY: number, maxY: number): Array<T & { labelY: number }> => {
   const placed = [...ticks]
     .sort((left, right) => left.y - right.y)
     .reduce<Array<T & { labelY: number }>>((acc, tick) => {
