@@ -340,7 +340,7 @@ const MARKS_PER_ROW = 30;
  * set in. A square's hit area reaches up and down to 44px; across, it is the
  * square and its gap, which is why a tap shows the month before a second opens it.
  */
-function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
+export function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
   const firstYear = marks[0]?.asOf.slice(0, 4);
   const oneRow = marks.length <= MARKS_PER_ROW;
   return (

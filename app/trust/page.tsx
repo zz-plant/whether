@@ -16,6 +16,14 @@ import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
 import { formatDecisionReversal } from "../../lib/report/reportFormatting";
+import {
+  CALIBRATION_DISTANCE_PARAM,
+  buildCalibrationChoice,
+  buildCalibrationChoiceHref,
+  type CalibrationChoiceGroup,
+} from "../../lib/report/confidenceCalibration";
+import { describeBaseRateMonth } from "../../lib/report/evidenceReaderModel";
+import { DistanceHeldChoice } from "./distanceHeldChoice";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -45,7 +53,27 @@ export default async function MethodPage({
     runHistory,
     readerReturns,
     reportShellModel,
+    trustStrip,
   } = await buildTrustPageModel();
+
+  /* The limits fold on a healthy week (below), under the `sources` key. */
+  const limitsFolded = !isFallback && warnings.length === 0;
+  /* How often conditions held at each distance: this week's group, the one the strip
+     quotes, unless the URL picks another. Each option is a link to its URL, keeping the
+     rest of the query; the default group's link drops the key, and on a folded week every
+     link keeps the fold open, so a shared link shows what the sender saw. A saved copy is
+     not this week's reading, so it marks no group as this week's, as the strip drops its
+     count then. The canonical URL is `/trust` whatever the query (`buildPageMetadata`). */
+  const distance = trustStrip.savedCopy ? undefined : trustStrip.margin?.points;
+  const requestedDistance = resolvedSearchParams?.[CALIBRATION_DISTANCE_PARAM];
+  const distanceGroups = buildCalibrationChoice({ distance, requested: requestedDistance });
+  const distanceHref = (group: CalibrationChoiceGroup) =>
+    buildCalibrationChoiceHref({
+      path: "/trust",
+      params: resolvedSearchParams,
+      group,
+      extra: limitsFolded ? { sources: "1" } : {},
+    });
 
   /* What is folded on a healthy week: the limits, the confidence record and the
      warnings. The source board used to lead this group; it is open under the
@@ -86,6 +114,13 @@ export default async function MethodPage({
                 index names both sections, and "Check source dates" closes the
                 section below. */}
           </div>
+        </div>
+        <div className="mt-6">
+          <DistanceHeldChoice
+            groups={distanceGroups}
+            marksFor={(group) => group.entries.map(describeBaseRateMonth)}
+            hrefFor={distanceHref}
+          />
         </div>
         {/* The study moved to /calibration — it is original research and deserved
             an address, and two indexable URLs carrying it would compete. One line
@@ -165,10 +200,13 @@ export default async function MethodPage({
       {/* The query key stays "sources": a link someone already shared with
           `?sources=1` still opens this panel, though the board itself is
           above it now. The summary names what is behind it (§XII). */}
-      {!isFallback && warnings.length === 0 ? (
+      {limitsFolded ? (
         <UrlDetails
           queryKey="sources"
-          initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "sources")}
+          /* A picked distance is inside the fold, so a link that names one opens it. */
+          initialOpen={
+            isDisclosureOpenInParams(resolvedSearchParams, "sources") || typeof requestedDistance === "string"
+          }
           /* A row with the site's own chevron between the page's section rules, like the two
              disclosures above it (2026-11-10). It was the page's one filled, bordered box on
              the card radius with a framed chevron key, which read as a control panel. */
