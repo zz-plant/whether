@@ -2,6 +2,7 @@ import { DefinedTerm } from "./ui/definedTerm";
 import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
 import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
+import { MarkReadout } from "./ui/markReadout";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -13,6 +14,9 @@ import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from ".
  * that renders a reading, read once, and /trust keeps the full explanation
  * below its own copy of it.
  */
+/** One month-end behind the base rate: its month, whether conditions held a month later, and that month in the time machine. */
+export type BaseRateMark = { asOf: string; held: boolean; label: string; href: string };
+
 export type TrustStripProps = {
   recordDateLabel: string;
   /** True when every source answered live for this reading. */
@@ -39,8 +43,10 @@ export type TrustStripProps = {
    * How often conditions held at this distance, from the month-end record
    * (`calibrationForDistance`). A historical count, not a probability: the brief
    * quotes its own base rate rather than leaving the reader to find /calibration.
+   * `marks` are the same months, oldest first, drawn as one square each beside the
+   * count (2026-11-18).
    */
-  baseRate?: { held: number; months: number } | null;
+  baseRate?: { held: number; months: number; marks?: readonly BaseRateMark[] } | null;
   /**
    * Which inputs set the scores (`resolveScoringBasis`): the cell's value, and
    * after it what the inputs left out would do to a line, where they would
@@ -145,6 +151,8 @@ export function TrustStrip({
     detailKind?: "next-week" | "basis";
     /** A historical count at the margin's distance, printed after the detail. */
     baseRate?: string;
+    /** The months that count is made of, drawn beside it. */
+    baseRateMarks?: readonly BaseRateMark[];
     /** `caveat`: read this reading with care (the caveat diamond); `easing`: in the state it should be (a filled dot, lit). Never the crossed red, which is for lines. */
     tone?: "caveat" | "easing";
     routine?: boolean;
@@ -163,7 +171,12 @@ export function TrustStrip({
       label: MARGIN_LABEL,
       value: describeMarginCell(margin, confidenceLabel, regime),
       ...(savedCopy ? {} : { detail: describeNextWeek(couldChangeNextWeek, changeReason), detailKind: "next-week" as const }),
-      ...(baseRate ? { baseRate: `Past conditions held ${baseRate.held} of ${baseRate.months} months at this distance` } : {}),
+      ...(baseRate
+        ? {
+            baseRate: `Past conditions held ${baseRate.held} of ${baseRate.months} months at this distance`,
+            ...(baseRate.marks?.length === baseRate.months ? { baseRateMarks: baseRate.marks } : {}),
+          }
+        : {}),
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },
     /* Which inputs set the scores, on every call (2026-10-09). Routine on the
@@ -267,8 +280,26 @@ export function TrustStrip({
               ) : null}
               {cell.baseRate ? (
                 <span className="font-normal text-slate-500" data-base-rate>
-                  {"\u00A0·\u00A0"}
-                  {cell.baseRate}
+                  {cell.baseRateMarks ? (
+                    /* The squares lead the count, held on one line with the dot before them
+                       and the count's first word. After the count, a full phone line broke
+                       after the squares (a box is a break on either side) and stranded the
+                       next cell's dot at the head of the line below. */
+                    <>
+                      <span className="whitespace-nowrap">
+                        {"\u00A0·\u00A0"}
+                        <BaseRateMarks marks={cell.baseRateMarks} />
+                        {"\u00A0"}
+                        {cell.baseRate.split(" ")[0]}
+                      </span>
+                      {cell.baseRate.slice(cell.baseRate.indexOf(" "))}
+                    </>
+                  ) : (
+                    <>
+                      {"\u00A0·\u00A0"}
+                      {cell.baseRate}
+                    </>
+                  )}
                 </span>
               ) : null}
             </dd>
@@ -291,5 +322,46 @@ export function TrustStrip({
         </>
       ) : null}
     </div>
+  );
+}
+
+/* Past this many squares a row wraps; the top band holds 89 month-ends. */
+const MARKS_PER_ROW = 30;
+
+/**
+ * The base rate drawn (2026-11-18): one square per month-end at this distance,
+ * oldest first, filled where conditions held the next month and hollow where they
+ * changed. "Held 7 of 10" is a fraction a reader has to picture; ten squares with
+ * three open show it, and say when the three were. Each square names its month and
+ * what happened, on hover, focus or a tap (`MarkReadout`), and opens that month in
+ * the time machine. Ink only: held and changed are neither a condition nor a line.
+ *
+ * Text height and em-sized, so it sits in the sentence at every size the strip is
+ * set in. A square's hit area reaches up and down to 44px; across, it is the
+ * square and its gap, which is why a tap shows the month before a second opens it.
+ */
+function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
+  const firstYear = marks[0]?.asOf.slice(0, 4);
+  const oneRow = marks.length <= MARKS_PER_ROW;
+  return (
+    <MarkReadout
+      as="span"
+      label={`The ${marks.length} month-ends at this distance${firstYear ? ` since ${firstYear}` : ""}, oldest first: filled where conditions held the next month`}
+      className="inline-flex max-w-[24em] flex-wrap items-center gap-[0.2em] align-[-0.05em] whitespace-normal text-slate-400"
+    >
+      {marks.map((mark, index) => (
+        <a
+          key={mark.asOf}
+          href={mark.href}
+          tabIndex={index === 0 ? 0 : -1}
+          aria-label={mark.label}
+          data-mark={mark.label}
+          data-base-rate-mark={mark.held ? "held" : "changed"}
+          className={`relative block size-[0.6em] rounded-[1px] border-[1.5px] border-current hover:text-slate-200 after:absolute after:-inset-x-[0.1em] after:content-[''] ${
+            oneRow ? "after:-inset-y-[calc(22px-0.3em)]" : "after:-inset-y-[0.1em]"
+          } ${mark.held ? "bg-current" : "bg-transparent"}`}
+        />
+      ))}
+    </MarkReadout>
   );
 }

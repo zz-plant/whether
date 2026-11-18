@@ -2,6 +2,7 @@ import type { RegimeScores } from "../regimeEngineCore";
 import type { TimeMachineYieldCurveEntry } from "../timeMachine/timeMachineCache";
 import { calibrationMonthRows } from "./confidenceCalibration";
 import { regimeSignalLabel } from "./signalTranslations";
+import { formatMonthLabel } from "../timeMachine/monthFormatting";
 
 /**
  * How big a move is, for a reader who cannot tell whether 0.18 points, or 8
@@ -106,33 +107,113 @@ const describeMoveBand = ({ atLeast, changes }: MoveCount): "a common" | "an unu
 
 type ScoreKey = "tightness" | "riskAppetite";
 
-let scoreRecord: Record<ScoreKey, number[]> | null = null;
+let scoreRecord: (Record<ScoreKey, number[]> & { since: number | null; months: string[] }) | null = null;
 
 /** Each score's month-end values, oldest first: the record /history and /calibration read. */
-const scoreValues = (score: ScoreKey): number[] => {
+const readScoreRecord = () => {
   if (!scoreRecord) {
     const rows = calibrationMonthRows();
-    scoreRecord = { tightness: rows.map((row) => row.tightness), riskAppetite: rows.map((row) => row.riskAppetite) };
+    const since = Number(rows[0]?.asOf.slice(0, 4));
+    scoreRecord = {
+      tightness: rows.map((row) => row.tightness),
+      riskAppetite: rows.map((row) => row.riskAppetite),
+      since: Number.isFinite(since) ? since : null,
+      months: rows.map((row) => row.asOf),
+    };
   }
-  return scoreRecord[score];
+  return scoreRecord;
+};
+
+const scoreValues = (score: ScoreKey): number[] => readScoreRecord()[score];
+
+/**
+ * The record behind one move's band (2026-11-18): every month-to-month move of the
+ * score, as bars by whole points, with how many moved at least `points`. The area
+ * groups draw it beside "It is 24 points away, a rare one-month move", so "rare" can
+ * be seen: the bars past the mark are the months that moved that far. The band is read
+ * off the same count (`describeScoreMoveBand` returns it), so the word and the bars
+ * are one derivation. Month-end scores are whole numbers, so whole-point bars lose
+ * nothing.
+ */
+export type ScoreMoveHistogram = {
+  score: ScoreKey;
+  /** The move asked about, in points. */
+  points: number;
+  /** The band without its noun, as the sentence prints it: "a rare". */
+  band: ReturnType<typeof describeMoveBand>;
+  /** Month-to-month changes on record, and how many moved at least `points`. */
+  changes: number;
+  atLeast: number;
+  /** The record's first year. */
+  since: number;
+  /**
+   * One bar per whole point, from 0 to the largest move on record or the move asked
+   * about, each with what its bar says on hover, focus or a tap ("3 of 177 months moved
+   * 4 points, the latest Mar 2020") and the month-end that latest move landed on, which
+   * the bar opens in the time machine. Null for no move or none of that size.
+   */
+  bins: { size: number; count: number; label: string; latest: string | null }[];
+  /** The drawing's domain, under it: "177 one-month moves since 2012". */
+  caption: string;
+};
+
+const pointsWord = (size: number) => (size === 1 ? "point" : "points");
+
+/** The bars and the band for a move of `points`; null when there is no distance or under a year of record. */
+export const describeScoreMoveHistogram = (score: ScoreKey, points: number): ScoreMoveHistogram | null => {
+  if (!(points > 0)) return null;
+  const { since, months } = readScoreRecord();
+  const values = scoreValues(score);
+  const counted = countMonthlyMovesAtLeast(values, points);
+  if (counted.changes < MIN_RECORD_CHANGES || since === null) return null;
+  const moves = values.slice(1).map((value, index) => Math.round(Math.abs(value - (values[index] ?? value))));
+  const counts = Array.from({ length: Math.max(...moves, Math.ceil(points)) + 1 }, () => 0);
+  const latest: (string | null)[] = counts.map(() => null);
+  moves.forEach((move, index) => {
+    counts[move] = (counts[move] ?? 0) + 1;
+    latest[move] = months[index + 1] ?? null;
+  });
+  const of = (count: number) => `${count} of ${counted.changes} ${counted.changes === 1 ? "month" : "months"}`;
+  const monthOf = (asOf: string | null) => {
+    const [year, month] = (asOf ?? "").split("-").map(Number);
+    return year && month ? formatMonthLabel(year, month) : null;
+  };
+  const bins = counts.map((count, size) => {
+    const last = size > 0 ? monthOf(latest[size] ?? null) : null;
+    return {
+      size,
+      count,
+      label: size === 0 ? `${of(count)} did not move` : `${of(count)} moved ${size} ${pointsWord(size)}${last ? `, the latest ${last}` : ""}`,
+      latest: size > 0 ? (latest[size] ?? null) : null,
+    };
+  });
+  return {
+    score,
+    points,
+    band: describeMoveBand(counted),
+    changes: counted.changes,
+    atLeast: counted.atLeast,
+    since,
+    bins,
+    caption: `${counted.changes} one-month moves since ${since}`,
+  };
 };
 
 /**
  * How far `points` of a score is, as a band ("a rare move"), or null when there
  * is no distance to judge or the record is under a year long. `named` puts the
  * score in as the move's modifier, for a surface that does not name it nearby:
- * "a common risk-appetite move".
+ * "a common risk-appetite move". `move` is the record already read for this
+ * distance (`describeScoreMoveHistogram`), where the caller draws it too.
  */
 export const describeScoreMoveBand = (
   score: ScoreKey,
   points: number,
-  { named = false }: { named?: boolean } = {},
+  { named = false, move = describeScoreMoveHistogram(score, points) }: { named?: boolean; move?: ScoreMoveHistogram | null } = {},
 ): string | null => {
-  if (!(points > 0)) return null;
-  const counted = countMonthlyMovesAtLeast(scoreValues(score), points);
-  if (counted.changes < MIN_RECORD_CHANGES) return null;
+  if (!move) return null;
   const modifier = named ? ` ${regimeSignalLabel[score].toLowerCase().replaceAll(" ", "-")}` : "";
-  return `${describeMoveBand(counted)}${modifier} move`;
+  return `${move.band}${modifier} move`;
 };
 
 export type ScoreMoveRanges = Record<ScoreKey, { common: number; unusual: number }>;
