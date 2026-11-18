@@ -53,6 +53,14 @@ import { RecordSection } from "./components/home/RecordSection";
 import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
+import { buildRuleChartModel } from "../lib/report/ruleRegions";
+import {
+  RULE_CHART_AREA_PARAM,
+  RULE_CHART_COUNTED_PARAM,
+  buildCountedChartHref,
+  parseRuleChartArea,
+  parseRuleChartCounted,
+} from "../lib/report/ruleChartParams";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
@@ -580,6 +588,20 @@ async function PageContent({
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
   const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
+  /* The conditions chart's rule layer: each area's regions, opening on the lead rule only
+     when the sentence beside the chart is that rule's; the counted switch on a live read. */
+  const ruleChart = {
+    ...buildRuleChartModel({
+      rules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+      scores: { tightness, riskAppetite },
+      leadArea: corridorRule && boundedConditions ? corridorRule.area : null,
+      notCounted: historicalSelection || savedCopy ? [] : reportData.scoringBasis?.notCounted ?? [],
+      changeLines: callChangeLines,
+    }),
+    initialArea: parseRuleChartArea(searchParams?.[RULE_CHART_AREA_PARAM]),
+    initialCounted: parseRuleChartCounted(searchParams?.[RULE_CHART_COUNTED_PARAM]),
+    query: searchParams,
+  };
   /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
   const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
   /* The card sizes the room before a change once; the count of months held at this
@@ -931,6 +953,7 @@ async function PageContent({
                   : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
+                chartHref={ruleChart.counted ? buildCountedChartHref(searchParams) : undefined}
               />
 
               {/* 6. What would change the guidance: its pause and restart lines, the
@@ -948,6 +971,7 @@ async function PageContent({
                 callChangeLines={callChangeLines}
                 regime={regime}
                 conditionsTrail={conditionsTrail}
+                ruleChart={ruleChart}
               />
 
               {/* 8. How unusual is this? */}
