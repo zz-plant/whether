@@ -143,15 +143,15 @@ body:has([data-record-plate]) .record-band-plate {
   inset: -8px -1.5px;
 }
 .record-week-cell[data-regime="VOLATILE"] {
-  background-image: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-light) 55%, transparent) 4px 5px);
+  background-image: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-dense) 55%, transparent) 4px 5px);
 }
 .record-week-cell[data-regime="DEFENSIVE"] {
-  background-image: repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 4px 5px);
+  background-image: repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-light) 45%, transparent) 4px 5px);
 }
 .record-week-cell[data-regime="SCARCITY"] {
   background-image:
-    repeating-linear-gradient(45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 5px 6px),
-    repeating-linear-gradient(-45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 5px 6px);
+    repeating-linear-gradient(45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-light) 40%, transparent) 5px 6px),
+    repeating-linear-gradient(-45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-light) 40%, transparent) 5px 6px);
 }
 
 .record-band-cursor {
