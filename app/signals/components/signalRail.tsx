@@ -34,7 +34,7 @@ export function SignalRail({ row, value, children }: { row: SignalReferenceRow; 
   const crossed = betterWhen === "lower" ? value > line.value : value < line.value;
   const isScore = row.key === "tightness" || row.key === "riskAppetite";
   const previous = row.previous !== null && row.previous !== value ? row.previous : null;
-  const ends = reversed ? [scale.max, scale.min] : [scale.min, scale.max];
+  const ends: readonly [number, number] = reversed ? [scale.max, scale.min] : [scale.min, scale.max];
   return (
     <figure className="w-[15rem] max-w-full" data-signal-rail={row.key}>
       <div className="relative h-9" aria-hidden="true">

@@ -103,7 +103,7 @@ export function SignalFlowDiagram({ flow }: { flow: SignalFlow }) {
                     onPointerEnter={() => setActive(node.id)}
                     onFocus={() => setActive(node.id)}
                     onBlur={() => setActive(null)}
-                    className={`weather-hit-box flex min-h-8 w-full items-center gap-1 rounded-sm border border-[color:var(--border-subtle)] bg-[var(--bg-body)] px-1.5 py-1 text-fluid-nano leading-tight text-slate-200 underline decoration-slate-600 underline-offset-2 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent-action)] ${
+                    className={`weather-hit-box flex min-h-8 w-full items-center gap-1 rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-body)] px-1.5 py-1 text-fluid-nano leading-tight text-slate-200 underline decoration-slate-600 underline-offset-2 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent-action)] ${
                       bounds.column === "input" ? "justify-end text-right" : bounds.column === "score" ? "justify-center text-center font-semibold" : "justify-start"
                     }`}
                     style={{ touchAction: "manipulation" }}

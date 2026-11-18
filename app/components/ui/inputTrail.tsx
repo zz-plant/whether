@@ -17,14 +17,16 @@ import { Sparkline } from "./sparkline";
  */
 export function InputTrailChart({ trail, label }: { trail: InputTrail; label: string }) {
   const [active, setActive] = useState<number | null>(null);
-  const frameRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLLabelElement | null>(null);
   const last = trail.points.length - 1;
   const point = active === null ? null : trail.points[active];
-  const shown = point ?? trail.points[last];
+  /* `buildInputTrail` returns no trail under three readings, so the last point exists;
+     the fallback only keeps the type honest. */
+  const shown = point ?? trail.points[last] ?? { label: "", valueLabel: "" };
 
   /* Hover reads the day under the pointer; a range input does not follow a pointer
      that is not pressing it. */
-  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const onPointerMove = (event: ReactPointerEvent<HTMLLabelElement>) => {
     if (event.pointerType !== "mouse") return;
     const rect = frameRef.current?.getBoundingClientRect();
     if (!rect || rect.width <= 0) return;
@@ -35,8 +37,9 @@ export function InputTrailChart({ trail, label }: { trail: InputTrail; label: st
   return (
     <figure className="min-w-0 text-sm" data-input-trail={trail.key}>
       {/* A native range over the drawing: the arrow keys, Home and End, a press and a
-          drag come with it, and the focus ring is drawn on the frame. */}
-      <div
+          drag come with it, and the focus ring is drawn on the frame — a label, so the
+          frame is part of the control (§XXVII), and a press anywhere on it is the range's. */}
+      <label
         ref={frameRef}
         className="relative inline-flex min-h-11 items-center py-2 text-slate-400 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[color:var(--accent-action)]"
         onPointerMove={onPointerMove}
@@ -70,7 +73,7 @@ export function InputTrailChart({ trail, label }: { trail: InputTrail; label: st
             if (event.key === "Escape") setActive(null);
           }}
         />
-      </div>
+      </label>
       {/* One line, swapped in place, so the readout moves nothing (CLS 0). */}
       <figcaption className="text-fluid-nano tabular-nums text-slate-400" aria-hidden="true" data-input-trail-caption>
         {point ? (

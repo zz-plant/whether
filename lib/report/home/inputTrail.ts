@@ -137,10 +137,14 @@ const buildTrail = ({
   const offScale = onScale ? null : line < low ? "below" : "above";
   const lineCaption = `${words.label} ${format(line)}${offScale ? `, ${offScale === "below" ? "under" : "over"} this range` : ""}`;
   const first = points[0];
+  const final = points.at(-1);
+  const comparisonPoint = comparisonMark ? points[comparisonMark.index] : undefined;
+  /* Unreachable past the three-reading guard above; it keeps the reads checked. */
+  if (!first || !final) return null;
   /* The drawn range, which takes in the line where it is drawn. */
   const range = `${format(domain[0])}–${format(domain[1])}`;
-  const caption = `Daily, ${first.label} to ${points.at(-1)?.label ?? first.label} · ${range}`;
-  const comparisonPhrase = comparisonMark ? ` Earlier reading ${format(comparisonMark.value)} on ${points[comparisonMark.index].label}.` : "";
+  const caption = `Daily, ${first.label} to ${final.label} · ${range}`;
+  const comparisonPhrase = comparisonMark && comparisonPoint ? ` Earlier reading ${format(comparisonMark.value)} on ${comparisonPoint.label}.` : "";
   return {
     key,
     points,
@@ -149,7 +153,7 @@ const buildTrail = ({
     comparison: comparisonMark,
     caption,
     lineCaption,
-    summary: `${SIGNAL_NAMES[key]}, ${points.length} daily readings from ${first.label} to ${points.at(-1)?.label}, ranging ${range}. Latest ${format(reading)}.${comparisonPhrase} ${lineCaption}.`,
+    summary: `${SIGNAL_NAMES[key]}, ${points.length} daily readings from ${first.label} to ${final.label}, ranging ${range}. Latest ${format(reading)}.${comparisonPhrase} ${lineCaption}.`,
   };
 };
 
