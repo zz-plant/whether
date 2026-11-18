@@ -145,7 +145,7 @@ const BaseRateSentence = ({ totals, baseRate }: Pick<NonNullable<ReturnType<type
 const WarningDiamond = ({ warned, className = "" }: { warned: boolean; className?: string }) => (
   <span
     aria-hidden="true"
-    className={`inline-block size-2.5 shrink-0 rotate-45 border-[1.5px] border-current ${warned ? "bg-current" : ""} ${className}`.trim()}
+    className={["inline-block size-2.5 shrink-0 rotate-45 border-[1.5px] border-current", warned ? "bg-current" : "", className].filter(Boolean).join(" ")}
   />
 );
 
