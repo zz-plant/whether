@@ -114,12 +114,12 @@ export function WhyConditionsSection({
                     .join(" and ")}.`}{" "}
               {NOT_COUNTED_REASON}
             </p>
-            {/* The same reading, plotted: the chart in "What would change our mind" with the
-                left-out inputs counted, and the areas that would then move named under it. */}
+            {/* The same reading, plotted: the conditions chart two sections down, with the
+                left-out inputs counted and the areas that would then move named under it. */}
             {chartHref ? (
               <p className="mt-1 text-fluid-sm">
                 <PlainActionLink href={chartHref} variant="inline" data-counted-chart-link="">
-                  See it on the conditions chart
+                  See it charted
                 </PlainActionLink>
               </p>
             ) : null}

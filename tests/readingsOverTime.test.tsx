@@ -204,12 +204,14 @@ describe("the record behind the brief's two figures", () => {
     assert.equal(describeScoreDistribution({ series: series.slice(0, 10), metric: "tightness", value: 90 }), null, "too short a record to rank against");
   });
 
-  it("draws it behind the figure's rule with the rank in its name, and not on the compact figure", () => {
+  it("draws it behind the figure's rule with the rank as its title, and not on the compact figure", () => {
     const distribution = describeScoreDistribution({ series, metric: "riskAppetite", value: 30 });
     const lines = [{ kind: "pause" as const, value: 44 }, { kind: "resume" as const, value: 54 }, { kind: "callChange" as const, value: 50 }];
     const html = renderToStaticMarkup(<ScoreLadder figure label="Risk appetite" value={30} lines={lines} distribution={distribution} />);
     assert.match(html, /data-ladder-distribution[^>]*title="Lower than 73% of the 40 month-end readings since Jan 2012\."/);
-    assert.match(html, /<span class="sr-only">30 of 100\. Lower than 73%/);
+    /* The rank is the drawing's title, not repeated as hidden text: the sentence beside the
+       brief's figures says it in words ("lower than most months since 2012"). */
+    assert.doesNotMatch(html, /<span class="sr-only">[^<]*Lower than 73%/);
     const compact = renderToStaticMarkup(<ScoreLadder figure="compact" label="Risk appetite" value={30} lines={lines} distribution={distribution} />);
     assert.doesNotMatch(compact, /data-ladder-distribution|Lower than 73%/);
     const off = renderToStaticMarkup(<ScoreLadder figure label="Risk appetite" value={30} lines={lines} />);

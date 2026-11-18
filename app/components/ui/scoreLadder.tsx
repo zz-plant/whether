@@ -90,9 +90,11 @@ type ScoreLadderProps = {
   /**
    * Every month-end reading of this score on the record, in bands (`describeScoreDistribution`),
    * drawn faintly behind the figure's ruled line (2026-11-18), with the score's rank as the
-   * drawing's title and in its accessible name. Off by default; the brief's two figures
-   * beside the guidance turn it on, where the sentence "higher than most months since
-   * 2012" sits beside them. Not drawn on the compact figure, which has no ruled line.
+   * drawing's title. Off by default; the brief's two figures beside the guidance turn it on,
+   * where the sentence "higher than most months since 2012" sits beside them and states the
+   * rank in words for every reader. The precise rank is not repeated as hidden text: it cost
+   * the first screen 24 words of its load budget to say what that sentence says. Not drawn
+   * on the compact figure, which has no ruled line.
    */
   distribution?: { bins: readonly number[]; binPoints: number; summary: string } | null;
   className?: string;
@@ -630,7 +632,6 @@ export function ScoreLadder({
           <span className={`${figure === "compact" ? "text-[0.8125rem]" : "text-fluid-sm"} leading-snug text-slate-300`} data-ladder-caption>
             <span className="sr-only">
               {formatPoints(value)} of {formatPoints(max)}.{" "}
-              {figure === true && distribution ? `${distribution.summary} ` : null}
             </span>
             <span className={`font-semibold ${standing.crossed ? "text-line-crossed-fg" : "text-slate-100"}`}>
               <LineStateIcon state={standing.crossed ? "crossed" : "clear"} className="mr-1.5 inline align-[-0.15em]" />

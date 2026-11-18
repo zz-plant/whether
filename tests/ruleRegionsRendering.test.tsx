@@ -115,7 +115,7 @@ describe("the conditions chart's rule layer on the brief", () => {
       />,
     );
     assert.match(html, /<a href="\/\?counted=1#what-would-change"[^>]*data-counted-chart-link/);
-    assert.match(text(html), /See it on the conditions chart/);
+    assert.match(text(html), /See it charted/);
   });
 });
 
