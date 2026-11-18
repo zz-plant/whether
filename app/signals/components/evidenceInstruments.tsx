@@ -27,6 +27,15 @@ import { ConditionCellsPreview, RatesSparklinePreview, ScoreSparklinesPreview } 
 import { MonthReadoutStrip } from "./monthReadoutStrip";
 import { columnMonthLabel, columnYearLabel, instrumentMonthHref } from "./instrumentMonthHref";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
+import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
+import { THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
+import {
+  describeLinesAndInputsAnswer,
+  hasCustomLines,
+  hasInputChoiceParams,
+  type InputChoiceModel,
+} from "../../../lib/report/countedInputs";
+import { formatChangeLines } from "../../../lib/report/evidenceInstrumentSummaries";
 
 /**
  * The fourth section of the evidence page: the instruments. Charts, the line
@@ -163,6 +172,7 @@ export const SignalsInstrumentsSection = ({
   cacheMonthsByYear,
   invalidHistoricalSelection,
   monthPickerOpen,
+  inputChoice = null,
   searchParams,
 }: {
   assessment: RegimeAssessment;
@@ -178,6 +188,8 @@ export const SignalsInstrumentsSection = ({
   cacheMonthsByYear: Record<number, number[]>;
   invalidHistoricalSelection: boolean;
   monthPickerOpen: boolean;
+  /** Which inputs count, for the line settings (`buildInputChoiceModel`); null when the reading offers no choice. */
+  inputChoice?: InputChoiceModel | null;
   searchParams?: SignalsPageSearchParams;
 }) => {
   /* Each closed question carries its answer (§XII), from the values the panel
@@ -204,6 +216,15 @@ export const SignalsInstrumentsSection = ({
   const ratesMonthHref = instrumentMonthHref({ searchParams, panelKey: "rates", anchor: "signal-diagnostics" });
   const trendsMonthHref = instrumentMonthHref({ searchParams, panelKey: "trends", anchor: "trends" });
   const percent = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}%` : "n/a");
+  /* The line settings open when the URL names lines or inputs: a shared link opens on what the
+     sender set. Decided here, from the request, so the server and the browser agree. */
+  const linesOpen =
+    Object.values(THRESHOLD_PARAM_KEYS).some((key) => typeof searchParams?.[key] === "string") || hasInputChoiceParams(searchParams);
+  const linesAnswer = describeLinesAndInputsAnswer({
+    customLines: hasCustomLines(assessment.thresholds, DEFAULT_THRESHOLDS),
+    inputs: inputChoice,
+    linesText: formatChangeLines(assessment.thresholds),
+  });
   return (
   /* Ruled off from "What would change this guidance" by the report rows' own divider.
      It drew a second rule 24px under that one, and kept the 20px inset the report
@@ -310,7 +331,12 @@ export const SignalsInstrumentsSection = ({
         </div>
       </UrlDetails>
 
-      <AdvancedThresholdsSection currentThresholds={assessment.thresholds} />
+      <AdvancedThresholdsSection
+        currentThresholds={assessment.thresholds}
+        defaultOpen={linesOpen}
+        answer={linesAnswer}
+        inputChoice={inputChoice}
+      />
 
       <UrlDetails
         id="past-months"
