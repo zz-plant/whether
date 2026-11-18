@@ -8,13 +8,16 @@ import { WhyConditionsSection } from "../app/components/home/WhyConditionsSectio
 import { AreaTable } from "../app/components/ui/areaTable";
 import { RuleRegionMap } from "../app/components/ui/ruleRegionMap";
 import { AreaStateHistory } from "../app/operate/components/areaStateHistory";
+import { PlanLinesForm } from "../app/operate/components/planLinesForm";
 import { buildAreaRows } from "../app/operate/areaRows";
+import { planLinesFromRules } from "../lib/alert/planLines";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 import { buildActionStripItems } from "../lib/report/operatingCalls";
 import {
   buildAreaStateHistory,
   buildRuleChartModel,
   buildRuleRegions,
+  compareOwnRule,
   describeRegionsAt,
   ruleFromStripItem,
 } from "../lib/report/ruleRegions";
@@ -67,7 +70,7 @@ describe("the conditions chart's rule layer on the brief", () => {
     assert.match(text(html), /Hiring pauses restarts between them, nothing changes/);
     assert.match(html, />Restart when</, "the guidance's own label, as before");
     assert.match(text(html), /Restart when Funding pressure falls below 66 and risk appetite is above 54/);
-    assert.match(html, /This week&#x27;s reading is in the pause region\./, "the claim is in the figure's text alternative");
+    assert.match(html, /This week&#x27;s reading is where Hiring pauses\./, "the claim is in the figure's text alternative");
     /* The switch is offered, off, and the published reading is the dot. */
     assert.match(html, /Count startup-market inputs/);
     assert.match(html, /data-counted-difference="" aria-live="polite"><\/p>/, "its line is empty until it is on");
@@ -159,10 +162,46 @@ describe("the rules table on /operate", () => {
     const months = buildAreaStateHistory(stripRules, history);
     assert.equal(months.length, 12);
     const html = renderToStaticMarkup(<AreaStateHistory months={months} />);
-    assert.match(text(html), /scored with today’s formula, against this week’s lines/);
+    assert.match(text(html), /scored with today’s formula, against this week’s rules/);
+    /* Every piece of a month's column names its month, for the page-wide active month. */
+    const latest = months.at(-1)!.recordDate.slice(0, 7);
+    assert.equal(html.match(new RegExp(`data-month="${latest}"`, "g"))?.length, 1 + 5 + 2 + 1, "head, five areas, two scores, the link");
+    /* The months it prints are dates: the caption's two and each column's head. */
+    assert.equal(html.match(new RegExp(`<time[^>]*dateTime="${latest}"`, "gi"))?.length, 2, "the caption's last month and its column head");
     const links = html.match(/<a href="\/operate\?month=\d+&amp;year=\d+#ops-monthly-action-summary"/g) ?? [];
     assert.ok(links.length > 0 && links.length <= 12, `${links.length} month links`);
     assert.equal(html.match(/data-area-state="crossed"/g)?.length, 4 * 4, "four paused months for the four areas on funding pressure");
     assert.match(text(html), /Hiring, Fundraising, Spending and New bets paused; Roadmap clear\. Funding pressure 90, risk appetite 56\./);
+  });
+
+  it("draws the same chart beside each area's numbers in the form, with no outline until a number moves", () => {
+    const defaults = planLinesFromRules(rules);
+    const html = renderToStaticMarkup(<PlanLinesForm defaults={defaults} reading={{ scores: week, changeLines }} />);
+    assert.equal(html.match(/data-rule-region-map=/g)?.length, 5);
+    /* Its own hatch ids, so the table's charts on the same page keep theirs. */
+    assert.match(html, /id="plan-map-hiring-pause-hatch"/);
+    assert.doesNotMatch(html, /id="rule-map-/);
+    assert.doesNotMatch(html, /data-rule-outline/);
+    assert.match(text(html), /Each chart runs risk appetite 0–100 across and funding pressure 0–100 down\. Our rule is shaded/);
+    assert.match(html, /<span class="sr-only">Hiring pauses where Funding pressure &gt; 76 or Risk appetite &lt; 44/);
+    /* The words, read aloud or on screen, never name the drawing's parts. */
+    assert.doesNotMatch(text(html), /\b(outline|overlay|ghost|diff|regions?|mini-map|delta|toggle)\b/i);
+    /* Without this week's reading the form is as it was. */
+    const bare = renderToStaticMarkup(<PlanLinesForm defaults={defaults} />);
+    assert.doesNotMatch(bare, /data-rule-region-map=|data-rule-map-key/);
+  });
+
+  it("outlines a reader's moved numbers dashed in the ink, over the published shading", () => {
+    const hiring = planLinesFromRules(rules).find((line) => line.area === "hiring")!;
+    const own = { ...hiring, resume: [{ ...hiring.resume[0]!, value: 60 }, hiring.resume[1]!] };
+    const comparison = compareOwnRule({ published: hiring, own, scores: week });
+    const html = renderToStaticMarkup(
+      <RuleRegionMap area="hiring" regions={comparison.regions} outline={comparison.outline} scores={week} changeLines={changeLines} label={comparison.description} />,
+    );
+    const outline = html.match(/<g data-rule-outline="">(.*?)<\/g>/)?.[1] ?? "";
+    assert.equal(outline.match(/<line /g)?.length, 2, "the moved restart box's two edges");
+    assert.match(outline, /stroke="var\(--app-text\)"/);
+    assert.match(outline, /stroke-dasharray="6 4"/);
+    assert.doesNotMatch(outline, /--line-crossed|--line-clear/, "a reader's own lines take no line-state colour");
   });
 });

@@ -14,10 +14,12 @@
  * they were, and this module only adds the words a picture needs beside it.
  */
 import {
+  buildRuleCondition,
   decisionAreaLabel,
   decisionAreaOrder,
   distanceToRuleCondition,
   isRuleConditionMet,
+  ruleMetricLabel,
   type BoundedDecisionRule,
   type DecisionArea,
   type RuleCondition,
@@ -25,7 +27,6 @@ import {
 } from "./boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import { resolveLineState, type ActionStripItem, type LineState } from "./operatingCalls";
-import { anyPauseLineMet } from "./reportEvidence";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
 import { regimeAtCoordinates } from "../regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
@@ -145,13 +146,16 @@ export const buildRuleRegions = (rule: AreaRule): AreaRuleRegions => ({
   resume: regionFor(rule.resume),
 });
 
-/* The pause by the predicate every area surface uses (`anyPauseLineMet`); a clause stored
-   as "and" needs every line, as its sentence says. */
+/* The pause by the predicate every area surface uses: any line met, as `anyPauseLineMet`
+   (lib/report/reportEvidence.ts) reads it, through the same `isRuleConditionMet`. It is not
+   imported from there, because the /operate form's client island reads this module and the
+   evidence builder would bring the engine with it. A clause stored as "and" needs every
+   line, as its sentence says. */
 const pauseMet = (rule: AreaRule, scores: Scores) =>
   rule.pause.conditions.length > 0 &&
   (rule.pause.join === "and"
     ? rule.pause.conditions.every((condition) => isRuleConditionMet(condition, scores[condition.metric]))
-    : anyPauseLineMet([{ pauseConditions: [...rule.pause.conditions] }], scores));
+    : rule.pause.conditions.some((condition) => isRuleConditionMet(condition, scores[condition.metric])));
 
 const restartMet = (rule: AreaRule, scores: Scores) =>
   rule.resume.conditions.length > 0 &&
@@ -187,16 +191,18 @@ const listAreas = (areas: readonly DecisionArea[]) => listFormat.format(areas.ma
 /* The compact form the rules table prints ("Funding pressure > 76 or Risk appetite < 44"). */
 const clauseLabel = (clause: RuleClause) => clause.conditions.map((condition) => condition.label).join(` ${clause.join} `);
 
-const WHERE: Record<RegionState, string> = {
-  pause: "in the pause region",
-  restart: "in the restart region",
-  between: "between the two, where nothing changes",
+/* Where the reading sits, by the area's verb: "region" is the drawing's word, not the reader's
+   (it read "in the pause region" until 2026-11-18). */
+const WHERE: Record<RegionState, (label: string) => string> = {
+  pause: (label) => `where ${label} pauses`,
+  restart: (label) => `where ${label} restarts`,
+  between: () => "between the two, where nothing changes",
 };
 
 /**
  * The chart's claim in words, for its text alternative: which region is which and where the
  * reading sits. "Hiring pauses where Funding pressure > 76 or Risk appetite < 44 and restarts
- * where Funding pressure < 66 and Risk appetite > 54. This week's reading is in the pause region."
+ * where Funding pressure < 66 and Risk appetite > 54. This week's reading is where Hiring pauses."
  */
 export const describeRegionsAt = (rule: AreaRule, scores: Scores, readingName: string): string => {
   const label = decisionAreaLabel(rule.area);
@@ -205,7 +211,7 @@ export const describeRegionsAt = (rule: AreaRule, scores: Scores, readingName: s
     rule.resume.conditions.length > 0 ? `restarts where ${clauseLabel(rule.resume)}` : null,
   ].filter((side): side is string => side !== null);
   const ruleSentence = sides.length > 0 ? `${label} ${sides.join(" and ")}.` : `${label} has no line on the two scores.`;
-  return `${ruleSentence} ${readingName} is ${WHERE[regionAt(rule, scores)]}.`;
+  return `${ruleSentence} ${readingName} is ${WHERE[regionAt(rule, scores)](label)}.`;
 };
 
 /**
@@ -405,4 +411,102 @@ export const buildAreaStateHistory = (
         summary: `${label}: ${byState.join("; ")}. Funding pressure ${entry.tightness}, risk appetite ${entry.riskAppetite}.`,
       };
     });
+};
+
+/** One line of a rule as numbers only, the way a reader's own rules are kept (`PlanLines`, lib/alert/planLines.ts). */
+type NumericLine = { metric: RuleConditionMetric; operator: ">" | "<"; value: number };
+
+/** A rule as numbers only: a pause on any of its lines, a restart on all of them, as every published rule joins them. */
+type NumericRule = { area: DecisionArea; pause: readonly NumericLine[]; resume: readonly NumericLine[] };
+
+/** A numbers-only rule as the regions and predicates read one. */
+export const ruleFromNumbers = (rule: NumericRule): AreaRule => ({
+  area: rule.area,
+  pause: { conditions: rule.pause.map((line) => buildRuleCondition(line.metric, line.operator, line.value)), join: "or" },
+  resume: { conditions: rule.resume.map((line) => buildRuleCondition(line.metric, line.operator, line.value)), join: "and" },
+});
+
+/* A line is met sooner when it moves toward the reading that meets it: a "> 76" lowered, a
+   "< 44" raised. A pause comes as conditions get harder and a restart as they ease, so
+   "sooner" reads the same way on both sides. */
+const metSooner = (line: NumericLine, from: number) => (line.operator === ">" ? line.value < from : line.value > from);
+
+type RuleSide = "pause" | "resume";
+
+const SIDE_VERB: Record<RuleSide, string> = { pause: "pauses if", resume: "restarts when" };
+
+type OwnRuleComparison = {
+  /** The published rule's regions, as the rules table draws them. */
+  regions: AreaRuleRegions;
+  /** The reader's regions, one per side whose numbers moved, drawn over the published ones as an outline. */
+  outline: RuleRegion[];
+  /**
+   * One sentence per moved number, the answer first: "Later than ours: your Hiring restarts
+   * when funding pressure is below 60, not 66." Empty while the numbers are the published ones.
+   */
+  changes: string[];
+  /**
+   * Where the reader's numbers put the area this week, when that differs from where the
+   * published rule puts it: "Hiring would restart this week by your numbers. By ours it
+   * stays paused." Null when the two agree.
+   */
+  thisWeek: string | null;
+  /** The map's text alternative: the published rule and where this week's reading sits against it. */
+  description: string;
+};
+
+/**
+ * A reader's own numbers for one area beside the published rule, for the /operate form that
+ * lets them move each number. The regions, "sooner" and "later", and this week's state are
+ * judged with the geometry and predicates the rules table and its map use (`regionAt`), so
+ * the form cannot say an area pauses where the table, read with the same numbers, does not.
+ * Lines are paired by score and direction, as the form keeps them; a line with no published
+ * counterpart says nothing.
+ */
+export const compareOwnRule = ({
+  published,
+  own,
+  scores,
+}: {
+  published: NumericRule;
+  own: NumericRule;
+  scores: Scores;
+}): OwnRuleComparison => {
+  const label = decisionAreaLabel(published.area);
+  const publishedRule = ruleFromNumbers(published);
+  const ownRule = ruleFromNumbers({ ...own, area: published.area });
+  const ownRegions = buildRuleRegions(ownRule);
+  const moved = (side: RuleSide) =>
+    own[side].flatMap((line) => {
+      const from = published[side].find((candidate) => candidate.metric === line.metric && candidate.operator === line.operator);
+      return from && from.value !== line.value ? [{ side, line, from: from.value }] : [];
+    });
+  const movedPause = moved("pause");
+  const movedResume = moved("resume");
+  const changes = [...movedPause, ...movedResume].map(({ side, line, from }) => {
+    const score = ruleMetricLabel[line.metric].toLowerCase();
+    const direction = line.operator === ">" ? "above" : "below";
+    return `${metSooner(line, from) ? "Sooner" : "Later"} than ours: your ${label} ${SIDE_VERB[side]} ${score} is ${direction} ${line.value}, not ${from}.`;
+  });
+  const publishedAt = regionAt(publishedRule, scores);
+  const ownAt = regionAt(ownRule, scores);
+  /* Only the pause decides this week's state: an area that is not paused has nothing to restart. */
+  const thisWeek =
+    ownAt === "pause" && publishedAt !== "pause"
+      ? `${label} would pause this week by your numbers, not by ours.`
+      : ownAt !== "pause" && publishedAt === "pause"
+        ? ownAt === "restart"
+          ? `${label} would restart this week by your numbers. By ours it stays paused.`
+          : `${label} wouldn't pause this week by your numbers. By ours it does.`
+        : null;
+  return {
+    regions: buildRuleRegions(publishedRule),
+    outline: [
+      ...(movedPause.length > 0 ? [ownRegions.pause] : []),
+      ...(movedResume.length > 0 ? [ownRegions.resume] : []),
+    ].filter((region) => region.edges.length > 0),
+    changes,
+    thisWeek,
+    description: describeRegionsAt(publishedRule, scores, "This week's reading"),
+  };
 };
