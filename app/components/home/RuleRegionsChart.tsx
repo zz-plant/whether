@@ -4,39 +4,65 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type MouseEvent,
   type ReactNode,
 } from "react";
 import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { buildHomeDecisionCookie } from "../../../lib/report/home/homeSectionModel";
+import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigation";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { RULE_CHART_AREA_PARAM, RULE_CHART_COUNTED_PARAM, buildRuleChartHref } from "../../../lib/report/ruleChartParams";
-import type { RuleChartArea, RuleChartModel } from "../../../lib/report/ruleRegions";
-import { PlainActionLink } from "../ui/actionLink";
+import {
+  RULE_CHART_AREA_PARAM,
+  RULE_CHART_COUNTED_PARAM,
+  RULE_CHART_DECISION_PARAM,
+  RULE_CHART_READING_PARAM,
+  buildRuleChartHref,
+  describeRuleChartWhere,
+  type RuleChartReadingKey,
+} from "../../../lib/report/ruleChartParams";
+import { formatShortRate } from "../../../lib/report/fedSteps";
+import type { RuleChartArea, RuleChartModel, RuleChartReading } from "../../../lib/report/ruleRegions";
+import { ClipboardActionRow } from "../clipboardActionRow";
+import { getClipboardUiState, useClipboardCopy } from "../useClipboardCopy";
+import { ActionLink, PlainActionLink } from "../ui/actionLink";
 import { BoundedValue } from "../ui/boundedValue";
 import { AreaIcon, LineStateIcon } from "../ui/conceptIcons";
 import { RegimeRadar, type RegimeRadarProps } from "./RegimeRadar";
 
 /**
- * The rule layer of the brief's conditions chart (2026-11-18): pick an area and its pause
- * region and restart region are shaded on the chart, so the week's reading visibly sits in
- * one, the other, or the band between where nothing changes; and, where the reading leaves
- * inputs out, a switch that plots the reading with them counted.
+ * What the brief's conditions chart can be asked (2026-11-18): which area's rule it shades,
+ * and which reading it plots. Pick an area and its pause and restart are shaded, so the
+ * week's reading visibly sits where the area pauses, where it restarts, or between the two
+ * where nothing changes. Pick a reading and the filled marker moves to it, this week's
+ * stays as the hollow one, and one sentence under the chart says which areas would pause
+ * or restart: the reading with the left-out startup-market inputs counted, or this week's
+ * after one, two or three quarter-point Fed cuts or one hike (`rateScenario.ts`). The
+ * guidance beside the chart never changes.
  *
- * Three small pieces share one state, so the section's own layout stays where it was
- * (`WhatWouldChangeSection`): the chooser over the chart, the chart, and the "Pause if" /
- * "Restart when" lines beside it, which follow the chosen area. Every word and region
- * comes from the server (`buildRuleChartModel`); nothing here judges a reading.
+ * Small pieces share one state, so the section's own layout stays where it was
+ * (`WhatWouldChangeSection`): the two rows of choices over the chart, the chart, and the
+ * "Pause if" / "Restart when" lines beside it, which follow the chosen area. Every word,
+ * region and score comes from the server (`buildRuleChartModel`); nothing here judges a
+ * reading.
  *
- * The state is the URL's (§V): `?rule=` names a chosen area other than the guidance's
- * lead, `?counted=1` the switch. The chooser and the switch are links to those URLs, as the
- * phase map's window chooser on /history is (`.weather-pill[aria-current="page"]`): each
- * works before the script loads and copies as the picture it shows, and the brief's load
- * budget counts no field for them. Once the page is live a plain click is taken here and
- * the URL replaced rather than pushed, as the decision picker does: changing the picture
- * is not a step Back should retrace.
+ * The state is the URL's (§V): `?decision=` names the area, as the decision picker's
+ * does, and `?reading=` the reading (`ruleChartParams.ts`; `?rule=` and `?counted=1` still
+ * open theirs). The choices are links to those URLs, as the phase map's window chooser on
+ * /history is (`.weather-pill[aria-current="page"]`): each works before the script loads
+ * and copies as the picture it shows, and the brief's load budget counts no field for
+ * them. Once the page is live a plain click is taken here and the URL replaced rather
+ * than pushed, as the decision picker does: changing the picture is not a step Back
+ * should retrace. Choosing an area is choosing the brief's decision, so it is remembered
+ * in the picker's cookie and announced to the page as a `whether:decision` event, which
+ * this chart also hears.
  */
+
+/** The page event an area choice is announced with, and heard on: `detail: { area, source }`. */
+const DECISION_EVENT = "whether:decision";
+const SOURCE = "conditions-chart";
 
 type RuleChartState = {
   selected: DecisionArea | null;
@@ -44,20 +70,22 @@ type RuleChartState = {
   shown: DecisionArea | null;
   select: (area: DecisionArea) => void;
   preview: (area: DecisionArea | null) => void;
-  counted: boolean;
-  setCounted: (on: boolean) => void;
+  reading: RuleChartReadingKey | null;
+  setReading: (reading: RuleChartReadingKey | null) => void;
   /** The link to a state of the chart, keeping the rest of the page's query. */
-  hrefFor: (next: { area?: DecisionArea | null; counted?: boolean }) => string;
+  hrefFor: (next: { area?: DecisionArea; reading?: RuleChartReadingKey | null }) => string;
 };
 
 const RuleChartContext = createContext<RuleChartState | null>(null);
 
 const useRuleChart = () => useContext(RuleChartContext);
 
-const writeParam = (key: string, value: string | null) => {
+const writeParams = (updates: Record<string, string | null>) => {
   const url = new URL(window.location.href);
-  if (value) url.searchParams.set(key, value);
-  else url.searchParams.delete(key);
+  for (const [key, value] of Object.entries(updates)) {
+    if (value) url.searchParams.set(key, value);
+    else url.searchParams.delete(key);
+  }
   window.history.replaceState(window.history.state, "", url);
 };
 
@@ -65,55 +93,92 @@ const writeParam = (key: string, value: string | null) => {
 const isPlainClick = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
 
+const isAreaDetail = (detail: unknown): detail is { area: DecisionArea; source?: string } =>
+  typeof detail === "object" && detail !== null && "area" in detail && typeof detail.area === "string";
+
 export function RuleChartProvider({
   defaultArea,
   initialArea,
-  initialCounted,
+  initialReading,
+  areas,
   query,
   children,
 }: {
   defaultArea: DecisionArea | null;
-  /** The area the URL names, read on the server so the first paint shades it. */
+  /** The area the URL or the remembered decision names, read on the server so the first paint shades it. */
   initialArea?: DecisionArea;
-  initialCounted: boolean;
+  /** The reading the URL names, null for this week's. */
+  initialReading: RuleChartReadingKey | null;
+  /** The areas the chart can shade: an announced area outside them is ignored. */
+  areas: readonly DecisionArea[];
   /** The page's query, which every link the chart draws keeps. */
   query?: Record<string, string | undefined>;
   children: ReactNode;
 }) {
   const [selected, setSelected] = useState<DecisionArea | null>(initialArea ?? defaultArea);
+  /* Whether a reader chose the area: until then a reading's link leaves the decision out. */
+  const [chosen, setChosen] = useState(Boolean(initialArea));
   const [previewed, setPreviewed] = useState<DecisionArea | null>(null);
-  const [counted, setCountedState] = useState(initialCounted);
-  const select = useCallback(
-    (area: DecisionArea) => {
+  const [reading, setReadingState] = useState(initialReading);
+  const select = useCallback((area: DecisionArea) => {
+    setSelected(area);
+    setChosen(true);
+    setPreviewed(null);
+    writeParams({ [RULE_CHART_DECISION_PARAM]: area, [RULE_CHART_AREA_PARAM]: null });
+    document.cookie = buildHomeDecisionCookie(area);
+    document.dispatchEvent(new CustomEvent(DECISION_EVENT, { detail: { area, source: SOURCE } }));
+  }, []);
+  /* Another part of the page choosing the decision moves the chart with it. */
+  useEffect(() => {
+    const follow = (event: Event) => {
+      if (!(event instanceof CustomEvent) || !isAreaDetail(event.detail) || event.detail.source === SOURCE) return;
+      const { area } = event.detail;
+      if (!areas.includes(area)) return;
       setSelected(area);
-      setPreviewed(null);
-      /* The lead area is the chart's default, so its link carries no key. */
-      writeParam(RULE_CHART_AREA_PARAM, area === defaultArea ? null : area);
-    },
-    [defaultArea],
-  );
-  const setCounted = useCallback((on: boolean) => {
-    setCountedState(on);
-    writeParam(RULE_CHART_COUNTED_PARAM, on ? "1" : null);
+      setChosen(true);
+    };
+    document.addEventListener(DECISION_EVENT, follow);
+    return () => document.removeEventListener(DECISION_EVENT, follow);
+  }, [areas]);
+  const setReading = useCallback((next: RuleChartReadingKey | null) => {
+    setReadingState(next);
+    writeParams({ [RULE_CHART_READING_PARAM]: next, [RULE_CHART_COUNTED_PARAM]: null });
   }, []);
   const hrefFor = useCallback(
-    (next: { area?: DecisionArea | null; counted?: boolean }) => {
-      const area = next.area === undefined ? selected : next.area;
-      return buildRuleChartHref(query, { area: area === defaultArea ? null : area, counted: next.counted ?? counted });
-    },
-    [query, selected, defaultArea, counted],
+    (next: { area?: DecisionArea; reading?: RuleChartReadingKey | null }) =>
+      buildRuleChartHref(query, {
+        area: next.area ?? (chosen ? selected : null),
+        reading: next.reading === undefined ? reading : next.reading,
+      }),
+    [query, selected, chosen, reading],
   );
   const value = useMemo<RuleChartState>(
-    () => ({ selected, shown: previewed ?? selected, select, preview: setPreviewed, counted, setCounted, hrefFor }),
-    [selected, previewed, select, counted, setCounted, hrefFor],
+    () => ({ selected, shown: previewed ?? selected, select, preview: setPreviewed, reading, setReading, hrefFor }),
+    [selected, previewed, select, reading, setReading, hrefFor],
   );
   return <RuleChartContext.Provider value={value}>{children}</RuleChartContext.Provider>;
 }
 
+/* A row of choices: its question, then the choices as links, the current one marked. */
+function ChoiceRow({ id, question, children }: { id: string; question: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <p className="text-fluid-sm font-semibold text-slate-200" id={id}>
+        {question}
+      </p>
+      {/* A control, not navigation, but it changes the URL, so a shared link opens on the
+          picture the sender was reading (the phase map's window chooser does the same). */}
+      <nav aria-labelledby={id} className="flex flex-wrap gap-1.5">
+        {children}
+      </nav>
+    </div>
+  );
+}
+
 /**
  * The five areas, each with its glyph and name. Pointing at or focusing one previews its
- * regions; choosing one keeps them. On a touch screen, where there is no pointing, a tap
- * chooses.
+ * pause and restart; choosing one keeps them. On a touch screen, where there is no
+ * pointing, a tap chooses.
  */
 export function RuleChartChooser({ areas }: { areas: readonly DecisionArea[] }) {
   const state = useRuleChart();
@@ -122,13 +187,8 @@ export function RuleChartChooser({ areas }: { areas: readonly DecisionArea[] }) 
      task, so the chart does not flash the chosen area between two neighbours. */
   const leave = () => state.preview(null);
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2" data-rule-chooser="">
-      <p className="text-fluid-sm font-semibold text-slate-200" id="rule-chart-chooser-label">
-        Shade the lines for
-      </p>
-      {/* A control, not navigation, but it changes the URL, so a shared link opens on the
-          area the sender was reading (the phase map's window chooser does the same). */}
-      <nav aria-labelledby="rule-chart-chooser-label" className="flex flex-wrap gap-1.5">
+    <div data-rule-chooser="">
+      <ChoiceRow id="rule-chart-chooser-label" question="Which area?">
         {areas.map((area) => {
           const active = area === state.selected;
           return (
@@ -154,7 +214,46 @@ export function RuleChartChooser({ areas }: { areas: readonly DecisionArea[] }) 
             </PlainActionLink>
           );
         })}
-      </nav>
+      </ChoiceRow>
+    </div>
+  );
+}
+
+/**
+ * Which reading the chart plots: this week's, or one of the others the server scored
+ * (`RuleChartReading`). Only where there is another to plot.
+ */
+export function RuleChartReadings({ readings }: { readings: readonly Pick<RuleChartReading, "key" | "label" | "name">[] }) {
+  const state = useRuleChart();
+  if (!state || readings.length === 0) return null;
+  const choices: Array<{ key: RuleChartReadingKey | null; label: string; name?: string }> = [
+    { key: null, label: "This week's" },
+    ...readings,
+  ];
+  return (
+    <div data-reading-choices="">
+      <ChoiceRow id="rule-chart-reading-label" question="Which reading?">
+        {choices.map((choice) => (
+          <PlainActionLink
+            key={choice.key ?? "this-week"}
+            href={state.hrefFor({ reading: choice.key })}
+            variant="pill"
+            aria-current={choice.key === state.reading ? "page" : undefined}
+            /* "After two" in full for a listener who meets it alone; only where the full name
+               starts with the words shown, so a spoken "After two" still finds it (WCAG 2.5.3). */
+            aria-label={choice.name && choice.name !== choice.label && choice.name.startsWith(choice.label) ? choice.name : undefined}
+            className={choice.key === state.reading ? undefined : "text-slate-300"}
+            data-reading={choice.key ?? "this-week"}
+            onClick={(event) => {
+              if (!isPlainClick(event)) return;
+              event.preventDefault();
+              state.setReading(choice.key);
+            }}
+          >
+            {choice.label}
+          </PlainActionLink>
+        ))}
+      </ChoiceRow>
     </div>
   );
 }
@@ -179,48 +278,79 @@ function RegionSwatch({ kind }: { kind: "pause" | "resume" | "between" }) {
   );
 }
 
+/* The funding-pressure lines that matter for the shown area, with the rate each comes with. */
+const rateTicksFor = (
+  shown: Pick<RuleChartArea, "regions"> | null,
+  changeLine: number,
+  rates: NonNullable<RuleChartModel["fundingPressureRates"]>,
+) => {
+  const rateAt = new Map(rates.values.map((entry) => [entry.value, entry.rate]));
+  const lines = [
+    { value: changeLine, kind: "change" as const },
+    ...(shown?.regions.pause.edges ?? []).filter((edge) => edge.metric === "tightness").map((edge) => ({ value: edge.value, kind: "pause" as const })),
+    ...(shown?.regions.resume.edges ?? []).filter((edge) => edge.metric === "tightness").map((edge) => ({ value: edge.value, kind: "restart" as const })),
+  ];
+  const seen = new Set<number>();
+  return lines.flatMap((line) => {
+    const rate = rateAt.get(line.value);
+    if (rate === undefined || seen.has(line.value)) return [];
+    seen.add(line.value);
+    return [{ ...line, rate }];
+  });
+};
+
 /**
- * The chart with the shown area's regions, its key and the conditions no region can draw.
- * `radar` is the published chart as the section has always drawn it; with the left-out
- * inputs counted (`RuleChartCountedSwitch`), the counted reading becomes the filled marker
- * and the published one the hollow, the month-end path, which led to the published reading,
- * steps aside, and one line under the chart names the areas that would then move. The
- * guidance beside the chart does not change.
+ * The chart with the shown area's regions, its key and the conditions no region can draw,
+ * the plotted reading's answer under it, and a copy of the link to this picture. `radar` is
+ * this week's chart as the section has always drawn it; with another reading chosen, that
+ * reading becomes the filled marker and this week's the hollow one, and the month-end path,
+ * which led to this week's reading, steps aside.
  */
 export function RuleChartFigure({
   radar,
   areas,
-  counted,
+  readings,
+  fundingPressureRates,
   className = "",
 }: {
   radar: RegimeRadarProps;
   areas: readonly RuleChartArea[];
-  counted: RuleChartModel["counted"];
+  readings: readonly RuleChartReading[];
+  fundingPressureRates: RuleChartModel["fundingPressureRates"];
   className?: string;
 }) {
   const state = useRuleChart();
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: null });
   const shown = areas.find((candidate) => candidate.area === state?.shown) ?? null;
-  const on = Boolean(counted && state?.counted);
-  const plotted: RegimeRadarProps =
-    on && counted
-      ? {
-          ...radar,
-          tightness: counted.tightness,
-          riskAppetite: counted.riskAppetite,
-          currentRegime: counted.regime,
-          previousTightness: radar.tightness,
-          previousRiskAppetite: radar.riskAppetite,
-          primaryLabel: "Counted reading",
-          previousLabel: "Published reading",
-          readoutLabel: "Counted",
-          trail: undefined,
-          trailCaption: null,
-          caveat: null,
-          feelsLike: null,
-          travelFrom: null,
-        }
-      : radar;
-  const description = shown ? ((on ? shown.description.counted : shown.description.published) ?? undefined) : undefined;
+  const plotted = readings.find((reading) => reading.key === state?.reading) ?? null;
+  const drawn: RegimeRadarProps = plotted
+    ? {
+        ...radar,
+        tightness: plotted.tightness,
+        riskAppetite: plotted.riskAppetite,
+        currentRegime: plotted.regime,
+        previousTightness: radar.tightness,
+        previousRiskAppetite: radar.riskAppetite,
+        primaryLabel: plotted.name,
+        previousLabel: "This week's reading",
+        readoutLabel: plotted.label,
+        trail: undefined,
+        trailCaption: null,
+        caveat: null,
+        feelsLike: null,
+        travelFrom: null,
+      }
+    : radar;
+  const rateTicks = fundingPressureRates ? rateTicksFor(shown, radar.tightnessThreshold, fundingPressureRates) : [];
+  /* The figure's text alternative: where the reading sits against the shown area's rule,
+     and the rate at each labelled line, so the picture's numbers are in the page's text. */
+  const where = shown ? (plotted ? plotted.where[shown.area] : shown.where) : undefined;
+  const description = [
+    shown && where ? `${shown.rule} ${plotted ? plotted.name : "This week's reading"} is ${describeRuleChartWhere(shown.area, where)}.` : null,
+    rateTicks.length > 0 && fundingPressureRates
+      ? `${fundingPressureRates.name}: ${rateTicks.map((tick) => `funding pressure ${tick.value} at ${formatShortRate(tick.rate)}`).join(", ")}.`
+      : null,
+  ].filter(Boolean).join(" ") || undefined;
   const label = shown ? decisionAreaLabel(shown.area) : null;
   const key = shown ? (
     <span className="block space-y-0.5" data-rule-key="">
@@ -241,62 +371,53 @@ export function RuleChartFigure({
         </span>
       </span>
       {shown.note ? <span className="block" data-rule-note="">{shown.note}</span> : null}
+      {/* An area on hold this week: the email the day it restarts, as the area groups offer. */}
+      {shown.held ? (
+        <span className="block pt-0.5" data-restart-email="">
+          <ActionLink href={buildPlanLinesWatchHref([shown.area])} variant="inline">
+            {`Email me when ${label} restarts →`}
+          </ActionLink>
+        </span>
+      ) : null}
     </span>
   ) : null;
+  const copyState = getClipboardUiState("chart-link", { status, error, activeTarget, copiedTarget });
   return (
-    <div className={className} data-rule-chart="" data-counted={on ? "" : undefined}>
-      {/* Counted, the marker takes the counted reading's conditions, so the dot and the lit
-          quadrant say one thing. */}
-      <div data-regime={on && counted ? counted.regime : undefined}>
+    <div className={className} data-rule-chart="" data-reading={plotted?.key}>
+      {/* Another reading's marker takes its own conditions, so the dot and the lit quadrant say one thing. */}
+      <div data-regime={plotted ? plotted.regime : undefined}>
         <RegimeRadar
-          {...plotted}
+          {...drawn}
           ruleRegions={shown?.regions ?? null}
           description={description}
           legend={key}
+          rateTicks={rateTicks}
+          rateTicksLabel={fundingPressureRates?.name}
           className="w-full"
         />
       </div>
-      {/* What the counted reading would change, under the chart it is plotted on. */}
-      {counted ? (
-        <p className="mt-2 text-fluid-sm text-slate-300" data-counted-difference="" aria-live="polite">
-          {on ? counted.difference : null}
+      {/* What the plotted reading would change, under the chart it is plotted on. */}
+      {readings.length > 0 ? (
+        <p className="mt-2 text-fluid-sm text-slate-300" data-reading-answer="" aria-live="polite">
+          {plotted ? plotted.answer : null}
         </p>
       ) : null}
-    </div>
-  );
-}
-
-/**
- * Which reading the chart plots: as published, or with the left-out startup-market inputs
- * counted. Two views of one chart, as links to each (see the chooser), in the row of
- * controls over it. Only where the reading leaves inputs out.
- */
-export function RuleChartCountedSwitch({ available }: { available: boolean }) {
-  const state = useRuleChart();
-  if (!state || !available) return null;
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2" data-counted-switch="">
-      <p className="text-fluid-sm font-semibold text-slate-200" id="rule-chart-reading-label">
-        Plot the reading
-      </p>
-      <nav aria-labelledby="rule-chart-reading-label" className="flex flex-wrap gap-1.5">
-        {([false, true] as const).map((countIt) => (
-          <PlainActionLink
-            key={String(countIt)}
-            href={state.hrefFor({ counted: countIt })}
-            variant="pill"
-            aria-current={countIt === state.counted ? "page" : undefined}
-            className={countIt === state.counted ? undefined : "text-slate-300"}
-            onClick={(event) => {
-              if (!isPlainClick(event)) return;
-              event.preventDefault();
-              state.setCounted(countIt);
-            }}
-          >
-            {countIt ? "Count startup-market inputs" : "As published"}
-          </PlainActionLink>
-        ))}
-      </nav>
+      {state ? (
+        <ClipboardActionRow
+          className="mt-2"
+          label="Copy link"
+          state={copyState}
+          buttonVariant="pill"
+          compact
+          onClick={() => {
+            void copyToClipboard(new URL(state.hrefFor({}), window.location.origin).toString(), "chart-link");
+          }}
+          showStatus
+          statusClassName="sr-only"
+          statusMessages={{ copied: "Link to this chart copied" }}
+          buttonProps={{ "aria-label": "Copy link to this chart", "data-copy-chart-link": "" }}
+        />
+      ) : null}
     </div>
   );
 }

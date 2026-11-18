@@ -1,3 +1,4 @@
+import type { RateDial } from "../../lib/report/rateScenario";
 import type { ScoreComposition } from "../../lib/report/scoreComposition";
 import { ScoreCompositionBar } from "./scoreCompositionBar";
 
@@ -12,12 +13,17 @@ import { ScoreCompositionBar } from "./scoreCompositionBar";
  * The sentence is the arithmetic a reader copies; the bar draws the same object
  * (`buildScoreComposition`), so the two cannot disagree, and the not-counted
  * line is the scoring basis's own sentence, the one `/signals` prints under the
- * score.
+ * score. Funding pressure's bar also takes the short rate on a range
+ * (`buildRateDial`, 2026-11-18): moved, the bar redraws at that rate with this
+ * week's total marked, and a sentence under the control says what would move.
  */
 export function ScoreCompositionFigure({
   composition,
+  rateDial = null,
 }: {
   composition: { tightness: ScoreComposition; riskAppetite: ScoreComposition };
+  /** Funding pressure at other short rates, with the rate the URL names; null where there is no rate to move. */
+  rateDial?: (RateDial & { initialRate?: number }) | null;
 }) {
   const scores = [composition.tightness, composition.riskAppetite];
   return (
@@ -30,9 +36,11 @@ export function ScoreCompositionFigure({
           </p>
           <ScoreCompositionBar
             label={score.label}
+            published={score.published}
             parts={score.parts}
             notCounted={score.notCounted}
             largest={score.largest}
+            rateDial={score.metric === "tightness" ? rateDial : null}
           />
         </div>
       ))}

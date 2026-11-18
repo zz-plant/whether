@@ -12,6 +12,8 @@ import {
 import { scaleLinear } from "d3-scale";
 import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
+import { RadarScrubOverlay } from "./RadarScrubOverlay";
+import { RateTickColumn, type RateTick } from "./RateTickColumn";
 import { classifyRegime } from "../../../lib/regimeEngineCore";
 import { UrlDetails } from "../ui/urlDetails";
 import { ConditionIcon } from "../ui/conceptIcons";
@@ -34,7 +36,7 @@ export type RegimeRadarProps = {
    * point. Month-ends on the brief; the domain is stated in `trailCaption`.
    * When present it replaces the single earlier dot, which is its last point.
    */
-  trail?: ReadonlyArray<{ tightness: number; riskAppetite: number; label?: string }>;
+  trail?: ReadonlyArray<{ tightness: number; riskAppetite: number; label?: string; month?: string }>;
   /** What the path's dots are (UI standards §XV: state the domain of a graphic). */
   trailCaption?: string | null;
   /** The like-for-like note when the earlier readings were scored from fewer inputs. */
@@ -78,6 +80,15 @@ export type RegimeRadarProps = {
   readoutLabel?: string;
   /** A key to what the plot draws beyond the conditions (the shaded regions), first under it. */
   legend?: ReactNode;
+  /**
+   * Funding-pressure values labelled at the plot's right edge with the short rate each
+   * comes with ("76 3.92%"), where the rate alone makes the score (`fundingPressureRateLookup`).
+   * The change line's is among them, and its plain value is not drawn again. The drawing
+   * widens to hold the column; without ticks it is as it was.
+   */
+  rateTicks?: readonly RateTick[];
+  /** The rate the ticks are, named once along the right edge: "1-month rate". */
+  rateTicksLabel?: string;
   className?: string;
 };
 
@@ -100,6 +111,8 @@ const LINE_LABEL_MIN_Y = TOP_ICON_Y + QUADRANT_ICON + 7;
 const LINE_LABEL_MAX_Y = BOTTOM_ICON_Y - 2;
 const SNAP_DETENT_POINTS = 1.6;
 const DRAG_ACTIVATION_PX = 4;
+/* The room the rate column takes right of the plot (`RateTickColumn`). */
+const RATE_TICK_ROOM = 44;
 
 const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
 /* Funding pressure rises downward (2026-11-03), so up and right are both the easier
@@ -148,8 +161,14 @@ export function RegimeRadar({
   description,
   readoutLabel,
   legend,
+  rateTicks,
+  rateTicksLabel,
   className = "",
 }: RegimeRadarProps) {
+  const hasRateTicks = Boolean(rateTicks && rateTicks.length > 0);
+  const viewWidth = hasRateTicks ? VIEW_W + RATE_TICK_ROOM : VIEW_W;
+  /* The plot keeps its size: the drawing's cap grows with the column it gains. */
+  const capStyle: CSSProperties | undefined = hasRateTicks ? { maxWidth: `${(16 * viewWidth) / VIEW_W}rem` } : undefined;
   /* The regions' hatch is a <pattern> referenced by id; one per chart on the page. */
   const regionIdPrefix = `radar-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -249,7 +268,7 @@ export function RegimeRadar({
     if (!svg) return null;
     const rect = svg.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return null;
-    const viewX = ((clientX - rect.left) / rect.width) * VIEW_W;
+    const viewX = ((clientX - rect.left) / rect.width) * viewWidth;
     const viewY = ((clientY - rect.top) / rect.height) * VIEW_H;
     const rawRisk = ((viewX - PLOT_X) / PLOT_SIZE) * 100;
     const rawTightness = ((viewY - PLOT_Y) / PLOT_SIZE) * 100;
@@ -362,6 +381,7 @@ export function RegimeRadar({
     x: xFor(point.riskAppetite),
     y: yFor(point.tightness),
     label: point.label,
+    month: point.month,
     tightness: point.tightness,
     riskAppetite: point.riskAppetite,
     /* A dated dot names its reading on hover, in the words the current marker uses. */
@@ -453,7 +473,7 @@ export function RegimeRadar({
   const readingsFold = compact ? readableReadings.length > 1 || Boolean(caveat) : readableReadings.length > 1;
   const linkToReadings = (chart: ReactNode) =>
     readingsId && readingsFold ? (
-      <a href={`#${readingsId}`} tabIndex={-1} aria-hidden="true" title="Scores on this chart" className="block w-full max-w-[16rem]">
+      <a href={`#${readingsId}`} tabIndex={-1} aria-hidden="true" title="Scores on this chart" className="block w-full max-w-[16rem]" style={capStyle}>
         {chart}
       </a>
     ) : (
@@ -506,7 +526,7 @@ export function RegimeRadar({
 
       {linkToReadings(<svg
         ref={svgRef}
-        viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+        viewBox={`0 0 ${viewWidth} ${VIEW_H}`}
         /* 16rem (256px) at most: the plot is the card's one picture, and at
            200px its month-end trail bunched into a knot beside the current
            point. The viewBox text scales with it, to about 13px at the cap
@@ -514,7 +534,7 @@ export function RegimeRadar({
            display root step instead of shrinking against the text beside it. */
         className="block h-auto w-full max-w-[16rem]"
         aria-hidden="true"
-        style={isScrubbing ? { touchAction: "none", userSelect: "none", cursor: "grabbing" } : { touchAction: "none", userSelect: "none", cursor: "crosshair" }}
+        style={{ ...capStyle, touchAction: "none", userSelect: "none", cursor: isScrubbing ? "grabbing" : "crosshair" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointerInteraction}
@@ -634,15 +654,33 @@ export function RegimeRadar({
           <title>{`Risk appetite change line at ${riskAppetiteThreshold}`}</title>
         </line>
         {/* Each change line's value at its end, so the quadrants are defined on
-            the picture: "70" outside the right edge, "50" above the top. */}
-        <text
-          x={PLOT_RIGHT + 3}
-          y={Math.min(LINE_LABEL_MAX_Y, Math.max(LINE_LABEL_MIN_Y, boundaryY)) + 3}
-          className="fill-slate-400 text-[11px] tabular-nums"
-          data-change-line="tightness"
-        >
-          {tightnessLine}
-        </text>
+            the picture: "70" outside the right edge, "50" above the top. With the
+            rate column, the 70 is its row there. */}
+        {rateTicks?.some((tick) => tick.kind === "change") ? null : (
+          <text
+            x={PLOT_RIGHT + 3}
+            y={Math.min(LINE_LABEL_MAX_Y, Math.max(LINE_LABEL_MIN_Y, boundaryY)) + 3}
+            className="fill-slate-400 text-[11px] tabular-nums"
+            data-change-line="tightness"
+          >
+            {tightnessLine}
+          </text>
+        )}
+        {/* The short rate at each funding-pressure line that matters (2026-11-18): the
+            chosen area's pause and restart and the change line, as "76 3.92%", each
+            joined to its line's end by a hairline in the line's own ink. */}
+        {hasRateTicks && rateTicks ? (
+          <RateTickColumn
+            ticks={rateTicks}
+            label={rateTicksLabel}
+            y={yFor}
+            plotRight={PLOT_RIGHT}
+            viewWidth={viewWidth}
+            titleY={PLOT_Y + PLOT_SIZE / 2}
+            minY={LINE_LABEL_MIN_Y}
+            maxY={LINE_LABEL_MAX_Y}
+          />
+        ) : null}
         <text
           x={boundaryX}
           y={PLOT_Y - 3}
@@ -704,10 +742,16 @@ export function RegimeRadar({
             {trailPoints.map((point, index) => (
               <g
                 key={`${point.x}-${point.y}-${index}`}
+                /* The month this dot stands for, for the page's month cursor: it sets
+                   `data-month-active` here, and the ring under it shows (2026-11-18). */
+                data-month={point.month}
                 onPointerEnter={point.label ? () => setInspectedTrailIndex(index) : undefined}
                 onPointerLeave={point.label ? () => setInspectedTrailIndex((prev) => (prev === index ? null : prev)) : undefined}
               >
                 {point.title ? <title>{point.title}</title> : null}
+                {point.month ? (
+                  <circle cx={point.x} cy={point.y} r="5" fill="none" stroke="var(--app-text)" strokeWidth="1.2" className="hidden in-data-[month-active]:inline" />
+                ) : null}
                 <circle
                   cx={point.x}
                   cy={point.y}
@@ -834,54 +878,7 @@ export function RegimeRadar({
 
         {/* Direct-manipulation scrub overlay: rendered only while actively scrubbing or spring-settling */}
         {isScrubbing ? (
-          <g data-radar-scrub-overlay>
-            {/* Projection guides from scrubbed crosshair to both change lines */}
-            <line
-              x1={scrubX}
-              y1={scrubY}
-              x2={scrubX}
-              y2={boundaryY}
-              stroke="var(--regime-ink)"
-              strokeDasharray="1.5 1.5"
-              strokeWidth="1"
-              strokeOpacity="0.85"
-            />
-            <line
-              x1={scrubX}
-              y1={scrubY}
-              x2={boundaryX}
-              y2={scrubY}
-              stroke="var(--regime-ink)"
-              strokeDasharray="1.5 1.5"
-              strokeWidth="1"
-              strokeOpacity="0.85"
-            />
-            {/* Vector from live reading to scrubbed crosshair */}
-            <line
-              x1={currentX}
-              y1={currentY}
-              x2={scrubX}
-              y2={scrubY}
-              stroke="var(--regime-ink)"
-              strokeWidth="1.25"
-              strokeOpacity="0.9"
-            />
-            <circle
-              cx={scrubX}
-              cy={scrubY}
-              r="7.5"
-              fill="none"
-              stroke="var(--regime-ink)"
-              strokeWidth="1.4"
-              strokeOpacity="0.9"
-            />
-            <circle
-              cx={scrubX}
-              cy={scrubY}
-              r="3.2"
-              fill="var(--regime-ink)"
-            />
-          </g>
+          <RadarScrubOverlay scrubX={scrubX} scrubY={scrubY} currentX={currentX} currentY={currentY} boundaryX={boundaryX} boundaryY={boundaryY} />
         ) : null}
 
         {/* Axes guides */}
