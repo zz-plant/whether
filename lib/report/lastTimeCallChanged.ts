@@ -223,22 +223,81 @@ export const describeConditionsSince = ({
  */
 const shareWords = (share: number) => (share >= 0.95 ? "almost every month" : "most months");
 
+type RecordMetric = "tightness" | "riskAppetite";
+
+/**
+ * Where a score ranks among the record's month-ends: the share below it and above it.
+ * One count, read by the sentence beside the guidance and by the distribution drawn
+ * behind the score's rail, so the two cannot rank the score differently. Null on a
+ * record too short to rank against.
+ */
+const rankAgainstRecord = (series: readonly TimeMachineRegimeEntry[], metric: RecordMetric, value: number) => {
+  const first = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate)).at(0);
+  if (series.length < 24 || first === undefined) return null;
+  return {
+    below: series.filter((entry) => entry[metric] < value).length / series.length,
+    above: series.filter((entry) => entry[metric] > value).length / series.length,
+    first,
+    months: series.length,
+  };
+};
+
 const describeScoreAgainstRecord = ({
   series,
   metric,
   value,
 }: {
   series: readonly TimeMachineRegimeEntry[];
-  metric: "tightness" | "riskAppetite";
+  metric: RecordMetric;
   value: number;
 }): string | null => {
-  const firstYear = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate)).at(0)?.year;
-  if (series.length < 24 || firstYear === undefined) return null;
-  const below = series.filter((entry) => entry[metric] < value).length / series.length;
-  const above = series.filter((entry) => entry[metric] > value).length / series.length;
-  if (below >= 0.6) return `higher than ${shareWords(below)} since ${firstYear}`;
-  if (above >= 0.6) return `lower than ${shareWords(above)} since ${firstYear}`;
+  const rank = rankAgainstRecord(series, metric, value);
+  if (!rank) return null;
+  if (rank.below >= 0.6) return `higher than ${shareWords(rank.below)} since ${rank.first.year}`;
+  if (rank.above >= 0.6) return `lower than ${shareWords(rank.above)} since ${rank.first.year}`;
   return "about typical";
+};
+
+const SCORE_BIN_POINTS = 5;
+const PERCENT = new Intl.NumberFormat("en-US", { style: "percent", maximumFractionDigits: 0 });
+
+type ScoreDistribution = {
+  /** Month-ends in each 5-point band of the 0–100 scale, lowest band first. */
+  bins: number[];
+  binPoints: number;
+  /** "Higher than 92% of the 178 month-end readings since Jan 2012." */
+  summary: string;
+};
+
+/**
+ * Every month-end reading of a score on the record, in 5-point bands, for a quiet
+ * histogram behind the score's rail (2026-11-18), with the score's rank in the words the
+ * figure's title and accessible name carry. The same series and the same count as
+ * `describeConditionFacts`' "higher than most months since 2012".
+ */
+export const describeScoreDistribution = ({
+  series,
+  metric,
+  value,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  metric: RecordMetric;
+  value: number;
+}): ScoreDistribution | null => {
+  const rank = rankAgainstRecord(series, metric, value);
+  if (!rank) return null;
+  const bins = Array.from({ length: 100 / SCORE_BIN_POINTS }, () => 0);
+  for (const entry of series) {
+    const index = Math.min(bins.length - 1, Math.max(0, Math.floor(entry[metric] / SCORE_BIN_POINTS)));
+    bins[index] += 1;
+  }
+  const since = formatMonthLabel(rank.first.year, rank.first.month);
+  const of = `of the ${rank.months} month-end readings since ${since}`;
+  const summary =
+    rank.below >= rank.above
+      ? `Higher than ${PERCENT.format(rank.below)} ${of}.`
+      : `Lower than ${PERCENT.format(rank.above)} ${of}.`;
+  return { bins, binPoints: SCORE_BIN_POINTS, summary };
 };
 
 /** The current scores against the record, even when the committed conditions are holding. */

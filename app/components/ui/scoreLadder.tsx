@@ -56,6 +56,13 @@ type ScoreLadderProps = {
   /** The score with the left-out inputs counted, where that changes conditions: their glyph, plotted. */
   feelsLike?: { value: number; regime: RegimeKey } | null;
   /**
+   * The score with its ceilings removed, where a ceiling holds it (`saturatedPressure`,
+   * 2026-11-18): the same points, so it sits on this scale, and past its end when it is
+   * over `max`. A ghost ring where it fits; a chevron at the scale's end where it does
+   * not. The sentence under the ladder says what it means.
+   */
+  uncapped?: number | null;
+  /**
    * Direct-manipulation callback when a surface (such as Scenario Studio) commits
    * the scrubbed score rather than springing back to `value`.
    */
@@ -80,6 +87,14 @@ type ScoreLadderProps = {
    * says where the score stands against the lines alone.
    */
   standing?: ScoreFigureStanding | null;
+  /**
+   * Every month-end reading of this score on the record, in bands (`describeScoreDistribution`),
+   * drawn faintly behind the figure's ruled line (2026-11-18), with the score's rank as the
+   * drawing's title and in its accessible name. Off by default; the brief's two figures
+   * beside the guidance turn it on, where the sentence "higher than most months since
+   * 2012" sits beside them. Not drawn on the compact figure, which has no ruled line.
+   */
+  distribution?: { bins: readonly number[]; binPoints: number; summary: string } | null;
   className?: string;
 };
 
@@ -328,10 +343,12 @@ export function ScoreLadder({
   max = 100,
   monthRange,
   feelsLike,
+  uncapped = null,
   onScrubValue,
   travel = false,
   figure = false,
   standing: knownStanding = null,
+  distribution = null,
   className = "",
 }: ScoreLadderProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -551,6 +568,11 @@ export function ScoreLadder({
         return [{ band, left: roundPercent(Math.min(low, high)), width: roundPercent(Math.abs(high - low)) }];
       })
     : [];
+  /* Where the uncapped score sits: on the track, or past whichever end is `max`. */
+  const overflow =
+    typeof uncapped === "number" && Number.isFinite(uncapped) && uncapped > value
+      ? { value: uncapped, past: uncapped > max, left: uncapped > max ? at(max) : at(uncapped), endLeft: at(max) < 50 }
+      : null;
   const trackStyle: TrackStyle = {
     "--ladder-rows": maxRow("row"),
     "--ladder-rows-wide": maxRow("wideRow"),
@@ -608,6 +630,7 @@ export function ScoreLadder({
           <span className={`${figure === "compact" ? "text-[0.8125rem]" : "text-fluid-sm"} leading-snug text-slate-300`} data-ladder-caption>
             <span className="sr-only">
               {formatPoints(value)} of {formatPoints(max)}.{" "}
+              {figure === true && distribution ? `${distribution.summary} ` : null}
             </span>
             <span className={`font-semibold ${standing.crossed ? "text-line-crossed-fg" : "text-slate-100"}`}>
               <LineStateIcon state={standing.crossed ? "crossed" : "clear"} className="mr-1.5 inline align-[-0.15em]" />
@@ -618,7 +641,30 @@ export function ScoreLadder({
           </span>
         </figcaption>
         {figure === "compact" ? null : (
-          <div className="relative mt-3 h-10" aria-hidden="true" data-ladder-rule>
+          <div className={`relative h-10 ${distribution ? "mt-6" : "mt-3"}`} aria-hidden="true" data-ladder-rule>
+            {distribution ? (
+              /* The record behind the line: each band's month-ends as a faint bar standing on
+                 the pause range's top edge, so the range does not cover it. Heights are in
+                 proportion, the tallest band 18px; a band with any month-end shows. */
+              <span className="absolute inset-x-0 top-[-12px] h-[18px]" data-ladder-distribution title={distribution.summary}>
+                {(() => {
+                  const tallest = Math.max(1, ...distribution.bins);
+                  return distribution.bins.map((count, index) =>
+                    count > 0 ? (
+                      <span
+                        key={index}
+                        className="absolute bottom-0 bg-[color:var(--app-text)] opacity-[0.16]"
+                        style={{
+                          left: `${Math.min(at(index * distribution.binPoints), at((index + 1) * distribution.binPoints))}%`,
+                          width: `calc(${roundPercent(Math.abs(at((index + 1) * distribution.binPoints) - at(index * distribution.binPoints)))}% - 1px)`,
+                          height: `${Math.max(2, Math.round((count / tallest) * 18))}px`,
+                        }}
+                      />
+                    ) : null,
+                  );
+                })()}
+              </span>
+            ) : null}
             <span className="absolute inset-x-0 top-[9px] h-0.5 bg-[color:var(--app-text)]" />
             {pauseZone ? (
               <span
@@ -759,6 +805,32 @@ export function ScoreLadder({
             data-ladder-feels-like
           />
         ) : null}
+        {overflow ? (
+          overflow.past ? (
+            /* Past the end: a chevron inside the track's end, pointing off it. */
+            <svg
+              data-ladder-uncapped="past"
+              viewBox="0 0 10 10"
+              className={`absolute top-[8px] h-2.5 w-2.5 text-[color:var(--app-text)] ${overflow.endLeft ? "" : "-translate-x-full"}`}
+              style={{ left: `${overflow.left}%` }}
+            >
+              <polyline
+                points={overflow.endLeft ? "7,1 3,5 7,9" : "3,1 7,5 3,9"}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <span
+              data-ladder-uncapped="ghost"
+              className="absolute top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-dashed border-[color:var(--app-text-muted)]"
+              style={{ left: `${overflow.left}%` }}
+            />
+          )
+        ) : null}
         {travels && previous !== null ? (
           /* A rail as wide as the track, so the travel is a transform in the track's own
              percentages and no layout property animates (ui-ux-standards §IX). */
@@ -805,7 +877,7 @@ export function ScoreLadder({
       </p>
       {/* The hollow dot's key. It was a tooltip inside an aria-hidden track, so
           a sighted reader had nothing saying which dot was which. */}
-      {rangeBands.length > 0 || feelsLike ? (
+      {rangeBands.length > 0 || feelsLike || overflow ? (
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] leading-none text-slate-400" data-ladder-range-key>
           {rangeBands.map((range) => (
             <span key={range.band} className="inline-flex items-center gap-1.5">
@@ -817,6 +889,18 @@ export function ScoreLadder({
             <span className="inline-flex items-center gap-1 tabular-nums">
               <ConditionIcon regime={feelsLike.regime} />
               {`Feels like ${formatPoints(feelsLike.value)}`}
+            </span>
+          ) : null}
+          {overflow ? (
+            <span className="inline-flex items-center gap-1 tabular-nums" data-ladder-uncapped-key>
+              {overflow.past ? (
+                <svg aria-hidden="true" viewBox="0 0 10 10" className="h-2.5 w-2.5 text-[color:var(--app-text)]">
+                  <polyline points={overflow.endLeft ? "7,1 3,5 7,9" : "3,1 7,5 3,9"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full border-2 border-dashed border-[color:var(--app-text-muted)]" />
+              )}
+              {overflow.past ? `Uncapped ${formatPoints(overflow.value)}, past ${formatPoints(max)}` : `Uncapped ${formatPoints(overflow.value)}`}
             </span>
           ) : null}
         </p>

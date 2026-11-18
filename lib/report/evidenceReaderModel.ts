@@ -1,4 +1,4 @@
-import type { RegimeAssessment } from "../regimeEngine";
+import { RISK_APPETITE_MAX_SLOPE, RISK_APPETITE_MIN_SLOPE, type RegimeAssessment } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildCallChangeLines } from "./reportEvidence";
 import type { RegimeSignalKey } from "./reportFormatting";
@@ -78,6 +78,13 @@ export type SignalReferenceRow = {
   movement: string | null;
   /** The watch page for this signal, where one exists. */
   watchHref: string | null;
+  /**
+   * The scale its rail is drawn on (2026-11-18), stated at the rail's ends: 0–100 for a
+   * score; for the rate, 0–6%, which holds every month-end of the one-month bill since
+   * 2012 (0.01–5.60%); for the curve, the −1.00 to 1.50 spread risk appetite is scored
+   * across, so its rail lines up with risk appetite's. A reading past an end sits at it.
+   */
+  scale: { min: number; max: number };
 };
 
 /** The line at which the call itself changes; the ladder's own label for that kind. */
@@ -97,6 +104,13 @@ const BETTER_WHEN: Record<RegimeSignalKey, "higher" | "lower"> = {
   riskAppetite: "higher",
   baseRate: "lower",
   curveSlope: "higher",
+};
+
+const RAIL_SCALE: Record<RegimeSignalKey, { min: number; max: number }> = {
+  tightness: { min: 0, max: 100 },
+  riskAppetite: { min: 0, max: 100 },
+  baseRate: { min: 0, max: 6 },
+  curveSlope: { min: RISK_APPETITE_MIN_SLOPE, max: RISK_APPETITE_MAX_SLOPE },
 };
 
 const SCORE_UNITS: ScoreUnits = {};
@@ -187,6 +201,7 @@ const rowFor = (
     direction,
     movement: isScore ? joinSentences(describeScoreMovement(key, dynamics.movement?.[key], basis), describeNotCountedScore(key, scoringBasis)) : null,
     watchHref: WATCH_HREF_BY_KEY[key],
+    scale: RAIL_SCALE[key],
   };
 };
 

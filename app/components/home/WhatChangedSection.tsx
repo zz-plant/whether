@@ -11,6 +11,8 @@ import { TrendGlyph, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { describeSignalMoveMeaning, type SignalMoveMeaning } from "../../../lib/report/signalMoveMeaning";
+import type { InputTrail, InputTrailKey } from "../../../lib/report/home/inputTrail";
+import { InputTrailChart } from "../ui/inputTrail";
 
 /**
  * Movement: one row per signal, each opening on what the move means in everyday
@@ -127,6 +129,7 @@ export function WhatChangedSection({
   history,
   historyCaveat,
   inputHistory,
+  inputTrails,
   compact = false,
   historyOpen = false,
   drawnAbove = false,
@@ -145,6 +148,8 @@ export function WhatChangedSection({
   historyCaveat?: string | null;
   /** Trailing ~90-day history of the raw inputs behind the scores, autoscaled per series. */
   inputHistory?: readonly { key: string; label: string; points: readonly SparklinePoint[] }[];
+  /** The two market inputs' daily readings, each ending at the value its row prints (`buildInputTrails`). */
+  inputTrails?: Partial<Record<InputTrailKey, InputTrail>>;
   /** Said over the table only when there is no earlier reading to compare with. */
   lead?: string;
   comparisonUnavailable: boolean;
@@ -283,6 +288,8 @@ export function WhatChangedSection({
                               ? { value: feelsLike[row.key], regime: feelsLike.regime }
                               : null
                           }
+                          /* The note under it gives the number; the ladder puts it on the scale. */
+                          uncapped={row.saturatedPressure ?? null}
                         />
                       </Link>
                       {row.saturatedPressure !== undefined ? (
@@ -307,10 +314,28 @@ export function WhatChangedSection({
                        its own" was false for the base rate, which funding pressure
                        judges against a line. */
                     <div className="space-y-1 text-xs text-slate-500">
-                      <span className="block tabular-nums text-slate-200">{row.valueLabel}</span>
-                      {!comparisonUnavailable && row.delta !== null && row.delta !== 0 && row.previousLabel ? (
-                        <span className="block text-xs tabular-nums text-slate-400">{`${basis.label}: ${row.previousLabel}`}</span>
-                      ) : null}
+                      {(() => {
+                        const trail = row.key === "baseRate" || row.key === "curveSlope" ? inputTrails?.[row.key] : undefined;
+                        const showPrevious = !comparisonUnavailable && row.delta !== null && row.delta !== 0 && row.previousLabel;
+                        return (
+                          <>
+                            {/* The figure and the earlier reading are the trail's label; the
+                                hollow ring before the earlier one keys its tick on the line. */}
+                            <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 tabular-nums">
+                              <span className="text-sm text-slate-200">{row.valueLabel}</span>
+                              {showPrevious ? (
+                                <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
+                                  {trail?.comparison ? (
+                                    <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400" />
+                                  ) : null}
+                                  {`${basis.label}: ${row.previousLabel}`}
+                                </span>
+                              ) : null}
+                            </span>
+                            {trail ? <InputTrailChart trail={trail} label={row.label} /> : null}
+                          </>
+                        );
+                      })()}
                       {compact ? null : (
                         <span className="block">
                           {row.key === "baseRate"
