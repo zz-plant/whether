@@ -31,11 +31,11 @@ type RegimeSpellRecord = {
   completed: boolean;
 };
 
-type FlippedAxis = "tightness" | "riskAppetite";
+export type FlippedAxis = "tightness" | "riskAppetite";
 
 const ALL_AXES: FlippedAxis[] = ["tightness", "riskAppetite"];
 
-type RegimeTransitionRecord = {
+export type RegimeTransitionRecord = {
   /** First observation inside the new regime. */
   atDate: string;
   from: string;
@@ -84,7 +84,7 @@ const median = (values: number[]): number | null => {
  * still publishing VOLATILE), so a consecutive-observation comparison sees no
  * crossing at all and grades a banded, gated flip as unsignaled.
  */
-const regimeSide = (regime: string, axis: FlippedAxis): boolean => {
+export const regimeSide = (regime: string, axis: FlippedAxis): boolean => {
   switch (regime) {
     case "SCARCITY":
       return axis === "tightness";

@@ -8,7 +8,9 @@ import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift"
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
 import { CALL_CHANGE_RULE, describeCalibrationRescore } from "../../../lib/report/trackRecordCopy";
 import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
-import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
+import { buildAdvanceWarningMarks } from "../../../lib/report/advanceWarning";
+import { formatMonthYearShortFromValue } from "../../../lib/formatters";
+import { HistoryReadout } from "./historyReadout";
 
 /**
  * What the confidence percent has been worth, against the record.
@@ -136,16 +138,34 @@ const BaseRateSentence = ({ totals, baseRate }: Pick<NonNullable<ReturnType<type
   </>
 );
 
+/* A change with advance warning is a filled diamond, one without an open one: the open
+   diamond is the caveat mark the "How the record held up" table sets beside "none"
+   (`weather-caveat-mark`), so "no warning" is drawn one way on the page. Drawn in CSS:
+   the text face has no ◆ or ◇ (ui-ux-standards §XXII). */
+const WarningDiamond = ({ warned, className = "" }: { warned: boolean; className?: string }) => (
+  <span
+    aria-hidden="true"
+    className={`inline-block size-2.5 shrink-0 rotate-45 border-[1.5px] border-current ${warned ? "bg-current" : ""} ${className}`.trim()}
+  />
+);
+
 /**
  * Advance warning summary for /history: leads with how many changes had advance warning
  * and how many were missed, keeping the stability-by-distance calibration study on /calibration.
+ *
+ * Beside the count, a mark for each change, oldest first (2026-11-18): filled where the
+ * change had warning. The sentence said "4 of 7" and nothing said which four, or that
+ * the three without were the latest. Each mark links to its month in the time machine
+ * (there is no compare view to open: `/history/compare` redirects here), named and read
+ * out with the words the grading table uses (`describeAdvanceWarning`); the count and
+ * the marks are one object (`buildAdvanceWarningMarks`). The month under each mark is
+ * what a touch screen reads before it opens one.
  */
 export function ConfidenceRecordSummary() {
   const fullSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
-  const track = buildRegimeTrackRecord(fullSeries);
-  const total = track.transitions.length;
-  const warned = track.signaledCount;
+  const { total, warned, marks } = buildAdvanceWarningMarks(fullSeries);
   const missed = total - warned;
+  const since = fullSeries.at(0)?.recordDate;
 
   return (
     <div className="space-y-1.5" data-confidence-record-summary>
@@ -154,6 +174,43 @@ export function ConfidenceRecordSummary() {
         <span className="font-semibold text-slate-100">{warned} of {total}</span> changes had
         advance warning.
       </p>
+      {marks.length > 0 ? (
+        <figure className="m-0 space-y-1" data-advance-warning-marks data-readout-scope>
+          <ol
+            className="flex flex-wrap"
+            aria-label={`Each change in conditions${since ? ` since ${formatMonthYearShortFromValue(since)}` : ""}, oldest first`}
+          >
+            {marks.map((mark) => (
+              <li key={mark.atDate}>
+                <a
+                  href={mark.href}
+                  aria-label={mark.label}
+                  data-readout-text={mark.label}
+                  data-warned={mark.signaled ? "" : undefined}
+                  className="group flex min-h-11 min-w-11 touch-manipulation flex-col items-center gap-1.5 px-0.5 pt-2.5 pb-1 text-[color:var(--app-text)] no-underline"
+                >
+                  <WarningDiamond warned={mark.signaled} />
+                  <span className="text-center text-fluid-nano leading-tight tabular-nums text-slate-400 group-hover:text-slate-200">
+                    {mark.monthLabel.slice(0, 3)}
+                    <span className="block">{mark.monthLabel.slice(-4)}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+          {/* The key at rest; the change under the pointer or the focus while it is read. */}
+          <p data-readout aria-hidden="true" className="min-h-[2.5rem] text-xs leading-snug text-slate-400">
+            <span data-readout-rest className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
+              <WarningDiamond warned className="text-[color:var(--app-text)]" />
+              <span>warning</span>
+              <WarningDiamond warned={false} className="ml-2 text-[color:var(--app-text)]" />
+              <span>none · a mark per change, oldest first</span>
+            </span>
+            <span data-readout-live hidden className="text-slate-200" />
+          </p>
+          <HistoryReadout />
+        </figure>
+      ) : null}
       <p className="text-xs text-slate-400">
         {missed} changes had no advance warning when scores moved across the line in a single month.
       </p>
