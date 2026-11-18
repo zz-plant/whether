@@ -10,10 +10,13 @@ import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { describeScoreMovement } from "./scoreMovement";
 import { describeNotCountedScore, joinSentences, type ScoringBasis } from "./scoringBasis";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
-import type { TrustStripProps } from "../../app/components/trustStrip";
+import type { BaseRateMark, TrustStripProps } from "../../app/components/trustStrip";
 import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
 import { resolveNearestLineMargin, type ConfidenceInputs } from "./confidence";
-import { calibrationForDistance } from "./confidenceCalibration";
+import { calibrationForDistance, type CalibrationEntry } from "./confidenceCalibration";
+/* The month href alone, not the time-machine selection module: the picker, a client
+   component, reaches this file through homeSectionModel, and that module loads the cache. */
+import { buildMonthBriefHref, formatMonthLabel } from "../timeMachine/monthFormatting";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
@@ -241,6 +244,24 @@ const describeChangeReason = ({ regimeTransition, scores, thresholds }: TrustAss
 };
 
 /**
+ * One month-end behind the base rate, as its square beside the count says it:
+ * the month, its conditions and whether they held a month later, and the month
+ * in the time machine. Read off the same band entries the count adds up, so the
+ * squares and "held 7 of 10" are the same ten months.
+ */
+const describeBaseRateMonth = (entry: CalibrationEntry): BaseRateMark => {
+  const [year, month] = entry.asOf.split("-").map(Number);
+  const held = entry.next === entry.regime;
+  const conditions = getRegimePublicLabel(entry.regime);
+  return {
+    asOf: entry.asOf,
+    held,
+    label: `${formatMonthLabel(year, month)}: ${conditions}, ${held ? "held the next month" : `changed to ${getRegimePublicLabel(entry.next)} the next month`}`,
+    href: buildMonthBriefHref(entry.asOf),
+  };
+};
+
+/**
  * The four trust facts, the one way every reading route states them.
  *
  * Each route used to fill the strip from what it happened to hold, so one
@@ -299,7 +320,7 @@ export const buildTrustStripProps = ({
     confidenceLabel,
     ...(margin ? { margin } : {}),
     ...(calibration && calibration.months >= 5 && !savedCopy
-      ? { baseRate: { held: calibration.held, months: calibration.months } }
+      ? { baseRate: { held: calibration.held, months: calibration.months, marks: calibration.entries.map(describeBaseRateMonth) } }
       : {}),
     couldChangeNextWeek: couldCallChangeNextWeek(assessment),
     changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
