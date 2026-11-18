@@ -71,6 +71,7 @@ import {
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
 import { buildWeekMove } from "../lib/report/home/weekMove";
+import { buildInputTrails } from "../lib/report/home/inputTrail";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
@@ -85,7 +86,7 @@ import { frameFactsAttributes } from "../lib/navigation/runningHead";
 import { ScoreLadder } from "./components/ui/scoreLadder";
 import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { describeConditionFacts, describeConditionsSince, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeConditionFacts, describeConditionsSince, describeScoreDistribution, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -753,7 +754,8 @@ async function PageContent({
                 aside={
                   <div className="space-y-8" data-hero-scores>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)} />
+                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)}
+                        distribution={historicalSelection ? null : describeScoreDistribution({ series: recordSeries, metric: ladder.metric, value: ladder.value })} />
                     ))}
                   </div>
                 }
@@ -913,6 +915,13 @@ async function PageContent({
                 }}
                 historyCaveat={conditionsTrail.caveat}
                 inputHistory={historicalSelection ? undefined : inputHistory}
+                inputTrails={historicalSelection ? undefined : buildInputTrails({
+                  treasury: reportData.treasury,
+                  materializedSignals: reportData.materializedSignals,
+                  rows: signalChangeRows,
+                  baseRateLine: reportData.assessment.thresholds.baseRateTightness,
+                  comparedWith: comparisonUnavailable ? null : homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith,
+                })}
                 lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
                 comparisonUnavailable={comparisonUnavailable}
                 basis={basis}

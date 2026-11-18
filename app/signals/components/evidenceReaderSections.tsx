@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { ReportSection } from "../../components/reportSection";
 import { ScoreCell, formatPoints } from "../../components/ui/scoreCell";
@@ -9,6 +10,10 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { SignalReferenceRow } from "../../../lib/report/evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQueryState";
+import { describeSignalRelations, type SignalFlow } from "../../../lib/report/signalFlow";
+import { regimeSignalLabelByKey } from "../../../lib/report/reportFormatting";
+import { SignalRail } from "./signalRail";
+import { SignalFlowDiagram } from "./signalFlowDiagram";
 
 /**
  * The first of the evidence page's two sections: what moved. The instruments —
@@ -60,6 +65,8 @@ const DeltaChip = ({ row }: { row: SignalReferenceRow }) => {
      the next column what it reads now. */
   return (
     <span className={`inline-flex items-center gap-1.5 text-xs tabular-nums ${TONE_CLASS[row.direction.tone]}`}>
+      {/* The rail's hollow dot is this reading; the ring keys it. */}
+      <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400" />
       <span className="text-slate-400">from</span>
       <span className="font-semibold">{from}</span>
       <span className="sr-only">{row.direction.label}</span>
@@ -69,6 +76,37 @@ const DeltaChip = ({ row }: { row: SignalReferenceRow }) => {
 
 type ChangedSignalRow = SignalReferenceRow & { note: string | null };
 
+/**
+ * What a row feeds, or which areas it sets the lines for, from `describeSignalRelations`,
+ * the table the diagram beside the table draws too. With the diagram on the page the line
+ * is for a screen reader, as words with no links: the diagram's nodes are the links, and
+ * a hidden link would still take a tab stop. On a filtered view, which draws no diagram,
+ * it is the visible line with its links, as before.
+ */
+const RowRelations = ({ row, drawn }: { row: ChangedSignalRow; drawn: boolean }) => {
+  const relations = describeSignalRelations(row.key, (key) => regimeSignalLabelByKey[key]);
+  if (drawn) return relations.sentence ? <span className="sr-only">{relations.sentence}</span> : null;
+  if (row.key === "tightness" || row.key === "riskAppetite") {
+    /* The areas this score sets the lines for, each opening the brief on that area's answer. */
+    return <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />;
+  }
+  return (
+    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px]">
+      Feeds into{" "}
+      {relations.feeds.map((feed, index) => (
+        <Fragment key={feed.key}>
+          {index > 0 ? ", and " : null}
+          {feed.condition ? (
+            `${feed.label} ${feed.condition}`
+          ) : (
+            <a href={`#${feed.key}`} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{feed.label}</a>
+          )}
+        </Fragment>
+      ))}
+    </span>
+  );
+};
+
 export const SignalsWhatChangedSection = ({
   rows,
   activeFocus,
@@ -76,8 +114,11 @@ export const SignalsWhatChangedSection = ({
   focusInstruments,
   searchParams,
   basis = comparisonBasis(),
+  flow = null,
 }: {
   rows: ChangedSignalRow[];
+  /** Inputs → scores → areas, drawn under the table on the unfiltered view (`buildSignalFlow`). */
+  flow?: SignalFlow | null;
   activeFocus: FocusTab;
   focusLabelByTab: Record<FocusTab, string>;
   focusInstruments: Array<{ label: string; why: string; href: string }>;
@@ -161,24 +202,7 @@ export const SignalsWhatChangedSection = ({
                       premise test found both scores track deal count in the same quarter and the
                       next, with the same decay (docs/research/premise-test-results.md, "Lead and
                       lag"), so neither label held. */}
-                  {row.key === "tightness" || row.key === "riskAppetite" ? (
-                    /* The areas this score sets the lines for, each opening the
-                       brief on that area's answer. It said "Sets the pause and
-                       restart lines" without saying whose. */
-                    <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
-                  ) : row.key === "baseRate" ? (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px]">
-                      Feeds into <a href="#tightness" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
-                    </span>
-                  ) : (
-                    /* The curve slope. Sets risk appetite outright, and adds to
-                       funding pressure only below zero (`computeRiskAppetiteScore`
-                       and the inversion points in regimeEngineCore). This said
-                       funding pressure alone. */
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px]">
-                      Feeds into <a href="#riskAppetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted (short-term rates above long-term)
-                    </span>
-                  )}
+                  <RowRelations row={row} drawn={Boolean(flow)} />
                   {/* The move sits under the signal it belongs to, so the table
                       spends its width on the line and the consequence instead of
                       a separate "since" column whose cells mostly said "No change". */}
@@ -202,12 +226,14 @@ export const SignalsWhatChangedSection = ({
                        "Funding pressure" twice and on a phone the two sat
                        two lines apart. No earlier reading under it (2026-10-09):
                        the chip one column over prints "56 → 49" in the same row. */
-                    <ScoreCell
-                      label="This week"
-                      value={row.value}
-                      line={row.line}
-                      units={row.units}
-                    />
+                    <SignalRail row={row} value={row.value}>
+                      <ScoreCell
+                        label="This week"
+                        value={row.value}
+                        line={row.line}
+                        units={row.units}
+                      />
+                    </SignalRail>
                   )}
                 </td>
                 {showNotes ? (
@@ -220,6 +246,9 @@ export const SignalsWhatChangedSection = ({
           </tbody>
         </table>
       </div>
+      {flow ? (
+        <SignalFlowDiagram flow={flow} />
+      ) : null}
       <p className="text-fluid-sm text-slate-400">
         <ActionLink href="/#what-would-change" variant="inline">
           {DECISION_CONTRACT_LABELS.watch.flipWatch}
