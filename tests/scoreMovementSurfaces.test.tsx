@@ -123,7 +123,8 @@ describe("the evidence page", () => {
     assert.doesNotMatch(html, /Moves first|Confirms later/);
     /* The from-chip is a fact, unframed and with no hover title (2026-11-03): framed,
        with its move in a title, it read as a control and a tap showed nothing. */
-    const chip = /<span class="inline-flex items-center gap-1.5 text-xs tabular-nums[^"]*"><span class="text-slate-400">from<\/span>/.exec(html);
+    /* The ring before "from" keys the rail's hollow dot (2026-11-18). */
+    const chip = /<span class="inline-flex items-center gap-1.5 text-xs tabular-nums[^"]*">(?:<span aria-hidden="true"[^>]*><\/span>)?<span class="text-slate-400">from<\/span>/.exec(html);
     assert.ok(chip, "the from-chip renders");
     assert.doesNotMatch(html, /<span[^>]*title="[^"]*points since/);
   });

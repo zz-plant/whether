@@ -106,12 +106,21 @@ export const describeTrackRecordRescore = (now: { changes: number; signaled: num
  * Stormy, each hard on one score, can land either side. On the record through
  * Sep 2026, Sunny months read 50-100, Freezing 0-42, Cloudy 42-49, Stormy 21-69.
  */
+/**
+ * The one value of operating latitude the two change lines fix (44 at today's lines):
+ * the sentence below names it, and /history's chart of the score draws it, from here.
+ */
+export const latitudeConditionLine = (
+  thresholds: { tightnessRegime: number; riskAppetiteRegime: number } = DEFAULT_THRESHOLDS,
+) =>
+  Math.round(
+    OPERATING_LATITUDE_RISK_WEIGHT * thresholds.riskAppetiteRegime + (1 - OPERATING_LATITUDE_RISK_WEIGHT) * (100 - thresholds.tightnessRegime),
+  );
+
 export const describeLatitudeAgainstConditions = (
   thresholds: { tightnessRegime: number; riskAppetiteRegime: number } = DEFAULT_THRESHOLDS,
 ) => {
-  const boundary = Math.round(
-    OPERATING_LATITUDE_RISK_WEIGHT * thresholds.riskAppetiteRegime + (1 - OPERATING_LATITUDE_RISK_WEIGHT) * (100 - thresholds.tightnessRegime),
-  );
+  const boundary = latitudeConditionLine(thresholds);
   /* Said of the quadrants, not the months: conditions change only after a second
      reading, so a month can carry its old word for one reading past a line. */
   return `It is not a fifth condition. A reading in Sunny's quadrant is always ${boundary} or higher, and one in Freezing's quadrant is ${boundary} or lower. Readings in Cloudy's or Stormy's quadrant can land on either side, since each is hard on only one score.`;

@@ -89,7 +89,7 @@ describe("/ draws the two scores once at each width", () => {
   });
 
   it("with the trail's caption under the map it describes, not in the guidance block", () => {
-    assert.match(readFileSync("app/components/home/WhatWouldChangeSection.tsx", "utf8"), /trailCaption=\{conditionsTrail\?\.caption\}/);
+    assert.match(readFileSync("app/components/home/WhatWouldChangeSection.tsx", "utf8"), /trailCaption: conditionsTrail\?\.caption/);
     assert.doesNotMatch(route, /asideNote=/);
   });
 });

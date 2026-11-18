@@ -1,9 +1,6 @@
-import { ActionLink } from "../ui/actionLink";
-import { ScoreCell } from "../ui/scoreCell";
-import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+import { ChangeFollowThrough } from "./ChangeFollowThrough";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { buildLastTimeCompareHref, describeAgainstToday, lastTimeVerb, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import { describeAgainstToday, lastTimeVerb, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 
 /**
  * On a week the call changed: the last time it moved this way, what the two
@@ -16,6 +13,10 @@ import { buildLastTimeCompareHref, describeAgainstToday, lastTimeVerb, type Last
  * Under them, how that month differed from this week: an earlier month is one
  * outcome from one starting point, and "the scores stood here three months on"
  * reads as a forecast to anyone who is not told where they started.
+ *
+ * Since 2026-11-18 each cell heads a small panel of the months between
+ * (`ChangeFollowThrough`): the earlier change's month-ends from the change to three
+ * months on, and this week's reading at the change, against the line.
  */
 export function LastTimeCallChangedCard({
   record,
@@ -39,31 +40,16 @@ export function LastTimeCallChangedCard({
         <span className="font-semibold text-slate-50">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.
       </p>
-      {/* Two cells packed to the left edge, not one per half of the page: each is
-          three short lines, and halves left the second one stranded mid-page. They
-          wrap on their own widths, so they sit together wherever both fit. */}
-      <div className="flex flex-wrap gap-x-10 gap-y-3">
-        <ScoreCell
-          label={regimeSignalLabel.tightness}
-          value={record.tightness.later}
-          line={{ value: callChangeLines.tightness, label: DECISION_CONTRACT_LABELS.watch.changeLine }}
-          previous={record.tightness.atChange}
-          previousLabel={changedAt}
-        />
-        <ScoreCell
-          label={regimeSignalLabel.riskAppetite}
-          value={record.riskAppetite.later}
-          line={{ value: callChangeLines.riskAppetite, label: DECISION_CONTRACT_LABELS.watch.changeLine }}
-          previous={record.riskAppetite.atChange}
-          previousLabel={changedAt}
-        />
-      </div>
+      {/* Two panels packed to the left edge, not one per half of the page: each is
+          a cell and a small drawing, and halves left the second one stranded mid-page.
+          They wrap on their own widths, so they sit together wherever both fit. */}
+      <ChangeFollowThrough record={record} callChangeLines={callChangeLines} />
       <p data-testid="last-time-versus-today" className="max-w-[60ch] text-fluid-sm leading-5 text-slate-300">
         <span className="font-semibold text-slate-100">Against this week:</span> {versus.text}
       </p>
-      <ActionLink href={buildLastTimeCompareHref(record)} variant="inline">
-        Compare {changedAt} with {after} →
-      </ActionLink>
+      {/* "Compare Sep 2022 with Dec 2022 →" went to /history/compare, which has redirected
+          to /history since the compare view was retired; the panels above draw those
+          months, each a link to its month in the time machine (2026-11-18). */}
     </aside>
   );
 }

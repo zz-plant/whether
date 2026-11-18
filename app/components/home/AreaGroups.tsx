@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { LineStateIcon } from "../ui/conceptIcons";
 import { ActionLink } from "../ui/actionLink";
+import { ScoreMoveBars } from "./ScoreMoveBars";
 import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import type { AreaGroup } from "../../../lib/report/home/homeSectionModel";
 import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigation";
@@ -74,6 +75,10 @@ export function AreaGroups({
      `xl` the groups then stand side by side (ui-ux-standards §XXVIII: parallel blocks, one
      frame), ruled apart as they are when stacked. */
   const sideBySide = rulesAbove && groups.length > 1;
+  /* The record's moves are drawn once, beside the first group that sizes one: the held
+     group's restart, where there is one. A second set of bars for another score asked the
+     reader to learn a second scale for one idea. */
+  const drawnMove = groups.find((group) => group.move && group.distance)?.move ?? null;
   return (
     <div
       data-area-groups
@@ -98,6 +103,8 @@ export function AreaGroups({
                 {[group.condition, group.distance].filter(Boolean).join(" ")}
               </p>
             ) : null}
+            {/* The record the distance's band was read from, beside the sentence that names it (2026-11-18). */}
+            {group.move && group.move === drawnMove ? <ScoreMoveBars move={group.move} /> : null}
             {group.history ? (
               <p className="max-w-[60ch] text-fluid-sm text-slate-400" data-group-history>
                 {group.history}

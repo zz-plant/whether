@@ -2,8 +2,9 @@ import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import { MonthStrip } from "../history/monthStrip";
+import { SpellLengthPlot } from "./SpellLengthPlot";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
-import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import type { LastTimeCallChanged, SpellLengthPlot as SpellLengthPlotModel } from "../../../lib/report/lastTimeCallChanged";
 
 /**
  * "Has this happened before?", seventh (2026-10-09): on a week conditions changed,
@@ -28,8 +29,11 @@ export function RecordSection({
   lastTime: LastTimeCallChanged | null;
   callChangeLines: { tightness: number; riskAppetite: number };
   turningPoints: readonly { label: string; href: string }[];
-  /** How long these conditions lasted before (`describeSpellLengths`): its lead heads the section. Null on an archived view. */
-  spellLengths?: { lead: string; rest: string } | null;
+  /**
+   * How long these conditions lasted before (`describeSpellLengths`): its lead heads the
+   * section, and its plot draws every stretch beside the sentences. Null on an archived view.
+   */
+  spellLengths?: { lead: string; rest: string; plot?: SpellLengthPlotModel | null } | null;
   /** Every month-end on record, for the band; left out of an archived view, whose record would end at its month. */
   record?: readonly { recordDate: string; regime: string; tightness?: number; riskAppetite?: number }[];
 }) {
@@ -40,7 +44,11 @@ export function RecordSection({
        the section showed the band and the question, and the answer was a scroll away. */
     <HomeSection id={HOME_SECTIONS.record.id} heading={HOME_SECTIONS.record.heading} lead={spellLengths?.lead}>
       {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
-      {record && record.length > 0 ? (
+      {/* Every stretch by how long it lasted (2026-11-18), with the months under each
+          condition on its rows: the count the key printed, so the key is not printed too. */}
+      {spellLengths?.plot ? (
+        <SpellLengthPlot plot={spellLengths.plot} />
+      ) : record && record.length > 0 ? (
         <>
           {/* The count under each condition; the band itself is the frame's now, under the
               navigation, and a second strip here drew the record twice (2026-11-10). */}

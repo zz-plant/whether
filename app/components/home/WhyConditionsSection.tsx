@@ -5,6 +5,7 @@ import { NOT_COUNTED_REASON } from "../../../lib/report/scoringBasis";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
+import { PlainActionLink } from "../ui/actionLink";
 
 type NotCountedReading = {
   metric: "tightness" | "riskAppetite";
@@ -39,6 +40,7 @@ export function WhyConditionsSection({
   pendingConditions,
   notCounted,
   warning,
+  chartHref,
 }: {
   regime: string;
   tightness: number;
@@ -50,6 +52,8 @@ export function WhyConditionsSection({
   notCounted: readonly NotCountedReading[];
   /** What the uncounted inputs would do to a line, in one sentence; null when they would cross none. */
   warning: string | null;
+  /** The conditions chart with the left-out inputs counted (`buildCountedChartHref`), where it can plot them. */
+  chartHref?: string;
 }) {
   const regimeLabel = getRegimePublicLabel(regime);
   const readingLabel = pendingConditions ? getRegimePublicLabel(pendingConditions) : regimeLabel;
@@ -110,6 +114,15 @@ export function WhyConditionsSection({
                     .join(" and ")}.`}{" "}
               {NOT_COUNTED_REASON}
             </p>
+            {/* The same reading, plotted: the conditions chart two sections down, with the
+                left-out inputs counted and the areas that would then move named under it. */}
+            {chartHref ? (
+              <p className="mt-1 text-fluid-sm">
+                <PlainActionLink href={chartHref} variant="inline" data-counted-chart-link="">
+                  See it charted
+                </PlainActionLink>
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>

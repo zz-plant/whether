@@ -3,8 +3,18 @@ import { HomeSection } from "./HomeSection";
 import { BoundedValue } from "../ui/boundedValue";
 import { DECISION_CONTRACT_LABELS, BOUNDED_CALL_CONTRAST } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
-import { RegimeRadar } from "./RegimeRadar";
+import { RegimeRadar, type RegimeRadarProps } from "./RegimeRadar";
+import {
+  RuleChartChooser,
+  RuleChartCountedSwitch,
+  RuleChartFigure,
+  RuleChartLines,
+  RuleChartProvider,
+  RuleLines,
+} from "./RuleRegionsChart";
 import type { RegimeKey } from "../../../lib/types";
+import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import type { RuleChartModel } from "../../../lib/report/ruleRegions";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
 
@@ -61,6 +71,12 @@ type FlipProximityLine = {
  * its month-end path, so this section stops drawing it there: one picture of
  * where the reading sits per screen. Below `md` the card has no room for it and
  * it stays here.
+ *
+ * Since 2026-11-18 the chart also draws the rules (`ruleChart`, `RuleRegionsChart`): an
+ * area chosen over it shades that area's pause and restart regions, and the pause or
+ * restart line beside it follows the choice. It opens on the guidance's lead rule, so the
+ * first picture is the sentence beside it. Where the reading leaves inputs out, a switch
+ * plots the reading with them counted and names the areas that would then move.
  */
 export function WhatWouldChangeSection({
   feelsLike,
@@ -75,6 +91,7 @@ export function WhatWouldChangeSection({
   callChangeLines,
   regime,
   conditionsTrail,
+  ruleChart,
 }: {
   feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
   ladders: readonly HomeScoreLadder[];
@@ -101,6 +118,18 @@ export function WhatWouldChangeSection({
     caption: string | null;
     caveat: string | null;
   };
+  /**
+   * Each area's regions and lines for the chart (`buildRuleChartModel`), with the area and
+   * switch the URL names. Without it the chart draws the conditions alone, as before.
+   */
+  ruleChart?:
+    | (RuleChartModel & {
+        initialArea?: DecisionArea;
+        initialCounted: boolean;
+        /** The page's query, which the chart's links keep. */
+        query?: Record<string, string | undefined>;
+      })
+    | null;
 }) {
   const tightnessLadder = ladders.find((ladder) => ladder.metric === "tightness");
   const riskAppetiteLadder = ladders.find((ladder) => ladder.metric === "riskAppetite");
@@ -120,12 +149,29 @@ export function WhatWouldChangeSection({
      other. Both are printed under their own heading (2026-10-22). */
   const resumeLine = leadHeld === false ? undefined : resumeWhen ?? leadResume;
   const pauseLine = leadHeld === true ? undefined : guardrail;
+  const radar: RegimeRadarProps = {
+    tightness: tightnessVal,
+    riskAppetite: riskAppetiteVal,
+    previousTightness: tightnessLadder?.previous,
+    previousRiskAppetite: riskAppetiteLadder?.previous,
+    tightnessThreshold: callChangeLines.tightness,
+    riskAppetiteThreshold: callChangeLines.riskAppetite,
+    currentRegime: activeRegime,
+    trail: conditionsTrail?.points,
+    trailCaption: conditionsTrail?.caption,
+    caveat: conditionsTrail?.caveat,
+    feelsLike,
+    readingsId: "conditions-chart-readings",
+  };
+  /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
+     and line numbers drew at 8–10px with empty ground either side. */
+  const chartWidth = "w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[280px] shrink-0";
+  const chart = ruleChart && ladders.length > 0 ? ruleChart : null;
 
-  return (
-    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} lead={BOUNDED_CALL_CONTRAST}>
-      {/* No key to the three lines (2026-11-03): the two questions below answer
-          what each line does, in the reader's terms, and the key was a third
-          explanation of the mechanism on one page. */}
+  const body = (
+      /* No key to the three lines (2026-11-03): the two questions below answer
+         what each line does, in the reader's terms, and the key was a third
+         explanation of the mechanism on one page. */
       <div
         className={
           ladders.length === 0
@@ -134,23 +180,11 @@ export function WhatWouldChangeSection({
         }
       >
         {ladders.length > 0 ? (
-          <RegimeRadar
-            tightness={tightnessVal}
-            riskAppetite={riskAppetiteVal}
-            previousTightness={tightnessLadder?.previous}
-            previousRiskAppetite={riskAppetiteLadder?.previous}
-            tightnessThreshold={callChangeLines.tightness}
-            riskAppetiteThreshold={callChangeLines.riskAppetite}
-            currentRegime={activeRegime}
-            trail={conditionsTrail?.points}
-            trailCaption={conditionsTrail?.caption}
-            caveat={conditionsTrail?.caveat}
-            feelsLike={feelsLike}
-            readingsId="conditions-chart-readings"
-            /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
-               and line numbers drew at 8–10px with empty ground either side. */
-            className="w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[280px] shrink-0"
-          />
+          chart ? (
+            <RuleChartFigure radar={radar} areas={chart.areas} counted={chart.counted} className={chartWidth} />
+          ) : (
+            <RegimeRadar {...radar} className={chartWidth} />
+          )
         ) : null}
         {/* Side by side wherever the column holds two at 20rem (2026-10-27, by the
             column's width since 2026-11-03): stacked in a 64rem column they left the
@@ -192,24 +226,11 @@ export function WhatWouldChangeSection({
             </div>
           ) : null}
 
-          {pauseLine || resumeLine ? (
-            <div className="space-y-2">
-              <dl className="space-y-3 text-fluid-sm">
-                {pauseLine ? (
-                  <div className="space-y-0.5">
-                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
-                    <dd className="text-slate-300"><BoundedValue>{pauseLine}</BoundedValue></dd>
-                  </div>
-                ) : null}
-                {resumeLine ? (
-                  <div className="space-y-0.5">
-                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
-                    <dd className="text-slate-300"><BoundedValue>{resumeLine}</BoundedValue></dd>
-                  </div>
-                ) : null}
-              </dl>
-            </div>
-          ) : null}
+          {chart ? (
+            <RuleChartLines areas={chart.areas} defaultArea={chart.defaultArea} pauseLine={pauseLine} resumeLine={resumeLine} />
+          ) : (
+            <RuleLines pauseLine={pauseLine} resumeLine={resumeLine} />
+          )}
 
           {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
             <div className="space-y-0.5 text-fluid-sm">
@@ -225,6 +246,28 @@ export function WhatWouldChangeSection({
           ) : null}
         </div>
       </div>
+  );
+
+  return (
+    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} lead={BOUNDED_CALL_CONTRAST}>
+      {chart ? (
+        <RuleChartProvider
+          defaultArea={chart.defaultArea}
+          initialArea={chart.initialArea}
+          initialCounted={chart.initialCounted}
+          query={chart.query}
+        >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <RuleChartChooser areas={chart.areas.map((entry) => entry.area)} />
+              <RuleChartCountedSwitch available={Boolean(chart.counted)} />
+            </div>
+            {body}
+          </div>
+        </RuleChartProvider>
+      ) : (
+        body
+      )}
       {/* The claim above is only worth making beside its proof. A reader who has
           just been told these lines are unusual should be able to check how often
           they held and read every brief behind them in one click, or the sentence

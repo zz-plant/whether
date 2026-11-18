@@ -18,7 +18,7 @@ import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
-import { describeScoreMoveBand } from "../marketMoveScale";
+import { describeScoreMoveBand, describeScoreMoveHistogram, type ScoreMoveHistogram } from "../marketMoveScale";
 import { describePastHolds } from "../lastTimeCallChanged";
 import type { TimeMachineRegimeEntry } from "../../timeMachine/timeMachineCache";
 import { describeMovementCause, type AreaMovementKind, type DecisionMovement } from "../decisionMovement";
@@ -328,8 +328,8 @@ const formatPointsInWords = (points: number) =>
  * trend after it ("5 points closer since Nov 9") counted points the sentence never gave.
  * The points alone, where the record cannot size the move.
  */
-const describeSlotGap = (slot: Pick<HomeAreaLineSlot, "metric" | "points">): string => {
-  const band = describeScoreMoveBand(slot.metric, slot.points);
+const describeSlotGap = (slot: Pick<HomeAreaLineSlot, "metric" | "points">, move: ScoreMoveHistogram | null): string => {
+  const band = describeScoreMoveBand(slot.metric, slot.points, { move });
   const away = `${formatPointsInWords(slot.points)} away`;
   return band ? `${away}, ${band.replace(/ move$/, " one-month move")}` : away;
 };
@@ -741,6 +741,12 @@ export type AreaGroup = {
   distance: string | null;
   /** A held group's record: "It rose above 76 in Sep 2026. The last time, in Sep 2022, it took 39 months to fall below 66." */
   history: string | null;
+  /**
+   * The record the distance's band was read from (`describeScoreMoveHistogram`), for the
+   * bars beside it: every one-month move of the score, and the move this one needs. Null
+   * where the sentence sizes no move (at the line, or a record too short to count).
+   */
+  move: ScoreMoveHistogram | null;
   areas: { area: DecisionArea; label: string; rule: string; changed?: string }[];
 };
 
@@ -798,9 +804,11 @@ export const buildAreaGroups = (
        (`describeSlotGap`), then which way it went in the same points. At the line there
        is no move to size. */
     const trend = slot && comparison ? describeTrend(slot, scores[slot.metric], comparison.scores[slot.metric], comparison.since) : null;
+    /* One read of the record for the sentence's band and the bars drawn beside it. */
+    const move = slot && phrase ? describeScoreMoveHistogram(slot.metric, slot.points) : null;
     const distance = slot && phrase
       ? slot.points > 0
-        ? `It is ${describeSlotGap(slot)}${trend ? `, and ${trend}` : ""}.`
+        ? `It is ${describeSlotGap(slot, move)}${trend ? `, and ${trend}` : ""}.`
         : `It is ${Math.round(scores[slot.metric])} today${trend ? `, ${trend}` : ""}.`
       : null;
     /* The record reads the lines the group shows, so both must be on one score. */
@@ -818,7 +826,7 @@ export const buildAreaGroups = (
     /* A held group's history reads its pause line too, so areas held by different pause
        lines are different groups even when one restart lifts them. */
     const key = `${state}|${condition ?? ""}|${history ?? ""}`;
-    const group = groups.get(key) ?? { state, status: GROUP_STATUS[state], condition, distance, history, areas: [] };
+    const group = groups.get(key) ?? { state, status: GROUP_STATUS[state], condition, distance, history, move, areas: [] };
     group.areas.push({
       area: row.area,
       label: decisionAreaLabel(row.area),

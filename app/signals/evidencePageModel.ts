@@ -19,6 +19,7 @@ import {
 import { resolvePublishedConfidence } from "../../lib/report/confidence";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
+import { buildSignalFlow } from "../../lib/report/signalFlow";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
 import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
@@ -205,6 +206,9 @@ const deriveSignalsPageModel = (
   const changedSignalRows = signalRows
     .filter((row) => focusFilter.signals.includes(row.key))
     .map((row) => ({ ...row, note: focusFilter.notes[row.key] ?? null }));
+  const basis = comparisonBasis(reportDynamics.comparedWith);
+  /* Every row is in the table only unfiltered, and every node links to its row. */
+  const signalFlow = activeFocus === "all" ? buildSignalFlow(signalRows, basis.reference) : null;
 
   return {
     structuredData: buildStructuredData(),
@@ -229,8 +233,9 @@ const deriveSignalsPageModel = (
     activeFocus,
     focusInstruments: focusFilter.instruments,
     changedSignalRows,
+    signalFlow,
     /* What the "since" column compares with; the rows carry the same label. */
-    basis: comparisonBasis(reportDynamics.comparedWith),
+    basis,
     sectionLinks: signalsSectionLinks,
   };
 };

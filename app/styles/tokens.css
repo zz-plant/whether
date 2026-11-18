@@ -303,9 +303,12 @@
   --regime-on-accent: #0f1419;
 
   /* The record band's two line inks (record-band.css). Constants of the plate,
-     the same in both themes as the condition fills are: the dark line prints on
-     the light fields (Sunny, Stormy), the pale one on the dense (Cloudy,
-     Freezing). */
+     the same in both themes as the condition fills are: the pale line prints on
+     the one dense field (Stormy's navy), the dark one on the light fields
+     (Sunny, Cloudy, Freezing) — `isLightField` in lib/report/recordBandCodec.ts,
+     which the week cells' patterns in record-band.css follow too. (Until
+     2026-11-18 the comment and the week cells still followed Covenant's fills,
+     where Stormy was a light field: dark rules on navy, pale ones on pale blue.) */
   --band-line-on-light: #0f1419;
   --band-line-on-dense: #eef1f6;
 

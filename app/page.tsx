@@ -53,6 +53,14 @@ import { RecordSection } from "./components/home/RecordSection";
 import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
+import { buildRuleChartModel } from "../lib/report/ruleRegions";
+import {
+  RULE_CHART_AREA_PARAM,
+  RULE_CHART_COUNTED_PARAM,
+  buildCountedChartHref,
+  parseRuleChartArea,
+  parseRuleChartCounted,
+} from "../lib/report/ruleChartParams";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
@@ -71,6 +79,7 @@ import {
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
 import { buildWeekMove } from "../lib/report/home/weekMove";
+import { buildInputTrails } from "../lib/report/home/inputTrail";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
@@ -85,7 +94,7 @@ import { frameFactsAttributes } from "../lib/navigation/runningHead";
 import { ScoreLadder } from "./components/ui/scoreLadder";
 import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { describeConditionFacts, describeConditionsSince, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeConditionFacts, describeConditionsSince, describeScoreDistribution, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -580,6 +589,20 @@ async function PageContent({
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
   const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
+  /* The conditions chart's rule layer: each area's regions, opening on the lead rule only
+     when the sentence beside the chart is that rule's; the counted switch on a live read. */
+  const ruleChart = {
+    ...buildRuleChartModel({
+      rules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+      scores: { tightness, riskAppetite },
+      leadArea: corridorRule && boundedConditions ? corridorRule.area : null,
+      notCounted: historicalSelection || savedCopy ? [] : reportData.scoringBasis?.notCounted ?? [],
+      changeLines: callChangeLines,
+    }),
+    initialArea: parseRuleChartArea(searchParams?.[RULE_CHART_AREA_PARAM]),
+    initialCounted: parseRuleChartCounted(searchParams?.[RULE_CHART_COUNTED_PARAM]),
+    query: searchParams,
+  };
   /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
   const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
   /* The card sizes the room before a change once; the count of months held at this
@@ -753,7 +776,8 @@ async function PageContent({
                 aside={
                   <div className="space-y-8" data-hero-scores>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)} />
+                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)}
+                        distribution={historicalSelection ? null : describeScoreDistribution({ series: recordSeries, metric: ladder.metric, value: ladder.value })} />
                     ))}
                   </div>
                 }
@@ -913,6 +937,13 @@ async function PageContent({
                 }}
                 historyCaveat={conditionsTrail.caveat}
                 inputHistory={historicalSelection ? undefined : inputHistory}
+                inputTrails={historicalSelection ? undefined : buildInputTrails({
+                  treasury: reportData.treasury,
+                  materializedSignals: reportData.materializedSignals,
+                  rows: signalChangeRows,
+                  baseRateLine: reportData.assessment.thresholds.baseRateTightness,
+                  comparedWith: comparisonUnavailable ? null : homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith,
+                })}
                 lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
                 comparisonUnavailable={comparisonUnavailable}
                 basis={basis}
@@ -931,6 +962,7 @@ async function PageContent({
                   : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
+                chartHref={ruleChart.counted ? buildCountedChartHref(searchParams) : undefined}
               />
 
               {/* 6. What would change the guidance: its pause and restart lines, the
@@ -948,6 +980,7 @@ async function PageContent({
                 callChangeLines={callChangeLines}
                 regime={regime}
                 conditionsTrail={conditionsTrail}
+                ruleChart={ruleChart}
               />
 
               {/* 8. How unusual is this? */}

@@ -607,3 +607,28 @@ Six fixes to what a first visit could not read, from the owner's review of the l
 - **Distances in points.** A group's distance gives the points and what they are measured as:
   "It is 4 points away, a common one-month move, and 5 points closer since Nov 9." It read
   "A common move away, 5 points closer since Nov 9."
+
+### Counts drawn beside their sentences (2026-11-18)
+
+Four counts the brief already printed are drawn beside the sentence that states them; the
+sentences stay, and each drawing reads the model its sentence comes from.
+
+- **The base rate.** "Past conditions held 7 of 10 months at this distance" (the trust strip's
+  room cell, `/trust`) leads with one square per month-end in that band, oldest first, filled
+  where conditions held a month later (`calibrationBuckets` entries through
+  `buildTrustStripProps`). Each square names its month and opens it in the time machine.
+- **How long conditions last.** "Has this happened before?" plots every stretch by its length
+  on one axis, a row per condition carrying its months in all, the stretch the record ends in
+  open, and the shortest that ended as a dashed rule (`describeSpellLengths` `plot`). The rows
+  print the totals the record's key printed, so the key is not drawn there too.
+- **The last change against this one.** On a week the call moved, each score cell on "The last
+  time conditions …" heads a small 0–100 panel: the earlier change's month-ends from the change
+  to three months on, this week's reading at the change, and the change line
+  (`findLastTimeCallChanged` `path`). Easier is up on both.
+- **How big a move is.** The first area group that sizes a move ("It is 24 points away, a rare
+  one-month move") draws every one-month move of that score since 2012 as bars by points, the
+  move marked and the bars past it in the ink (`describeScoreMoveHistogram`, which
+  `describeScoreMoveBand` reads its word from). A bar opens the latest month that moved that far.
+
+Every mark names itself on hover, on keyboard focus (each drawing is one tab stop; arrow keys
+step) and on a first tap, which a second tap follows (`app/components/ui/markReadout.tsx`).

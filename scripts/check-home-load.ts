@@ -89,7 +89,7 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
   /* 1428 → 1437, 264 → 266, 316 → 323 (2026-11-08): three quick-copy pills on the
      brief's action row (1-line standup, 3-bullet exec summary, card as image) add
      their labels ahead of the areas. Justified raise, said here. */
-  words: 1437,
+  words: 1435,
   numbers: 266,
   wordsBeforeAreas: 323,
   folds: 9,

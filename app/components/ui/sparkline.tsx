@@ -121,6 +121,19 @@ type SparklineProps = {
   tone?: SparklineTone;
   /** Width in `em`, so the graphic scales with its surrounding type. */
   widthEm?: number;
+  /**
+   * The line the series is judged against (2026-11-18): a dashed rule at its value, in
+   * the crossed ink when the latest reading is on its bad side. Where the line lies
+   * outside the domain, `offScale` names the edge and nothing is drawn: the caller's
+   * key says where it is, with an arrow.
+   */
+  reference?: { value: number; crossed: boolean; offScale?: "above" | "below" | null };
+  /** An earlier reading the caption compares with, drawn hollow at its point. */
+  mark?: { index: number; value: number };
+  /** A reading a readout is showing: a hairline and a dot at that point. */
+  activeIndex?: number | null;
+  /** Inside a control that names it: the drawing is hidden from assistive tech. */
+  decorative?: boolean;
   className?: string;
 };
 
@@ -131,6 +144,10 @@ export function Sparkline({
   band,
   tone = "unchanged",
   widthEm = 5,
+  reference,
+  mark,
+  activeIndex = null,
+  decorative = false,
   className,
 }: SparklineProps) {
   // Below three points there is no shape to show. Two points is a segment, and
@@ -166,6 +183,9 @@ export function Sparkline({
   // ends clipped to the frame. Bands rather than stripes, so a run of one
   // regime reads as one block the way it does on the /history plane.
   const step = VIEW_W / Math.max(points.length - 1, 1);
+  const xAt = (index: number) => index * step;
+  const clampY = (value: number) => Math.min(VIEW_H - PAD_Y, Math.max(PAD_Y, toY(value)));
+  const active = activeIndex !== null && activeIndex >= 0 && activeIndex < points.length ? points[activeIndex] : null;
 
   return (
     <svg
@@ -174,7 +194,8 @@ export function Sparkline({
       // aspect matches the viewBox (5:1) so the stroke never distorts.
       style={{ width: `${widthEm}em`, height: `${widthEm / 5}em` }}
       className={`inline-block shrink-0 align-[-0.15em] overflow-visible ${className ?? ""}`}
-      aria-label={accessibleLabel}
+      aria-label={decorative ? undefined : accessibleLabel}
+      aria-hidden={decorative ? true : undefined}
     >
       {groundLabels.length > 0
         ? points.map((point, i) =>
@@ -213,8 +234,47 @@ export function Sparkline({
         opacity="0.75"
         vectorEffect="non-scaling-stroke"
       />
+      {reference && !reference.offScale ? (
+        <line
+          data-sparkline-reference
+          x1="0"
+          x2={VIEW_W}
+          y1={toY(reference.value)}
+          y2={toY(reference.value)}
+          stroke={reference.crossed ? "var(--line-crossed)" : "var(--app-text-muted)"}
+          strokeWidth="1"
+          strokeDasharray="3 2"
+          vectorEffect="non-scaling-stroke"
+        />
+      ) : null}
+      {active ? (
+        <line
+          x1={xAt(activeIndex ?? 0)}
+          x2={xAt(activeIndex ?? 0)}
+          y1="0"
+          y2={VIEW_H}
+          stroke="var(--app-text-muted)"
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
+        />
+      ) : null}
+      {mark && mark.index >= 0 && mark.index < points.length ? (
+        <circle
+          data-sparkline-mark
+          cx={xAt(mark.index)}
+          cy={clampY(mark.value)}
+          r="2"
+          fill="var(--bg-body)"
+          stroke="currentColor"
+          strokeWidth="1.25"
+          vectorEffect="non-scaling-stroke"
+        />
+      ) : null}
       {/* Tufte marks the current reading so the eye lands on "now" first. */}
       <circle cx={VIEW_W} cy={lastY} r="2" fill={TONE_COLOR[tone]} />
+      {active && activeIndex !== points.length - 1 ? (
+        <circle cx={xAt(activeIndex ?? 0)} cy={toY(active.value)} r="2" fill="var(--app-text)" />
+      ) : null}
     </svg>
   );
 }

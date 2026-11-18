@@ -5,7 +5,7 @@ import { HistoricalTrendChart } from "../components/historicalTrendChart";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
-import { MonthStrip } from "../components/history/monthStrip";
+import { ConditionsByYear } from "../components/history/conditionsByYear";
 import { PublishedWeeks } from "../components/history/publishedWeeks";
 import { RecordPlateCanvas } from "./recordPlateCanvas";
 import { findRecordDifferences } from "../../lib/report/recordBand";
@@ -18,11 +18,11 @@ import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/
 import { buildPublishedBriefPath, getPublishedBriefs, listPublishedRecord, publishedBriefDisplay, publishedBriefRunLabel, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
+import { buildRecordCalendar } from "../../lib/report/recordCalendar";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
 import { formatDateUTC } from "../../lib/formatters";
-import { regimeKeyFromLabel, toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import { ConditionIcon, ConditionWord } from "../components/ui/conceptIcons";
+import { ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
@@ -94,6 +94,10 @@ export default async function HistoryPage({
   const publishedBriefs = getPublishedBriefs();
   const trackRecord = buildTrackRecord(fullSeries);
   const recordDifferences = findRecordDifferences(fullSeries, publishedBriefs);
+  const recordCalendar = buildRecordCalendar(fullSeries);
+  /* Each closed year's page, from the row that draws that year. */
+  const archivePaths = new Map(postureArchiveYears.map((year) => [Number(year.slug), buildPostureArchivePath(year.slug)]));
+  const archiveYearHref = (year: number) => archivePaths.get(year) ?? null;
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
   /* The month strip ends at the last month-end, and its "held since" line was
@@ -222,31 +226,12 @@ export default async function HistoryPage({
               </Link>
             </p>
           ) : null}
-          <MonthStrip entries={fullSeries} band={false} />
-          {/* Each closed year, under the strip it summarises. "Conditions by
-              year" was a section of its own near the foot of the page, ten
-              screens from the strip that draws the same months. */}
-          <div className="space-y-2">
-            <h3 className="type-eyebrow">By year</h3>
-            {/* A line of links, not fourteen boxed chips (2026-11-10). Each reaches up
-                only across the 4px row gap (`--weather-hit-up`, controls.css). */}
-            <ul className="flex flex-wrap gap-x-5 gap-y-1 text-fluid-sm [--weather-hit-up:4px]">
-              {postureArchiveYears.map((year) => {
-                const yearRegime = regimeKeyFromLabel(year.operatorLabel);
-                return (
-                  <li key={year.slug}>
-                    <Link href={buildPostureArchivePath(year.slug)} className="weather-hit inline-flex items-center gap-1.5 py-1.5 tabular-nums text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                      {year.title}
-                      <span className="inline-flex items-center gap-1 text-slate-400">
-                        {yearRegime ? <ConditionIcon regime={yearRegime} /> : null}
-                        {yearRegime ? <ConditionWord regime={yearRegime}>{toWeatherLabel(year.operatorLabel)}</ConditionWord> : toWeatherLabel(year.operatorLabel)}
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          {/* The months by calendar (2026-11-18): a row per year, a cell per month-end.
+              It replaced the key above a missing strip (the band at the top of the page
+              is that strip) and a line of one word per year, which hid every change
+              inside a year; its key carries the count under each condition, and each
+              row's year still opens that year's page. */}
+          {recordCalendar ? <ConditionsByYear calendar={recordCalendar} yearHref={archiveYearHref} /> : null}
           {/* No pointer to the briefs below and no "Prepare a board decision note" link
               (2026-11-11): the briefs are the next section, and the record's export is the
               Track record's "Copy the record summary". */}
@@ -376,7 +361,7 @@ export default async function HistoryPage({
 
       {/* Grades the record above: which regime changes were visible in the near band
           beforehand, and which were not. */}
-      <TrackRecordSection series={statsSeries} recordChanges={trackRecord?.regimeChanges} />
+      <TrackRecordSection series={statsSeries} history={fullSeries} recordChanges={trackRecord?.regimeChanges} />
 
       <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap
