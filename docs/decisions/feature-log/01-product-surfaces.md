@@ -4812,6 +4812,80 @@ Left as it is, each for a stated reason: "What changed" gives its two ladders up
 (`tests/onePlacePerFact.test.tsx`), which leaves "Where it stands" empty beside the two scores on a
 laptop; the "#" beside a report heading stays visible on touch (`reportSection.tsx`).
 
+### 1.1.108 Drawing what the pages only said (2026-11-18)
+
+The owner asked for this and said it overrides maintenance mode. Before it, a pass listed the facts
+the brief, `/signals`, `/trust` and `/history` state only in prose and that a drawing could carry.
+Each drawing sits beside the sentence it draws, and the sentence stays: it is what gets copied and
+cited (§XV). Each drawing reads the same object as its sentence. Every mark that stands for a past
+month opens that month in the time machine, and hover, keyboard focus and a tap show the same
+words.
+
+- **`/`, the conditions chart.**
+  - An area chooser shades the chosen area's pause region and restart region
+    (`lib/report/ruleRegions.ts`, `RuleRegionsChart`). An "or" pause is an L of half-planes, an
+    "and" restart a corner box. The gap between them is left bare and named.
+  - A switch plots the reading with the startup-market inputs counted, and names the areas that
+    would move. The guidance never changes.
+  - Both are links to URL states (`?rule=`, `?counted=1`), not radios. Radios took the first
+    screen's form fields from 21 to 27, and that budget only falls.
+  - `?rule=` is its own key, not `?decision=`. The decision picker writes `?decision=` and a cookie
+    and hears no other writer.
+- **`/operate`.**
+  - Each rule row draws its area's regions on a 72px map, at one scale for all five rows. The
+    map replaced the short bar, which only restated the badge.
+  - "Each area by month-end" applies this week's lines to the last twelve month-ends.
+  - Fundraising and New bets read "at the line" while funding pressure stood 14 points past their
+    76. The row took the rule's first stored line on a 0-point tie. `buildAreaRows` now takes the
+    week's scores and calls `selectPauseCondition`, on `/operate` and `/share`.
+- **`/`, the rest.**
+  - The two market inputs in "What changed" draw their daily trail, with their line and the
+    comparison reading, and a range input reads a day (`lib/report/home/inputTrail.ts`). A trail is
+    drawn only when it ends at the figure the row prints.
+  - The hero's figures draw the 178 month-end readings as a faint histogram behind the rule, with
+    the rank as its title. The rank is not repeated as hidden text: the sentence beside the figures
+    says it in words, and the copy cost 24 words of the first screen's budget.
+  - "A rare one-month move" gets the record's one-month moves as bars, with the needed move marked
+    (`describeScoreMoveHistogram`; the word "rare" now reads from the same counts).
+  - "Has this happened before?" draws each stretch of conditions by its length, the current one
+    open, the shortest on record as a rule.
+  - The last-time card draws the months from that change to three months on, against this week's
+    reading. Its "Compare Sep 2022 with Dec 2022 →" went to `/history/compare`, which redirects to
+    `/history`; it is gone, and the panels draw those months.
+- **`/signals`.**
+  - "Against its line" is a rail on every row. Every row runs easier to the right, so the hard side
+    is the same side on each.
+  - An inputs → scores → areas diagram (`lib/report/signalFlow.ts`) replaces each row's
+    "Affects" and "Feeds into" lines, which stay as screen-reader text on the unfiltered view.
+  - Each closed question draws its answer at text height in its summary. Those marks are
+    `aria-hidden` and hold no links, since a link inside a `<summary>` is not reachable cleanly.
+    The opened panels carry month links instead. "Which past cycle" has no picture: it is a
+    hand-picked cycle, and no small drawing of it would be honest.
+- **`/trust`.**
+  - This week's arithmetic for each score is a bar on 0–100 (`lib/report/scoreComposition.ts`):
+    solid where an input counted, hatched where it took points away, dashed where it was left out.
+    A sentence above each bar says the same sum.
+  - The composition renders nothing unless staged re-scoring reproduces the published score.
+  - The trust strip's "held 7 of 10 months at this distance" gets one square per month.
+- **`/history`.**
+  - "By year" was one word per year, which hid changes inside a year. It is now a year × month
+    grid of month-end conditions (`lib/report/recordCalendar.ts`), read by calendar, which the
+    band cannot do. It never shows the briefs (§XXX).
+  - "4 of 7 changes had advance warning" gets a mark per change.
+  - Each row of "How the record held up" draws the crossing score's distance to its line over the
+    six month-ends before the change, with the 5-point band shaded, on one scale.
+  - "Monthly readings" draws the room-to-move score over every month-end, with a readout.
+- **The published-week cells drew their patterns in Covenant's inks.** They were dark on Stormy's
+  navy and pale on pale Freezing. They now follow `isLightField`, as §XXX states and the band
+  does. The year grid uses the same cells.
+
+Left out, each for a reason:
+- The base-rate squares show only on `/trust`: the other strips already leave the base rate out.
+- "Each area by month-end" is not drawn on archived views, whose twelve months would have to end
+  at that month.
+- Several marks are narrower than 44px on a phone: the grid cells, the bars and the squares. Each
+  takes a 44px height, and on touch the first tap only shows its words.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

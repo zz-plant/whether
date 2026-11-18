@@ -90,13 +90,15 @@ describe("the last time conditions moved this way, against this week", () => {
     assert.match(versus.text, /One earlier outcome, not a forecast\.$/);
   });
 
-  it("prints on the card under the two scores, above the way to the comparison", () => {
+  it("prints on the card under the two scores, and sends no reader to the retired compare view", () => {
     const record = lastTimeForSep25Reading();
     assert.ok(record);
     const html = renderToStaticMarkup(<LastTimeCallChangedCard record={record} callChangeLines={{ tightness: 70, riskAppetite: 50 }} />);
 
     assert.match(html, /data-testid="last-time-versus-today"/);
     assert.match(html, /Against this week:<\/span> That change was Stormy to Freezing/);
-    assert.ok(html.indexOf("last-time-versus-today") < html.indexOf("Compare Sep 2022 with Dec 2022"));
+    assert.ok(html.indexOf("data-follow-through=") !== -1 && html.indexOf("data-follow-through=") < html.indexOf("last-time-versus-today"));
+    /* /history/compare redirects to /history; the panels draw the months it compared. */
+    assert.doesNotMatch(html, /history\/compare/);
   });
 });

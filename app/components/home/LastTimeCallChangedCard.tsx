@@ -1,7 +1,6 @@
-import { ActionLink } from "../ui/actionLink";
 import { ChangeFollowThrough } from "./ChangeFollowThrough";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { buildLastTimeCompareHref, describeAgainstToday, lastTimeVerb, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import { describeAgainstToday, lastTimeVerb, type LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 
 /**
  * On a week the call changed: the last time it moved this way, what the two
@@ -48,9 +47,9 @@ export function LastTimeCallChangedCard({
       <p data-testid="last-time-versus-today" className="max-w-[60ch] text-fluid-sm leading-5 text-slate-300">
         <span className="font-semibold text-slate-100">Against this week:</span> {versus.text}
       </p>
-      <ActionLink href={buildLastTimeCompareHref(record)} variant="inline">
-        Compare {changedAt} with {after} →
-      </ActionLink>
+      {/* "Compare Sep 2022 with Dec 2022 →" went to /history/compare, which has redirected
+          to /history since the compare view was retired; the panels above draw those
+          months, each a link to its month in the time machine (2026-11-18). */}
     </aside>
   );
 }

@@ -161,9 +161,6 @@ export const lastTimeVerb = (record: Pick<LastTimeCallChanged, "direction">) =>
   record.direction === "tightening" ? "tightened" : "eased";
 
 /** The comparison page for the change month against the month three later. */
-export const buildLastTimeCompareHref = (record: LastTimeCallChanged) =>
-  `/history/compare?yearA=${record.changedAt.year}&monthA=${record.changedAt.month}&yearB=${record.after.year}&monthB=${record.after.month}`;
-
 type RecentCallChange = MonthRef & { fromLabel: string; toLabel: string };
 
 /**

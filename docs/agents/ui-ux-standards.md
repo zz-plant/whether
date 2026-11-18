@@ -1084,6 +1084,10 @@ the frame.
   on Sunny, Cloudy and Freezing, `--band-line-on-dense` on Stormy, the one dense fill since
   2026-11-12 (`isLightField`). A field's sky lifts its top a fifth toward the paper, never more,
   so the line ink chosen for its fill still holds at the top.
+- A drawing of the month-ends arranged another way is not a second band (2026-11-18): `/history`'s
+  year × month grid (`conditionsByYear.tsx`) reads the record by calendar, which the band cannot.
+  It shows month-ends only, never the briefs, and draws each cell with the published-week cell's
+  fill and pattern (`.record-week-cell`), whose rules take the band's inks by `isLightField`.
 - MUST: keep the two records apart. The fields and lines are the month-end readings, scored with
   today's formula. The marks under the band are the briefs as published, one each, from a dashed
   line where publication began; a week with no brief has no mark. The caption counts each record
