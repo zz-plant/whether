@@ -1,5 +1,5 @@
 import type { ActionStripItem, LineState } from "../../lib/report/operatingCalls";
-import { formatPointsToLine, resolveLineState } from "../../lib/report/operatingCalls";
+import { formatPointsToLine, resolveLineState, selectPauseCondition } from "../../lib/report/operatingCalls";
 import { operatingLeverToDecisionArea } from "../../lib/report/businessAreaMap";
 import type { DecisionArea, RuleCondition, RuleConditionMetric } from "../../lib/report/boundedDecisionRules";
 import type { Route } from "../../lib/navigation/routeType";
@@ -61,18 +61,30 @@ const distanceTo = (nearest: ActionStripItem["nearestPause"], kind: "pause" | "r
 const stateOf = (nearest: ActionStripItem["nearestPause"], kind: "pause" | "resume") =>
   nearest ? resolveLineState(nearest.pointsToLine, kind, nearest.satisfied) : undefined;
 
-export const buildAreaRows = (items: readonly ActionStripItem[]): AreaRowText[] =>
+/**
+ * `scores`, where the caller has the reading the strip was measured from, judges the pause
+ * by the line the brief's rows use (`selectPauseCondition`: one already crossed, else the
+ * nearest). The strip's own `nearestPause` breaks a tie at zero points by the order the rule
+ * stores its lines, so at funding pressure 90 and risk appetite 44 Fundraising and New bets,
+ * whose risk-appetite line is stored first, read "at the line" with their funding-pressure
+ * line crossed, while Hiring, stored the other way round, read "in effect" (2026-11-18).
+ */
+export const buildAreaRows = (
+  items: readonly ActionStripItem[],
+  scores?: { tightness: number; riskAppetite: number },
+): AreaRowText[] =>
   items.map((item) => {
     const area = operatingLeverToDecisionArea[item.lever];
     const pauseConditions = item.pauseConditions ?? [];
     const resumeConditions = item.resumeConditions ?? [];
+    const pauseLine = scores && pauseConditions.length > 0 ? selectPauseCondition(pauseConditions, scores) : item.nearestPause;
     return {
       area,
       rule: item.areaActionNow,
       pause: {
         line: pauseConditions.length > 0 ? joinConditions(pauseConditions, "or", item.pauseQualifier) : item.triggerThreshold,
-        distance: pauseConditions.length > 0 ? distanceTo(item.nearestPause, "pause") : undefined,
-        state: pauseConditions.length > 0 ? stateOf(item.nearestPause, "pause") : undefined,
+        distance: pauseConditions.length > 0 ? distanceTo(pauseLine, "pause") : undefined,
+        state: pauseConditions.length > 0 ? stateOf(pauseLine, "pause") : undefined,
       },
       resume: {
         line: resumeConditions.length > 0 ? joinConditions(resumeConditions, "and", item.resumeQualifier) : item.reversalCondition,

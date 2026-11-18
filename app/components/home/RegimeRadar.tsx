@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type CSSProperties,
@@ -14,9 +15,11 @@ import { formatThresholdNumber } from "../../../lib/formatters";
 import { classifyRegime } from "../../../lib/regimeEngineCore";
 import { UrlDetails } from "../ui/urlDetails";
 import { ConditionIcon } from "../ui/conceptIcons";
+import { RuleRegionShapes } from "../ui/ruleRegionShapes";
+import type { AreaRuleRegions } from "../../../lib/report/ruleRegions";
 import type { RegimeKey } from "../../../lib/types";
 
-type RegimeRadarProps = {
+export type RegimeRadarProps = {
   compact?: boolean;
   detailsOpen?: boolean;
   tightness: number;
@@ -67,6 +70,14 @@ type RegimeRadarProps = {
    * path it took fades once it lands. Not the trail, which is month-ends.
    */
   travelFrom?: { tightness: number; riskAppetite: number } | null;
+  /** One area's pause and restart regions (`buildRuleRegions`), shaded over the quadrants; none without it. */
+  ruleRegions?: AreaRuleRegions | null;
+  /** The shaded regions' claim in words (`describeRegionsAt`), added to the figure's text alternative. */
+  description?: string;
+  /** Names the scores in the header line when they are not the published reading's ("Counted"). */
+  readoutLabel?: string;
+  /** A key to what the plot draws beyond the conditions (the shaded regions), first under it. */
+  legend?: ReactNode;
   className?: string;
 };
 
@@ -133,8 +144,14 @@ export function RegimeRadar({
   feelsLike,
   onScrubScores,
   travelFrom,
+  ruleRegions,
+  description,
+  readoutLabel,
+  legend,
   className = "",
 }: RegimeRadarProps) {
+  /* The regions' hatch is a <pattern> referenced by id; one per chart on the page. */
+  const regionIdPrefix = `radar-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const svgRef = useRef<SVGSVGElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const dragStateRef = useRef<{
@@ -306,8 +323,10 @@ export function RegimeRadar({
   /* The plotted glyph and Freezing's corner word want the same corner when the left-out
      inputs land there: the word moves to the top of its quadrant, and the plotted glyph
      stands in for the one beside it. */
-  const freezingUp =
+  const feelsLikeInCorner =
     Boolean(feelsLike) && yFor(feelsLike?.tightness ?? 0) > PLOT_BOTTOM - 26 && xFor(feelsLike?.riskAppetite ?? 100) < PLOT_X + 76;
+  /* The marker itself on the word (a counted reading deep in Freezing) lifts it too; lifted, its glyph would meet the axis name. */
+  const freezingUp = feelsLikeInCorner || (yFor(tightness) > PLOT_BOTTOM - 22 && xFor(riskAppetite) < PLOT_X + 62);
   const boundaryX = xFor(riskAppetiteThreshold);
   const boundaryY = yFor(tightnessThreshold);
   const currentX = xFor(riskAppetite);
@@ -447,7 +466,7 @@ export function RegimeRadar({
        "The Flat Paper Rule"). */
     <figure
       className={`relative m-0 flex flex-col items-center justify-center ${className}`.trim()}
-      aria-label={`Conditions map: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}`}
+      aria-label={`Conditions map: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}${description ? `. ${description}` : ""}`}
       data-scrubbing={isScrubbing ? "" : undefined}
     >
       <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
@@ -473,7 +492,7 @@ export function RegimeRadar({
           </span>
         ) : compact ? null : (
           <span className="tabular-nums text-slate-400">
-            Funding pressure {tightness} · Risk appetite {riskAppetite}
+            {readoutLabel ? `${readoutLabel}: ` : null}Funding pressure {tightness} · Risk appetite {riskAppetite}
           </span>
         )}
       </div>
@@ -536,6 +555,10 @@ export function RegimeRadar({
           .map((quadrant) => (
             <rect key={`${quadrant.key}-lit`} x={quadrant.x} y={quadrant.y} width={quadrant.width} height={quadrant.height} fill={quadrant.fill} />
           ))}
+
+        {/* The chosen area's rule over the quadrants and under every word and mark, so the
+            corner names stay legible and the reading sits on top of the region it is in. */}
+        {ruleRegions ? <RuleRegionShapes regions={ruleRegions} x={xFor} y={yFor} idPrefix={regionIdPrefix} /> : null}
 
         {/* Quadrant corner labels, each in its condition's ink. These read the
             line-state families until 2026-10-09 (Sunny in the clear ink,
@@ -805,12 +828,8 @@ export function RegimeRadar({
             strokeWidth="1.5"
             strokeOpacity="0.8"
           />
-          <circle
-            cx={currentX}
-            cy={currentY}
-            r="3.5"
-            fill="var(--regime-accent)"
-          />
+          {/* An ink edge (2026-11-18): Freezing's ice dot on its lit quadrant all but vanished on light. */}
+          <circle cx={currentX} cy={currentY} r="3.5" fill="var(--regime-accent)" stroke="var(--app-text)" strokeWidth="0.9" />
         </g>
 
         {/* Direct-manipulation scrub overlay: rendered only while actively scrubbing or spring-settling */}
@@ -890,6 +909,7 @@ export function RegimeRadar({
           axes and Freezing hard on both, while Cloudy and Stormy are each hard
           on one. The chart is where that shows, so it says so. */}
       <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
+          {legend ? <span className="block pb-1">{legend}</span> : null}
           {/* What the two directions mean before which corner is which
               (2026-10-21): the axes name two scores a first visit has not met,
               and the legend that decodes them in money terms is hidden from `md`
