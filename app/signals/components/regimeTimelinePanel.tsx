@@ -7,6 +7,7 @@ import { buildTimeMachineHref } from "../../../lib/timeMachine/timeMachineSelect
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { ConditionIcon } from "../../components/ui/conceptIcons";
 import { summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
+import { toMonthKey } from "../../../lib/monthCursor";
 
 
 type RegimeRun = {
@@ -126,7 +127,10 @@ export const RegimeTimelinePanel = ({
               })}
             </div>
 
-            <div className="absolute inset-0 z-30 flex">
+            {/* Each month link carries its month (`data-month`, lib/monthCursor.ts): a month read
+                elsewhere on the page (the record band, `[` and `]`) names itself here as if
+                pointed at, and is the one name shown while it is read. */}
+            <div className="group/timeline absolute inset-0 z-30 flex">
               {series.map((entry, index) => {
                 const isCurrent = entry.year === selectedYear && entry.month === selectedMonth;
                 const monthLabel = formatMonthLabel(entry.year, entry.month);
@@ -141,7 +145,8 @@ export const RegimeTimelinePanel = ({
                     href={href}
                     aria-current={isCurrent ? "date" : undefined}
                     aria-label={`${monthLabel}: ${REGIME_LABELS[entry.regime]}`}
-                    className="group/month h-full min-h-[44px] flex-1 hover:bg-[color:var(--app-text)]/10 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
+                    data-month={toMonthKey(entry.year, entry.month)}
+                    className="group/month h-full min-h-[44px] flex-1 hover:bg-[color:var(--app-text)]/10 data-[month-active]:bg-[color:var(--app-text)]/10 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
                     style={{ touchAction: "manipulation" }}
                   >
                     {/* The chosen month's rule is the link's own state, so it is drawn
@@ -158,10 +163,12 @@ export const RegimeTimelinePanel = ({
                         conditions: the same words the link's label carries. */}
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute left-2 top-2 hidden items-center gap-1.5 rounded-sm bg-[color:var(--bg-panel)] px-2 py-1 text-fluid-nano font-semibold text-slate-100 group-hover/month:flex group-focus-visible/month:flex"
+                      className="pointer-events-none absolute left-2 top-2 hidden items-center gap-1.5 rounded-sm bg-[color:var(--bg-panel)] px-2 py-1 text-fluid-nano font-semibold text-slate-100 group-hover/month:flex group-focus-visible/month:flex group-has-[a[data-month-active]]/timeline:hidden group-data-[month-active]/month:flex!"
                     >
                       <ConditionIcon regime={entry.regime} />
-                      {monthLabel} · {REGIME_LABELS[entry.regime]}
+                      <span>
+                        <time dateTime={toMonthKey(entry.year, entry.month)}>{monthLabel}</time> · {REGIME_LABELS[entry.regime]}
+                      </span>
                     </span>
                   </a>
                 );

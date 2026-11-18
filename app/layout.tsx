@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
 import { RecordBand } from "./components/recordBand";
+import { MonthCursor } from "./components/monthCursor";
 import { STORAGE_KEYS } from "../lib/storage/keys";
 import { navigationGroups, pagesInGroup, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
@@ -258,6 +259,8 @@ export default function RootLayout({
           </a>
           <GlobalHeader />
           <RecordBand />
+          {/* One month across every drawing on a page; the band's readout is one of them. */}
+          <MonthCursor />
           <RunningHead />
           <GlobalCommandPalette />
           <ServiceWorkerRegistrar />

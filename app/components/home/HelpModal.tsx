@@ -21,6 +21,7 @@ const SHORTCUTS: Array<[string, string]> = [
   ["F", "On the brief: presentation / focus mode"],
   ["J", "Next section"],
   ["K", "Previous section"],
+  ["[ ]", "Step through the months on this page"],
   ...navigationGroups.map((group): [string, string] => [group.shortcut.toUpperCase(), `${group.label}: ${group.description}`]),
   ["⌘K", "Search or jump to a page"],
   ["/", "Search"],

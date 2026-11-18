@@ -1,0 +1,62 @@
+/*
+ * One month at a time, across every drawing on a page (2026-11-18,
+ * app/components/monthCursor.tsx, lib/monthCursor.ts). A mark that stands for the
+ * page's month carries `data-month-active`; here each kind of mark says so.
+ *
+ * - Ink only. The month is the reader's choice, not a reading, so it takes neither a
+ *   condition's colour nor a line state's (ui-ux-standards §XVI), and the ink reads
+ *   on both themes.
+ * - Outline and stroke only. Nothing moves, grows or reflows, so nothing on the page
+ *   shifts (§VII), and nothing transitions: the month changes as often as the pointer
+ *   moves, and a state that changes that often is a state, not an animation (§XXIII).
+ *   With no transition there is nothing for reduced motion to switch off.
+ * - The drawings with a readout of their own (the record band, the room-to-move
+ *   chart) show the month in it and draw no ring here; the month rows on /signals
+ *   show their words and light the month as their hover does.
+ */
+
+/* A cell of the year grid on /history, ringed as its hover rings it. */
+a[data-month][data-month-active] > .record-week-cell {
+  outline: 2px solid var(--app-text);
+  outline-offset: 1px;
+}
+
+/* The cells a closed question on /signals draws beside its answer: a few pixels wide, so a hairline. */
+[data-preview] [data-month][data-month-active] {
+  outline: 1px solid var(--app-text);
+  outline-offset: 1px;
+}
+
+/* A base-rate square on /trust. */
+[data-base-rate-mark][data-month-active] {
+  outline: 1.5px solid var(--app-text);
+  outline-offset: 1.5px;
+}
+
+/* An advance-warning mark on /history: the diamond is ringed (the ring turns with it),
+   and the month under it takes the ink, as its hover does. */
+[data-advance-warning-marks] a[data-month-active] > :first-child {
+  outline: 1.5px solid var(--app-text);
+  outline-offset: 2px;
+}
+
+[data-advance-warning-marks] a[data-month-active] > :last-child {
+  color: var(--app-text);
+}
+
+/* A month-end in a change's drawing on /history: the dot widens by its own stroke. */
+[data-change-approach] circle[data-month-active] {
+  stroke: currentColor;
+  stroke-width: 2.5px;
+}
+
+/* A stretch on the brief's "Has this happened before?" plot: a ring around its dot. */
+[data-spell-plot-mark][data-month-active] > span {
+  outline: 2px solid var(--app-text);
+  outline-offset: 2px;
+}
+
+/* A month in a row on /signals, lit as its hover lights it; its words show above the row. */
+[data-month-readout-strip] a[data-month-active] {
+  background-color: var(--bg-nested);
+}
