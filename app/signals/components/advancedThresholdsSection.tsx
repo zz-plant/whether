@@ -42,7 +42,7 @@ export const AdvancedThresholdsSection = ({
     /* A row in the instruments list like the others: the question is the
        control. It was an eyebrow, a heading and a separate "Open the line
        settings · Show / hide" button, three lines for one toggle. */
-    <section id="advanced-controls" className="weather-panel p-5 max-sm:px-0" aria-label="Line settings">
+    <section id="advanced-controls" className="weather-panel px-0 py-5" aria-label="Line settings">
       {/* Kept as a JS collapsible rather than a native `<details>`, on
           purpose: `ThresholdsPanel` restores a saved draft into the URL from
           a mount effect, and a `<details>` mounts its content whether or not

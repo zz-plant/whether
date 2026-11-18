@@ -1,8 +1,11 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
+import { REGIME_LABELS } from "../../../lib/regimePresentation";
+import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { formatMonthLabel, formatMonthShortLabel } from "../../../lib/timeMachine/monthFormatting";
+import { buildTimeMachineHref } from "../../../lib/timeMachine/timeMachineSelection";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { ConditionIcon } from "../../components/ui/conceptIcons";
 import { summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
 
 
@@ -68,14 +71,10 @@ export const RegimeTimelinePanel = ({
   const conditionRuns = summarizeConditionRuns(series);
   const { runs, longestRun } = conditionRuns;
 
-  const buildHref = (month: number, year: number) => {
-    const nextParams = new URLSearchParams(preservedParams.toString());
-    nextParams.set("month", String(month));
-    nextParams.set("year", String(year));
-
-    const queryString = nextParams.toString();
-    return queryString ? `/signals?${queryString}` : "/signals";
-  };
+  /* The time machine's own href builder, over the reader's other settings. */
+  const preservedQuery = preservedParams.toString();
+  const buildHref = (month: number, year: number) =>
+    buildTimeMachineHref(preservedQuery ? `/signals?${preservedQuery}` : "/signals", { month, year });
 
   return (
     <section id="regime-timeline" aria-labelledby="regime-timeline-title" className="mt-6 border-t border-slate-800/60 pt-6">
@@ -111,10 +110,11 @@ export const RegimeTimelinePanel = ({
                     className="relative flex min-w-[3.25rem] flex-1 items-end border-r border-slate-950/70 last:border-r-0"
                     style={{ flexGrow: run.count }}
                   >
-                    <div
-                      className={`absolute inset-0 opacity-85 ${REGIME_STYLE_TOKENS[run.regime].marker}`}
-                      aria-hidden="true"
-                    />
+                    {/* The conditions' fill and their pattern (§XXX), the cells the
+                        question over this panel draws, so the two read alike. */}
+                    <div className="absolute inset-0" aria-hidden="true">
+                      <span data-regime={regimeDataAttribute(run.regime)} className="record-week-cell block h-full w-full" />
+                    </div>
                     <div className="relative z-10 w-full bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent px-2 pb-2 pt-8 sm:px-3">
                       <p className="truncate type-eyebrow text-slate-100 sm:text-xs">
                         {runLabel}
@@ -127,32 +127,41 @@ export const RegimeTimelinePanel = ({
             </div>
 
             <div className="absolute inset-0 z-30 flex">
-              {series.map((entry) => {
+              {series.map((entry, index) => {
                 const isCurrent = entry.year === selectedYear && entry.month === selectedMonth;
                 const monthLabel = formatMonthLabel(entry.year, entry.month);
                 const href = buildHref(entry.month, entry.year);
 
+                /* Not positioned itself: the readout inside it is placed against the
+                   strip, so every month prints in one spot, the top left, where the
+                   runs carry no words. */
                 return (
                   <a
                     key={`${entry.year}-${entry.month}`}
                     href={href}
                     aria-current={isCurrent ? "date" : undefined}
                     aria-label={`${monthLabel}: ${REGIME_LABELS[entry.regime]}`}
-                    className="relative h-full min-h-[44px] flex-1 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
+                    className="group/month h-full min-h-[44px] flex-1 hover:bg-[color:var(--app-text)]/10 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
                     style={{ touchAction: "manipulation" }}
                   >
                     {/* The chosen month's rule is the link's own state, so it is drawn
-                        inside the link, in the action colour (ui-ux-standards §XXVII).
-                        The runs under these links never brighten on hover: the links
-                        sit above them and take the pointer. */}
+                        with the link, in the action colour (ui-ux-standards §XXVII),
+                        placed by the month's share of the strip. */}
                     {isCurrent ? (
                       <span
-                        className="pointer-events-none absolute inset-y-2 left-1/2 w-px -translate-x-1/2 bg-sky-300/95"
+                        className="pointer-events-none absolute inset-y-2 w-px -translate-x-1/2 bg-sky-300/95"
+                        style={{ left: `${((index + 0.5) / series.length) * 100}%` }}
                         aria-hidden="true"
                       />
                     ) : null}
-                    <span className="sr-only">
-                      {monthLabel} — {REGIME_LABELS[entry.regime]}
+                    {/* The month under the pointer or the keyboard, named with its
+                        conditions: the same words the link's label carries. */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-2 top-2 hidden items-center gap-1.5 rounded-sm bg-[color:var(--bg-panel)] px-2 py-1 text-fluid-nano font-semibold text-slate-100 group-hover/month:flex group-focus-visible/month:flex"
+                    >
+                      <ConditionIcon regime={entry.regime} />
+                      {monthLabel} · {REGIME_LABELS[entry.regime]}
                     </span>
                   </a>
                 );
