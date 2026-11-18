@@ -17,6 +17,7 @@ import { CloseIcon } from "./uiIcons";
 import { CalendarButton, buildMondayAgendaDescription } from "./calendarButton";
 import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
 import { SegmentedControl } from "./ui/segmentedControl";
+import { shareablePageLink } from "../../lib/navigation/shareableLink";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
@@ -232,7 +233,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => {
-                  void copyToClipboard(window.location.href, "link");
+                  void copyToClipboard(shareablePageLink(window.location.href), "link");
                 }}
                 className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >

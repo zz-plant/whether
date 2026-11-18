@@ -102,11 +102,14 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
      (1-line standup, 3-bullet exec summary, card as image), so a founder can
      paste the artifact in under 10 seconds. Same three controls the brief's
      transmission loop asks for; justified raise, said here. */
-  buttons: 19,
+  /* 19 → 17 buttons and 9 → 6 jargon terms (2026-11-18): the conditions chart's "Copy link"
+     took one of the two spare buttons, and its rate labels replaced three jargon terms in the
+     "In interest-rate terms" fold. Lowered to the measure, as the rule above asks. */
+  buttons: 17,
   fields: 21,
   fundingPressure: 34,
   riskAppetite: 37,
-  jargon: 9,
+  jargon: 6,
   hardSentences: 2,
   longestSentence: 22,
 };
