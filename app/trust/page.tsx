@@ -16,6 +16,7 @@ import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
 import { formatDecisionReversal } from "../../lib/report/reportFormatting";
+import { RATE_PARAM, parseRateParam } from "../../lib/report/fedSteps";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -38,6 +39,7 @@ export default async function MethodPage({
   const {
     reportData,
     scoreComposition,
+    rateDial,
     isFallback,
     sourceBoardRows,
     warnings,
@@ -157,6 +159,7 @@ export default async function MethodPage({
         <FormulaReference
           scoringBasis={reportData.scoringBasis}
           composition={scoreComposition}
+          rateDial={rateDial ? { ...rateDial, initialRate: parseRateParam(resolvedSearchParams?.[RATE_PARAM]) } : null}
           plainLanguageFolded={!isFallback && warnings.length === 0}
           plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
         />

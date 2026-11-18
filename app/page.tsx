@@ -54,13 +54,10 @@ import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { buildRuleChartModel } from "../lib/report/ruleRegions";
-import {
-  RULE_CHART_AREA_PARAM,
-  RULE_CHART_COUNTED_PARAM,
-  buildCountedChartHref,
-  parseRuleChartArea,
-  parseRuleChartCounted,
-} from "../lib/report/ruleChartParams";
+import { buildCountedChartHref, parseRuleChartDecision, parseRuleChartReading } from "../lib/report/ruleChartParams";
+import { buildRateMoves, fundingPressureRateLookup } from "../lib/report/rateScenario";
+import { buildScoreComposition } from "../lib/report/scoreComposition";
+import { evaluateRegime } from "../lib/regimeEngine";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
@@ -589,18 +586,37 @@ async function PageContent({
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
   const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
-  /* The conditions chart's rule layer: each area's regions, opening on the lead rule only
-     when the sentence beside the chart is that rule's; the counted switch on a live read. */
+  /* The conditions chart's rule layer: each area's regions, opening on the decision the
+     reader chose, else on the lead rule only when the sentence beside the chart is that
+     rule's. On a live read it can also plot the reading with the left-out inputs counted,
+     or after a Fed cut or hike, and label funding pressure's lines with the short rate
+     where the rate makes the whole score; all three re-score through the engine. */
+  const liveChart = !historicalSelection && !savedCopy;
+  const rateInputs = { assessment: reportData.assessment, treasury: reportData.treasury, macroSeries: reportData.macroSeries, evaluate: evaluateRegime };
+  const ruleChartModel = buildRuleChartModel({
+    rules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+    scores: { tightness, riskAppetite },
+    leadArea: corridorRule && boundedConditions ? corridorRule.area : null,
+    notCounted: liveChart ? reportData.scoringBasis?.notCounted ?? [] : [],
+    changeLines: callChangeLines,
+    regime,
+    rateMoves: liveChart ? buildRateMoves(rateInputs) : [],
+    rateAtFundingPressure: liveChart
+      ? fundingPressureRateLookup({
+          assessment: reportData.assessment,
+          composition: buildScoreComposition({
+            ...rateInputs,
+            treasurySource: { label: reportData.treasuryProvenance.sourceLabel, url: reportData.treasuryProvenance.sourceUrl },
+            scoringBasis: reportData.scoringBasis,
+          }),
+        })
+      : undefined,
+  });
+  const chosenReading = parseRuleChartReading(searchParams);
   const ruleChart = {
-    ...buildRuleChartModel({
-      rules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
-      scores: { tightness, riskAppetite },
-      leadArea: corridorRule && boundedConditions ? corridorRule.area : null,
-      notCounted: historicalSelection || savedCopy ? [] : reportData.scoringBasis?.notCounted ?? [],
-      changeLines: callChangeLines,
-    }),
-    initialArea: parseRuleChartArea(searchParams?.[RULE_CHART_AREA_PARAM]),
-    initialCounted: parseRuleChartCounted(searchParams?.[RULE_CHART_COUNTED_PARAM]),
+    ...ruleChartModel,
+    initialArea: parseRuleChartDecision(searchParams) ?? data.operatorContext.decisionArea ?? undefined,
+    initialReading: ruleChartModel.readings.some((reading) => reading.key === chosenReading) ? chosenReading : null,
     query: searchParams,
   };
   /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
@@ -962,7 +978,7 @@ async function PageContent({
                   : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
-                chartHref={ruleChart.counted ? buildCountedChartHref(searchParams) : undefined}
+                chartHref={ruleChart.readings.some((reading) => reading.key === "counted") ? buildCountedChartHref(searchParams) : undefined}
               />
 
               {/* 6. What would change the guidance: its pause and restart lines, the

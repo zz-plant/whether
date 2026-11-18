@@ -4827,10 +4827,22 @@ words.
     "and" restart a corner box. The gap between them is left bare and named.
   - A switch plots the reading with the startup-market inputs counted, and names the areas that
     would move. The guidance never changes.
-  - Both are links to URL states (`?rule=`, `?counted=1`), not radios. Radios took the first
-    screen's form fields from 21 to 27, and that budget only falls.
-  - `?rule=` is its own key, not `?decision=`. The decision picker writes `?decision=` and a cookie
-    and hears no other writer.
+  - Both are links to URL states, not radios. Radios took the first screen's form fields from 21
+    to 27, and that budget only falls.
+  - The same day, the chart got two rows of questions. "Which area?" writes `?decision=`, so the chart
+    and the decision picker make one choice. It sets the picker's cookie and announces a
+    `whether:decision` event, which the chart also hears. `?rule=` still opens its area.
+  - "Which reading?" offers this week's reading, the reading with startup-market inputs counted, and
+    the reading after one, two or three quarter-point Fed cuts or one hike (`?reading=`; `?counted=1`
+    still opens counted). The filled marker moves and this week's stays hollow. One sentence under
+    the chart starts with the areas that would pause or restart. The Fed steps move the 1-month rate
+    one-for-one with everything else as this week, re-scored by the engine (`lib/report/rateScenario.ts`).
+    A step that draws the same picture as the step before it is left out.
+  - Where the 1-month rate makes the whole of funding pressure (the composition decides), the
+    chosen area's funding-pressure lines and the change line carry that rate ("76 3.92%"). The
+    "In interest-rate terms" fold drops its "That is the 1-month Treasury bill rate …" line, which
+    those labels draw. An area on hold offers "Email me when Hiring restarts", and "Copy link"
+    copies the chart's URL.
 - **`/operate`.**
   - Each rule row draws its area's regions on a 72px map, at one scale for all five rows. The
     map replaced the short bar, which only restated the badge.
@@ -4866,6 +4878,11 @@ words.
     solid where an input counted, hatched where it took points away, dashed where it was left out.
     A sentence above each bar says the same sum.
   - The composition renders nothing unless staged re-scoring reproduces the published score.
+  - Funding pressure's bar takes the 1-month rate on one native range, 3.00% to 4.50% in hundredths
+    (`?rate=`). Moved, the bar redraws at that rate through the engine (`buildRateDial`), this
+    week's total stays marked, and the answer says which areas would pause or restart, and how far
+    that rate is from this week in Fed steps. The curve's parts are named "Recession warning gauge"
+    there, the site's name for the curve, in place of "Yield curve".
   - The trust strip's "held 7 of 10 months at this distance" gets one square per month.
 - **`/history`.**
   - "By year" was one word per year, which hid changes inside a year. It is now a year × month

@@ -1,6 +1,8 @@
 "use client";
 
-import { useId, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { RATE_PARAM, describeFedSteps, describeRateDialAnswer, formatShortRate } from "../../lib/report/fedSteps";
+import type { RateDial } from "../../lib/report/rateScenario";
 import type { CompositionPart, CompositionSource } from "../../lib/report/scoreComposition";
 
 /**
@@ -18,14 +20,39 @@ import type { CompositionPart, CompositionSource } from "../../lib/report/scoreC
  * hover and focus pick the same part, and a tap picks it on a touch screen.
  * The pick stays when the pointer leaves, so the source link under it can be
  * reached. It opens on the biggest counted input.
+ *
+ * Funding pressure's bar also takes the short rate (2026-11-18): a native range in
+ * hundredths of a point (`buildRateDial`, which re-scored every stop through the engine).
+ * Moved off this week's rate, the parts redraw at that rate, this week's total stays
+ * marked on the scale, and one sentence under the control says which areas would pause
+ * or restart, the rate in Fed steps from this week, and funding pressure there. The
+ * sentence above the bar is this week's and does not change. The rate is the URL's
+ * (`?rate=3.85`, replaced rather than pushed), so a link opens on the same bar.
  */
 
 type ScoreCompositionBarProps = {
   /** "Funding pressure", for the group's name. */
   label: string;
+  /** This week's score, which the scale marks once the rate is moved. */
+  published?: number;
   parts: readonly CompositionPart[];
   notCounted: CompositionPart | null;
   largest: CompositionSource | null;
+  /** The score at other short rates, and the rate the URL names; funding pressure's bar only. */
+  rateDial?: (RateDial & { initialRate?: number }) | null;
+};
+
+const roundRate = (value: number) => Math.round(value * 100) / 100;
+const clampRate = (dial: RateDial, value: number) => roundRate(Math.min(dial.max, Math.max(dial.min, value)));
+/* Within half a hundredth, a rate is this week's. */
+const isThisWeek = (dial: RateDial, rate: number) => Math.abs(rate - dial.rate) < 0.005;
+
+/* Keeps the rate in the URL without a history entry per step, and drops the key at this week's rate. */
+const writeRate = (dial: RateDial, rate: number) => {
+  const url = new URL(window.location.href);
+  if (isThisWeek(dial, rate)) url.searchParams.delete(RATE_PARAM);
+  else url.searchParams.set(RATE_PARAM, rate.toFixed(2));
+  window.history.replaceState(window.history.state, "", url);
 };
 
 /* Each hit area is at least 44px wide, centred on its part, and the narrower
@@ -50,13 +77,50 @@ const HATCH =
 /* A part's name fits inside it from about a third of the scale (110px of a 340px phone bar). */
 const LABEL_MIN_POINTS = 30;
 
-export function ScoreCompositionBar({ label, parts, notCounted, largest }: ScoreCompositionBarProps) {
+export function ScoreCompositionBar({
+  label,
+  published,
+  parts: publishedParts,
+  notCounted: publishedNotCounted,
+  largest,
+  rateDial = null,
+}: ScoreCompositionBarProps) {
   const name = useId();
+  const rateId = useId();
+  const [rate, setRate] = useState(() => (rateDial ? clampRate(rateDial, rateDial.initialRate ?? rateDial.rate) : 0));
+  const moved = Boolean(rateDial && !isThisWeek(rateDial, rate));
+  const stop = rateDial?.stops.find((candidate) => rate >= candidate.from - 0.001 && rate <= candidate.to + 0.001) ?? null;
+  /* The URL follows the control a moment after it settles, never on the first paint. */
+  const firstPaint = useRef(true);
+  useEffect(() => {
+    if (!rateDial) return;
+    if (firstPaint.current) {
+      firstPaint.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => writeRate(rateDial, rate), 250);
+    return () => window.clearTimeout(timer);
+  }, [rateDial, rate]);
+  /* At a moved rate each part takes its points there, and the rate part reads that rate. */
+  const parts: readonly CompositionPart[] =
+    moved && stop && rateDial
+      ? publishedParts.map((part) => {
+          /* A part the stop leaves out gave nothing at that rate. */
+          const at = stop.parts.find((candidate) => candidate.source === part.source) ?? { points: 0, from: 0, to: 0 };
+          return {
+            ...part,
+            ...at,
+            reading: part.source === "rateLevel" ? `${rateDial.readingLabel} ${formatShortRate(rate)}` : part.reading,
+          };
+        })
+      : publishedParts;
+  /* What the inputs left out would add is this week's, so it shows at this week's rate only. */
+  const notCounted = moved ? null : publishedNotCounted;
   const drawnCounted = parts.filter((part) => part.points !== 0);
   const drawn = notCounted ? [...drawnCounted, notCounted] : drawnCounted;
   const [selected, setSelected] = useState<CompositionSource | null>(largest ?? drawn[0]?.source ?? null);
-  const active = drawn.find((part) => part.source === selected) ?? null;
-  if (drawn.length === 0) return null;
+  const active = [...parts, ...(notCounted ? [notCounted] : [])].find((part) => part.source === selected) ?? null;
+  if (drawn.length === 0 && !rateDial) return null;
 
   /* Additions first and subtractions over them: a subtraction is drawn on the run it took back. */
   const layered = [...drawnCounted].sort((left, right) => Number(left.points < 0) - Number(right.points < 0));
@@ -117,6 +181,18 @@ export function ScoreCompositionBar({ label, parts, notCounted, largest }: Score
               </div>
             );
           })}
+          {/* This week's total, kept on the scale while the bar draws another rate. */}
+          {moved && typeof published === "number" ? (
+            <>
+              <div data-this-week-mark="" className="absolute top-1 h-[1.875rem] w-px bg-[color:var(--app-text)]" style={{ left: `${published}%` }} />
+              <span
+                className="absolute -top-1 whitespace-nowrap text-fluid-nano text-slate-300"
+                style={published >= 50 ? { right: `calc(${100 - published}% + 0.25rem)` } : { left: `calc(${published}% + 0.25rem)` }}
+              >
+                This week {published}
+              </span>
+            </>
+          ) : null}
         </div>
         {/* The options over the drawing, one per drawn part. */}
         <div className="relative -mt-11 h-11">{drawnCounted.map(option)}</div>
@@ -157,6 +233,38 @@ export function ScoreCompositionBar({ label, parts, notCounted, largest }: Score
           </span>
         ))}
       </div>
+      {rateDial ? (
+        <div className="space-y-1 pt-2" data-rate-dial="">
+          <label htmlFor={rateId} className="block text-sm font-semibold text-slate-100">
+            {`What if ${rateDial.rateName} moves?`}
+          </label>
+          <div className="flex items-center gap-3 text-fluid-nano tabular-nums text-slate-400">
+            <span aria-hidden="true">{formatShortRate(rateDial.min)}</span>
+            <input
+              id={rateId}
+              type="range"
+              min={rateDial.min}
+              max={rateDial.max}
+              step="0.01"
+              value={rate}
+              onChange={(event) => setRate(clampRate(rateDial, Number(event.target.value)))}
+              aria-valuetext={
+                moved
+                  ? `${formatShortRate(rate)}, ${describeFedSteps(rate - rateDial.rate).phrase} ${rate < rateDial.rate ? "below" : "above"} this week`
+                  : `${formatShortRate(rate)}, this week's rate`
+              }
+              className="h-11 min-w-0 flex-1 cursor-pointer accent-[color:var(--accent-action)]"
+              style={{ touchAction: "manipulation" }}
+            />
+            <span aria-hidden="true">{formatShortRate(rateDial.max)}</span>
+          </div>
+          <output htmlFor={rateId} aria-live="polite" className="block text-sm text-slate-200" data-rate-answer="">
+            {stop
+              ? describeRateDialAnswer({ rate, thisWeek: rateDial.rate, rateName: rateDial.rateName, tightness: stop.tightness, lead: stop.lead })
+              : null}
+          </output>
+        </div>
+      ) : null}
       <div aria-live="polite" className="min-h-[5.25rem] pt-1 text-sm" data-composition-readout>
         {active ? (
           <>

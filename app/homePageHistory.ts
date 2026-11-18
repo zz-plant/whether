@@ -51,6 +51,8 @@ export function buildHomeHistoryModels({
       tightness: entry.tightness,
       riskAppetite: entry.riskAppetite,
       label: formatDateUTC(entry.recordDate),
+      /* "2026-05": the month the dot stands for, which the page's month cursor names. */
+      month: entry.recordDate.slice(0, 7),
     })),
     caption: describeConditionsTrail(conditionsTrailEntries.map((entry) => entry.recordDate)),
     caveat: describeScoreMovementCaveat(

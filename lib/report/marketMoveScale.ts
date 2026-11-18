@@ -34,9 +34,6 @@ import { formatMonthLabel } from "../timeMachine/monthFormatting";
  * (`describeScoreMoveBand`).
  */
 
-const FED_STEP = 0.25;
-/** Within this of a whole number of steps, the move is "about" that many. */
-const STEP_TOLERANCE = 0.03;
 /** Under a year of month-to-month changes, a count says nothing about how often. */
 const MIN_RECORD_CHANGES = 12;
 
@@ -236,25 +233,14 @@ export const describeScoreMoveRanges = (): ScoreMoveRanges | null => {
   return tightness && riskAppetite ? { tightness, riskAppetite } : null;
 };
 
-/**
- * A short-rate move in the Fed's own steps, leading the sentence it ends:
- * "Less than one quarter-point Fed cut turns conditions Stormy." A rise is a
- * hike and a fall a cut, the words the news uses for the same step.
+/*
+ * A short-rate move in the Fed's own steps, leading the sentence it ends: "Less than
+ * one quarter-point Fed cut turns conditions Stormy." Written in `fedSteps.ts`, which
+ * a client island can import without this module's record; counts are words since
+ * 2026-11-18 ("About two quarter-point Fed hikes"), as the brief's other sentences
+ * print small numbers.
  */
-export const describeRateMoveInFedSteps = (move: number, conditionsLabel: string): string => {
-  const size = Math.abs(move);
-  const step = move > 0 ? "hike" : "cut";
-  const steps = size / FED_STEP;
-  const nearest = Math.round(steps);
-  const whole = Math.floor(steps);
-  const [phrase, plural] =
-    nearest >= 1 && Math.abs(size - nearest * FED_STEP) <= STEP_TOLERANCE
-      ? [nearest === 1 ? `About one quarter-point Fed ${step}` : `About ${nearest} quarter-point Fed ${step}s`, nearest > 1]
-      : steps < 1
-        ? [`Less than one quarter-point Fed ${step}`, false]
-        : [whole === 1 ? `More than one quarter-point Fed ${step}` : `More than ${whole} quarter-point Fed ${step}s`, whole > 1];
-  return `${phrase} ${plural ? "turn" : "turns"} conditions ${conditionsLabel}.`;
-};
+export { describeRateMoveInFedSteps } from "./fedSteps";
 
 /**
  * How often the record moved as far as one market move, or null when the record
@@ -279,7 +265,10 @@ export const describeMarketMoveScale = ({
   const since = values[0]?.year;
   if (counted.changes < MIN_RECORD_CHANGES || since === undefined) return null;
   /* The curve's line names its instrument here, once: the sentence above it says
-     the move in plain words ("long rates fall … closer to short rates"). */
-  const subject = input === "curveSlope" ? `The ${regimeSignalLabel.curveSlope.toLowerCase()}` : "The rate";
+     the move in plain words ("long rates fall … closer to short rates"). The short
+     rate names which one (2026-11-18): on the brief the line that named the bill went
+     to the chart's rate labels, and "The rate" was left naming nothing. */
+  const subject =
+    input === "curveSlope" ? `The ${regimeSignalLabel.curveSlope.toLowerCase()}` : baseRateUsed === "3M" ? "The 3-month rate" : "The 1-month rate";
   return `${subject} ${describeMonthlyFrequency(counted, since)}.`;
 };
