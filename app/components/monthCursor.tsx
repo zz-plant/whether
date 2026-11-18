@@ -80,7 +80,7 @@ export const setPageMonth = (month: MonthKey | null) => {
 
 /** Calls `follow` with every month the page is set to, from any source, until the return is called. */
 export const followPageMonth = (follow: (month: MonthKey | null) => void) => {
-  const listener = (event: Event) => follow(monthOfDetail((event as CustomEvent<unknown>).detail));
+  const listener = (event: Event) => follow(monthOfDetail(event instanceof CustomEvent ? event.detail : undefined));
   document.addEventListener(MONTH_EVENT, listener);
   return () => document.removeEventListener(MONTH_EVENT, listener);
 };

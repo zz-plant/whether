@@ -80,6 +80,6 @@ export const recordMonthKeys = (firstDate: string, count: number): MonthKey[] =>
 
 /** The month an announcement names, or null for a clear (or anything malformed). */
 export const monthOfDetail = (detail: unknown): MonthKey | null => {
-  const month = detail && typeof detail === "object" ? (detail as { month?: unknown }).month : null;
+  const month = detail && typeof detail === "object" && "month" in detail ? detail.month : null;
   return isMonthKey(month) ? month : null;
 };
