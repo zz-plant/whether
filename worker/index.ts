@@ -15,7 +15,8 @@ import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
 import { sendOpsFailureNotice, type FailedStep } from "../lib/delivery/opsNotice";
-import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { API_CATALOG_PATH, WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { apiCatalogResponse } from "../lib/agent/apiCatalog";
 import { negotiateMarkdown, withAgentDiscoveryLinks } from "../lib/runtime/agentResponse";
 import {
   agentManifestResponse,
@@ -301,6 +302,11 @@ export default {
       url.pathname === MCP_WELL_KNOWN_PATH
     ) {
       return agentManifestResponse();
+    }
+
+    /* The RFC 9727 API catalog, here for the same dot-directory reason (lib/agent/apiCatalog.ts). */
+    if (url.pathname === API_CATALOG_PATH) {
+      return apiCatalogResponse(request);
     }
 
     /* Markdown negotiation: an agent that asks for text/markdown at the homepage is

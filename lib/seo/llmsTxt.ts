@@ -1,4 +1,4 @@
-import { AGENT_START_TOOL, WHETHER_AGENT_MANIFEST_PATH, buildAgentEndpoints, buildAgentStartPointers } from "../agent/discovery";
+import { AGENT_START_TOOL, API_CATALOG_PATH, WHETHER_AGENT_MANIFEST_PATH, buildAgentEndpoints, buildAgentStartPointers } from "../agent/discovery";
 import { describeToolParams } from "../agent/registry";
 import { describeAgentTools } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
@@ -159,6 +159,8 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "## Discovery",
     `- Manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,
     `- WebMCP: ${baseUrl}/.well-known/webmcp.json`,
+    `- API catalog (RFC 9727): ${baseUrl}${API_CATALOG_PATH}`,
+    `- OpenAPI: ${endpoints.openapi}`,
     `- Homepage: ${baseUrl}/`,
     `- Brief (Markdown): ${endpoints.brief}`,
     `- Agent API: ${endpoints.agent}`,
