@@ -10,8 +10,7 @@ export function ReusableVisuals() {
         </summary>
         <div className="max-w-3xl space-y-3 pt-3">
           <p className="text-fluid-sm leading-relaxed text-slate-400">
-            Download editable graphics for conditions, operating areas and decision lines, plus chart and presentation templates in both themes.
-            Each example is labeled so you can replace its sample values with your own reading.
+            Editable light and dark graphics, charts, and slide templates with labeled placeholder values.
           </p>
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             <ActionLink href="/visual-assets/index.html" variant="inline">Browse the visual library</ActionLink>

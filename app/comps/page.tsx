@@ -219,16 +219,11 @@ export default async function CompsPage() {
 
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-slate-100">Use public multiples in a fundraising discussion</h2>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            Founders, finance teams and board members can use the basket to question valuation assumptions.
-            Compare growth, gross margin, retention, scale and the revenue period before choosing a comparable.
-            Public shares are liquid; a private round also depends on its terms, investor demand and company risk.
-            Multiplying private ARR by this median will not produce a supported valuation.
-          </p>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            For the board note, record the observation date, selected comparable, revenue basis and the differences
-            that matter. Revisit the financing plan when actual investor feedback or the cash deadline changes.
-          </p>
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300 leading-relaxed">
+            <li>Use the basket to test valuation assumptions—not as a direct multiplier on private ARR.</li>
+            <li>Adjust for growth, gross margin, retention, scale, revenue basis, and private-round illiquidity.</li>
+            <li>Log the observation date, chosen comparable, and key differences; revisit when investor feedback or cash deadlines shift.</li>
+          </ul>
           <ActionLink href="/answers/should-startups-raise-capital-now" variant="inline">Decide when to prepare a raise</ActionLink>
         </section>
       </article>

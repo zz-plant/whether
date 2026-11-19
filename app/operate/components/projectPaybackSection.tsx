@@ -229,10 +229,10 @@ export function ProjectPaybackSection({
         <p id="ops-project-payback-heading" className="text-xs font-semibold text-slate-400">
           Engineering work against the payback bar
         </p>
-        <p className="mt-1 text-sm text-slate-100">{describePaybackBar(bar, regime)}</p>
+        <p className="mt-1 text-sm font-semibold text-slate-100">{describePaybackBar(bar, regime)}</p>
         {whatMovesBar ? <p className="mt-1 text-fluid-sm text-slate-300">{whatMovesBar}</p> : null}
         <p className="mt-1 text-fluid-sm text-slate-400">
-          Price each piece of work by what it saves: the payback bar measures how fast savings recoup build costs post-launch (hours someone no longer spends, and bills it cuts).
+          Measures how fast post-launch savings (hours saved and bills cut) recoup build cost.
         </p>
       </div>
 
@@ -281,12 +281,13 @@ export function ProjectPaybackSection({
           </li>
         ))}
       </ul>
-      <p className="text-fluid-sm text-slate-400">
-        The payback counts engineer time at what a week costs; the runway does not, because the engineers are paid either
-        way. The saving starts in full the week the work ships, and the runway it adds assumes revenue stays flat. Paying a
-        contractor for the work is new spend, so it falls under the Spending rule&apos;s{" "}
-        {SPENDING_PAYBACK_BAR_MONTHS}-month bar instead.
-      </p>
+      <details className="weather-auto-chevron">
+        <summary className="text-xs font-semibold text-slate-400">Assumptions</summary>
+        <p className="mt-1 text-fluid-sm text-slate-400">
+          Payback counts engineer time; runway does not (salaries are already paid). Savings start when work ships,
+          assuming flat revenue. Contractor spend uses the Spending rule&apos;s {SPENDING_PAYBACK_BAR_MONTHS}-month bar.
+        </p>
+      </details>
     </section>
   );
 }

@@ -218,12 +218,10 @@ export function TrackRecordTable({
             equivalent to them: it is a weighted blend, and the month-to-month
             change column is a move in that blend. */}
         <p className="max-w-prose text-sm text-slate-300">
-          {OPERATING_LATITUDE_LABEL} for each month: one 0 to 100 score made of risk appetite
-          ({Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}%) and how far funding pressure is below 100 (
-          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}%).
-          Higher means more room to hire, spend and commit. {describeLatitudeAgainstConditions()}{" "}
+          {OPERATING_LATITUDE_LABEL} (0–100): {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite +{" "}
+          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% inverse funding pressure. Higher means more room to commit.{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-            How it is computed
+            Formula
           </Link>
         </p>
       </div>
@@ -247,6 +245,7 @@ export function TrackRecordTable({
         {/* No min-width and no horizontal scroll: the delta folds into the
             latitude cell below sm rather than sitting off-screen. */}
         <div className="mt-3 space-y-4">
+          <p className="max-w-prose text-xs text-slate-400">{describeLatitudeAgainstConditions()}</p>
           <RecordTable
             rows={record.rows}
             caption={`The ${record.rows.length} most recent monthly readings, newest first, with ${OPERATING_LATITUDE_LABEL} for each one.`}

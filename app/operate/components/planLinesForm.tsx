@@ -192,8 +192,7 @@ export function PlanLinesForm({
             className="mt-0.5 size-4 shrink-0 accent-sky-500"
           />
           <span>
-            Say what a pause or restart means at my runway ({runwayBandLabel(runwayBand)}). Every company on the
-            published rules is emailed the same day; your runway is what makes the email yours.
+            Include my runway band ({runwayBandLabel(runwayBand)}) so alerts state what a crossing means at my runway.
           </span>
         </label>
       ) : null}
@@ -238,11 +237,9 @@ export function PlanLinesForm({
             <p id="plan-lines-message" role="alert" className="text-xs text-rose-300">{message}</p>
           ) : null}
           <p className="max-w-[60ch] text-xs text-slate-400">
-            Stored with your email address and nothing else: the numbers above, for the areas you tick, and your
-            runway band if the box above is ticked (the band, never a figure). Sending the form again replaces them
-            once you confirm. See{" "}
+            Stores only your email, selected lines, and optional runway band (never a figure); resending updates them once confirmed.{" "}
             <Link href="/privacy" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
-              what is stored
+              What is stored
             </Link>
             .
           </p>

@@ -112,13 +112,11 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
     >
       {runHistory.status === "unavailable" ? (
         <p className="text-sm text-slate-300">
-          The run log could not be loaded right now. The fault is in reading the log, not in the
-          brief: the source dates on this page are unaffected.
+          The run log could not be loaded; source dates on this page are unaffected.
         </p>
       ) : runHistory.steps.length === 0 ? (
         <p className="text-sm text-slate-300">
-          Nothing ran in this window. Every job records itself, so an empty log means none ran.
-          Treat the source dates on this page as the last word on how current the brief is.
+          No jobs ran in this window. Use the source dates on this page to check brief freshness.
         </p>
       ) : (
         <>

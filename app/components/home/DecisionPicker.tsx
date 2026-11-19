@@ -123,7 +123,6 @@ export function DecisionPicker({
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
     if (activePause?.line) bullets.push(`• *Pause if:* ${activePause.line}${activePause.distance ? ` (${activePause.distance})` : ""}`);
     if (activeResume?.line) bullets.push(`• *Restart when:* ${activeResume.line}${activeResume.distance ? ` (${activeResume.distance})` : ""}`);
-    if (activeTransmission?.whyLineMatters) bullets.push(`• *Why it matters:* ${activeTransmission.whyLineMatters}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
@@ -146,19 +145,19 @@ export function DecisionPicker({
           </p>
         ) : null}
         {activeTransmission ? (
-          <div data-transmission-note className="max-w-[60ch] space-y-1.5 text-fluid-sm">
-            <p className="leading-relaxed text-slate-300">
-              <span className="font-semibold text-slate-100">Why this matters for {decisionAreaLabel(area).toLowerCase()}:</span>{" "}
-              {activeTransmission.transmission} {activeTransmission.whyLineMatters}
-            </p>
-            <p className="text-fluid-nano text-slate-400">
-              <span className="font-medium text-slate-200">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
-            </p>
+          <div data-transmission-note className="max-w-[60ch] space-y-2 text-fluid-sm">
             {activeTransmission.startupMath ? (
-              <p className="text-fluid-nano text-slate-400">
-                <span className="font-medium text-slate-200">Startup math:</span> {activeTransmission.startupMath}
+              <p className="leading-snug text-slate-200">
+                <span className="font-semibold text-slate-100">Startup math:</span> {activeTransmission.startupMath}
               </p>
             ) : null}
+            <p className="leading-snug text-slate-200">
+              <span className="font-semibold text-slate-100">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
+            </p>
+            <p className="text-xs leading-relaxed text-slate-400">
+              <span className="font-medium text-slate-300">Why this matters for {decisionAreaLabel(area).toLowerCase()}:</span>{" "}
+              {activeTransmission.transmission} {activeTransmission.whyLineMatters}
+            </p>
           </div>
         ) : null}
         <details className="weather-auto-chevron" data-commitment-disclosure>

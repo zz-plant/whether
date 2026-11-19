@@ -103,10 +103,7 @@ export function SignalInversionPreview({
         {/* The chart is labelled in bond-desk shorthand. This says what it is
             before the reader has to decode the axes. */}
         <p className="text-sm text-slate-300">
-          Each line is the gap between what the U.S. government pays to borrow long-term and what it
-          pays short-term. When a line drops below zero, short-term borrowing costs more than
-          long-term. That pattern has run ahead of most U.S. recessions. The last 12 month-end
-          readings show whether that pressure is easing or deepening.
+          Long-term minus short-term U.S. Treasury rates over the last 12 month-ends. Below zero means short-term borrowing costs more than long-term—a pattern that has preceded most U.S. recessions.
         </p>
         <div className="rounded-lg border border-slate-800/80 bg-slate-950/45 p-4">
           <svg viewBox={`-2 -2 ${CHART_WIDTH + 4} ${CHART_HEIGHT + 4}`} className="weather-data-plot mx-auto h-auto w-full max-w-[40rem]" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread">

@@ -173,7 +173,7 @@ export async function buildPlanningPageModel(
   const planLinesSummary = `Start from the published rules for ${listOf(
     planLineDefaults.map((line) => decisionAreaLabel(line.area)),
     "conjunction",
-  )}, move the numbers your plan needs, and get an email the day an area pauses or restarts.`;
+  )}, adjust your lines, and get emailed the day one crosses.`;
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
   /* Freshness and confidence, once, under the h1 before anything asks the
@@ -264,7 +264,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Areas",
             title: "This week's rule for each area",
-            description: "Each area pauses at one score and restarts at another, far enough apart that one noisy week can't flip it back and forth.",
+            description: "Separate pause and restart lines keep one noisy week from reversing a decision.",
             hashAliases: ["ops-monthly-action-summary-panel"],
             // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {
@@ -343,7 +343,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Test",
             title: "Test a decision",
-            description: "Check one move against this week's guidance before you commit to it: a hire, a price change, a roadmap bet or an acquisition.",
+            description: "Score a hire, price change, roadmap bet, or acquisition against this week's guidance.",
             hashAliases: ["ops-decision-shield-panel"],
             // The question this header used to ask now heads DecisionShieldPanel itself, so the
             // step reads "Test a decision" → "Is this move safe right now?" with nothing between.

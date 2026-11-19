@@ -232,10 +232,9 @@ function ConfidenceRecordBody() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-slate-200">
-        <BaseRateSentence totals={totals} baseRate={baseRate} /> Every band below held more often
-        than its published percent, and the two closest bands are in the wrong order. So read the
-        room before a change as a distance, not a probability: it says how far the scores are from
-        the line where conditions change, and the count beside it says how often that room mattered.
+        <BaseRateSentence totals={totals} baseRate={baseRate} /> Every band below held more often than its
+        published percent, and the two closest bands are out of order—read the room before a change
+        as a distance from the change line, not a probability.
       </p>
 
       <MarginReliabilityChart rows={rows} />
