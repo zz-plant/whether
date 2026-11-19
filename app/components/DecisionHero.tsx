@@ -304,9 +304,13 @@ export function DecisionHero({
             ) : null}
             {/* In the sentence, not beside it: as a flex item it took a row of its
                 own on a phone, above the call. "Feels like" too (2026-11-10), with a
-                non-breaking space so a wrapped line never opens with the separator. */}
+                non-breaking space so a wrapped line never opens with the separator.
+                The caveat's diamond is drawn turned, so its corner reaches into the
+                space before it: a plain space left the dot and the diamond touching
+                ("·◇") on the first screen. The padding rides on the separator, so a
+                wrapped line still opens flush. */}
             {move ? <> <ReplayMoveButton since={move.since} /></> : null}
-            {feelsLike ? <>{"\u00a0· "}{feelsLikeLink}</> : null}
+            {feelsLike ? <><span className="pe-[0.3em]">{"\u00a0·"}</span> {feelsLikeLink}</> : null}
           </span>
         ) : null}
 

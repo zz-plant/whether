@@ -39,6 +39,7 @@ export const signalsEvidenceSections = ({
     focusInstruments={model.focusInstruments}
     searchParams={searchParams}
     basis={model.basis}
+    flow={model.signalFlow}
   />,
   <SignalsInstrumentsSection
     key="instruments"

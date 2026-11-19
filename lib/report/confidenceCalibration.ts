@@ -51,7 +51,16 @@ type ConfidenceCalibrationBucket = {
   months: number;
   /** How many of those kept the same published regime the following month. */
   held: number;
+  /**
+   * The month-ends behind `months` and `held`, oldest first: each one's conditions
+   * and the next month's. The trust strip draws one square per entry beside the
+   * count, so the drawing and the sentence are the same months, counted once.
+   */
+  entries: CalibrationEntry[];
 };
+
+/** One month-end in a band: its conditions, and the conditions a month later. */
+export type CalibrationEntry = { asOf: string; regime: string; next: string };
 
 /**
  * Chosen before looking at the outcomes: 5 and 12 are the labelled-confidence
@@ -116,10 +125,14 @@ export const calibrationBuckets = (months: CalibrationMonth[]): ConfidenceCalibr
     to: index + 1 < BUCKET_EDGES.length ? BUCKET_EDGES[index + 1] : null,
     months: 0,
     held: 0,
+    entries: [],
   }));
 
   for (let index = 0; index + 1 < months.length; index += 1) {
     const month = months[index];
+    const following = months[index + 1];
+    /* Both exist inside the loop's bounds; the guard keeps the reads checked. */
+    if (!month || !following) continue;
     const distance = resolveDistanceToFlip({
       scores: { tightness: month.tightness, riskAppetite: month.riskAppetite },
       thresholds: {
@@ -128,8 +141,11 @@ export const calibrationBuckets = (months: CalibrationMonth[]): ConfidenceCalibr
       },
     });
     const bucket = buckets[bucketFor(distance)];
+    if (!bucket) continue;
+    const next = following.regime;
     bucket.months += 1;
-    if (months[index + 1].regime === month.regime) bucket.held += 1;
+    if (next === month.regime) bucket.held += 1;
+    bucket.entries.push({ asOf: month.asOf, regime: month.regime, next });
   }
 
   return buckets;

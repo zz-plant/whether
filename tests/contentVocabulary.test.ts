@@ -3,6 +3,8 @@ import { describe, it } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
+import { presupposedObjections, sentencesIn } from "./fixtures/presupposedObjections";
+
 /*
  * The vocabulary guard reaches `content/` and `public/downloads/`.
  *
@@ -67,5 +69,26 @@ describe("the reader vocabulary in the content layer", () => {
       });
     }
     assert.deepEqual(findings, [], `retired vocabulary in the content layer:\n${findings.join("\n")}`);
+  });
+
+  /* docs/objections.md (2026-11-17): an article or template answers only the objections a
+     visitor raised. JSON is read as its string values, so a sentence starts where the reader's
+     does and a key is never judged as copy. */
+  it("presupposes no objection a visitor has not raised", () => {
+    const stringsOf = (value: unknown): string[] =>
+      typeof value === "string"
+        ? [value]
+        : Array.isArray(value)
+          ? value.flatMap(stringsOf)
+          : value && typeof value === "object"
+            ? Object.values(value).flatMap(stringsOf)
+            : [];
+    const findings = files.flatMap((file) => {
+      const text = file.path.endsWith(".json") ? stringsOf(JSON.parse(file.text)).join("\n") : file.text;
+      return sentencesIn(text).flatMap((sentence) =>
+        presupposedObjections(file.path, sentence).map((why) => `${file.path} — ${why}\n    ${sentence.slice(0, 160)}`),
+      );
+    });
+    assert.deepEqual(findings, [], `presupposed objections in the content layer:\n${findings.join("\n")}`);
   });
 });

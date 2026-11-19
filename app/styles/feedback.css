@@ -81,6 +81,18 @@
   color: var(--line-crossed-ink);
 }
 
+/* A line close, not crossed (2026-11-18): nothing has happened yet, so the band keeps
+   the neutral edge the close badge keeps (conceptIcons.tsx, LINE_STATE_STAMP) and the
+   ink of the page. The red box, rule and words read as an error over a note that says
+   what would pause an area. The dashed ring stays in the line-state ink (§XXIV), the
+   one mark of "close". */
+.weather-line-band[data-line-state-band="near"] {
+  border-color: var(--border-strong);
+  border-top-width: 1px;
+  background-color: transparent;
+  color: var(--app-text);
+}
+
 /* The caveat mark: an outlined diamond, the shape of a warning sign, before
    anything that says "read this reading with care" (cached sources, a
    scoring note, an archived week, guidance held back). Its own shape because

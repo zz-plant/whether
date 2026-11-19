@@ -65,6 +65,13 @@ export type AreaRowData = {
    */
   note?: ReactNode;
   /**
+   * The area's rule as a small conditions chart (`RuleRegionMap`): its pause and restart
+   * regions and this week's reading, one per row at one scale, so the rows read as small
+   * multiples. Opt-in; /operate passes it. A row with a map draws no proximity rail beside
+   * its badge, because the map shows the same distance at its real scale.
+   */
+  map?: ReactNode;
+  /**
    * A control for this row — on /share, the button that copies the area's tag.
    * Drawn in a last column so it stays with the row it acts on; the five sat in
    * a row under the table until 2026-10-02, a table's height from their rows.
@@ -112,9 +119,12 @@ const MIXED_SIDES_HEADER = "What changes it";
 const LineCell = ({
   value,
   kind,
+  rail = true,
 }: {
   value?: AreaLineValue;
   kind: "pause" | "resume";
+  /** Draw the proximity rail beside the badge; off in a row whose map draws the distance. */
+  rail?: boolean;
 }) => {
   if (!value) return <span className="text-slate-500">—</span>;
 
@@ -145,12 +155,14 @@ const LineCell = ({
               <LineStateBadge state={value.state} stamp={inForce}>
                 {value.distance}
               </LineStateBadge>
-              <span
-                aria-hidden="true"
-                className="inline-block h-1 w-12 overflow-hidden rounded-full bg-[color:var(--border-faint)]"
-              >
-                <span className={`block h-full ${railInk}`} style={{ width: railWidth }} />
-              </span>
+              {rail ? (
+                <span
+                  aria-hidden="true"
+                  className="inline-block h-1 w-12 overflow-hidden rounded-full bg-[color:var(--border-faint)]"
+                >
+                  <span className={`block h-full ${railInk}`} style={{ width: railWidth }} />
+                </span>
+              ) : null}
             </span>
           ) : (
             value.distance
@@ -164,15 +176,18 @@ const LineCell = ({
 
 /* The one side that can change the row's area, named in the cell: on a phone,
    where no header is drawn, and from md up when the rows are on different sides. */
-const SideCell = ({ row, labelFromMd }: { row: AreaRowData; labelFromMd: boolean }) => {
+const SideCell = ({ row, labelFromMd, beside }: { row: AreaRowData; labelFromMd: boolean; beside: boolean }) => {
   const side = decidingSide(row);
   return (
-    <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:col-span-2 max-md:p-0" data-rule-side={side}>
+    <td className={`py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0 ${beside ? "max-md:col-span-1" : "max-md:col-span-2"}`} data-rule-side={side}>
       <CellLabel className={SIDE_INK[side]} fromMd={labelFromMd}>{SIDE_LABEL[side]}</CellLabel>
-      <LineCell value={side === "resume" ? row.resume : row.pause} kind={side} />
+      <LineCell value={side === "resume" ? row.resume : row.pause} kind={side} rail={!row.map} />
     </td>
   );
 };
+
+/* The column's name for the small charts; the rows' own labels carry each claim. */
+const MAP_HEADER = "On the chart";
 
 /**
  * A table from md up. Below it the columns do not fit a phone — the restart
@@ -186,6 +201,9 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
   const ordered = [...rows].sort((a, b) => orderIndex(a.area) - orderIndex(b.area));
   const showChanged = ordered.some((row) => row.changed);
   const showAction = ordered.some((row) => row.action);
+  /* On a phone a row with a map sets it to the right of its lines rather than under them. */
+  const showMap = ordered.some((row) => row.map);
+  const lineSpan = showMap ? "max-md:col-span-1" : "max-md:col-span-2";
   /* Every row on one side: the header names it, as each of the pair's headers did. */
   const [firstSide, ...otherSides] = ordered.map(decidingSide);
   const sharedSide = firstSide && otherSides.every((side) => side === firstSide) ? firstSide : null;
@@ -207,6 +225,7 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
                 {sharedSide ? SIDE_LABEL[sharedSide] : MIXED_SIDES_HEADER}
               </th>
             )}
+            {showMap ? <th scope="col" className="py-2 pr-3 font-medium">{MAP_HEADER}</th> : null}
             {showChanged ? <th scope="col" className="py-2 pr-3 font-medium">Changed</th> : null}
             {showAction ? (
               <th scope="col" className="py-2 font-medium">
@@ -226,7 +245,9 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
                  glued to an interpolation ("max-md:py-3${") as one token it cannot
                  parse and never generates it (tests/tailwindClassBoundaries).
                  On a phone the moved row's tint is inset from its text. */
-              className={`border-b border-[color:var(--border-faint)] align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3 ${
+              className={`border-b border-[color:var(--border-faint)] align-top max-md:grid max-md:gap-x-4 max-md:gap-y-2 max-md:py-3 ${
+                showMap ? "max-md:grid-cols-[minmax(0,1fr)_auto]" : "max-md:grid-cols-2"
+              } ${
                 row.moved ? "bg-amber-500/[0.06] max-md:-mx-2 max-md:rounded-md max-md:px-2" : ""
               }`}
               data-area={row.area}
@@ -257,11 +278,11 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
               </td>
               {bothSides ? (
                 <>
-                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:col-span-2 max-md:p-0">
+                  <td className={`py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0 ${lineSpan}`}>
                     <CellLabel className={SIDE_INK.pause}>{SIDE_LABEL.pause}</CellLabel>
-                    <LineCell value={row.pause} kind="pause" />
+                    <LineCell value={row.pause} kind="pause" rail={!row.map} />
                   </td>
-                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:col-span-2 max-md:p-0">
+                  <td className={`py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0 ${lineSpan}`}>
                     <CellLabel className={SIDE_INK.resume}>{SIDE_LABEL.resume}</CellLabel>
                     {/* A met restart line on an area that is not on hold stamped "already
                         met" beside "14 pts away" from its pause line, which read as a
@@ -275,12 +296,24 @@ export function AreaTable({ rows, caption, className = "", bothSides = false }: 
                           : row.resume
                       }
                       kind="resume"
+                      rail={!row.map}
                     />
                   </td>
                 </>
               ) : (
-                <SideCell row={row} labelFromMd={sharedSide === null} />
+                <SideCell row={row} labelFromMd={sharedSide === null} beside={showMap} />
               )}
+              {showMap ? (
+                /* Beside the lines it draws: on a phone in the second column, across the
+                   rows the line cells take. */
+                <td
+                  className={`py-2.5 pr-3 max-md:col-start-2 max-md:row-start-3 max-md:p-0 ${
+                    bothSides ? "max-md:row-span-2" : "max-md:row-span-1"
+                  }`}
+                >
+                  {row.map ?? <span className="text-slate-500">—</span>}
+                </td>
+              ) : null}
               {showChanged ? (
                 <td
                   className={`py-2.5 pr-3 max-md:col-span-2 max-md:p-0 ${row.moved ? "font-medium text-amber-200/90" : "text-slate-400"} ${

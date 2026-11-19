@@ -54,8 +54,8 @@ describe("/history leads with the record's answer", () => {
     assert.ok(record < confidence && confidence < map, "the confidence record sits with the track record, before the phase map");
     assert.ok(map < table, "the month-by-month table is evidence, after the map");
 
-    assert.equal((html.match(/data-month-strip/g) ?? []).length, 1);
-    assert.ok(html.indexOf("data-month-strip") < html.indexOf('id="phase-map-heading"'));
+    assert.equal((html.match(/data-conditions-by-year/g) ?? []).length, 1);
+    assert.ok(html.indexOf("data-conditions-by-year") < html.indexOf('id="phase-map-heading"'));
     assert.doesNotMatch(html, /Where this month sits/);
     /* The confidence record prints the rule on /calibration; here it sits
        beside the tiles that already state it, and the rule is once per page. */
@@ -84,7 +84,7 @@ describe("/history leads with the record's answer", () => {
       return;
     }
     assert.ok(line !== -1, "the bridge line renders");
-    assert.ok(line < html.indexOf("data-month-strip"), "above the strip it qualifies");
+    assert.ok(line < html.indexOf("data-conditions-by-year"), "above the months it qualifies");
     assert.ok(html.slice(line, line + 400).includes(publishedBriefDisplay(latest).conditions));
   });
 
@@ -108,14 +108,14 @@ describe("/history leads with the record's answer", () => {
     assert.match(mapTag(windowed), /\sopen/, "a window link lands on the chart it changed");
   });
 
-  it("lists each closed year under the strip, not in a section of its own", async () => {
+  it("links each closed year from its row of the month grid, not from a section of its own", async () => {
     const page = await import("../app/history/page");
     const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
     const { buildPostureArchivePath, postureArchiveYears } = await import("../lib/summary/postureArchiveYears");
     const strip = /<section[^>]*id="call-by-month"[^>]*>([\s\S]*?)<\/section>/.exec(html)?.[1] ?? "";
     assert.ok(postureArchiveYears.length > 0);
     for (const year of postureArchiveYears) {
-      assert.ok(strip.includes(`href="${buildPostureArchivePath(year.slug)}"`), `${year.title} links from the strip's section`);
+      assert.ok(strip.includes(`href="${buildPostureArchivePath(year.slug)}"`), `${year.title} links from the grid's section`);
     }
     assert.doesNotMatch(html, /posture-by-year-heading/);
   });

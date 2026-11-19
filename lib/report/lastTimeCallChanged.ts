@@ -39,6 +39,13 @@ export type LastTimeCallChanged = {
   monthsLater: number;
   tightness: { atChange: number; later: number };
   riskAppetite: { atChange: number; later: number };
+  /**
+   * Every month-end from the change to `after`, both ends included, with how many months
+   * on each is (2026-11-18). `tightness` and `riskAppetite` above are its first and last
+   * entries; the card draws the months between beside them, so the drawing and the
+   * cells read one walk.
+   */
+  path: (MonthRef & { monthsSince: number; tightness: number; riskAppetite: number })[];
   /** This week's change and scores, for the comparison with the month that was found. */
   today: { from: RegimeKey; to: RegimeKey; tightness: number; riskAppetite: number };
 };
@@ -80,6 +87,12 @@ export const findLastTimeCallChanged = ({
     if (entry.regime === before.regime) continue;
     if (severityStep(before.regime, entry.regime) !== step) continue;
     const after = ordered[index + FOLLOW_THROUGH_MONTHS];
+    const path = ordered.slice(index, index + FOLLOW_THROUGH_MONTHS + 1).map((step, monthsSince) => ({
+      ...monthRef(step),
+      monthsSince,
+      tightness: step.tightness,
+      riskAppetite: step.riskAppetite,
+    }));
     return {
       direction: step > 0 ? "tightening" : "easing",
       changedAt: {
@@ -93,6 +106,7 @@ export const findLastTimeCallChanged = ({
       monthsLater: FOLLOW_THROUGH_MONTHS,
       tightness: { atChange: entry.tightness, later: after.tightness },
       riskAppetite: { atChange: entry.riskAppetite, later: after.riskAppetite },
+      path,
       today: { from: previousRegime, to: currentRegime, ...currentScores },
     };
   }
@@ -147,9 +161,6 @@ export const lastTimeVerb = (record: Pick<LastTimeCallChanged, "direction">) =>
   record.direction === "tightening" ? "tightened" : "eased";
 
 /** The comparison page for the change month against the month three later. */
-export const buildLastTimeCompareHref = (record: LastTimeCallChanged) =>
-  `/history/compare?yearA=${record.changedAt.year}&monthA=${record.changedAt.month}&yearB=${record.after.year}&monthB=${record.after.month}`;
-
 type RecentCallChange = MonthRef & { fromLabel: string; toLabel: string };
 
 /**
@@ -223,22 +234,81 @@ export const describeConditionsSince = ({
  */
 const shareWords = (share: number) => (share >= 0.95 ? "almost every month" : "most months");
 
+type RecordMetric = "tightness" | "riskAppetite";
+
+/**
+ * Where a score ranks among the record's month-ends: the share below it and above it.
+ * One count, read by the sentence beside the guidance and by the distribution drawn
+ * behind the score's rail, so the two cannot rank the score differently. Null on a
+ * record too short to rank against.
+ */
+const rankAgainstRecord = (series: readonly TimeMachineRegimeEntry[], metric: RecordMetric, value: number) => {
+  const first = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate)).at(0);
+  if (series.length < 24 || first === undefined) return null;
+  return {
+    below: series.filter((entry) => entry[metric] < value).length / series.length,
+    above: series.filter((entry) => entry[metric] > value).length / series.length,
+    first,
+    months: series.length,
+  };
+};
+
 const describeScoreAgainstRecord = ({
   series,
   metric,
   value,
 }: {
   series: readonly TimeMachineRegimeEntry[];
-  metric: "tightness" | "riskAppetite";
+  metric: RecordMetric;
   value: number;
 }): string | null => {
-  const firstYear = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate)).at(0)?.year;
-  if (series.length < 24 || firstYear === undefined) return null;
-  const below = series.filter((entry) => entry[metric] < value).length / series.length;
-  const above = series.filter((entry) => entry[metric] > value).length / series.length;
-  if (below >= 0.6) return `higher than ${shareWords(below)} since ${firstYear}`;
-  if (above >= 0.6) return `lower than ${shareWords(above)} since ${firstYear}`;
+  const rank = rankAgainstRecord(series, metric, value);
+  if (!rank) return null;
+  if (rank.below >= 0.6) return `higher than ${shareWords(rank.below)} since ${rank.first.year}`;
+  if (rank.above >= 0.6) return `lower than ${shareWords(rank.above)} since ${rank.first.year}`;
   return "about typical";
+};
+
+const SCORE_BIN_POINTS = 5;
+const PERCENT = new Intl.NumberFormat("en-US", { style: "percent", maximumFractionDigits: 0 });
+
+type ScoreDistribution = {
+  /** Month-ends in each 5-point band of the 0–100 scale, lowest band first. */
+  bins: number[];
+  binPoints: number;
+  /** "Higher than 92% of the 178 month-end readings since Jan 2012." */
+  summary: string;
+};
+
+/**
+ * Every month-end reading of a score on the record, in 5-point bands, for a quiet
+ * histogram behind the score's rail (2026-11-18), with the score's rank in the words the
+ * figure's title and accessible name carry. The same series and the same count as
+ * `describeConditionFacts`' "higher than most months since 2012".
+ */
+export const describeScoreDistribution = ({
+  series,
+  metric,
+  value,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  metric: RecordMetric;
+  value: number;
+}): ScoreDistribution | null => {
+  const rank = rankAgainstRecord(series, metric, value);
+  if (!rank) return null;
+  const bins = Array.from({ length: 100 / SCORE_BIN_POINTS }, () => 0);
+  for (const entry of series) {
+    const index = Math.min(bins.length - 1, Math.max(0, Math.floor(entry[metric] / SCORE_BIN_POINTS)));
+    bins[index] += 1;
+  }
+  const since = formatMonthLabel(rank.first.year, rank.first.month);
+  const of = `of the ${rank.months} month-end readings since ${since}`;
+  const summary =
+    rank.below >= rank.above
+      ? `Higher than ${PERCENT.format(rank.below)} ${of}.`
+      : `Lower than ${PERCENT.format(rank.above)} ${of}.`;
+  return { bins, binPoints: SCORE_BIN_POINTS, summary };
 };
 
 /** The current scores against the record, even when the committed conditions are holding. */
@@ -270,6 +340,68 @@ const monthEnds = (count: number) => (count === 1 ? "1 month" : `${count} months
 const spellRange = (spell: Spell) =>
   `${formatMonthLabel(spell.start.year, spell.start.month)} to ${formatMonthLabel(spell.end.year, spell.end.month)}`;
 
+/** One stretch on the plot: how long it ran, the month it began (the time machine opens there) and what its mark says. */
+type SpellPlotStretch = { months: number; start: MonthRef; latest: boolean; label: string };
+
+/**
+ * Every stretch of conditions on the record, by how long it ran, for the plot beside the
+ * sentences (2026-11-18): one row per condition, a mark per stretch, the stretch the
+ * record ends in open, and a rule at the shortest that ended. The same walk and the same
+ * `shortest` as the sentence "every stretch of conditions has lasted at least 6 months",
+ * so the rule and the sentence cannot name two numbers.
+ */
+export type SpellLengthPlot = {
+  /** The conditions the record holds, mildest first (the order the record's key uses). */
+  rows: { regime: RegimeKey; label: string; total: string; stretches: SpellPlotStretch[] }[];
+  /** The shortest stretch that ended, in months; null with none ended. */
+  shortest: number | null;
+  /** The axis' end in months: the longest stretch, up to a whole year. */
+  axisMax: number;
+  /** The months the plot reads: "Jan 2012 to Oct 2026". */
+  range: string;
+  /** What the open mark is, for the key. */
+  latestKey: string;
+};
+
+const buildSpellLengthPlot = (spells: readonly Spell[], ongoing: boolean, shortest: number | null): SpellLengthPlot | null => {
+  const first = spells.at(0);
+  const last = spells.at(-1);
+  if (!first || !last) return null;
+  const lastMonth = formatMonthLabel(last.end.year, last.end.month);
+  const regimes = [...new Set(spells.map((spell) => spell.regime))].sort(
+    (left, right) => REGIME_SEVERITY_RANK[left] - REGIME_SEVERITY_RANK[right],
+  );
+  const rows = regimes.map((regime) => {
+    const label = getRegimePublicLabel(regime);
+    const own = spells.filter((spell) => spell.regime === regime);
+    return {
+      regime,
+      label,
+      total: `${monthEnds(own.reduce((sum, spell) => sum + spell.months, 0))} in all`,
+      stretches: own.map((spell) => {
+        const latest = spell === last;
+        const since = formatMonthLabel(spell.start.year, spell.start.month);
+        /* The stretch the record ends in has not ended at its last month-end, whether or
+           not this week's reading has moved on from it. */
+        const text = !latest
+          ? `${label}, ${spellRange(spell)}: ${monthEnds(spell.months)}`
+          : ongoing
+            ? `${label} since ${since}: ${monthEnds(spell.months)} so far`
+            : `${label} since ${since}: ${monthEnds(spell.months)} by ${lastMonth}, the latest month-end`;
+        return { months: spell.months, start: spell.start, latest, label: text };
+      }),
+    };
+  });
+  const longest = Math.max(...spells.map((spell) => spell.months));
+  return {
+    rows,
+    shortest,
+    axisMax: Math.max(12, Math.ceil(longest / 12) * 12),
+    range: `${formatMonthLabel(first.start.year, first.start.month)} to ${lastMonth}`,
+    latestKey: ongoing ? "this one, so far" : `latest, to ${lastMonth}`,
+  };
+};
+
 /**
  * How long conditions like this week's lasted before, from the month-end walk.
  *
@@ -294,7 +426,7 @@ export const describeSpellLengths = ({
   currentRegime: RegimeKey;
   /** The reader's own band; null when they have not chosen one. */
   runwayBand: RunwayBand | null;
-}): { lead: string; rest: string } | null => {
+}): { lead: string; rest: string; plot: SpellLengthPlot | null } | null => {
   const spells = spellsOf(series);
   const firstYear = spells.at(0)?.start.year;
   if (spells.length < 2 || firstYear === undefined) return null;
@@ -343,7 +475,7 @@ export const describeSpellLengths = ({
     );
   }
   parts.push("That's a count, not a forecast.");
-  return { lead, rest: parts.join(" ") };
+  return { lead, rest: parts.join(" "), plot: buildSpellLengthPlot(spells, ongoing, shortest) };
 };
 
 type HoldLine = { value: number; holdsAbove: boolean };

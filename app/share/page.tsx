@@ -84,7 +84,11 @@ const buildCurrentShareArtifact = async () => {
   /* The same five rows the plan page tabulates, so an area's rule and its
      lines read identically on both surfaces; each row's pause state says which
      side the note prints. */
-  const areaRows = buildAreaRows(actionStripItems);
+  /* With the week's scores, so a row picks the pause line that holds this week
+     (`selectPauseCondition`), as /operate does: without them it took the rule's first
+     stored line on a 0-point tie, and Fundraising and New bets read "at the line" while
+     funding pressure stood 14 points past their 76 (2026-11-18). */
+  const areaRows = buildAreaRows(actionStripItems, { tightness: document.tightness, riskAppetite: document.riskAppetite });
   /* One citation for the week: the one the picker offers. The meeting pack and
      the email carried a second, the answer pages', with a different shape. */
   const citation = formatBriefArtifact(document, "citation", siteUrl);

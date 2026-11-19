@@ -1,9 +1,11 @@
-import { ActionLink } from "../components/ui/actionLink";
+import { ActionLink, PlainActionLink } from "../components/ui/actionLink";
+import { companyCalendarPath } from "../../lib/export/calendarFeed";
 import { findLeadAnswerForArea } from "../answers/decisionPages";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { COMPANIES, type CompanyEntry } from "../../lib/companies/companyRegistry";
-import type { CompanyRole } from "../../lib/report/companyRoles";
+import { nextReportLine, reportFigureRows, type CompanyPageRole, type CompanyRole } from "../../lib/report/companyRoles";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { CopyPlanningNote } from "./copyPlanningNote";
 import {
   decisionAreaLabel,
   formatBoundedDecisionAction,
@@ -12,7 +14,6 @@ import {
   type BoundedDecisionRule,
 } from "../../lib/report/boundedDecisionRules";
 import type { CompanySituation } from "../../lib/report/companySituation";
-import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 
 export type WeekConditions = {
   /** The weather word: Sunny, Cloudy, Stormy, Freezing. */
@@ -46,7 +47,10 @@ export function WeekConditionsLines({ conditions }: { conditions: WeekConditions
         <span className="font-semibold text-slate-100">This week&apos;s conditions: {conditions.label}.</span> {conditions.rationale}
       </p>
       <p className="text-sm text-slate-200">
-        <span className="font-semibold text-slate-100">{publicDecisionLabels.call}, written for companies that depend on outside funding:</span>{" "}
+        {/* For startups, by name: the page sits under a company that may fund itself from
+            revenue, and "written for companies that depend on outside funding" beside
+            Microsoft's $60B of free cash flow read as guidance for Microsoft (2026-11-17). */}
+        <span className="font-semibold text-slate-100">Whether&apos;s guidance for startups that depend on outside funding:</span>{" "}
         {conditions.guidance}{" "}
         {/* At the end of the guidance it comes from, not on a line of its own: there it
             read as the first item of the role links under it on a company's overview. */}
@@ -78,12 +82,6 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
           ))}
         </div>
       ) : null}
-      {situation.budgetCalendar ? (
-        <div className="space-y-1" data-testid="company-budget-calendar">
-          <h3 className="text-sm font-semibold text-slate-100">Budget calendar</h3>
-          <p className="text-sm text-slate-300">{situation.budgetCalendar}</p>
-        </div>
-      ) : null}
       {situation.restructurings.length > 0 ? (
         <div className="space-y-1" data-testid="company-restructurings">
           <h3 className="text-sm font-semibold text-slate-100">Restructuring filings, last 12 months</h3>
@@ -107,6 +105,7 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
   );
 }
 
+/** A role's decisions under the startup week's rules, for the /roles pages. */
 export function RoleDecisionsSection({
   role,
   askFor,
@@ -150,6 +149,128 @@ export function RoleDecisionsSection({
   );
 }
 
+/**
+ * The company's planning year: when budgets are set, when the next report is due, and a calendar
+ * that carries both. The dates a reader at the company plans around, ahead of anything weekly.
+ */
+export function CompanyCalendarSection({ company, situation }: { company: CompanyEntry; situation: CompanySituation }) {
+  const report = nextReportLine(situation);
+  if (!situation.budgetCalendar && !report) return null;
+  return (
+    <section className={panel} data-testid="company-calendar">
+      <h2 className="text-lg font-semibold text-slate-100">{company.name}&apos;s planning calendar</h2>
+      {situation.budgetCalendar ? <p className="text-sm text-slate-200">{situation.budgetCalendar}</p> : null}
+      {report ? <p className="text-sm text-slate-200">{report}</p> : null}
+      <div className="flex flex-wrap items-center gap-3">
+        <PlainActionLink href={companyCalendarPath(company.slug)} variant="ghost">
+          Add these dates to your calendar
+        </PlainActionLink>
+        <p className="text-xs text-slate-400">A subscribed calendar: the dates move on as {company.name} files.</p>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * What the role takes to each of the company's dates: planning, a 1:1, the quarterly report. The
+ * planning line rests on the filed R&D and revenue figures it quotes, and is left out without them.
+ */
+export function RolePlanningSection({
+  role,
+  situation,
+  note,
+}: {
+  role: CompanyPageRole;
+  situation: CompanySituation;
+  /** `buildPlanningNote`, for the copy button. */
+  note: string;
+}) {
+  const figures = reportFigureRows(role, situation);
+  return (
+    <section className={panel} data-testid="company-role-planning">
+      <h2 className="text-lg font-semibold text-slate-100">What to bring</h2>
+      {situation.planning ? (
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold text-slate-100">To planning</h3>
+          <p className="text-sm text-slate-300">{situation.planning.evidence}</p>
+          <p className="text-sm text-slate-200">{role.planning.bring[situation.planning.kind]}</p>
+        </div>
+      ) : null}
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold text-slate-100">To your next 1:1</h3>
+        <p className="text-sm text-slate-200">Ask: &ldquo;{role.leadershipQuestion}&rdquo;</p>
+      </div>
+      {figures.length > 0 ? (
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold text-slate-100">When the next report lands</h3>
+          <p className="text-sm text-slate-300">{role.planning.reportWhy} Last filed, for the period ended {situation.asOf}:</p>
+          <dl className="weather-grid gap-x-6 gap-y-2 text-sm [--col-min:15rem]">
+            {figures.map((row) => (
+              <div key={row.label} className="flex flex-col">
+                <dt className="text-xs text-slate-400">{row.label}</dt>
+                <dd className="font-medium tabular-nums text-slate-100">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : null}
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold text-slate-100">The decisions this touches</h3>
+        <ul className="list-disc space-y-1 pl-5 text-sm text-slate-200">
+          {role.decisions.map((decision) => <li key={decision}>{decision}</li>)}
+        </ul>
+      </div>
+      <CopyPlanningNote note={note} />
+    </section>
+  );
+}
+
+/**
+ * The startup week, for a reader at a large company: the conditions, how they bear on a pitch, and
+ * the general rules as one line each with the answer that argues them. The rules' pause and restart
+ * scores are a startup's lines, so they stay on the answer pages.
+ */
+export function RoleMarketSection({
+  conditions,
+  askFor,
+  paybackBar,
+  rules,
+}: {
+  conditions: WeekConditions;
+  /** What this role can pitch under this week's conditions (`askForThisWeek`). */
+  askFor: string;
+  paybackBar: string;
+  rules: readonly BoundedDecisionRule[];
+}) {
+  return (
+    <section className={panel}>
+      <h2 className="text-lg font-semibold text-slate-100">This week&apos;s market</h2>
+      <WeekConditionsLines conditions={conditions} />
+      <div className="space-y-1" data-testid="company-role-ask">
+        <h3 className="text-sm font-semibold text-slate-100">Pitching this week</h3>
+        <p className="text-sm text-slate-200">{askFor}</p>
+        <p className="text-sm text-slate-300">{paybackBar}</p>
+      </div>
+      {rules.length > 0 ? (
+        <ul className="space-y-1 text-sm text-slate-200">
+          {rules.map((rule) => {
+            const answer = findLeadAnswerForArea(rule.area);
+            return (
+              <li key={rule.area}>
+                <span className="font-medium text-slate-100">The {decisionAreaLabel(rule.area).toLowerCase()} rule for startups:</span>{" "}
+                {formatBoundedDecisionAction(rule)}.{" "}
+                {answer && isIndexableAnswerSlug(answer.slug) ? (
+                  <ActionLink href={`/answers/${answer.slug}`} variant="inline">{answer.title}</ActionLink>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
 /** The same role at the next few companies, so every page is a short walk from every other. */
 const neighbours = (company: CompanyEntry, count: number): CompanyEntry[] => {
   const start = COMPANIES.findIndex((entry) => entry.slug === company.slug);
@@ -163,7 +284,7 @@ const neighbours = (company: CompanyEntry, count: number): CompanyEntry[] => {
  * company's overview, its other roles and the company list are a breadcrumb away; the
  * overview's own row of three neighbours went for the same reason (2026-11-11).
  */
-export function CompanyNextLinks({ company, role }: { company: CompanyEntry; role: CompanyRole }) {
+export function CompanyNextLinks({ company, role }: { company: CompanyEntry; role: CompanyPageRole }) {
   return (
     <section className={panel}>
       <h2 className="text-lg font-semibold text-slate-100">Where to go next</h2>

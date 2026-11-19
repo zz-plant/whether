@@ -5,6 +5,7 @@ import { NOT_COUNTED_REASON } from "../../../lib/report/scoringBasis";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
+import { PlainActionLink } from "../ui/actionLink";
 
 type NotCountedReading = {
   metric: "tightness" | "riskAppetite";
@@ -39,6 +40,7 @@ export function WhyConditionsSection({
   pendingConditions,
   notCounted,
   warning,
+  chartHref,
 }: {
   regime: string;
   tightness: number;
@@ -50,6 +52,8 @@ export function WhyConditionsSection({
   notCounted: readonly NotCountedReading[];
   /** What the uncounted inputs would do to a line, in one sentence; null when they would cross none. */
   warning: string | null;
+  /** The conditions chart with the left-out inputs counted (`buildCountedChartHref`), where it can plot them. */
+  chartHref?: string;
 }) {
   const regimeLabel = getRegimePublicLabel(regime);
   const readingLabel = pendingConditions ? getRegimePublicLabel(pendingConditions) : regimeLabel;
@@ -96,7 +100,9 @@ export function WhyConditionsSection({
     >
       <div className="min-w-0">
         {notCounted.length > 0 ? (
-          <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
+          /* The band hugs its paragraph (2026-11-17): prose stops at 60ch, and a band
+             held to `max-w-3xl` ran 300px past it, a box half empty in a laptop frame. */
+          <div className="weather-caveat-band w-fit max-w-3xl px-4 py-3" data-excluded-inputs>
             <p className="weather-caveat-mark text-fluid-sm font-semibold">
               {countedRegimeLabel !== readingLabel ? `Why it feels like ${countedRegimeLabel}` : "What the headline reading leaves out"}
             </p>
@@ -111,6 +117,15 @@ export function WhyConditionsSection({
               <summary className="cursor-pointer select-none font-medium text-slate-300">Why these aren&rsquo;t counted</summary>
               <p className="mt-1 leading-relaxed">{NOT_COUNTED_REASON}</p>
             </details>
+            {/* The same reading, plotted: the conditions chart two sections down, with the
+                left-out inputs counted and the areas that would then move named under it. */}
+            {chartHref ? (
+              <p className="mt-1 text-fluid-sm">
+                <PlainActionLink href={chartHref} variant="inline" data-counted-chart-link="">
+                  See it charted
+                </PlainActionLink>
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>

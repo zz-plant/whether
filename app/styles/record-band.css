@@ -143,15 +143,15 @@ body:has([data-record-plate]) .record-band-plate {
   inset: -8px -1.5px;
 }
 .record-week-cell[data-regime="VOLATILE"] {
-  background-image: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-light) 55%, transparent) 4px 5px);
+  background-image: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-dense) 55%, transparent) 4px 5px);
 }
 .record-week-cell[data-regime="DEFENSIVE"] {
-  background-image: repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 4px 5px);
+  background-image: repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--band-line-on-light) 45%, transparent) 4px 5px);
 }
 .record-week-cell[data-regime="SCARCITY"] {
   background-image:
-    repeating-linear-gradient(45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 5px 6px),
-    repeating-linear-gradient(-45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-dense) 70%, transparent) 5px 6px);
+    repeating-linear-gradient(45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-light) 40%, transparent) 5px 6px),
+    repeating-linear-gradient(-45deg, transparent 0 5px, color-mix(in srgb, var(--band-line-on-light) 40%, transparent) 5px 6px);
 }
 
 .record-band-cursor {
@@ -275,12 +275,56 @@ body:has([data-record-plate]) .record-band-plate {
   background: var(--app-text);
 }
 
-.record-band-caption {
-  max-width: none;
-  margin: 0;
+/* The band's foot (2026-11-18): what the site is, the key to the fills, then the two
+   counts. One wrapping row: on a laptop the three share a line; on a phone the category
+   line, the key and the counts take a line each, the counts kept to the right. */
+.record-band-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 1.25rem;
+  row-gap: 0.125rem;
   padding: 0.125rem var(--weather-shell-pad-inline) 0;
   font-size: var(--fs-nano);
   line-height: 1.4;
+}
+
+.record-band-what {
+  max-width: none;
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.record-band-key {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--app-text-secondary);
+}
+.record-band-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  max-width: none;
+}
+/* The field's own fill, from the data-regime map on the item, as the band draws it.
+   The hairline keeps Freezing's pale ice and Sunny's gold apart from the paper. */
+.record-band-key-swatch {
+  display: inline-block;
+  flex: none;
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--regime-accent);
+  border: 1px solid var(--border-strong);
+}
+
+.record-band-caption {
+  max-width: none;
+  margin: 0 0 0 auto;
   color: var(--app-text-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -299,5 +343,5 @@ body:has([data-record-plate]) .record-band-plate {
 
 @media print {
   .record-band-plate { cursor: auto; }
-  .record-band-field, .record-band-lines path { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .record-band-field, .record-band-lines path, .record-band-key-swatch { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }

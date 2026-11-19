@@ -11,6 +11,8 @@ import { CALL_CHANGE_RULE, describeLatitudeAgainstConditions } from "../../../li
 import { Fact, FactList } from "../ui/factList";
 import { UrlDetails } from "../ui/urlDetails";
 import { ConditionWord } from "../ui/conceptIcons";
+import { buildLatitudeChart } from "../../../lib/report/latitudeChart";
+import { LatitudeChart } from "./latitudeChart";
 
 /**
  * The record of what this product has called, framed as evidence rather than as
@@ -204,6 +206,7 @@ export function TrackRecordTable({
      of the twelve recent rows — so one month was claimed by both tables. */
   const earlierNewestDate = earlierRows[0]?.recordDate;
   const earlierOldestDate = earlierRows[earlierRows.length - 1]?.recordDate;
+  const latitudeChart = buildLatitudeChart(record.allRows);
 
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
@@ -222,6 +225,10 @@ export function TrackRecordTable({
           </Link>
         </p>
       </div>
+
+      {/* The score across every month, above the rows it draws (2026-11-18); the table
+          stays in its fold for copying and citing. */}
+      {latitudeChart ? <LatitudeChart chart={latitudeChart} /> : null}
 
       <UrlDetails
         queryKey="months"

@@ -26,6 +26,10 @@ import { planLinesFromRules } from "../../lib/alert/planLines";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
+import { AreaStateHistory } from "./components/areaStateHistory";
+import { RuleRegionMap } from "../components/ui/ruleRegionMap";
+import { buildAreaStateHistory, buildRuleRegions, describeRegionsAt, ruleFromStripItem } from "../../lib/report/ruleRegions";
+import { getMonthlyRegimeHistory, primeMonthlyRegimeHistoryForRead } from "../../lib/summary/monthlyRegimeHistory";
 import { ReportSection } from "../components/reportSection";
 import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
@@ -129,6 +133,29 @@ export async function buildPlanningPageModel(
 
   const showAllActionLanes = resolvedSearchParams?.actions === "all";
   const actionStripItems = snapshot.homeBriefModel.actionStripItems;
+  /* Each row's rule as a small conditions chart: the rule the row prints, from the same
+     strip item, and the reading its distances were measured from. */
+  const weekScores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+  const stripRules = actionStripItems.map(ruleFromStripItem);
+  const areaRows = buildAreaRows(actionStripItems, weekScores).map((row) => {
+    const rule = stripRules.find((candidate) => candidate.area === row.area);
+    return rule
+      ? {
+          ...row,
+          map: h(RuleRegionMap, {
+            area: row.area,
+            regions: buildRuleRegions(rule),
+            scores: weekScores,
+            changeLines: { tightness: assessment.thresholds.tightnessRegime, riskAppetite: assessment.thresholds.riskAppetiteRegime },
+            label: describeRegionsAt(rule, weekScores, "This week's reading"),
+          }),
+        }
+      : row;
+  });
+  /* The same rules against the last twelve month-ends. Live only: an archived month's
+     record would have to end at that month, and its lines are that month's. */
+  if (!historicalSelection) await primeMonthlyRegimeHistoryForRead();
+  const areaStateMonths = historicalSelection ? [] : buildAreaStateHistory(stripRules, getMonthlyRegimeHistory());
   const weeklyCall = snapshot.weeklyCall;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
   /* What each closed step holds, said on the closed step (§XII: "a summary that
@@ -254,12 +281,18 @@ export async function buildPlanningPageModel(
                 /* One row per area, in the order every surface uses, with the rule and
                    both its lines: the brief's table draws only the side that can change
                    each area, and this is the page where a reader sets rules of their own. */
-                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area", bothSides: true }),
+                h(AreaTable, { rows: areaRows, caption: "This week's rule for each decision area", bothSides: true }),
+                /* The small charts' domain, once for the five (§XV). */
+                h("p", { className: "text-xs leading-5 text-slate-400", "data-rule-map-key": "" },
+                  "On the chart: each area's rule on the brief's conditions chart, risk appetite 0–100 across and funding pressure 0–100 down (easier is up and right). Hatched red is where the area pauses, grey where it restarts, and between them nothing changes; the dot is this week's reading.",
+                ),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "Before adding fixed costs or growing scope, look again at what you approved last week."
                     : `Nothing to revisit: keep the current plan unless funding pressure crosses ${assessment.thresholds.tightnessRegime}.`,
                 ),
+                /* Under the table: how these lines would have held each area, month by month. */
+                areaStateMonths.length > 0 ? h(AreaStateHistory, { months: areaStateMonths }) : null,
               ),
               // The monthly call has one owner: the Monthly tab on the brief. A
               // second copy here, with its provenance and raw text, was method

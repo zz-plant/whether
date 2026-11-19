@@ -7,7 +7,7 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { Sparkline } from "../app/components/ui/sparkline";
 import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
 import { regimeDataAttribute } from "../lib/regimeAccent";
-import { OG_CONDITION_INK } from "../lib/image/ogTheme";
+import { OG_CONDITION_INK, OG_SKY, OG_SKY_PAPER } from "../lib/image/ogTheme";
 import type { RegimeKey } from "../lib/types";
 import * as nextNavigation from "next/navigation";
 
@@ -100,6 +100,37 @@ describe("regime colour contract", () => {
     for (const [regime, name] of names) {
       assert.match(tokens, new RegExp(`--color-condition-${name}:\\s*${REGIME_HEX_COLORS[regime]};`), `${regime}'s utility fill is its plane hue`);
       assert.match(tokens, new RegExp(`--color-condition-${name}-ink:\\s*${OG_CONDITION_INK[regime]};`), `${regime}'s artifact ink is the dark theme's ink`);
+    }
+  });
+
+  it("paints the cards' sky and paper in the page's own values, for both themes", () => {
+    // The weekly card and the brief card sit on the homepage's sky (2026-11-17). They
+    // cannot read CSS, so the eight skies and the paper under their figures are copied
+    // into lib/image/ogTheme.ts; this holds each copy to the token it mirrors. The
+    // brief card's light paper had stayed green for five days after the site left it.
+    const tokens = readRepoFile("app/styles/tokens.css");
+    const themes = [["dark", ""], ["light", 'html\\[data-theme="light"\\] ']] as const;
+    for (const [theme, scope] of themes) {
+      for (const [regime, sky] of Object.entries(OG_SKY[theme])) {
+        const rule = new RegExp(
+          `^${scope}\\[data-regime="${regime}"\\] \\{ --regime-sky-top: ${sky.top}; --regime-sky: ${sky.base}; --regime-sky-ink: ${sky.ink}; --regime-sky-muted: ${sky.muted}; \\}`,
+          "m",
+        );
+        assert.match(tokens, rule, `${regime}'s ${theme} sky on a card is the page's`);
+      }
+    }
+    const light = tokens.slice(tokens.indexOf('html[data-theme="light"] {'));
+    const lightBlock = light.slice(0, light.indexOf("\n}"));
+    const paper = OG_SKY_PAPER.light;
+    for (const [token, value] of [
+      ["--bg-panel", paper.panel],
+      ["--border-subtle", paper.border],
+      ["--app-text", paper.text],
+      ["--app-text-secondary", paper.secondary],
+      ["--app-text-muted", paper.muted],
+      ["--line-crossed-ink", paper.crossed],
+    ] as const) {
+      assert.ok(lightBlock.includes(`${token}: ${value};`), `the light card's paper takes ${token}`);
     }
   });
 

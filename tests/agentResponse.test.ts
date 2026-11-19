@@ -67,6 +67,7 @@ describe("discovery Link headers", () => {
     const link = withAgentDiscoveryLinks(htmlResponse()).headers.get("Link") ?? "";
     assert.ok(link.includes(`<${siteUrl}/.well-known/whether-agent.json>; rel="describedby"`), link);
     assert.ok(link.includes(`<${siteUrl}/llms.txt>; rel="describedby"`), link);
+    assert.ok(link.includes(`<${siteUrl}/.well-known/api-catalog>; rel="api-catalog"`), link);
     assert.ok(link.includes(`<${siteUrl}/brief.md>; rel="alternate"; type="text/markdown"`), link);
   });
 

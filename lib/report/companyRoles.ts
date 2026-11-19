@@ -14,6 +14,9 @@ import { resolvePaybackBar } from "./projectPayback";
 import { SPENDING_PAYBACK_BAR_MONTHS, type DecisionArea } from "./boundedDecisionRules";
 import type { OperatorStage } from "./operatorStage";
 import type { RegimeKey } from "../regimeEngine";
+import type { CompanySituation, FigureKey, PlanningPressure } from "./companySituation";
+import type { CompanyEntry } from "../companies/companyRegistry";
+import { formatDateUTC } from "../formatters";
 
 const BAR = SPENDING_PAYBACK_BAR_MONTHS;
 
@@ -46,7 +49,23 @@ export type CompanyRole = {
   atStage: Record<OperatorStage, string>;
   /** False keeps a role off the company pages: 50 pages each, added only once those earn their place. */
   onCompanyPages?: false;
+  /** What this role takes to the company's own planning and reporting dates. Every company-page role has it. */
+  planning?: RolePlanning;
 };
+
+/**
+ * A company page's reader works inside a budget set once a year and re-read every quarter, so the
+ * role's lines follow those dates rather than the startup week: what to take to planning, given
+ * whether the filings show the R&D budget keeping up (`PlanningPressure`), and which filed
+ * figures to read when a quarterly report lands.
+ */
+type RolePlanning = {
+  bring: Record<PlanningPressure["kind"], string>;
+  reportFigures: readonly FigureKey[];
+  reportWhy: string;
+};
+
+export type CompanyPageRole = CompanyRole & { planning: RolePlanning };
 
 export const ROLES: readonly CompanyRole[] = [
   {
@@ -65,6 +84,14 @@ export const ROLES: readonly CompanyRole[] = [
       "series-a": "Tie your proposal to a number the company tracks, and avoid starting a second big project before the first shows results.",
       "series-b": "Show how the work improves margin or efficiency this quarter. Work that lowers cost to serve is the easiest to defend here.",
       bootstrapped: `Size work in stages you can stop, and show where the cash comes back inside ${BAR} months.`,
+    },
+    planning: {
+      bring: {
+        squeezed: "Bring work that pays for itself: the cost it removes or the revenue it protects, and what it replaces on the roadmap.",
+        growing: "Bring the larger proposal you have been holding, staged so each step can stop, with the number it moves.",
+      },
+      reportFigures: ["research", "capitalSpending"],
+      reportWhy: "R&D is the budget engineering work is paid from, and capital spending shows where the company is building.",
     },
     askFor: {
       tight: "Propose work that saves money or protects revenue, and put the payback in your first sentence.",
@@ -85,6 +112,14 @@ export const ROLES: readonly CompanyRole[] = [
       "series-b": "Favor the few areas that are already efficient, and show the margin gain before asking for more.",
       bootstrapped: `Fund roadmap bets from revenue, and pick the ones customers would pay for inside ${BAR} months.`,
     },
+    planning: {
+      bring: {
+        squeezed: "Bring a roadmap that names what it stops to fund what it starts, with the revenue each item protects.",
+        growing: "Bring the discovery work and second bets a tighter year would cut, each with the result that would end it.",
+      },
+      reportFigures: ["revenueGrowth", "research"],
+      reportWhy: "Revenue growth sets the room for new bets, and R&D shows whether product spending is keeping up with it.",
+    },
     askFor: {
       tight: "Lead with what customers can use this quarter and the revenue it protects. Keep discovery small enough to stop after one round.",
       unsettled: "Pitch in stages you can stop, and ask for the first stage rather than the whole plan.",
@@ -104,6 +139,14 @@ export const ROLES: readonly CompanyRole[] = [
       "series-b": "Show the efficiency gain before adding headcount, such as lower cost to serve or fewer incidents.",
       bootstrapped: "Stage platform work so it can pause without breaking operations, and avoid anything that needs outside money to finish.",
     },
+    planning: {
+      bring: {
+        squeezed: "Bring a capacity plan that keeps reliability work funded and says what the team would drop, before someone else chooses.",
+        growing: "Bring the headcount and platform asks now, each tied to the work it unblocks.",
+      },
+      reportFigures: ["research", "stockPay"],
+      reportWhy: "R&D covers your team's cost, and stock pay is a large part of what each hire costs.",
+    },
     askFor: {
       tight: "Protect the reliability budget, and frame new platform work by the cost it removes. Avoid commitments you can't unwind.",
       unsettled: "Prefer work you can stop or reverse, and put off long architecture commitments until conditions settle.",
@@ -122,6 +165,14 @@ export const ROLES: readonly CompanyRole[] = [
       "series-a": "Aim design work at the conversion the company already measures, one major change at a time so the results stay readable.",
       "series-b": "Show what a redesign does for margin or support cost, not only for conversion.",
       bootstrapped: "Ship changes in small stages, and put research where it affects what customers pay for.",
+    },
+    planning: {
+      bring: {
+        squeezed: "Bring research and redesigns tied to a number the business already tracks, scoped to what changes a decision this year.",
+        growing: "Bring the broader research program or redesign that tighter years squeeze out.",
+      },
+      reportFigures: ["revenueGrowth", "research"],
+      reportWhy: "Design work is judged against revenue growth and paid from the R&D budget.",
     },
     askFor: {
       tight: "Tie each proposal to a number the business already tracks, such as conversion or retention. Keep research to what changes a near-term decision.",
@@ -146,6 +197,14 @@ export const ROLES: readonly CompanyRole[] = [
       "series-b": "Measure cost to serve and margin by product, because spending at this stage rests on them.",
       bootstrapped: "Track how fast cash comes back on each investment, and keep tooling costs low.",
     },
+    planning: {
+      bring: {
+        squeezed: "Bring the analyses behind the spending and pricing calls planning will make, and the pipelines that could be retired.",
+        growing: "Bring the longer-term models and data work that need a year to pay off.",
+      },
+      reportFigures: ["revenueGrowth", "freeCashFlow"],
+      reportWhy: "Most spending analyses come down to whether growth is being paid for from cash.",
+    },
     askFor: {
       tight: "Put first the analysis behind a spending or pricing decision being made now, and check which pipelines and models could be retired.",
       unsettled: "Favor analyses that can answer in days, because the question may change.",
@@ -164,6 +223,14 @@ export const ROLES: readonly CompanyRole[] = [
       "series-a": `Fund only channels that convert repeatably and pay back inside ${BAR} months, one expansion program at a time.`,
       "series-b": "Put spend into the few channels already efficient, and show the effect on margin.",
       bootstrapped: "Fund campaigns from revenue, in amounts you could pause next month.",
+    },
+    planning: {
+      bring: {
+        squeezed: "Bring channel budgets backed by a proven cost per customer, and the point at which you would cut each one.",
+        growing: "Bring the case for more acquisition spend, with the cost per customer you will hold it to.",
+      },
+      reportFigures: ["revenueGrowth", "freeCashFlow"],
+      reportWhy: "Acquisition budgets are measured against revenue growth and paid from the cash left after capital spending.",
     },
     askFor: {
       tight: "Ask for spend only in channels where the cost per customer is proven, and show the payback.",
@@ -253,7 +320,9 @@ export const ROLES: readonly CompanyRole[] = [
   },
 ];
 
-export const COMPANY_ROLES: readonly CompanyRole[] = ROLES.filter((role) => role.onCompanyPages !== false);
+export const COMPANY_ROLES: readonly CompanyPageRole[] = ROLES.filter(
+  (role): role is CompanyPageRole => role.onCompanyPages !== false && role.planning !== undefined,
+);
 
 export const findCompanyRole = (slug: string) => COMPANY_ROLES.find((role) => role.slug === slug);
 export const findRole = (slug: string) => ROLES.find((role) => role.slug === slug);
@@ -266,4 +335,46 @@ export const paybackBarLine = (regime: RegimeKey): string => {
   return bar.kind === "months"
     ? `The general roadmap rule slows anything that pays back in more than ${bar.months} months.`
     : "The general rules set no payback bar on roadmap work this week.";
+};
+
+/** The filed figures a role reads when a report lands, as printed on the page. */
+export const reportFigureRows = (role: CompanyPageRole, situation: CompanySituation) =>
+  role.planning.reportFigures.flatMap((key) => situation.rows.filter((row) => row.key === key));
+
+/** The next report, as one sentence. Null when no fiscal calendar is on file. */
+export const nextReportLine = (situation: CompanySituation): string | null => {
+  const next = situation.nextReports[0];
+  if (!next) return null;
+  const kind = next.annual ? "annual report" : "quarterly report";
+  return `Its next ${kind} covers the quarter ending around ${formatDateUTC(next.quarterEndIso)}, and is due by about ${formatDateUTC(next.dueByIso)}.`;
+};
+
+/**
+ * The page as a note to paste into a planning doc or a 1:1 agenda: plain lines, no markup, the
+ * source last so a pasted copy says where it came from and who it isn't.
+ */
+export const buildPlanningNote = ({
+  role,
+  company,
+  situation,
+  url,
+}: {
+  role: CompanyPageRole;
+  company: CompanyEntry;
+  situation: CompanySituation;
+  url: string;
+}): string => {
+  const figures = reportFigureRows(role, situation).map((row) => `${row.label}: ${row.value}`);
+  const report = nextReportLine(situation);
+  return [
+    `${role.title} at ${company.name}: planning note`,
+    ...(situation.budgetCalendar ? [`Budgets: ${situation.budgetCalendar}`] : []),
+    ...(report ? [`Next report: ${report}`] : []),
+    ...(figures.length > 0 ? [`From the filing for the period ended ${situation.asOf}: ${figures.join("; ")}.`] : []),
+    ...(situation.planning ? [situation.planning.evidence] : []),
+    ...(situation.planning ? [`To bring: ${role.planning.bring[situation.planning.kind]}`] : []),
+    `To ask at my next 1:1: ${role.leadershipQuestion}`,
+    "",
+    `Source: ${url}. Figures from SEC filings; Whether isn't affiliated with ${company.name}.`,
+  ].join("\n");
 };

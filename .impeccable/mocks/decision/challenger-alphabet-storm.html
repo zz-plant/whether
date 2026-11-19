@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Alphabet Storm</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+:root{--paper:#f7f7f4;--ink:#1a1a1a;--silver:#c0c0c0;--rain:#8a8a8a;--blue:#a8c8e8;--muted:#5a5a5a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.4}
+.shell{display:grid;grid-template-rows:44px 1fr;height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:0 24px;border-bottom:1px solid #ddd;font-size:12px}
+.top .word{font-weight:900;letter-spacing:-.02em;font-size:18px}
+.top a{color:var(--muted);text-decoration:none;text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+.top a.cur{color:var(--ink);border-bottom:2px solid var(--ink);padding-bottom:2px}
+.body{display:grid;grid-template-columns:1fr 240px;overflow:hidden}
+.main{padding:20px 28px;overflow:auto;position:relative}
+.storm{font-size:120px;font-weight:900;letter-spacing:-.04em;line-height:.9;margin:0 0 8px;position:relative}
+.storm .c{display:inline-block;transform:translateY(-6px)}
+.storm .l{display:inline-block;transform:translateY(4px) rotate(-2deg)}
+.storm .o{display:inline-block;transform:translateY(-2px)}
+.storm .u{display:inline-block;transform:translateY(8px) rotate(3deg)}
+.storm .d{display:inline-block;transform:translateY(-4px)}
+.rain{position:absolute;top:90px;left:40px;right:40px;height:60px;pointer-events:none}
+.rain span{position:absolute;width:1px;height:14px;background:var(--rain);opacity:.6}
+.meta{font-size:11px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.1em}
+.cond{display:inline-block;padding:2px 8px;background:var(--blue);color:var(--ink);font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:12px}
+.guidance{font-size:16px;line-height:1.45;max-width:58ch;margin-bottom:14px;font-weight:500}
+.areas{border-top:2px solid var(--ink);margin-top:8px}
+.area{display:grid;grid-template-columns:24px 1fr auto;gap:10px;padding:8px 0;border-bottom:1px solid #ddd;align-items:center;font-size:13px}
+.area .n{font-size:11px;color:var(--muted);font-weight:700}
+.area .name{font-weight:600}
+.area .act{font-size:11px}
+.area.hold .act{color:var(--rain);font-weight:700}
+.side{padding:20px;border-left:1px solid #ddd;background:var(--paper)}
+.side .label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+.side .fig{font-size:32px;font-weight:900;line-height:1}
+.side .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.side .block{margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span style="margin-left:auto;color:var(--muted)">Share · About · Search</span>
+  </div>
+  <div class="body">
+    <div class="main">
+      <div class="meta">No. 2026-W45 · 3 Nov 2026 · 177 months</div>
+      <div class="storm"><span class="c">C</span><span class="l">L</span><span class="o">O</span><span class="u">U</span><span class="d">D</span><span style="font-size:40px;vertical-align:top;margin-left:8px;color:var(--rain)">Y</span></div>
+      <div class="cond">Cloudy</div>
+      <p class="guidance">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line.</p>
+      <div class="areas">
+        <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · 76</span></div>
+        <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · 76</span></div>
+        <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · 66</span></div>
+        <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · 66</span></div>
+        <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · 66</span></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="block"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">of 100 · pause 76</div></div>
+      <div class="block"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">of 100 · restart 66</div></div>
+      <div class="block"><div class="label">Record</div><div class="sub">177 weekly briefs · since Jan 2012</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

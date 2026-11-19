@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Data Room</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--paper:#f5f0e8;--manila:#d4c4a8;--ink:#2a2a2a;--muted:#6b6458;--tab:#4a6fa5;--folder:#5a7a5a;--red:#a0302a;--line:#b8ad98}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--manila);color:var(--ink);font-size:14px;line-height:1.4}
+.shell{display:grid;grid-template-rows:48px 1fr;height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:0 24px;background:var(--paper);border-bottom:1px solid var(--line);font-size:13px}
+.top .word{font-weight:600;letter-spacing:.02em}
+.top a{color:var(--muted);text-decoration:none}
+.top a.cur{color:var(--ink);border-bottom:2px solid var(--ink);padding-bottom:2px}
+.body{display:grid;grid-template-columns:220px 1fr 260px;overflow:hidden}
+.rail{background:var(--manila);border-right:1px solid var(--line);padding:16px 12px;overflow:auto}
+.rail .folder{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:3px;font-size:13px;color:var(--muted)}
+.rail .folder.on{background:var(--paper);color:var(--ink);font-weight:500}
+.rail .folder::before{content:'';width:14px;height:12px;background:var(--folder);border-radius:2px 2px 0 0;flex-shrink:0}
+.rail .sub{padding-left:22px;font-size:12px;color:var(--muted)}
+.main{background:var(--paper);padding:24px 32px;overflow:auto;border-right:1px solid var(--line)}
+.filetab{display:inline-block;background:var(--manila);border:1px solid var(--line);border-bottom:none;padding:6px 14px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--muted);border-radius:3px 3px 0 0;margin-bottom:-1px}
+.filetab.on{background:var(--paper);color:var(--ink);font-weight:500}
+h1{font-size:22px;font-weight:600;margin:8px 0 4px}
+.meta{font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:16px}
+.cond{display:inline-block;padding:2px 8px;background:#e8e0d0;border-radius:2px;font-weight:600;font-size:12px;margin-bottom:12px}
+.guidance{font-size:17px;line-height:1.45;max-width:62ch;margin-bottom:16px}
+.areas{border-top:2px solid var(--ink);margin-top:8px}
+.area{display:grid;grid-template-columns:24px 1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.area .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.area .name{font-weight:500}
+.area .act{font-size:12px;color:var(--muted)}
+.area.hold .act{color:var(--red)}
+.side{background:var(--manila);padding:16px;overflow:auto}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:12px;margin-bottom:12px}
+.card .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.card .fig{font-size:36px;font-weight:600;font-family:'IBM Plex Mono',monospace;line-height:1}
+.card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span style="margin-left:auto;color:var(--muted)">Share · About · Search</span>
+  </div>
+  <div class="body">
+    <div class="rail">
+      <div class="folder on">This week</div>
+      <div class="sub">No. 2026-W45</div>
+      <div class="folder">Plan</div>
+      <div class="folder">History</div>
+      <div class="sub">2012 → now</div>
+      <div class="folder">Guides</div>
+      <div class="folder">Trust</div>
+      <div class="folder">Calibration</div>
+    </div>
+    <div class="main">
+      <div class="filetab on">W45 · brief.md</div>
+      <h1>Pause hiring and hold the roadmap.</h1>
+      <div class="meta">Week of 3 Nov 2026 · No. 2026-W45 · Fields: 177 months</div>
+      <div class="cond">Cloudy</div>
+      <p class="guidance">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line.</p>
+      <div class="areas">
+        <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · pause at 76</span></div>
+        <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · pause at 76</span></div>
+        <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · restart at 66</span></div>
+        <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · restart at 66</span></div>
+        <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · restart at 66</span></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">higher is worse · pause 76</div></div>
+      <div class="card"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">higher is better · restart 66</div></div>
+      <div class="card"><div class="label">Files</div><div class="sub">177 weekly briefs · 156 month-end readings</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -918,7 +918,9 @@ ways. On a phone it is the whole screen, wherever they stopped scrolling. On a l
 dragged around one block. A page reads well as a screenshot only if both pictures name their source
 and hold their unit whole. `bun run ui:frames` (scripts/ui-frames.mjs) walks every live route at a
 1440×900 laptop and a 390×844 phone, frame by frame, and fails a route on either. It is not in the
-gate, which has no browser: run it after layout work, beside `bun run ui:iterate`.
+gate, which has no browser: run it after layout work, beside `bun run ui:iterate`. The default run
+is dark; `-- --theme light` walks the light theme into `artifacts/ui/frames-light/` (2026-11-17:
+the audit had only ever walked dark, the second theme).
 
 - MUST: name the site in every frame, and on a page that reports a reading, the date and the
   conditions too. The header hides on scroll, so past the first screen this is the running head's
@@ -1082,10 +1084,20 @@ the frame.
   on Sunny, Cloudy and Freezing, `--band-line-on-dense` on Stormy, the one dense fill since
   2026-11-12 (`isLightField`). A field's sky lifts its top a fifth toward the paper, never more,
   so the line ink chosen for its fill still holds at the top.
+- A drawing of the month-ends arranged another way is not a second band (2026-11-18): `/history`'s
+  year × month grid (`conditionsByYear.tsx`) reads the record by calendar, which the band cannot.
+  It shows month-ends only, never the briefs, and draws each cell with the published-week cell's
+  fill and pattern (`.record-week-cell`), whose rules take the band's inks by `isLightField`.
 - MUST: keep the two records apart. The fields and lines are the month-end readings, scored with
   today's formula. The marks under the band are the briefs as published, one each, from a dashed
   line where publication began; a week with no brief has no mark. The caption counts each record
-  under its own name. Where a brief and its month-end name different conditions,
+  under its own name.
+- MUST: say what the site is and name the band's colours in its foot (2026-11-18), at every
+  width: the category line (`categorySentence`, `lib/seo.ts`), then a key with a swatch of each
+  condition's fill from the data-regime map, listing only the conditions the record holds, then
+  the two counts. On a phone the lines are plain, so the fill is the only cue; there was no key
+  at any width, and the category line was a dismissible first-visit line on the homepage under
+  the band, read after the band if at all. Where a brief and its month-end name different conditions,
   `findRecordDifferences` states both facts and claims no cause.
 - MUST: draw the still band on the server from the bundled month-end series, with no request and
   no script. The two client pieces read the band's own `data-months` attribute and take their

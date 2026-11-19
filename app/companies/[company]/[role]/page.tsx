@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findCompany, type CompanyEntry } from "../../../../lib/companies/companyRegistry";
-import { askForThisWeek, findCompanyRole, paybackBarLine, type CompanyRole } from "../../../../lib/report/companyRoles";
+import {
+  askForThisWeek,
+  buildPlanningNote,
+  findCompanyRole,
+  paybackBarLine,
+  type CompanyPageRole,
+} from "../../../../lib/report/companyRoles";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../../lib/navigation/routeType";
-import { buildPageMetadata } from "../../../../lib/seo";
+import { buildCanonicalUrl, buildPageMetadata } from "../../../../lib/seo";
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { JsonLdScript } from "../../../components/jsonLdScript";
 import { buildCompanyPageStructuredData } from "../../../../lib/seo/pageStructuredData";
 import { Breadcrumbs } from "../../../components/ui/breadcrumbs";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
-import { CompanyNextLinks, CompanyPositionSection, RoleDecisionsSection, WeekConditionsLines } from "../../companyPageSections";
+import {
+  CompanyCalendarSection,
+  CompanyNextLinks,
+  CompanyPositionSection,
+  RoleMarketSection,
+  RolePlanningSection,
+  WeekConditionsLines,
+} from "../../companyPageSections";
 import { loadCompanyPage } from "../../loadCompanyPage";
 
 type Params = { company: string; role: string };
@@ -20,12 +33,13 @@ export const revalidate = 3600;
 
 /*
  * The role and the company first, in the words every link to this page uses ("Product managers at
- * Microsoft"). All 300 titles opened "This week's conditions for", which is what a result list shows
- * when it cuts a long title, and which tells these pages from nothing.
+ * Microsoft"). The pages asked "what to ask for this week", answered with the startup call; a reader
+ * at a large company plans around its budget season and its quarterly reports, so the page does
+ * (2026-11-17).
  */
-const roleTitle = (role: CompanyRole, company: CompanyEntry) => `${role.title} at ${company.name}: what to ask for this week`;
-const roleDescription = (role: CompanyRole, company: CompanyEntry) =>
-  `Is now a good time for ${role.label} at ${company.name} to ask for a raise or more headcount? This week's conditions, the general rules, and the company's latest filed figures.`;
+const roleTitle = (role: CompanyPageRole, company: CompanyEntry) => `${role.title} at ${company.name}: what to bring to planning`;
+const roleDescription = (role: CompanyPageRole, company: CompanyEntry) =>
+  `When ${company.name} sets next year's budgets, when its next report is due, and what ${role.label} can bring to planning and to a 1:1, from its SEC filings.`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { company: companySlug, role: roleSlug } = await params;
@@ -81,14 +95,22 @@ export default async function CompanyRolePage({ params }: { params: Promise<Para
         )}
       />
       <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
-        <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {company.name} can ask for this week</h1>
-        {/* The question the page answers, then the week it answers it in. A second sentence
-            listed what the page goes on to show (2026-11-11). */}
-        <p className="text-sm text-slate-300">Is now a good time to ask for a raise or more headcount?</p>
-        <WeekConditionsLines conditions={conditions} />
+        <h1 className="text-fluid-2xl font-semibold text-slate-100">What {role.label} at {company.name} can bring to planning</h1>
+        <p className="text-sm text-slate-300">When are next year&apos;s budgets set, and what makes a proposal hold up there?</p>
       </section>
-      <RoleDecisionsSection
-        role={role}
+      {situation ? (
+        <>
+          <CompanyCalendarSection company={company} situation={situation} />
+          <RolePlanningSection role={role} situation={situation} note={buildPlanningNote({ role, company, situation, url: buildCanonicalUrl(path) })} />
+        </>
+      ) : (
+        /* No filing on record: the startup week is all the page has to stand on. */
+        <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
+          <WeekConditionsLines conditions={conditions} />
+        </section>
+      )}
+      <RoleMarketSection
+        conditions={conditions}
         askFor={askForThisWeek(role, regime)}
         paybackBar={paybackBarLine(regime)}
         rules={role.areas.flatMap((area) => rules.filter((rule) => rule.area === area))}

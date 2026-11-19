@@ -582,3 +582,53 @@ same thing every week.
 “By role →” opens the lead role's thread on Guides, with the remaining roles listed below
 it. The copy and the selection rule are in `app/guides/stakeholderGuides.ts`; the pairs are
 drawn by the same `HearingBubbles` component the role panels use.
+
+### First-screen clarity (2026-11-18)
+
+Six fixes to what a first visit could not read, from the owner's review of the live page.
+
+- **What the site is.** The category line (`categorySentence`, derived from `websiteName` in
+  `lib/seo.ts`) is in the record band's caption on every route and every visit, before the
+  week's guidance. It was a first-visit line under the band that a reader could dismiss
+  before reading it; the homepage now mounts `ConditionsLegend` only for a shared arrival's
+  greeting.
+- **A key to the band.** The caption names each condition the band draws beside a swatch of
+  its fill (§XXX), at every width: on a phone the lines are plain and the fill is the only cue.
+- **A close line is a note.** The band above the card draws a close pause line with the close
+  badge's neutral edge and the page's ink, keeping the dashed ring in the line-state ink; a
+  newly crossed line keeps the red. Its sentence is the rule in the reader's terms: "Roadmap:
+  pause long-payback bets if risk appetite falls below 44. It is 48 now."
+- **Whose lines the figures draw.** The two figures beside the guidance draw hiring's lines (the
+  first rule's), and say so: "Hiring paused above 76. Restarts only when below 66 and risk
+  appetite is above 54." beside "Clear of hiring’s pause at 44. Restart also needs above 54."
+  (`describeScoreFigureStanding`). "Clear" under "Freezing" read as a contradiction.
+- **No split numbering.** "Your decisions this week" groups the areas by condition and no
+  longer prints the strip's 1–5 beside them, which read as missing items once split.
+- **Distances in points.** A group's distance gives the points and what they are measured as:
+  "It is 4 points away, a common one-month move, and 5 points closer since Nov 9." It read
+  "A common move away, 5 points closer since Nov 9."
+
+### Counts drawn beside their sentences (2026-11-18)
+
+Four counts the brief already printed are drawn beside the sentence that states them; the
+sentences stay, and each drawing reads the model its sentence comes from.
+
+- **The base rate.** "Past conditions held 7 of 10 months at this distance" (the trust strip's
+  room cell, `/trust`) leads with one square per month-end in that band, oldest first, filled
+  where conditions held a month later (`calibrationBuckets` entries through
+  `buildTrustStripProps`). Each square names its month and opens it in the time machine.
+- **How long conditions last.** "Has this happened before?" plots every stretch by its length
+  on one axis, a row per condition carrying its months in all, the stretch the record ends in
+  open, and the shortest that ended as a dashed rule (`describeSpellLengths` `plot`). The rows
+  print the totals the record's key printed, so the key is not drawn there too.
+- **The last change against this one.** On a week the call moved, each score cell on "The last
+  time conditions …" heads a small 0–100 panel: the earlier change's month-ends from the change
+  to three months on, this week's reading at the change, and the change line
+  (`findLastTimeCallChanged` `path`). Easier is up on both.
+- **How big a move is.** The first area group that sizes a move ("It is 24 points away, a rare
+  one-month move") draws every one-month move of that score since 2012 as bars by points, the
+  move marked and the bars past it in the ink (`describeScoreMoveHistogram`, which
+  `describeScoreMoveBand` reads its word from). A bar opens the latest month that moved that far.
+
+Every mark names itself on hover, on keyboard focus (each drawing is one tab stop; arrow keys
+step) and on a first tap, which a second tap follows (`app/components/ui/markReadout.tsx`).

@@ -14,6 +14,7 @@ import { buildLlmsFullCorpus } from "../lib/seo/llmsFullCorpus";
 import { postureArchiveStaticParams } from "../lib/summary/postureArchive";
 import { REGIME_ORDER } from "../lib/regimePresentation";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+import { OBJECTION_ALLOWANCES, presupposedObjections, readObjectionLedger } from "./fixtures/presupposedObjections";
 
 serveUnreachableUpstreams();
 
@@ -127,6 +128,8 @@ const judge = (surface: string, text: string): Finding[] =>
     const gloss = repeatedGloss(sentence);
     if (gloss) findings.push({ surface, sentence, why: `gloss "(${gloss})" twice` });
     if (SELF_NARRATION.test(sentence)) findings.push({ surface, sentence, why: "the page narrating itself" });
+    /* 4. An answer to an objection no visitor raised (2026-11-17, docs/objections.md). */
+    for (const why of presupposedObjections(surface, sentence)) findings.push({ surface, sentence, why });
     return findings;
   });
 
@@ -164,6 +167,52 @@ describe("the detectors", () => {
     assert.equal(repeatedGloss("Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 1 pt to clear 50 (49 today)."), "# today");
     assert.equal(repeatedGloss("Pause if < 44 (4 pts away) Restart when > 54 (6 pts away)"), null);
     assert.equal(repeatedGloss("Risk appetite was 7 then (investors are avoiding risk) and is 49 now (investors are selective about risk)."), null);
+  });
+});
+
+describe("the presupposed-objection check", () => {
+  it("flags a sentence that answers a doubt no visitor raised", () => {
+    for (const presupposing of [
+      "You might be wondering whether this is just a newsletter.",
+      "Don't worry: the guidance is free.",
+      "No hidden fees, no strings attached.",
+      "This isn't a sales pitch.",
+      "Not a dashboard. A weekly brief.",
+      "Unlike other tools, Whether names the decision.",
+      "We don't ask for an email, because the brief is public.",
+      "If you're worried about lock-in, export the brief.",
+    ]) {
+      assert.notDeepEqual(presupposedObjections("/sample", presupposing, { allowances: [], ledger: new Set() }), [], presupposing);
+    }
+    for (const fine of [
+      "It is a distance, not a probability.",
+      "How much is up for renewal in the next six months, and which renewals are we worried about?",
+      "Whether isn't affiliated with Acme.",
+      "No account, key, or email is required to read the weekly guidance.",
+      "Whether will not email this address again.",
+    ]) {
+      assert.deepEqual(presupposedObjections("/sample", fine, { allowances: [], ledger: new Set() }), [], fine);
+    }
+  });
+
+  it("passes a hit an allowance ties to a ledger id, and fails one naming an unknown id", () => {
+    const sentence = "Don't worry: the guidance is free.";
+    const allowances = [{ surface: "/sample", text: "Don't worry", objection: "cost" }];
+    assert.deepEqual(presupposedObjections("/sample", sentence, { allowances, ledger: new Set(["cost"]) }), []);
+    assert.deepEqual(presupposedObjections("/sample", sentence, { allowances, ledger: new Set() }), [
+      'allowance names "cost", which docs/objections.md does not list',
+    ]);
+    assert.notDeepEqual(presupposedObjections("/elsewhere", sentence, { allowances, ledger: new Set(["cost"]) }), []);
+  });
+
+  it("reads the ids from the ledger table's backticked first cells", () => {
+    assert.deepEqual(
+      [...readObjectionLedger("| id | Objection |\n| --- | --- |\n| `cost` | Is it free? |\n")],
+      ["cost"],
+    );
+    const ledger = readObjectionLedger();
+    const unknown = OBJECTION_ALLOWANCES.filter((allowance) => !ledger.has(allowance.objection));
+    assert.deepEqual(unknown, [], "every allowance names an id in docs/objections.md");
   });
 });
 

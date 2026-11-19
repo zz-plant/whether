@@ -66,7 +66,7 @@ curl "https://whether.work/api/agent?view=state"
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/screens/weekly-brief-light.png" />
-    <img src="docs/assets/screens/weekly-brief-dark.png" alt="The weekly brief at whether.work for the week of Oct 19, 2026: Cloudy conditions, the week's guidance, and the conditions chart plotting funding pressure against risk appetite" width="820" />
+    <img src="docs/assets/screens/weekly-brief-dark.png" alt="The weekly brief at whether.work for the week of Nov 9, 2026: Freezing conditions, the week's guidance, and the two scores against their pause and restart lines" width="820" />
   </picture>
 </p>
 
@@ -81,13 +81,13 @@ Whether scores two things from public U.S. market data every Monday:
 
 Together the two scores place the week in one of four conditions: `Sunny`, `Cloudy`, `Stormy` or `Freezing`. Interest rates, the yield curve, the pace of rate rises, stock-market volatility and the Chicago Fed financial conditions index move the scores, because the record holds each of them at every month-end since 2012. Inflation, labor, the high-yield credit spread and startup-market inputs are shown beside them and move nothing.
 
-Each decision area gets an action for this week, a **pause line** that holds it back and a **restart line**, set apart from the pause line so one noisy week cannot undo the decision. Three rows from the brief for the week of Oct 19, 2026, in Cloudy conditions:
+Each decision area gets an action for this week, a **pause line** that holds it back and a **restart line**, set apart from the pause line so one noisy week cannot undo the decision. Three rows from the brief for the week of Nov 9, 2026, in Freezing conditions:
 
 | Area | This week | Pause line | Restart line |
 | :--- | :--- | :--- | :--- |
-| **Hiring** | Limit hiring to backfills and mission-critical roles tied to delivery risk | Funding pressure &gt; 76 or risk appetite &lt; 44 | Funding pressure &lt; 66 and risk appetite &gt; 54 |
-| **Spending** | Put a payback figure on every discretionary line before approving it | Funding pressure &gt; 76 | Funding pressure &lt; 66 and the payback figures still hold |
-| **Fundraising** | If you plan to raise, prepare the materials now so the timing stays yours | Risk appetite &lt; 44 or funding pressure &gt; 76 | Risk appetite &gt; 54 and funding pressure &lt; 66 |
+| **Hiring** | Only replace people who leave, and hire for roles you can't deliver without | Funding pressure &gt; 76 or risk appetite &lt; 44 | Funding pressure &lt; 66 and risk appetite &gt; 54 |
+| **Spending** | Before you approve any optional spend, work out how long it takes to pay back | Funding pressure &gt; 76 | Funding pressure &lt; 66 and the payback figures still hold |
+| **Fundraising** | If you're planning to raise, get your materials ready now so you decide when to go out | Funding pressure &gt; 76 or risk appetite &lt; 44 | Funding pressure &lt; 66 and risk appetite &gt; 54 |
 
 The live brief at `/` fits the actions to a company's stage and cash runway. Every number traces to its formula and source on `/trust`.
 
@@ -112,14 +112,14 @@ Predicting "no change" every month would also score 96%, so that figure shows ho
 
 | | |
 | :--- | :--- |
-| <img src="docs/assets/screens/decide.png" alt="The Decide page: this week's rule for each area, with its pause and resume lines" /> | <img src="docs/assets/screens/why-it-changed.png" alt="Why it changed: each signal since the last reading, against its lines" /> |
-| **Decide** (`/operate`): this week's rule for each area, the work to stop and start, and a runway planner. | **Why it changed** (`/signals`): each reading since the last brief, measured against the lines it governs. |
-| <img src="docs/assets/screens/trust.png" alt="How much to trust this week: the scores built step by step from public data" /> | <img src="docs/assets/screens/record.png" alt="The Record: conditions by month since 2012 and every published weekly brief" /> |
-| **Trust** (`/trust`): how each score is built, where each feed comes from and when it last updated. | **Record** (`/history`): conditions by month since 2012, every published brief, and how past readings held up. |
+| <img src="docs/assets/screens/decide.png" alt="The Plan page: this week's rule for each area, with its pause and restart lines" /> | <img src="docs/assets/screens/why-it-changed.png" alt="Why it changed: each signal since the last reading, against its lines" /> |
+| **Plan** (`/operate`): this week's rule for each area, the work to stop and start, and a runway planner. | **Why it changed** (`/signals`): each reading since the last brief, measured against the lines it governs. |
+| <img src="docs/assets/screens/trust.png" alt="How much to trust this week: the scores built step by step from public data" /> | <img src="docs/assets/screens/record.png" alt="History: conditions by month since 2012 and every published weekly brief" /> |
+| **Trust** (`/trust`): how each score is built, where each feed comes from and when it last updated. | **History** (`/history`): conditions by month since 2012, every published brief, and how past readings held up. |
 | <img src="docs/assets/screens/share.png" alt="Share: this week's guidance as a Slack post, email, slide, ticket or investor update" /> | <picture><source media="(prefers-color-scheme: light)" srcset="docs/assets/screens/weekly-brief-mobile-light.png" /><img src="docs/assets/screens/weekly-brief-mobile-dark.png" alt="The weekly brief on a phone" width="260" /></picture> |
 | **Share** (`/share`): the week's guidance as a Slack post, email, meeting slide, ticket or investor update. | **On a phone:** the same brief at 430px. |
 
-Captured from whether.work on Oct 21, 2026. [docs/assets/README.md](docs/assets/README.md) says how to recapture them.
+Captured from whether.work on Nov 17, 2026. [docs/assets/README.md](docs/assets/README.md) says how to recapture them.
 
 ---
 
@@ -228,7 +228,7 @@ Open [http://localhost:3000](http://localhost:3000). Without network access the 
 whether/
 ├── app/                  # Routes and UI
 │   ├── page.tsx          # The weekly brief
-│   ├── operate/          # Decide: rules per area, runway planner, scenarios
+│   ├── operate/          # Plan: rules per area, runway planner, scenarios
 │   ├── signals/          # Why it changed: the evidence behind the scores
 │   ├── trust/            # Sources, freshness and formulas
 │   ├── history/          # The record: conditions by month, published briefs

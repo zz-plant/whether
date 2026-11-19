@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { LineStateIcon } from "../ui/conceptIcons";
 import { ActionLink } from "../ui/actionLink";
-import { decisionAreaOrder, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { ScoreMoveBars } from "./ScoreMoveBars";
+import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import type { AreaGroup } from "../../../lib/report/home/homeSectionModel";
 import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigation";
 
@@ -69,15 +70,29 @@ export function AreaGroups({
   rulesAbove?: boolean;
 }) {
   if (groups.length === 0) return null;
+  /* Where the block above carries each area's sentence, a group here is its line and a
+     short column of names, a third of a laptop frame wide with the rest of it empty. From
+     `xl` the groups then stand side by side (ui-ux-standards §XXVIII: parallel blocks, one
+     frame), ruled apart as they are when stacked. */
+  const sideBySide = rulesAbove && groups.length > 1;
+  /* The record's moves are drawn once, beside the first group that sizes one: the held
+     group's restart, where there is one. A second set of bars for another score asked the
+     reader to learn a second scale for one idea. */
+  const drawnMove = groups.find((group) => group.move && group.distance)?.move ?? null;
   return (
-    <div data-area-groups className="divide-y divide-[color:var(--border-subtle)] border-y border-[color:var(--border-subtle)]">
+    <div
+      data-area-groups
+      className={`divide-y divide-[color:var(--border-subtle)] border-y border-[color:var(--border-subtle)] ${
+        sideBySide ? "xl:grid xl:auto-cols-fr xl:grid-flow-col xl:divide-x xl:divide-y-0" : ""
+      }`.trim()}
+    >
       {groups.map((group) => {
         const names = joinAnd(group.areas.map((entry) => entry.label));
         return (
           <section
             key={`${group.state}-${group.condition ?? ""}-${group.history ?? ""}`}
             aria-label={`${group.status}: ${names}`}
-            className="space-y-2 py-4"
+            className={`space-y-2 py-4 ${sideBySide ? "xl:px-6 xl:first:pl-0 xl:last:pr-0" : ""}`.trim()}
           >
             <h3 className={`flex items-center gap-2 text-fluid-lg font-semibold leading-snug ${HEADING_INK[group.state]}`}>
               <LineStateIcon state={group.state} className="shrink-0" />
@@ -88,6 +103,8 @@ export function AreaGroups({
                 {[group.condition, group.distance].filter(Boolean).join(" ")}
               </p>
             ) : null}
+            {/* The record the distance's band was read from, beside the sentence that names it (2026-11-18). */}
+            {group.move && group.move === drawnMove ? <ScoreMoveBars move={group.move} /> : null}
             {group.history ? (
               <p className="max-w-[60ch] text-fluid-sm text-slate-400" data-group-history>
                 {group.history}
@@ -100,18 +117,16 @@ export function AreaGroups({
                   <li
                     key={entry.area}
                     id={`area-${entry.area}`}
-                    className="grid max-w-[68ch] grid-cols-[auto_minmax(0,1fr)] gap-x-2.5 gap-y-1 text-fluid-base leading-snug text-slate-200"
+                    className="max-w-[68ch] space-y-1 text-fluid-base leading-snug text-slate-200"
                   >
-                    {/* The glyph and the rule answer a tap as the name does (2026-11-03): only
-                        the name was the button, and a reader who learned the row opens tapped
-                        the glyph or the sentence and got nothing. The button's ::after spans
-                        this header, not the detail under it, so the detail's own links work. */}
-                    <div className={`col-span-2 grid grid-cols-subgrid ${onToggle ? "group relative" : ""}`}>
-                      {/* Centred on the bordered name when it is a button, on the first line of text when not. */}
-                      {/* The area's number, as the rows under the guidance give it. */}
-                      <span aria-hidden="true" className={`w-3 shrink-0 text-xs tabular-nums text-slate-400 ${onToggle ? "mt-2" : "mt-1.5"}`}>
-                        {decisionAreaOrder.indexOf(entry.area) + 1}
-                      </span>
+                    {/* The rule answers a tap as the name does (2026-11-03): only the name was
+                        the button, and a reader who learned the row opens tapped the sentence
+                        and got nothing. The button's ::after spans this header, not the detail
+                        under it, so the detail's own links work. */}
+                    {/* No number (2026-11-18). The rows under the guidance number the areas
+                        1 to 5; split across groups here, "1, 3, 4, 5" under one heading and
+                        "2" under another read as missing items. The names are the same. */}
+                    <div className={onToggle ? "group relative" : undefined}>
                       <p>
                         {onToggle ? (
                           <button
@@ -133,10 +148,10 @@ export function AreaGroups({
                         <span className={rulesAbove ? "lg:hidden" : undefined} data-area-group-rule>{sentence(entry.rule)}</span>
                       </p>
                     </div>
-                    {entry.changed ? <p className="col-start-2 text-fluid-sm text-slate-400">{entry.changed}</p> : null}
-                    {note ? <div className="col-start-2 empty:hidden">{note(entry.area)}</div> : null}
+                    {entry.changed ? <p className="text-fluid-sm text-slate-400">{entry.changed}</p> : null}
+                    {note ? <div className="empty:hidden">{note(entry.area)}</div> : null}
                     {open && detail ? (
-                      <div id={`area-${entry.area}-detail`} aria-live="polite" className="col-start-2">
+                      <div id={`area-${entry.area}-detail`} aria-live="polite">
                         {detail(entry.area)}
                       </div>
                     ) : null}

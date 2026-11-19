@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Shadow approaches</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{
+  --sky:#6a8aaa; --ink:#0f1419; --muted:#162028; --paper:#eef1f6;
+  --card:#f8fafc; --line:#c8d0dc; --red:#c4242b; --accent:#2a4fa8;
+  --sh: 0 1px 2px rgba(0,0,0,.06), 0 4px 8px rgba(0,0,0,.08), 0 12px 24px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+.shell{min-height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--paper);border-bottom:1px solid var(--line);font-size:13px}
+.top .word{font-weight:800;letter-spacing:-.02em;font-size:18px}
+.top a{color:var(--muted);text-decoration:none;font-weight:500}
+.top a.cur{color:var(--ink);font-weight:700}
+.top .right{margin-left:auto;color:var(--muted);font-size:12px}
+.sky{background:linear-gradient(180deg,#6a8aaa 0%,#6a8aaa 100%);color:var(--ink);padding:48px 28px 56px;position:relative;overflow:hidden;min-height:200px;box-shadow:var(--sh)}
+.sky .row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;position:relative}
+.glyph{font-size:72px;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.15))}
+.condword{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px}
+.guidance{font-size:clamp(28px,3.5vw,40px);font-weight:800;line-height:1.05;letter-spacing:-.02em;max-width:20ch;margin:12px 0 16px}
+.meta{font-size:12px;color:var(--muted);margin-bottom:20px;font-weight:500}
+.scores{display:flex;gap:40px;flex-wrap:wrap;margin-top:12px}
+.score .fig{font-size:64px;font-weight:900;line-height:.85;letter-spacing:-.04em}
+.score .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:2px}
+.score .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.body{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
+.sec{margin-bottom:32px}
+.sec h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:12px}
+.area{display:grid;grid-template-columns:36px 1fr auto;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:center;border-radius:8px;transition:all .2s;box-shadow:var(--sh)}
+.area:hover{transform:translateY(-1px)}
+.area .n{font-size:12px;color:var(--muted);font-weight:700}
+.area .name{font-weight:600;font-size:16px}
+.area .act{font-size:13px;font-weight:600}
+.area.hold .act{color:var(--red)}
+.narrative{font-size:15px;line-height:1.6;max-width:64ch;margin-bottom:20px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;box-shadow:var(--sh);transition:all .2s}
+.fact:hover{transform:translateY(-2px)}
+.fact .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.fact .val{font-size:13px;font-weight:500}
+.cta{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.btn{padding:11px 18px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:all .2s;box-shadow:var(--sh)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn:hover{transform:translateY(-1px)}
+.switches{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.sw{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s;box-shadow:var(--sh)}
+.sw.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.sh-switches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.sh{padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--card);font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.sh.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.note{font-size:12px;color:var(--muted);margin-top:12px;max-width:72ch}
+.sh-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:6px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span class="right">Share · About · Search</span>
+  </div>
+  <div class="sky" id="sky">
+    <div class="row">
+      <div class="glyph">☁️</div>
+      <div>
+        <div class="condword">Cloudy</div>
+        <div class="meta">No. 2026-W45 · Week of 3 Nov 2026 · 177 months on the record</div>
+        <h1 class="guidance">Pause hiring and hold the roadmap.</h1>
+        <div class="scores">
+          <div class="score"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">of 100 · higher is worse · pause 76</div></div>
+          <div class="score"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">of 100 · higher is better · restart 66</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <p class="sh-label">Shadow approach</p>
+    <div class="sh-switches">
+      <button class="sh" data-s="none">None (flat)</button>
+      <button class="sh" data-s="subtle">Subtle drop</button>
+      <button class="sh" data-s="medium">Medium elevation</button>
+      <button class="sh" data-s="colored">Condition-colored</button>
+      <button class="sh" data-s="glow">Glow (sky-tinted)</button>
+      <button class="sh on" data-s="layered">Layered (multi)</button>
+      <button class="sh" data-s="richest">Richest (layered+glow)</button>
+      <button class="sh" data-s="inset">Inset (pressed)</button>
+    </div>
+    <p class="note" id="shnote">Layered (multi): three shadow layers at different distances. Rich, physical depth. Stripe/Linear style. Zero detector flags.</p>
+
+    <div class="sec" style="margin-top:28px">
+      <h2>Five areas</h2>
+      <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · restart at 66</span></div>
+    </div>
+    <p class="narrative">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line.</p>
+    <div class="facts">
+      <div class="fact"><div class="label">Files</div><div class="val">177 weekly briefs · 156 month-end readings</div></div>
+      <div class="fact"><div class="label">Rules</div><div class="val">Rules for this company · change</div></div>
+      <div class="fact"><div class="label">Source</div><div class="val">FRED, U.S. Treasury · last fetch ok</div></div>
+    </div>
+    <div class="cta">
+      <button class="btn primary">Copy this week's brief</button>
+      <button class="btn">Subscribe</button>
+      <button class="btn">Share link</button>
+    </div>
+  </div>
+</div>
+<script>
+const SHADOWS={
+  none:'none',
+  subtle:'0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04)',
+  medium:'0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06)',
+  colored:'0 4px 16px rgba(42,79,168,.15), 0 2px 4px rgba(42,79,168,.08)',
+  glow:'0 0 24px rgba(106,138,170,.35), 0 4px 12px rgba(106,138,170,.15)',
+  layered:'0 1px 2px rgba(0,0,0,.06), 0 4px 8px rgba(0,0,0,.08), 0 12px 24px rgba(0,0,0,.06)',
+  inset:'inset 0 2px 4px rgba(0,0,0,.08), inset 0 1px 2px rgba(0,0,0,.04)',
+  richest:'0 0 0 1px rgba(106,138,170,.08), 0 1px 2px rgba(0,0,0,.04), 0 4px 8px rgba(0,0,0,.06), 0 12px 24px rgba(0,0,0,.05), 0 0 32px rgba(106,138,170,.12)'
+};
+const NOTES={
+  none:'None (flat): the Covenant rule — no shadows on containers. Flat paper, hairlines only. Cleanest, most honest.',
+  subtle:'Subtle drop: barely-there lift. Cards feel slightly raised without breaking the flat-paper rule. Material Design 1.',
+  medium:'Medium elevation: clear depth. Cards and buttons float. More conventional web-app feel.',
+  colored:'Condition-colored: shadow tinted with the accent color. Ties elevation to the weather. More personality.',
+  glow:'Glow (sky-tinted): a soft halo around elements in the sky color. Atmospheric, weather-app feel. Can look muddy.',
+  layered:'Layered (multi): three shadow layers at different distances. Rich, physical depth. Stripe/Linear style.',
+  inset:'Inset (pressed): elements look pushed into the page. Good for active/selected states, not for resting cards.',
+  richest:'Richest (layered+glow): layered depth + a sky-tinted glow halo. Maximum visual richness — cards float and glow like weather icons.'
+};
+document.querySelectorAll('.sh').forEach(b=>b.addEventListener('click',()=>{
+  const s=b.dataset.s;
+  document.documentElement.style.setProperty('--sh',SHADOWS[s]);
+  document.getElementById('shnote').textContent=NOTES[s];
+  document.querySelectorAll('.sh').forEach(x=>x.classList.toggle('on',x.dataset.s===s));
+}));
+</script>
+</body>
+</html>

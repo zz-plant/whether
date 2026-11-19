@@ -17,6 +17,14 @@ export const organizationName = "Whether";
  */
 export const websiteName = "Whether — Weekly Operating Guidance for Startup Leaders";
 /*
+ * The category line as a sentence: "Weekly operating guidance for startup leaders." The
+ * strip under the header prints it on every route (recordBand.tsx), so a first visit
+ * reads what the site is before the week's guidance (2026-11-18). Derived from the
+ * title, so the two cannot drift.
+ */
+const [, categoryTitle = ""] = websiteName.split(" — ");
+export const categorySentence = `${categoryTitle.charAt(0)}${categoryTitle.slice(1).toLowerCase()}.`;
+/*
  * What a search result calls the site: the `WebSite` node's `name` and `og:site_name`. Both carried
  * `websiteName` until 2026-11-12, and Google's site-name system asks for the short name people use
  * for a site, not a tagline, so it was left to pick one. `websiteName` stays the default <title>.

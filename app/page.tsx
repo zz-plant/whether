@@ -3,7 +3,6 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
-import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -54,6 +53,14 @@ import { RecordSection } from "./components/home/RecordSection";
 import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
+import { buildRuleChartModel } from "../lib/report/ruleRegions";
+import {
+  RULE_CHART_AREA_PARAM,
+  RULE_CHART_COUNTED_PARAM,
+  buildCountedChartHref,
+  parseRuleChartArea,
+  parseRuleChartCounted,
+} from "../lib/report/ruleChartParams";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
@@ -67,10 +74,12 @@ import {
   describeEarlierConditions,
   buildAreaStrip,
   describeLineStateBand,
+  describeScoreFigureStanding,
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
 import { buildWeekMove } from "../lib/report/home/weekMove";
+import { buildInputTrails } from "../lib/report/home/inputTrail";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
@@ -85,7 +94,7 @@ import { frameFactsAttributes } from "../lib/navigation/runningHead";
 import { ScoreLadder } from "./components/ui/scoreLadder";
 import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { describeConditionFacts, describeConditionsSince, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeConditionFacts, describeConditionsSince, describeScoreDistribution, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -393,6 +402,20 @@ async function PageContent({
       ],
     },
   ];
+  /* The two figures' sentences name the area whose lines they draw, the first rule's
+     (hiring), and say its restart whole: "Hiring paused above 76. Restarts only when
+     below 66 and risk appetite is above 54." Without the rule's lines the figures keep
+     their own wording. */
+  const figureStanding = (metric: "tightness" | "riskAppetite") =>
+    corridorRule && boundedConditions
+      ? describeScoreFigureStanding({
+          area: corridorRule.area,
+          metric,
+          pause: boundedConditions.pause,
+          resume: boundedConditions.resume,
+          scores: { tightness, riskAppetite },
+        })
+      : null;
   /* Only on a week the call moved: the last time it moved the same way, and
      what the scores did over the three months after. Null otherwise, and the
      section renders nothing rather than reaching for the nearest analogue. */
@@ -566,6 +589,20 @@ async function PageContent({
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
   const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
+  /* The conditions chart's rule layer: each area's regions, opening on the lead rule only
+     when the sentence beside the chart is that rule's; the counted switch on a live read. */
+  const ruleChart = {
+    ...buildRuleChartModel({
+      rules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+      scores: { tightness, riskAppetite },
+      leadArea: corridorRule && boundedConditions ? corridorRule.area : null,
+      notCounted: historicalSelection || savedCopy ? [] : reportData.scoringBasis?.notCounted ?? [],
+      changeLines: callChangeLines,
+    }),
+    initialArea: parseRuleChartArea(searchParams?.[RULE_CHART_AREA_PARAM]),
+    initialCounted: parseRuleChartCounted(searchParams?.[RULE_CHART_COUNTED_PARAM]),
+    query: searchParams,
+  };
   /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
   const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
   /* The card sizes the room before a change once; the count of months held at this
@@ -654,17 +691,17 @@ async function PageContent({
           <PublishedCallWatcher
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
-          <ConditionsLegend
-            compact
-            arrival={arrivedFromShare ? "share" : undefined}
-            /* On an archived week too (2026-10-27): the sentence is as true of March 2020
-               as of this week, a first visit can arrive on a shared archive link, and
-               leaving it out shrank the legend by a line, so on a first visit the week
-               stepper under it jumped up 62px on the first step back. */
-            orientation={homeOrientationLine}
-            currentRegime={historicalSelection ? undefined : regime}
-            thresholds={reportData.assessment.thresholds}
-          />
+          {/* The share greeting alone (2026-11-18). The category line it also carried for a
+              first visit is in the caption under the record band, on every visit, where no
+              dismissal can hide it before it is read and it comes before the week's data. */}
+          {arrivedFromShare ? (
+            <ConditionsLegend
+              compact
+              arrival="share"
+              currentRegime={historicalSelection ? undefined : regime}
+              thresholds={reportData.assessment.thresholds}
+            />
+          ) : null}
           {/* Browse the week before the call. Horizon and confidence details
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}
@@ -739,7 +776,8 @@ async function PageContent({
                 aside={
                   <div className="space-y-8" data-hero-scores>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                      <ScoreLadder key={ladder.metric} figure label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)}
+                        distribution={historicalSelection ? null : describeScoreDistribution({ series: recordSeries, metric: ladder.metric, value: ladder.value })} />
                     ))}
                   </div>
                 }
@@ -767,7 +805,7 @@ async function PageContent({
                 phoneFigure={
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1" data-hero-scores-compact>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} />
+                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)} />
                     ))}
                     {/* The facts line's one link to the basis, which it carries from md up. */}
                     <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4">
@@ -899,6 +937,13 @@ async function PageContent({
                 }}
                 historyCaveat={conditionsTrail.caveat}
                 inputHistory={historicalSelection ? undefined : inputHistory}
+                inputTrails={historicalSelection ? undefined : buildInputTrails({
+                  treasury: reportData.treasury,
+                  materializedSignals: reportData.materializedSignals,
+                  rows: signalChangeRows,
+                  baseRateLine: reportData.assessment.thresholds.baseRateTightness,
+                  comparedWith: comparisonUnavailable ? null : homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith,
+                })}
                 lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
                 comparisonUnavailable={comparisonUnavailable}
                 basis={basis}
@@ -917,6 +962,7 @@ async function PageContent({
                   : undefined}
                 notCounted={reportData.scoringBasis.notCounted}
                 warning={reportData.scoringBasis.warning}
+                chartHref={ruleChart.counted ? buildCountedChartHref(searchParams) : undefined}
               />
 
               {/* 6. What would change the guidance: its pause and restart lines, the
@@ -934,6 +980,7 @@ async function PageContent({
                 callChangeLines={callChangeLines}
                 regime={regime}
                 conditionsTrail={conditionsTrail}
+                ruleChart={ruleChart}
               />
 
               {/* 8. How unusual is this? */}

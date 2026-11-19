@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Whether — Less played-out type</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&display=swap');
+
+:root{
+  --sky:#6a8aaa; --ink:#0f1419; --muted:#162028; --paper:#eef1f6;
+  --card:#f8fafc; --line:#c8d0dc; --red:#c4242b; --accent:#2a4fa8;
+  --ff:'Source Sans 3',system-ui,sans-serif;
+  --ff-display:'Bricolage Grotesque',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--ff);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+.shell{min-height:100vh}
+.top{display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--paper);border-bottom:1px solid var(--line);font-size:13px}
+.top .word{font-weight:800;letter-spacing:-.02em;font-size:18px;font-family:var(--ff-display)}
+.top a{color:var(--muted);text-decoration:none;font-weight:500}
+.top a.cur{color:var(--ink);font-weight:700}
+.top .right{margin-left:auto;color:var(--muted);font-size:12px}
+.sky{background:linear-gradient(180deg,#6a8aaa 0%,#6a8aaa 100%);color:var(--ink);padding:48px 28px 56px;position:relative;overflow:hidden;min-height:200px}
+.sky .row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;position:relative}
+.glyph{font-size:72px;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.15))}
+.condword{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px;font-family:var(--ff-display)}
+.guidance{font-size:clamp(28px,3.5vw,40px);font-weight:800;line-height:1.05;letter-spacing:-.02em;max-width:20ch;margin:12px 0 16px;font-family:var(--ff-display)}
+.meta{font-size:12px;color:var(--muted);margin-bottom:20px;font-weight:500}
+.scores{display:flex;gap:40px;flex-wrap:wrap;margin-top:12px}
+.score .fig{font-size:64px;font-weight:900;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums;font-family:var(--ff-display)}
+.score .label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:2px}
+.score .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.body{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
+.sec{margin-bottom:32px}
+.sec h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;margin-bottom:12px}
+.area{display:grid;grid-template-columns:36px 1fr auto;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:center;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.08),0 12px 24px rgba(0,0,0,.06)}
+.area .n{font-size:12px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.area .name{font-weight:600;font-size:16px}
+.area .act{font-size:13px;font-weight:600}
+.area.hold .act{color:var(--red)}
+.narrative{font-size:15px;line-height:1.6;max-width:64ch;margin-bottom:20px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 8px rgba(0,0,0,.08),0 12px 24px rgba(0,0,0,.06)}
+.fact .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.fact .val{font-size:13px;font-weight:500}
+.switches{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center}
+.sw{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.sw.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ts{padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--card);font-size:11px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.ts.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.note{font-size:12px;color:var(--muted);margin-top:12px;max-width:72ch}
+.tl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:6px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <span class="word">Whether</span>
+    <a class="cur" href="#">This week</a>
+    <a href="#">Plan</a>
+    <a href="#">History</a>
+    <a href="#">Guides</a>
+    <span class="right">Share · About · Search</span>
+  </div>
+  <div class="sky" id="sky">
+    <div class="row">
+      <div class="glyph">☁️</div>
+      <div>
+        <div class="condword">Cloudy</div>
+        <div class="meta">No. 2026-W45 · Week of 3 Nov 2026 · 177 months on the record</div>
+        <h1 class="guidance">Pause hiring and hold the roadmap.</h1>
+        <div class="scores">
+          <div class="score"><div class="label">Funding pressure</div><div class="fig">78</div><div class="sub">of 100 · higher is worse · pause 76</div></div>
+          <div class="score"><div class="label">Risk appetite</div><div class="fig">62</div><div class="sub">of 100 · higher is better · restart 66</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <p class="tl">Type approach (less played-out)</p>
+    <div class="switches" style="flex-wrap:wrap">
+      <button class="ts on" data-t="bricolage">Bricolage Grotesque + Source Sans 3</button>
+      <button class="ts" data-t="bitter">Bitter (slab) + Source Sans 3</button>
+      <button class="ts" data-t="zilla">Zilla Slab + Karla</button>
+      <button class="ts" data-t="bodoni">Bodoni Moda + Mulish</button>
+      <button class="ts" data-t="caslon">Libre Caslon + Source Sans 3</button>
+    </div>
+    <p class="note" id="typenote">Bricolage Grotesque (display) + Source Sans 3 (body): Bricolage has distinctive, slightly quirky letterforms that avoid the geometric-sans monoculture. Source Sans 3 is a clean professional body face that isn't overused. Two families, clear roles.</p>
+
+    <div class="sec" style="margin-top:28px">
+      <h2>Five areas</h2>
+      <div class="area hold"><span class="n">01</span><span class="name">Hiring</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area hold"><span class="n">02</span><span class="name">Roadmap</span><span class="act">Hold · pause at 76</span></div>
+      <div class="area"><span class="n">03</span><span class="name">Fundraising</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">04</span><span class="name">Spending</span><span class="act">Go · restart at 66</span></div>
+      <div class="area"><span class="n">05</span><span class="name">New bets</span><span class="act">Go · restart at 66</span></div>
+    </div>
+    <p class="narrative">Risk appetite is on but money is dear: hold the plan, keep the hires paused, and let the runway stretch. Funding pressure sits 8 points above the pause line. The hold lifts when funding pressure falls to 66 or risk appetite rises past 72.</p>
+    <div class="facts">
+      <div class="fact"><div class="label">Files</div><div class="val">177 weekly briefs · 156 month-end readings</div></div>
+      <div class="fact"><div class="label">Rules</div><div class="val">Rules for this company · change</div></div>
+      <div class="fact"><div class="label">Source</div><div class="val">FRED, U.S. Treasury · last fetch ok</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const TYPES={
+  bricolage:{ffd:"'Bricolage Grotesque',system-ui,sans-serif",ff:"'Source Sans 3',system-ui,sans-serif",note:'Bricolage Grotesque (display) + Source Sans 3 (body): Bricolage has distinctive, slightly quirky letterforms that avoid the geometric-sans monoculture. Source Sans 3 is a clean professional body face that isn\'t overused. Two families, clear roles.'},
+  bitter:{ffd:"'Bitter',Georgia,serif",ff:"'Source Sans 3',system-ui,sans-serif",note:'Bitter (slab serif display) + Source Sans 3 (body): a slab serif guidance carries weight like a weather advisory or a filed document. Sturdy, distinctive, not overused. Risks feeling heavy if the weight is too bold.'},
+  zilla:{ffd:"'Zilla Slab',Georgia,serif",ff:"'Karla',system-ui,sans-serif",note:'Zilla Slab (slab display) + Karla (body): Zilla Slab is Mozilla\'s distinctive slab — less common than Roboto Slab. Karla is a humanist body face with warmth. Distinctive pairing.'},
+  bodoni:{ffd:"'Bodoni Moda',Georgia,serif",ff:"'Mulish',system-ui,sans-serif",note:'Bodoni Moda (high-contrast serif display) + Mulish (body): dramatic, high-contrast display that commands attention. Mulish is a clean, light body face. Bold choice — risks feeling like a fashion magazine.'},
+  caslon:{ffd:"'Libre Caslon Text',Georgia,serif",ff:"'Source Sans 3',system-ui,sans-serif",note:'Libre Caslon (classic serif display) + Source Sans 3 (body): Caslon is a classic book face with authority. Less overused than Playfair or Lora. Carries the "filed brief" feeling well.'}
+};
+document.querySelectorAll('.ts').forEach(b=>b.addEventListener('click',()=>{
+  const t=TYPES[b.dataset.t];
+  const r=document.documentElement.style;
+  r.setProperty('--ff',t.ff);r.setProperty('--ff-display',t.ffd);
+  document.getElementById('typenote').textContent=t.note;
+  document.querySelectorAll('.ts').forEach(x=>x.classList.toggle('on',x.dataset.t===b.dataset.t));
+}));
+</script>
+</body>
+</html>

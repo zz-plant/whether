@@ -129,7 +129,10 @@ export default async function ResourcesHubPage({
       {/* The group's tabs, as on every grouped working page: Guides has three pages
           since Roles and Companies joined it (2026-11-06), so its trail gave way to them. */}
       <SectionTabs currentPath="/resources" />
-      <article className="weather-panel space-y-8 px-5 max-sm:px-0 py-5">
+      {/* No inline padding of its own: the tabs above start on the shell's edge, and the
+          title and the lists under them start there too. With `px-5` the page sat 20px
+          right of its own tabs from `sm` up. */}
+      <article className="weather-panel space-y-8 px-0 py-5">
         {/* No emblem: the "Governance Pillars" glyph beside the title was
             decoration from when the page was "Governance resources", and the
             only image on the page said nothing about guides (2026-10-09). */}
@@ -163,7 +166,11 @@ export default async function ResourcesHubPage({
                     const answerStanding = describeAnswerStanding({ page, areaRows, conditionsLabel });
                     const standing = answerStanding?.kind === "conditions" ? answerStanding : undefined;
                     return (
-                      <li key={page.slug}>
+                      /* `max-w-none`: the base layer holds a list item of prose to 60ch, and it
+                         reads a row whose one child is a link as prose. The row then stopped at
+                         60ch, and its rule with it, short of the group's rule above and the
+                         list's below, with the chevron adrift in the column (2026-11-17). */
+                      <li key={page.slug} className="max-w-none">
                         {/* The title is the anchor's own first child, not nested in a
                             wrapper, because that is what the underline rule in
                             decision-flow.css keys on: `a:has(p)` clears the inherited
@@ -198,7 +205,7 @@ export default async function ResourcesHubPage({
                     );
                   })}
                   {group.guides.map((entry) => (
-                    <li key={entry.href}>
+                    <li key={entry.href} className="max-w-none">
                       <Link href={entry.href} className={ROW_CLASS}>
                         <p className="col-start-1 row-start-1 text-sm font-semibold text-slate-100">{entry.title}</p>
                         <span aria-hidden="true" className="col-start-2 row-span-2 row-start-1 shrink-0 text-slate-500">›</span>
@@ -223,7 +230,7 @@ export default async function ResourcesHubPage({
           <h2 id="resources-pillars-heading" className="type-section">Planning and decision frameworks</h2>
           <ul className="weather-grid gap-3 [--grid-max:2]">
             {frameworks.map((entry) => (
-              <li key={entry.href}>
+              <li key={entry.href} className="max-w-none">
                 <Link href={entry.href} className="weather-surface block space-y-1 px-4 py-4 text-sm text-slate-100 hover:border-sky-500/50">
                   <span className="block font-semibold">{entry.title}</span>
                   <span className="block text-fluid-sm text-slate-400">{entry.description}</span>
@@ -284,7 +291,7 @@ export default async function ResourcesHubPage({
                   <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">Leadership guidance and stage</h3>
                   <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
                     {stakeholderGuides.map((guide) => (
-                      <li key={guide.slug}>
+                      <li key={guide.slug} className="max-w-none">
                         <Link
                           href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
                           className="grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2.5 hover:bg-slate-900/40"
@@ -296,7 +303,7 @@ export default async function ResourcesHubPage({
                       </li>
                     ))}
                     {stageGuides.map((stage) => (
-                      <li key={stage.slug}>
+                      <li key={stage.slug} className="max-w-none">
                         <Link
                           href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}
                           className="grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2.5 hover:bg-slate-900/40"

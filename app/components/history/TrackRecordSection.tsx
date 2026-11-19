@@ -7,6 +7,13 @@ import { ConditionWord } from "../ui/conceptIcons";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { Fact, FactList } from "../ui/factList";
 import { buildMonthBriefHref } from "../../../lib/timeMachine/monthFormatting";
+import {
+  CHANGE_APPROACH_MONTHS_BEFORE,
+  CHANGE_APPROACH_SCALE_PTS,
+  buildChangeApproach,
+  describeAdvanceWarning,
+} from "../../../lib/report/advanceWarning";
+import { ChangeApproachDrawing } from "./changeApproach";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -17,9 +24,16 @@ import { buildMonthBriefHref } from "../../../lib/timeMachine/monthFormatting";
  */
 export function TrackRecordSection({
   series,
+  history,
   recordChanges,
 }: {
   series: TimeMachineRegimeEntry[];
+  /**
+   * The whole record, for the drawing of how each change approached its line: the six
+   * months before a change early in the window fall before the window. Defaults to
+   * `series`, which draws such a change with the months it has.
+   */
+  history?: readonly TimeMachineRegimeEntry[];
   /** Changes in conditions across the whole record, for the line on its last re-score; this section grades a trailing window. */
   recordChanges?: number;
 }) {
@@ -42,6 +56,9 @@ export function TrackRecordSection({
   // published reversal condition could have fired. The grader already calls
   // these "unsignaled"; the marker says why — structurally, not just this time.
   const shockByDate = new Map(series.map((entry) => [entry.recordDate, entry.shock === true]));
+  /* Each row's drawing reads the transition its words are graded from. */
+  const approachOf = (transition: (typeof recentTransitions)[number]) =>
+    buildChangeApproach(history ?? series, transition, { nearBandPts: record.nearBandPts });
 
   return (
     <section
@@ -89,7 +106,9 @@ export function TrackRecordSection({
               </tr>
             </thead>
             <tbody>
-              {recentTransitions.map((transition) => (
+              {recentTransitions.map((transition) => {
+                const approach = approachOf(transition);
+                return (
                 <tr key={transition.atDate} className="group relative border-b border-[color:var(--border-subtle)]">
                   <td className="py-2.5 pr-4 whitespace-nowrap text-slate-400">
                     {/* The row opens the brief as it read that month: a dated change with
@@ -106,16 +125,21 @@ export function TrackRecordSection({
                     {label(transition.from)} → {label(transition.to)}
                   </td>
                   {/* A change with no advance signal is a miss, set in the caveat's ink with its
-                      mark (2026-11-10). It was the crossed red, which means a pause line. */}
-                  <td className={`py-2.5 ${transition.signaled ? "text-slate-200" : "weather-caveat-mark text-caveat-fg"}`}>
-                    {transition.signaled
-                      ? `within ${record.nearBandPts} pts of its line ${transition.leadMonths} mo before`
-                      : shockByDate.get(transition.atDate)
-                        ? `none: it crossed from ${record.nearBandPts}+ pts away in one month`
-                        : "none"}
+                      mark (2026-11-10). It was the crossed red, which means a pause line.
+                      The drawing beside the words (2026-11-18) is how the score that
+                      crossed came to its line; the row's link covers it, so it opens the
+                      change's month too. */}
+                  <td className="py-2.5">
+                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                      {approach ? <ChangeApproachDrawing approach={approach} id={transition.atDate} /> : null}
+                      <span className={transition.signaled ? "text-slate-200" : "weather-caveat-mark text-caveat-fg"}>
+                        {describeAdvanceWarning(transition, record.nearBandPts, shockByDate.get(transition.atDate) === true)}
+                      </span>
+                    </span>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -131,6 +155,13 @@ export function TrackRecordSection({
       <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400">
         &ldquo;Advance warning&rdquo; means the score that crossed was within {record.nearBandPts} pts of its line, on
         either side, for at least a month first. Changes with no warning are listed too.
+      </p>
+      {/* The drawings' domain, stated once for all of them (§XV). */}
+      <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400" data-change-approach-key>
+        Each drawing is that score over the {CHANGE_APPROACH_MONTHS_BEFORE} month-ends before the change and the change
+        month, at the right: its distance from its line (dashed), with the side it left up. The shaded band is within{" "}
+        {record.nearBandPts} pts. Every drawing runs {CHANGE_APPROACH_SCALE_PTS} pts either side of the line, so a reading
+        further out leaves it.
       </p>
       {recordChanges !== undefined ? (
         <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400" data-record-rescore>

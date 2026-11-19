@@ -49,9 +49,10 @@ describe("regime presentation labels", () => {
     const text = collectText(image);
 
     assert.equal(getRegimePublicLabel("VOLATILE"), "Stormy");
-    /* The stamp names the weather once; it used to print it twice ("Stormy · Stormy — Mid"). */
+    /* The card names the weather once; it used to print it twice ("Stormy · Stormy — Mid").
+       As the site's first screen sets it since 2026-11-17: the word, not a capitalised stamp. */
     assert.equal(text.match(/stormy/gi)?.length, 1);
-    assert.match(text, /STORMY/);
+    assert.match(text, /Stormy/);
     assert.doesNotMatch(text, /Uncertain/i);
   });
 

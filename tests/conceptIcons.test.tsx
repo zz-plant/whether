@@ -156,12 +156,15 @@ const areaByGlyphClass = Object.fromEntries(
 /**
  * The rules every drawn glyph keeps: hidden from assistive tech, and beside its
  * words — a condition beside its weather word, an area beside its name, a state
- * beside the words for it. Glyphs drawn inside a chart's own SVG (`x=`) and the
- * run marks on /history's band are judged by the tests of those drawings.
+ * beside the words for it. Glyphs drawn inside a chart's own SVG (`x=`), the
+ * run marks on /history's band and the stretch marks in its month grid (each in a
+ * cell named by its link, with the grid's key naming the glyph) are judged by the
+ * tests of those drawings (tests/historyRecordVisuals.test.tsx for the grid).
  */
 const assertGlyphsBesideTheirWords = (html: string, surface: string) => {
   const glyphs = glyphsWithText(html).filter(
-    ({ attributes }) => !/\bx="/.test(attributes) && !attributes.includes("data-strip-run-glyph"),
+    ({ attributes }) =>
+      !/\bx="/.test(attributes) && !attributes.includes("data-strip-run-glyph") && !attributes.includes("data-calendar-run-glyph"),
   );
   for (const { attributes, concept, following } of glyphs) {
     assert.match(attributes, /aria-hidden="true"/, `${surface}: a ${concept} glyph is announced`);

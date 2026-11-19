@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
+  buildRatesTrail,
   describeConditionChanges,
   describeFossilSummary,
   describeInversionSummary,
   describeRatesSummary,
   describeScoreTrendSummary,
   formatChangeLines,
+  inversionSpreadOrder,
+  monthOfLabel,
   summarizeConditionRuns,
+  summarizeInversionMonths,
   summarizeScoreWindow,
 } from "../lib/report/evidenceInstrumentSummaries";
 
@@ -117,5 +121,80 @@ describe("lines, past months and habits", () => {
   it("lists the habit areas, or nothing for an empty table", () => {
     assert.equal(describeFossilSummary([{ domain: "Infrastructure" }, { domain: "Org chart" }, { domain: "Roadmap" }]), "Infrastructure, org chart, and roadmap");
     assert.equal(describeFossilSummary([]), null);
+  });
+});
+
+/*
+ * The pictures beside the closed questions (`instrumentPreviews.tsx`) and the
+ * month rows in the opened panels read these, the same values the answers are
+ * built from.
+ */
+describe("rates trail", () => {
+  it("ends on the two readings the answer quotes: the last month-end before this reading, then this reading", () => {
+    const current = { recordDate: "2026-10-05", oneMonth: 4.05 };
+    const trail = buildRatesTrail({ current, series: [...SERIES, { recordDate: "2026-10-31", oneMonth: 4.2 }] });
+    assert.deepEqual(
+      trail?.map((point) => [point.recordDate, point.value, point.isCurrent]),
+      [
+        ["2025-12-31", 3.74, false],
+        ["2026-07-31", 3.78, false],
+        ["2026-08-31", 3.85, false],
+        ["2026-10-05", 4.05, true],
+      ],
+    );
+    assert.match(describeRatesSummary({ current, series: SERIES }) ?? "", /up from 3\.85% on Aug 31/);
+  });
+
+  it("keeps a year of month-ends, and gives nothing without a reading this week", () => {
+    const series = Array.from({ length: 20 }, (_, index) => ({
+      recordDate: `${2024 + Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}-28`,
+      oneMonth: 3 + index / 100,
+    }));
+    assert.equal(buildRatesTrail({ current: { recordDate: "2026-10-05", oneMonth: 4 }, series })?.length, 13);
+    assert.equal(buildRatesTrail({ current: { recordDate: "2026-10-05", oneMonth: null }, series }), null);
+  });
+});
+
+describe("inversion months", () => {
+  const point = (recordDate: string, spread10Y2Y: number | null, spread2Y3M: number | null) => ({ recordDate, spread10Y2Y, spread2Y3M });
+  /* Thirteen months, Oct 2025 to Oct 2026, the short end below zero in the four after the first. */
+  const months = Array.from({ length: 13 }, (_, index) => {
+    const year = 2025 + Math.floor((index + 9) / 12);
+    const month = ((index + 9) % 12) + 1;
+    return point(`${year}-${String(month).padStart(2, "0")}-15`, 0.3, index >= 1 && index <= 4 ? -0.1 : 0.2);
+  });
+
+  it("averages each month, keeps the last twelve, and counts the months each spread sat below zero", () => {
+    const summary = summarizeInversionMonths([...months, point("2026-10-30", 0.3, 0.4)]);
+    assert.equal(summary.months.length, 12);
+    assert.equal(summary.months[0]?.label, "Nov 2025", "the oldest month falls off");
+    assert.equal(summary.inverted10Y2Y, 0);
+    assert.equal(summary.inverted2Y3M, 4);
+    assert.deepEqual(summary.order, ["spread2Y3M", "spread10Y2Y"]);
+    assert.equal(summary.months.at(-1)?.spread2Y3M?.toFixed(2), "0.30", "two readings in one month are averaged");
+  });
+
+  it("names the spread below zero more often first, the short end on a tie, as the answer does", () => {
+    assert.deepEqual(inversionSpreadOrder({ inverted10Y2Y: 3, inverted2Y3M: 1 }), ["spread10Y2Y", "spread2Y3M"]);
+    assert.deepEqual(inversionSpreadOrder({ inverted10Y2Y: 2, inverted2Y3M: 2 }), ["spread2Y3M", "spread10Y2Y"]);
+    assert.match(
+      describeInversionSummary({ months: 12, inverted10Y2Y: 3, inverted2Y3M: 1 }),
+      /^Yes: the 10-year rate below the 2-year rate in 3 of 12 months, and the 2-year/,
+    );
+  });
+
+  it("marks a month with no reading as not inverted", () => {
+    const summary = summarizeInversionMonths([point("2026-01-31", null, null)]);
+    assert.equal(summary.months[0]?.inverted10Y2Y, false);
+    assert.equal(summary.inverted2Y3M, 0);
+  });
+});
+
+describe("month labels", () => {
+  it("reads the year and month a month label names, and nothing from a label no month prints", () => {
+    assert.deepEqual(monthOfLabel("Oct 2026"), { year: 2026, month: 10 });
+    assert.deepEqual(monthOfLabel("Jan 2025"), { year: 2025, month: 1 });
+    assert.equal(monthOfLabel("Octember 2026"), null);
+    assert.equal(monthOfLabel("this week"), null);
   });
 });

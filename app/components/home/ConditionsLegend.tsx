@@ -91,6 +91,11 @@ const LEGEND_ORDER: readonly RegimeKey[] = ["EXPANSION", "DEFENSIVE", "VOLATILE"
  * Whether is, so a first visit met a weather word and a headline with no subject.
  * One sentence, the category line, in the slot that already shows only to a first
  * visit; returning readers and a dismissal hide it with the legend.
+ *
+ * The homepage passes no orientation since 2026-11-18: the category line is in the
+ * caption under the record band (recordBand.tsx), on every visit and every route,
+ * where nothing dismisses it before it is read. The page mounts this only for a
+ * visit that followed a shared brief, for the greeting.
  */
 export function ConditionsLegend({
   arrival,
@@ -100,7 +105,7 @@ export function ConditionsLegend({
   thresholds,
 }: {
   arrival?: "share";
-  /** The homepage already explains conditions in the call; keep its introduction to one sentence. */
+  /** The homepage already explains conditions in the call: no definitions, only the greeting. */
   compact?: boolean;
   /** Whom Whether is for and what it does (`homeOrientationLine`), shown at every width. */
   orientation?: string;
@@ -140,7 +145,7 @@ export function ConditionsLegend({
         {arrival === "share" ? <>This is this week&apos;s guidance from Whether. </> : null}
         {/* A block for the eye, a space for a copy or a screen reader, which would
             otherwise read "…and raise.Cloudy this week". */}
-        {orientation ? <><span className="block text-slate-100 md:text-fluid-sm" data-orientation-line>{compact ? "Weekly operating guidance for startup leaders." : orientation}</span>{" "}</> : null}
+        {orientation ? <><span className="block text-slate-100 md:text-fluid-sm" data-orientation-line>{orientation}</span>{" "}</> : null}
         {!compact ? <span data-conditions-definitions>
           {/* The first entry names both scores; the rest keep the same order, so
               the line stays short enough to read as one. */}
