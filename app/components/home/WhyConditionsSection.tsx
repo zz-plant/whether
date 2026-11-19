@@ -111,12 +111,9 @@ export function WhyConditionsSection({
                 ? `${warning}${countedRegimeLabel !== readingLabel ? ` If we counted them, the scores would land in ${countedRegimeLabel}.` : ""}`
                 : `If we counted them, we'd have ${notCounted
                     .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
-                    .join(" and ")}.`}
+                    .join(" and ")}.`}{" "}
+              {NOT_COUNTED_REASON}
             </p>
-            <details className="weather-auto-chevron mt-1.5 text-xs text-slate-400">
-              <summary className="cursor-pointer select-none font-medium text-slate-300">Why these aren&rsquo;t counted</summary>
-              <p className="mt-1 leading-relaxed">{NOT_COUNTED_REASON}</p>
-            </details>
             {/* The same reading, plotted: the conditions chart two sections down, with the
                 left-out inputs counted and the areas that would then move named under it. */}
             {chartHref ? (
