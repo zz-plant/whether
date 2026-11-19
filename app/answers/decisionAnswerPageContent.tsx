@@ -285,22 +285,22 @@ export async function DecisionAnswerPageContent({
           {leadTransmission ? (
             <div
               data-transmission-note
-              className="mt-3 space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-xs"
+              className="mt-3 space-y-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-xs"
             >
-              <p className="font-semibold text-slate-100">
-                Operating rationale for {leadArea ? decisionAreaLabel(leadArea).toLowerCase() : "this decision"}:
-              </p>
-              <p className="leading-relaxed text-slate-300">
-                {leadTransmission.transmission} {leadTransmission.whyLineMatters}
-              </p>
-              <p className="text-slate-400">
-                <span className="font-medium text-slate-200">Shared rule of thumb:</span> {leadTransmission.ruleOfThumb}
-              </p>
               {leadTransmission.startupMath ? (
-                <p className="text-slate-400">
-                  <span className="font-medium text-slate-200">Startup math:</span> {leadTransmission.startupMath}
+                <p className="leading-snug text-slate-200">
+                  <span className="font-semibold text-slate-100">Startup math:</span> {leadTransmission.startupMath}
                 </p>
               ) : null}
+              <p className="leading-snug text-slate-200">
+                <span className="font-semibold text-slate-100">Shared rule of thumb:</span> {leadTransmission.ruleOfThumb}
+              </p>
+              <p className="leading-relaxed text-slate-400">
+                <span className="font-medium text-slate-300">
+                  Operating rationale for {leadArea ? decisionAreaLabel(leadArea).toLowerCase() : "this decision"}:
+                </span>{" "}
+                {leadTransmission.transmission} {leadTransmission.whyLineMatters}
+              </p>
             </div>
           ) : null}
         </SecondaryPageSection>

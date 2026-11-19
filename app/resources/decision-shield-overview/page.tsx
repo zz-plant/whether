@@ -28,9 +28,7 @@ export default async function DecisionShieldOverviewPage() {
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">Would this plan hold up?</h1>
         <p className="text-sm text-slate-200">
-          Decision Shield checks a plan against this week&apos;s guidance and returns one verdict:
-          Safe, Risky or Dangerous. It names the pause line to hold and the restart line that would
-          change the guidance, and it records what you decided.
+          Checks a plan against this week&apos;s guidance and returns Safe, Risky, or Dangerous, with pause and restart lines.
         </p>
         <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p className="type-eyebrow">This week</p>
@@ -77,9 +75,7 @@ export default async function DecisionShieldOverviewPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Run it on this week&apos;s plan</h2>
         <p className="text-sm text-slate-200">
-          Decision Shield lives in the plan&apos;s &ldquo;Test a decision&rdquo; step. Type a plan and it
-          returns the verdict against this week&apos;s guidance, your runway and how hard the move is
-          to undo.
+          Open &ldquo;Test a decision&rdquo; on the plan page to score any move against this week&apos;s guidance, your runway, and reversibility.
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <ActionLink href="/operate#ops-decision-shield" variant="primary">

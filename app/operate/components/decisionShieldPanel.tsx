@@ -167,7 +167,7 @@ export const DecisionShieldPanel = ({
             <>
               <div className="weather-surface p-4">
                 <p className="type-label text-slate-400">
-                  Pick a stage, an area, and an action. The verdict below says whether the move is safe this week, what would pause it, and what would reopen it.
+                  Pick stage, area, and action to see this week&apos;s verdict, pause line, and restart line.
                 </p>
               </div>
               <Fieldset.Root className="weather-grid min-w-0 gap-4 border-0 p-0 [--col-min:12rem]">

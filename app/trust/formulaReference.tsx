@@ -260,9 +260,7 @@ export function FormulaReference({
             <li id="record-basis">
               <span className="font-semibold text-slate-100">3. Count only what the record can test.</span>{" "}
               <span className="text-slate-300">
-                {upperFirst(joinAnd(recordBasis.counted))} move the scores. The record holds each of them
-                at every month-end since 2012, so the history page and the calibration study test the
-                same score that sets the guidance.
+                {upperFirst(joinAnd(recordBasis.counted))} move the scores. Each has month-end history since 2012.
                 {recordBasis.shownBecause.length > 0
                   ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. We score and show each of them, but none of them moves the scores.`
                   : null}
@@ -351,14 +349,7 @@ export function FormulaReference({
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series DGS1MO,
-              DGS2 and DGS10, with DGS3MO standing in when DGS1MO is missing.
-              <span className="mt-1 block text-xs text-slate-400">
-                FRED is the St. Louis Fed&rsquo;s free public data service; each code names one
-                published series. DGS1MO is the one-month Treasury bill rate, and the cards below
-                call it the short-term borrowing rate. DGS3MO is the three-month bill, DGS2 the
-                two-year rate and DGS10 the ten-year.
-              </span>
+              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series DGS1MO (one-month Treasury bill rate, or DGS3MO fallback), DGS2 (2-year), and DGS10 (10-year).
             </li>
             <li>
               <span className="text-slate-400">Market reads that count:</span> {joinAnd(recordBasis.countedMarket)}.
@@ -411,12 +402,11 @@ export function FormulaReference({
                 + min({BASE_RATE_VELOCITY_POINTS}, ({BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day rise in the
                 short-term borrowing rate − {BASE_RATE_VELOCITY_THRESHOLD}) × {BASE_RATE_VELOCITY_MULTIPLIER})
               </code>{" "}
-              when {BASE_RATE_VELOCITY_LOOKBACK_DAYS} days of rate history are available. This is the
-              speed term: rates rising fast count before their level alone reaches the ramp above.
+              when {BASE_RATE_VELOCITY_LOOKBACK_DAYS} days of rate history exist (catches fast rate rises before the level alone hits the ramp).
             </li>
             <li>
-              <span className="text-slate-400">Stress add-ons:</span> a high-yield credit spread ≥{" "}
-              {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; the Chicago Fed
+              <span className="text-slate-400">Stress add-ons:</span> high-yield credit spread ≥{" "}
+              {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; Chicago Fed
               financial conditions index ≥ {adj.chicagoFciTighteningThreshold} adds up to +
               {adj.chicagoFciTightnessCap}.
               {shownNotCounted([
@@ -424,9 +414,7 @@ export function FormulaReference({
                 ["CHICAGO_FCI", "the index"],
               ])}
               <span className="mt-1 block text-xs text-slate-400">
-                The high-yield credit spread is the extra interest riskier companies pay to borrow,
-                over the government&rsquo;s rate. The Chicago Fed index summarises borrowing
-                conditions across markets: zero is average, above zero is tighter than average.
+                High-yield spread = extra interest riskier companies pay to borrow over Treasuries. Chicago Fed index: zero is average, above zero is tighter than average.
               </span>
             </li>
           </ul>
@@ -436,33 +424,26 @@ export function FormulaReference({
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               Recession warning gauge, mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
-              +{RISK_APPETITE_MAX_SLOPE}% → 100. The further the ten-year rate sits above the
-              two-year, the more willing lenders are to wait for a return.
+              +{RISK_APPETITE_MAX_SLOPE}% → 100 (higher 10Y–2Y spread means more willingness to fund long-term risk).
             </li>
             <li>
-              <span className="text-slate-400">Deductions:</span> the VIX ≥ {adj.vixShockThreshold}{" "}
+              <span className="text-slate-400">Deductions:</span> VIX ≥ {adj.vixShockThreshold}{" "}
               subtracts up to {adj.vixRiskAppetiteCap}; venture funding pace ≤{" "}
               {adj.vcVelocitySlowdownThreshold}% subtracts up to {adj.vcVelocityRiskAppetiteCap};
-              the tech layoff index ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
+              tech layoff index ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
               {shownNotCounted([
                 ["VIX_INDEX", "the VIX"],
                 ["VC_FUNDING_VELOCITY", "the funding pace"],
                 ["TECH_LAYOFF_TREND", "the layoff index"],
               ])}
               <span className="mt-1 block text-xs text-slate-400">
-                The VIX is the stock market&rsquo;s own forecast of turbulence over the next month;
-                higher means more expected swings. Venture funding pace is the quarter-over-quarter
-                change in venture money invested. The layoff index is a composite of tech layoff
-                reports; higher means more layoffs.
+                VIX = forecast of turbulence over the next month. Venture funding pace = QoQ change in VC dollars. Layoff index = composite of tech layoff reports.
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Market-stress cap:</span> when the VIX has averaged{" "}
-              {adj.vixMarketStressVetoMean} or more over its last {adj.vixVetoMeanWindow} readings,
-              the score is capped at the line where conditions change ({RISK_APPETITE_REGIME_THRESHOLD});
-              between {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
-              {adj.vixVetoSoftCap}. It uses an average rather than one day, so a single spike cannot
-              cap a week. While the cap holds, extreme market stress sets the ceiling, not the rates.
+              <span className="text-slate-400">Market-stress cap:</span> {adj.vixVetoMeanWindow}-reading VIX average ≥{" "}
+              {adj.vixMarketStressVetoMean} caps risk appetite at {RISK_APPETITE_REGIME_THRESHOLD}; between{" "}
+              {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean}, caps it at {adj.vixVetoSoftCap} (averaged so a single-day spike cannot cap a week).
             </li>
           </ul>
         </FormulaCard>
@@ -476,7 +457,7 @@ export function FormulaReference({
                 {/* A rule, not a record (2026-11-03): the state machine holds conditions while
                     the margin is at its lowest band and lets only a shock crossing through. */}
                 With little {MARGIN_LABEL.toLowerCase()}, conditions hold unless one reading moves a score{" "}
-                {SHOCK_CROSSING_POINTS} points or more past the line where conditions change, from more than{" "}
+                {SHOCK_CROSSING_POINTS}+ points past the change line from more than{" "}
                 {REGIME_CONFIDENCE_NEAR_THRESHOLD} points away.
               </span>
             </li>
@@ -484,16 +465,13 @@ export function FormulaReference({
               <span className="text-slate-400">{OPERATING_LATITUDE_LABEL}:</span>{" "}
               <code className="text-slate-100">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
               <span className="mt-1 block text-xs text-slate-400">
-                The 0–100 score beside each month on the history page and in the copied and Slack
-                briefs. It measures {OPERATING_LATITUDE_GLOSS}.
+                0–100 score shown on history and copied briefs; measures {OPERATING_LATITUDE_GLOSS}.
               </span>
             </li>
             <li>
-              <span className="text-slate-400">{MARGIN_LABEL}:</span> how far the scores sit from the
-              nearest line where conditions would change, counted in funding-pressure points. A
-              risk-appetite point is worth {riskPointWorth}, because it stands for a{" "}
-              {riskPointWorth}-times larger move in rates: risk appetite {RISK_GAP_EXAMPLE_POINTS} points
-              from its line is {Math.round(RISK_GAP_EXAMPLE_POINTS * RISK_GAP_TO_TIGHTNESS_EQUIVALENT)} points away.
+              <span className="text-slate-400">{MARGIN_LABEL}:</span> distance to the nearest change line in
+              funding-pressure points (a risk-appetite point is worth {riskPointWorth}, so {RISK_GAP_EXAMPLE_POINTS} pts
+              on risk appetite = {Math.round(RISK_GAP_EXAMPLE_POINTS * RISK_GAP_TO_TIGHTNESS_EQUIVALENT)} pts away).
               <div className="mt-1.5">
                 <ConfidenceLadder />
               </div>
@@ -509,8 +487,7 @@ export function FormulaReference({
           repository, a 404 for every reader. */}
       {/* One line, here and nowhere else: the method note for a change under test. */}
       <p className="mt-2 text-xs leading-5 text-slate-400" data-ramp-test-note>
-        Three other ways to score the short-term borrowing rate are being tested beside each
-        week&rsquo;s reading, and none of them sets the guidance.{" "}
+        Three candidate short-rate ramps are scored alongside each reading; none of them sets the guidance.{" "}
         <a
           href={RAMP_TEST_REGISTRATION_URL}
           className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"

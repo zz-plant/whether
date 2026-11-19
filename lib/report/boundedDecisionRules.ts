@@ -414,53 +414,53 @@ export type DecisionAreaCorporateTransmission = {
 export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
   hiring: {
     transmission:
-      "When capital gets expensive, investors reward companies that generate revenue with lean headcount, and penalize adding payroll ahead of sales. Every new hire adds fixed monthly spend you can't easily undo if sales cycles drag.",
+      "When capital is expensive, investors reward lean headcount and penalize payroll added ahead of revenue. Every hire is fixed spend that is hard to unwind if sales slow.",
     whyLineMatters:
-      "Deciding ahead of time when to pause protects the commitments you already carry, so a slow quarter never forces emergency cuts.",
+      "Setting a pause line ahead of time protects existing commitments so a slow quarter never forces emergency cuts.",
     ruleOfThumb:
-      "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
+      "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, limit hiring to backfills and critical roles.",
     startupMath:
-      "A $180k hire adds ~$15k/mo in fixed payroll. In tight markets, that single hire requires $300k+ in fresh revenue to justify at your next round.",
+      "A $180k hire adds ~$15k/mo in fixed burn—requiring $300k+ in new revenue to justify in tight markets.",
   },
   "product-tempo": {
     transmission:
-      "When conditions get cautious, buyers care about what ships and delivers value this quarter, not a 3-year vision. They reward reliability and clear savings over unproven features.",
+      "In cautious markets, buyers pay for value delivered this quarter—reliability and clear savings—not 3-year visions.",
     whyLineMatters:
-      "Shorter release cycles give you real user proof faster—and let you adjust before burning months of engineering time.",
+      "Shorter release cycles prove demand faster before you sink months of engineering time.",
     ruleOfThumb:
-      "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
+      "In Sunny weather, ship for activation and retention. In Stormy or Freezing, back only work that pays back within 12 months.",
     startupMath:
-      "A 3-month engineering detour costs three months of engineering, whether that is salaries or your own time. Focus on features that save current customer renewals this quarter.",
+      "A 3-month detour burns a full quarter of engineering capacity—prioritize work that protects renewals now.",
   },
   "capital-raising": {
     transmission:
-      "When risk appetite drops, investors reward proven revenue and clear runway, while penalizing growth that relies on continuous outside capital. If you wait until runway is tight, you lose your leverage.",
+      "When risk appetite drops, investors back proven revenue and healthy runway. Waiting until runway is tight destroys your leverage.",
     whyLineMatters:
-      "Starting early while conditions are open keeps timing and terms on your side rather than the market's.",
+      "Starting early keeps timing and terms on your side instead of the market's.",
     ruleOfThumb:
-      "In Sunny weather, raise opportunistically while terms are warm. In Freezing or Stormy, start early and protect your cap table over closing fast.",
+      "In Sunny weather, raise opportunistically. In Freezing or Stormy, start early and protect terms over speed.",
     startupMath:
-      "Term sheet diligence stretches from 4 weeks in Sunny weather to 12+ weeks in Cloudy or Freezing. Start 6 months before your runway line.",
+      "Diligence stretches from 4 weeks in Sunny weather to 12+ weeks in Cloudy or Freezing—start 6 months before your runway floor.",
   },
   "burn-discipline": {
     transmission:
-      "When funding pressure rises, small monthly expenses quietly add up. Unused software seats and long agency commitments burn runway with zero return.",
+      "Under funding pressure, small recurring costs—unused seats and retainers—quietly drain runway with zero return.",
     whyLineMatters:
-      "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when conditions shift.",
+      "A 6-month payback bar keeps cash in the bank as your best buffer when conditions shift.",
     ruleOfThumb:
-      "In Sunny weather, invest in growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend that doesn't quickly pay for itself.",
+      "In Sunny weather, fund growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend without fast payback.",
     startupMath:
-      "Trimming unused software seats and agency retainers every 90 days routinely extends company runway by 1–2 months.",
+      "Auditing unused seats and retainers every 90 days routinely adds 1–2 months of runway.",
   },
   "expansion-bets": {
     transmission:
-      "In tight conditions, big new product lines are risky because follow-on money is slow to arrive. Run small experiments that prove customer demand before committing full-time capacity.",
+      "In tight markets, big new product lines stall when follow-on capital slows. Prove demand with small experiments before committing full-time capacity.",
     whyLineMatters:
-      "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
+      "Staged experiments let you wind down a bet in a week without dragging down the core business.",
     ruleOfThumb:
-      "In Sunny weather, fund new bets stage-by-stage with written stop triggers. In Stormy or Freezing, run only experiments you can pause on short notice.",
+      "In Sunny weather, stage new bets with written stop lines. In Stormy or Freezing, run only experiments you can pause on short notice.",
     startupMath:
-      "Cap experiment risk to under 5% of monthly burn, requiring measurable customer demand before committing dedicated engineering time.",
+      "Cap experiment spend under 5% of monthly burn until customer demand justifies dedicated engineering.",
   },
 };
 

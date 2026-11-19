@@ -98,7 +98,7 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
             ))}
           </ul>
           <p className="text-xs text-slate-400">
-            This item reports a plan to exit or restructure part of a business, with material costs. Read the filing for what it covers: it may not say how many people or which groups are affected.
+            Reports material exit or restructuring costs; check the filing for scope (it may not say how many people or teams are affected).
           </p>
         </div>
       ) : null}

@@ -359,7 +359,7 @@ export function RunwayPlannerPanel({
             How is this calculated?
           </summary>
           <p className="rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
-            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions. Growth compounds monthly. Burn is compared with revenue as monthly burn divided by monthly revenue. That ratio reads 4x with no revenue and never goes above 4x, so earning something never scores worse than earning nothing.
+            Scores your runway against the safe band, monthly burn-to-revenue (capped at 4x, including at zero revenue), compounding monthly growth, and this week&apos;s conditions.
           </p>
         </details>
       </div>

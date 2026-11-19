@@ -3,6 +3,8 @@ import { describe, it } from "bun:test";
 import {
   buildCanonicalBoundedDecisionRules,
   buildScopedVariantDecisionAdjustment,
+  decisionAreaCorporateTransmission,
+  decisionAreaOrder,
   extractCompactClause,
   formatBoundedDecisionReverse,
   formatBoundedDecisionTriplet,
@@ -202,5 +204,17 @@ describe("shared flip corridor", () => {
 
   it("returns null when there are too few rules to share anything", () => {
     assert.equal(formatSharedFlipCorridor(rules.slice(0, 1)), null);
+  });
+});
+
+describe("decision area transmission notes", () => {
+  it("keeps every operating area's startup math, rule of thumb, and rationale concise", () => {
+    for (const area of decisionAreaOrder) {
+      const note = decisionAreaCorporateTransmission[area];
+      assert.ok(note.startupMath && note.startupMath.length <= 160, `${area} startupMath should stay scannable`);
+      assert.ok(note.ruleOfThumb.length <= 160, `${area} ruleOfThumb should stay scannable`);
+      assert.ok(note.whyLineMatters.length <= 140, `${area} whyLineMatters should stay scannable`);
+      assert.ok(note.transmission.length <= 180, `${area} transmission should stay scannable`);
+    }
   });
 });

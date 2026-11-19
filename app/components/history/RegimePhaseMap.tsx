@@ -166,9 +166,8 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
         <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
           <div className="min-w-0">
             <p className="max-w-prose text-sm text-slate-300">
-              Funding pressure and risk appetite together are one point on this chart, and conditions
-              follow whichever quarter of it the point lands in. The lines at {thresholds.tightness} and{" "}
-              {thresholds.riskAppetite} are the same two numbers the weekly brief cites.
+              Each point pairs funding pressure and risk appetite; its quadrant sets the conditions (cut at {thresholds.tightness} and{" "}
+              {thresholds.riskAppetite}).
             </p>
           </div>
 

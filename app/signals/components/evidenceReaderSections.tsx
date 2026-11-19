@@ -176,7 +176,7 @@ export const SignalsWhatChangedSection = ({
                        and the inversion points in regimeEngineCore). This said
                        funding pressure alone. */
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400 [--weather-hit-up:0px]">
-                      Feeds into <a href="#riskAppetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted (short-term rates above long-term)
+                      Feeds <a href="#riskAppetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a> (and Funding pressure when inverted)
                     </span>
                   )}
                   {/* The move sits under the signal it belongs to, so the table
