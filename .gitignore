@@ -24,6 +24,11 @@ artifacts/
 .playwright-mcp/
 .playwright-cli/
 
+# Impeccable local build and finish-review artifacts. The approved comp and the
+# decision record live in .impeccable/mocks/, which is tracked.
+.impeccable/build/
+.impeccable/review/
+
 # vinext (Next.js plugin)
 .vinext/
 

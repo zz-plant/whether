@@ -1,0 +1,48 @@
+{
+  "status": "approved",
+  "seed": "23003e23",
+  "scope": "structure of weekly brief and shared shell",
+  "maintenanceOverride": "User explicitly confirmed override maintenance",
+  "rankedStructures": [
+    "One-page brief",
+    "Action-first list",
+    "Change-first weekly review",
+    "Focused workspace",
+    "Week and evidence split",
+    "Decision table",
+    "Decision picker"
+  ],
+  "dealtIndices": [
+    4,
+    6,
+    1
+  ],
+  "entries": [
+    {
+      "id": "focused",
+      "label": "Focused workspace",
+      "thesis": "Choose an operating area and read its action and lines in one focused view.",
+      "viewport": "A slim navigation rail, a compact weekly call, five area rows, and a selected-area detail panel.",
+      "risk": "Fast for one decision; the other areas’ full rules require selection.",
+      "prompt": "Use case: ui-mockup. Create a high-fidelity desktop web product screen for Whether, edge to edge, 1536 by 1024 landscape, crisp readable text, no browser or device frame. This is weekly operating guidance for startup leaders, used on Monday to decide what to pause and what would allow a restart. Redesign the information structure to remove clutter. The reference screenshot contributes the real wordmark, Bricolage Grotesque and Source Sans 3 character, cool near-white surfaces, dark ink, Freezing blue and semantic pause red; do not reproduce its composition, oversized history strip or repeated explanations.\n\nConcept: focused workspace. Use a narrow left navigation rail: Whether, This week (active), Plan, History, Guides, Share and embed; Search, theme and About are quiet utilities. Main workspace begins with Week of Nov 16, 2026, Freezing, and the existing call: “Only say yes to things that bring in cash or that a customer is already counting on.” Compact score summary: Funding pressure 90 / 100; Risk appetite 38 / 100. Each appears once.\n\nBelow, a clearly selectable five-area list: Hiring, Roadmap, Fundraising, Spending, New bets. All show On hold. Roadmap is selected; its adjacent detail panel states “Keep the core roadmap on schedule, and ship what customers can use this quarter first.” Pause line: risk appetite below 44. Restart line: risk appetite above 54. Show the score 38 and these two labeled thresholds on one simple horizontal scale. A small note says “Since Nov 9, Roadmap paused.”\n\nRetain visible footer trust “Data as of Nov 19, 2026 · Sources partly current”, company settings “Series A · 12–24 months”, and Copy brief action. Historical context and evidence have restrained links, no decorative charts or duplicate summaries. This must look like a finished, coherent working application with generous but efficient spacing."
+    },
+    {
+      "id": "matrix",
+      "label": "Decision table",
+      "thesis": "Compare all five actions and their pause and restart lines without scrolling through repeated cards.",
+      "viewport": "A compact top navigation, short blue weekly summary, and one full-width table with action and threshold columns.",
+      "risk": "The densest option; phone layouts must turn each row into a readable vertical group.",
+      "prompt": "Use case: ui-mockup. Render a high-fidelity desktop web app screen for Whether, edge to edge, 1536 by 1024 landscape, crisp legible product text, no hardware or browser frame. Whether turns public US rates and credit data into weekly operating guidance for startup leaders. The reader needs to see the call, compare five decisions, and copy the brief in under a minute. The screenshot reference supplies brand typography, cool near-white ground, black ink, Freezing blue, and red exclusively for paused states; replace its structure.\n\nConcept: decision table. Top navigation reads Whether, This week active, Plan, History, Guides; utilities Search and Share and embed. Below, a compact blue weekly summary containing “Week of Nov 16, 2026”, “Freezing”, and “Only say yes to things that bring in cash or that a customer is already counting on.” The blue region is modest, leaving most screen space for decisions. Funding pressure 90 / 100 and Risk appetite 38 / 100 are compact adjacent readings, not oversized tiles.\n\nOne main well-spaced table reads “Your decisions this week”, columns Area, This week, Action, Pause line, Restart line. Five rows, all On hold. Hiring: “Only replace people who leave, and hire for roles you can't deliver without.” Roadmap: “Keep the core roadmap on schedule, and ship what customers can use this quarter first.” Fundraising: “Get your materials ready now so you can decide when to go out.” Spending: “Before optional spend, work out how long it takes to pay back.” New bets: “Keep only experiments you can stop within a week, each with a review date.” Use named threshold links “View lines” except Roadmap, whose pause is “Risk appetite < 44” and restart “Risk appetite > 54”; never invent numeric rules.\n\nA restrained change note marks Roadmap paused since Nov 9. One company settings line: Series A · 12–24 months · Change. Bottom action row Copy brief, Copy as image, Email me Mondays; compact trust “Data as of Nov 19, 2026 · Sources partly current”. History and source detail are links below the table. Strong alignment, a readable humanist type scale, no duplicate panels, unnecessary charts, badges, or ornamental illustrations."
+    },
+    {
+      "id": "brief",
+      "label": "One-page brief",
+      "thesis": "Read the weekly call and five actions as one concise, shareable brief.",
+      "viewport": "Top navigation, one reading column with a compact blue call, five flat action rows, and a quiet evidence rail.",
+      "risk": "The clearest reading flow, with less room for detailed evidence in the opening screen.",
+      "prompt": "Use case: ui-mockup. Create an exceptionally clean high-fidelity desktop web product screen for Whether, edge to edge, 1536 by 1024 landscape, no browser frame or devices. It is weekly operating guidance for startup leaders: the Monday reader checks what changed, chooses how to act, and shares a brief. Use the reference only for the Whether wordmark, Bricolage Grotesque / Source Sans 3 typography, cool near-white paper, dark ink, Freezing blue and pause red. Do not repeat its huge historical ribbon, giant score card, or stacked explanations.\n\nConcept: one-page brief. Slim top navigation with Whether, This week active, Plan, History, Guides; Search and Share and embed as utilities. The main screen has one dominant readable brief column and a quiet narrow evidence rail. Start the brief with “Week of Nov 16, 2026”, condition “Freezing”, and the existing call: “Only say yes to things that bring in cash or that a customer is already counting on.” A flat, compact blue header makes the call unmistakable. The subline says “Since Nov 9, Roadmap paused after risk appetite fell below 44.”\n\nBelow, five spacious ruled action rows, not separate cards. Hiring — On hold — “Only replace people who leave, and hire for roles you can't deliver without.” Roadmap — On hold — “Keep the core roadmap on schedule, and ship what customers can use this quarter first.” Fundraising — On hold — “Get your materials ready now so you can decide when to go out.” Spending — On hold — “Before optional spend, work out how long it takes to pay back.” New bets — On hold — “Keep only experiments you can stop within a week, each with a review date.” A secondary View lines link on each row.\n\nThe evidence rail contains Funding pressure 90 / 100, Risk appetite 38 / 100, and a small text block: “Roadmap restarts above 54. Current risk appetite: 38.” Compact source caveat “Data as of Nov 19, 2026 · Sources partly current”, plus Why this call and History links. Beneath the brief: Series A · 12–24 months · Change, primary Copy brief, secondary Copy as image. Show coherent spacing and finished app navigation, with all critical actions readable and no repeated hold summaries."
+    }
+  ],
+  "approved": "brief",
+  "approvedAt": "2026-11-21"
+}

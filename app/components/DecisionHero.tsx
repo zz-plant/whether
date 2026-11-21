@@ -8,6 +8,8 @@ import { ScreenshotCaption } from "./screenshotCaption";
 import { ConditionIcon } from "./ui/conceptIcons";
 import { DefinedTerm } from "./ui/definedTerm";
 import { ReplayMoveButton } from "./home/ReplayMoveButton";
+import { LineStateBand } from "./home/LineStateBand";
+import type { LineStateBandModel } from "../../lib/report/home/homeSectionModel";
 import type { WeekMove } from "../../lib/report/home/weekMove";
 
 type Props = {
@@ -72,6 +74,13 @@ type Props = {
    * opens on, so a search visitor meets the artifact before any explanation.
    */
   question?: string;
+  /**
+   * The week's exception, inside the call (2026-11-21): a hold that started since the
+   * earlier reading, or a line close enough to warn about. It sat in a band above the
+   * card, so the first screen opened on a box about the call before the call; the
+   * one-page brief prints it under the sentence it qualifies, in the crossed line's ink.
+   */
+  notice?: LineStateBandModel | null;
   /**
    * The two published scores the meaning rests on, and where the rules behind
    * them are read (2026-10-31): "Funding pressure 90, risk appetite 55."
@@ -190,6 +199,7 @@ export function DecisionHero({
   reading,
   phoneFigure,
   move,
+  notice,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -213,22 +223,24 @@ export function DecisionHero({
     </Link>
   ) : null;
 
-  /* The week control and the brief's number: a control, and the citation it selects. */
-  const weekLine = (placement: string) =>
-    periodControl || briefNumber ? (
-      <div className={`weather-hero-period flex flex-wrap items-center gap-x-3 gap-y-1 ${placement}`.trim()}>
-        {periodControl}
-        {briefNumber ? (
-          <Link
-            href={briefNumber.href}
-            data-brief-number
-            className="weather-hit text-fluid-sm tabular-nums text-[var(--app-text-muted)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]"
-          >
-            <span className="sr-only">Published brief </span>No. {briefNumber.label}
-          </Link>
-        ) : null}
-      </div>
-    ) : null;
+  /* The week control and the brief's number: a control, and the citation it selects.
+     It heads the call on every layout (2026-11-21): the one-page brief dates the
+     statement before it makes it, rather than setting the date in the margin beside
+     the scores. */
+  const weekLine = periodControl || briefNumber ? (
+    <div className="weather-hero-period flex flex-wrap items-center gap-x-3 gap-y-1 basis-full">
+      {periodControl}
+      {briefNumber ? (
+        <Link
+          href={briefNumber.href}
+          data-brief-number
+          className="weather-hit text-fluid-sm tabular-nums text-[var(--app-text-muted)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]"
+        >
+          <span className="sr-only">Published brief </span>No. {briefNumber.label}
+        </Link>
+      ) : null}
+    </div>
+  ) : null;
 
   /* Freshness and confidence, once, where every reading route puts them. */
   const trustStrip = trust ? (
@@ -252,8 +264,6 @@ export function DecisionHero({
           ran four facts together ("hard to raise · Tightening this week ·
           Was Cloudy on Sep 30") ahead of the call they lead into. */}
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-        {/* With no margin, the week on a row of its own above the statement it selects. */}
-        {aside ? null : weekLine("basis-full")}
         <span className="relative inline-flex">
           {/* The earlier conditions' stamp, over this week's until the reading
               crosses the change line (week-move.css). Its word is printed from
@@ -356,18 +366,17 @@ export function DecisionHero({
 
   const phoneScoresAndFacts = (
     <>
-      {/* What the weather word means for money, as the line under the call:
-          the stamp names the week, the call says what to do, this says why. */}
       {/* On a phone the two scores follow the guidance as figures, the number and where it
-          stands, and the facts line gives way to them: both printed the same two numbers,
-          and together they pushed the fifth area under the tab bar (2026-11-10). */}
+          stands. On the homepage the margin carries them from `md` up, and the rail's "Why
+          this call" carries the link the facts line used to: printing the numbers under the
+          call as well said one fact twice on the same screen (2026-11-21). */}
       {phoneFigure ? (
         <div className={aside ? "weather-hero-sky-panel md:hidden" : "md:hidden"} data-hero-phone-figure>
           {phoneFigure}
         </div>
       ) : null}
 
-      {regimeKey ? (
+      {regimeKey && !aside ? (
         <p className={`max-w-xl text-pretty text-fluid-base leading-snug text-[var(--app-text-secondary)] ${phoneFigure ? "max-md:hidden" : ""}`.trim()} data-regime-meaning>
           {reading?.facts ? null : REGIME_WEATHER_RATIONALES[regimeKey]}
           {reading ? (
@@ -458,40 +467,52 @@ export function DecisionHero({
       <div className="relative z-10 min-w-0 space-y-3">
         {aside ? (
           <>
-            {/* The sky (Forecast, 2026-11-12; .impeccable/surfaces/app-page-tsx.md): the
-                week's statement sits on its condition, full width, and the two scores sit on
-                it in a panel of paper. From `md` the week line heads the margin beside the
-                condition word and the scores follow it; on a phone the week line leads and
-                the scores follow the guidance. The areas and the trust facts are on the paper
-                below. The clouds are drawn, never read. */}
-            <div className="weather-hero-sky" data-hero-sky>
-              <span aria-hidden="true" className="weather-hero-sky-clouds">
-                <span />
-                <span />
-                <span />
-                <span />
-              </span>
-              <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:grid-rows-[auto_1fr] md:gap-x-10 md:gap-y-0 lg:gap-x-14">
-                {weekLine("weather-hero-margin-head max-md:mb-1 md:col-start-2 md:row-start-1 md:pb-5")}
-                <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3 md:col-start-1 md:row-span-2 md:row-start-1">
-                  {conditionRow}
-                  {heading}
-                  {phoneScoresAndFacts}
+            {/* The brief's two columns (2026-11-21, the approved one-page comp): one
+                reading column on the left, one quiet evidence rail on the right. The
+                week's statement sits on its condition in a contained block, not across
+                the page: the sky is the call's ground, and the scores are the rail's,
+                drawn on the page's own paper. The clouds are drawn, never read. */}
+            <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:items-start md:gap-x-10 lg:gap-x-14">
+              <div className="min-w-0">
+                <div className="weather-hero-sky" data-hero-sky>
+                  <span aria-hidden="true" className="weather-hero-sky-clouds">
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                  <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">
+                    {weekLine}
+                    {conditionRow}
+                    {heading}
+                    {notice ? <LineStateBand model={notice} /> : null}
+                    {phoneScoresAndFacts}
+                  </div>
                 </div>
-                <div className="weather-hero-aside weather-hero-sky-panel max-md:hidden md:col-start-2 md:row-start-2">
-                  <div className="max-md:hidden">{aside}</div>
-                </div>
+                <div className="@container mt-4 flex min-w-0 flex-col gap-2 sm:mt-5 sm:gap-3">{bodyItems}</div>
               </div>
-            </div>
-            <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:gap-x-10 md:pt-4 lg:gap-x-14">
-              <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">{bodyItems}</div>
-              {trust ? <div className="weather-hero-trust flex flex-col max-md:mt-3">{trustStrip}</div> : null}
+              <aside className="weather-hero-aside mt-4 flex min-w-0 flex-col gap-4 md:mt-0">
+                <div className="max-md:hidden">{aside}</div>
+                {trust ? trustStrip : null}
+                {reading ? (
+                  <nav aria-label="Why this reading" className="weather-hero-rail-links flex flex-col gap-1 border-t border-[color:var(--border-faint)] pt-3 text-sm">
+                    <Link href={reading.whyHref} className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
+                      Why this call
+                    </Link>
+                    <Link href="/history" className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
+                      History
+                    </Link>
+                  </nav>
+                ) : null}
+              </aside>
             </div>
           </>
         ) : (
           <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">
+            {weekLine}
             {conditionRow}
             {heading}
+            {notice ? <LineStateBand model={notice} /> : null}
             {phoneScoresAndFacts}
             {bodyItems}
             {/* With no margin (the answer pages), the trust facts close the column as before. */}

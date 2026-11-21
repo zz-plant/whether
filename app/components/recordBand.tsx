@@ -50,13 +50,28 @@ export function RecordBand() {
   const briefsCounted = briefCount > 0 ? `${briefCount} ${briefCount === 1 ? "brief" : "briefs"}` : null;
   const published = briefsCounted ? `${briefsCounted}, published as written` : null;
   const keyed = CONDITIONS.filter((regime) => model.runs.some((run) => run.regime === regime));
+  const firstYear = model.firstDate.slice(0, 4);
   return (
     <aside className="record-band" aria-label="The record" data-record-band data-first={model.firstDate} data-months={model.encoded}>
-      <p className="sr-only">
-        Conditions by month, {firstLabel} to {lastLabel}: they changed {model.changes} {model.changes === 1 ? "time" : "times"}.
-        {published ? ` ${published}.` : null}
-      </p>
-      <div className="record-band-plate" data-record-band-plate>
+      {/* The record folds (2026-11-21, the one-page brief): it is the frame's proof and
+          its only ornament, not the week's answer, and drawn open it took the first
+          screen before the call. The category line stays visible in the summary on
+          every route and every visit; the band, its readout and the way to History are
+          one native disclosure away, and need no script to open. */}
+      <details className="record-band-details weather-auto-chevron" data-record-band-disclosure>
+        <summary className="record-band-summary">
+          <span className="record-band-what" data-category-line>
+            {categorySentence}
+          </span>
+          <span className="record-band-summary-meta" aria-hidden="true">
+            The record since {firstYear}
+          </span>
+        </summary>
+        <p className="sr-only">
+          Conditions by month, {firstLabel} to {lastLabel}: they changed {model.changes} {model.changes === 1 ? "time" : "times"}.
+          {published ? ` ${published}.` : null}
+        </p>
+        <div className="record-band-plate" data-record-band-plate>
         <svg
           className="record-band-art"
           viewBox={`0 0 ${model.months} ${RECORD_BAND_HEIGHT}`}
@@ -175,13 +190,6 @@ export function RecordBand() {
         ))}
       </div>
       <div className="record-band-foot">
-        {/* What the site is, before the week's guidance (2026-11-18). It was a dismissible
-            line on the homepage, for a first visit only, under this band: the first thing a
-            new reader met was the band and then a weather word, with nothing saying whose
-            guidance it was. Here it is on every route and every visit, as the frame's words. */}
-        <p className="record-band-what" data-category-line>
-          {categorySentence}
-        </p>
         {/* The band's colours named (2026-11-18). On a phone the lines are drawn plain, so the
             fill is the only cue, and there was no key at any width. Only the conditions the
             record holds (§XVI: a legend lists only what is on the surface). Hidden from
@@ -215,6 +223,7 @@ export function RecordBand() {
         </p>
       </div>
       <RecordBandReadout />
+      </details>
     </aside>
   );
 }

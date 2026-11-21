@@ -62,6 +62,35 @@ describe("the card ties the weather word to the areas", () => {
     assert.equal(strip([{ area: "hiring", pause: slot(false) }]), null, "nothing held");
   });
 
+  it("prints each area's action and the line that can change its standing", () => {
+    const model = buildAreaStrip([
+      {
+        area: "hiring",
+        rule: "Only replace people who leave, and hire for roles you can't deliver without",
+        pause: { ...slot(true), line: "Funding pressure > 76", value: 76, holdsAbove: true },
+        resume: { ...slot(false), line: "Funding pressure < 66", points: 24, value: 66, holdsAbove: false },
+        resumeQualifier: "the weekly reading holds or improves",
+      },
+      {
+        area: "burn-discipline",
+        rule: "Before optional spend, work out how long it takes to pay back",
+        pause: { ...slot(false), line: "Funding pressure > 76", value: 76, holdsAbove: true, points: 14 },
+      },
+    ]);
+    assert.equal(model?.cells[0]?.action, "Only replace people who leave, and hire for roles you can't deliver without");
+    assert.deepEqual(model?.cells[0]?.line, {
+      kind: "resume",
+      label: "Restart when",
+      text: "Funding pressure < 66. the weekly reading holds or improves",
+    });
+    assert.deepEqual(model?.cells[1]?.line, { kind: "pause", label: "Pause if", text: "Funding pressure > 76" });
+    const html = renderToStaticMarkup(<AreaStrip model={model!} />);
+    assert.match(html, /data-area-rule[^>]*>Only replace people who leave/);
+    assert.match(html, /data-area-line[^>]*>[\s\S]*?Restart when[\s\S]*?Funding pressure &lt; 66/);
+    assert.match(html, /data-area-line[^>]*>[\s\S]*?Pause if[\s\S]*?Funding pressure &gt; 76/);
+    assert.match(html, /View lines/);
+  });
+
   it("links each column on the card to its area's rule", () => {
     const html = renderToStaticMarkup(
       <AreaStrip model={{ cells: [{ area: "hiring", state: "crossed", label: "On hold", href: "#area-hiring" }], restart: null }} />,

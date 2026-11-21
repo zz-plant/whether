@@ -86,12 +86,14 @@ export type HomeLoadReading = z.infer<typeof readingSchema>;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  /* 1428 → 1437, 264 → 266, 316 → 323 (2026-11-08): three quick-copy pills on the
-     brief's action row (1-line standup, 3-bullet exec summary, card as image) add
-     their labels ahead of the areas. Justified raise, said here. */
-  words: 1435,
-  numbers: 266,
-  wordsBeforeAreas: 323,
+  /* 1435 → 1399, 266 → 226, 323 → 288, 19 → 14 buttons, 34 → 24 pressure mentions,
+     37 → 29 appetite mentions, 2 → 0 hard sentences (2026-11-21, the one-page brief):
+     the record band folds, the area rows carry their action and line in the brief, and
+     the grouped rules below stop reprinting the action and the facts line stops
+     reprinting the two scores. The budget only falls; this records the cut. */
+  words: 1399,
+  numbers: 226,
+  wordsBeforeAreas: 288,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
      appetite, room before a change). A deliberate raise, said here and in its PR.
@@ -101,13 +103,15 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
   /* 16 → 19 (2026-11-08): three quick-copy pills on the brief's action row
      (1-line standup, 3-bullet exec summary, card as image), so a founder can
      paste the artifact in under 10 seconds. Same three controls the brief's
-     transmission loop asks for; justified raise, said here. */
-  buttons: 19,
+     transmission loop asks for; justified raise, said here.
+     19 → 14 (2026-11-21): the five area-name buttons moved inside the picker's closed
+     disclosure; the area rows above are links, not buttons. */
+  buttons: 14,
   fields: 21,
-  fundingPressure: 34,
-  riskAppetite: 37,
+  fundingPressure: 24,
+  riskAppetite: 29,
   jargon: 9,
-  hardSentences: 2,
+  hardSentences: 0,
   longestSentence: 22,
 };
 

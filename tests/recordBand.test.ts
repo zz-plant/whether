@@ -213,9 +213,19 @@ describe("the band says what the site is and names its colours", () => {
   const html = renderToStaticMarkup(createElement(RecordBand));
   const css = readFileSync("app/styles/record-band.css", "utf8");
 
-  it("prints the category line under the band, with nothing to dismiss it", () => {
-    assert.match(html, /<p class="record-band-what" data-category-line="true">Weekly operating guidance for startup leaders\.<\/p>/);
+  it("prints the category line in the disclosure's summary, with nothing to dismiss it", () => {
+    assert.match(html, /<span class="record-band-what" data-category-line="true">Weekly operating guidance for startup leaders\.<\/span>/);
     assert.doesNotMatch(html, /Dismiss|data-weather-first-run-orientation/);
+  });
+
+  it("folds the band behind a native disclosure whose summary stays visible", () => {
+    assert.match(html, /<details class="record-band-details weather-auto-chevron" data-record-band-disclosure="true">/);
+    const summary = /<summary class="record-band-summary">([\s\S]*?)<\/summary>/.exec(html)?.[1] ?? "";
+    assert.match(summary, /data-category-line/, "the frame's words stay on the closed row");
+    assert.match(summary, /The record since \d{4}/);
+    assert.ok(html.indexOf("data-record-band-plate") > html.indexOf("</summary>"), "the chart is inside the disclosure");
+    assert.ok(html.indexOf("data-record-band-readout") > html.indexOf("</summary>"), "the readout is inside it too");
+    assert.match(html, /<a class="record-band-link" href="\/history">History<\/a>/);
   });
 
   it("names each condition the band draws beside its fill, at every width", () => {
