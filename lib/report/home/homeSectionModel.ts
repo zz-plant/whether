@@ -531,8 +531,27 @@ export const describeScoreFigureStanding = ({
   return { crossed: false, lead: `${name} clear`, rest: `Pauses ${side(own)}.` };
 };
 
+/**
+ * The one line a row prints beside its action (2026-11-21, the one-page brief): the side
+ * of the rule that can change the area's standing. A held area waits on its restart line;
+ * every other area on its pause line. The label is the contract's own ("Pause if" /
+ * "Restart when"), so the row reads as the same rule the sections below print.
+ */
 export type AreaStripModel = {
-  cells: { area: DecisionArea; state: LineState; label: string; href: string }[];
+  cells: {
+    area: DecisionArea;
+    state: LineState;
+    label: string;
+    href: string;
+    /** The area's action, as the brief prints it ("Keep the core roadmap on schedule…"). */
+    action?: string;
+    /** The canonical line the action is bounded by, visible in the row. */
+    line?: {
+      kind: "pause" | "resume";
+      label: string;
+      text: string;
+    };
+  }[];
   /** What the holds wait on, where every held area names the same restart line. */
   restart: string | null;
 };
@@ -557,16 +576,45 @@ const AREA_STRIP_STATE_LABEL: Record<LineState, string> = {
 };
 
 /**
- * The card's five-area row: where each area stands against its pause line, in the words
- * the page's groups use. Null when no area states a line. The distance is the line under
- * the columns: areas held by one score would print one distance in every column.
+ * The card's five-area list: where each area stands against its pause line, the action
+ * that goes with it, and the one canonical line that can change that standing (2026-11-21).
+ * Null when no area states a line. The distance is the line under the columns: areas held
+ * by one score would print one distance in every column.
  */
-export const buildAreaStrip = (rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[]): AreaStripModel | null => {
+export const buildAreaStrip = (
+  rows: readonly (Pick<HomeAreaRow, "area" | "pause" | "resume" | "pauseQualifier" | "resumeQualifier"> & {
+    rule?: string;
+  })[],
+): AreaStripModel | null => {
   const cells = rows.flatMap((row) => {
     const status = describeAreaPauseStatus(row);
-    return status
-      ? [{ area: row.area, state: status.state, label: AREA_STRIP_STATE_LABEL[status.state], href: `#area-${row.area}` }]
-      : [];
+    if (!status) return [];
+    /* The side that can change the standing: a held area waits on its restart, any other
+       area on its pause. The same choice `DecisionPicker` makes for its detail, so the
+       row above and the card below cannot state two different conditions. */
+    const held = Boolean(row.pause?.met);
+    const slot = held && row.resume ? row.resume : row.pause;
+    const qualifier = held && row.resume ? row.resumeQualifier : row.pauseQualifier;
+    const line: NonNullable<AreaStripModel["cells"][number]["line"]> | undefined = slot?.line
+      ? {
+          kind: held && row.resume ? "resume" : "pause",
+          label:
+            held && row.resume
+              ? DECISION_CONTRACT_LABELS.reversal.resumeWhen
+              : DECISION_CONTRACT_LABELS.threshold.pauseIf,
+          text: qualifier ? `${slot.line}. ${qualifier}` : slot.line,
+        }
+      : undefined;
+    return [
+      {
+        area: row.area,
+        state: status.state,
+        label: AREA_STRIP_STATE_LABEL[status.state],
+        href: `#area-${row.area}`,
+        ...(row.rule ? { action: row.rule } : {}),
+        ...(line ? { line } : {}),
+      },
+    ];
   });
   if (cells.length === 0) return null;
   return { cells, restart: describeSharedRestart(rows) };

@@ -17,6 +17,24 @@
   background: var(--bg-body);
 }
 
+/* The record is a disclosure (2026-11-21, the one-page brief): its summary is the
+   category line the frame says on every route, plus a quiet name for what opens. */
+.record-band-summary {
+  padding-inline: var(--weather-shell-pad-inline);
+  font-size: var(--fs-nano);
+  line-height: 1.4;
+  color: var(--app-text);
+}
+.record-band-summary-meta {
+  margin-left: auto;
+  font-weight: 400;
+  color: var(--app-text-muted);
+  white-space: nowrap;
+}
+.record-band-details:not([open]) > .record-band-summary {
+  border-bottom: 1px solid var(--border-faint);
+}
+
 .record-band-plate {
   position: relative;
   /* 68px on a phone: at 84 the band and its axis took an eighth of the first screen. */

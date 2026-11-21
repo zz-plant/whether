@@ -207,7 +207,7 @@ describe("regime colour contract", () => {
 
   it("keys the home page's atmosphere to the week the hero states", () => {
     const page = readRepoFile("app/page.tsx");
-    const shellOpen = page.indexOf("<Shell regime={regime}>");
+    const shellOpen = page.indexOf('<Shell regime={regime} measure="wide">');
     assert.ok(shellOpen !== -1, "PageContent mounts the Shell with the hero's regime");
     assert.ok(!page.includes("regimeHistory.at(-1)?.regime"), "the shell no longer takes the last month-end's regime");
   });

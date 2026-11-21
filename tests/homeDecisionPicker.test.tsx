@@ -107,6 +107,28 @@ describe("decision picker", () => {
   });
 });
 
+describe("the optional exploration folds", () => {
+  const details = (html: string) => /<details class="weather-auto-chevron" data-decision-explore(="true")?([^>]*)>/.exec(html)?.[2] ?? "";
+
+  it("closes the groups on a live week, whose brief above already carries every action", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" rulesAbove />);
+    assert.doesNotMatch(details(html), /\bopen\b/);
+    assert.match(html, /Open each area’s rule, test and links/);
+  });
+
+  it("opens on the area a `?decision=` link names", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" rulesAbove initialSelected="hiring" />);
+    assert.match(details(html), /\bopen\b/);
+    assert.match(html, /id="area-hiring-detail"/);
+  });
+
+  it("stays open on a saved copy or an archived month, where the groups are the five answers", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" />);
+    assert.match(details(html), /\bopen\b/);
+    assert.match(html, /Every area’s rule, test and links/);
+  });
+});
+
 describe("first-visit helpers", () => {
   it("finds a decision answer that leads with each area", () => {
     for (const area of decisionAreaOrder) {

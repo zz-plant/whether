@@ -1,0 +1,70 @@
+{
+  "title": "A clearer Whether",
+  "question": "Choose the structure to carry forward. These are visual mockups using the captured Nov 16 brief; no production UI has changed.",
+  "options": [
+    {
+      "id": "focused",
+      "label": "Focused workspace",
+      "thesis": "Choose an operating area and read its action and lines in one focused view.",
+      "viewport": "A slim navigation rail, a compact weekly call, five area rows, and a selected-area detail panel.",
+      "risk": "Fast for one decision; the other areas’ full rules require selection.",
+      "palette": [
+        "#eef1f6",
+        "#0f1419",
+        "#8ac2ec",
+        "#b81f27"
+      ],
+      "materials": [
+        "Bricolage Grotesque",
+        "Source Sans 3",
+        "Flat reading surfaces"
+      ],
+      "comp": ".impeccable/mocks/declutter-20261121/focused.png",
+      "kicker": "THE ROLL"
+    },
+    {
+      "id": "matrix",
+      "label": "Decision table",
+      "thesis": "Compare all five actions and their pause and restart lines without scrolling through repeated cards.",
+      "viewport": "A compact top navigation, short blue weekly summary, and one full-width table with action and threshold columns.",
+      "risk": "The densest option; phone layouts must turn each row into a readable vertical group.",
+      "palette": [
+        "#eef1f6",
+        "#0f1419",
+        "#8ac2ec",
+        "#b81f27"
+      ],
+      "materials": [
+        "Bricolage Grotesque",
+        "Source Sans 3",
+        "Flat reading surfaces"
+      ],
+      "comp": ".impeccable/mocks/declutter-20261121/matrix.png"
+    },
+    {
+      "id": "brief",
+      "label": "One-page brief",
+      "thesis": "Read the weekly call and five actions as one concise, shareable brief.",
+      "viewport": "Top navigation, one reading column with a compact blue call, five flat action rows, and a quiet evidence rail.",
+      "risk": "The clearest reading flow, with less room for detailed evidence in the opening screen.",
+      "palette": [
+        "#eef1f6",
+        "#0f1419",
+        "#8ac2ec",
+        "#b81f27"
+      ],
+      "materials": [
+        "Bricolage Grotesque",
+        "Source Sans 3",
+        "Flat reading surfaces"
+      ],
+      "comp": ".impeccable/mocks/declutter-20261121/brief.png"
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "buildPath": {
+    "value": "comp",
+    "toggle": false
+  }
+}

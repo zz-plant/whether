@@ -207,11 +207,14 @@ html[data-focus-mode] [data-home-shell-main] {
 
 /* The weekly brief's own column, named beside the other page measures: the
    one-screen brief's two inner columns use it (app/page.tsx), and the focus
-   mode above narrows the shell to the same 64rem. Until 2026-10-21 the
+   mode above narrows the shell to the same measure. Until 2026-10-21 the
    measure was a hand-typed `max-w-[64rem]` literal twice over, beside a
-   registry it never joined (DD-046). */
+   registry it never joined (DD-046). Widened from 72rem to 84rem with the
+   one-page brief (2026-11-21): the approved comp sets the call and its rail
+   across a wide field, and the wider measure keeps the guidance to three
+   lines on a laptop. It is the wide report shell's measure, not a new step. */
 .weather-brief-measure {
-  max-width: 72rem;
+  max-width: 84rem;
 }
 
 .weather-page-shell-standard {
@@ -605,9 +608,7 @@ a.weather-hub-link-card:hover {
     letter-spacing: -0.03em;
   }
 
-  .weather-hero-aside,
-  .weather-hero-trust,
-  .weather-hero-margin-head {
+  .weather-hero-aside {
     border-inline-start: 1px solid var(--border-subtle);
     padding-inline-start: 1.25rem;
   }
@@ -630,8 +631,6 @@ a.weather-hub-link-card:hover {
 
 /* The week is part of the artifact header, close to the call it dates. */
 .weather-hero-period { flex-basis: 100%; margin-bottom: 0.25rem; }
-/* Heading the margin, it joins the scores' hairline below it with no gap. */
-.weather-hero-period.weather-hero-margin-head { margin-bottom: 0; }
 .weather-signal-table tr[data-input] th,
 .weather-signal-table tr[data-input] td { padding-block: 0.5rem; }
 @media (max-width: 767px) {

@@ -186,12 +186,14 @@ components:
 **Creative North Star: "The Forecast"** (since 2026-11-12; Covenant, 2026-11-10 to 2026-11-12)
 
 The weekly brief is the week's weather report for a startup: the condition is the sky, and how
-to proceed follows from it. The homepage opens on a sky tinted by the week's condition, full
-width, with the guidance written on it and the two scores on a panel of paper; a storm week and a
+to proceed follows from it. The homepage opens on a sky tinted by the week's condition in a
+contained block, with the guidance written on it and the five areas ruled beneath; the two
+scores sit in the evidence rail beside it, on the page's own paper. A storm week and a
 sunny week look like different pages. Beneath the sky the brief is filed on cool paper in a
-blue-black ink, read top to bottom: the five areas, the trust facts, then the sections that
-explain them. The record band under the navigation of every route is every month-end reading
-since January 2012, drawn as the same four conditions.
+blue-black ink, read top to bottom: the five areas with their action and line, the calibration,
+then the sections that explain them. The record band under the navigation of every route is
+every month-end reading since January 2012, drawn as the same four conditions, folded under a
+one-line summary that carries the category line.
 
 The world borrows a modern weather app's glanceability and an investor update's restraint: the
 condition drives the page, structure stays quiet, every engraved line on the band is drawn from
@@ -210,6 +212,7 @@ The direction contract is `.impeccable/surfaces/app-page-tsx.md`.
 **Key Characteristics:**
 
 - Colour commits at page scale in two places: the record band, and the homepage's sky.
+  The sky is the call's contained block; the band folds under its summary.
   Everything else is ink on paper.
 - Two voices: Bricolage Grotesque binds, Source Sans 3 explains.
 - Ruled lists and lifted sheets: hairlines and a 2px ink rule over a list; a card or a button
@@ -267,10 +270,11 @@ band draws as fields.
 
 ### The sky
 
-The homepage's first screen sits on its condition (`app/styles/forecast.css`, drawn by
-`DecisionHero` wherever it has a margin). Each sky is a vertical gradient from
-`--regime-sky-top` to `--regime-sky`, with its own two inks, `--regime-sky-ink` and
-`--regime-sky-muted`, that clear 4.5:1 at both ends (`tests/forecastVisualWorld.test.tsx`):
+The homepage's first screen sets its call on its condition in a contained block
+(`app/styles/forecast.css`, drawn by `DecisionHero` wherever it has a margin). Each sky is a
+vertical gradient from `--regime-sky-top` to `--regime-sky`, with its own two inks,
+`--regime-sky-ink` and `--regime-sky-muted`, that clear 4.5:1 at both ends
+(`tests/forecastVisualWorld.test.tsx`):
 
 | Condition | Light theme sky | Ink on it | Dark theme sky | Ink on it |
 | --- | --- | --- | --- | --- |
@@ -281,10 +285,12 @@ The homepage's first screen sits on its condition (`app/styles/forecast.css`, dr
 
 On the light theme a sky is light where its fill is, so Stormy's is the one dark sky and takes
 the paper as its ink. Text on the sky takes the sky's inks, the condition word and its glyph
-included: the sky already says the condition in colour, and the glyph says it in shape. The
-scores sit on a panel of paper on the sky, which puts every page ink back, so the ladders' red
-reads there as it does everywhere else. Four soft cloud masses drift on it, by `transform` only,
-and hold still under reduced motion. A page with no condition gets the plain paper.
+included: the sky already says the condition in colour, and the glyph says it in shape. From
+`md` the two scores sit in the evidence rail beside the call, on paper; on a phone they follow
+the guidance on a panel of paper on the sky, which puts every page ink back, so the ladders'
+red reads there as it does everywhere else. Four soft cloud masses drift inside the block, by
+`transform` only, and hold still under reduced motion. A page with no condition gets the plain
+paper.
 
 ### Tertiary: a crossed line
 
@@ -389,8 +395,9 @@ are for `.type-badge` alone. No italics.
 ## Layout
 
 One frame on every route: the global header, the record band full-bleed beneath it, then the
-document. The page gutter is `--weather-shell-pad-inline` (16px); the brief's measure is 72rem,
-the wide report shell 84rem.
+document. The page gutter is `--weather-shell-pad-inline` (16px); the one-page brief's call
+and rail take the wide 84rem measure, and its reading body below keeps 72rem (the one-page
+brief, 2026-11-21).
 
 On `/` from `md`, the guidance block is a reading column and a margin of up to 22rem. Its top
 half is the sky, full width: the condition word and the guidance in the column, the week line

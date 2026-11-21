@@ -629,7 +629,7 @@ export function ScoreLadder({
               </span>
             ) : null}
           </span>
-          <span className={`${figure === "compact" ? "text-[0.8125rem]" : "text-fluid-sm"} leading-snug text-slate-300`} data-ladder-caption>
+          <span className={`${figure === "compact" ? "text-sm" : "text-fluid-sm"} leading-snug text-slate-300`} data-ladder-caption>
             <span className="sr-only">
               {formatPoints(value)} of {formatPoints(max)}.{" "}
             </span>
