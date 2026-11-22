@@ -12,6 +12,8 @@ pause threshold, and the reversal condition.
 
 ## Surfaces
 
+The homepage's visible area rows retain every required restart condition. `buildHomeAreaRows` carries the complete canonical restart text separately from the one-line distance slots used for measurement (`tests/intuitiveReading.test.tsx`). A pause may show one sufficient trigger because its numeric conditions combine with `or`.
+
 | Surface | Canonical code | Tests | Log |
 | --- | --- | --- | --- |
 | Weekly brief / homepage | `app/page.tsx`, `app/components/DecisionHero.tsx`, `lib/report/homeBriefModel.ts`, `lib/report/decisionKnobs.ts` | `tests/homeBriefModel.test.ts`, `tests/homeRouteDecisionTransmissionContract.test.tsx` | [01](decisions/feature-log/01-product-surfaces.md) |

@@ -665,3 +665,6 @@ approved comp in `.impeccable/mocks/declutter-20261121/brief.png`.
   14 buttons, 24 "Funding pressure" mentions, 29 "Risk appetite" mentions and 0 hard sentences
   (`scripts/check-home-load.ts`). The canonical rule models, exports, archival caveats,
   calibration and URL selection are unchanged.
+## Finish correction (2026-11-21)
+
+The area rows print every required condition under “Restart when”. A distance slot may select the single binding score for measurement, but that slot is not a sufficient restart rule: an `and` restart must retain every required score and any qualitative condition. The rows use the existing rule formatters for both action-strip and canonical-rule fallback data. A pause may show one sufficient trigger because its numeric conditions combine with `or`.

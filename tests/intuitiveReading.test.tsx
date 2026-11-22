@@ -7,7 +7,10 @@ import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { ScoreLadder } from "../app/components/ui/scoreLadder";
 import { AreaStrip } from "../app/components/home/AreaStrip";
-import { buildAreaStrip, type SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import { buildAreaStrip, buildHomeAreaRows, type SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { buildActionStripItems } from "../lib/report/operatingCalls";
+import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import { describeLatitudeAgainstConditions } from "../lib/report/trackRecordCopy";
 
 /*
@@ -20,6 +23,29 @@ import { describeLatitudeAgainstConditions } from "../lib/report/trackRecordCopy
 const slot = (met: boolean) => ({ line: "Funding pressure > 76", distance: "", points: 4, met, metric: "tightness" as const });
 
 describe("the card ties the weather word to the areas", () => {
+  for (const source of ["rules", "action strip"] as const) {
+    it(`keeps both restart requirements in the visible brief from ${source}`, () => {
+      for (const scores of [{ tightness: 90, riskAppetite: 38 }, { tightness: 65, riskAppetite: 38 }]) {
+        const decisionRules = buildCanonicalBoundedDecisionRules({ regime: "SCARCITY", thresholds: DEFAULT_THRESHOLDS, scores });
+        const rows = buildHomeAreaRows({
+          decisionRules, scores, movement: null,
+          actionStripItems: source === "action strip" ? buildActionStripItems(decisionRules, scores) : undefined,
+        });
+        const model = buildAreaStrip(rows);
+        for (const area of ["hiring", "capital-raising", "expansion-bets"]) {
+          const cell = model?.cells.find((entry) => entry.area === area);
+          assert.equal(cell?.line?.label, "Restart when");
+          const text = cell?.line?.text ?? "";
+          assert.match(text, /funding pressure.*66/i, `${area} retains its funding-pressure requirement`);
+          assert.match(text, /risk appetite.*54/i, `${area} retains its risk-appetite requirement`);
+          assert.match(text, / and /, `${area} requires both scores even when one already meets its line`);
+        }
+        const html = renderToStaticMarkup(<AreaStrip model={model!} />);
+        assert.match(html, /data-area-line[^>]*>[\s\S]*?funding pressure[\s\S]*?risk appetite/i);
+      }
+    });
+  }
+
   const held = (metric: "tightness" | "riskAppetite", value: number, holdsAbove: boolean) => ({
     ...slot(true),
     metric,
