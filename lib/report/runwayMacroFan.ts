@@ -2,7 +2,7 @@ import type { RegimeKey } from "../regimeEngine";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import { getRegimePublicLabel } from "../regimePresentation";
 
-type MacroSpellBenchmark = {
+export type MacroSpellBenchmark = {
   regime: RegimeKey;
   regimeLabel: string;
   currentSpellMonths: number;

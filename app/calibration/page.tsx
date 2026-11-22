@@ -9,6 +9,7 @@ import {
 } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
+import { AdviceStudyTeaser } from "../components/history/AdviceStudyTeaser";
 import { PremiseOutcomeScatterChart } from "../components/history/premiseOutcomeScatterChart";
 import { loadPremiseTestBacktestModel } from "../../lib/research/premiseBacktestModel";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
@@ -135,6 +136,8 @@ export default function CalibrationPage() {
           </li>
         </ul>
       </SecondaryPageSection>
+
+      <AdviceStudyTeaser />
     </ContentPageShell>
   );
 }

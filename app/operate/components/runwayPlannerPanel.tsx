@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { COMPANIES } from "../../../lib/companies/companyRegistry";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
@@ -38,8 +40,8 @@ import { CompanyFilingLookup } from "./companyFilingLookup";
 import { buildEngineeringPaybackLines, buildProjectPaybacks, resolvePaybackBar } from "../../../lib/report/projectPayback";
 import { runwayBandForMonths } from "../../../lib/report/operatorRunway";
 import { ProjectPaybackSection } from "./projectPaybackSection";
-import { RunwayMacroFanChart } from "./runwayMacroFanChart";
-import { buildRunwayMacroFanModel } from "../../../lib/report/runwayMacroFan";
+import { RunwayMacroFanChart, RunwayMacroFanGhost } from "./runwayMacroFanChart";
+import { buildRunwayMacroFanModel, computeMacroSpellBenchmark } from "../../../lib/report/runwayMacroFan";
 import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
@@ -252,6 +254,16 @@ export function RunwayPlannerPanel({
   const resolution = useMemo(() => resolveRunwayPlannerRequest(profile, stage), [profile, stage]);
   const runway = useMemo(() => resolveProfileRunway(profile), [profile]);
 
+  const macroSpellBenchmark = useMemo(
+    () => computeMacroSpellBenchmark(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), assessment.regime),
+    [assessment.regime],
+  );
+
+  const matchedCompany = useMemo(() => {
+    const filingTicker = profile.filing?.ticker.toUpperCase();
+    return filingTicker ? COMPANIES.find((company) => company.ticker.toUpperCase() === filingTicker) : undefined;
+  }, [profile.filing]);
+
   const macroFanModel = useMemo(() => {
     if (!resolution.ready) return null;
     const initialCash =
@@ -396,6 +408,18 @@ export function RunwayPlannerPanel({
         {profile.filing ? (
           <p data-testid="company-filing-source" className="text-xs text-slate-300">
             {describeProfileFiling(profile.filing, Boolean(runway?.debtLimitsRunway))}
+            {matchedCompany ? (
+              <>
+                {" "}
+                <Link
+                  href={`/companies/${matchedCompany.slug}`}
+                  data-company-filing-page-link
+                  className="weather-hit weather-focus-ring font-semibold text-sky-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-sky-200"
+                >
+                  Open {matchedCompany.name}&apos;s role notes, 8-K history and calendar (.ics) &rarr;
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
 
@@ -533,6 +557,8 @@ export function RunwayPlannerPanel({
           <p className="mt-3 text-fluid-sm text-slate-400">
             Your figures stay in this browser and are shared with the plan stress test.
           </p>
+
+          <RunwayMacroFanGhost benchmark={macroSpellBenchmark} className="mt-4" />
         </div>
       ) : (
         <>

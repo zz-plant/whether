@@ -24,6 +24,7 @@ import { formatDateUTC } from "../../lib/formatters";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
+import { AdviceStudyTeaser } from "../components/history/AdviceStudyTeaser";
 import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
@@ -405,6 +406,8 @@ export default async function HistoryPage({
           </div>
         </div>
       </UrlDetails>
+
+      <AdviceStudyTeaser />
     </ReportShell>
   );
 }

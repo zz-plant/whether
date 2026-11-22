@@ -18,12 +18,18 @@
 }
 
 /* The record is a disclosure (2026-11-21, the one-page brief): its summary is the
-   category line the frame says on every route, plus a quiet name for what opens. */
+   category line the frame says on every route, plus a quiet name for what opens and
+   a 4px proportional horizon strip of the record along its bottom edge. */
 .record-band-summary {
+  position: relative;
   padding-inline: var(--weather-shell-pad-inline);
+  padding-bottom: 4px;
   font-size: var(--fs-nano);
   line-height: 1.4;
   color: var(--app-text);
+}
+.record-band-details[open] > .record-band-summary {
+  padding-bottom: 0;
 }
 .record-band-summary-meta {
   margin-left: auto;
@@ -31,8 +37,39 @@
   color: var(--app-text-muted);
   white-space: nowrap;
 }
-.record-band-details:not([open]) > .record-band-summary {
-  border-bottom: 1px solid var(--border-faint);
+.record-band-summary-cue {
+  display: none;
+}
+@container (min-width: 46rem) {
+  .record-band-summary-cue {
+    display: inline;
+  }
+}
+.record-band-horizon {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  height: 4px;
+  pointer-events: none;
+  transform-origin: bottom;
+}
+.record-band-details[open] .record-band-horizon {
+  display: none;
+}
+.record-band-horizon-segment {
+  display: block;
+  flex-basis: 0;
+  background: var(--regime-accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .record-band-horizon {
+    transition: transform 160ms var(--ease-out);
+  }
+  .record-band-details:not([open]) > .record-band-summary:hover .record-band-horizon,
+  .record-band-details:not([open]) > .record-band-summary:focus-visible .record-band-horizon {
+    transform: scaleY(2);
+  }
 }
 
 .record-band-plate {
@@ -361,5 +398,5 @@ body:has([data-record-plate]) .record-band-plate {
 
 @media print {
   .record-band-plate { cursor: auto; }
-  .record-band-field, .record-band-lines path, .record-band-key-swatch { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .record-band-field, .record-band-lines path, .record-band-key-swatch, .record-band-horizon-segment { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }

@@ -55,6 +55,11 @@ describe("/comps title and as-of date", () => {
       visibleText(html).includes("As of Jan 15, 2027, from SEC EDGAR filings and Cboe delayed prices."),
       "the read's date and source sit beside the figures",
     );
+    /* The basket and the pilot company pages overlap; the overlap is the door
+       from a valuation conversation into that company's filings. */
+    assert.match(html, /href="\/companies\/snowflake(?:#company-restructurings)?"/);
+    assert.match(html, /href="\/companies\/salesforce(?:#company-restructurings)?"/);
+    assert.ok(!html.includes('href="/companies/zscaler"'), "a basket company with no page is not linked");
   });
 
   it("names Yahoo Finance when the fallback answered instead", async () => {

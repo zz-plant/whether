@@ -10,6 +10,8 @@ import type { z } from "zod";
 
 type CompanyFiling = z.infer<typeof companyFilingSchema>;
 
+const SAMPLE_TICKERS = ["NET", "DOCU", "DDOG", "ABNB"] as const;
+
 /**
  * Fills the figures below from a public company's latest SEC filing, so a public company's
  * operator types one word instead of four numbers. It says what it will change before it does.
@@ -20,13 +22,14 @@ export function CompanyFilingLookup({ onFiling }: { onFiling: (filing: CompanyFi
   const [status, setStatus] = useState<"idle" | "loading">("idle");
   const [failure, setFailure] = useState<string | null>(null);
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!ticker.trim()) return;
+  const fetchFiling = async (rawTicker: string) => {
+    const clean = rawTicker.trim().toUpperCase().slice(0, 10);
+    if (!clean) return;
+    setTicker(clean);
     setStatus("loading");
     setFailure(null);
     try {
-      const response = await fetch(`/api/company-filing?ticker=${encodeURIComponent(ticker.trim())}`);
+      const response = await fetch(`/api/company-filing?ticker=${encodeURIComponent(clean)}`);
       const lookup = companyFilingLookupSchema.parse(await response.json());
       if (lookup.ok) onFiling(lookup.filing);
       else setFailure(describeLookupFailure(lookup.failure));
@@ -35,6 +38,11 @@ export function CompanyFilingLookup({ onFiling }: { onFiling: (filing: CompanyFi
     } finally {
       setStatus("idle");
     }
+  };
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    await fetchFiling(ticker);
   };
 
   return (
@@ -63,6 +71,23 @@ export function CompanyFilingLookup({ onFiling }: { onFiling: (filing: CompanyFi
         >
           {status === "loading" ? "Reading the filing…" : "Fill from filing"}
         </button>
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400" data-sample-tickers>
+        <span>Try a live filing:</span>
+        {SAMPLE_TICKERS.map((symbol) => (
+          <button
+            key={symbol}
+            type="button"
+            disabled={status === "loading"}
+            data-sample-ticker={symbol}
+            onClick={() => {
+              void fetchFiling(symbol);
+            }}
+            className="weather-hit weather-focus-ring rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-mono text-xs font-medium text-slate-200 transition-colors hover:border-[color:var(--border-strong)] hover:text-white disabled:opacity-60"
+          >
+            {symbol}
+          </button>
+        ))}
       </div>
       <p className="text-xs text-slate-400">
         Replaces your cash, spend, revenue and growth with the latest SEC filing, and sets your stage to Series B+.

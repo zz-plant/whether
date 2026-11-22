@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useId } from "react";
+import { Fragment, useCallback, useMemo, useState, useId } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { useSlackPreviewOverlay } from "./useSlackPreviewOverlay";
 import { useBriefArtifact } from "./useBriefArtifact";
@@ -11,6 +11,7 @@ import {
   type BriefFormatId,
 } from "../../lib/report/briefArtifact";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildAssistantLinks } from "../../lib/export/askAssistant";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
@@ -110,6 +111,14 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   }, [copyToClipboard, buildShareText]);
 
   const activeFormat = BRIEF_FORMATS.find((option) => option.id === format) ?? BRIEF_FORMATS[0];
+
+  /* The rail is the keyboard's way into sharing (⇧S), so it also carries the
+     handoff /share has at its foot: the frozen brief and a prompt for the
+     reader's own numbers. Only where there is a brief to hand over. */
+  const assistantLinks = useMemo(
+    () => (artifact ? buildAssistantLinks(`${siteUrl}${artifact.permalinkPath ?? "/"}`, artifact.recordDateLabel) : []),
+    [artifact],
+  );
 
   /* The canonical origin, not `window.location.origin` (2026-11-02): the same
      string is now what Copy Brief under the call copies, and a paste outlives
@@ -239,6 +248,30 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 {copiedTarget === "link" ? "Copied" : "Copy page link"}
               </button>
             </div>
+
+            {assistantLinks.length > 0 ? (
+              <div className="mt-3 border-t border-slate-800/60 pt-3">
+                <p className="type-eyebrow">Ask an assistant</p>
+                <p className="mt-1 text-sm text-slate-300">
+                  {assistantLinks.map((link, index) => (
+                    <Fragment key={link.name}>
+                      {index > 0 ? <span aria-hidden="true"> &middot; </span> : null}
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="weather-hit weather-focus-ring font-medium text-[var(--accent-action)] underline underline-offset-4 transition-colors hover:text-slate-100"
+                      >
+                        {link.name}
+                      </a>
+                    </Fragment>
+                  ))}
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Opens with this week&apos;s brief and asks for your burn and runway.
+                </p>
+              </div>
+            ) : null}
           </div>
         </div>
       </Dialog.Popup>

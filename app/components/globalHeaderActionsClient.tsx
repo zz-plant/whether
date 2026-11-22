@@ -74,7 +74,7 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
           buttons either side. */}
       <ThemeToggleButton className={`${CELL} !outline-offset-[-2px]`} />
       {showPresentMode ? (
-        <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
+        <PresentModeButton className="!rounded-none !border-0 !bg-transparent lg:gap-1.5 lg:px-2.5 focus-visible:outline-offset-[-2px]" />
       ) : null}
     </div>
   );

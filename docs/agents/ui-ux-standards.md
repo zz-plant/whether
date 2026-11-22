@@ -1072,6 +1072,12 @@ the frame.
 
 - MUST: mount it once, in `app/layout.tsx`, directly under `GlobalHeader`. A route never mounts a
   second one; `/history` changes the one it has.
+- The band is a native disclosure on every route (2026-11-21, the one-page brief): its summary
+  keeps the category line and says "The record since 2012". A 4px proportional strip of the runs
+  sits on the summary's bottom edge, hidden while the band is open and thickening to 8px on hover
+  or keyboard focus. The strip is the record's own proportions, not a decorative gradient, and is
+  `aria-hidden`; the summary's words carry the meaning. `/history` opens the disclosure on arrival
+  so the plate canvas has a height to draw into, and closes it on leaving if that route opened it.
 - MUST: make every mark a reading. A field is a stretch of conditions, filled from `data-regime`
   through `--regime-accent`. Two bundles of fine lines cross the fields, risk appetite above and
   funding pressure below, so easier is up, as on every other drawing. The band carries no

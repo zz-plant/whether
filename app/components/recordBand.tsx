@@ -51,20 +51,34 @@ export function RecordBand() {
   const published = briefsCounted ? `${briefsCounted}, published as written` : null;
   const keyed = CONDITIONS.filter((regime) => model.runs.some((run) => run.regime === regime));
   const firstYear = model.firstDate.slice(0, 4);
+  const lastYear = model.lastDate.slice(0, 4);
   return (
     <aside className="record-band" aria-label="The record" data-record-band data-first={model.firstDate} data-months={model.encoded}>
       {/* The record folds (2026-11-21, the one-page brief): it is the frame's proof and
           its only ornament, not the week's answer, and drawn open it took the first
           screen before the call. The category line stays visible in the summary on
           every route and every visit; the band, its readout and the way to History are
-          one native disclosure away, and need no script to open. */}
+          one native disclosure away, and need no script to open. Along the closed bar's
+          bottom edge sits a 4px proportional strip of the monthly record so visitors can
+          see the coloured history waiting behind one click. */}
       <details className="record-band-details weather-auto-chevron" data-record-band-disclosure>
         <summary className="record-band-summary">
           <span className="record-band-what" data-category-line>
             {categorySentence}
           </span>
-          <span className="record-band-summary-meta" aria-hidden="true">
+          <span className="record-band-summary-meta">
             The record since {firstYear}
+            <span className="record-band-summary-cue"> &middot; Scrub {firstYear}&ndash;{lastYear}</span>
+          </span>
+          <span className="record-band-horizon" aria-hidden="true" data-record-band-horizon>
+            {model.runs.map((run) => (
+              <span
+                key={run.start}
+                className="record-band-horizon-segment"
+                data-regime={run.regime}
+                style={{ flexGrow: run.length }}
+              />
+            ))}
           </span>
         </summary>
         <p className="sr-only">

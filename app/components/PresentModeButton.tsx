@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback } from "react";
-import { Maximize2 } from "lucide-react";
+import { Presentation } from "lucide-react";
 
 type Props = {
   className?: string;
 };
 
 /**
- * Puts the page into presentation focus mode.
+ * Puts the page into presentation focus mode (3-slide meeting deck).
  *
  * This lived in `DecisionHero`, in the row that runs Copy Brief · Copy Meeting
  * Slide · Track in Memory — three controls that act on the brief artifact,
@@ -21,11 +21,9 @@ type Props = {
  * `[data-home-shell-main]` and `Shell` — the only component that renders it —
  * serves that one route.
  *
- * It is icon-only now. A prior comment here insisted on a visible label at every
- * width, because hiding it below `sm` left one bare glyph at the end of a
- * wrapping row of three labelled buttons. That row is no longer its parent; in
- * the header cluster every sibling is a 44px icon button, so a label is what
- * would look out of place.
+ * Shows a presentation-slide glyph on compact screens and expands to a visible
+ * "Present" label with its `F` keycap on wide screens, matching the Search cell
+ * in the same header group so the 3-slide meeting deck is discoverable at a glance.
  */
 export function PresentModeButton({ className = "" }: Props) {
   const handleToggle = useCallback(() => {
@@ -36,11 +34,13 @@ export function PresentModeButton({ className = "" }: Props) {
     <button
       type="button"
       onClick={handleToggle}
-      title="Presentation focus mode (F)"
+      title="Present 3-slide deck (F)"
       className={`weather-header-action inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 transition-colors duration-150 hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 ${className}`}
-      aria-label="Toggle presentation focus mode"
     >
-      <Maximize2 aria-hidden="true" size={16} strokeWidth={1.8} />
+      <Presentation aria-hidden="true" size={16} strokeWidth={1.8} />
+      <span className="sr-only lg:not-sr-only lg:inline lg:text-fluid-sm lg:font-medium">Present</span>
+      <span className="sr-only"> 3-slide deck</span>
+      <kbd aria-hidden="true" className="weather-kbd hidden xl:inline-flex">F</kbd>
     </button>
   );
 }

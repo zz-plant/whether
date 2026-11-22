@@ -14,6 +14,7 @@ import { PeriodControl } from "./components/home/PeriodControl";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { QuietWeekFold } from "./components/home/QuietWeekFold";
+import { BoardSlidePreviewLink } from "./components/home/BoardSlidePreviewLink";
 import type { CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
@@ -616,6 +617,12 @@ async function PageContent({
     initialCounted: parseRuleChartCounted(searchParams?.[RULE_CHART_COUNTED_PARAM]),
     query: searchParams,
   };
+  /* The closed quiet-week row's miniature radar: the lead rule's pause region
+     and this week's dot, so the fold shows what it is holding. */
+  const quietWeekLeadRule = ruleChart.areas.find((candidate) => candidate.area === ruleChart.defaultArea) ?? ruleChart.areas[0];
+  const quietWeekPreview = quietWeekLeadRule
+    ? { area: quietWeekLeadRule.area, regions: quietWeekLeadRule.regions, scores: { tightness, riskAppetite }, changeLines: callChangeLines }
+    : null;
   /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
   const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
   /* The card sizes the room before a change once; the count of months held at this
@@ -914,14 +921,23 @@ async function PageContent({
                     words-before-the-areas budget stands. A wrapped row reaches up only
                     across the 4px gap (`--weather-hit-up`, controls.css). */}
                 {!historicalSelection ? (
-                  <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)] [--weather-hit-up:4px]">
-                    Share as:
-                    {ROLE_FORMAT_LINKS.map((format) => (
-                      <ActionLink key={format.href} href={format.href} variant="inline">
-                        {format.label}
-                      </ActionLink>
-                    ))}
-                  </p>
+                  <div data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)] [--weather-hit-up:4px]">
+                    <span>Share as:</span>
+                    {ROLE_FORMAT_LINKS.map((format) =>
+                      format.href === "/share#image-artifacts" ? (
+                        <BoardSlidePreviewLink
+                          key={format.href}
+                          href={format.href}
+                          label={format.label}
+                          stage={activeStage}
+                        />
+                      ) : (
+                        <ActionLink key={format.href} href={format.href} variant="inline">
+                          {format.label}
+                        </ActionLink>
+                      ),
+                    )}
+                  </div>
                 ) : null}
               </DecisionPicker>
 
@@ -946,7 +962,11 @@ async function PageContent({
                   says what the week did to the conditions and why, and each area's
                   row says which of its lines moved. Only a read with nothing to
                   compare says so over it. */}
-              <QuietWeekFold quiet={quietWeek} regimeLabel={publicRegimeLabel}>
+              <QuietWeekFold
+                quiet={quietWeek}
+                regimeLabel={publicRegimeLabel}
+                preview={quietWeekPreview}
+              >
                 <WhatChangedSection
                   compact
                   drawnAbove
