@@ -8,6 +8,9 @@ import { useBriefArtifact } from "./useBriefArtifact";
 import { BriefFormatPicker } from "./briefFormatPicker";
 import {
   BRIEF_FORMATS,
+  MONDAY_AGENDA_MINUTES,
+  MONDAY_AGENDA_STEPS,
+  MONDAY_AGENDA_TITLE,
   formatBriefArtifact,
   type BriefFormatId,
 } from "../../lib/report/briefArtifact";
@@ -206,18 +209,45 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             <span id={slackOverlayLabelId}>Slack preview overlay</span>
           </label>
 
-          <div className="border-t border-slate-800/60 pt-3">
-            <div className="mb-3">
-              <CalendarButton
-                title="Whether Weekly Brief"
-                description={buildMondayAgendaDescription()}
-                date={(() => {
-                  const d = new Date();
-                  d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
-                  return d.toISOString().split("T")[0];
-                })()}
-              />
-            </div>
+          <div className="border-t border-[color:var(--border-subtle)] pt-3">
+            {/* The one place the product says what the Monday ritual is. The Agenda
+                format below has carried the item since 2026-10-21 and the hold has
+                lived in this rail just as long, but nothing said they were the same
+                three minutes: a reader met "Agenda" as one of four formats and a
+                calendar button with no reason to press it. Only where there is a
+                brief to paste — a route with no artifact has no Agenda format. */}
+            {artifact ? (
+              <div className="mb-3 space-y-1.5">
+                <p className="type-eyebrow">
+                  {MONDAY_AGENDA_TITLE} · {MONDAY_AGENDA_MINUTES} min
+                </p>
+                <p className="text-xs leading-relaxed text-[var(--app-text-muted)]">
+                  {MONDAY_AGENDA_STEPS.map((step) => step.label).join(" · ")}. The Agenda
+                  format below is the item to paste; the hold brings it back every Monday.
+                </p>
+                <CalendarButton
+                  title="Whether Weekly Brief"
+                  description={buildMondayAgendaDescription()}
+                  date={(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
+                    return d.toISOString().split("T")[0];
+                  })()}
+                />
+              </div>
+            ) : (
+              <div className="mb-3">
+                <CalendarButton
+                  title="Whether Weekly Brief"
+                  description={buildMondayAgendaDescription()}
+                  date={(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
+                    return d.toISOString().split("T")[0];
+                  })()}
+                />
+              </div>
+            )}
             <p className="type-eyebrow">Copy as</p>
             <output aria-live="polite" className="sr-only">
               {copyStatusMessage}
