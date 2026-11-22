@@ -69,6 +69,14 @@ export function BoardSlidePreviewLink({ href, label, stage }: BoardSlidePreviewL
     }
   }, []);
 
+  const handleInterestEnd = useCallback(() => {
+    clearTimers();
+    if (supportsNativeInterest()) return;
+    hideTimerRef.current = setTimeout(() => {
+      closeFallback();
+    }, 120);
+  }, [clearTimers, closeFallback]);
+
   useEffect(() => {
     const trigger = triggerRef.current;
     const popover = popoverRef.current;
@@ -83,11 +91,21 @@ export function BoardSlidePreviewLink({ href, label, stage }: BoardSlidePreviewL
       if (Reflect.get(event, "newState") === "open") setEngaged(true);
     };
     popover.addEventListener("toggle", onToggle);
+    /* Keep the fallback preview open while the pointer rests on the card (WCAG 1.4.13). */
+    const fallback = !supportsNativeInterest();
+    if (fallback) {
+      popover.addEventListener("mouseenter", clearTimers);
+      popover.addEventListener("mouseleave", handleInterestEnd);
+    }
     return () => {
       popover.removeEventListener("toggle", onToggle);
+      if (fallback) {
+        popover.removeEventListener("mouseenter", clearTimers);
+        popover.removeEventListener("mouseleave", handleInterestEnd);
+      }
       clearTimers();
     };
-  }, [clearTimers, popoverId]);
+  }, [clearTimers, handleInterestEnd, popoverId]);
 
   const handleInterestStart = useCallback(() => {
     clearTimers();
@@ -97,14 +115,6 @@ export function BoardSlidePreviewLink({ href, label, stage }: BoardSlidePreviewL
       openFallback();
     }, 180);
   }, [clearTimers, openFallback]);
-
-  const handleInterestEnd = useCallback(() => {
-    clearTimers();
-    if (supportsNativeInterest()) return;
-    hideTimerRef.current = setTimeout(() => {
-      closeFallback();
-    }, 120);
-  }, [clearTimers, closeFallback]);
 
   return (
     <span className="inline-flex items-center">
