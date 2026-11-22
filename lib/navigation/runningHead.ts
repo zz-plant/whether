@@ -98,6 +98,34 @@ export const sameFrameFacts = (a: FrameFacts, b: FrameFacts): boolean =>
   a.jump?.label === b.jump?.label;
 
 /**
+ * Whether a page's intro block has left the masthead, which is what turns the bar into
+ * the reading head.
+ *
+ * `scrollY === 0` is never past the hero. The brief's card streams in after hydration,
+ * so a first measurement taken while the page was still short found the block above the
+ * head and the phone masthead opened in reading mode — the week's condition and call
+ * over a page the reader had not scrolled (measured on production, two loads of three,
+ * 2026-11-22). At the top of the page the nav is what the reader should see, whatever
+ * the layout was doing at mount.
+ *
+ * `anchorTop` is null on a page with no marked block and no h1; there the distance
+ * scrolled is the only signal.
+ */
+export const isPastHero = ({
+  scrollY,
+  anchorTop,
+  headerBottom,
+}: {
+  scrollY: number;
+  anchorTop: number | null;
+  headerBottom: number;
+}): boolean => {
+  if (scrollY <= 0) return false;
+  if (anchorTop === null) return scrollY > 240;
+  return anchorTop + 24 < headerBottom;
+};
+
+/**
  * The section a frame is in: the last heading that has reached the line under the head.
  * Null above the first one, where the page's title says enough.
  */

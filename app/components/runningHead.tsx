@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import {
+  isPastHero,
   readFrameFacts,
   runningHeadSection,
   sameFrameFacts,
@@ -89,7 +90,13 @@ export function useMastheadReading(pathname: string): MastheadReadingState {
       setFacts((previous) => (previous && sameFrameFacts(previous, nextFacts) ? previous : nextFacts));
 
       const anchor = source ?? document.querySelector("main h1");
-      setPastHero(anchor ? anchor.getBoundingClientRect().top + 24 < headerBottom : window.scrollY > 240);
+      setPastHero(
+        isPastHero({
+          scrollY: window.scrollY,
+          anchorTop: anchor ? anchor.getBoundingClientRect().top : null,
+          headerBottom,
+        }),
+      );
 
       const visibleHeadings = [...document.querySelectorAll<HTMLElement>("main h2")].filter(
         (heading) =>
@@ -118,11 +125,21 @@ export function useMastheadReading(pathname: string): MastheadReadingState {
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
     };
+
+    /* The brief streams its card in after hydration and the web fonts land after that,
+       so the mount measurement can see a page that is not laid out yet. Re-measure when
+       the document's box changes, and once the fonts are ready; both are equality-guarded
+       upstream, so a settled page stops re-rendering. */
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(document.documentElement);
+    void document.fonts?.ready.then(schedule);
+
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
