@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Drawer } from "@base-ui/react/drawer";
-import { Home, LayoutGrid, Archive, BookOpen, MoreHorizontal } from "lucide-react";
-import { navigationGroups, type NavigationGroupKey } from "../../lib/navigation/informationArchitecture";
+import { Home, LayoutGrid, Archive, BookOpen, Menu, ChevronUp } from "lucide-react";
+import { pagesInGroup, type NavigationGroupKey } from "../../lib/navigation/informationArchitecture";
 import {
+  findActivePage,
   normalizePathname,
   resolveGlobalHeaderNavigationLinks,
+  type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
 import { MobileNavContent } from "./globalHeaderNavClient";
 
@@ -19,97 +21,155 @@ const TAB_ICONS: Record<NavigationGroupKey, typeof Home> = {
   guides: BookOpen,
 };
 
-const SWIPE_MIN_PX = 72;
 /** Scroll distance that counts as a direction, so a jittery thumb does not flicker the bar. */
 const SCROLL_INTENT_PX = 8;
 /** Near the top the bar always shows: the page has not been read into yet. */
 const SCROLL_REVEAL_TOP_PX = 96;
 
-/**
- * Starts inside something that scrolls sideways, or on a control that owns
- * the gesture (the month scrubber, the brief's own cadence swipe).
- */
-const startsInHorizontalOwner = (target: EventTarget | null): boolean => {
-  let node = target instanceof Element ? target : null;
-  while (node && node !== document.body) {
-    if (node.getAttribute("role") === "slider") return true;
-    if (node.hasAttribute("data-swipe-owner")) return true;
-    if (node.scrollWidth > node.clientWidth + 1) {
-      const overflowX = window.getComputedStyle(node).overflowX;
-      if (overflowX === "auto" || overflowX === "scroll") return true;
-    }
-    node = node.parentElement;
-  }
-  return false;
-};
-
 const TAB_CLASS =
-  "flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-fluid-nano font-medium leading-none no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400";
+  "weather-focus-ring flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-fluid-nano font-medium leading-none no-underline transition-colors";
 
 /**
- * The four groups, one thumb-tap away on a phone.
+ * Active bottom-bar tab with a one-tap sibling switcher popover (`popover="auto"`).
  *
- * A fixed bottom bar is the native-app convention every phone user already
- * knows: This week, Decide, Record and Guides as tabs, and More opening the
- * sheet with Search, each group's other pages and the utility links. Until
- * 2026-10-08 the bar carried Brief, Plan and Evidence beside Search and More,
- * and Resolve, Trust and History sat behind More.
- *
- * On a group's pages a horizontal swipe moves to the neighbouring group, so
- * the bar and the gesture agree. The brief keeps its own swipe, which moves the
- * month, and marks itself `data-swipe-owner`.
+ * Tapping an inactive group tab navigates straight to its hub; tapping the active
+ * tab opens a compact popover directly above the bar listing that group's 2–3 pages
+ * so a reader can jump between Plan / Runway planner / SaaS multiples (or This week /
+ * Why it changed / Can I trust this?) without scrolling to the top or opening the
+ * full Menu drawer.
  */
-export function MobileTabBar() {
-  const pathname = normalizePathname(usePathname() ?? "/");
-  const router = useRouter();
+function ActiveGroupTab({
+  tab,
+  activePageKey,
+  onOpenChange,
+}: {
+  tab: GlobalHeaderNavigationLink;
+  activePageKey: string | undefined;
+  onOpenChange: (open: boolean) => void;
+}) {
+  /* Keyed by the group, not `useId`: Next's `Link` consumes a `useId` on the client
+     only, so an id derived from it shifts between server and client and the trigger's
+     `popoverTarget` stops naming the popover (see `DesktopNavGroupItem`). One tab is
+     active at a time, so the key is unique. */
+  const popoverId = `mobile-tab-group-${tab.key}`;
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+
+  const Icon = TAB_ICONS[tab.key];
+  const pages = useMemo(() => pagesInGroup(tab.key), [tab.key]);
+
+  useEffect(() => {
+    const popover = popoverRef.current;
+    if (!popover) return;
+    const onToggle = (event: Event) => {
+      const next = Reflect.get(event, "newState") === "open";
+      setOpen(next);
+      onOpenChange(next);
+    };
+    popover.addEventListener("toggle", onToggle);
+    return () => {
+      popover.removeEventListener("toggle", onToggle);
+      onOpenChange(false);
+    };
+  }, [onOpenChange]);
+
+  const closePopover = useCallback(() => {
+    const popover = popoverRef.current;
+    if (!popover || typeof popover.hidePopover !== "function") return;
+    try {
+      if (popover.matches(":popover-open")) popover.hidePopover();
+    } catch {
+      // Ignore if unsupported or already closed.
+    }
+  }, []);
+
+  if (pages.length < 2) {
+    return (
+      <Link
+        href={tab.href}
+        aria-current="page"
+        className={`relative ${TAB_CLASS} font-semibold text-[var(--app-text)]`}
+      >
+        <span className="absolute top-0 h-0.5 w-8 bg-[var(--app-text)]" aria-hidden="true" />
+        <Icon aria-hidden="true" size={20} strokeWidth={2.2} />
+        <span className="whitespace-nowrap">{tab.label}</span>
+      </Link>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        popoverTarget={popoverId}
+        aria-controls={popoverId}
+        aria-expanded={open}
+        aria-current="page"
+        aria-label={`${tab.label}, current section — open ${tab.label} pages`}
+        className={`relative ${TAB_CLASS} font-semibold text-[var(--app-text)]`}
+      >
+        <span className="absolute top-0 h-0.5 w-8 bg-[var(--app-text)]" aria-hidden="true" />
+        <Icon aria-hidden="true" size={20} strokeWidth={2.2} />
+        <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
+          <span>{tab.label}</span>
+          <ChevronUp
+            aria-hidden="true"
+            size={11}
+            strokeWidth={2.2}
+            className={`text-[var(--app-text-muted)] transition-transform duration-150 motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
+          />
+        </span>
+      </button>
+      <div
+        ref={popoverRef}
+        id={popoverId}
+        popover="auto"
+        className="mobile-tab-submenu"
+        data-mobile-group-menu={tab.key}
+      >
+        <ul className="flex flex-col gap-0.5">
+          {pages.map((page) => {
+            const isCurrent = page.key === activePageKey;
+            return (
+              <li key={page.href}>
+                <Link
+                  href={page.href}
+                  data-current-page={isCurrent ? "true" : undefined}
+                  onClick={closePopover}
+                  className="site-nav-popover-link"
+                >
+                  <span className="truncate">{page.label}</span>
+                  {isCurrent ? <span className="sr-only"> (current page)</span> : null}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </>
+  );
+}
+
+/**
+ * The four groups, one thumb-tap away on a phone, in Forecast's ink register.
+ *
+ * - Inactive tabs navigate straight to their group hub.
+ * - The active tab opens a compact popover for its sibling pages right above the bar.
+ * - The hidden full-page horizontal swipe-to-switch-group listener is retired so
+ *   charts, tables, and the Record Band scrubber never collide with route navigation.
+ */
+export function MobileTabBar({ pathname: propPathname }: { pathname?: string } = {}) {
+  const hookPathname = usePathname() ?? "/";
+  const pathname = normalizePathname(propPathname ?? hookPathname);
   const [showMore, setShowMore] = useState(false);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const [submenuOpen, setSubmenuOpen] = useState(false);
   const [scrolledAway, setScrolledAway] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const tabs = useMemo(() => resolveGlobalHeaderNavigationLinks(pathname), [pathname]);
+  const activePageKey = useMemo(() => findActivePage(pathname)?.key, [pathname]);
 
   useEffect(() => {
-    // The brief owns its swipe (it moves the month); every other grouped route
-    // moves along the groups. Neighbours come from the same ordered list the
-    // tabs and the desktop row render.
-    if (pathname === "/") return;
-    const currentIndex = tabs.findIndex((tab) => tab.isActive);
-    if (currentIndex < 0) return;
-
-    const onStart = (event: TouchEvent) => {
-      if (startsInHorizontalOwner(event.target)) {
-        touchStart.current = null;
-        return;
-      }
-      const touch = event.touches[0];
-      touchStart.current = { x: touch.clientX, y: touch.clientY };
-    };
-    const onEnd = (event: TouchEvent) => {
-      const start = touchStart.current;
-      touchStart.current = null;
-      if (!start) return;
-      const touch = event.changedTouches[0];
-      const dx = touch.clientX - start.x;
-      const dy = touch.clientY - start.y;
-      if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-      const next = navigationGroups[currentIndex + (dx < 0 ? 1 : -1)];
-      if (next) router.push(next.href);
-    };
-    document.addEventListener("touchstart", onStart, { passive: true });
-    document.addEventListener("touchend", onEnd, { passive: true });
-    return () => {
-      document.removeEventListener("touchstart", onStart);
-      document.removeEventListener("touchend", onEnd);
-    };
-  }, [pathname, tabs, router]);
-
-  useEffect(() => {
-    // Out of the way while reading down, back on the first move up. A fixed bar
-    // sits in every phone screenshot and cuts through whatever is behind it; a
-    // reader scrolling down is reading, and one scrolling up is looking for it.
-    // It returns at the foot of the page too, where there is nothing left to
-    // read behind it. Plain scroll events, not rAF: the handler is two compares.
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
@@ -123,8 +183,6 @@ export function MobileTabBar() {
       setScrolledAway(y > lastY);
       lastY = y;
     };
-    // Keyboard focus brings it back: a tab stop inside a bar that is off the
-    // screen is a focus ring nobody can see.
     const nav = navRef.current;
     const onFocusIn = () => setScrolledAway(false);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -135,7 +193,7 @@ export function MobileTabBar() {
     };
   }, []);
 
-  const hidden = scrolledAway && !showMore;
+  const hidden = scrolledAway && !showMore && !submenuOpen;
 
   return (
     <>
@@ -144,28 +202,28 @@ export function MobileTabBar() {
         data-testid="mobile-tab-bar"
         ref={navRef}
         data-scrolled-away={hidden ? "true" : undefined}
-        className={`fixed inset-x-0 bottom-0 z-[var(--z-chrome)] border-t border-[color:var(--border-default)] bg-[var(--bg-body)] px-2 pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden ${hidden ? "translate-y-full" : ""}`}
+        className={`fixed inset-x-0 bottom-0 z-[var(--z-chrome)] border-t border-[color:var(--border-default)] bg-[var(--bg-body)] px-2 pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden print:hidden ${hidden ? "translate-y-full" : ""}`}
       >
-        {/* Capped from `sm`: on a tablet held upright (the bar shows to 767px) the
-            five tabs spread to 140px apiece, each label a long reach from the
-            next. Centred at 36rem they sit where a thumb expects them. */}
         <ul className="flex items-stretch sm:mx-auto sm:max-w-xl">
           {tabs.map((tab) => {
             const Icon = TAB_ICONS[tab.key];
             return (
               <li key={tab.key} className="flex flex-1">
-                <Link
-                  href={tab.href}
-                  aria-current={tab.isActive ? "page" : undefined}
-                  className={`relative ${TAB_CLASS} ${tab.isActive ? "text-sky-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
-                >
-                  <Icon aria-hidden="true" size={20} strokeWidth={tab.isActive ? 2.2 : 1.8} />
-                  {/* One line: at 320px "This week" broke in two under its own marker. */}
-                  <span className="whitespace-nowrap">{tab.label}</span>
-                  {tab.isActive ? (
-                    <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-sky-400" aria-hidden="true" />
-                  ) : null}
-                </Link>
+                {tab.isActive ? (
+                  <ActiveGroupTab
+                    tab={tab}
+                    activePageKey={activePageKey}
+                    onOpenChange={setSubmenuOpen}
+                  />
+                ) : (
+                  <Link
+                    href={tab.href}
+                    className={`relative ${TAB_CLASS} text-[var(--app-text-muted)] hover:text-[var(--app-text)]`}
+                  >
+                    <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
+                    <span className="whitespace-nowrap">{tab.label}</span>
+                  </Link>
+                )}
               </li>
             );
           })}
@@ -174,11 +232,11 @@ export function MobileTabBar() {
               type="button"
               onClick={() => setShowMore(true)}
               aria-expanded={showMore}
-              aria-label="More: search, every page and about"
-              className={`relative ${TAB_CLASS} text-slate-400 hover:text-slate-200`}
+              aria-label="Menu: search, every page and about"
+              className={`relative ${TAB_CLASS} text-[var(--app-text-muted)] hover:text-[var(--app-text)]`}
             >
-              <MoreHorizontal aria-hidden="true" size={20} strokeWidth={1.8} />
-              <span>More</span>
+              <Menu aria-hidden="true" size={20} strokeWidth={1.8} />
+              <span>Menu</span>
             </button>
           </li>
         </ul>
@@ -187,12 +245,6 @@ export function MobileTabBar() {
       <Drawer.Root open={showMore} onOpenChange={setShowMore}>
         <Drawer.Portal>
           <Drawer.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/50 backdrop-blur-sm" />
-          {/* Viewport is what gives the sheet its swipe-to-dismiss and scroll lock.
-              The panel token, opaque, as the command palette uses: `bg-slate-950/95`
-              resolves to a 3.5% tint on the light theme (tokens.css), so the sheet
-              was clear glass over the page it covers (2026-11-06). `dvh`, so the
-              sheet's 85% is of the screen a phone shows, not of the one behind its
-              toolbars. */}
           <Drawer.Viewport className="fixed inset-0 z-[var(--z-modal)] flex items-end md:hidden">
             <Drawer.Popup className="w-full max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-2xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] shadow-2xl">
               <MobileNavContent

@@ -28,7 +28,7 @@ describe("MobileNavContent", () => {
 });
 
 describe("GlobalHeaderNavClient", () => {
-  it("renders the four groups as tabs in order, then the utility links, and no More menu", () => {
+  it("renders the four groups as tabs in order, a single utility row, and anchored group submenus", () => {
     const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
     const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf('aria-label="Utility"'));
     const utility = html.slice(html.indexOf('aria-label="Utility"'));
@@ -40,13 +40,20 @@ describe("GlobalHeaderNavClient", () => {
     });
     assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "tabs keep IA order");
     for (const retired of ["Brief", "Decide", "Why it changed", "Resolve", "Trust", "Record"]) {
-      assert.ok(!bar.includes(`<span>${retired}</span>`), `the bar no longer carries ${retired}`);
+      assert.ok(!bar.includes(`<span>${retired}</span>`), `the top tab row no longer carries ${retired}`);
     }
-    for (const href of ["/share", "/about"]) {
-      assert.ok(utility.includes(`href="${href}"`), `the utility row links ${href}`);
-    }
+    assert.ok(utility.includes('href="/about"'), "the utility row links /about");
+    assert.ok(!utility.includes('href="/share"'), "Share is not duplicated beside the header Share button");
     assert.ok(!html.includes("<details"), "no More menu");
     assert.ok(!html.includes('href="/api-docs"'), "API & MCP is reached from /share, not the header");
+    assert.ok(!bar.includes('role="menu"'), "navigation submenus keep link semantics, not ARIA menu roles");
+    assert.ok(!bar.includes("aria-haspopup"), "navigation submenus avoid aria-haspopup menu semantics");
+    for (const groupKey of ["this-week", "decide", "record", "guides"]) {
+      assert.ok(bar.includes(`data-nav-submenu="${groupKey}"`), `group ${groupKey} renders an anchored popover submenu`);
+    }
+    for (const sibling of ["Why it changed", "Runway planner", "How it held up"]) {
+      assert.ok(bar.includes(sibling), `desktop group submenus expose sibling page ${sibling}`);
+    }
   });
 
   it("shows each tab's one-key shortcut so the keyboard layer is discoverable", () => {

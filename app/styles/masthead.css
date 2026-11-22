@@ -1,0 +1,260 @@
+/* Sitewide masthead & navigation popovers (Forecast visual system).
+   Full-bleed paper ground, ink-is-the-action rules, zero dark-mode utility cages.
+   Popover positioning follows progressive enhancement: native CSS Anchor Positioning
+   gated inside `@supports (position-area: ...)`, with `@supports not` fixed fallbacks
+   paired with lightweight JS `getBoundingClientRect()` placement for Firefox. */
+
+.site-masthead {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-chrome);
+  width: 100%;
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.site-masthead[data-scrolled="true"] {
+  border-bottom-color: var(--border-subtle);
+  box-shadow: var(--elev-control);
+}
+
+/* Under a live reading in reading mode, the masthead carries a 2px rule in the week's
+   condition colour so screenshots at any scroll depth name the weather by colour too. */
+.site-masthead[data-masthead-mode="reading"][data-regime] {
+  border-bottom: 2px solid var(--regime-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-masthead {
+    transition: box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
+  }
+}
+
+/* Desktop primary group submenus (`app/components/globalHeaderNavClient.tsx`).
+   Links stay in Tab order; no ARIA menu roles. Hover bridge spans the gap above
+   the popover so moving the pointer from the tab into the submenu never dismisses it. */
+.site-nav-submenu[popover] {
+  inline-size: max-content;
+  min-inline-size: 14.5rem;
+  max-inline-size: min(20rem, calc(100dvw - 1.5rem));
+  height: auto;
+  padding: 0.375rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--bg-panel);
+  color: var(--app-text);
+  box-shadow: var(--elev-card);
+  overflow: visible;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.site-nav-submenu[popover]:not(:is(:popover-open, .\:popover-open)) {
+  display: none;
+}
+
+.site-nav-submenu[popover]:is(:popover-open, .\:popover-open) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-nav-submenu[popover]::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 100%;
+  block-size: 0.5rem;
+}
+
+@supports (position-area: block-end) {
+  .site-nav-submenu[popover] {
+    position: absolute;
+    inset: auto;
+    margin: 0.375rem 0 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
+@supports not (position-area: block-end) {
+  .site-nav-submenu[popover] {
+    position: fixed;
+    margin: 0;
+  }
+}
+
+/* In-masthead section jumper popover (replaces stacked mobile chip scroller). */
+.site-section-popover[popover] {
+  inline-size: min(18rem, calc(100dvw - 1.5rem));
+  max-block-size: min(22rem, calc(100dvh - 5rem));
+  height: auto;
+  padding: 0.375rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--bg-panel);
+  color: var(--app-text);
+  box-shadow: var(--elev-card);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.site-section-popover[popover]:not(:is(:popover-open, .\:popover-open)) {
+  display: none;
+}
+
+.site-section-popover[popover]:is(:popover-open, .\:popover-open) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@supports (position-area: block-end) {
+  .site-section-popover[popover] {
+    position: absolute;
+    inset: auto;
+    margin: 0.375rem 0 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
+@supports not (position-area: block-end) {
+  .site-section-popover[popover] {
+    position: fixed;
+    inset-block-start: 3.25rem;
+    inset-inline-start: 0.75rem;
+    margin: 0;
+  }
+}
+
+/* Mobile bottom-bar active-tab sibling switcher popover. */
+.mobile-tab-submenu[popover] {
+  inline-size: min(17rem, calc(100dvw - 1.5rem));
+  height: auto;
+  padding: 0.375rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--bg-panel);
+  color: var(--app-text);
+  box-shadow: var(--elev-card);
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.mobile-tab-submenu[popover]:not(:is(:popover-open, .\:popover-open)) {
+  display: none;
+}
+
+.mobile-tab-submenu[popover]:is(:popover-open, .\:popover-open) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@supports (position-area: block-start) {
+  .mobile-tab-submenu[popover] {
+    position: absolute;
+    inset: auto;
+    margin: 0 0 0.5rem;
+    position-area: block-start span-inline-end;
+    position-try-fallbacks: flip-inline;
+  }
+}
+
+@supports not (position-area: block-start) {
+  .mobile-tab-submenu[popover] {
+    position: fixed;
+    inset-block-start: auto;
+    inset-block-end: calc(3.75rem + env(safe-area-inset-bottom));
+    inset-inline: 0.75rem;
+    inline-size: auto;
+    margin: 0;
+  }
+}
+
+@starting-style {
+  .site-nav-submenu[popover]:is(:popover-open, .\:popover-open),
+  .site-section-popover[popover]:is(:popover-open, .\:popover-open) {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  .mobile-tab-submenu[popover]:is(:popover-open, .\:popover-open) {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-nav-submenu[popover],
+  .site-section-popover[popover],
+  .mobile-tab-submenu[popover] {
+    transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out), display 150ms, overlay 150ms;
+    transition-behavior: allow-discrete;
+  }
+}
+
+/* Shared submenu link styling: never color alone (left ink rule + semibold on aria-current). */
+.site-nav-popover-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-block-size: 2.5rem;
+  padding: 0.45rem 0.625rem;
+  border-radius: var(--radius-lg);
+  border-inline-start: 2px solid transparent;
+  color: var(--app-text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.site-nav-popover-link:hover,
+.site-nav-popover-link:focus-visible {
+  background: var(--bg-nested);
+  color: var(--app-text);
+}
+
+.site-nav-popover-link:focus-visible {
+  outline: 2px solid var(--accent-action);
+  outline-offset: -2px;
+}
+
+.mobile-tab-submenu .site-nav-popover-link,
+.site-section-popover .site-nav-popover-link {
+  min-block-size: 2.75rem;
+}
+
+@media (pointer: coarse) {
+  .site-nav-popover-link {
+    min-block-size: 2.75rem;
+  }
+}
+
+.site-nav-popover-link[aria-current="page"],
+.site-nav-popover-link[aria-current="location"],
+.site-nav-popover-link[data-current-page="true"] {
+  border-inline-start-color: var(--app-text);
+  background: var(--bg-nested);
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+@media (forced-colors: active) {
+  .site-nav-popover-link[aria-current="page"],
+  .site-nav-popover-link[aria-current="location"],
+  .site-nav-popover-link[data-current-page="true"] {
+    border-inline-start-color: Highlight;
+  }
+}

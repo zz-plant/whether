@@ -48,9 +48,9 @@ describe("one anchor offset", () => {
 });
 
 describe("sticky rows scroll themselves, never the page", () => {
-  it("keeps scrollIntoView out of the chip rows and the year rail", async () => {
+  it("keeps scrollIntoView out of the horizontal tab row and the year rail", async () => {
     for (const file of [
-      "app/components/mobileSectionChips.tsx",
+      "app/components/sectionTabsActiveInView.tsx",
       "app/components/TimelineBar.tsx",
     ]) {
       const source = await readFile(file, "utf8");
