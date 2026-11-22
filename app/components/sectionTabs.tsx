@@ -43,10 +43,10 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
           key={link.href}
           href={withQuery(link.href)}
           aria-current={link.isActive ? "page" : undefined}
-          className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-sm font-medium no-underline transition-colors ${
+          className={`weather-focus-ring inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-sm font-medium no-underline transition-colors ${
             link.isActive
-              ? "border-[var(--app-text)] text-slate-100"
-              : "border-transparent text-slate-400 hover:border-slate-600 hover:text-slate-200"
+              ? "border-[var(--app-text)] font-semibold text-[var(--app-text)]"
+              : "border-transparent text-[var(--app-text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--app-text)]"
           }`}
         >
           {link.label}
@@ -59,10 +59,10 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
               key={link.href}
               href={link.href}
               aria-current={link.isActive ? "page" : undefined}
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-fluid-sm no-underline transition-colors ${
+              className={`weather-focus-ring inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-fluid-sm no-underline transition-colors ${
                 link.isActive
-                  ? "border-[var(--app-text)] font-medium text-slate-100"
-                  : "border-transparent text-slate-500 hover:border-slate-600 hover:text-slate-300"
+                  ? "border-[var(--app-text)] font-semibold text-[var(--app-text)]"
+                  : "border-transparent text-[var(--app-text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--app-text)]"
               }`}
             >
               {link.label}

@@ -33,7 +33,10 @@ describe("one anchor offset", () => {
     const css = await readFile("app/styles/typography.css", "utf8");
     const declarations = css.match(/scroll-padding-top:[^;]+;/g) ?? [];
     assert.equal(declarations.length, 1);
-    assert.match(declarations[0], /7rem/);
+    /* 5.5rem clears the tallest masthead (the phone reading bar at 4.75rem). It was 7rem
+       while a two-row header and a section-chip row sat above every page; a hash jump then
+       landed 63px under the 48px bar. */
+    assert.match(declarations[0], /5\.5rem/);
   });
 
   it("lets nothing under app/ add a scroll margin on top of it", async () => {
@@ -48,9 +51,9 @@ describe("one anchor offset", () => {
 });
 
 describe("sticky rows scroll themselves, never the page", () => {
-  it("keeps scrollIntoView out of the chip rows and the year rail", async () => {
+  it("keeps scrollIntoView out of the horizontal tab row and the year rail", async () => {
     for (const file of [
-      "app/components/mobileSectionChips.tsx",
+      "app/components/sectionTabsActiveInView.tsx",
       "app/components/TimelineBar.tsx",
     ]) {
       const source = await readFile(file, "utf8");

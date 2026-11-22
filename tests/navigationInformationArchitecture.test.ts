@@ -137,14 +137,16 @@ describe("navigation groups", () => {
 });
 
 describe("utility links", () => {
-  it("draws Share and embed and About in the header, not behind a menu", () => {
+  it("draws About in the header utility row and routes Share through the single Share action", () => {
     assert.deepEqual(
       headerUtilityLinks.map((link) => [link.label, link.href]),
-      [
-        ["Share and embed", "/share"],
-        ["About", "/about"],
-      ],
+      [["About", "/about"]],
     );
+    const share = utilityLinks.find((link) => link.href === "/share");
+    assert.ok(share, "/share remains in the utility links for footer, mobile sheet, and palette");
+    assert.equal(share.header, null, "Share is not duplicated beside the masthead Share button");
+    const rail = readFileSync(new URL("../app/components/shareRail.tsx", import.meta.url), "utf8");
+    assert.match(rail, /href="\/share"/, "ShareRail links directly to /share");
   });
 
   /* Until 2026-10-23 no page, nav or palette linked /contact — only the sitemap

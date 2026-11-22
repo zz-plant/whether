@@ -10,7 +10,6 @@ import { GlobalTimeMachine } from "./components/globalTimeMachine";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { MobileTabBar } from "./components/MobileTabBar";
 import { DeadClickBeacon } from "./components/deadClickBeacon";
-import { RunningHead } from "./components/runningHead";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
@@ -259,7 +258,6 @@ export default function RootLayout({
           </a>
           <GlobalHeader />
           <RecordBand />
-          <RunningHead />
           <GlobalCommandPalette />
           <ServiceWorkerRegistrar />
           <GlobalTimeMachine />

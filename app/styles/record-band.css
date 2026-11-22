@@ -28,6 +28,11 @@
   line-height: 1.4;
   color: var(--app-text);
 }
+@media (min-width: 640px) and (hover: hover) and (pointer: fine) {
+  .record-band-details > .record-band-summary {
+    min-height: 2.25rem;
+  }
+}
 .record-band-details[open] > .record-band-summary {
   padding-bottom: 0;
 }

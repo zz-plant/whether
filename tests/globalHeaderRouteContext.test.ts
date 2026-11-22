@@ -38,20 +38,15 @@ describe("route context in the global header", () => {
 });
 
 describe("the header action group does not clip its children", () => {
-  it("rounds through the end cells rather than overflow-hidden", () => {
+  it("renders flat Forecast ink controls without a clipping dark cage or sky chrome", () => {
     const source = readFileSync(
       new URL("../app/components/globalHeaderActionsClient.tsx", import.meta.url).pathname,
       "utf8",
     );
     const markup = source.replace(/\/\*[\s\S]*?\*\//g, "");
 
-    // `.weather-pill:focus-visible` draws an outward 2px outline plus a halo
-    // from unlayered CSS, so a clipping ancestor cuts the ring's top and bottom.
     assert.doesNotMatch(markup, /overflow-hidden/);
-    assert.match(markup, /rounded-l-\[7px\]/);
-    assert.match(markup, /rounded-r-\[7px\]/);
-    // Every child that brings its own focus treatment is pulled inward.
-    assert.match(markup, /!outline-offset-\[-2px\]/, "theme toggle takes the inward ring");
-    assert.match(markup, /focus-visible:outline-offset-\[-2px\]"/, "present mode takes the inward ring");
+    assert.doesNotMatch(markup, /bg-slate-900|border-slate-800|sky-400/);
+    assert.match(markup, /weather-focus-ring/, "controls carry the shared focus treatment");
   });
 });

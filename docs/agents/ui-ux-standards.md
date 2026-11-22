@@ -168,9 +168,10 @@ section that matches the change, not the file.
   under the sections' own names. Until 2026-09-15 `/operate` carried three — the sidebar list, the
   stepper's own sticky chip row, and a card grid at the tail — with three vocabularies for the same
   five sections.
-- MUST: give the mobile index row a scroll affordance. `MobileSectionChips` fades whichever edge
-  has content beyond it; a row that silently clips its overflow reads as broken labels, not as
-  something you can scroll. The fades are state, tracked on scroll, not decoration.
+- MUST: give horizontal mobile tab rows a scroll affordance (`SectionTabsActiveInView` marks
+  `data-row-fade` so whichever edge has content beyond it fades). In-page section jumping on mobile
+  lives inside the single morphing masthead's section-jumper popover (`MastheadSectionJumper`),
+  rather than stacking a second sticky chip strip under the header.
 - MUST: make the page intro state the week as well as the route. The page title leads; under it,
   as one line of facts, come the condition word in the regime ink, the trust headline and the
   record date (2026-11-10). From 2026-09-25 until then the condition word led and the H1 followed,
@@ -923,15 +924,16 @@ is dark; `-- --theme light` walks the light theme into `artifacts/ui/frames-ligh
 the audit had only ever walked dark, the second theme).
 
 - MUST: name the site in every frame, and on a page that reports a reading, the date and the
-  conditions too. The header hides on scroll, so past the first screen this is the running head's
-  job (`app/components/runningHead.tsx`). A page hands it the facts by spreading
-  `frameFactsAttributes(…)` (`lib/navigation/runningHead.ts`) onto its intro block: the report
-  intro, the brief's call block, `/share`'s heading, a reading page's `SecondaryPageHeader`. A page
-  that marks nothing is named by its h1. On 2026-10-27, before the head, 7 of 83 frames past the
-  first screen named all three.
-- MUST: keep a sticky row below the head and the header, not under them:
-  `top-[var(--top-chrome-height,0px)]`, as the section chips and the report rail do. The head sets
-  the variable to where the two end, so it follows the header in and out.
+  conditions too. Past the first screen, the single sticky masthead (`GlobalHeaderRouteGate` +
+  `useMastheadReading` in `app/components/runningHead.tsx`) morphs in place into the reading
+  running head (`[data-running-head]`) so top chrome stays one 48px bar instead of stacking two
+  headers. A page hands it the facts by spreading `frameFactsAttributes(…)`
+  (`lib/navigation/runningHead.ts`) onto its intro block: the report intro, the brief's call block,
+  `/share`'s heading, a reading page's `SecondaryPageHeader`. A page that marks nothing is named by
+  its h1. On 2026-10-27, before the head, 7 of 83 frames past the first screen named all three.
+- MUST: keep a sticky row below the masthead, not under it:
+  `top-[var(--top-chrome-height,0px)]`, as the report rail does. The masthead sets the variable to
+  its own live height (`3rem`, or `4.75rem` on phone `/` when the compact brief-call line is open).
 - MUST: fit every block a reader would frame in one phone frame under the head (about 810px). A
   block that is a list of units marks each unit `data-frame-block` (the `/signals` rows, the area
   rows, the published briefs, the `/concepts` pairs), and each unit carries its own labels: a

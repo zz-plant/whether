@@ -503,10 +503,8 @@ corners: they are print, not furniture.
 
 ### Navigation
 
-- **Global header:** the Bricolage wordmark, then This week, Plan, History, Guides; Share and
-  embed, About and search to the right. The current route is underlined in a 2px ink rule.
-- **Phone:** a sticky bottom tab bar and a running head that names the week's call once the
-  guidance scrolls away.
+- **Global masthead:** full-bleed sticky Forecast bar (`48px`) on paper ground. At the top of a page it carries the Bricolage wordmark, the four primary groups (`This week`, `Plan`, `History`, `Guides`) with anchored hover/click sibling popovers (`popover="auto"`) and a 2px ink active underline, `About`, and flat ink action controls (`Search ⌘K`, `Present F` on desktop `/`, a single `Share` button opening `ShareRail`, and `Theme` on `md+`). Past the hero, the same single 48px masthead morphs in place into the reading running head (conditions, nearest change, date, current section jumper popover, site address, and a `Nav` reveal toggle on desktop), so top chrome never stacks into two bars.
+- **Phone:** the same 48px masthead carries Brand + `Search` + `Share` on every route (morphing into the reading head with a section-jumper popover on scroll, replacing any second sticky chip strip), paired with a sticky bottom tab bar in Forecast's ink register whose active tab opens a sibling-page popover directly above the thumb bar and whose fifth tab (`Menu`) opens the compact 2-column route sheet.
 
 ### The record band (signature)
 

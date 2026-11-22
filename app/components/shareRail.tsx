@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Fragment, useCallback, useMemo, useState, useId } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { useSlackPreviewOverlay } from "./useSlackPreviewOverlay";
@@ -272,6 +273,16 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 </p>
               </div>
             ) : null}
+
+            <div className="mt-3 border-t border-slate-800/60 pt-3">
+              <Link
+                href="/share"
+                onClick={onClose}
+                className="weather-hit weather-focus-ring text-fluid-sm font-semibold text-[var(--app-text)] underline decoration-[var(--border-strong)] underline-offset-4"
+              >
+                All formats, slides &amp; embed &rarr;
+              </Link>
+            </div>
           </div>
         </div>
       </Dialog.Popup>
