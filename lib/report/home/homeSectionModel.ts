@@ -1,5 +1,5 @@
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
-import { formatRegimeSignalValue, type RegimeSignalKey } from "../reportFormatting";
+import { formatDecisionReversal, formatRegimeSignalValue, type RegimeSignalKey } from "../reportFormatting";
 import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
 import {
@@ -13,7 +13,7 @@ import {
   type RuleThresholdDistance,
 } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, isRuleConditionMet, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, decisionAreaOrder, formatStandingRuleTriplet, isDecisionArea, isRuleConditionMet, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -268,6 +268,8 @@ export type HomeAreaLineSlot = {
 export type HomeAreaRow = {
   area: DecisionArea;
   rule: string;
+  /** Every required restart condition; the distance slot below selects one line for measurement. */
+  resumeText?: string;
   pause?: HomeAreaLineSlot;
   resume?: HomeAreaLineSlot;
   /**
@@ -582,7 +584,7 @@ const AREA_STRIP_STATE_LABEL: Record<LineState, string> = {
  * by one score would print one distance in every column.
  */
 export const buildAreaStrip = (
-  rows: readonly (Pick<HomeAreaRow, "area" | "pause" | "resume" | "pauseQualifier" | "resumeQualifier"> & {
+  rows: readonly (Pick<HomeAreaRow, "area" | "pause" | "resume" | "pauseQualifier" | "resumeQualifier" | "resumeText"> & {
     rule?: string;
   })[],
 ): AreaStripModel | null => {
@@ -595,6 +597,7 @@ export const buildAreaStrip = (
     const held = Boolean(row.pause?.met);
     const slot = held && row.resume ? row.resume : row.pause;
     const qualifier = held && row.resume ? row.resumeQualifier : row.pauseQualifier;
+    const completeText = held && row.resume ? row.resumeText : undefined;
     const line: NonNullable<AreaStripModel["cells"][number]["line"]> | undefined = slot?.line
       ? {
           kind: held && row.resume ? "resume" : "pause",
@@ -602,7 +605,7 @@ export const buildAreaStrip = (
             held && row.resume
               ? DECISION_CONTRACT_LABELS.reversal.resumeWhen
               : DECISION_CONTRACT_LABELS.threshold.pauseIf,
-          text: qualifier ? `${slot.line}. ${qualifier}` : slot.line,
+          text: completeText ?? (qualifier ? `${slot.line}. ${qualifier}` : slot.line),
         }
       : undefined;
     return [
@@ -729,6 +732,7 @@ export const buildHomeAreaRows = ({
       return {
         area,
         rule: item.areaActionNow,
+        resumeText: formatDecisionReversal(item.reversalCondition),
         pause: lineSlot(
           item.pauseConditions?.length ? selectPauseCondition(item.pauseConditions, scores) : item.nearestPause,
           "pause",
@@ -749,6 +753,7 @@ export const buildHomeAreaRows = ({
   return decisionRules.map((rule) => ({
     area: rule.area,
     rule: rule.doNow[0] ?? rule.recommendation,
+    resumeText: formatStandingRuleTriplet(rule).reverse,
     pause: lineSlot(selectPauseCondition(rule.pause.conditions, scores), "pause"),
     resume: lineSlot(resumeLineToShow(distancesFor(rule.resume.conditions, scores)), "resume"),
     ...changedFor(rule.area),
