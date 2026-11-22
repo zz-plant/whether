@@ -28,6 +28,32 @@ describe("a quiet week folds the explanation", () => {
     assert.ok(html.indexOf('id="what-changed"') > html.indexOf("<details"), "the sections are inside the fold, still server-rendered");
   });
 
+  it("teases the conditions radar on the closed row without adding words", () => {
+    const html = renderToStaticMarkup(
+      <QuietWeekFold
+        quiet
+        regimeLabel="Sunny"
+        preview={{
+          area: "hiring",
+          regions: {
+            pause: { rects: [{ tightness: [70, 100], riskAppetite: [0, 100] }], edges: [] },
+            resume: { rects: [], edges: [] },
+          },
+          scores: { tightness: 60, riskAppetite: 55 },
+          changeLines: { tightness: 70, riskAppetite: 50 },
+        }}
+      >
+        {sections}
+      </QuietWeekFold>,
+    );
+    const summary = /<summary[^>]*>([\s\S]*?)<\/summary>/.exec(html)?.[1] ?? "";
+    assert.match(summary, /data-quiet-week-radar="hiring"/);
+    assert.match(summary, /aria-hidden="true"/);
+    assert.match(summary, /quiet-week-radar-hiring-pause-hatch/, "the pause region is hatched, as on the full chart");
+    assert.match(summary, /The full reading: what changed, why conditions are Sunny and what would change them/);
+    assert.doesNotMatch(summary, /Pause if|Restart when/, "the radar adds no rule copy to the row");
+  });
+
   it("is quiet only on a live, compared week where nothing moved and nothing is close", () => {
     const page = readFileSync("app/page.tsx", "utf8");
     const rule = page.slice(page.indexOf("const quietWeek ="), page.indexOf(";", page.indexOf("const quietWeek =")));

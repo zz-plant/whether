@@ -242,3 +242,40 @@ describe("the band says what the site is and names its colours", () => {
     assert.match(html, /month-end readings since/);
   });
 });
+
+/*
+ * The closed band's horizon (2026-11-21). The disclosure protects the first
+ * screen, but a closed bar that says only "The record since 2012" hides the one
+ * drawing that makes the record worth opening. A 4px proportional strip of the
+ * runs sits on its bottom edge, with no extra words and no extra height beyond
+ * the strip itself.
+ */
+describe("the closed band teases the record it holds", () => {
+  const html = renderToStaticMarkup(createElement(RecordBand));
+  const css = readFileSync("app/styles/record-band.css", "utf8");
+
+  it("draws one proportional segment per run, covering every month once", () => {
+    const horizon = /data-record-band-horizon="true">([\s\S]*?)<\/span><\/summary>/.exec(html)?.[1] ?? "";
+    const segments = [...horizon.matchAll(/data-regime="([A-Z]+)" style="flex-grow:(\d+)"/g)];
+    assert.ok(segments.length > 0, "the strip is drawn");
+    const months = recordBandMonthCount(/data-months="([^"]+)"/.exec(html)?.[1] ?? "");
+    assert.equal(
+      segments.reduce((sum, [, , grow]) => sum + Number(grow), 0),
+      months,
+      "the strip is the record's own proportions, not a decorative gradient",
+    );
+  });
+
+  it("hides the strip once the band is open, and thickens it on hover", () => {
+    assert.match(css, /\.record-band-details\[open\] \.record-band-horizon \{\s*display: none/);
+    assert.match(css, /\.record-band-summary:hover \.record-band-horizon/);
+    assert.match(css, /prefers-reduced-motion: no-preference/);
+  });
+
+  it("opens the band on /history so the plate canvas has a height to draw into", () => {
+    const plate = readFileSync("app/history/recordPlateCanvas.tsx", "utf8");
+    assert.match(plate, /disclosure\.open = true/);
+    assert.match(plate, /addEventListener\("toggle", schedule\)/);
+    assert.match(plate, /openedByHistory/);
+  });
+});

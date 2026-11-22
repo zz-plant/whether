@@ -28,6 +28,7 @@ type NavigationPageKey =
   | "comps"
   | "history"
   | "calibration"
+  | "concepts"
   | "guides"
   | "roles"
   | "companies";
@@ -211,6 +212,14 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
   {
+    key: "concepts",
+    group: "record",
+    href: "/concepts",
+    label: "Advice vs. market",
+    description: "407 investor posts and 35 essays placed against the monthly record since 2012.",
+    placement: "secondary",
+  },
+  {
     key: "guides",
     group: "guides",
     href: "/resources",
@@ -316,7 +325,6 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
-  { prefix: "/concepts", label: "Advice vs. market" },
   { prefix: "/privacy", label: "Privacy" },
   { prefix: "/acceptable-use-policy", label: "Acceptable Use" },
   { prefix: "/terms-of-service", label: "Terms" },

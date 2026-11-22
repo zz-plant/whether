@@ -61,11 +61,12 @@ describe("global header navigation helpers", () => {
     assert.equal(groupOf("/history"), "record");
     assert.equal(groupOf("/history/2024-q1"), "record");
     assert.equal(groupOf("/calibration"), "record");
+    assert.equal(groupOf("/concepts"), "record");
     assert.equal(groupOf("/brief/2026-w31"), "record");
     assert.equal(groupOf("/resources"), "guides");
     assert.equal(groupOf("/resources/reversibility-as-governance"), "guides");
     assert.equal(groupOf("/answers/should-startups-raise-capital-now"), "guides");
-    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy", "/concepts"]) {
+    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy"]) {
       assert.equal(groupOf(ungrouped), null, `${ungrouped} belongs to no group`);
     }
   });
@@ -90,6 +91,7 @@ describe("sub-tabs", () => {
       [
         ["History", "tab", false],
         ["How it held up", "tab", true],
+        ["Advice vs. market", "secondary", false],
         ["Sources", "cross", false],
         ["How the scores are built", "cross", false],
       ],

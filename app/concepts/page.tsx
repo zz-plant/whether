@@ -31,6 +31,7 @@ import {
   describeScoreAlignment,
 } from "../../lib/productCanonMeasures";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { SectionTabs } from "../components/sectionTabs";
 import { AdvicePlane, type AdvicePlanePoint } from "./advicePlane";
 import { AdviceCorpusSection } from "./adviceCorpusSection";
 
@@ -242,6 +243,7 @@ export default function ProductCanonPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
+      <SectionTabs currentPath="/concepts" />
 
       <SecondaryPageHeader
         title="Does startup advice follow the market?"

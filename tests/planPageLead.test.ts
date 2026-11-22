@@ -76,6 +76,15 @@ describe("/operate opening", () => {
     );
   });
 
+  it("shows the default alert lines on the closed rules step", async () => {
+    const steps = await loadSteps();
+    const step = steps.find((candidate) => candidate.id === "ops-plan-lines");
+    assert.ok(step?.preview, "the closed step carries a preview");
+    const text = textIn(step.preview);
+    assert.match(text, /Hiring: pause pressure > \d+ · restart pressure < \d+/);
+    assert.match(text, /New bets: pause risk < \d+/);
+  });
+
   it("says on each closed step what is behind it, not what the gesture does", async () => {
     const steps = await loadSteps();
     const description = (id: string) => steps.find((step) => step.id === id)?.description ?? "";
