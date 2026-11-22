@@ -33,7 +33,10 @@ describe("one anchor offset", () => {
     const css = await readFile("app/styles/typography.css", "utf8");
     const declarations = css.match(/scroll-padding-top:[^;]+;/g) ?? [];
     assert.equal(declarations.length, 1);
-    assert.match(declarations[0], /7rem/);
+    /* 5.5rem clears the tallest masthead (the phone reading bar at 4.75rem). It was 7rem
+       while a two-row header and a section-chip row sat above every page; a hash jump then
+       landed 63px under the 48px bar. */
+    assert.match(declarations[0], /5\.5rem/);
   });
 
   it("lets nothing under app/ add a scroll margin on top of it", async () => {
