@@ -100,6 +100,7 @@ describe("the buried craft has a visible door", () => {
     const html = renderToStaticMarkup(<FooterAgentColophon />);
     assert.match(html, /curl -H &quot;Accept: text\/markdown&quot; https:\/\/whether\.work/);
     assert.match(html, /href="\/api-docs"/);
+    assert.match(html, /<output aria-live="polite"[^>]*data-visible="false"><\/output>/, "status bubble stays empty at rest so screen readers do not read a stale Copied");
   });
 
   it("carries the assistant handoff in the share rail", () => {
