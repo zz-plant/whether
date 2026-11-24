@@ -375,13 +375,19 @@ export function RegimeRadar({
      one's hover (SVG hit-testing is painter's order, so the last ring drawn
      wins), so each ring is capped at half the gap to its nearest dated
      neighbour: the rings meet at the midpoint and neither masks the other's
-     date. */
+     date.
+     The distance is a square root, not Math.hypot: hypot is not required to be
+     correctly rounded, and V8 (the server) and JavaScriptCore (Safari) disagree
+     in the last digit, so the server's r failed to hydrate in Safari. Multiply,
+     add and sqrt are exact in every engine. */
   const hitRadii = trailPoints.map((point, index) => {
     if (!point.title) return 0;
     let nearest = Infinity;
     for (const [otherIndex, other] of trailPoints.entries()) {
       if (otherIndex === index || !other.title) continue;
-      nearest = Math.min(nearest, Math.hypot(other.x - point.x, other.y - point.y));
+      const dx = other.x - point.x;
+      const dy = other.y - point.y;
+      nearest = Math.min(nearest, Math.sqrt(dx * dx + dy * dy));
     }
     return nearest === Infinity ? 7 : Math.min(7, nearest / 2);
   });

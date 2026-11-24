@@ -225,7 +225,9 @@ describe("the band says what the site is and names its colours", () => {
     assert.match(summary, /The record since \d{4}/);
     assert.ok(html.indexOf("data-record-band-plate") > html.indexOf("</summary>"), "the chart is inside the disclosure");
     assert.ok(html.indexOf("data-record-band-readout") > html.indexOf("</summary>"), "the readout is inside it too");
-    assert.match(html, /<a class="record-band-link" href="\/history">History<\/a>/);
+    /* Attribute order is the renderer's: tests/reportShellSections.test.tsx mocks next/link
+       process-wide and puts href first, so a shuffled run that loads it earlier flips the order. */
+    assert.match(html, /<a(?=[^>]*\bclass="record-band-link")(?=[^>]*\bhref="\/history")[^>]*>History<\/a>/);
   });
 
   it("names each condition the band draws beside its fill, at every width", () => {

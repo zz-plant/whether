@@ -154,6 +154,48 @@ describe("RegimeRadar path", () => {
     assert.ok(Number(a[3]) + Number(b[3]) <= distance + 0.00001, "neither target may mask its neighbor's date");
   });
 
+  it("renders the same markup whatever last digit the engine's Math library returns", () => {
+    // The server renders on V8 and Safari hydrates on JavaScriptCore. Math.hypot,
+    // exp, sin and the rest need not be correctly rounded, and the two engines
+    // disagree in the last bit: on 2026-11-24 a hover ring's r came out
+    // 5.966070733740926 on the server and ...927 in Safari, and React refused to
+    // hydrate the attribute. Nudging every such function by one ulp stands in
+    // for the other engine; the drawing may use only exact arithmetic
+    // (+ − × ÷, sqrt, rounding), so the markup must not move.
+    const trail = [
+      { tightness: 36, riskAppetite: 52, label: "September 2026" },
+      { tightness: 40, riskAppetite: 59, label: "October 2026" },
+      { tightness: 63, riskAppetite: 56 },
+    ];
+    const render = () =>
+      renderToStaticMarkup(
+        <RegimeRadar {...base} previousTightness={63} previousRiskAppetite={56} trail={trail} readingsId="readings" />,
+      );
+    const exact = render();
+
+    const view = new DataView(new ArrayBuffer(8));
+    const nextUp = (value: number) => {
+      // An integer result (log10(100), cos(0)) is exact in any sane libm; leave it.
+      if (!Number.isFinite(value) || Number.isInteger(value)) return value;
+      view.setFloat64(0, value);
+      view.setBigInt64(0, view.getBigInt64(0) + (value > 0 ? 1n : -1n));
+      return view.getFloat64(0);
+    };
+    const inexact = [
+      "hypot", "exp", "expm1", "log", "log1p", "log2", "log10", "pow", "cbrt",
+      "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "sinh", "cosh", "tanh",
+    ] as const;
+    const originals = inexact.map((name) => [name, Math[name]] as const);
+    try {
+      for (const [name, fn] of originals) {
+        Reflect.set(Math, name, (...args: number[]) => nextUp(Reflect.apply(fn, Math, args)));
+      }
+      assert.equal(render(), exact);
+    } finally {
+      for (const [name, fn] of originals) Reflect.set(Math, name, fn);
+    }
+  });
+
   it("offers the dated readings in HTML for touch, keyboard and screen-reader users", () => {
     const html = renderToStaticMarkup(<RegimeRadar {...base} trail={[
       { tightness: 40, riskAppetite: 61, label: "April 2026" },
