@@ -13,6 +13,7 @@ import {
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
+import { placePopoverElement } from "../../lib/navigation/popoverPlacement";
 import {
   headerUtilityLinks,
   pagesInGroup,
@@ -178,17 +179,7 @@ function DesktopNavGroupItem({
     const submenu = submenuRef.current;
     if (!item || !submenu) return;
     if (typeof CSS !== "undefined" && CSS.supports("position-area", "block-end")) return;
-    const itemRect = item.getBoundingClientRect();
-    const popRect = submenu.getBoundingClientRect();
-    const margin = 8;
-    const below = itemRect.bottom + 6;
-    const top =
-      below + popRect.height > window.innerHeight - margin
-        ? Math.max(margin, itemRect.top - popRect.height - 6)
-        : below;
-    const left = Math.max(margin, Math.min(itemRect.left, window.innerWidth - popRect.width - margin));
-    submenu.style.top = `${top}px`;
-    submenu.style.left = `${left}px`;
+    placePopoverElement(item, submenu, { side: "below" });
   }, []);
 
   useEffect(() => {
@@ -304,7 +295,7 @@ function DesktopNavGroupItem({
             aria-expanded={open}
             aria-label={`${group.label} pages`}
             onClick={handleTriggerClick}
-            className="weather-focus-ring inline-flex h-7 w-5 items-center justify-center rounded-md text-[var(--app-text-muted)] transition-colors hover:bg-[var(--bg-nested)] hover:text-[var(--app-text)]"
+            className="weather-focus-ring inline-flex h-7 w-6 items-center justify-center rounded-md text-[var(--app-text-muted)] transition-colors hover:bg-[var(--bg-nested)] hover:text-[var(--app-text)]"
           >
             <ChevronDown
               aria-hidden="true"
