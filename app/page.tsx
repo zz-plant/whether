@@ -890,8 +890,10 @@ async function PageContent({
 
             {/* The reading body keeps the brief's reading measure (72rem) while the
                 call and its rail take the wide field (2026-11-21): the explanatory
-                tables and prose should not stretch to the comp's full width. */}
-            <div className="weather-brief-flow mx-auto w-full max-w-[72rem]">
+                tables and prose should not stretch to the comp's full width. It
+                keeps the call's left edge, so the page reads down one axis: centred,
+                it started 80px right of the brief above it on a laptop (2026-11-24). */}
+            <div className="weather-brief-flow mr-auto w-full max-w-[72rem]">
               {/* 2. The five areas: the picker, all five side by side folded under it,
                   and the one plan link. */}
               <DecisionPicker
