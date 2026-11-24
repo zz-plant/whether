@@ -9,6 +9,7 @@ import {
   sameFrameFacts,
   type FrameFacts,
 } from "../../lib/navigation/runningHead";
+import { placePopoverElement } from "../../lib/navigation/popoverPlacement";
 import { siteUrl } from "../../lib/siteUrl";
 
 export const MASTHEAD_SITE_HOST = new URL(siteUrl).host;
@@ -166,31 +167,32 @@ export function MastheadSectionJumper({
   const popoverRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
-  const positionFallback = useCallback(() => {
-    const trigger = triggerRef.current;
-    const popover = popoverRef.current;
-    if (!trigger || !popover) return;
-    if (typeof CSS !== "undefined" && CSS.supports("position-area", "block-end")) return;
-    const triggerRect = trigger.getBoundingClientRect();
-    const popRect = popover.getBoundingClientRect();
-    const margin = 8;
-    const top = Math.min(window.innerHeight - popRect.height - margin, triggerRect.bottom + 6);
-    const left = Math.max(margin, Math.min(triggerRect.left, window.innerWidth - popRect.width - margin));
-    popover.style.top = `${Math.max(margin, top)}px`;
-    popover.style.left = `${left}px`;
-  }, []);
-
   useEffect(() => {
     const popover = popoverRef.current;
     if (!popover) return;
+    /* Placed by script in every engine, not by CSS anchoring: the trigger sits mid-bar
+       and the list is wider than either side of it, so no anchored area fits and the
+       list ran off the right edge (`lib/navigation/popoverPlacement.ts`). */
+    const place = () => {
+      const trigger = triggerRef.current;
+      if (trigger) placePopoverElement(trigger, popover, { side: "below" });
+    };
     const onToggle = (event: Event) => {
       const isOpen = Reflect.get(event, "newState") === "open";
       setOpen(isOpen);
-      if (isOpen) positionFallback();
+      if (isOpen) {
+        place();
+        window.addEventListener("resize", place);
+      } else {
+        window.removeEventListener("resize", place);
+      }
     };
     popover.addEventListener("toggle", onToggle);
-    return () => popover.removeEventListener("toggle", onToggle);
-  }, [positionFallback]);
+    return () => {
+      popover.removeEventListener("toggle", onToggle);
+      window.removeEventListener("resize", place);
+    };
+  }, []);
 
   const closePopover = useCallback(() => {
     const popover = popoverRef.current;

@@ -12,6 +12,7 @@ import {
   resolveGlobalHeaderNavigationLinks,
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
+import { placePopoverElement } from "../../lib/navigation/popoverPlacement";
 import { MobileNavContent } from "./globalHeaderNavClient";
 
 const TAB_ICONS: Record<NavigationGroupKey, typeof Home> = {
@@ -53,6 +54,7 @@ function ActiveGroupTab({
      active at a time, so the key is unique. */
   const popoverId = `mobile-tab-group-${tab.key}`;
   const popoverRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
 
   const Icon = TAB_ICONS[tab.key];
@@ -61,14 +63,28 @@ function ActiveGroupTab({
   useEffect(() => {
     const popover = popoverRef.current;
     if (!popover) return;
+    /* Centred over the tab and clamped to the screen by script in every engine: a middle
+       tab left CSS anchoring no area that fit, and WebKit ran the History list 40px off
+       the right edge (`lib/navigation/popoverPlacement.ts`). */
+    const place = () => {
+      const trigger = triggerRef.current;
+      if (trigger) placePopoverElement(trigger, popover, { side: "above", align: "center", gap: 8 });
+    };
     const onToggle = (event: Event) => {
       const next = Reflect.get(event, "newState") === "open";
       setOpen(next);
       onOpenChange(next);
+      if (next) {
+        place();
+        window.addEventListener("resize", place);
+      } else {
+        window.removeEventListener("resize", place);
+      }
     };
     popover.addEventListener("toggle", onToggle);
     return () => {
       popover.removeEventListener("toggle", onToggle);
+      window.removeEventListener("resize", place);
       onOpenChange(false);
     };
   }, [onOpenChange]);
@@ -100,6 +116,7 @@ function ActiveGroupTab({
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         popoverTarget={popoverId}
         aria-controls={popoverId}
