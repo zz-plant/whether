@@ -300,3 +300,15 @@ describe("the figures say whose lines they draw, and that a restart needs both",
     assert.match(routeSource, /sharedFigureStanding\.lead\.replace/, "without repeating the figure's own number");
   });
 });
+
+describe("the page reads down one left edge", () => {
+  /* The body under the call keeps its reading measure but not a centre of its own
+     (2026-11-24): centred, it started 80px right of the call and the area rows. */
+  it("starts the reading body at the call's left edge", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    const flow = /className="weather-brief-flow ([^"]*)"/.exec(routeSource)?.[1] ?? "";
+    assert.match(flow, /max-w-\[72rem\]/, "the reading measure stays");
+    assert.match(flow, /(?:^|\s)mr-auto(?:\s|$)/);
+    assert.doesNotMatch(flow, /(?:^|\s)mx-auto(?:\s|$)/, "centred, it drifts off the call's edge");
+  });
+});

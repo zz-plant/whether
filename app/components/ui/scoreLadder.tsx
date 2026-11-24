@@ -623,8 +623,10 @@ export function ScoreLadder({
             {label}
             {worse ? (
               /* In the compact pair the direction is for a screen reader: beside a 46px
-                 figure in half a phone's width it wrapped the label to three lines. */
-              <span className={figure === "compact" ? "sr-only" : "ml-1.5 font-normal text-slate-400"} data-ladder-direction={worse}>
+                 figure in half a phone's width it wrapped the label to three lines.
+                 Beside the full figure it takes its own line: run on, it split
+                 "(higher is / worse)" or "Funding / pressure" in the rail. */
+              <span className={figure === "compact" ? "sr-only" : "block font-normal text-slate-400"} data-ladder-direction={worse}>
                 {worse === "higher" ? "(higher is worse)" : "(higher is better)"}
               </span>
             ) : null}
@@ -707,7 +709,9 @@ export function ScoreLadder({
         <span className="font-medium text-slate-200">
           {label}
           {worse ? (
-            <span className="ml-1.5 font-normal text-slate-400" data-ladder-direction={worse}>
+            /* No gap when the name before it is for a screen reader only (the
+               What-changed rows): the note then opens the line. */
+            <span className="ml-1.5 whitespace-nowrap font-normal text-slate-400 [.sr-only+&]:ml-0" data-ladder-direction={worse}>
               {worse === "higher" ? "(higher is worse)" : "(higher is better)"}
             </span>
           ) : null}

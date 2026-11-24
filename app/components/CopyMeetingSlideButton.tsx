@@ -79,8 +79,8 @@ export function CopyMeetingSlideButton({
       label="Copy as a slide"
       state={didCopy ? "copied" : "idle"}
       onClick={() => void handleCopy()}
-      leadingIcon={<CopyIcon className="text-slate-400" />}
-      stateIcons={{ copied: <CheckIcon className="text-emerald-400" /> }}
+      leadingIcon={<CopyIcon className="size-4 text-slate-400" />}
+      stateIcons={{ copied: <CheckIcon className="size-4 text-emerald-400" /> }}
       buttonLabels={{ copied: <span className="text-emerald-300">Slide copied</span> }}
       buttonProps={{
         title: "Copy this week's guidance as one slide, formatted for Notion, Keynote or Google Slides",
