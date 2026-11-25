@@ -291,6 +291,13 @@ describe("stress test — detection confidence", () => {
     assert.notEqual(grade("open a London office").detectedCategory, "HIRING");
   });
 
+  it("reads a numbered add of machines as infrastructure, not a hire", () => {
+    // `whether check "add 3 AWS GPU nodes"` came back "Hire is considered DANGEROUS".
+    assert.equal(grade("add 3 AWS GPU nodes").detectedCategory, "INFRASTRUCTURE");
+    assert.equal(grade("Add 4 Kubernetes nodes to the cluster").detectedCategory, "INFRASTRUCTURE");
+    assert.equal(grade("Add 3 engineers to the GPU cluster team").detectedCategory, "HIRING");
+  });
+
   it("treats an explicit category override as matched, not assumed", () => {
     const result = grade("asdf qwerty", { category: "PRICING" });
     assert.equal(result.detectedCategory, "PRICING");

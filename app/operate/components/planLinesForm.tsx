@@ -157,7 +157,7 @@ export function PlanLinesForm({
   if (defaults.length === 0) return null;
 
   return (
-    <form onSubmit={handleSubmit} aria-label={"Set your own rules"} data-testid="plan-lines-form" className="space-y-4">
+    <form onSubmit={handleSubmit} aria-label={"Your own numbers"} data-testid="plan-lines-form" className="space-y-4">
       {/* The step's own line already says these start at the published lines and
           that a crossing sends one email; this says how to use them. */}
       <p className="max-w-[60ch] text-sm text-slate-300">

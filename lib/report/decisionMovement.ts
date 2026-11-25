@@ -93,7 +93,7 @@ type AreaMovement = {
 };
 
 /** The areas that moved the same way, with the lines that decided it for any of them, once each. */
-type MovementGroup = {
+export type MovementGroup = {
   kind: Exclude<AreaMovementKind, "held">;
   areas: DecisionArea[];
   crossed: CrossedLine[];
@@ -199,6 +199,10 @@ const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) =>
   resumable: (areas) => `the restart condition now holds for ${areas}`,
   resumeLost: (areas) => `the restart condition no longer holds for ${areas}`,
 };
+
+/** One group's clause as the sentence states it ("the pause now applies to Hiring and Spending"), out of `totalAreas` ruled areas. */
+export const describeMovementGroup = (group: Pick<MovementGroup, "kind" | "areas">, totalAreas: number) =>
+  GROUP_CLAUSE[group.kind](listAreas(group.areas, totalAreas));
 
 const GROUP_ORDER: readonly Exclude<AreaMovementKind, "held">[] = ["paused", "lifted", "resumable", "resumeLost"];
 
@@ -456,11 +460,26 @@ export const buildStandupLine = ({
   regime: RegimeKey;
   /** What the week did to the guidance; null when nothing was compared. */
   change: GuidanceChange | null;
+}): string =>
+  `${describeStandupStatus({ regime, change, policyOverrideActive: source.weeklyCall.policyOverrideActive })} ${buildCallChangeLine(source)}`;
+
+/**
+ * The standup line's first half: whether the guidance moved and what that means for pace.
+ * The calendar feed prints it alone (`lib/export/calendarFeed.ts`), since its event already
+ * carries the full change line.
+ */
+export const describeStandupStatus = ({
+  regime,
+  change,
+  policyOverrideActive,
+}: {
+  regime: RegimeKey;
+  change: GuidanceChange | null;
+  policyOverrideActive: boolean;
 }): string => {
-  const callChange = buildCallChangeLine(source);
-  if (source.weeklyCall.policyOverrideActive) return `Guidance on hold this week; no pace change. ${callChange}`;
-  if (change === null) return `No earlier reading to compare with. ${callChange}`;
-  if (change === "held") return `Guidance unchanged; no pace change. ${callChange}`;
-  if (change === "conditions") return `Conditions changed to ${getRegimePublicLabel(regime)}; review pace. ${callChange}`;
-  return `An area paused or restarted; review pace. ${callChange}`;
+  if (policyOverrideActive) return "Guidance on hold this week; no pace change.";
+  if (change === null) return "No earlier reading to compare with.";
+  if (change === "held") return "Guidance unchanged; no pace change.";
+  if (change === "conditions") return `Conditions changed to ${getRegimePublicLabel(regime)}; review pace.`;
+  return "An area paused or restarted; review pace.";
 };

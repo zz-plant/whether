@@ -1440,7 +1440,15 @@ the brief; these reach people who have not, and each carries the link back.
   frozen week on its Monday, carrying that week's conditions, guidance, and lines, plus a marker
   for the coming Monday. The repeating Monday hold cannot carry a week's numbers; a subscribed feed
   can. Linked beside the hold on the meeting formats (webcal for Apple and Outlook, Google's
-  add-by-URL page).
+  add-by-URL page). Since 2026-11-25 (#1787) each week's description is the hold's agenda answered
+  for that week (`buildWeekAgenda`): under the guidance and the change line, the three
+  `MONDAY_AGENDA_STEPS` carry the standup status (`describeStandupStatus`) and the lines the scores
+  crossed (`describeMovementCause`), the areas on hold, and one question from the week's largest
+  change: an area that paused or restarted, then conditions that changed, then the score that moved
+  furthest, else the standing revisit prompt. It is rebuilt from the frozen record, since the feed
+  serves past weeks that no live reading or `BriefDocument` covers. Editing a reader's own recurring
+  invite through the Google or Microsoft calendar APIs needs OAuth and stored secrets, and was not
+  built; there is no per-week `.ics` download for a meeting pack to carry.
 - *Frames and oEmbed.* `/api/embed` and `/api/oembed` were removed with the low-use surfaces on
   2026-11-15 (#1833) and the frame came back on 2026-11-25 (#1785) as `/embed/call-strip`
   (`lib/export/callStripEmbed.ts`): a route handler, so none of the root layout's chrome, that
@@ -4911,6 +4919,89 @@ Left out, each for a reason:
   - 2026-11-25: the drawing is the target instead. A tap anywhere in it chooses the nearest mark
     (`lib/ui/nearestMark.ts`) and shows its words above the finger with a 44px "Open Sep 2022"
     link, which replaced "Tap again to open" and its second tap on the same few pixels.
+
+### 1.1.109 Questions as people ask them (2026-11-25)
+
+The owner asked, overriding maintenance mode, for the site to ask and answer the way an operator
+would out loud or in a Slack message, without suffering its own vocabulary, and for better
+semantic SEO throughout with no new pages. The rules are in `docs/editorial-guardrails.md`
+("Questions and answers, as people say them") and `docs/seo/quality-gates.md` ("Semantic gates").
+A section that answers a question is headed by it, and its first sentence starts with the answer.
+
+- **`/`.** "What's on hold?" lists the held areas by name ("Nothing is on hold." on a Sunny week).
+  The other headings follow the same pattern:
+  - "What's changed since Oct 30?" answers with the two scores' moves.
+  - "Why Freezing?" opens "Money is pricey, and investors won't go out in it."
+  - "What would change our mind?" answers with the Conditions change if sentence, which no longer
+    prints a second time under its own label.
+  - "Has this happened before?" answers "Once: …", "Yes. …" or "Not since 2012: …".
+  - "Can I get an email when conditions turn?" opens "Yes. …".
+  - "What about our runway?" heads the runway fold.
+
+  The questions and answers are built once (`app/homePageQuestions.ts`, the section model). The
+  page and its JSON-LD both read them.
+- **The report pages.** Each page's questions live in one object that the heading and the markup
+  both read (`app/operate/planQuestions.ts`, `app/signals/signalsQuestions.ts`,
+  `app/trust/trustQuestions.ts`, `app/components/history/historyQuestions.ts`,
+  `app/calibration/calibrationQuestions.ts`, `app/brief/[week]/briefQuestions.ts`).
+  - /operate asks "When does each area pause or restart?", "What should we stop, start and keep
+    small?", "Does this plan fit this week?", "Want your own numbers?" and "How much runway should
+    we keep?".
+  - /signals asks "Why did the guidance change?" and "Has the recession warning gauge gone below
+    zero in the past year?".
+  - /trust asks "Can we trust this week's guidance?" and "Is the data current?".
+  - /history asks "Has it been right?" (once; the intro no longer asks it too).
+  - /brief asks "What happened next?".
+  - The "On this page" indexes name the sections the same way.
+  - Two suggested titles were declined. "When was it last like this?" claims recency, but the
+    answer is the closest of a few hand-picked cycles. "Did it see the changes coming?" gives a
+    record a person's verb.
+- **Answer pages.** The lead, the copied brief and the FAQ answer start with this week's standing
+  ("No, not this week: hiring is open until risk appetite falls below 44; it is 52.") and then
+  the page's rule. Titles, questions and meta descriptions are unchanged: they are search
+  contracts, and an older decision keeps the weekly number out of what crawlers cache.
+- **Pastes and emails are messages.** The copy-brief Slack and agenda pastes, the Monday Slack post
+  (`buildSlackBrief`), the frozen week's Slack and email exports and the Monday email all open on
+  the week's answer: "*This week (Aug 28, 2026): put more into what's already working, …
+  Conditions are holding.*".
+  - The title moves to the source line ("Whether Weekly Brief · Source: …").
+  - The "Guidance:" slot is gone. Do now / Pause if / Restart when and the links stay.
+  - The Monday email's subject is the same answer.
+  - `tests/fixtures/briefFormats.golden.json` moved only on those keys.
+- **Structured data mirrors what is visible.** Each page with question headings carries them as
+  `Question` / `acceptedAnswer` nodes in its page node's `hasPart`, with text from the same
+  object. `tests/homeQuestionMarkup.test.tsx` and `tests/pageQuestionMarkup.test.tsx` hold each
+  node to its visible heading and first sentence.
+  - The homepage dropped a FAQPage of questions no section asked.
+  - /operate's FAQPage now carries its three step questions.
+- **Datasets say what they hold.** The homepage's "US Treasury yield curve snapshot" and /signals'
+  "Macro signal evidence feed" are now named for this week's reading. /history's dataset names the
+  month-end record. Each lists funding pressure, risk appetite (and on /history Room to move)
+  with 0–100 bounds in `unitText` "points", its coverage, its download or API `distribution` and
+  `measurementTechnique` → /about#method.
+- **One set of terms.** `/about#method` defines the vocabulary's eight terms: the two scores, Room
+  to move, Room before a change and the four conditions. Each is a visible `<dfn>` holding a
+  sentence the site already prints, under one `DefinedTermSet` (`lib/seo/definedTerms.ts`). Pages
+  point at the terms by id in `mentions`. The market concepts link to Wikipedia through
+  `wikipediaTopic`, each title checked as a non-redirect. There is still no glossary page (§1.5).
+- **Dates and links.** The dates a reading or brief belongs to sit in `<time dateTime>`. Links
+  name their destination: "Why Freezing?", "Read that week's brief", "Read the week of Sep 14,
+  2026", "Want your own numbers? →".
+- **A shared brief opens on its area.** Copy brief's link carries `?decision=`, and
+  `/brief/<week>` now marks that area's row and scrolls to it. This happens in the browser, so
+  the frozen page stays one cached render. Its canonical URL ignores the parameter.
+- **The builders' names stay out of the copy.** `tests/featureNameVocabulary.test.ts` reads the
+  visible strings of the files this work touched and fails on the names it was specified under:
+  lens, cursor, what-if, slider, region, overlay. Its first catch predated the work: the share
+  panel's "Slack preview overlay" switch now reads "Preview in Slack".
+
+Left out, each for a reason:
+- The MCP `get_answer` tool still returns the answer pages' short answer without this week's
+  lead. The lead is computed in `app/answers`, not in the shared answer object.
+- `/api/cli/history` serves 12 month-ends, so /history's dataset `distribution` points at what
+  exists. There is no full-record download.
+- `llms.txt` is built without a reading. It asks "What's changed since the last reading?" and
+  "Why these conditions?" as a person would.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

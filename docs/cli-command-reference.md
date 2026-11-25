@@ -16,6 +16,8 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether ping`
 - `whether agent [weekly|monthly|quarterly|yearly] [--json] [--compact|--payload-only|--prompt-only|--skills-only]`
 - `whether state [--json] [--require-ready]`
+- `whether check ["<proposal>"] [--file <path>] [--category <category>] [--fail-on risky|dangerous] [--require-ready] [--json]`
+- `whether standup [--json]`
 - `whether status [--compact]`
 - `whether call [show|copy|diff]`
 - `whether regime`
@@ -67,8 +69,8 @@ Notes:
 
 - Default text output is optimized for terminal reading and meeting handoff. It can add local context lines and rendered brief variants.
 - `--json` on parity commands is optimized for agents, CI, and scripts. It returns the backend payload without local CLI wrappers.
-- Current parity commands are `agent`, `state`, `status`, `call`, `changes`, `regime`, `diagnostics`, `history`, `brief`, and `scenario`.
-- Derived commands such as `export`, `share`, and filtered `diagnostics evidence|provenance` intentionally compose or transform backend data.
+- Current parity commands are `agent`, `state`, `status`, `call`, `changes`, `regime`, `diagnostics`, `history`, `brief`, `scenario`, and `standup`.
+- Derived commands such as `export`, `share`, `check` (the state and a tool result in one payload), and filtered `diagnostics evidence|provenance` intentionally compose or transform backend data.
 
 Agent shortcuts:
 - `whether agent --compact --json` returns a smaller agent brief with the summary hash, decision delta, flip watch, and skill list.
@@ -79,6 +81,8 @@ Agent shortcuts:
 Shell shortcuts:
 - `whether status --compact` prints a one-screen status snapshot that is easier to scan in a terminal or pipe into shell tools.
 - `whether state` prints the state an agent decides from (`GET /api/agent?view=state`, `lib/agentState.ts`): the conditions, the published confidence, whether the data is live and current (`automation.ready`), each score against its pause, resume and change lines, what moved it since the dated earlier reading, and the guidance. `--json` prints the payload as served, for an agent; without it, a page for a person. It is the same answer as the MCP tool `get_state`. `--require-ready` exits `8` when `automation.ready` is false, so a script can gate on the exit code instead of parsing the payload.
+- `whether check "<proposal>"` lints a proposal against the current reading with the MCP tool `lint_commitment` (`POST /api/mcp`, JSON-RPC `tools/call`; the proposal travels in the body, not the URL) and reads `/api/agent?view=state` for the reading's date and readiness. The proposal is the words after `check`, `--file <path>` (`-` for stdin), or stdin, so a CI step can pipe a PR body in. `--category` grades a proposal whose wording names no decision (`roadmap` for a migration). It exits `0` on any decision verdict; `--fail-on risky` exits `9` on `RISKY` or `DANGEROUS`, `--fail-on dangerous` on `DANGEROUS` only, and `Not graded` never does. `--require-ready` exits `8` first when the reading is not live and current. `--json` prints `{ tool, reading, result, failOn, blocked, use }`. Recipes for hooks and CI: `docs/agents/ide-policy-integration.md`.
+- `whether standup` prints the standup line from the MCP tool `get_standup_line` (`GET /api/mcp?tool=get_standup_line`) and the reading's date; `--json` prints the shim's answer as served.
 - `whether changes` heads its report with the reading it is measured against ("What changed since Aug 31": the previous month-end snapshot, not the last refresh), names each signal as the page does, says what a score's move is made of, and prints a line already crossed as "1 past the line" and not as "-1 away". An older server that does not name the basis prints "since the last refresh".
 - A word that is no command is refused as one (`error: unknown command 'stat' (did you mean 'status'?)`, exit 1, with the list of commands). `status` remains what runs when no command is given; it was Commander's default command, which used to answer a mistyped command with "too many arguments for 'status'". The completion scripts list the registered commands rather than a copy of them.
 - If the configured local URL is unreachable and you are using the default local setup, the CLI probes common local dev ports and reuses the first healthy Whether API it finds. Use `--no-local-discovery` to force strict URL behavior.
@@ -118,7 +122,8 @@ Local dev note:
 - `5` invalid scenario input
 - `6` network reachability failure
 - `7` server/rate-limit failure
-- `8` the reading is not live and current (`whether state --require-ready`; the state is still printed)
+- `8` the reading is not live and current (`whether state --require-ready`, `whether check --require-ready`; the answer is still printed)
+- `9` the proposal's decision verdict meets `--fail-on` (`whether check`; the result is still printed)
 
 ## Export behavior
 
@@ -176,6 +181,9 @@ Order: **flags > env vars > config file**.
 ## CLI API routes
 
 - `GET /api/agent?cadence=weekly|monthly|quarterly|yearly`
+- `GET /api/agent?view=state` (`state`, `check`)
+- `GET /api/mcp?tool=get_standup_line` (`standup`)
+- `POST /api/mcp`, JSON-RPC `tools/call` of `lint_commitment` (`check`)
 - `GET /api/cli/status`
 - `GET /api/cli/call`
 - `GET /api/cli/regime`
@@ -184,7 +192,7 @@ Order: **flags > env vars > config file**.
 - `GET /api/cli/history`
 - `GET /api/cli/scenario`
 
-All are versioned `v1` payloads for automation-safe command output.
+The `/api/cli/*` routes and the state are versioned `v1` payloads for automation-safe command output; the MCP routes answer in the shapes `docs/agents/agent-interface.md` describes.
 
 Each `/api/cli/*` route reads its query string with the agent tools' parser (`lib/cli/queryContracts.ts`,
 over `lib/agent/registry.ts`), and the scenario scores with the tools' `numberInput`. A query the route

@@ -1,7 +1,7 @@
 import { formatNumberWithUnit } from "../formatters";
 import { weeklyHeadline } from "../report/reportEvidence";
 import type { RegimeAssessment } from "../regimeEngine";
-import type { BriefDocument } from "../report/briefArtifact";
+import { formatWeekAnswer, type BriefDocument } from "../report/briefArtifact";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildSharedCorridorRails, formatPointsToLine, selectPauseCondition, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
@@ -313,6 +313,13 @@ export const buildBoardSlideBullets = (document: BriefDocument) => {
 /**
  * The weekly Slack brief: the Monday post, `GET /api/brief/slack` and the
  * weekly artifact script all print this, from the same document.
+ *
+ * A message, not a form (2026-11-25, docs/editorial-guardrails.md "Pastes are messages"):
+ * it opens on the line the copied brief and the Monday email open on, "*This week
+ * (Aug 28, 2026): put more into what's already working… Conditions are holding.*"
+ * (`formatWeekAnswer`), and the title rides on the source line at the foot. It opened on
+ * "Whether Weekly Brief — 2026-08-28" and then "• Guidance: …", a heading and a label
+ * before the answer, in a channel between other people's messages.
  */
 export const buildSlackBrief = (document: BriefDocument) => {
   const { readings } = document;
@@ -320,7 +327,9 @@ export const buildSlackBrief = (document: BriefDocument) => {
     (macro) => `• ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)} · refreshed ${macro.record_date}`,
   );
   const areaRows = buildAreaRowLines(document);
-  const callSlots = briefCallSlots(document);
+  /* The guidance is the opening line; the lines it is bounded by follow under their labels. */
+  const [guidance, ...boundingSlots] = briefCallSlots(document);
+  const [stampLine, ...stampRest] = buildExportStamp(document, CONFIDENCE_STAMP_NOTE);
 
   /*
    * The page's order: the call, what changed, what that changes for you, what
@@ -328,11 +337,9 @@ export const buildSlackBrief = (document: BriefDocument) => {
    * to lead, above the call they explain.
    */
   return [
-    `Whether Weekly Brief — ${document.provenance.recordDate}`,
+    `*${formatWeekAnswer(guidance?.value ?? formatGuidance(document.slots), document.recordDateLabel)}*`,
     `Conditions: ${document.conditions.line}`,
-    "",
-    "This week:",
-    ...callSlots.map(({ label, value }) => `• ${label}: ${value}`),
+    ...boundingSlots.map(({ label, value }) => `• ${label}: ${value}`),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,
     ...briefReadingLines(document),
@@ -350,7 +357,8 @@ export const buildSlackBrief = (document: BriefDocument) => {
     "",
     `Full brief: ${document.provenance.permalink}`,
     "",
-    ...buildExportStamp(document, CONFIDENCE_STAMP_NOTE),
+    `Whether Weekly Brief · ${stampLine ?? ""}`,
+    ...stampRest,
   ].join("\n");
 };
 

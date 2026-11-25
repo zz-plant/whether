@@ -50,4 +50,5 @@ For a specific plan ("hire three engineers next quarter", "sign a three-year lea
 a verdict, the assumptions that would break first, and the pause and resume lines that apply. A null
 verdict means it has no rules for that kind of decision: say so, and use the `answer` it points to
 rather than guessing a grade. Pass `cashUsd` and `monthlySpendUsd` when the user has given them, so
-the plan is sized against their cash.
+the plan is sized against their cash. A plan naming several commitments can go in one call:
+`commitments` lists each with its own verdict and figure, and the verdict covers them together.

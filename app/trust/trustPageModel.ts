@@ -1,9 +1,8 @@
 import { formatGuidance } from "../../lib/export/briefBuilders";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
-import { buildBreadcrumbList } from "../../lib/seo";
-import { graph } from "../../lib/seo/pageStructuredData";
-import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
+import { buildTrustStructuredData } from "../../lib/seo/reportPageStructuredData";
+import { buildTrustQuestions } from "./trustQuestions";
 import {
   buildCompactTrustSummary,
   buildTrustWarnings,
@@ -20,7 +19,6 @@ import { buildRateDial } from "../../lib/report/rateScenario";
 
 
 export async function buildTrustPageModel() {
-  const breadcrumbStructuredData = graph([buildBreadcrumbList(buildGroupBreadcrumbs("/trust"))]);
   /* Read alongside the brief, not after it: the run history has its own deadline and
      fails soft, so it never lengthens the page past the report path's own bound. The
      funnel is a KV get of a record the Monday cron already wrote, so it costs one read
@@ -103,8 +101,10 @@ export async function buildTrustPageModel() {
      method before the revisit triggers, while the page drew the formula first,
      the method next and every other section folded at its foot. */
   const sectionLinks = [
-    { href: "#source-board", label: "Sources" },
-    { href: "#formula-reference", label: "How the scores are built" },
+    /* The two open sections by the questions their headings ask (2026-11-25), short; no two
+       entries open on the same word. */
+    { href: "#source-board", label: "Is the data current?" },
+    { href: "#formula-reference", label: "How are scores worked out?" },
     { href: "#confidence-limits", label: "Distance to a change" },
     { href: "#revisit-call", label: "What would make it wrong" },
     // Only when the telemetry read is configured: an index entry for a section that
@@ -117,6 +117,20 @@ export async function buildTrustPageModel() {
     { href: "#trust-snapshot", label: "System status" },
   ];
 
+  const sourceBoardRows = buildSourceBoardRows(reportData.sourceHealth);
+  /* The page's questions and the sentence that answers each, answer first: the h1 and the
+     line under it, the board's and the derivation's leads, and the limits fold's summary.
+     The markup reads the same entries. */
+  const questions = buildTrustQuestions({
+    rows: sourceBoardRows,
+    strip: trustStrip,
+    regime: reportData.assessment.regime,
+    flipThreshold: reportData.flipThreshold,
+  });
+  /* The limits fold is a summary only on a healthy week (app/trust/page.tsx); the markup
+     carries its question only when the page prints it. */
+  const limitsFolded = !isFallback && warnings.length === 0;
+
   const reportShellModel: ReportShellModel = {
     status: {
       statusLabel: reportData.statusLabel,
@@ -125,9 +139,12 @@ export async function buildTrustPageModel() {
       fetchedAtLabel: reportData.fetchedAtLabel,
     },
     page: {
-      /* No summary (2026-10-09): "Check whether this week's guidance is current
-         enough to act on." said the title again under it. */
-      pageTitle: "How much to trust this week's guidance",
+      /* The nav's question, asked by the page and answered under it (2026-11-25). The
+         title was "How much to trust this week's guidance" with no summary, since
+         "Check whether this week's guidance is current enough to act on." said the
+         title again (2026-10-09); the answer says something the title does not. */
+      pageTitle: questions.page.question,
+      pageSummary: questions.page.answer,
       sectionLinks,
       currentPath: "/trust",
     },
@@ -143,11 +160,14 @@ export async function buildTrustPageModel() {
     },
     // No closing "Open the record" card (2026-10-09): Record is a header tab.
     payloads: {
-      structuredData: breadcrumbStructuredData,
+      structuredData: buildTrustStructuredData({
+        questions: [questions.page, questions.sources, questions.scores, ...(limitsFolded ? [questions.limits] : [])],
+        recordDateIso: reportData.treasury.record_date,
+      }),
     },
   };
 
-  /* This week's scores split by input, for "How the scores are built": the
+  /* This week's scores split by input, for "How are the scores worked out?": the
      engine's own stages over the inputs this reading was scored from, and the
      source board's Treasury link for the rate terms. */
   const scoreComposition = buildScoreComposition({
@@ -184,7 +204,9 @@ export async function buildTrustPageModel() {
     rateDial,
     isFallback,
     degradedSourceRows,
-    sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
+    sourceBoardRows,
+    questions,
+    limitsFolded,
     trustSummary,
     warnings,
     revisitBullets,

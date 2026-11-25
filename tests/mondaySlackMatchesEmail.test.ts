@@ -48,18 +48,23 @@ const slot = (text: string, label: string): string | undefined => {
   return undefined;
 };
 
+/** The post's first line without its bold marks: the week's answer, as the email's first line prints it. */
+const postAnswer = (post: string) => (post.split("\n")[0] ?? "").replace(/^\*(.*)\*$/, "$1");
+
 const assertSameCall = (post: string, mail: string, snapshot: OperatingSnapshot) => {
   const { weeklyCall } = snapshot;
-  // Both lead with the week's one headline action (`weeklyHeadline`): the post under
-  // "Guidance", the email as its first line, "This week (Aug 28, 2026): …" (2026-11-18).
-  const emailAnswer = (mail.split("\n")[0] ?? "").replace(/^This week \([^)]+\): /, "This week: ");
-  assert.equal(emailAnswer, formatWeekAnswer(slot(post, "Guidance") ?? ""), "the post and the email lead with the same headline");
-  assert.equal(slot(post, "Guidance"), weeklyHeadline(weeklyCall).composed);
+  // Both open on the week's one headline action (`weeklyHeadline`) as one typed line,
+  // "This week (Aug 28, 2026): …": the email since 2026-11-18, the post since 2026-11-25,
+  // when it stopped printing it under a "Guidance" label below a title.
+  assert.equal(postAnswer(post), mail.split("\n")[0] ?? "", "the post and the email open on the same line");
+  assert.equal(postAnswer(post).replace(/^This week \([^)]+\): /, "This week: "), formatWeekAnswer(weeklyHeadline(weeklyCall).composed));
+  assert.equal(slot(post, "Guidance"), undefined, "the guidance is the first line, not a slot");
   assert.equal(slot(mail, "Action now"), undefined, "the email prints no second headline");
   assert.equal(slot(post, "Pause if"), slot(mail, "Pause if"));
   assert.equal(slot(post, "Conditions change if"), slot(mail, "Conditions change if"));
   assert.equal(slot(post, "Conditions change if"), weeklyCall.callChangesIf);
-  assert.ok(slot(post, "Guidance")?.includes(weeklyCall.policyOverrideActive ? weeklyCall.actionNow : weeklyCall.currentCall), "the headline is the call, or a held week's action");
+  const headline = (weeklyCall.policyOverrideActive ? weeklyCall.actionNow : weeklyCall.currentCall).replace(/\.$/, "");
+  assert.ok(postAnswer(post).toLowerCase().includes(headline.toLowerCase()), "the headline is the call, or a held week's action");
 };
 
 describe("the Monday Slack post carries the email's call", () => {
@@ -75,7 +80,7 @@ describe("the Monday Slack post carries the email's call", () => {
     // Held first because the two scores disagree, so the post leads with that reason's lines.
     assert.equal(snapshot.assessment.policyAssessment.refusal.reasonCodes?.[0], "signals-disagree");
     const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
-    assert.equal(slot(post, "Guidance"), `${hold.actionNow} ${hold.currentCall}`);
+    assert.equal(postAnswer(post).replace(/^This week \([^)]+\): /, "This week: "), formatWeekAnswer(`${hold.actionNow} ${hold.currentCall}`));
     assert.equal(slot(post, "Do now"), undefined, "the action is not repeated under a second label");
     assert.equal(slot(mail, "Pause if"), hold.pauseIf);
   });

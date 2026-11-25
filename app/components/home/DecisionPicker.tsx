@@ -199,7 +199,7 @@ export function DecisionPicker({
             </PlainActionLink>
           ) : null}
           <ActionLink href="/operate#ops-plan-lines" variant="inline">
-            Set your own rules →
+            Want your own numbers? →
           </ActionLink>
           <button
             type="button"

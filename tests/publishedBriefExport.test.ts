@@ -196,7 +196,10 @@ describe("published brief date-pinned exports", () => {
     assert.ok(july30Brief);
     const slack = buildPublishedBriefSlackUpdate(july30Brief);
 
-    assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
+    /* The answer first, dated in words, as the live copy and the Monday email open
+       (2026-11-25); the title rides on the provenance line. */
+    assert.match(slack, /^\*This week \(Jul 30, 2026\): keep expansion selective: .+ Conditions are tightening\.\*$/m);
+    assert.ok(slack.startsWith("*This week (Jul 30, 2026): "), "the post opens on the answer");
     assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(room before a change: some\)/);
     /* The stored sentences, as the display layer restates them (`publishedBriefDisplay`):
        no "+1.2" in no unit, no "flips this call", no stop-item under "Pause if". */
@@ -204,10 +207,10 @@ describe("published brief date-pinned exports", () => {
     /* One headline (`publishedBriefHeadline`): the stored call, opened by the stored
        action's direction. The action printed under "Do now" and the call again
        under "Summary" until 2026-10-09. */
-    assert.match(slack, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
+    assert.doesNotMatch(slack, /^• Guidance:/m, "the guidance is the first line, not a slot");
     assert.doesNotMatch(slack, /^• Do now:|^Summary:/m);
     assert.doesNotMatch(slack, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
-    assert.match(slack, /^This week:$/m);
+    assert.doesNotMatch(slack, /^Whether Weekly Brief — /m);
     assert.doesNotMatch(slack, /Over-engineering/);
     assert.match(slack, /• Conditions change if: Funding pressure rises from 52 to clear 70, or risk appetite falls from 58 to 50 or below\./);
     assert.doesNotMatch(slack, /flip|Cash availability|cash availability|Market risk appetite|market risk appetite|\d\.0\b(?!%)/);
@@ -223,7 +226,7 @@ describe("published brief date-pinned exports", () => {
 
     // Provenance
     assert.match(slack, /Provenance:/);
-    assert.match(slack, /Data as of Jul 30, 2026 · Saved copy of the published reading · captured Aug 1, 2026 at 1:51 PM UTC/);
+    assert.match(slack, /Whether Weekly Brief · Data as of Jul 30, 2026 · Saved copy of the published reading · captured Aug 1, 2026 at 1:51 PM UTC/);
     assert.match(slack, /Source: https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO/);
 
     // Permanent URL
@@ -235,10 +238,12 @@ describe("published brief date-pinned exports", () => {
     assert.ok(july30Brief);
     const email = buildPublishedBriefEmailUpdate(july30Brief);
 
-    assert.match(email, /Whether Weekly Brief — week of Jul 27, 2026/, "the week by its Monday");
+    /* The answer first, the week by its Monday (2026-11-25); the title on the source line. */
+    assert.ok(email.startsWith("This week (Jul 27, 2026): keep expansion selective: "), "the week by its Monday, answer first");
+    assert.match(email, /^This week \(Jul 27, 2026\): .+ Conditions are tightening\.$/m);
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
     assert.match(email, /^Room before a change: some$/m);
-    assert.match(email, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
+    assert.doesNotMatch(email, /^• Guidance:|^This week's guidance:$/m);
     assert.doesNotMatch(email, /Executive summary:|Action now:/);
     assert.match(email, /What changed this week:\nConditions tightened\. This record does not name the earlier reading it compared with\./);
     assert.doesNotMatch(email, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
@@ -257,7 +262,7 @@ describe("published brief date-pinned exports", () => {
 
     // Sources
     assert.match(email, /• Data as of: Jul 30, 2026/);
-    assert.match(email, /• Source: Saved copy of the published reading \(https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO\)/);
+    assert.match(email, /• Whether Weekly Brief · Source: Saved copy of the published reading \(https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO\)/);
     assert.match(email, /• Freshness: Aug 1, 2026 at 1:51 PM UTC/);
 
     // Permanent URL

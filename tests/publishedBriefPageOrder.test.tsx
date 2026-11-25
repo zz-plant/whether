@@ -50,17 +50,19 @@ describe("/brief/[week] leads with the delta, then the guidance, then the share 
     const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ week: "2026-w31" }) }));
 
     const changed = html.indexOf("What changed this week");
-    const outcome = html.indexOf("What happened after this week");
+    /* Asked as a reader would, and answered first (2026-11-25). */
+    const outcome = html.indexOf(">What happened next?</h2>");
     const areas = html.indexOf("Guidance by area");
     assert.ok(changed !== -1 && outcome !== -1 && areas !== -1);
     assert.ok(changed < outcome, "the outcome follows the week's own delta");
     assert.ok(outcome < areas, "and is read before the area rules");
 
     const section = html.slice(outcome, areas);
-    assert.match(section, /The next published brief, for the week of [A-Z][a-z]{2} \d{1,2}, \d{4}/);
-    assert.match(section, /a change from/, "w31 read Sunny and the next published week did not");
-    assert.match(section, /Conditions were set to change if/);
+    const text = section.replace(/<[^>]+>/g, "");
+    assert.match(text, /Conditions changed: the next brief, for the week of [A-Z][a-z]{2} \d{1,2}, \d{4}, read Freezing, where this one read Sunny\./, "w31 read Sunny and the next published week did not");
+    assert.match(text, /They were set to change if/);
     assert.match(section, /href="\/brief\/2026-w38"/, "it links the week it reports");
+    assert.match(text, /Read the week of [A-Z][a-z]{2} \d{1,2}, \d{4}/, "the link names the week it opens");
   });
 
   /* w40 printed "+27.0 vs prior week": the stored move was against Aug 31, five

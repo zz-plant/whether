@@ -14,6 +14,7 @@ import {
   describeAdvanceWarning,
 } from "../../../lib/report/advanceWarning";
 import { ChangeApproachDrawing } from "./changeApproach";
+import type { HistoryQuestion } from "./historyQuestions";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -26,6 +27,7 @@ export function TrackRecordSection({
   series,
   history,
   recordChanges,
+  question = null,
 }: {
   series: TimeMachineRegimeEntry[];
   /**
@@ -36,6 +38,13 @@ export function TrackRecordSection({
   history?: readonly TimeMachineRegimeEntry[];
   /** Changes in conditions across the whole record, for the line on its last re-score; this section grades a trailing window. */
   recordChanges?: number;
+  /**
+   * The heading's question and its answer (`buildRecentRecordQuestion`, from the same window),
+   * the words the page's markup carries. The answer holds the two counts the "Near the line the
+   * month before" and "Changed back within a month" facts printed, so with it they are not
+   * printed again.
+   */
+  question?: HistoryQuestion | null;
 }) {
   if (series.length < 2) return null;
 
@@ -67,8 +76,13 @@ export function TrackRecordSection({
       className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
       aria-labelledby="track-record-grading-heading"
     >
-      <div>
-        <h2 id="track-record-grading-heading" className="type-section">How the record held up</h2>
+      <div className="space-y-1">
+        <h2 id="track-record-grading-heading" className="type-section">{question?.question ?? "How the record held up"}</h2>
+        {question ? (
+          <p className="max-w-prose text-sm text-slate-200" data-section-answer>
+            {question.answer}
+          </p>
+        ) : null}
         <p className="max-w-prose text-sm text-slate-300">
           The last {counts?.readings ?? record.observations} month-end readings{windowLabel ? `, ${windowLabel},` : ""} graded
           against the same data that produced them.
@@ -84,15 +98,18 @@ export function TrackRecordSection({
           unit={`in the last ${counts?.readings ?? record.observations} months`}
         />
         {/* What `signaled` measures, said of the readings (2026-11-12): "Warned a month ahead"
-            had them warn, which a reading cannot do (tests/titleSubjects.test.ts). */}
-        <Fact label="Near the line the month before" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+            had them warn, which a reading cannot do (tests/titleSubjects.test.ts). With the
+            heading's answer above, the count is its sentence's (2026-11-25). */}
+        {question ? null : (
+          <Fact label="Near the line the month before" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        )}
         {/* Says what lasted (2026-11-10): "Typical length" named no noun. */}
         <Fact
           label="Conditions typically held"
           value={record.medianHoldMonths ?? "—"}
           unit={record.medianHoldMonths != null ? "mo" : undefined}
         />
-        <Fact label="Changed back within a month" value={record.whipsawCount} />
+        {question ? null : <Fact label="Changed back within a month" value={record.whipsawCount} />}
       </FactList>
 
       {recentTransitions.length > 0 ? (

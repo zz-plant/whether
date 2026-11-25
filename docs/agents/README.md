@@ -151,6 +151,7 @@ Do this before spawning or briefing a subagent:
 - `ui-ux-standards.md` — accessibility, visual consistency, and interaction standards
 - `mcp-and-skills-playbook.md` — practical MCP + repo-skill workflows, including the canonical subagent handoff packet
 - `agent-interface.md` — HTTP and MCP entrypoints for agentic integrations
+- `ide-policy-integration.md` — recipes for other repositories: an agent-instructions snippet, a git hook and a GitHub Actions step that run `whether check` on a proposal
 - `lessons/README.md` — the dated post-mortems, indexed by the topic they explain
 
 If you are using Roo, repo-scoped workspace modes live in `../../.roomodes` and route common Whether jobs to the matching repo-local skills.

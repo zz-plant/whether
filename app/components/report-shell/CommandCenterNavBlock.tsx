@@ -5,6 +5,7 @@ import { formatNearestChange } from "../../../lib/report/reportFormatting";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import type { RegimeKey } from "../../../lib/types";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
+import { DatedText } from "../ui/datedText";
 
 /**
  * The one page intro block a report route gets (ui-ux-standards §XI): kicker,
@@ -72,6 +73,9 @@ export function CommandCenterNavBlock({
   ]
     .filter(Boolean)
     .join(" • ");
+  /* The same line with its record date in `<time dateTime>` (2026-11-25): it is the date the
+     reading belongs to, and the strip's own date cell does the same (`DatedText`). */
+  const introMeta = <DatedText text={introMetaRest} />;
   // Same rule for the refresh stamp: /history passes no fetch time, and
   // printed "Updated " with nothing after it. There is no second stamp: a
   // "15m cadence" label and, on /history, "Fixed historical snapshot" beside the
@@ -153,17 +157,22 @@ export function CommandCenterNavBlock({
                     hero's tag and the sticky strip print. */}
                 <span data-regime={statusRegime} className="type-stamp weather-tag-placard text-fluid-base">{statusLabel}</span>
                 {introMetaRest ? (
-                  <span className="text-fluid-sm font-medium text-slate-400">{introMetaRest}</span>
+                  <span className="text-fluid-sm font-medium text-slate-400">{introMeta}</span>
                 ) : null}
               </p>
             ) : introMetaRest ? (
-              <p className="text-fluid-sm font-medium leading-4 text-slate-400">{introMetaRest}</p>
+              <p className="text-fluid-sm font-medium leading-4 text-slate-400">{introMeta}</p>
             ) : null}
             {/* On a phone a route with a strip drops the summary: the bottom bar
                 already names the page, and the strip is the line a reader
-                needs before the first task block. */}
+                needs before the first task block. A title that asks a question
+                keeps it (2026-11-25): the summary is the answer, and a question
+                with its answer hidden does not earn its "?". */}
             {pageSummary ? (
-              <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
+              <p
+                data-page-answer={pageTitle.trim().endsWith("?") ? "" : undefined}
+                className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip && !pageTitle.trim().endsWith("?") ? "max-sm:hidden" : ""}`.trim()}
+              >
                 {pageSummary}
               </p>
             ) : null}

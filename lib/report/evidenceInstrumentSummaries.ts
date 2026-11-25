@@ -20,7 +20,9 @@ import { buildComparedWith } from "./comparisonBasis";
 const PERCENT = (value: number) => `${value.toFixed(2)}%`;
 
 /**
- * "1-month rate 4.05%, up from 3.85% on Aug 31". This week's 1-month reading
+ * "Rising: the 1-month rate is 4.05%, up from 3.85% on Aug 31", the answer to "What are
+ * interest rates doing?" with the reply first (2026-11-25; it opened on the rate's name, so the
+ * direction a person would say first came third). This week's 1-month reading
  * against the last month-end the rate charts draw before it: the charts are
  * the month-end archive and end there, so that is the point the reader finds
  * when the panel opens. Null without a reading.
@@ -35,14 +37,15 @@ export const describeRatesSummary = ({
   const trail = buildRatesTrail({ current, series });
   const latest = trail?.at(-1);
   if (!trail || !latest) return null;
-  const now = `1-month rate ${PERCENT(latest.value)}`;
+  const now = `the 1-month rate is ${PERCENT(latest.value)}`;
   const earlier = trail.at(-2);
   const label = earlier ? buildComparedWith(earlier.recordDate, latest.recordDate)?.label : undefined;
-  if (!earlier || !label) return now;
+  if (!earlier || !label) return `The 1-month rate is ${PERCENT(latest.value)}`;
   const before = PERCENT(earlier.value);
   const after = PERCENT(latest.value);
-  if (before === after) return `${now}, unchanged from ${label}`;
-  return `${now}, ${latest.value > earlier.value ? "up" : "down"} from ${before} on ${label}`;
+  if (before === after) return `Holding: ${now}, as on ${label}`;
+  const rising = latest.value > earlier.value;
+  return `${rising ? "Rising" : "Falling"}: ${now}, ${rising ? "up" : "down"} from ${before} on ${label}`;
 };
 
 /** How many month-ends the rates trail carries before this reading: a year. */
@@ -76,17 +79,16 @@ export const buildRatesTrail = ({
 type SpreadKey = "spread10Y2Y" | "spread2Y3M";
 
 /**
- * The order the inversion answer names the two spreads in: the one below zero
- * in more months first, the short end on a tie. The strips drawn beside the
- * answer follow it, so the first strip is the first clause.
+ * The order the inversion answer names the two spreads in: the recession warning gauge
+ * (10-year minus 2-year) first, because the question asks about it by name, then the short
+ * end. The strips drawn beside the answer follow it, so the first strip is the first clause.
+ * Until 2026-11-25 the spread below zero in more months led, and the question asked about "the
+ * yield curve", which named neither.
  */
-export const inversionSpreadOrder = ({
-  inverted10Y2Y,
-  inverted2Y3M,
-}: {
-  inverted10Y2Y: number;
-  inverted2Y3M: number;
-}): [SpreadKey, SpreadKey] => (inverted2Y3M >= inverted10Y2Y ? ["spread2Y3M", "spread10Y2Y"] : ["spread10Y2Y", "spread2Y3M"]);
+export const inversionSpreadOrder = (): [SpreadKey, SpreadKey] => [
+  "spread10Y2Y",
+  "spread2Y3M",
+];
 
 const INVERSION_MONTHS = 12;
 
@@ -133,7 +135,7 @@ export const summarizeInversionMonths = (
     .slice(-INVERSION_MONTHS);
   const inverted10Y2Y = months.filter((month) => month.inverted10Y2Y).length;
   const inverted2Y3M = months.filter((month) => month.inverted2Y3M).length;
-  return { months, inverted10Y2Y, inverted2Y3M, order: inversionSpreadOrder({ inverted10Y2Y, inverted2Y3M }) };
+  return { months, inverted10Y2Y, inverted2Y3M, order: inversionSpreadOrder() };
 };
 
 /**
@@ -148,9 +150,13 @@ export const monthOfLabel = (label: string): { year: number; month: number } | n
   return month ? { year, month } : null;
 };
 
+/** The question the inversion chart answers, in the gauge's own name. */
+export const INVERSION_QUESTION = "Has the recession warning gauge gone below zero in the past year?";
+
 /**
- * Whether either spread went below zero across the months the inversion chart
- * draws, from the counts its caption prints.
+ * Whether the recession warning gauge (the 10-year rate minus the 2-year) went below zero
+ * across the months the inversion chart draws, then the short end, from the counts its caption
+ * prints. "No" or "Yes" first, as a person would answer.
  */
 export const describeInversionSummary = ({
   months,
@@ -161,18 +167,17 @@ export const describeInversionSummary = ({
   inverted10Y2Y: number;
   inverted2Y3M: number;
 }): string => {
-  if (inverted10Y2Y === 0 && inverted2Y3M === 0) {
-    return `No: long-term rates stayed above short-term ones in all of the last ${months} months`;
+  /* In words, not "2Y−3M" and "10Y−2Y" (2026-10-28): the summary is the question's first line. */
+  const shortEnd =
+    inverted2Y3M === 0
+      ? "and the 2-year stayed above the 3-month"
+      : `and the 2-year rate was below the 3-month rate in ${inverted2Y3M} of them`;
+  if (inverted10Y2Y === 0) {
+    return inverted2Y3M === 0
+      ? `No: the 10-year rate stayed above the 2-year rate, and the 2-year above the 3-month, in all of the last ${months} months`
+      : `No: the 10-year rate stayed above the 2-year rate in all of the last ${months} months, though the 2-year rate was below the 3-month rate in ${inverted2Y3M} of them`;
   }
-  /* In words, not "2Y−3M" and "10Y−2Y" (2026-10-28): the naming table asks for the
-     gauge's full name on first use, and this summary is the question's first line. */
-  const count = (inverted: number) => (inverted === 0 ? "none" : `${inverted} of ${months} months`);
-  const clauses: Record<SpreadKey, string> = {
-    spread2Y3M: `the 2-year rate below the 3-month rate in ${count(inverted2Y3M)}`,
-    spread10Y2Y: `the 10-year rate below the 2-year rate in ${count(inverted10Y2Y)}`,
-  };
-  const [first, second] = inversionSpreadOrder({ inverted10Y2Y, inverted2Y3M });
-  return `Yes: ${clauses[first]}, and ${clauses[second]}`;
+  return `Yes, in ${inverted10Y2Y} of the last ${months} months: the 10-year rate was below the 2-year rate, ${shortEnd}`;
 };
 
 /**
@@ -254,17 +259,23 @@ export const summarizeConditionRuns = <Entry extends ConditionsEntry>(series: re
   return { runs, changeCount: Math.max(runs.length - 1, 0), longestRun, months: series.length };
 };
 
-/** "3 changes across the last 24 months", in the timeline's words. */
+/** "Conditions changed 3 times in the last 24 months", in the timeline's words. */
 export const describeConditionChanges = ({ changeCount, months }: { changeCount: number; months: number }) =>
   changeCount === 0
-    ? `No change across the last ${months} months`
-    : `${changeCount} ${changeCount === 1 ? "change" : "changes"} across the last ${months} months`;
+    ? `Conditions held through all of the last ${months} months`
+    : `Conditions changed ${changeCount === 1 ? "once" : `${changeCount} times`} in the last ${months} months`;
 
 const LIST = new Intl.ListFormat("en", { style: "long", type: "conjunction" });
 
-/** "Infrastructure, support, data, pricing, org chart, and roadmap": the areas the table walks through. */
+const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+
+/**
+ * "Habits in six areas: infrastructure, support, data, pricing, org chart, and roadmap", the
+ * answer to "Which zero-rate habits should we check for?": the areas the table walks through.
+ */
 export const describeFossilSummary = (rows: ReadonlyArray<{ domain: string }>) => {
   if (rows.length === 0) return null;
-  const domains = rows.map((row, index) => (index === 0 ? row.domain : row.domain.charAt(0).toLowerCase() + row.domain.slice(1)));
-  return LIST.format(domains);
+  const domains = rows.map((row) => row.domain.charAt(0).toLowerCase() + row.domain.slice(1));
+  const count = COUNT_WORDS[rows.length] ?? String(rows.length);
+  return `Habits in ${count} ${rows.length === 1 ? "area" : "areas"}: ${LIST.format(domains)}`;
 };

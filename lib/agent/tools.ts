@@ -498,7 +498,7 @@ const AGENT_TOOLS = [
     name: "stress_test_plan",
     title: "Stress-test a planned decision against today's conditions",
     description:
-      "Audits a proposed operational decision (hiring, cloud commit, office lease, vendor deal or discount) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line. A plan it has no rules for comes back with a null verdict and where to look instead; pass `category` if you know which kind of decision it is. Pass the company's figures to size it. Use it when someone describes a specific plan and asks whether it holds up in this market.",
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, vendor deal or discount) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line. A plan it has no rules for comes back with a null verdict and where to look instead; pass `category` if you know which kind of decision it is. Pass the company's figures to size it. A plan naming several commitments returns each one in `commitments`, graded and sized on its own, and the verdict covers them together. Use it when someone describes a specific plan and asks whether it holds up in this market.",
     input: {
       planText: textInput.describe("The planned decision or initiative in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),
@@ -560,6 +560,7 @@ const AGENT_TOOLS = [
         reversalTrigger: plan.reversalTrigger,
         fragileAssumptions: plan.fragileAssumptions,
         sizingNote: plan.sizingNote,
+        commitments: plan.commitments,
       };
     },
   }),
@@ -591,14 +592,20 @@ const AGENT_TOOLS = [
       }
       const plan = stressTestDecisionPlan(assessment, { planText, lifecycle: lifecycle ?? "GROWTH" });
       if (plan.verdict === null) return { violationCount: 0, violations: [], ...withAnswerForUngraded(plan, planText) };
-      const candidate: SprintDecisionCandidate = {
-        title: planText,
-        category: plan.detectedCategory,
-        action: plan.detectedAction,
-        verdict: plan.verdict,
-      };
+      /* Each commitment the plan names is a decision of its own; a pause or a clause with no rules is none. */
+      const candidates: SprintDecisionCandidate[] = plan.commitments.flatMap((commitment) =>
+        commitment.verdict === null || commitment.category === null || commitment.action === null
+          ? []
+          : [{
+              title: commitment.text,
+              category: commitment.category,
+              action: commitment.action,
+              verdict: commitment.verdict,
+              ...(commitment.department === null ? {} : { department: commitment.department }),
+            }],
+      );
       const report = auditSprintDecisions({
-        decisions: [candidate],
+        decisions: candidates,
         regime: assessment.regime,
         scores: assessment.scores,
         thresholds: assessment.thresholds,

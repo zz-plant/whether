@@ -41,7 +41,10 @@ describe("Slack brief delivery", () => {
     assert.equal(result.status, "posted");
     assert.equal(result.delivered, 1);
     assert.match(String(sentBody), /Posture: Guarded/);
-    assert.match(String(sentBody), /2026-08-17/);
+    /* No title header (2026-11-25): the post and its notification preview open on the brief's
+       own first line, which on a real week is the dated answer. */
+    assert.match(String(sentBody), /"text":"Posture: Guarded"\}$/, "the preview is the post's first line");
+    assert.doesNotMatch(String(sentBody), /"type":"header"/);
   });
 
   it("reports partial with an error when one of two webhooks fails", async () => {
@@ -96,7 +99,7 @@ describe("Slack brief delivery", () => {
     const lines = Array.from({ length: 60 }, (_, index) => `• Line ${index}: ${"y".repeat(80)}`);
     const brief = lines.join("\n");
     const sections = buildSlackBriefBlocks(brief, "2026-08-17").flatMap((block) =>
-      block.type === "section" && typeof block.text?.text === "string" ? [block.text.text] : [],
+      block.type === "section" && "text" in block && typeof block.text?.text === "string" ? [block.text.text] : [],
     );
     assert.ok(sections.length > 1, "more than one section");
     for (const text of sections) assert.ok(text.length <= 3000, `${text.length} characters`);
@@ -104,7 +107,7 @@ describe("Slack brief delivery", () => {
     assert.doesNotMatch(sections.join("\n"), /truncated/);
 
     const oneLine = buildSlackBriefBlocks("x".repeat(4000), "2026-08-17").flatMap((block) =>
-      block.type === "section" && typeof block.text?.text === "string" ? [block.text.text] : [],
+      block.type === "section" && "text" in block && typeof block.text?.text === "string" ? [block.text.text] : [],
     );
     assert.equal(oneLine.join(""), "x".repeat(4000), "a line longer than a section is split inside it");
   });
@@ -192,7 +195,11 @@ describe("Slack brief delivery", () => {
 
       assert.equal(result.status, "posted");
       assert.equal(result.delivered, 1);
-      assert.match(sentBody, /Whether Weekly Brief — 2099-12-31/);
+      /* The answer first, in the post and in the notification preview; the title on the source line (2026-11-25). */
+      assert.match(sentBody, /"text":"\*This week \([A-Z][a-z]{2} \d{1,2}, \d{4}\): /);
+      assert.match(sentBody, /"text":"This week \(/, "the notification preview is the answer");
+      assert.match(sentBody, /Whether Weekly Brief · Source: /);
+      assert.doesNotMatch(sentBody, /"type":"header"/);
       assert.match(sentBody, /Conditions:/);
     } finally {
       globalThis.fetch = originalFetch;

@@ -25,14 +25,15 @@ import {
 } from "../../lib/report/confidenceCalibration";
 import { describeBaseRateMonth } from "../../lib/report/evidenceReaderModel";
 import { DistanceHeldChoice } from "./distanceHeldChoice";
+import { InstrumentQuestion } from "../signals/components/instrumentQuestion";
+import { TRUST_PAGE_QUESTION, trustPageDescription } from "./trustQuestions";
 
 export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "How much to trust this week's guidance",
-  description:
-    "Check how fresh the sources are, how close conditions are to changing, and how the scores are built, before acting on anything you can't undo.",
+  title: TRUST_PAGE_QUESTION,
+  description: trustPageDescription,
   path: "/trust",
   imageAlt: "Whether trust hub",
   imageParams: { template: "method", eyebrow: "Trust" },
@@ -56,10 +57,12 @@ export default async function MethodPage({
     readerReturns,
     reportShellModel,
     trustStrip,
+    questions,
+    limitsFolded,
   } = await buildTrustPageModel();
 
-  /* The limits fold on a healthy week (below), under the `sources` key. */
-  const limitsFolded = !isFallback && warnings.length === 0;
+  /* The limits fold on a healthy week (below), under the `sources` key: `limitsFolded`, from
+     the model, which marks up the fold's question only when the page prints it. */
   /* How often conditions held at each distance: this week's group, the one the strip
      quotes, unless the URL picks another. Each option is a link to its URL, keeping the
      rest of the query; the default group's link drops the key, and on a folded week every
@@ -187,11 +190,13 @@ export default async function MethodPage({
 
       <div className="weather-grid gap-8 [--col-min:28rem] [--grid-max:2] items-start">
         <SourceBoard
+          question={questions.sources}
           rows={sourceBoardRows}
           treasurySourceUrl={reportData.treasuryProvenance.sourceUrl}
           macroSourceUrl={reportData.macroProvenance.sourceUrl}
         />
         <FormulaReference
+          question={questions.scores}
           scoringBasis={reportData.scoringBasis}
           composition={scoreComposition}
           rateDial={rateDial ? { ...rateDial, initialRate: parseRateParam(resolvedSearchParams?.[RATE_PARAM]) } : null}
@@ -215,7 +220,10 @@ export default async function MethodPage({
              the card radius with a framed chevron key, which read as a control panel. */
           className="weather-auto-chevron group py-2"
           summaryClassName="flex min-h-11 cursor-pointer list-none items-center gap-2 text-base font-semibold text-slate-100 select-none"
-          summary="Limits and the lines that change the guidance"
+          /* The question the fold answers and this week's answer, as the closed instruments on
+             /signals carry theirs (2026-11-25): it read "Limits and the lines that change the
+             guidance", a list of what was inside. */
+          summary={<InstrumentQuestion question={questions.limits.question} answer={questions.limits.answer} />}
         >
           <div className="mt-6 space-y-8">
             {secondaryContent}

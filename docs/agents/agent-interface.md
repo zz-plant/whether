@@ -7,6 +7,11 @@ This repo exposes a dedicated interface for agentic LLM workflows, with these pa
 3. **MCP server**, remote (`/api/mcp`) and local (`bun run mcp:whether`), for Model Context Protocol-compatible runtimes.
 4. **A plain-GET shim** on `/api/mcp?tool=<name>` for an agent with no MCP client.
 
+From a terminal, hook or CI step, `whether check "<proposal>"` runs `lint_commitment` against the
+current reading and `whether standup` prints `get_standup_line`'s answer. The recipes for wiring
+them into another repository's agent instructions, git hooks and GitHub Actions are in
+[ide-policy-integration.md](ide-policy-integration.md).
+
 For Claude Code, [the Whether plugin](../../plugins/whether/README.md) bundles the remote server
 with a skill for hiring, fundraising, burn and board-update questions. The marketplace lives in
 `.claude-plugin/marketplace.json`; the MCP Registry declaration is `server.json`. These files prepare
@@ -35,6 +40,10 @@ Its shape is a zod schema (`agentStateSchema`) published as the `outputSchema` o
 so a client can read the contract without making a call, and `tests/agentState.test.ts` holds the numbers in
 it to the page's own. It takes no cadence other than weekly (`?view=state&cadence=monthly` is a 400, not the
 weekly state under another name) and cannot be combined with `format=jev`.
+
+Spreadsheets read it too: [`=WHETHER(key, [score])`](../developer/spreadsheets/README.md) for Google Sheets
+and a Power Query table for Excel. Each key names a field of this payload; `tests/spreadsheetFunction.test.ts`
+runs the Apps Script file against the state the route builds, so renaming a field here fails that test.
 
 ## One confidence
 
@@ -196,7 +205,7 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 - `get_answer` — one decision answer's guidance, current standing and rules in force, by slug or natural-language question ("should I hire a second engineer?"); the answer pages are the same ones `/llms.txt` routes questions to. Titles, keywords and curated `askedAs` phrases in `content/answers/pages.json` match their declared page before weighted topic matching. A question no page answers is refused with where to go next: to `stress_test_plan` when it names a decision the stress test grades ("should we sign a three-year lease"), to the nearest answer, named as the nearest, when the stress test already sends that decision to one ("should I take venture debt"), and otherwise to the available answer titles and slugs (`routePlanText` in `lib/decisionShield.ts`). The refusal's `problems[].next` names the tool to call, for a caller that branches on fields.
 - `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
-- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions. A plan naming no decision the matrix has a row for (a price rise, money coming in, ad spend) comes back with `verdict: null` (`"not_graded"` from `lint_sprint_goal`), a `nextStep` and the `answer` that covers it, if one does; until 2026-11-03 it was graded as a hire. The first three also take `category`, to grade what the wording could not, and `cashUsd`, `monthlySpendUsd`, `monthlyRevenueUsd`, `runwayMonths` and `businessModel`, because an agent has no browser profile and every plan it sent was graded on conditions alone. Over the plain-GET shim those figures sit in the URL, which reaches the request logs; send them over MCP.
+- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions. A plan naming no decision the matrix has a row for (a price rise, money coming in, ad spend) comes back with `verdict: null` (`"not_graded"` from `lint_sprint_goal`), a `nextStep` and the `answer` that covers it, if one does; until 2026-11-03 it was graded as a hire. The first three also take `category`, to grade what the wording could not, and `cashUsd`, `monthlySpendUsd`, `monthlyRevenueUsd`, `runwayMonths` and `businessModel`, because an agent has no browser profile and every plan it sent was graded on conditions alone. Over the plain-GET shim those figures sit in the URL, which reaches the request logs; send them over MCP. Since 2026-11-25 a plan naming several commitments ("Pause 2 SDR reqs and allocate $80k to an annual Datadog commit while deferring SOC-2 to Q3") is read clause by clause (`segmentPlanClauses` / `parsePlanClauses` in `lib/planCommitment.ts`, `extractPlanCommitments` in `lib/decisionShield.ts`, all deterministic and offline). Every result from the first three carries `commitments`: one entry per clause with `text`, `direction` (`COMMIT` or `REDUCE` for a pause, deferral or cut), `category`, `action`, `verdict`, `headline`, `commitment` (amount, cadence, first-year cost and its basis), `headcountDelta` and `department`. A one-clause plan has one entry and grades exactly as before. In a plan of several, pauses and clauses with no rules carry `verdict: null` and add nothing to the cost; the top-level `verdict` is the harshest graded commitment's on conditions, then sized on `totalAnnualUsd`, the first-year cost of every graded commitment together; `commitment` is the largest of them, and `detectedCategory` / `detectedAction` name the clause behind the verdict. `category` fills in only a clause the wording names no row for. `audit_sprint_retro` audits each graded commitment as its own decision.
 - `list_agent_skills` — the skill contract.
 
 ### Prompts and resources (2026-11-12)

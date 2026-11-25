@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { stressTestDecisionPlan, type DecisionCategory, type LifecycleStage } from "../lib/decisionShield";
+import { buildWeekAgenda } from "../lib/export/calendarFeed";
+import { getPublishedBriefs } from "../lib/report/publishedBriefs";
 import { macroSeries } from "../lib/macroSnapshot";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import {
@@ -79,6 +81,10 @@ describe("guidance that holds at any company size", () => {
         assertAgnostic(`${category} at ${lifecycle}`, result);
       }
     }
+  });
+
+  it("names no role in the calendar feed's meeting agenda, for any frozen week", () => {
+    for (const brief of getPublishedBriefs()) assertAgnostic(`${brief.slug} agenda`, buildWeekAgenda(brief));
   });
 
   it("names no role in any pinned brief format", () => {
