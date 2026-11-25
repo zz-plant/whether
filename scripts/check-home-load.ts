@@ -91,8 +91,11 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
      the record band folds, the area rows carry their action and line in the brief, and
      the grouped rules below stop reprinting the action and the facts line stops
      reprinting the two scores. The budget only falls; this records the cut. */
-  words: 1399,
-  numbers: 226,
+  /* 1,399 → 1,345 words and 226 → 207 numbers (2026-11-25): each dot on the conditions
+     chart's month trail printed its two scores a third time as an SVG tooltip, beside the
+     chart's readout and its "Scores on this chart" table. */
+  words: 1345,
+  numbers: 207,
   wordsBeforeAreas: 288,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
@@ -105,12 +108,15 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
      paste the artifact in under 10 seconds. Same three controls the brief's
      transmission loop asks for; justified raise, said here.
      19 → 14 (2026-11-21): the five area-name buttons moved inside the picker's closed
-     disclosure; the area rows above are links, not buttons. */
-  buttons: 14,
+     disclosure; the area rows above are links, not buttons.
+     → 15 buttons and 9 → 6 jargon terms (2026-11-25, merging the drawings and controls of
+     feature log §1.1.108–109): the conditions chart's "Copy link" is one button, and its rate
+     labels replaced three jargon terms in the "In interest-rate terms" fold. */
+  buttons: 15,
   fields: 21,
   fundingPressure: 24,
   riskAppetite: 29,
-  jargon: 9,
+  jargon: 6,
   hardSentences: 0,
   longestSentence: 22,
 };

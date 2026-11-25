@@ -1,6 +1,7 @@
 /**
- * Thresholds panel: move the lines the call is judged against, and keep the
- * recent changes visible. The lines live in the URL so a shared link matches.
+ * Thresholds panel: move the lines the call is judged against, choose which
+ * inputs count, and keep the recent changes visible. The lines and the inputs
+ * live in the URL so a shared link matches.
  */
 "use client";
 
@@ -13,7 +14,14 @@ import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { formatChangeLines } from "../../../lib/report/evidenceInstrumentSummaries";
+import {
+  writeInputChoiceParams,
+  type InputChoice,
+  type InputChoiceModel,
+  type InputChoiceOption,
+} from "../../../lib/report/countedInputs";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { ActionLink } from "../../components/ui/actionLink";
 import { SpinnerIcon } from "../../components/uiIcons";
 import { createBrowserSource, useBrowserSource } from "../../components/browserSource";
 import { ThresholdNumberField } from "./ThresholdNumberField";
@@ -137,10 +145,112 @@ const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
   };
 };
 
+/* A part's points as /trust's arithmetic signs them, with the true minus. */
+const formatInputPoints = (points: number) => (points > 0 ? `+${points}` : points < 0 ? `\u2212${Math.abs(points)}` : "0");
+
+/**
+ * Which inputs count (2026-11-18): one box per input /trust's arithmetic adds up, under the
+ * score it feeds, ticked as the published score counts them. A change is a navigation, like
+ * the lines: the URL carries the choice, the server runs the engine on it
+ * (`buildInputChoiceModel`), and the sentence under the question says what it gives, the
+ * same sentence the closed row answers with. It sits by the boxes because the closed row is
+ * a screen above them on a phone. The box moves at once; the sentence follows when the page
+ * does. Nothing else on the page reads the choice.
+ */
+const InputChoiceFieldset = ({ model }: { model: InputChoiceModel }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  /* The reader's latest choice until the page answers it, stamped with the choice the page
+     was showing, so a new answer from the server replaces it rather than racing it. */
+  const serverKey = JSON.stringify(model.choice);
+  const [pendingChoice, setPendingChoice] = useState<{ baseline: string; value: InputChoice } | null>(null);
+  const choice = pendingChoice?.baseline === serverKey ? pendingChoice.value : model.choice;
+  const isCounted = (option: InputChoiceOption) =>
+    option.published ? !choice.without.includes(option.source) : choice.with.includes(option.source);
+  const options = model.groups.flatMap((group) => group.options);
+
+  const toggle = (toggled: InputChoiceOption) => {
+    const counted = (option: InputChoiceOption) => (option.source === toggled.source ? !isCounted(option) : isCounted(option));
+    const next: InputChoice = {
+      without: options.filter((option) => option.published && !counted(option)).map((option) => option.source),
+      with: options.filter((option) => !option.published && counted(option)).map((option) => option.source),
+    };
+    setPendingChoice({ baseline: serverKey, value: next });
+    const query = writeInputChoiceParams(new URLSearchParams(searchParams.toString()), next).toString();
+    startTransition(() => {
+      router.push(toRoute(query ? `${pathname}?${query}` : pathname), { scroll: false });
+    });
+  };
+
+  return (
+    <div className="weather-surface p-4" data-input-choice>
+      <fieldset className="min-w-0 border-0 p-0" aria-describedby="input-choice-result">
+        <legend className="text-sm font-semibold text-slate-100">Which inputs count?</legend>
+        {/* The answer right under the question, conditions first, and read out when it
+            changes. While the page works out a new one the old answer stays, quieter,
+            rather than a spinner in its place. */}
+        <p
+          id="input-choice-result"
+          aria-live="polite"
+          aria-busy={isPending}
+          className={`mt-1 text-sm tabular-nums transition-opacity motion-reduce:transition-none ${isPending ? "text-slate-400 opacity-70" : "text-slate-100"}`}
+          data-input-choice-result
+        >
+          {model.result}
+        </p>
+        <div className="mt-3 weather-switch gap-x-6 gap-y-3 [--col-min:14rem]">
+          {model.groups.map((group) => (
+            <fieldset key={group.metric} className="min-w-0 border-0 p-0" data-input-group={group.metric}>
+              <legend className="type-eyebrow">{group.label}</legend>
+              <ul className="mt-1">
+                {group.options.map((option) => (
+                  <li key={option.source}>
+                    <label
+                      className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-200"
+                      style={{ touchAction: "manipulation" }}
+                    >
+                      {/* No `name`: the boxes sit in no form. The choice travels in the
+                          URL's two keys, written whole on every change. */}
+                      <input
+                        type="checkbox"
+                        checked={isCounted(option)}
+                        onChange={() => toggle(option)}
+                        className="size-4 shrink-0 accent-sky-500"
+                        data-input-source={option.source}
+                      />
+                      <span className="min-w-0 grow">{option.name}</span>
+                      {/* What it gives the published score, and for an input that score leaves
+                          out, the label /trust and the score rows print beside it. */}
+                      <span className="shrink-0 tabular-nums text-slate-400">
+                        {option.published ? formatInputPoints(option.points) : `Not counted: ${formatInputPoints(option.points)}`}
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </fieldset>
+          ))}
+        </div>
+        {/* The link names the section it opens: each box's points are that arithmetic. */}
+        <p className="mt-2 text-fluid-sm text-slate-400">
+          <ActionLink href="/trust#formula-reference" variant="inline">
+            How the scores are built
+          </ActionLink>
+        </p>
+      </fieldset>
+    </div>
+  );
+};
+
 export const ThresholdsPanel = ({
   currentThresholds,
+  inputChoice = null,
 }: {
   currentThresholds: RegimeThresholds;
+  /** Which inputs count (`buildInputChoiceModel`); null when the reading offers no choice. */
+  inputChoice?: InputChoiceModel | null;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -316,7 +426,11 @@ export const ThresholdsPanel = ({
           label="Change lines"
           title="Adjust when conditions change"
           titleId="thresholds-title"
-          description="Your lines stay in the URL, so a shared link opens with them."
+          description={
+            inputChoice
+              ? "Your lines and inputs stay in the URL, so a shared link opens with them."
+              : "Your lines stay in the URL, so a shared link opens with them."
+          }
           aside={
             /* A labelled value, not a control: it was set in `weather-pill`,
                which is the class the page's pill-shaped links press. */
@@ -434,6 +548,8 @@ export const ThresholdsPanel = ({
               </Form>
             </div>
           </details>
+
+          {inputChoice ? <InputChoiceFieldset model={inputChoice} /> : null}
         </div>
 
         <div className="mt-6 weather-switch gap-4 [--col-min:18rem]">

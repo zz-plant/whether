@@ -136,6 +136,7 @@ export async function buildPlanningPageModel(
   /* Each row's rule as a small conditions chart: the rule the row prints, from the same
      strip item, and the reading its distances were measured from. */
   const weekScores = { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite };
+  const changeLines = { tightness: assessment.thresholds.tightnessRegime, riskAppetite: assessment.thresholds.riskAppetiteRegime };
   const stripRules = actionStripItems.map(ruleFromStripItem);
   const areaRows = buildAreaRows(actionStripItems, weekScores).map((row) => {
     const rule = stripRules.find((candidate) => candidate.area === row.area);
@@ -146,7 +147,7 @@ export async function buildPlanningPageModel(
             area: row.area,
             regions: buildRuleRegions(rule),
             scores: weekScores,
-            changeLines: { tightness: assessment.thresholds.tightnessRegime, riskAppetite: assessment.thresholds.riskAppetiteRegime },
+            changeLines,
             label: describeRegionsAt(rule, weekScores, "This week's reading"),
           }),
         }
@@ -313,7 +314,7 @@ export async function buildPlanningPageModel(
                 h(AreaTable, { rows: areaRows, caption: "This week's rule for each decision area", bothSides: true }),
                 /* The small charts' domain, once for the five (§XV). */
                 h("p", { className: "text-xs leading-5 text-slate-400", "data-rule-map-key": "" },
-                  "On the chart: each area's rule on the brief's conditions chart, risk appetite 0–100 across and funding pressure 0–100 down (easier is up and right). Hatched red is where the area pauses, grey where it restarts, and between them nothing changes; the dot is this week's reading.",
+                  "Each chart runs risk appetite 0–100 across and funding pressure 0–100 down, so easier is up and right. The area pauses where it's hatched red and restarts where it's grey. The dot is this week's reading.",
                 ),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
@@ -396,7 +397,12 @@ export async function buildPlanningPageModel(
               title: "Set your own rules",
               description: planLinesSummary,
               preview: planLinesPreview,
-              children: h(PlanLinesForm, { defaults: planLineDefaults, watch: parsePlanLinesWatch(resolvedSearchParams) }),
+              children: h(PlanLinesForm, {
+                defaults: planLineDefaults,
+                watch: parsePlanLinesWatch(resolvedSearchParams),
+                /* Each area's numbers beside the rules table's chart of them, against this week's reading. */
+                reading: { scores: weekScores, changeLines },
+              }),
             }]),
           {
             id: "ops-finance-strategy",

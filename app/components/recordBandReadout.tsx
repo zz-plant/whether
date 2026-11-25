@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { decodeRecordBandMonth, recordBandMonthAt, recordBandMonthCount } from "../../lib/report/recordBandCodec";
+import { monthsAfter, toMonthKey, type MonthKey } from "../../lib/monthCursor";
+import { followPageMonth, setPageMonth } from "./monthCursor";
 
 const MONTH = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
@@ -26,6 +28,11 @@ const MONTH = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric"
  * month's condition while it is read (a `data-regime` on the sky, which the data-regime
  * map resolves; forecast.css cross-fades it), and goes back to the week's when the
  * reading ends. The guidance on it does not change, and the card names the month.
+ *
+ * One month across the page (2026-11-18): the month read here is the page's month
+ * (`setPageMonth`), so every drawing below shows it too, and a month set anywhere else
+ * (a mark pointed at or focused, `[` and `]`) reads out here as if the band were
+ * pointed at, sky included, and goes when that month is let go.
  */
 export function RecordBandReadout() {
   const anchor = useRef<HTMLSpanElement>(null);
@@ -53,6 +60,18 @@ export function RecordBandReadout() {
 
     const defaultText = readout.dataset.default ?? readout.textContent ?? "";
     let current = months - 1;
+    /* The month the band reads out now, if any: the page's month once the reader moves it. */
+    let shown: MonthKey | null = null;
+    /* True while the band follows a month set elsewhere: it moves and says nothing back. */
+    let following = false;
+    const keyAt = (index: number) => {
+      const { year, month } = recordBandMonthAt(firstDate, index);
+      return toMonthKey(year, month);
+    };
+    const indexOf = (key: MonthKey) => {
+      const index = monthsAfter(firstDate, key);
+      return index >= 0 && index < months ? index : null;
+    };
 
     const monthName = (index: number) => {
       const { year, month } = recordBandMonthAt(firstDate, index);
@@ -97,6 +116,8 @@ export function RecordBandReadout() {
       showCard(current, at);
       plate.setAttribute("aria-valuenow", String(current + 1));
       plate.setAttribute("aria-valuetext", text);
+      shown = keyAt(current);
+      if (!following) setPageMonth(shown);
     };
     const clear = () => {
       readout.textContent = defaultText;
@@ -104,6 +125,17 @@ export function RecordBandReadout() {
       card.hidden = true;
       sky()?.removeAttribute("data-regime");
       sky()?.removeAttribute("data-band-preview");
+      const had = shown;
+      shown = null;
+      if (!following && had) setPageMonth(null);
+    };
+    const follow = (month: MonthKey | null) => {
+      if (month === shown) return;
+      const index = month ? indexOf(month) : null;
+      following = true;
+      if (index === null) clear();
+      else show(index);
+      following = false;
     };
     const indexAt = (clientX: number) => {
       const box = plate.getBoundingClientRect();
@@ -140,6 +172,7 @@ export function RecordBandReadout() {
     };
     const onFocus = () => show(current);
 
+    const stopFollowing = followPageMonth(follow);
     plate.addEventListener("pointermove", onMove);
     plate.addEventListener("pointerdown", onMove);
     plate.addEventListener("pointerleave", clear);
@@ -149,6 +182,7 @@ export function RecordBandReadout() {
     plate.addEventListener("focus", onFocus);
     plate.addEventListener("blur", clear);
     return () => {
+      stopFollowing();
       plate.removeEventListener("pointermove", onMove);
       plate.removeEventListener("pointerdown", onMove);
       plate.removeEventListener("pointerleave", clear);
@@ -160,6 +194,7 @@ export function RecordBandReadout() {
       for (const name of ["role", "tabindex", "aria-label", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-valuetext"]) {
         plate.removeAttribute(name);
       }
+      following = true;
       clear();
     };
   }, [router]);

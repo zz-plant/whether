@@ -169,3 +169,116 @@ export const confidenceCalibrationTotals = (): { months: number; held: number } 
     (totals, bucket) => ({ months: totals.months + bucket.months, held: totals.held + bucket.held }),
     { months: 0, held: 0 },
   );
+
+/**
+ * A distance group as `/calibration`'s table prints it under "Points from the line": "0 to
+ * 5", "37 or more". One wording for the table, its chart and `/trust`'s choice of groups.
+ */
+export const formatCalibrationGroup = ({ from, to }: { from: number; to: number | null }) =>
+  to === null ? `${from} or more` : `${from} to ${to}`;
+
+/** The same group with its unit, where no column header carries it: "10 to 20 points". */
+export const formatCalibrationDistance = (group: { from: number; to: number | null }) =>
+  `${formatCalibrationGroup(group)} points`;
+
+/** The query key `/trust` carries a picked distance group in: the group's lower edge. */
+export const CALIBRATION_DISTANCE_PARAM = "distance";
+
+/**
+ * The link that picks a group on `/trust`: the page's query as it stands with the group's
+ * key set, or dropped for the default group so it keeps the plain URL, plus `extra` (the
+ * open fold the group sits in), landing on the choice itself.
+ */
+export const buildCalibrationChoiceHref = ({
+  path,
+  params,
+  group,
+  extra = {},
+}: {
+  path: string;
+  params: Record<string, string | undefined> | undefined;
+  group: Pick<CalibrationChoiceGroup, "from" | "isDefault">;
+  extra?: Record<string, string>;
+}) => {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params ?? {})) {
+    if (typeof value === "string") query.set(key, value);
+  }
+  if (group.isDefault) query.delete(CALIBRATION_DISTANCE_PARAM);
+  else query.set(CALIBRATION_DISTANCE_PARAM, String(group.from));
+  for (const [key, value] of Object.entries(extra)) query.set(key, value);
+  const search = query.toString();
+  return `${path}${search ? `?${search}` : ""}#distance-held`;
+};
+
+/** The lower edge of the group a distance falls in. */
+export const calibrationGroupFor = (distance: number): number => BUCKET_EDGES[bucketFor(distance)] ?? 0;
+
+/*
+ * The answer before the count, as a person would give it (editorial-guardrails, "Questions
+ * and answers"): how often, in a word, then the months. A count of past months, never a
+ * chance.
+ */
+const describeHeldShare = (held: number, months: number) => {
+  if (held === months) return "Every month";
+  if (held === 0) return "Never";
+  const share = held / months;
+  if (share >= 0.7) return "Mostly";
+  if (share > 0.5) return "More often than not";
+  if (share === 0.5) return "Half the time";
+  return "Less often than not";
+};
+
+export type CalibrationChoiceGroup = {
+  from: number;
+  to: number | null;
+  /** "10 to 20 points". */
+  label: string;
+  held: number;
+  months: number;
+  entries: CalibrationEntry[];
+  /** The group this week's distance falls in. */
+  thisWeek: boolean;
+  /** The group shown with no `?distance=`: this week's, or the first when this week has no distance. */
+  isDefault: boolean;
+  selected: boolean;
+  /** The answer, then the count in the trust strip's words at this group's distance: "Mostly: conditions held 7 of 10 months at 5 to 10 points." */
+  sentence: string;
+};
+
+/**
+ * Every distance group with month-ends in it, for a reader to pick one and see how often
+ * conditions held there (2026-11-18). The trust strip quotes this week's group only; this
+ * lays the others beside it, each counted from the same entries the strip's squares draw.
+ * `distance` is the one the strip looks up (`calibrationForDistance`), so the group picked
+ * by default is the one the strip quotes. `requested` is the URL's group, kept only when it
+ * names one.
+ */
+export const buildCalibrationChoice = ({
+  distance,
+  requested,
+}: {
+  distance: number | null | undefined;
+  requested: string | undefined;
+}): CalibrationChoiceGroup[] => {
+  const groups = confidenceCalibration().filter((bucket) => bucket.months > 0);
+  const thisWeek = typeof distance === "number" ? calibrationGroupFor(distance) : null;
+  const fallback = groups.some((group) => group.from === thisWeek) ? thisWeek : (groups[0]?.from ?? null);
+  const asked = requested === undefined || requested === "" ? Number.NaN : Number(requested);
+  const selected = groups.some((group) => group.from === asked) ? asked : fallback;
+  return groups.map((group) => {
+    const label = formatCalibrationDistance(group);
+    return {
+      from: group.from,
+      to: group.to,
+      label,
+      held: group.held,
+      months: group.months,
+      entries: group.entries,
+      thisWeek: group.from === thisWeek,
+      isDefault: group.from === fallback,
+      selected: group.from === selected,
+      sentence: `${describeHeldShare(group.held, group.months)}: conditions held ${group.held} of ${group.months} months at ${label}.`,
+    };
+  });
+};

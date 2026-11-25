@@ -56,6 +56,7 @@ export const signalsEvidenceSections = ({
     cacheMonthsByYear={model.cacheMonthsByYear}
     invalidHistoricalSelection={model.invalidHistoricalSelection}
     monthPickerOpen={model.monthPickerOpen}
+    inputChoice={model.inputChoice}
     searchParams={searchParams}
   />,
 ];

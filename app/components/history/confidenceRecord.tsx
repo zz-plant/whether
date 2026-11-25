@@ -3,6 +3,7 @@ import { ReportSection } from "../reportSection";
 import {
   confidenceCalibration,
   confidenceCalibrationTotals,
+  formatCalibrationGroup,
 } from "../../../lib/report/confidenceCalibration";
 import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift";
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
@@ -36,8 +37,8 @@ const CONFIDENCE_RECORD_TITLE = "How often conditions held near a change";
 
 const percentFormat = (value: number) => `${Math.round(value)}%`;
 
-const bandLabel = (from: number, to: number | null) =>
-  to === null ? `${from} or more` : `${from} to ${to}`;
+/* "0 to 5", "37 or more": the wording /trust's choice of distances prints too. */
+const bandLabel = (from: number, to: number | null) => formatCalibrationGroup({ from, to });
 
 /** "2 of 2", "8 of 9" — with "and" before the last item when there is more than one. */
 const listClauses = (clauses: string[]) => {
@@ -187,13 +188,14 @@ export function ConfidenceRecordSummary() {
                   aria-label={mark.label}
                   data-readout-text={mark.label}
                   data-warned={mark.signaled ? "" : undefined}
+                  data-month={mark.atDate.slice(0, 7)}
                   className="group flex min-h-11 min-w-11 touch-manipulation flex-col items-center gap-1.5 px-0.5 pt-2.5 pb-1 text-[color:var(--app-text)] no-underline"
                 >
                   <WarningDiamond warned={mark.signaled} />
-                  <span className="text-center text-fluid-nano leading-tight tabular-nums text-slate-400 group-hover:text-slate-200">
+                  <time dateTime={mark.atDate.slice(0, 7)} className="text-center text-fluid-nano leading-tight tabular-nums text-slate-400 group-hover:text-slate-200">
                     {mark.monthLabel.slice(0, 3)}
                     <span className="block">{mark.monthLabel.slice(-4)}</span>
-                  </span>
+                  </time>
                 </a>
               </li>
             ))}

@@ -36,6 +36,7 @@ import {
 } from "../../lib/report/scoringBasis";
 import type { ScoreComposition } from "../../lib/report/scoreComposition";
 import { ScoreCompositionFigure } from "./scoreCompositionFigure";
+import type { RateDial } from "../../lib/report/rateScenario";
 
 /** "How hard…" to "how hard…", for a definition that follows its term mid-sentence. */
 const lowerFirst = (sentence: string) => `${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`;
@@ -218,6 +219,7 @@ function FormulaCard({ title, children }: { title: string; children: ReactNode }
 export function FormulaReference({
   scoringBasis,
   composition = null,
+  rateDial = null,
   plainLanguageFolded = false,
   plainLanguageOpen = false,
 }: {
@@ -225,6 +227,8 @@ export function FormulaReference({
   scoringBasis?: Pick<ScoringBasis, "notCounted">;
   /** This week's two scores, input by input (`buildScoreComposition`); null when the engine cannot rebuild them. */
   composition?: { tightness: ScoreComposition; riskAppetite: ScoreComposition } | null;
+  /** Funding pressure at other short rates, for the control on its bar (`buildRateDial`), with the rate the URL names. */
+  rateDial?: (RateDial & { initialRate?: number }) | null;
   /** Fold the plain-language derivation behind `?derivation` on a stable week (the page decides; see the call site). */
   plainLanguageFolded?: boolean;
   /** The server-resolved open state for that fold (`?derivation=1`). */
@@ -314,7 +318,7 @@ export function FormulaReference({
       {/* What this week's scores are made of, open (§XII): the claim this section
           checks, drawn beside the sentence that states it. The method behind
           each part stays in the folds below. */}
-      {composition ? <ScoreCompositionFigure composition={composition} /> : null}
+      {composition ? <ScoreCompositionFigure composition={composition} rateDial={rateDial} /> : null}
 
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score

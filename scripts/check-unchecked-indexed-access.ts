@@ -41,7 +41,7 @@ const CONFIG_PATH = join(tmpdir(), "whether-unchecked-access.tsconfig.json");
  * The current count. Lowering it is an edit to this file that lands with the
  * work that earned it; raising it is a policy change and belongs in its own PR.
  */
-export const UNCHECKED_ACCESS_BASELINE = 829;
+export const UNCHECKED_ACCESS_BASELINE = 815;
 
 export type TscDiagnostic = { file: string; code: string; line: number };
 

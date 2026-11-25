@@ -28,6 +28,10 @@ const { signalsEvidenceSections } = await import("../app/signals/components/evid
  * question.
  */
 const model = await buildSignalsPageModel();
+/* The line settings name the inputs too where the reading offers a choice of them. */
+const LINES_QUESTION = model.inputChoice
+  ? "What would conditions be with different lines or inputs?"
+  : "What would conditions be with different lines?";
 const html = renderToStaticMarkup(
   <>{signalsEvidenceSections({ model, focusLabelByTab, tightnessTrend: [], riskAppetiteTrend: [] })}</>,
 );
@@ -94,8 +98,9 @@ describe("/signals leads with the delta and folds its instruments", () => {
       "What are interest rates doing?",
       "How have the two scores moved this year?",
       /* Was "What would the call be with different lines?": "the call" is
-         retired reader vocabulary (lib/report/AGENTS.md). Changed on purpose. */
-      "What would conditions be with different lines?",
+         retired reader vocabulary (lib/report/AGENTS.md). "or inputs" since the panel
+         took which inputs count too (2026-11-18). */
+      LINES_QUESTION,
       /* Was "What did the brief say…": a brief does not speak (tests/titleSubjects.test.ts). */
       "What was the guidance in an earlier month?",
       "Which past cycle looks most like this one?",
@@ -152,12 +157,28 @@ describe("/signals answers each closed question in its summary", () => {
     assert.equal(summaryAnswer(html, "How have the two scores moved this year?"), undefined, "no series, no answer");
   });
 
+  /* With the published inputs, the answer is what it was before the inputs joined the panel. */
   it("lines: the lines in force, in the words of the panel's defaults line", () => {
     const { thresholds } = model.assessment;
     assert.equal(
-      summaryAnswer(withTrends, "What would conditions be with different lines?"),
+      summaryAnswer(withTrends, LINES_QUESTION),
       `Lines now: rate ${thresholds.baseRateTightness}% · funding pressure ${thresholds.tightnessRegime} · risk appetite ${thresholds.riskAppetiteRegime}`,
     );
+  });
+
+  /* A link that leaves an input out opens on the panel, and the row answers with what it
+     gives, conditions first, from the engine's run for that choice. */
+  it("lines: with an input left out, the row opens and answers with what that gives", async () => {
+    assert.ok(model.inputChoice, "the bundled reading offers a choice of inputs");
+    const without = await buildSignalsPageModel({ without: "curve" });
+    assert.equal(without.inputChoice?.changed, true);
+    const markup = renderToStaticMarkup(
+      <>{signalsEvidenceSections({ model: without, focusLabelByTab, tightnessTrend: [], riskAppetiteTrend: [], searchParams: { without: "curve" } })}</>,
+    );
+    const answer = summaryAnswer(markup, "What would conditions be with different lines or inputs?");
+    assert.equal(answer, without.inputChoice?.result);
+    assert.match(answer ?? "", /^(Freezing|Cloudy|Stormy|Sunny) (either way|instead of (Freezing|Cloudy|Stormy|Sunny)): without the recession warning gauge, risk appetite would (still )?be \d+\.$/);
+    assert.match(markup, /id="input-choice-result"/, "the panel is open, its boxes rendered");
   });
 
   /* The summary is the one place the count prints: the timeline under it carried a
