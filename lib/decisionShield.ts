@@ -338,6 +338,10 @@ const BUYING_A_COMPANY =
 
 const VENTURE_DEBT = /\bventure\s+(?:debt|loan)\b/;
 
+/* "add 3 AWS GPU nodes", "open 2 new instances": a count of machines, the nearest noun after the number. */
+const ADDED_MACHINES =
+  /\b(?:add|adding|open)\s+\d{1,4}\s+(?:[a-z0-9][a-z0-9-]*\s+){0,3}?(?:gpus?|servers?|nodes?|instances?|clusters?|machines?|vms?|replicas?)\b/;
+
 /* A tender offer is also how a buyer acquires a company, which spends cash the test has a row for.
    The company has to be what the offer is for: "for employees at our startup" only mentions one. */
 const TENDER_OFFER_FOR_A_COMPANY =
@@ -395,10 +399,12 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
      hires before the pricing or roadmap checks below could run. "recruit"
      joins the bare list; "add" and "open" are hiring only with a number
      ("add 3 engineers", "open 2 roles"), matching the parse layer's
-     HEADCOUNT_AFTER_VERB, so "open a London office" still reads as an office. */
+     HEADCOUNT_AFTER_VERB, so "open a London office" still reads as an office.
+     A number of machines is not a number of people: "add 3 AWS GPU nodes"
+     was graded as a hire until 2026-11-25. */
   if (
     /\b(hire|hires|hired|hiring|headcount|recruit|recruiting|poach|engineer|engineers|sdr|developer|contractor|contractors|freelancer|consultant|team member)\b/.test(lower)
-    || /\b(?:add|adding|open)\s+\d{1,4}\b/.test(lower)
+    || (/\b(?:add|adding|open)\s+\d{1,4}\b/.test(lower) && !ADDED_MACHINES.test(lower))
     || /\b\d{1,4}\s+(?:new\s+)?(?:roles?|people)\b/.test(lower)
   ) {
     return { category: "HIRING", action: "HIRE" };
@@ -406,7 +412,7 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
-  if (/\b(cloud|aws|gpus?|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
+  if (/\b(cloud|aws|gpus?|servers?|nodes|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
     return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
   if (RAISING_PRICE.test(lower)) {

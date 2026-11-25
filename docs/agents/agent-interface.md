@@ -7,6 +7,11 @@ This repo exposes a dedicated interface for agentic LLM workflows, with these pa
 3. **MCP server**, remote (`/api/mcp`) and local (`bun run mcp:whether`), for Model Context Protocol-compatible runtimes.
 4. **A plain-GET shim** on `/api/mcp?tool=<name>` for an agent with no MCP client.
 
+From a terminal, hook or CI step, `whether check "<proposal>"` runs `lint_commitment` against the
+current reading and `whether standup` prints `get_standup_line`'s answer. The recipes for wiring
+them into another repository's agent instructions, git hooks and GitHub Actions are in
+[ide-policy-integration.md](ide-policy-integration.md).
+
 For Claude Code, [the Whether plugin](../../plugins/whether/README.md) bundles the remote server
 with a skill for hiring, fundraising, burn and board-update questions. The marketplace lives in
 `.claude-plugin/marketplace.json`; the MCP Registry declaration is `server.json`. These files prepare
