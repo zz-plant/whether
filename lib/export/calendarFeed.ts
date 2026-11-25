@@ -9,11 +9,30 @@
  * team calendar sees the week's guidance without opening anything.
  *
  * All-day events marked free: the feed says what the week is, and leaves the
- * meeting about it to the hold.
+ * meeting about it to the hold. Each event's description is that meeting's
+ * agenda, answered for the week (`buildWeekAgenda`), so a subscriber can open
+ * the event in the meeting instead of preparing for it.
  */
+import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
+import { MONDAY_AGENDA_STEPS, MONDAY_AGENDA_TITLE } from "../report/briefArtifact";
+import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, ruleMetricLabel } from "../report/boundedDecisionRules";
+import { comparisonBasis } from "../report/comparisonBasis";
+import {
+  areaStateAt,
+  buildDecisionMovement,
+  describeGuidanceChange,
+  describeMovementCause,
+  describeMovementGroup,
+  describeStandupStatus,
+  type DecisionMovement,
+  type MovementGroup,
+} from "../report/decisionMovement";
+import { formatPoints } from "../report/home/homeSectionModel";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { isImprovingSignalDelta } from "../report/reportEvidence";
 import {
   buildPublishedBriefPath,
+  isHeldPublishedBrief,
   publishedBriefDisplay,
   publishedBriefHeadline,
   type PublishedBrief,
@@ -87,6 +106,129 @@ const allDayEvent = ({
   "END:VEVENT",
 ];
 
+type AgendaStepId = (typeof MONDAY_AGENDA_STEPS)[number]["id"];
+type AreaLines = Parameters<typeof buildDecisionMovement>[0]["areas"][number];
+type ScoreMove = { metric: "tightness" | "riskAppetite"; delta: number };
+
+const SCORE_METRICS = ["tightness", "riskAppetite"] as const;
+
+const joinAnd = (items: readonly string[]) =>
+  items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items.at(-1) ?? ""}`;
+
+const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+
+/** The record's areas with the lines it was frozen with. Records frozen before the lines were data carry none. */
+const recordAreaLines = (brief: PublishedBrief): AreaLines[] =>
+  brief.decisions.flatMap((decision) =>
+    isDecisionArea(decision.area) && ((decision.pause?.length ?? 0) > 0 || (decision.resume?.length ?? 0) > 0)
+      ? [{ area: decision.area, pause: decision.pause ?? [], resume: decision.resume ?? [] }]
+      : [],
+  );
+
+/* What each kind of movement asks of the meeting, after the clause that names it. */
+const MOVEMENT_QUESTION: Record<MovementGroup["kind"], string> = {
+  paused: "Which commitment already under way there should wait for the restart line?",
+  lifted: "Which decision held back by the pause is worth reopening?",
+  resumable: "Which decision held back by the pause is ready to restart?",
+  resumeLost: "Which plan counted on a restart there, and does it wait now?",
+};
+
+const NOTHING_ON_HOLD_QUESTION = "Which decision is waiting on conditions rather than on your own numbers?";
+
+/**
+ * One question for the meeting, from what the week changed, most decisive first: an
+ * area that paused or restarted, then conditions that changed with no area moving,
+ * then the score that moved furthest. A week where nothing moved, or that compared
+ * with nothing, asks the standing agenda's own question, which only makes sense while
+ * an area is on hold.
+ */
+const agendaQuestion = ({
+  movement,
+  scoreMoves,
+  window,
+  anyOnHold,
+}: {
+  movement: DecisionMovement | null;
+  scoreMoves: readonly ScoreMove[];
+  window: string;
+  anyOnHold: boolean;
+}): string => {
+  const [group] = movement?.groups ?? [];
+  if (movement && group) {
+    return `${upperFirst(window)}, ${describeMovementGroup(group, movement.areas.length)}. ${MOVEMENT_QUESTION[group.kind]}`;
+  }
+  if (movement?.conditions) return `Which plan still assumes ${movement.conditions.from} conditions?`;
+  /* Ties go to funding pressure, the page's order. */
+  const largest = scoreMoves.reduce<ScoreMove | undefined>(
+    (best, move) => (!best || Math.abs(move.delta) > Math.abs(best.delta) ? move : best),
+    undefined,
+  );
+  if (largest) {
+    const keeps = largest.delta > 0 ? "rising" : "falling";
+    const fact = `${ruleMetricLabel[largest.metric]} ${largest.delta > 0 ? "rose" : "fell"} ${formatPoints(Math.abs(largest.delta))} ${window}.`;
+    return isImprovingSignalDelta(largest.metric, largest.delta)
+      ? `${fact} Which decision held back for conditions would you reopen if it keeps ${keeps}?`
+      : `${fact} Does every commitment you have planned still fit your runway if it keeps ${keeps}?`;
+  }
+  const revisit = MONDAY_AGENDA_STEPS.find((step) => step.id === "revisit")?.prompt;
+  return anyOnHold && revisit ? revisit : NOTHING_ON_HOLD_QUESTION;
+};
+
+/**
+ * A frozen week as the Monday review's agenda: the standing steps the hold lists
+ * (`MONDAY_AGENDA_STEPS`), each answered from the week's record.
+ *
+ * What changed is the standup line's status (`describeStandupStatus`) and the lines the
+ * scores crossed (`describeMovementCause`), from the decision movement the homepage
+ * reads, rebuilt from the record's own scores, earlier reading and area lines. The
+ * record stores no thresholds; every week frozen so far was scored against the default
+ * lines (70 and 50), which its change line prints. The status is left out where the
+ * record compared with a reading but froze no area lines, rather than claim nothing
+ * was compared.
+ */
+export const buildWeekAgenda = (brief: PublishedBrief): string[] => {
+  const display = publishedBriefDisplay(brief);
+  const areas = recordAreaLines(brief);
+  const scores = brief.scores ? { tightness: brief.scores.tightness, riskAppetite: brief.scores.riskAppetite } : null;
+  const movement = scores
+    ? buildDecisionMovement({ scores, previous: display.previous, thresholds: DEFAULT_THRESHOLDS, regime: brief.regime, areas })
+    : null;
+  const held = isHeldPublishedBrief(brief);
+  const status =
+    held || movement || display.previous === null
+      ? describeStandupStatus({
+          regime: brief.regime,
+          change: describeGuidanceChange({ movement, regimeChanged: undefined }),
+          policyOverrideActive: held,
+        })
+      : null;
+  const onHold = scores
+    ? areas
+        .filter((lines) => areaStateAt(lines, scores) === "pause")
+        .sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area))
+        .map((lines) => decisionAreaLabel(lines.area))
+    : [];
+  const holdLine = scores && areas.length > 0 ? (onHold.length > 0 ? `On hold: ${joinAnd(onHold)}.` : "No area is on hold.") : null;
+  const basis = comparisonBasis(display.previous?.comparedWith);
+  const scoreMoves = SCORE_METRICS.flatMap((metric): ScoreMove[] => {
+    const change = display.scoreChange(metric);
+    return change ? [{ metric, delta: change.delta }] : [];
+  });
+  const answers: Record<AgendaStepId, string[]> = {
+    changed: [...(status ? [status] : []), ...(movement ? [describeMovementCause(movement)] : [])],
+    thresholds: holdLine ? [holdLine] : [],
+    revisit: [
+      agendaQuestion({ movement, scoreMoves, window: basis.date ? basis.since : "this week", anyOnHold: onHold.length > 0 }),
+    ],
+  };
+  return [
+    MONDAY_AGENDA_TITLE,
+    ...MONDAY_AGENDA_STEPS.flatMap((step) =>
+      answers[step.id].length > 0 ? [step.label, ...answers[step.id].map((answer) => `• ${answer}`)] : [],
+    ),
+  ];
+};
+
 const briefEvent = (brief: PublishedBrief) => {
   const display = publishedBriefDisplay(brief);
   const url = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
@@ -102,7 +244,8 @@ const briefEvent = (brief: PublishedBrief) => {
       `Guidance: ${guidance}`,
       ...(display.pauseIf ? [`${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.pauseIf}`] : []),
       `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${display.conditionsChangeIf}`,
-      `What changed: ${display.whatChanged}`,
+      "",
+      ...buildWeekAgenda(brief),
       "",
       `Full brief: ${url}`,
     ].join("\n"),

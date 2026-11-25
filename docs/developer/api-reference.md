@@ -35,7 +35,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/badge` | GET | The week's conditions as an SVG badge, marked when the reading is a saved copy. |
 | `/api/image/slide?stage=<seed|series-a|series-b|growth>` | GET | The call as a 16:9 meeting slide, hand-written SVG. |
 | `/api/export/board-slide?format=<pptx|pdf>&stage=<mode>` | GET | The same slide as a file: a one-slide native PPTX (default) or a one-page 16:9 PDF, served as an attachment named by ISO week. |
-| `/brief.md`, `/feed.xml`, `/calendar.ics` | GET | The brief in Markdown, the RSS feed, and a subscribable calendar with each Monday's guidance for the last 26 weeks. |
+| `/brief.md`, `/feed.xml`, `/calendar.ics` | GET | The brief in Markdown, the RSS feed, and a subscribable calendar with each Monday's guidance and that week's meeting agenda for the last 26 weeks. |
 
 ### B) Validate drift and consistency
 

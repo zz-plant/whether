@@ -1440,7 +1440,15 @@ the brief; these reach people who have not, and each carries the link back.
   frozen week on its Monday, carrying that week's conditions, guidance, and lines, plus a marker
   for the coming Monday. The repeating Monday hold cannot carry a week's numbers; a subscribed feed
   can. Linked beside the hold on the meeting formats (webcal for Apple and Outlook, Google's
-  add-by-URL page).
+  add-by-URL page). Since 2026-11-25 (#1787) each week's description is the hold's agenda answered
+  for that week (`buildWeekAgenda`): under the guidance and the change line, the three
+  `MONDAY_AGENDA_STEPS` carry the standup status (`describeStandupStatus`) and the lines the scores
+  crossed (`describeMovementCause`), the areas on hold, and one question from the week's largest
+  change: an area that paused or restarted, then conditions that changed, then the score that moved
+  furthest, else the standing revisit prompt. It is rebuilt from the frozen record, since the feed
+  serves past weeks that no live reading or `BriefDocument` covers. Editing a reader's own recurring
+  invite through the Google or Microsoft calendar APIs needs OAuth and stored secrets, and was not
+  built; there is no per-week `.ics` download for a meeting pack to carry.
 - *Frames and oEmbed.* `/api/embed?format=page` wraps the widget in a whole document for a Notion
   embed block or any iframe, and `next.config.js` lifts `X-Frame-Options: DENY` for `/api/embed`
   alone (`frame-ancestors *`). `GET /api/oembed` (`lib/export/oembed.ts`) answers for `/` and
