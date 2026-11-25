@@ -187,7 +187,7 @@ export default async function HistoryPage({
              shipped with the line that would have changed it, and none edited
              after publication. The numbers stay in the tiles below. */
           pageSummary:
-            "Has it been right? Every brief records what would have changed the guidance, and none has been edited since. The record is published below.",
+            "Has it been right? Every brief records what would have changed the guidance, and none has been edited since.",
           sectionLinks: historySectionLinks,
           currentPath: "/history",
         },

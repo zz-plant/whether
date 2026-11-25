@@ -77,10 +77,10 @@ describe("buildAreaGroups", () => {
        hold: Roadmap" and read as a contradiction. */
     assert.equal(near?.areas.at(0)?.changed, undefined);
     const [paused] = buildAreaGroups(
-      [{ ...heldRow("hiring"), changed: "Pause now applies: funding pressure rose above 76.", changedKind: "paused" }],
+      [{ ...heldRow("hiring"), changed: "Paused: funding pressure rose above 76.", changedKind: "paused" }],
       SCORES,
     );
-    assert.equal(paused?.areas.at(0)?.changed, "Pause now applies: funding pressure rose above 76.");
+    assert.equal(paused?.areas.at(0)?.changed, "Paused: funding pressure rose above 76.");
   });
 
   it("says which way the score went since the comparison reading, against the condition", () => {

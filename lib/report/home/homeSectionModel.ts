@@ -557,7 +557,7 @@ export const describeScoreFigureStanding = ({
     const rest = !restart
       ? ""
       : others.length > 0
-        ? `Restarts only when ${side(restart)} and ${others.join(" and ")}.`
+        ? `Restarts once ${ruleMetricLabel[metric].toLowerCase()} is ${side(restart)} and ${others.join(" and ")}.`
         : `Restarts ${side(restart)}.`;
     return { crossed: true, lead: `${name} paused ${side(own)}`, rest };
   }

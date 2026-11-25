@@ -42,14 +42,14 @@ describe("buildSlackBrief", () => {
     assert.match(open, /^• Pause if: Funding pressure rises above 76$/m);
     // At 12 / 68 hiring is not on hold, so it has no hold to lift and no restart line beside the call.
     assert.equal(slot(open, "Restart when"), "");
-    assert.match(open, /This week's decision \(Guidance \/ Pause if \/ Conditions change if\):/);
+    assert.match(open, /^This week:\n• Guidance: .+\n• Pause if: .+\n• Conditions change if: /m);
 
     // At funding pressure 90 hiring is on hold, and the line it restarts at is the one that can change it.
     const reading = { ...assessment, scores: { ...assessment.scores, tightness: 90 } };
     const held = buildSlackBrief(fixtureBriefDocument({ reading, weeklyCall: { ...fixtureWeeklyCall(reading), pauseIf } }));
     assert.match(held, /^• Restart when: Funding pressure falls below 66 and risk appetite is above 54\. Funding pressure is 90 and risk appetite is 68 now\.$/m);
     assert.doesNotMatch(held, /Pause if: Pause|Restart when: Resume/);
-    assert.match(held, /This week's decision \(Guidance \/ Pause if \/ Restart when \/ Conditions change if\):/);
+    assert.match(held, /^This week:\n• Guidance: .+\n• Pause if: .+\n• Restart when: .+\n• Conditions change if: /m);
     const order = ["• Guidance:", "• Pause if:", "• Restart when:", "• Conditions change if:"].map((label) => held.indexOf(label));
     assert.deepEqual([...order].sort((left, right) => left - right), order, "the slots print in the page's order");
   });
@@ -70,7 +70,7 @@ describe("buildSlackBrief", () => {
     assert.equal(slot(brief, "Pause if"), hold.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
     assert.equal(slot(brief, "Restart when"), "");
-    assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Conditions change if\):/);
+    assert.match(brief, /^This week:\n• Guidance: .+\n• Pause if: .+\n• Conditions change if: /m);
   });
 
   it("states each reading against the corridor as numbers, not a paragraph", () => {

@@ -69,7 +69,7 @@ export default function AboutPage() {
         {/* One section under the h1 (2026-11-11): "How it works" was an h2 directly
             under "How Whether works", the same heading twice in a row. */}
         <p className="text-base text-slate-300">
-          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a score at which to restart—spaced apart so a small move back won&rsquo;t restart them.
+          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a score at which to restart. The two are set apart, so a small move back does not undo a pause or a restart.
         </p>
         <p className="text-base text-slate-300">
           Every published brief stays on record: see the{" "}
@@ -123,7 +123,7 @@ export default function AboutPage() {
           <p className="text-base font-semibold text-slate-100">It does not fit</p>
           <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
             <li>
-              A single hire or purchase—the rules set policy, not one-off verdicts.
+              A single hire or purchase: the rules set a policy for a kind of decision, not an answer for one.
             </li>
             <li>
               Under six months of runway, where cash overrides market conditions.
@@ -132,7 +132,7 @@ export default function AboutPage() {
               Funding outside U.S. rates (local-currency rounds or isolated sector booms).
             </li>
             <li>
-              Product prioritization—rates bound slow-payback work, not what to build.
+              Product prioritization: rates limit how much slow-payback work to take on, not which product to build.
             </li>
           </ul>
         </div>
@@ -157,17 +157,17 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">What it is built from</h2>
         <p className="text-base text-slate-300">
-          Two scores from U.S. Treasury rates read from the St. Louis Fed (FRED) and market stress set the conditions: Sunny, Cloudy, Stormy or Freezing.
+          Two scores set the conditions: Sunny, Cloudy, Stormy or Freezing. Both start from U.S. Treasury rates, read from the St. Louis Fed (FRED), and are adjusted for market stress.
         </p>
         <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
           <li>
-            <span className="font-semibold text-slate-100">Funding pressure:</span> 1-month Treasury rate, its pace of rise, and curve inversions, adjusted for high-yield spreads and Chicago Fed financial conditions.
+            <span className="font-semibold text-slate-100">Funding pressure:</span> the 1-month Treasury rate, how fast it has risen and whether the yield curve is inverted, adjusted for the Chicago Fed&rsquo;s financial conditions index.
           </li>
           <li>
-            <span className="font-semibold text-slate-100">Risk appetite:</span> 10Y–2Y Treasury spread, adjusted for VIX and curated snapshots of venture funding and tech layoffs (labelled where used).
+            <span className="font-semibold text-slate-100">Risk appetite:</span> the gap between 10-year and 2-year Treasury rates, adjusted for stock-market volatility (the VIX).
           </li>
           <li>
-            <span className="font-semibold text-slate-100">Context only:</span> Inflation and unemployment appear on Signals but enter neither score.
+            <span className="font-semibold text-slate-100">Context only:</span> Inflation and unemployment appear on Signals but enter neither score. The high-yield credit spread, the venture funding pace and tech layoffs print beside the scores and are not counted.
           </li>
         </ul>
         <div className="flex flex-wrap gap-2 pt-1">

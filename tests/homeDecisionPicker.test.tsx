@@ -127,7 +127,7 @@ describe("the optional exploration folds", () => {
   it("closes the groups on a live week, whose brief above already carries every action", () => {
     const html = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" rulesAbove />);
     assert.doesNotMatch(details(html), /\bopen\b/);
-    assert.match(html, /Open each area’s rule, test and links/);
+    assert.match(html, /Each area’s rule, decision test and links/);
   });
 
   it("opens on the area a `?decision=` link names", () => {
@@ -139,7 +139,7 @@ describe("the optional exploration folds", () => {
   it("stays open on a saved copy or an archived month, where the groups are the five answers", () => {
     const html = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" />);
     assert.match(details(html), /\bopen\b/);
-    assert.match(html, /Every area’s rule, test and links/);
+    assert.match(html, /Every area’s rule, decision test and links/);
   });
 });
 

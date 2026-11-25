@@ -104,9 +104,9 @@ export async function buildTrustPageModel() {
      the method next and every other section folded at its foot. */
   const sectionLinks = [
     { href: "#source-board", label: "Sources" },
-    { href: "#formula-reference", label: "Formula reference" },
-    { href: "#confidence-limits", label: "How close to changing" },
-    { href: "#revisit-call", label: "When to look again" },
+    { href: "#formula-reference", label: "How the scores are built" },
+    { href: "#confidence-limits", label: "Distance to a change" },
+    { href: "#revisit-call", label: "What would make it wrong" },
     // Only when the telemetry read is configured: an index entry for a section that
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),

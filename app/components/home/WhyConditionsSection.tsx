@@ -108,8 +108,8 @@ export function WhyConditionsSection({
             </p>
             <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
               {warning
-                ? `${warning}${countedRegimeLabel !== readingLabel ? ` If we counted them, the scores would land in ${countedRegimeLabel}.` : ""}`
-                : `If we counted them, we'd have ${notCounted
+                ? `${warning}${countedRegimeLabel !== readingLabel ? ` Counting those inputs would put the scores in ${countedRegimeLabel}.` : ""}`
+                : `Counting ${[...new Set(notCounted.map((entry) => entry.label))].join(" and ")} would put ${notCounted
                     .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
                     .join(" and ")}.`}{" "}
               {NOT_COUNTED_REASON}

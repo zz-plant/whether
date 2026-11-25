@@ -92,7 +92,7 @@ describe("weekly operator brief export adapters", () => {
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);
 
-    assert.match(text, /Weekly Operator Brief — 2026-03-04/);
+    assert.match(text, /Whether Weekly Brief — 2026-03-04/);
     // The number never travels without what it measures.
     assert.match(text, /Room to move: 58\/100 \(how much you can hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs last week: \+4 points/);
     assert.match(text, /^Room before a change: little \((funding pressure|risk appetite) is \d+ points? away\)$/m);
