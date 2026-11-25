@@ -43,6 +43,15 @@ export const OG_CONDITION_INK: Record<RegimeKey, string> = {
   SCARCITY: "#a3d6fa",
 };
 
+/** The light theme's ground and condition inks (tokens.css `html[data-theme="light"]`), for the formats drawn in both themes. */
+export const OG_BG_LIGHT = "#eef1f6";
+export const OG_CONDITION_INK_LIGHT: Record<RegimeKey, string> = {
+  EXPANSION: "#765600",
+  DEFENSIVE: "#46607a",
+  VOLATILE: "#3d4880",
+  SCARCITY: "#1a5e94",
+};
+
 /**
  * The homepage's sky on a card: the eight gradients and their inks, the same values as
  * `--regime-sky-top`, `--regime-sky`, `--regime-sky-ink` and `--regime-sky-muted` per

@@ -15,7 +15,7 @@ import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { resolveDataStatusLabel } from "../report/trustStatus";
 import type { RegimeKey } from "../types";
 import { AreaIcon, ConditionIcon, LineStateIcon } from "../../app/components/ui/conceptIcons";
-import { OG_BG, OG_PANEL, OG_TEXT, OG_TEXT_SECONDARY, OG_TEXT_MUTED, OG_BORDER, OG_CONDITION_INK, OG_LINE_CROSSED, OG_LINE_CROSSED_MARK } from "./ogTheme";
+import { OG_BG, OG_PANEL, OG_TEXT, OG_TEXT_SECONDARY, OG_TEXT_MUTED, OG_BORDER, OG_CONDITION_INK, OG_LINE_CROSSED, OG_LINE_CROSSED_MARK, OG_BG_LIGHT, OG_CONDITION_INK_LIGHT } from "./ogTheme";
 
 type AssetTheme = "dark" | "light";
 type Palette = {
@@ -34,8 +34,8 @@ type Palette = {
 export const VISUAL_ASSET_THEMES: Record<AssetTheme, Palette> = {
   dark: { bg: OG_BG, panel: OG_PANEL, ink: OG_TEXT, secondary: OG_TEXT_SECONDARY, muted: OG_TEXT_MUTED, rule: OG_BORDER, line: OG_LINE_CROSSED, lineMark: OG_LINE_CROSSED_MARK, conditionInk: OG_CONDITION_INK },
   light: {
-    bg: "#eef1f6", panel: "#f8fafc", ink: "#0f1419", secondary: "#2a3442", muted: "#4a5568", rule: "rgba(15, 20, 25, 0.16)", line: "#b81f27", lineMark: "#c4242b",
-    conditionInk: { EXPANSION: "#765600", DEFENSIVE: "#46607a", VOLATILE: "#3d4880", SCARCITY: "#1a5e94" },
+    bg: OG_BG_LIGHT, panel: "#f8fafc", ink: "#0f1419", secondary: "#2a3442", muted: "#4a5568", rule: "rgba(15, 20, 25, 0.16)", line: "#b81f27", lineMark: "#c4242b",
+    conditionInk: OG_CONDITION_INK_LIGHT,
   },
 };
 

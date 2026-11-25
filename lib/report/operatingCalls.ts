@@ -13,7 +13,8 @@ import {
 import { CircleDashed, Pause, Play, type LucideIcon } from "lucide-react";
 import { formatDecisionLatencyLine } from "./decisionLatency";
 import { businessAreaLabel, businessAreaOrder, businessAreaOwner, type BusinessAreaKey } from "./decisionKnobs";
-import { joinSentences } from "./reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, joinSentences } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
 
 /**
@@ -152,6 +153,19 @@ export const selectPauseCondition = (
   return distances.find((distance) => distance.satisfied)
     ?? [...distances].sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
 };
+
+/**
+ * One side of an area's rule (2026-11-03), the side that can change the area's
+ * state: an area on hold prints its restart line, any other area its pause
+ * line. `/brief.md` and the embed (`lib/export/callStripEmbed.ts`) print it.
+ */
+export const areaRuleLine = (
+  item: Pick<ActionStripItem, "pauseConditions" | "triggerThreshold" | "reversalCondition">,
+  scores: CurrentScores,
+): { label: string; value: string; held: boolean } =>
+  selectPauseCondition(item.pauseConditions, scores)?.satisfied === true
+    ? { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: formatDecisionReversal(item.reversalCondition), held: true }
+    : { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: formatDecisionThreshold(item.triggerThreshold), held: false };
 
 /**
  * One composite signal, ready to draw as a threshold rail.

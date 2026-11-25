@@ -4,6 +4,7 @@ import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeSharePath, type HomeShareSearchParams as HomePageSearchParams } from "./homeSharePreview";
 import { decisionTransmissionSearchDescription } from "./decisionTransmissionCopy";
 import { type HomeReportData } from "./homeBriefModel";
+import { buildOEmbedDiscoveryUrl } from "../export/oembed";
 import { formatWeekAnswer } from "./briefArtifact";
 import { getRegimePublicLabel } from "../regimePresentation";
 
@@ -76,6 +77,11 @@ export const buildHomeMetadata = async (
     description,
     alternates: {
       canonical: "/",
+      /* oEmbed discovery: an editor that reads it (Notion, Coda, Ghost, Iframely)
+         turns a pasted link to the brief into the embed. Not on an archived
+         reading: the embed draws only the live week, so it would replace the
+         month the link names with this one. */
+      ...(hasTimeMachineParams ? {} : { types: { "application/json+oembed": buildOEmbedDiscoveryUrl("/") } }),
     },
     openGraph: {
       type: "website",

@@ -28,6 +28,8 @@ const DOCUMENTED_API_PATHS = [
   "/api/brief/slack",
   "/api/image/",
   "/api/export/board-slide",
+  /* Read by the editors that unfurl a pasted link (Iframely, for Notion and others). */
+  "/api/oembed",
   "/api/cli/",
 ];
 

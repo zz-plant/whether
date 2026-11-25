@@ -29,7 +29,8 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/decision` | GET | The week's guidance as one object: the action, each area's action with its pause and restart lines, decisions to revisit, the lines that would change the guidance. |
 | `/api/weekly` | GET | Weekly summary copy + structured fields + summary hash. |
 | `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
-| `/api/embed?format=<html|text|json|page>` | GET | The brief as a snippet (`html` default; `page` is a whole document for an iframe). `mode=call-strip` is one line; `stage` and `runway` (a band or a number of months) calibrate it; `ticker` labels it. |
+| `/embed/call-strip?theme=<light|dark>` | GET | This week's guidance as a whole document for a frame (Notion, Coda, any iframe): conditions, guidance, each area's action and line, the change line, the reading's date. No site chrome, `noindex`, and the one route `frame-ancestors *` allows. Follows the device setting without `theme`. |
+| `/api/oembed?url=<whether.work URL>&format=json` | GET | oEmbed `rich` response framing `/embed/call-strip`, for `/`, `/share` and the embed itself; honours `maxwidth`/`maxheight`. 400 without a usable `url`, 404 for any other address, 501 for any format but JSON. |
 | `/api/image/brief` | GET | The brief card as a PNG, 1200×800; `layout=landscape|square|portrait`, `theme=light`, `month` + `year` for a past month-end, `stage` to calibrate. `ticker` and `sector` only add a label. |
 | `/api/image/brief-screenshot?date=<YYYY-MM-DD|latest>` | GET | The Monday screenshot of the homepage's guidance, kept 60 days; 404 when none is stored. Never captures on request. |
 | `/api/badge` | GET | The week's conditions as an SVG badge, marked when the reading is a saved copy. |

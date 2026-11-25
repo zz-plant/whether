@@ -8,9 +8,9 @@ import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { formatDecisionReversal, formatDecisionThreshold } from "../../lib/report/reportFormatting";
+import { formatDecisionReversal } from "../../lib/report/reportFormatting";
 import { describeConditions, pauseConditionOnly } from "../../lib/export/exportTerms";
-import { selectPauseCondition } from "../../lib/report/operatingCalls";
+import { areaRuleLine } from "../../lib/report/operatingCalls";
 import { formatGuidance } from "../../lib/export/briefBuilders";
 
 type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
@@ -57,19 +57,17 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const decisions = actionItems
-    .map((item) =>
-      [
-        /* A dash, not parentheses: a line the reading already meets carries
-           "(already true at 90)", which nested inside them. One side of the rule
-           (2026-11-03), as every paste prints it: an area on hold, its restart
-           line; any other area, its pause line. */
+    .map((item) => {
+      /* A dash, not parentheses: a line the reading already meets carries
+         "(already true at 90)", which nested inside them. One side of the rule
+         (`areaRuleLine`), as every paste prints it. */
+      const line = areaRuleLine(item, reportData.assessment.scores);
+      return [
         `- ${item.areaActionNow}`,
-        selectPauseCondition(item.pauseConditions, reportData.assessment.scores)?.satisfied === true
-          ? ` — ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`
-          : ` — ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)}`,
+        ` — ${line.label}: ${line.value}`,
         ...(item.latencyLine ? [` · ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
-      ].join(""),
-    )
+      ].join("");
+    })
     .join("\n");
 
   const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];

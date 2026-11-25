@@ -24,6 +24,7 @@ import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdate
 import { formatSourceFooter } from "../../lib/export/exportTerms";
 import { buildAssistantLinks } from "../../lib/export/askAssistant";
 import { CALENDAR_FEED_PATH } from "../../lib/export/calendarFeed";
+import { buildOEmbedDiscoveryUrl } from "../../lib/export/oembed";
 import { buildSocialComposeUrl, formatSocialPost, type SocialNetwork } from "../../lib/export/socialPosts";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -40,7 +41,7 @@ export const revalidate = 300;
    the root layout's, so a shared /share link previewed as the homepage — its
    title, its description and its URL. The live card is the right one here: the
    page exists to hand this week's brief to someone else. */
-export const metadata: Metadata = buildPageMetadata({
+const shareMetadata = buildPageMetadata({
   title: "Share this week's guidance",
   description:
     "Copy this week's Whether guidance for Slack, a slide, or a citation; add a meeting pack or calendar hold; or embed a live brief in a newsletter or wiki.",
@@ -48,6 +49,11 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "This week's Whether guidance",
   imageParams: { template: "report" },
 });
+/* oEmbed discovery, as on the homepage: a /share link pasted into Notion or Coda opens the embed. */
+export const metadata: Metadata = {
+  ...shareMetadata,
+  alternates: { ...shareMetadata.alternates, types: { "application/json+oembed": buildOEmbedDiscoveryUrl("/share") } },
+};
 
 /** "fred.stlouisfed.org" for a link's text; the raw string when it is not a URL. */
 const describeSourceHost = (source: string) => {
