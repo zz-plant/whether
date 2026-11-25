@@ -69,7 +69,8 @@ describe("decision picker", () => {
 
   it("is the areas section, with the old anchor and an h2", () => {
     assert.match(html, /^<section id="what-it-changes"/);
-    assert.match(html, /<h2[^>]*>Your decisions this week<\/h2>/);
+    /* The heading is the question a reader would ask (2026-11-18). */
+    assert.match(html, /<h2[^>]*>What’s on hold\?<\/h2>/);
     assert.doesNotMatch(html, /data-first-visit/, "nothing in it is first-visit only");
     assert.doesNotMatch(html, /Show the full brief/);
   });
@@ -104,16 +105,19 @@ describe("decision picker", () => {
     assert.doesNotMatch(html, /<fieldset|type="radio"|data-line-state-badge/);
     const toggles = [...html.matchAll(/<button type="button" aria-expanded="false"[^>]*>([^<]+)<svg/g)].map((match) => match[1]);
     assert.deepEqual(toggles, ["Hiring", "Fundraising", "Spending", "New bets", "Roadmap"], "held first, then the rest");
-    assert.ok(html.indexOf("data-area-groups") > html.indexOf("Your decisions this week"), "under the heading");
+    assert.ok(html.indexOf("data-area-groups") > html.indexOf("What’s on hold?"), "under the heading");
   });
 
-  it("counts the holds only on a saved copy", () => {
-    /* The count ("4 of 5 areas are on hold.") repeated the card's "On hold …" line on a
-       live week, so it prints on a saved copy alone, where it carries the reading's date. */
+  /* "What's on hold?" is answered first, with the held areas by name in the page's order
+     (2026-11-18); a saved copy's answer is the old reading's, in the past tense with its
+     date. It replaced the count ("4 of 5 areas are on hold.") a saved copy alone printed. */
+  it("answers its question with the held areas by name, and dates a saved copy's", () => {
     assert.doesNotMatch(html, /already covered by this week/);
-    assert.doesNotMatch(html, /4 of 5 areas are on hold\./);
+    assert.match(html, /<\/h2><\/div><p data-section-lead="true"[^>]*>Hiring, Fundraising, Spending and New bets\.<\/p>/);
     const saved = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" savedReadingDate="Jun 17, 2026" />);
-    assert.match(saved, /4 of 5 areas were on hold on the Jun 17, 2026 reading\./);
+    assert.match(saved, /Hiring, Fundraising, Spending and New bets were on hold on the Jun 17, 2026 reading\./);
+    const none = renderToStaticMarkup(<DecisionPicker options={OPTIONS.map((option) => ({ ...option, pause: option.pause && { ...option.pause, met: false } }))} groups={GROUPS} regime="SCARCITY" />);
+    assert.match(none, /data-section-lead="true"[^>]*>Nothing is on hold\.</);
   });
 
   it("carries no engine vocabulary", () => {

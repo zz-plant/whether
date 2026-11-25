@@ -97,9 +97,9 @@ export const assembleHomePage = async ({
         // ISO, not the display labels beside them — see HomeBriefStructuredDataInput.
         datePublishedIso: treasury.record_date,
         dateModifiedIso: treasury.fetched_at,
-        postureLabel: weeklyDecisionCardModel.status.postureWithStageLabel
-          ?? weeklyDecisionCardModel.status.statusLabel,
         regimeLabel: getRegimePublicLabel(assessment.regime),
+        regime: assessment.regime,
+        scores: weeklyDecisionCardModel.diagnostics.currentScores,
         confidenceLabel: weeklyDecisionCardModel.status.confidenceLabel,
       }),
       historicalBanner: historicalSelection

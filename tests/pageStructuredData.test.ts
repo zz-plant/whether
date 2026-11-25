@@ -36,7 +36,7 @@ describe("site entities", () => {
   it("identifies the website preview in homepage and page graphs", () => {
     const home = buildHomeStructuredData({
       headline: "h", description: "d", datePublishedIso: "2026-09-10",
-      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", regimeLabel: "r", confidenceLabel: "c",
     });
     for (const graph of [home, buildApiDocsStructuredData(), buildCompsStructuredData({ data: null, tickers: ["SNOW"] })]) {
       assert.equal(one(graph, "WebSite").image, "https://whether.work/api/og?template=report");
@@ -49,7 +49,6 @@ describe("site entities", () => {
       description: "d",
       datePublishedIso: "2026-09-10",
       dateModifiedIso: "2026-09-15T12:00:00.000Z",
-      postureLabel: "p",
       regimeLabel: "r",
       confidenceLabel: "c",
     });
@@ -67,7 +66,7 @@ describe("site entities", () => {
   it("names the site as people say it, with the product and the domain as alternates", () => {
     const home = buildHomeStructuredData({
       headline: "h", description: "d", datePublishedIso: "2026-09-10",
-      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", regimeLabel: "r", confidenceLabel: "c",
     });
     for (const graph of [home, buildApiDocsStructuredData()]) {
       const website = one(graph, "WebSite");
@@ -333,7 +332,7 @@ describe("data licenses", () => {
   it("puts Whether's own readings under CC BY 4.0", () => {
     const home = buildHomeStructuredData({
       headline: "h", description: "d", datePublishedIso: "2026-09-10",
-      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", regimeLabel: "r", confidenceLabel: "c",
     });
     const history = buildHistoryStructuredData({ periods: [], publishedBriefs: [], coverage: null });
     const calibration = buildCalibrationStudyStructuredData({ totals: { months: 10, held: 8 } });

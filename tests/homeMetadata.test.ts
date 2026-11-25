@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildHomeMetadata } from "../lib/report/homeMetadata";
+import { buildHomeMetadata, describeHomeSearchAnswer } from "../lib/report/homeMetadata";
 import { buildHomeSharePath, notLiveReadingLabel, readerSourceLabel } from "../lib/report/homeSharePreview";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
@@ -92,6 +92,25 @@ describe("buildHomeMetadata", () => {
 
     assert.equal(metadata.openGraph?.url, "https://whether.work/");
     assert.equal(metadata.robots, undefined);
+  });
+
+  /* The description is the answer to "what should a startup do this week?" in two spoken
+     sentences, with the two scores it rests on (2026-11-18). */
+  it("answers the week, with the scores, in every description a search or a share reads", async () => {
+    const week = {
+      call: "Only say yes to things that bring in cash or that a customer is already counting on.",
+      assessment: { regime: "SCARCITY", scores: { tightness: 90.2, riskAppetite: 44 } },
+    };
+    const answer = "This week: only say yes to things that bring in cash or that a customer is already counting on. Funding pressure is 90 and risk appetite is 44, so conditions are Freezing.";
+    assert.equal(describeHomeSearchAnswer(week), answer);
+    const metadata = await buildHomeMetadata(undefined, undefined, week);
+    assert.equal(metadata.description, answer);
+    assert.equal(metadata.openGraph?.description, answer);
+    assert.equal(metadata.twitter?.description, answer);
+    assert.equal(metadata.title, "When to Hire, Raise and Spend: Weekly Operating Guidance for Startup Leaders", "the title is unchanged");
+    /* An archived month is not this week. */
+    const archived = await buildHomeMetadata(Promise.resolve({ month: "3", year: "2026" }), undefined, week);
+    assert.doesNotMatch(String(archived.description), /^This week/);
   });
 });
 

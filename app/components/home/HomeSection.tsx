@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { DatedText, type KnownDate } from "../ui/datedText";
 
 /**
  * One of the homepage's questions, as a section with its own heading.
@@ -18,6 +19,7 @@ export function HomeSection({
   heading,
   lead,
   action,
+  dates,
   className = "",
   children,
 }: {
@@ -32,6 +34,11 @@ export function HomeSection({
   lead?: ReactNode;
   /** A control that belongs to the whole section, drawn beside the heading. */
   action?: ReactNode;
+  /**
+   * The yearless dates the heading and a string lead print ("since Nov 9"), so each sits in
+   * `<time dateTime>` (`DatedText`); a date with its year is found without one.
+   */
+  dates?: readonly KnownDate[];
   className?: string;
   children: ReactNode;
 }) {
@@ -49,11 +56,15 @@ export function HomeSection({
             frame's title, and Slack previews a phone screenshot at about 0.43 of its
             size, where 20px type lands under the 9px a reader can make out. */}
         <h2 id={headingId} className="type-section">
-          {heading}
+          <DatedText text={heading} dates={dates} />
         </h2>
         {action}
       </div>
-      {lead ? <p className="text-fluid-lg font-medium leading-snug text-slate-50" data-section-lead>{lead}</p> : null}
+      {lead ? (
+        <p className="text-fluid-lg font-medium leading-snug text-slate-50" data-section-lead>
+          {typeof lead === "string" ? <DatedText text={lead} dates={dates} /> : lead}
+        </p>
+      ) : null}
       {children}
     </section>
   );

@@ -12,6 +12,7 @@ import {
   websiteId,
 } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
+import { buildDefinedTermSet } from "../../lib/seo/definedTerms";
 import {
   buildAuthorSchema,
   buildPublisherSchema,
@@ -54,6 +55,8 @@ export default function AboutPage() {
       description: publisherAuthor.bio,
       worksFor: { "@id": organizationId },
     },
+    /* The site's vocabulary, as the method section prints it (`SITE_VOCABULARY`). */
+    buildDefinedTermSet(),
     buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: publisherProfilePath, label: "About" }])),
   ]);
 

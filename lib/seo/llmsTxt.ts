@@ -6,6 +6,25 @@ import { PUBLISH_MAX_RECORD_AGE_DAYS } from "../report/briefPublishGuard";
 import { canonicalPositioningLine } from "../seo";
 import { answerPages } from "../../app/answers/decisionPages";
 import { navigationGroups, pagesInGroup, utilityLinks } from "../navigation/informationArchitecture";
+import { ALERT_ANSWER, HOME_SECTIONS, changedHeading, diagnosisHeading } from "../report/home/homeSectionModel";
+import { comparisonBasis } from "../report/comparisonBasis";
+
+/*
+ * The weekly brief's questions, in the page's order and in its words (2026-11-18): the
+ * headings `/` asks, from the section model the page renders, each with what its first
+ * sentence answers. This file is read without a reading, so a week's own answer is named
+ * by what it holds; `get_state` and /brief.md carry the answers themselves. The two
+ * headings that name a date or a condition are given with placeholders.
+ */
+const HOME_QUESTION_LINES = [
+  "- What do we do this week? The page's heading answers it: the week's action, with funding pressure and risk appetite beside it.",
+  `- ${HOME_SECTIONS.areas.heading} The areas paused this week, by name. Each area's action and what restarts it are under it.`,
+  `- ${changedHeading(comparisonBasis()).replace("last week", "<the earlier reading>")} Each score as it stands now, after its move since then.`,
+  `- ${diagnosisHeading({ regimeLabel: "<the week's conditions>", pending: false })} What the two scores mean together, then each score against the line where conditions change.`,
+  `- ${HOME_SECTIONS.watch.heading} The week's "Conditions change if" sentence: how far each score has to move.`,
+  `- ${HOME_SECTIONS.record.heading} The earlier stretches of these conditions since 2012, with how long each lasted.`,
+  `- ${HOME_SECTIONS.alert.heading} ${ALERT_ANSWER}`,
+];
 
 /**
  * `/llms.txt`: what an agent reads before it calls anything.
@@ -77,6 +96,13 @@ export const buildLlmsTxt = (baseUrl: string) => {
     `- Read rather than decide: ${start.markdown} (Markdown).`,
     `- CLI, from a checkout: \`${start.cli}\``,
     "",
+    "## The weekly brief (/)",
+    "",
+    "The homepage answers these questions in this order. After the first, each is a heading, and the first sentence under it is the answer:",
+    ...HOME_QUESTION_LINES,
+    "",
+    "Each question is marked up on the page as a schema.org `Question` whose `acceptedAnswer` is the printed sentence. This week's reading is a `Dataset` with funding pressure and risk appetite on 0–100, and the site's terms are a `DefinedTermSet` at /about#terms.",
+    "",
     "## If the user asks a question",
     "",
     "Each page opens with this week's posture and what it means for the decision, with the date of the reading. Cite the page and its date.",
@@ -143,7 +169,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "- Prefer /brief.md for reading and summarization tasks — it's Markdown, structured, and instant",
     "- Use /api/agent for structured data processing, integration, or specific cadence windows",
     "- Scores are compared with last week's published brief, or with the previous month-end reading where there is none from the previous one to two weeks; either is named by date (`comparedWith`)",
-    "- The homepage (/) includes JSON-LD structured data (schema.org/Report) with decision artifacts",
+    "- The homepage (/) carries JSON-LD for the brief (schema.org/Report), this week's reading (Dataset) and its questions (Question), each matching what the page prints",
     "- All endpoints include provenance metadata — preserve it in downstream outputs",
     "- Informational only: not investment, legal, tax or employment advice, and not a forecast",
     "",

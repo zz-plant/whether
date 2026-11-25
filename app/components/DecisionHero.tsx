@@ -11,8 +11,14 @@ import { ReplayMoveButton } from "./home/ReplayMoveButton";
 import { LineStateBand } from "./home/LineStateBand";
 import type { LineStateBandModel } from "../../lib/report/home/homeSectionModel";
 import type { WeekMove } from "../../lib/report/home/weekMove";
+import { DatedText, type KnownDate } from "./ui/datedText";
 
 type Props = {
+  /**
+   * The yearless dates the stamp line and the detail print ("Was Cloudy on Nov 9"), with
+   * their ISO dates, so each sits in `<time dateTime>` (`DatedText`).
+   */
+  dates?: readonly KnownDate[];
   /** The call, as the page's heading. Absent on a read that produced no live call. */
   weeklyCall?: string;
   /** Live week navigation shares the card header instead of occupying a separate band. */
@@ -96,6 +102,12 @@ type Props = {
   reading?: {
     numbers: string;
     whyHref: string;
+    /**
+     * The name of the section `whyHref` opens, as its heading asks it ("Why Freezing?",
+     * 2026-11-18): a link that said only "Why" or "Why this call" did not say where it
+     * went. Defaults to the same question for this card's conditions.
+     */
+    whyLabel?: string;
     /**
      * The two current scores, each set against the
      * record (`describeConditionFacts`, 2026-11-03). When present it is the whole
@@ -200,9 +212,12 @@ export function DecisionHero({
   phoneFigure,
   move,
   notice,
+  dates,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
+  /* Where "Why" goes, by the question that section's heading asks. */
+  const whyLabel = reading?.whyLabel ?? `Why ${regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay}?`;
   const regimeWeatherLabel = regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay;
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
   const detail = callDetail && callDetail.trim() !== call.trim() ? callDetail : undefined;
@@ -301,7 +316,7 @@ export function DecisionHero({
           <span className="text-fluid-sm font-medium leading-snug text-[var(--app-text-secondary)]">
             {since && !earlier ? (
               <span data-conditions-since>
-                {since}
+                <DatedText text={since} dates={dates} />
                 {direction ? " · " : null}
               </span>
             ) : null}
@@ -309,7 +324,7 @@ export function DecisionHero({
             {earlier ? (
               <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
                 {/* The separator stays on the line before; a wrapped line must not open with "·". */}
-                {direction ? " · " : null}<span className="whitespace-nowrap">{earlier}</span>
+                {direction ? " · " : null}<span className="whitespace-nowrap"><DatedText text={earlier} dates={dates} /></span>
               </span>
             ) : null}
             {/* In the sentence, not beside it: as a flex item it took a row of its
@@ -386,7 +401,7 @@ export function DecisionHero({
                 {reading.facts ? withDefinedScores(reading.facts) : reading.numbers}
               </span>{" "}
               <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
-                Why
+                Why<span className="sr-only">{` ${whyLabel.replace(/^Why\s*/, "")}`}</span>
               </Link>
             </>
           ) : null}
@@ -442,7 +457,7 @@ export function DecisionHero({
 
       {detail ? (
         <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
-          <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]">{detail}</p>
+          <p className="text-sm leading-relaxed text-[var(--app-text-secondary)]"><DatedText text={detail} dates={dates} /></p>
         </div>
       ) : null}
 
@@ -497,7 +512,7 @@ export function DecisionHero({
                 {reading ? (
                   <nav aria-label="Why this reading" className="weather-hero-rail-links flex flex-col gap-1 border-t border-[color:var(--border-faint)] pt-3 text-sm">
                     <Link href={reading.whyHref} className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
-                      Why this call
+                      {whyLabel}
                     </Link>
                     <Link href="/history" className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
                       History

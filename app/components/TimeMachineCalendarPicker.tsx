@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Popover } from "@base-ui/react/popover";
 import { ChevronDownIcon } from "./uiIcons";
 import { ActionLink } from "./ui/actionLink";
+import { DatedText } from "./ui/datedText";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
 /**
@@ -84,7 +85,7 @@ export function TimeMachineCalendarPicker({
           the verdict is for, by its Monday. */}
       <p className="text-fluid-sm font-semibold tracking-tight text-slate-200">
         <Popover.Trigger className="group inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-left transition-colors hover:text-[color:var(--app-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400">
-          {currentDateLabel}
+          <span><DatedText text={currentDateLabel} /></span>
           <ChevronDownIcon
             className={`h-[18px] w-[18px] text-slate-400 transition-transform duration-200 group-hover:text-[color:var(--app-text)] ${
               open ? "rotate-180 text-sky-400" : ""

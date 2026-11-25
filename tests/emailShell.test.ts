@@ -279,7 +279,39 @@ describe("the brief a reader actually gets", () => {
     const [message] = mail.sent;
     assert.ok(message);
     assert.match(message.text, /\nYour rules: hiring (on hold|running|between pause and restart)\./);
-    assert.ok(message.text.indexOf("Your rules:") < message.text.indexOf("Guidance:"), "their rules lead the published ones");
+    assert.ok(message.text.indexOf("Your rules:") < message.text.indexOf("Pause if:"), "their rules lead the published ones");
+    assert.match(message.text, /^This week \(Aug 28, 2026\): /, "the answer leads, dated");
+  });
+
+  /* Pastes are messages (docs/editorial-guardrails.md, 2026-11-18), and so is the Monday
+     email: the subject and the first line answer "what do we do this week?", the subject
+     with the condition word, then the numbers, the labelled lines and the link, in the same
+     order in the text and the HTML. */
+  it("answers the week in the subject and the first line, and says the same in both versions", async () => {
+    resetSubscriberStore();
+    const store = getSubscriberStore();
+    const subscriber = await store.subscribe("answer-first@example.com");
+    await store.verifyEmail(subscriber.confirmToken ?? "");
+    const snapshot = snapshotFor();
+    const mail = captureMail();
+    try {
+      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: new Date("2026-08-31T12:00:00.000Z") });
+    } finally {
+      mail.restore();
+    }
+    const [message] = mail.sent;
+    assert.ok(message);
+    assert.match(message.subject, /^This week: [a-z].+ \((Sunny|Cloudy|Stormy|Freezing)\)$/);
+    const first = message.text.split("\n")[0] ?? "";
+    assert.ok(first.startsWith("This week (Aug 28, 2026): "));
+    const order = (body: string) =>
+      ["Conditions", "Pause if", "Conditions change if", "Full brief"].map((label) => body.indexOf(label));
+    for (const body of [message.text, message.html]) {
+      const at = order(body);
+      assert.ok(at.every((index, position) => index > 0 && (position === 0 || index > (at[position - 1] ?? 0))), `out of order: ${at.join(", ")}`);
+    }
+    assert.ok(message.html.includes(first.replace(/'/g, "&#39;").replace(/&(?!#)/g, "&amp;")) || message.html.includes(first), "the HTML opens on the same answer");
+    assert.doesNotMatch(message.text, /^Guidance:/m, "the answer is not printed a second time under a label");
   });
 
   it("ages a chosen band and says so, and leaves one that does not age alone", async () => {

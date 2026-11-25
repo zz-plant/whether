@@ -8,7 +8,8 @@ import { buildCanonicalBoundedDecisionRules, buildScopedVariantDecisionAdjustmen
 import { buildFlipThreshold } from "../lib/report/reportEvidence";
 import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, getPublishedBriefs } from "../lib/report/publishedBriefs";
 import { navigationGroups, navigationPages, utilityLinks } from "../lib/navigation/informationArchitecture";
-import { decisionTransmissionSearchDescription, homeDecisionFaqItems } from "../lib/report/decisionTransmissionCopy";
+import { decisionTransmissionSearchDescription } from "../lib/report/decisionTransmissionCopy";
+import { ALERT_ANSWER } from "../lib/report/home/homeSectionModel";
 import { buildLlmsTxt } from "../lib/seo/llmsTxt";
 import { buildLlmsFullCorpus } from "../lib/seo/llmsFullCorpus";
 import { postureArchiveStaticParams } from "../lib/summary/postureArchive";
@@ -264,7 +265,7 @@ describe("reader copy carries no stapled wh-clause, no repeated gloss and no pag
       ...navigationPages.map((entry) => entry.description ?? ""),
       ...utilityLinks.map((link) => link.description ?? ""),
       decisionTransmissionSearchDescription,
-      ...homeDecisionFaqItems.map((item) => item.answer),
+      ALERT_ANSWER,
     ].join("\n");
     const findings = judge("descriptions", text);
     assert.deepEqual(findings, [], report(findings));

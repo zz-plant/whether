@@ -20,6 +20,7 @@ import { ConditionIcon } from "../ui/conceptIcons";
 import { RuleRegionShapes } from "../ui/ruleRegionShapes";
 import type { AreaRuleRegions } from "../../../lib/report/ruleRegions";
 import type { RegimeKey } from "../../../lib/types";
+import { DatedText } from "../ui/datedText";
 
 export type RegimeRadarProps = {
   compact?: boolean;
@@ -444,7 +445,7 @@ export function RegimeRadar({
       <tbody>
         {readableReadings.map((reading) => (
           <tr key={reading.key}>
-            <th scope="row" className="whitespace-nowrap py-0.5 pr-3 font-normal">{reading.label}</th>
+            <th scope="row" className="whitespace-nowrap py-0.5 pr-3 font-normal"><DatedText text={reading.label} /></th>
             <td className="py-0.5 pr-3">{reading.tightness}</td>
             <td className="py-0.5">{reading.riskAppetite}</td>
           </tr>
@@ -921,7 +922,7 @@ export function RegimeRadar({
           <span className="block text-slate-300" data-radar-orientation>
             {compact ? <>Up: {CONDITION_SIDE_MEANINGS.pressureBelow}. Right: {CONDITION_SIDE_MEANINGS.appetiteAbove}.</> : <>Up means {CONDITION_SIDE_MEANINGS.pressureBelow}, right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, top right, is the easiest; Freezing, bottom left, the hardest.</>}
           </span>
-          {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
+          {hasTrail && trailCaption ? <span className="block"><DatedText text={trailCaption} /></span> : null}
           {feelsLike && !compact ? (
             <span className="block" data-feels-like-key>
               <ConditionIcon regime={feelsLike.regime} className="mr-1 inline align-text-bottom" />

@@ -20,6 +20,7 @@ import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import { getRegimePublicLabel, REGIME_SEVERITY_RANK } from "../lib/regimePresentation";
 import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
+import { formatWeekAnswer } from "../lib/report/briefArtifact";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { describeWeeklyMemoLead } from "../lib/report/homeBrief/decisionNarrative";
 import { buildDecisionMemo, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
@@ -205,7 +206,10 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(card.decision, headline.action, "the share card");
         assert.equal(publishedBriefHeadline(record).action, headline.action, "the frozen record");
         assert.equal(slot(slack, "Guidance"), guidance, "the Monday post");
-        assert.equal(slot(email, "Guidance"), guidance, "the Monday email");
+        /* The Monday email opens on the guidance as one typed line, dated (2026-11-18). */
+        const firstLine = email.split("\n")[0] ?? "";
+        assert.match(firstLine, /^This week \([^)]+\): /, "the Monday email opens on the answer");
+        assert.equal(firstLine.replace(/^This week \([^)]+\): /, "This week: "), formatWeekAnswer(guidance), "the Monday email");
         assert.ok(!email.includes(`Action now: ${actionNow}`), "the email prints no second headline");
         assert.equal(agent.guidance.call, guidance, "the agent state");
         assert.equal(cli.call.summary, guidance, "the CLI status");

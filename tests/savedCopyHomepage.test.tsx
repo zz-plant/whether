@@ -125,7 +125,8 @@ describe("the saved-copy homepage", () => {
   it("does not say no area is on hold under a hold", async () => {
     const { text } = await page();
     assert.doesNotMatch(text, /No area is on hold/);
-    assert.match(text, new RegExp(`(No area was|\\d+ of \\d+ areas (was|were)) on hold on the ${readingDate} reading\\.`));
+    /* "What's on hold?", answered with the old reading's areas by name and its date (2026-11-18). */
+    assert.match(text, new RegExp(`(Nothing was|[A-Z][A-Za-z ,]+ (was|were)) on hold on the ${readingDate} reading\\.`));
   });
 
   it("prints one side per area: its restart line on hold, else its pause line", async () => {

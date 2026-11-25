@@ -2,7 +2,7 @@ import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { BoundedValue } from "../ui/boundedValue";
 import { DECISION_CONTRACT_LABELS, BOUNDED_CALL_CONTRAST } from "../../../lib/report/reportCopy";
-import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
+import { HOME_SECTIONS, type HomeLadderLine, type HomeQuestion } from "../../../lib/report/home/homeSectionModel";
 import { RegimeRadar, type RegimeRadarProps } from "./RegimeRadar";
 import {
   RuleChartChooser,
@@ -97,7 +97,10 @@ export function WhatWouldChangeSection({
   regime,
   conditionsTrail,
   ruleChart,
+  question,
 }: {
+  /** The heading and its answer, as the page marks them up (`buildHomeQuestions`); the answer is `reversalTrigger`. */
+  question?: Pick<HomeQuestion, "question" | "answer"> | null;
   feelsLike?: { regime: RegimeKey; tightness: number; riskAppetite: number } | null;
   ladders: readonly HomeScoreLadder[];
   flipProximity: readonly FlipProximityLine[];
@@ -212,9 +215,11 @@ export function WhatWouldChangeSection({
               conditions is not permission to resume, and the old flat list read
               as one question with three answers. The conditions question comes
               first because it is the one the weather word answers. */}
-          {reversalTrigger || marketMoves.length > 0 ? (
+          {(reversalTrigger && !question) || marketMoves.length > 0 ? (
             <div className="space-y-2">
-              {reversalTrigger ? (
+              {/* With a question over the section, the sentence is its answer, printed once as
+                  the lead (2026-11-18); the fold below translates it. */}
+              {reversalTrigger && !question ? (
                 <dl className="text-fluid-sm">
                   <div className="space-y-0.5">
                     <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.postureFlips}</dt>
@@ -235,7 +240,10 @@ export function WhatWouldChangeSection({
                       const detail = [instrument, line.scale].filter(Boolean).join(" ");
                       return (
                         <li key={line.sentence} data-flip-axis={line.axis}>
-                          <span className="text-slate-400">{line.label}:</span> {line.sentence}
+                          {/* Under the answer, which names both scores in this order, a line is
+                              its move alone (2026-11-18). */}
+                          {question ? null : <><span className="text-slate-400">{line.label}:</span>{" "}</>}
+                          {line.sentence}
                           {detail ? <span className="block text-slate-400">{detail}</span> : null}
                         </li>
                       );
@@ -269,7 +277,13 @@ export function WhatWouldChangeSection({
   );
 
   return (
-    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} lead={BOUNDED_CALL_CONTRAST}>
+    /* "What would change our mind?", answered with the week's "Conditions change if" sentence
+       (`buildHomeQuestions`). A read that published no line keeps the label and the claim. */
+    <HomeSection
+      id={HOME_SECTIONS.watch.id}
+      heading={question?.question ?? HOME_SECTIONS.watch.fallback}
+      lead={question?.answer ?? BOUNDED_CALL_CONTRAST}
+    >
       {chart ? (
         <RuleChartProvider
           defaultArea={chart.defaultArea}

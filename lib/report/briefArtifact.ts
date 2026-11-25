@@ -454,17 +454,51 @@ export const carrySharedView = (
   return { text: text.split(sharedUrl).join(carried), url: carried };
 };
 
+/* Proper nouns keep their capital at the start of a clause (docs/editorial-guardrails.md,
+   Headings): the product, the Fed and the four conditions. */
+const KEEPS_CAPITAL = /^(?:Whether|Fed|FRED|Sunny|Cloudy|Stormy|Freezing|Room to move)\b/;
+
+/**
+ * A sentence carried after a colon, as a person would type it: "hold hiring at current
+ * headcount." Its first letter lowers unless it opens a proper noun or an acronym.
+ */
+export const asClause = (sentence: string): string => {
+  const text = sentence.trim();
+  if (KEEPS_CAPITAL.test(text) || /^[A-Z]{2}/.test(text)) return text;
+  return `${text.charAt(0).toLowerCase()}${text.slice(1)}`;
+};
+
+/**
+ * The week's answer as the one line a person would type in a channel (2026-11-18,
+ * docs/editorial-guardrails.md "Pastes are messages"): "This week (Nov 16, 2026): hold
+ * hiring at current headcount." The Slack post, the agenda and the Monday email lead with
+ * it, so a reader scrolling past other people's messages meets the answer before the
+ * labels, and the date in words says which week it was. The citation stays a citation.
+ */
+export const formatWeekAnswer = (call: string, dateLabel?: string): string => {
+  /* The action answers the question, so it leads; the week's direction, which the composed
+     guidance opens on ("Conditions are holding. Put more into…", `weeklyHeadline`), follows. */
+  const direction = /^(Conditions are (?:tightening|easing|holding)\.)\s+(.+)$/s.exec(call.trim());
+  const answer = direction ? `${direction[2]} ${direction[1]}` : call;
+  return `This week${dateLabel ? ` (${dateLabel})` : ""}: ${asClause(answer)}`;
+};
+
+/**
+ * A message, not a form (2026-11-18): the answer in one line, then the lines it is bounded
+ * by under the labels every screen uses, the numbers beside them, the source and the link.
+ * It opened on the title and a "Guidance:" label, so a channel read a heading before the
+ * answer; the title now rides on the source line.
+ */
 const formatSlack = (artifact: BriefArtifact, origin: string) =>
   [
-    `*${artifact.title} — ${artifact.recordDateLabel}*`,
-    `> *Guidance:* ${artifact.call}`,
+    `*${formatWeekAnswer(artifact.call, artifact.recordDateLabel)}*`,
     ...conditionLines(artifact).map((line) => `> • ${line}`),
     ...(artifact.phrase
       ? [`> • Say: “${artifact.phrase.say}”`, `> • Avoid: “${artifact.phrase.avoid}”`]
       : []),
     "",
     `${signalLine(artifact)} · ${artifact.regimeLabel}`,
-    `${provenanceLine(artifact)}`,
+    `${artifact.title} · ${provenanceLine(artifact)}`,
     `Full brief: ${resolveSharedBriefUrl(artifact, origin)}`,
   ].join("\n");
 
@@ -476,8 +510,10 @@ const formatSlack = (artifact: BriefArtifact, origin: string) =>
  */
 const formatAgenda = (artifact: BriefArtifact, origin: string) =>
   [
-    `### ${MONDAY_AGENDA_TITLE} (${MONDAY_AGENDA_MINUTES} min) — ${artifact.recordDateLabel}`,
-    `**Guidance:** ${artifact.call} (${artifact.regimeLabel})`,
+    /* The answer first, then the item it heads (2026-11-18): a meeting doc is read in a
+       list of other items, and the room should meet the week's answer before the agenda. */
+    `**${formatWeekAnswer(artifact.call, artifact.recordDateLabel)}** (${artifact.regimeLabel})`,
+    `### ${MONDAY_AGENDA_TITLE} (${MONDAY_AGENDA_MINUTES} min)`,
     ...(actionRestatesCall(artifact)
       ? []
       : [`**${DECISION_CONTRACT_LABELS.action.doNow}:** ${artifact.actionNow}`]),

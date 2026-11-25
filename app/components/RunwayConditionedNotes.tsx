@@ -88,8 +88,20 @@ function ClearRunwayButton() {
  * The notes themselves sit under the rule for the area they concern
  * (`RunwayAreaNote`); this is the heading and the invitation.
  */
-export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
+export function RunwayConditionedNotes({
+  regime,
+  nested = false,
+}: {
+  regime: RegimeKey;
+  /**
+   * Inside a fold whose summary already asks "What about our runway?" (2026-11-18): the
+   * generic label is left out, and a reader who has chosen no runway is answered first.
+   * A chosen band keeps its label, which names the band.
+   */
+  nested?: boolean;
+}) {
   const { runway, figuresGiven, thinlyCovered, bandAge, profile } = useRunwayNotes(regime);
+  const genericLabel = nested ? null : <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>;
   const filingSource = profile.filing ? (
     <p data-testid="company-filing-source" className="text-fluid-nano text-slate-400">
       {describeProfileFiling(profile.filing, Boolean(resolveProfileRunway(profile)?.debtLimitsRunway))}
@@ -99,7 +111,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
   if (thinlyCovered) {
     return (
       <div id="runway-notes" className="space-y-1.5">
-        <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
+        {genericLabel}
         <p className="text-fluid-nano text-slate-400">
           {THINLY_COVERED_NOTE}{" "}
           <Link href="/operate/financial#ops-runway-inputs" className="text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
@@ -115,7 +127,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
   if (!runway) {
     return (
       <div id="runway-notes" className="space-y-1.5">
-        <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
+        {genericLabel}
         {/* The control is not here. It shows the default until a reader
             chooses, so this says so rather than letting the default read as an
             answer the reader gave. A link rather than "above": these notes sit
@@ -123,7 +135,9 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
             wide screen while a phone's control is the header pill. The anchor
             opens the section at every width (`AnchorFeedback`). */}
         <p className="text-fluid-nano text-slate-400">
-          Showing {runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you{" "}
+          {/* Nested, the answer to "What about our runway?" leads; the default's value is on
+              the card's "Rules for" line and in the calibration section. */}
+          {nested ? "It’s the default until you " : `Showing ${runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you `}
           <a href={`#${HOME_SECTIONS.calibration.id}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
             pick your cash runway
           </a>
