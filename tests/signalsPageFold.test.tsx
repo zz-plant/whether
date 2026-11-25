@@ -27,26 +27,25 @@ const { signalsEvidenceSections } = await import("../app/signals/components/evid
  * settings. It leads with the delta now, and every instrument is a closed
  * question.
  */
-const model = await buildSignalsPageModel();
+/* The page model carries the two month-end series the score strip draws, with the answer built
+   from them: empty here, so the trends question is checked with a series below. */
+const model = await buildSignalsPageModel(undefined, { tightnessTrend: [], riskAppetiteTrend: [] });
 /* The line settings name the inputs too where the reading offers a choice of them. */
 const LINES_QUESTION = model.inputChoice
   ? "What would conditions be with different lines or inputs?"
   : "What would conditions be with different lines?";
 const html = renderToStaticMarkup(
-  <>{signalsEvidenceSections({ model, focusLabelByTab, tightnessTrend: [], riskAppetiteTrend: [] })}</>,
+  <>{signalsEvidenceSections({ model, focusLabelByTab })}</>,
 );
 const instruments = html.slice(html.indexOf('id="instruments"'));
 
-/* The two month-end series the page passes the score strip; empty above, so
-   the trends question is checked with them here. */
 const TREND = (values: number[]) => values.map((value, index) => ({ label: `M${index + 1}`, value }));
+const trendsModel = await buildSignalsPageModel(undefined, { tightnessTrend: TREND([90, 70, 63]), riskAppetiteTrend: TREND([62, 60, 56]) });
 const withTrends = renderToStaticMarkup(
   <>
     {signalsEvidenceSections({
-      model,
+      model: trendsModel,
       focusLabelByTab,
-      tightnessTrend: TREND([90, 70, 63]),
-      riskAppetiteTrend: TREND([62, 60, 56]),
     })}
   </>,
 );
@@ -78,7 +77,7 @@ describe("/signals leads with the delta and folds its instruments", () => {
   it("opens each instrument a link names by its query key, and only that one", () => {
     const openIds = (searchParams: Record<string, string>) => {
       const markup = renderToStaticMarkup(
-        <>{signalsEvidenceSections({ model, focusLabelByTab, tightnessTrend: TREND([90, 70, 63]), riskAppetiteTrend: TREND([62, 60, 56]), searchParams })}</>,
+        <>{signalsEvidenceSections({ model: trendsModel, focusLabelByTab, searchParams })}</>,
       );
       return [...markup.matchAll(/<details id="([^"]+)"[^>]*\sopen(?:=""|\s|>)/g)].map((match) => match[1]);
     };
@@ -96,15 +95,18 @@ describe("/signals leads with the delta and folds its instruments", () => {
   it("titles every instrument with its question, and opens none of them", () => {
     for (const question of [
       "What are interest rates doing?",
-      "How have the two scores moved this year?",
+      "Has the recession warning gauge gone below zero in the past year?",
+      "How have the two scores moved over the past year?",
       /* Was "What would the call be with different lines?": "the call" is
          retired reader vocabulary (lib/report/AGENTS.md). "or inputs" since the panel
          took which inputs count too (2026-11-18). */
       LINES_QUESTION,
       /* Was "What did the brief say…": a brief does not speak (tests/titleSubjects.test.ts). */
       "What was the guidance in an earlier month?",
-      "Which past cycle looks most like this one?",
-      "Which habits from the zero-rate years still shape your company?",
+      /* Not "When was it last like this?": the answer is the nearest of a few hand-picked
+         cycles, not always the last time (2026-11-25). */
+      "Which past cycle is this most like?",
+      "Which zero-rate habits should we check for?",
     ]) {
       assert.ok(instruments.includes(question), question);
     }
@@ -122,39 +124,37 @@ describe("/signals leads with the delta and folds its instruments", () => {
  * more than no summary (ui-ux-standards §XV).
  */
 describe("/signals answers each closed question in its summary", () => {
-  it("rates: this week's 1-month rate, which the opened panel prints too", () => {
+  it("rates: the direction, then this week's 1-month rate, which the opened panel prints too", () => {
     const answer = summaryAnswer(withTrends, "What are interest rates doing?");
     const oneMonth = model.treasury.yields.oneMonth;
     assert.ok(typeof oneMonth === "number");
-    assert.ok(answer?.startsWith(`1-month rate ${oneMonth.toFixed(2)}%`), answer);
+    assert.match(answer ?? "", new RegExp(`^(Rising|Falling|Holding): the 1-month rate is ${oneMonth.toFixed(2).replace(".", "\\.")}%`));
     const panel = withTrends.slice(withTrends.indexOf('id="signal-diagnostics"'), withTrends.indexOf('id="curve-context"'));
     assert.match(panel, new RegExp(`Latest: [^<]*1-month (<!-- -->)?${oneMonth.toFixed(2).replace(".", "\\.")}%`), "the panel prints the rate the summary quotes");
   });
 
-  it("inversion: yes or no, from the counts the chart's caption prints", () => {
-    const answer = summaryAnswer(withTrends, "Has the yield curve inverted in the last year?") ?? "";
+  it("inversion: yes or no for the recession warning gauge, from the counts the chart's caption prints", () => {
+    const answer = summaryAnswer(withTrends, "Has the recession warning gauge gone below zero in the past year?") ?? "";
     const caption = withTrends.match(/recession warning gauge(?:<!-- -->)? has been inverted\s*(?:<!-- -->)?\s*(\d+)\s*(?:<!-- -->)? of (?:<!-- -->)?(\d+)(?:<!-- -->)? months, the (?:<!-- -->)?2-year minus 3-month(?:<!-- -->)? spread (?:<!-- -->)?(\d+)/);
     assert.ok(caption, "the caption prints the counts");
     const [, longCount, months, shortCount] = caption;
-    if (longCount === "0" && shortCount === "0") {
-      assert.ok(answer.startsWith("No:"), answer);
+    if (longCount === "0") {
+      assert.ok(answer.startsWith(`No: the 10-year rate stayed above the 2-year rate`), answer);
+      if (shortCount !== "0") assert.ok(answer.includes(`below the 3-month rate in ${shortCount} of them`), answer);
     } else {
-      assert.ok(answer.startsWith("Yes:"), answer);
-      for (const count of [longCount, shortCount].filter((value) => value !== "0")) {
-        assert.ok(answer.includes(`${count} of ${months} months`), answer);
-      }
+      assert.ok(answer.startsWith(`Yes, in ${longCount} of the last ${months} months:`), answer);
     }
   });
 
   it("score trends: the move each cell prints, from the same window", () => {
     assert.equal(
-      summaryAnswer(withTrends, "How have the two scores moved this year?"),
+      summaryAnswer(withTrends, "How have the two scores moved over the past year?"),
       "Funding pressure down 27 to 63, risk appetite down 6 to 56 (2 months to M3)",
     );
     const cells = withTrends.slice(withTrends.indexOf('id="trends"'));
     assert.match(cells, /63<\/span>/);
     assert.match(cells, /-27(<!-- -->)? over (<!-- -->)?2(<!-- -->)? mo/);
-    assert.equal(summaryAnswer(html, "How have the two scores moved this year?"), undefined, "no series, no answer");
+    assert.equal(summaryAnswer(html, "How have the two scores moved over the past year?"), undefined, "no series, no answer");
   });
 
   /* With the published inputs, the answer is what it was before the inputs joined the panel. */
@@ -173,7 +173,7 @@ describe("/signals answers each closed question in its summary", () => {
     const without = await buildSignalsPageModel({ without: "curve" });
     assert.equal(without.inputChoice?.changed, true);
     const markup = renderToStaticMarkup(
-      <>{signalsEvidenceSections({ model: without, focusLabelByTab, tightnessTrend: [], riskAppetiteTrend: [], searchParams: { without: "curve" } })}</>,
+      <>{signalsEvidenceSections({ model: without, focusLabelByTab, searchParams: { without: "curve" } })}</>,
     );
     const answer = summaryAnswer(markup, "What would conditions be with different lines or inputs?");
     assert.equal(answer, without.inputChoice?.result);
@@ -185,14 +185,15 @@ describe("/signals answers each closed question in its summary", () => {
      "Changes in conditions" card with the same sentence until 2026-10-14. */
   it("past months: the change count, printed once", () => {
     const answer = summaryAnswer(withTrends, "What was the guidance in an earlier month?");
-    assert.ok(answer && /^(No change|\d+ changes?) across the last \d+ months$/.test(answer), answer);
+    assert.ok(answer && /^Conditions (held through all|changed (once|\d+ times) in) (of )?the last \d+ months$/.test(answer), answer);
     const timeline = withTrends.slice(withTrends.indexOf('id="regime-timeline"'));
     assert.ok(!timeline.includes(answer), "the timeline under it does not repeat it");
   });
 
   it("the reference cycle and the zero-rate habits name what the table holds", () => {
-    assert.ok(summaryAnswer(withTrends, "Which past cycle looks most like this one?"));
-    const habits = summaryAnswer(withTrends, "Which habits from the zero-rate years still shape your company?") ?? "";
+    assert.match(summaryAnswer(withTrends, "Which past cycle is this most like?") ?? "", /^Q\d \d{4}: [a-z]/);
+    const habits = summaryAnswer(withTrends, "Which zero-rate habits should we check for?") ?? "";
+    assert.match(habits, /^Habits in \w+ areas: /);
     const fossil = withTrends.slice(withTrends.indexOf('id="fossil-record"'));
     const domains = [...fossil.matchAll(/<td class="py-3 pr-3 font-semibold[^"]*">([^<]+)<\/td>/g)].map((match) => match[1]);
     assert.ok(domains.length > 0);

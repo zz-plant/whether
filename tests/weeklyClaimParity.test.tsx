@@ -20,7 +20,7 @@ import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import { getRegimePublicLabel, REGIME_SEVERITY_RANK } from "../lib/regimePresentation";
 import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
-import { formatWeekAnswer } from "../lib/report/briefArtifact";
+import { asClause, formatWeekAnswer } from "../lib/report/briefArtifact";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { describeWeeklyMemoLead } from "../lib/report/homeBrief/decisionNarrative";
 import { buildDecisionMemo, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
@@ -205,7 +205,14 @@ describe("one week, one set of claims, every surface", () => {
         );
         assert.equal(card.decision, headline.action, "the share card");
         assert.equal(publishedBriefHeadline(record).action, headline.action, "the frozen record");
-        assert.equal(slot(slack, "Guidance"), guidance, "the Monday post");
+        /* The Monday post opens on the same typed line as the email, in bold (2026-11-25). */
+        const slackFirstLine = slack.split("\n")[0] ?? "";
+        assert.match(slackFirstLine, /^\*This week \([^)]+\): .+\*$/, "the Monday post opens on the answer");
+        assert.equal(
+          slackFirstLine.replace(/^\*This week \([^)]+\): /, "This week: ").replace(/\*$/, ""),
+          formatWeekAnswer(guidance),
+          "the Monday post",
+        );
         /* The Monday email opens on the guidance as one typed line, dated (2026-11-18). */
         const firstLine = email.split("\n")[0] ?? "";
         assert.match(firstLine, /^This week \([^)]+\): /, "the Monday email opens on the answer");
@@ -237,7 +244,8 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(agent.recordDate, recordDate);
         assert.match(markdown, new RegExp(`^# Whether Weekly Brief — ${recordDate}$`, "m"));
         assert.equal(record.recordDate, recordDate, "the frozen record");
-        assert.match(slack, new RegExp(`^Whether Weekly Brief — ${recordDate}$`, "m"), "the Monday post");
+        /* The title and the date ride on the source line at the foot (2026-11-25). */
+        assert.match(slack, new RegExp(`^Whether Weekly Brief · Source: .+ · ${recordDate} · `, "m"), "the Monday post");
         assert.equal(agent.confidence.label, confidence);
         assert.equal(memo.confidence, confidence, "the /api/decision memo");
         assert.equal(record.confidenceLabel, confidence, "the frozen record");
@@ -257,7 +265,8 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(home.weeklyDecisionCardModel.decision.operatingStanceLine, currentCall, "the homepage card");
         assert.equal(memo.weeklyMemoLines[1], currentCall, "the /api/decision memo");
         assert.equal(record.summary, currentCall, "the frozen record");
-        assert.ok(slot(slack, "Guidance")?.endsWith(currentCall), "the Monday post");
+        const slackAnswer = slack.split("\n")[0] ?? "";
+        assert.ok(slackAnswer.includes(currentCall) || slackAnswer.includes(asClause(currentCall)), "the Monday post");
         /* The read path composes the same call when no snapshot is stored to project. */
         const composed = buildWeeklyBriefSnapshot({ reportData: { ...reportData, projectsOperatingSnapshot: false }, degraded: false });
         assert.equal(composed.weeklyCall.currentCall, currentCall, "the call the read path composes");

@@ -30,16 +30,15 @@ const { signalsEvidenceSections } = await import("../app/signals/components/evid
  * with the sentence, and the months in the panels are real links to the time
  * machine with what they read in their names.
  */
-const model = await buildSignalsPageModel();
 const TREND = (values: number[]) =>
   values.map((value, index) => ({ label: ["Aug 2026", "Sep 2026", "Oct 2026"][index] ?? "", value }));
+/* The trends the page draws ride in the model with the answers built from them. */
+const model = await buildSignalsPageModel(undefined, { tightnessTrend: TREND([90, 70, 63]), riskAppetiteTrend: TREND([62, 60, 56]) });
 const html = renderToStaticMarkup(
   <>
     {signalsEvidenceSections({
       model,
       focusLabelByTab,
-      tightnessTrend: TREND([90, 70, 63]),
-      riskAppetiteTrend: TREND([62, 60, 56]),
       searchParams: { focus: "growth" },
     })}
   </>,
@@ -84,7 +83,7 @@ describe("the pictures beside the closed questions", () => {
   });
 
   it("states the scale beside the two score lines and the rates line", () => {
-    const scores = summaries.find((entry) => entry.includes("How have the two scores moved this year?")) ?? "";
+    const scores = summaries.find((entry) => entry.includes("How have the two scores moved over the past year?")) ?? "";
     assert.match(scores, />0–100</);
     const rates = summaries.find((entry) => entry.includes("What are interest rates doing?")) ?? "";
     assert.match(rates, /\d+(<!-- -->)? mo · \d\.\d{2}–\d\.\d{2}%/);

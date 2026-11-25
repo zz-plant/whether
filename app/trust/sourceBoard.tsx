@@ -64,17 +64,22 @@ export function SourceBoard({
   rows,
   treasurySourceUrl,
   macroSourceUrl,
+  question = { question: "Is the data current?", answer: null },
 }: {
   rows: readonly SourceBoardRow[];
   treasurySourceUrl?: string;
   macroSourceUrl?: string;
+  /** The heading's question and the answer the board's rows give (`describeSourcesAnswer`), the words the page's markup carries. */
+  question?: { question: string; answer: string | null };
 }) {
   return (
     <ReportSection
       id="source-board"
-      title="Sources and last update"
-      /* No description (2026-11-11): it named the row's columns (live or not, cadence,
-         last update), which each row prints under the source's name. */
+      /* The question a reader brings here, answered from the rows below it (2026-11-25). It
+         was "Sources and last update", and its description, until 2026-11-11, named the
+         row's columns. */
+      title={question.question}
+      description={question.answer ?? undefined}
     >
       <ul className="@container divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
         {rows.map((row) => (

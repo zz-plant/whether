@@ -142,14 +142,14 @@ describe("GET /api/image/brief-screenshot", () => {
 });
 
 describe("Slack post with the screenshot", () => {
-  it("places the image block right after the header when a URL is given, and omits it otherwise", () => {
-    const withImage = buildSlackBriefBlocks("Posture: Guarded", "2026-09-14", { imageUrl: "https://whether.work/api/image/brief-screenshot?date=2026-09-14" });
-    assert.equal(withImage[0]?.type, "header");
-    assert.equal(withImage[1]?.type, "image");
-    assert.equal(withImage[2]?.type, "section");
+  /* No title header since 2026-11-25: the answer line leads, then the card, then the rest. */
+  it("places the image block right after the answer line when a URL is given, and omits it otherwise", () => {
+    const brief = "*This week (Sep 14, 2026): hold hiring.*\nPosture: Guarded";
+    const withImage = buildSlackBriefBlocks(brief, "2026-09-14", { imageUrl: "https://whether.work/api/image/brief-screenshot?date=2026-09-14" });
+    assert.deepEqual(withImage.map((block) => block.type), ["section", "image", "section", "actions"]);
 
-    const textOnly = buildSlackBriefBlocks("Posture: Guarded", "2026-09-14");
-    assert.deepEqual(textOnly.map((block) => block.type), ["header", "section", "actions"]);
+    const textOnly = buildSlackBriefBlocks(brief, "2026-09-14");
+    assert.deepEqual(textOnly.map((block) => block.type), ["section", "section", "actions"]);
   });
 
   it("posts the image URL to the webhook", async () => {

@@ -21,14 +21,11 @@ import { SignalsInstrumentsSection } from "./evidenceInstruments";
 export const signalsEvidenceSections = ({
   model,
   focusLabelByTab,
-  tightnessTrend,
-  riskAppetiteTrend,
   searchParams,
 }: {
+  /** Carries the score trends with the questions they answer, so the drawing and the answer read one series. */
   model: SignalsPageModel;
   focusLabelByTab: Record<FocusTab, string>;
-  tightnessTrend: Array<{ label: string; value: number }>;
-  riskAppetiteTrend: Array<{ label: string; value: number }>;
   searchParams?: SignalsPageSearchParams;
 }): ReactElement[] => [
   <SignalsWhatChangedSection
@@ -46,8 +43,8 @@ export const signalsEvidenceSections = ({
     assessment={model.assessment}
     treasury={model.treasury}
     yieldCurveSeries={model.yieldCurveSeries}
-    tightnessTrend={tightnessTrend}
-    riskAppetiteTrend={riskAppetiteTrend}
+    tightnessTrend={model.tightnessTrend}
+    riskAppetiteTrend={model.riskAppetiteTrend}
     regimeSeries={model.regimeSeries}
     selectedYear={model.selectedYear}
     selectedMonth={model.selectedMonth}
@@ -57,6 +54,7 @@ export const signalsEvidenceSections = ({
     invalidHistoricalSelection={model.invalidHistoricalSelection}
     monthPickerOpen={model.monthPickerOpen}
     inputChoice={model.inputChoice}
+    questions={model.instrumentQuestions}
     searchParams={searchParams}
   />,
 ];

@@ -53,10 +53,19 @@ import {
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { AreaLabel, LineStateIcon } from "../../components/ui/conceptIcons";
 import { isDecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { emphasisWhenChosen, quietUnlessMoves } from "../../components/home/chosenAreaInk";
+import { BriefWeekTime } from "../../components/history/briefWeekTime";
+import { BriefAreaScope } from "./briefAreaScope";
+import { briefAreaRowId, describeOutcomeAnswer } from "./briefQuestions";
 
 /* A frozen record stores its area as a string; a known area prints with its glyph. */
 const BriefAreaName = ({ area }: { area: string }) =>
   isDecisionArea(area) ? <AreaLabel area={area} /> : <>{labelForArea(area)}</>;
+
+/* A row's ink while a copied link names an area (`BriefAreaScope`): the named row's name in
+   full ink and weight, the homepage's chosen-area emphasis, and every other row quieted. */
+const chosenRowInk = (area: string) => (isDecisionArea(area) ? quietUnlessMoves([area]) : "");
+const chosenNameInk = (area: string) => (isDecisionArea(area) ? emphasisWhenChosen(area) : "");
 
 /**
  * The nearest of a decision's lines to the frozen reading, for the distance
@@ -151,6 +160,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
      conditions the next published week read. A cited week is where the product is
      checked against itself, and this is the only surface that can show it. */
   const outcome = describeBriefOutcome(brief, next);
+  /* "What happened next?", answered first; the markup carries the same sentence. */
+  const outcomeAnswer = outcome.kind === "superseded" ? describeOutcomeAnswer(outcome) : null;
 
   // The record's readings and corridor, drawn. Records frozen before the lines
   // were data carry neither and fall back to the sentences below.
@@ -181,6 +192,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
     headline: briefTitle(brief),
     description: buildPublishedBriefDescription(brief),
     dateModified: publishedBriefModifiedAt(brief),
+    questions: outcomeAnswer ? [outcomeAnswer] : [],
   });
 
   return (
@@ -282,27 +294,22 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             brief published is the line the next reading met. It states both and
             claims nothing about which score crossed, because the record holds
             month-ends and published weeks, not the reading between them. */}
-        {outcome.kind === "superseded" ? (
-          <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-            <h2 className="type-section">What happened after this week</h2>
+        {outcome.kind === "superseded" && outcomeAnswer ? (
+          <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6" aria-labelledby="what-happened-next">
+            {/* The question a reader checking a cited week asks, answered first (2026-11-25). It
+                was "What happened after this week", over "The next published brief, for the
+                week of …", which left whether conditions held for the end of the sentence. */}
+            <h2 id="what-happened-next" className="type-section">{outcomeAnswer.question}</h2>
+            <p className="text-sm text-slate-300" data-section-answer>
+              {outcomeAnswer.lead}{" "}
+              {next ? <BriefWeekTime brief={next}>{outcomeAnswer.weekLabel}</BriefWeekTime> : outcomeAnswer.weekLabel}
+              {outcomeAnswer.tail}
+            </p>
             <p className="text-sm text-slate-300">
-              {outcome.held ? (
-                <>
-                  The next published brief, for the week of {outcome.weekLabel}, read{" "}
-                  <span className="font-semibold text-slate-100">{outcome.to}</span> as well. Conditions
-                  were set to change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
-                </>
-              ) : (
-                <>
-                  The next published brief, for the week of {outcome.weekLabel}, read{" "}
-                  <span className="font-semibold text-slate-100">{outcome.to}</span> — a change from{" "}
-                  <span className="font-semibold text-slate-100">{outcome.from}</span>. Conditions were
-                  set to change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
-                </>
-              )}
+              They were set to change if <BoundedValue>{outcome.changeLine}</BoundedValue>.
             </p>
             <ActionLink href={buildPublishedBriefPath(outcome.slug)} variant="inline" className="self-start">
-              Read that week
+              Read the week of {outcome.weekLabel}
             </ActionLink>
           </section>
         ) : null}
@@ -381,6 +388,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         {brief.decisions.length ? (
           <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
             <h2 className="type-section">Guidance by area</h2>
+            {/* A copied link names the sender's area (`?decision=`); the scope gives that row
+                the homepage's emphasis and brings it into view (2026-11-25). */}
+            <BriefAreaScope>
             {tabulateDecisions && frozenScores ? (
               /* Every area's rule is a pair of the same four lines, drawn once
                  above. A row per area says which lines apply and how far off
@@ -399,8 +409,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                   </thead>
                   <tbody>
                     {brief.decisions.map((decision) => (
-                      <tr key={decision.area} className="border-b border-slate-800/50 align-top">
-                        <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">
+                      <tr
+                        key={decision.area}
+                        id={briefAreaRowId(decision.area)}
+                        data-area-row={decision.area}
+                        className={`scroll-mt-24 border-b border-slate-800/50 align-top ${chosenRowInk(decision.area)}`.trim()}
+                      >
+                        <th scope="row" className={`py-2 pr-3 font-semibold text-slate-100 ${chosenNameInk(decision.area)}`.trim()}>
                           <BriefAreaName area={decision.area} />
                         </th>
                         <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.action.doNow}>{display.sentence(decision.doNow || decision.call)}</td>
@@ -433,8 +448,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                  behind a 2px left stripe until 2026-11-10. */
               <ul className="border-t-2 border-[color:var(--app-text)]">
                 {brief.decisions.map((decision) => (
-                  <li key={decision.area} className="space-y-1 border-b border-[color:var(--border-default)] py-3">
-                    <p className="text-sm font-semibold text-slate-100">
+                  <li
+                    key={decision.area}
+                    id={briefAreaRowId(decision.area)}
+                    data-area-row={decision.area}
+                    className={`scroll-mt-24 space-y-1 border-b border-[color:var(--border-default)] py-3 ${chosenRowInk(decision.area)}`.trim()}
+                  >
+                    <p className={`text-sm font-semibold text-slate-100 ${chosenNameInk(decision.area)}`.trim()}>
                       <BriefAreaName area={decision.area} />
                     </p>
                     <p className="text-sm text-slate-300">{display.sentence(decision.call)}</p>
@@ -453,6 +473,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                 ))}
               </ul>
             )}
+            </BriefAreaScope>
           </section>
         ) : null}
 
@@ -484,7 +505,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <footer className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="type-section">Provenance</h2>
           <p className="text-sm text-slate-300">
-            Data as of {brief.recordDateLabel} · {display.source} · captured {brief.freshnessLabel}
+            Data as of <time dateTime={brief.recordDate.slice(0, 10)}>{brief.recordDateLabel}</time> · {display.source} · captured{" "}
+            {brief.freshnessLabel}
           </p>
           {brief.sourceUrl ? (
             <p className="text-sm">
@@ -511,12 +533,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           <div className="flex flex-wrap gap-2">
             {previous ? (
               <ActionLink href={buildPublishedBriefPath(previous.slug)} variant="ghost">
-                ← Week of {publishedBriefWeekLabel(previous)}
+                <span aria-hidden="true">← </span>Week of <BriefWeekTime brief={previous} />
               </ActionLink>
             ) : null}
             {next ? (
               <ActionLink href={buildPublishedBriefPath(next.slug)} variant="ghost">
-                Week of {publishedBriefWeekLabel(next)} →
+                Week of <BriefWeekTime brief={next} />
+                <span aria-hidden="true"> →</span>
               </ActionLink>
             ) : null}
           </div>

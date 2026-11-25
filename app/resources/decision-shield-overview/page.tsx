@@ -75,7 +75,7 @@ export default async function DecisionShieldOverviewPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Run it on this week&apos;s plan</h2>
         <p className="text-sm text-slate-200">
-          Open &ldquo;Test a decision&rdquo; on the plan page to score any move against this week&apos;s guidance, your runway, and reversibility.
+          The plan page&apos;s &ldquo;Does this plan fit this week?&rdquo; scores any move against this week&apos;s guidance, your runway, and reversibility.
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           <ActionLink href="/operate#ops-decision-shield" variant="primary">

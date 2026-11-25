@@ -82,21 +82,42 @@ const splitSectionText = (text: string): string[] => {
   return kept;
 };
 
+/**
+ * The post's first line without its bold marks, for the notification preview: the week's
+ * answer (`buildSlackBrief` opens on it), or the title where a brief has no line to give.
+ */
+const briefPreviewText = (briefText: string, recordDate: string) =>
+  briefText
+    .split("\n")
+    .find((line) => line.trim() !== "")
+    ?.replace(/^\*(.*)\*$/, "$1")
+    .trim() || `Whether Weekly Brief — ${recordDate}`;
+
+/*
+ * No title header block (2026-11-25): the post opens on the week's answer, as the copied
+ * brief and the Monday email do (docs/editorial-guardrails.md, "Pastes are messages"), and the
+ * title rides on the source line at its foot. A header reading "Whether Weekly Brief —
+ * 2026-08-28" sat above the answer in every channel. The answer line is its own section, so
+ * the card's picture follows the answer rather than standing in for the heading.
+ */
 export const buildSlackBriefBlocks = (
   briefText: string,
   recordDate: string,
   options: { imageUrl?: string } = {},
 ) => {
-  const sections = splitSectionText(briefText);
+  const [lead = "", ...rest] = briefText.split("\n");
+  const leadSections = splitSectionText(lead);
+  const restSections = rest.length > 0 ? splitSectionText(rest.join("\n")) : [];
+  const toSection = (text: string) => ({ type: "section", text: { type: "mrkdwn", text } });
 
   return [
-    { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief — ${recordDate}` } },
+    ...leadSections.map(toSection),
     /* The weekly call as rendered, when the Monday cron captured one (lib/export/briefScreenshot.ts).
        Slack fetches the URL once and proxies it, so the block costs one read of the stored PNG. */
     ...(options.imageUrl
       ? [{ type: "image", image_url: options.imageUrl, alt_text: `Whether weekly guidance card for ${recordDate}` }]
       : []),
-    ...sections.map((text) => ({ type: "section", text: { type: "mrkdwn", text } })),
+    ...restSections.map(toSection),
     {
       type: "actions",
       elements: [
@@ -247,7 +268,7 @@ export const deliverSlackBrief = async (options?: {
      that failed part-way reaches only the channels it missed. */
   const tally = await slackChannel.deliver(
     urls,
-    { blocks, text: `Whether Weekly Brief — ${recordDate}` },
+    { blocks, text: briefPreviewText(text, recordDate) },
     {
       fetchImpl: options?.fetchImpl,
       once: onceFor(weeklyPeriodKey("weekly-slack", now), { force: options?.force }),

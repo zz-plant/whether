@@ -194,8 +194,14 @@ describe("/history prints each record fact once", () => {
     assert.ok(!visible.includes(`${readings} month-end readings`), "the reading count is its tile's");
     assert.doesNotMatch(visible, /Record starts|Fixed historical snapshot/);
 
-    const margin = visible.slice(visible.indexOf("Advance warning"));
-    assert.match(margin, /^Advance warning \d+ of \d+ changes had advance warning\./);
+    /* The count answers the section's question, once, under it; the marks beside the
+       tiles no longer print it again (2026-11-25). */
+    const printed = text(html.replace(/<script\b[\s\S]*?<\/script>/g, " "));
+    assert.match(printed, /Has it been right\? (Copy the record summary )?\d+ of \d+ changes since [A-Z][a-z]{2} \d{4} had advance warning\./);
+    /* The whole record's count, once; the five-year section answers with its own window's count. */
+    const [, warned, total] = /(\d+) of (\d+) changes since [A-Z][a-z]{2} \d{4} had advance warning/.exec(printed) ?? [];
+    assert.equal((printed.match(new RegExp(`\\b${warned} of ${total} changes`, "g")) ?? []).length, 1, "the count prints once");
+    assert.ok(printed.indexOf("Has it been right?") < printed.indexOf("Advance warning"), "the answer leads, the marks follow");
     assert.doesNotMatch(html, /Points from the line/, "the band table is /calibration's");
     assert.match(html, /href="\/calibration"/);
   });

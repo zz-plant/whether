@@ -5,7 +5,7 @@ import { InstrumentQuestion } from "./instrumentQuestion";
 import { InversionCell, InversionCells } from "./instrumentPreviews";
 import { MonthReadoutStrip } from "./monthReadoutStrip";
 import { columnMonthLabel, columnYearLabel } from "./instrumentMonthHref";
-import { describeInversionSummary, summarizeInversionMonths } from "../../../lib/report/evidenceInstrumentSummaries";
+import { INVERSION_QUESTION, describeInversionSummary, summarizeInversionMonths } from "../../../lib/report/evidenceInstrumentSummaries";
 import { UrlDetails } from "../../components/ui/urlDetails";
 
 type YieldCurvePoint = {
@@ -34,6 +34,7 @@ export function SignalInversionPreview({
   summaryClassName,
   open = false,
   monthHref,
+  question,
 }: {
   yieldCurveSeries: YieldCurvePoint[];
   className?: string;
@@ -42,6 +43,8 @@ export function SignalInversionPreview({
   open?: boolean;
   /** Where each month in the panel's month row opens (`instrumentMonthHref`); without it the row is not drawn. */
   monthHref?: (month: { year: number; month: number }) => string | null;
+  /** The question and its answer from the page model, built from the same counts; without one, built here. */
+  question?: { question: string; answer: string | null };
 }) {
   const inversion = summarizeInversionMonths(yieldCurveSeries);
   const monthlyPoints = inversion.months;
@@ -89,12 +92,15 @@ export function SignalInversionPreview({
       /* The answer from the counts the caption under the chart prints. */
       summary={
         <InstrumentQuestion
-          question="Has the yield curve inverted in the last year?"
-          answer={describeInversionSummary({
-            months: monthlyPoints.length,
-            inverted10Y2Y: monthsInverted10Y2Y,
-            inverted2Y3M: monthsInverted2Y3M,
-          })}
+          question={question?.question ?? INVERSION_QUESTION}
+          answer={
+            question?.answer ??
+            describeInversionSummary({
+              months: monthlyPoints.length,
+              inverted10Y2Y: monthsInverted10Y2Y,
+              inverted2Y3M: monthsInverted2Y3M,
+            })
+          }
           preview={<InversionCells summary={inversion} />}
         />
       }

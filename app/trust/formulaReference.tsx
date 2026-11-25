@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
+import { SCORES_QUESTION } from "./trustQuestions";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/signalTranslations";
 import {
@@ -222,7 +223,10 @@ export function FormulaReference({
   rateDial = null,
   plainLanguageFolded = false,
   plainLanguageOpen = false,
+  question = SCORES_QUESTION,
 }: {
+  /** The heading's question and the sentence that answers it, the words the page's markup carries. */
+  question?: { question: string; answer: string };
   /** This reading's basis: what the inputs left out would make each score (`ReportData.scoringBasis`). */
   scoringBasis?: Pick<ScoringBasis, "notCounted">;
   /** This week's two scores, input by input (`buildScoreComposition`); null when the engine cannot rebuild them. */
@@ -302,9 +306,10 @@ export function FormulaReference({
   );
 
   return (
-    /* No description (2026-11-11): "The full derivation, from public data series to the
-       weekly guidance" restated the heading. */
-    <ReportSection id="formula-reference" title="How the scores are built">
+    /* The question, and its answer first (2026-11-25): it was "How the scores are built" with
+       no description, since "The full derivation, from public data series to the weekly
+       guidance" restated the heading (2026-11-11). The answer is the plain steps' gist. */
+    <ReportSection id="formula-reference" title={question.question} description={question.answer}>
       {/* Where this week's scores sit is the brief's section, linked; this page drew the
           same two ladders, pause, change and restart lines and all, until 2026-10-27. What
           follows is how the scores are made. */}

@@ -5,15 +5,15 @@ import {
   buildPlanningPageModel,
   type PlanningSearchParams,
 } from "./planningPageModel";
+import { operatePageDescription, operatePageName } from "./planQuestions";
 
 export { buildActionsExpansionHref } from "./planningPageModel";
 
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "This week's plan: hiring, spending and runway rules",
-  description:
-    "Set the rules in advance: this week's guidance, your runway, and your own pause and restart lines, so changing course is a line being crossed.",
+  title: operatePageName,
+  description: operatePageDescription,
   path: "/operate",
   imageAlt: "Whether planning view",
   imageParams: {
