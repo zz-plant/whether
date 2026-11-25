@@ -175,7 +175,7 @@ export async function buildPlanningPageModel(
     "conjunction",
   )}, adjust your lines, and get emailed the day one crosses.`;
   const formatPlanCondition = (condition: { metric: "tightness" | "riskAppetite"; operator: ">" | "<"; value: number }) =>
-    `${condition.metric === "tightness" ? "pressure" : "risk"} ${condition.operator} ${condition.value}`;
+    `${condition.metric === "tightness" ? "funding pressure" : "risk appetite"} ${condition.operator} ${condition.value}`;
   const planLinesPreview = planLineDefaults.length > 0
     ? h(
         "ul",

@@ -135,7 +135,7 @@ const buildTrail = ({
   const domain: readonly [number, number] = domainLow === domainHigh ? [domainLow - 0.05, domainHigh + 0.05] : [domainLow, domainHigh];
   const words = LINE_WORDS[key];
   const offScale = onScale ? null : line < low ? "below" : "above";
-  const lineCaption = `${words.label} ${format(line)}${offScale ? `, ${offScale === "below" ? "under" : "over"} this range` : ""}`;
+  const lineCaption = `${words.label} ${format(line)}${offScale ? `, ${offScale === "below" ? "below" : "above"} the range shown` : ""}`;
   const first = points[0];
   const final = points.at(-1);
   const comparisonPoint = comparisonMark ? points[comparisonMark.index] : undefined;

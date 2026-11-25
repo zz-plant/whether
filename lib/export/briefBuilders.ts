@@ -331,7 +331,7 @@ export const buildSlackBrief = (document: BriefDocument) => {
     `Whether Weekly Brief — ${document.provenance.recordDate}`,
     `Conditions: ${document.conditions.line}`,
     "",
-    `This week's decision (${callSlots.map(({ label }) => label).join(" / ")}):`,
+    "This week:",
     ...callSlots.map(({ label, value }) => `• ${label}: ${value}`),
     "",
     `${EXPORT_SECTION_HEADINGS.changed}:`,

@@ -497,7 +497,7 @@ export function DecisionHero({
                 {reading ? (
                   <nav aria-label="Why this reading" className="weather-hero-rail-links flex flex-col gap-1 border-t border-[color:var(--border-faint)] pt-3 text-sm">
                     <Link href={reading.whyHref} className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
-                      Why this call
+                      Why this guidance
                     </Link>
                     <Link href="/history" className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
                       History

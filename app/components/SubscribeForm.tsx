@@ -291,7 +291,7 @@ export function SubscribeForm({
       <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[color:var(--border-subtle)] text-fluid-nano text-slate-400">
         <span>
           {alertsOnly
-            ? "No weekly newsletter. Unsubscribe in one click."
+            ? "Alerts only, no Monday email. Unsubscribe in one click."
             : compact
               ? channel === "slack"
                 ? "Monday mornings, and an alert the day conditions change. To stop, delete the webhook in Slack."

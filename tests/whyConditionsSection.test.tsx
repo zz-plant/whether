@@ -54,7 +54,7 @@ describe("why conditions", () => {
     assert.match(html, /Why it feels like Freezing/);
     assert.match(html, /would put risk appetite at 44/);
     // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
-    assert.match(html, /the scores would land in Freezing/);
+    assert.match(html, /Counting those inputs would put the scores in Freezing/);
     assert.match(html, /doesn(?:&#x27;|')t go back far enough to check against past months/);
   });
 

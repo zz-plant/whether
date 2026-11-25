@@ -43,7 +43,7 @@ export const siteAlternateNames: readonly string[] = ["Whether Weekly Brief", ne
  * (2026-11-10): the restart line's verb, as every row and email says it since 2026-10-30.
  */
 export const canonicalPositioningLine =
-  "We read interest rates and credit markets and tell you when to pause or restart hiring, spending and fundraising. Updated every Monday, with an email the day that changes.";
+  "We read interest rates and credit markets and tell you when to pause or restart hiring, spending and fundraising. Updated every Monday, with an email the day the guidance changes.";
 /*
  * The category line as the homepage's first-visit orientation: whom it is for,
  * then the line itself. The page opens on the week's guidance, which says what

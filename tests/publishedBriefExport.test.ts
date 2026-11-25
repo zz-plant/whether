@@ -46,7 +46,7 @@ describe("published brief readings block", () => {
       "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · was 40 on Jun 30 · pauses above 76 (44 pts away)",
       "Risk appetite 52 of 100 (investors are selective about risk) · was 59 on Jun 30 · pauses below 44 (8 pts away)",
     ]);
-    assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
+    assert.match(buildPublishedBriefSlackUpdate(brief), /Scores:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
 
     /* A move with no named reading and no frozen week before it prints no earlier reading at all. */
@@ -207,7 +207,7 @@ describe("published brief date-pinned exports", () => {
     assert.match(slack, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
     assert.doesNotMatch(slack, /^• Do now:|^Summary:/m);
     assert.doesNotMatch(slack, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
-    assert.match(slack, /This week's decision \(Guidance \/ Conditions change if\):/);
+    assert.match(slack, /^This week:$/m);
     assert.doesNotMatch(slack, /Over-engineering/);
     assert.match(slack, /• Conditions change if: Funding pressure rises from 52 to clear 70, or risk appetite falls from 58 to 50 or below\./);
     assert.doesNotMatch(slack, /flip|Cash availability|cash availability|Market risk appetite|market risk appetite|\d\.0\b(?!%)/);
@@ -235,7 +235,7 @@ describe("published brief date-pinned exports", () => {
     assert.ok(july30Brief);
     const email = buildPublishedBriefEmailUpdate(july30Brief);
 
-    assert.match(email, /Whether Leadership Update — Week of Jul 27, 2026/, "the week by its Monday");
+    assert.match(email, /Whether Weekly Brief — week of Jul 27, 2026/, "the week by its Monday");
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
     assert.match(email, /^Room before a change: some$/m);
     assert.match(email, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
@@ -247,7 +247,7 @@ describe("published brief date-pinned exports", () => {
       email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: Funding pressure rises from 52 to clear 70, or risk appetite falls from 58 to 50 or below.`),
     );
 
-    // Area decisions
+    // Guidance by area
     assert.match(email, /• Roadmap: Speed up product work tied to activation and retention goals\./);
     assert.match(email, /- Action: Speed up on product bets/);
     assert.match(email, /- Pause if: Risk appetite falls below 44/);
@@ -255,7 +255,7 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, /- Restart when: Risk appetite is above 54/);
     assert.doesNotMatch(email, /Restart when: Resume/);
 
-    // Provenance & citations
+    // Sources
     assert.match(email, /• Data as of: Jul 30, 2026/);
     assert.match(email, /• Source: Saved copy of the published reading \(https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO\)/);
     assert.match(email, /• Freshness: Aug 1, 2026 at 1:51 PM UTC/);
@@ -269,13 +269,13 @@ describe("published brief date-pinned exports", () => {
     assert.ok(july30Brief);
     const board = buildPublishedBriefBoardUpdate(july30Brief);
 
-    assert.match(board, /^Whether Board Memo — Week of/m);
-    assert.match(board, /^Macro Posture: (Sunny|Cloudy|Stormy|Freezing) \(Room before a change: .+\)$/m);
-    assert.match(board, /^Executive Guidance: .+/m);
-    assert.match(board, /^Posture Flips If: .+/m);
-    assert.match(board, /Operating Limits by Area:/);
+    assert.match(board, /^Whether Weekly Brief, board memo — week of/m);
+    assert.match(board, /^Conditions: (Sunny|Cloudy|Stormy|Freezing) \(room before a change: .+\)$/m);
+    assert.match(board, /^Guidance: .+/m);
+    assert.match(board, /^Conditions change if: .+/m);
+    assert.match(board, /Guidance by area:/);
     assert.match(board, /• Hiring: .+ \(Action: .+\)/);
-    assert.match(board, new RegExp(`Permanent Record: ${buildCanonicalUrl("/brief/2026-w31")}`));
+    assert.match(board, new RegExp(`Permanent link: ${buildCanonicalUrl("/brief/2026-w31")}`));
   });
 
   it("proves July 30 brief exports never read or change with live report data", async () => {

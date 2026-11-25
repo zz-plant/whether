@@ -953,12 +953,12 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
     `Conditions: ${display.conditions} (${MARGIN_LABEL.toLowerCase()}: ${display.confidence.toLowerCase()})`,
     "",
-    `This week's decision (${slots.map((slot) => slot.label).join(" / ")}):`,
+    "This week:",
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),
-    ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
+    ...(readingLines.length > 0 ? ["", "Scores:", ...readingLines] : []),
     "",
     `What changed: ${display.whatChanged}`,
-    ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
+    ...(decisions.length > 0 ? ["", "Guidance by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction: ${correctionBody(brief.correction)}`] : []),
     "",
@@ -992,7 +992,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
 
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
-    `Whether Leadership Update — Week of ${publishedBriefWeekLabel(brief)}`,
+    `Whether Weekly Brief — week of ${publishedBriefWeekLabel(brief)}`,
     "",
     `Conditions: ${display.conditions}`,
     `${MARGIN_LABEL}: ${display.confidence.toLowerCase()}`,
@@ -1005,11 +1005,11 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     "What changed this week:",
     display.whatChanged,
     ...readingLines,
-    ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
+    ...(decisions.length > 0 ? ["", "Guidance by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction note: ${correctionBody(brief.correction)}`] : []),
     "",
-    "Provenance & citations:",
+    "Sources:",
     `• Data as of: ${brief.recordDateLabel}`,
     `• Source: ${display.source}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
     `• Freshness: ${brief.freshnessLabel}`,
@@ -1032,16 +1032,16 @@ export const buildPublishedBriefBoardUpdate = (brief: PublishedBrief): string =>
   );
 
   return [
-    `Whether Board Memo — Week of ${publishedBriefWeekLabel(brief)}`,
-    `Macro Posture: ${display.conditions} (${MARGIN_LABEL}: ${display.confidence.toLowerCase()})`,
+    `Whether Weekly Brief, board memo — week of ${publishedBriefWeekLabel(brief)}`,
+    `Conditions: ${display.conditions} (${MARGIN_LABEL.toLowerCase()}: ${display.confidence.toLowerCase()})`,
     "",
-    `Executive Guidance: ${publishedBriefHeadline(brief).composed}`,
-    ...(display.pauseIf ? [`Operating Threshold: ${display.pauseIf}`] : []),
-    `Posture Flips If: ${display.conditionsChangeIf}`,
-    ...(readingLines.length > 0 ? ["", "Macro Readings:", ...readingLines] : []),
-    ...(decisions.length > 0 ? ["", "Operating Limits by Area:", ...decisions] : []),
+    `${publicDecisionLabels.call}: ${publishedBriefHeadline(brief).composed}`,
+    ...(display.pauseIf ? [`${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.pauseIf}`] : []),
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${display.conditionsChangeIf}`,
+    ...(readingLines.length > 0 ? ["", "Scores:", ...readingLines] : []),
+    ...(decisions.length > 0 ? ["", "Guidance by area:", ...decisions] : []),
     "",
-    `Permanent Record: ${permalinkUrl} · Captured ${brief.freshnessLabel}`,
+    `Permanent link: ${permalinkUrl} · captured ${brief.freshnessLabel}`,
   ].join("\n");
 };
 

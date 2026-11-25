@@ -270,7 +270,7 @@ describe("the figures say whose lines they draw, and that a restart needs both",
     assert.deepEqual(standing("tightness"), {
       crossed: true,
       lead: "Hiring paused above 76",
-      rest: "Restarts only when below 66 and risk appetite is above 54.",
+      rest: "Restarts once funding pressure is below 66 and risk appetite is above 54.",
     });
     assert.deepEqual(standing("riskAppetite"), {
       crossed: false,

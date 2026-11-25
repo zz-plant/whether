@@ -92,7 +92,7 @@ describe("the trailing readings of the two market inputs", () => {
     assert.equal(trails.curveSlope?.line.crossed, false);
     assert.equal(trails.baseRate?.line.offScale, "below");
     assert.equal(trails.baseRate?.line.crossed, true, "4.10 counts against you above 3.50");
-    assert.equal(trails.baseRate?.lineCaption, "Counts against you above 3.50, under this range");
+    assert.equal(trails.baseRate?.lineCaption, "Counts against you above 3.50, below the range shown");
   });
 
   it("states the drawn range and its days", () => {
@@ -140,7 +140,7 @@ describe("the trailing readings of the two market inputs", () => {
     assert.match(rate, /<input type="range"[^>]*aria-label="Short-term borrowing rate, daily readings"/);
     assert.match(rate, /aria-valuetext="Oct 13: 4\.10"/);
     assert.match(text, /Daily, Oct 8 to Oct 13 · 4\.04–4\.14/);
-    assert.match(text, /↓ Counts against you above 3\.50, under this range/);
+    assert.match(text, /↓ Counts against you above 3\.50, below the range shown/);
     assert.match(rate, /data-sparkline-mark/);
     assert.doesNotMatch(rate, /data-sparkline-reference=/, "a line off the range is named, not drawn");
     const curve = html.slice(html.indexOf('data-signal="curveSlope"'));

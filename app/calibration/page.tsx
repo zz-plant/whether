@@ -99,7 +99,7 @@ export default function CalibrationPage() {
             ) : null}
           </li>
           <li>
-            <span className="text-slate-100">Outcome.</span> Whether conditions stayed the same one month later—unweighted, nothing else scored.
+            <span className="text-slate-100">Outcome.</span> Whether conditions stayed the same one month later. Every month counts the same, and nothing else is scored.
           </li>
           <li>
             <span className="text-slate-100">Bands.</span> Pre-set distance bands from the nearest change line (in funding-pressure points, converting risk-appetite points the same way).
@@ -126,7 +126,7 @@ export default function CalibrationPage() {
       <SecondaryPageSection title="What it does not show">
         <ul className="space-y-2 text-base text-slate-300">
           <li>
-            {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is too few to fit per-band probabilities—a fitted curve would read ~97% every week and separate nothing.
+            {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is too few to fit a probability to each band. A fitted curve would read about 97% every week and tell the bands apart not at all.
           </li>
           <li>
             Only the one-month horizon is tested; nothing here measures a quarter.

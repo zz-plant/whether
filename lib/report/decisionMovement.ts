@@ -170,7 +170,7 @@ const describeCrossing = (line: CrossedLine) =>
  * area that was running.
  */
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
-  paused: "Pause now applies",
+  paused: "Paused",
   lifted: "Pause lifted",
   resumable: "Restart condition now holds",
   resumeLost: "Restart condition no longer holds",

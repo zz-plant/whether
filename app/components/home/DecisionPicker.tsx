@@ -245,7 +245,7 @@ export function DecisionPicker({
           open={initialSelected || !rulesAbove ? true : undefined}
         >
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-            {rulesAbove ? "Open each area’s rule, test and links" : "Every area’s rule, test and links"}
+            {rulesAbove ? "Each area’s rule, decision test and links" : "Every area’s rule, decision test and links"}
           </summary>
           <div className="pt-3">
             <AreaGroups
