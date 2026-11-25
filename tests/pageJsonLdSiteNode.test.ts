@@ -95,7 +95,7 @@ describe("every hand-built page graph carries the site node", () => {
 
   it("but the homepage declares the full site node itself, once", async () => {
     const { buildHomeStructuredData } = await import("../lib/report/home/structuredData");
-    const home = buildHomeStructuredData({ headline: "h", description: "d", datePublishedIso: "2026-09-10", dateModifiedIso: "2026-09-15", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c" });
+    const home = buildHomeStructuredData({ headline: "h", description: "d", datePublishedIso: "2026-09-10", dateModifiedIso: "2026-09-15", regimeLabel: "r", confidenceLabel: "c" });
     const websites = home["@graph"].filter((node) => node["@type"] === "WebSite");
 
     assert.equal(websites.length, 1);

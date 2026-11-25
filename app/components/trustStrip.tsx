@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
 import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
 import { MarkReadout } from "./ui/markReadout";
+import { DatedText } from "./ui/datedText";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -252,7 +253,7 @@ export function TrustStrip({
                     : "font-medium text-slate-200"
               }`}
             >
-              {cell.value}
+              {cell.label === "Data as of" ? <DatedText text={cell.value} /> : cell.value}
               {cell.detail ? (
                 <span
                   className="font-normal text-slate-400"

@@ -9,13 +9,14 @@ import { SignalContextDetails } from "../ui/plainLanguage";
 import type { ScoreMoveRanges } from "../../../lib/report/marketMoveScale";
 import type { RegimeKey } from "../../../lib/types";
 import { TrendGlyph, trendToneClass } from "../illustrations/TrendGlyph";
-import { HOME_DECISION_PARAM, HOME_SECTIONS, buildHomeViewHref, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
+import { HOME_DECISION_PARAM, HOME_SECTIONS, buildHomeViewHref, changedHeading, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { describeSignalMoveMeaning, type SignalMoveMeaning } from "../../../lib/report/signalMoveMeaning";
 import { INPUT_TRAIL_PARAM, type InputTrail, type InputTrailKey, type InputTrailSpan } from "../../../lib/report/home/inputTrail";
 import { areasMovedBy } from "../../../lib/report/signalFlow";
 import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { InputTrailChart } from "../ui/inputTrail";
+import { DatedText, type KnownDate } from "../ui/datedText";
 import { ChosenAreaScope, MovesChosenArea } from "./homeView";
 import { quietUnlessMoves } from "./chosenAreaInk";
 
@@ -141,7 +142,7 @@ export function WhatChangedSection({
   lead,
   comparisonUnavailable,
   basis = comparisonBasis(),
-  heading = HOME_SECTIONS.changed.heading,
+  heading,
   history,
   historyCaveat,
   inputHistory,
@@ -152,6 +153,7 @@ export function WhatChangedSection({
   followsArea = false,
   chosenArea,
   query,
+  dates,
 }: {
   /** The guidance block above draws both scores on their ladders from `md` up; this table keeps its ladders for a phone, where the block draws one. */
   drawnAbove?: boolean;
@@ -181,13 +183,18 @@ export function WhatChangedSection({
   inputHistory?: readonly { key: string; label: string; points: readonly SparklinePoint[] }[];
   /** The two market inputs' daily readings, each ending at the value its row prints (`buildInputTrails`). */
   inputTrails?: Partial<Record<InputTrailKey, InputTrail>>;
-  /** Said over the table only when there is no earlier reading to compare with. */
+  /**
+   * The answer to the heading's question, over the table (2026-11-18): how the two scores
+   * moved (`describeScoreChanges`), or that there was nothing to compare with.
+   */
   lead?: string;
   comparisonUnavailable: boolean;
   /** The earlier reading the rows are compared with; "last week" when the week does not date it. */
   basis?: ComparisonBasis;
-  /** "What changed since Aug 31": the heading names the reading the move is measured from. */
+  /** "What’s changed since Aug 31?": the heading names the reading the move is measured from. */
   heading?: string;
+  /** The earlier reading's date as the page prints it ("Aug 31"), with its ISO date, for `<time>`. */
+  dates?: readonly KnownDate[];
 }) {
   const meanings = new Map(rows.map((row) => [row.key, meaningOf(row, basis)] as const));
   /* A score that moved enough to say so goes first; one whose row says "No real
@@ -216,8 +223,9 @@ export function WhatChangedSection({
   return (
     <HomeSection
       id={HOME_SECTIONS.changed.id}
-      heading={heading}
+      heading={heading ?? changedHeading(basis)}
       lead={lead}
+      dates={dates}
       /* In the reader's order: first what moved (the evidence), then what
          that changes (the consequences by area). Keeps DOM and visual order aligned. */
     >
@@ -370,7 +378,7 @@ export function WhatChangedSection({
                                   {trail?.comparison ? (
                                     <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full border-[1.5px] border-slate-400" />
                                   ) : null}
-                                  {`${basis.label}: ${row.previousLabel}`}
+                                  <span><DatedText text={`${basis.label}: ${row.previousLabel}`} dates={dates} /></span>
                                 </span>
                               ) : null}
                             </span>
