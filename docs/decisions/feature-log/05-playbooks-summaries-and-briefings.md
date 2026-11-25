@@ -276,3 +276,15 @@ $$
   outside capital (capital and refinancing staying cheap under elevated funding pressure, investors
   funding fast burn under low risk appetite) (`stressTestDecisionPlan`, `lib/decisionShield.ts`;
   `tests/decisionShield.test.ts`).
+- The plan stress test reads a plan of several commitments clause by clause (2026-11-25, #1778).
+  "Hire 2 engineers at $15k a month each and sign a $120k annual AWS commit" was one sentence
+  sized on its largest figure under the first cadence it found: $120k a month for each engineer,
+  $2.88M, graded dangerous on size. Each clause now keeps its own category, amount, cadence,
+  headcount and department ($360k and $120k, $480k together); a pause, deferral or cut is listed
+  but not graded or counted; the verdict is the harshest graded clause's on conditions, sized on
+  the clauses' combined first-year cost. The screen and the share text list each commitment with
+  its call and figure when there are two or more. A plan that does not split grades exactly as
+  before. No model and no network: the split is a conservative rule set that keeps "sales and
+  marketing", "$80k and 2 people for the same project" and "while maintaining a 9-month runway"
+  whole (`segmentPlanClauses`, `lib/planCommitment.ts`; `extractPlanCommitments`,
+  `lib/decisionShield.ts`; `tests/multiClausePlans.test.ts`).
