@@ -2,10 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { buildBreadcrumbList, buildCanonicalUrl, organizationName, websiteId } from "../../lib/seo";
-import { buildPublisherSchema } from "../../lib/publisher";
-import { graph } from "../../lib/seo/pageStructuredData";
-import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
+import { buildOperateStructuredData } from "../../lib/seo/reportPageStructuredData";
+import { answeredPlanQuestions, buildPlanQuestions, operatePageDescription, operatePageName } from "./planQuestions";
 import { operationsSectionLinks, parsePlanLinesWatch } from "../../lib/navigation/planningNavigation";
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -68,50 +66,6 @@ export async function buildPlanningPageModel(
   searchParams?: Promise<PlanningSearchParams>,
 ): Promise<PlanningPageModel> {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  // `isPartOf` names the site node `graph` adds, where it was an inline WebSite with no id.
-  const structuredData = graph([
-    {
-      "@type": "WebPage",
-      name: "This week's plan: hiring, spending and runway rules",
-      url: buildCanonicalUrl("/operate"),
-      description:
-        "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
-      inLanguage: "en",
-      isPartOf: { "@id": websiteId },
-      publisher: buildPublisherSchema(organizationName),
-    },
-    buildBreadcrumbList(buildGroupBreadcrumbs("/operate")),
-    {
-      "@type": "FAQPage",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: "How do I turn this week's guidance into a plan?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Start from the action for each area, then set the pause line and restart line that fit your cash and runway.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "What changes when I set my stage and runway?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "The thresholds scale to your cash, turning shared market guidance into concrete limits for your company.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "How often does the plan change?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "The guidance refreshes each week, and the plan follows it. Set rules once to trigger an alert the day an area pauses or restarts.",
-          },
-        },
-      ],
-    },
-  ]);
-
   const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
   const reportResult = weeklySnapshotResult.reportResult;
   const reportData = weeklySnapshotResult.reportData;
@@ -171,10 +125,20 @@ export async function buildPlanningPageModel(
   }));
   const listOf = (items: readonly string[], type: "conjunction" | "disjunction") =>
     new Intl.ListFormat("en-GB", { style: "long", type }).format(items);
-  const planLinesSummary = `Start from the published rules for ${listOf(
-    planLineDefaults.map((line) => decisionAreaLabel(line.area)),
-    "conjunction",
-  )}, adjust your lines, and get emailed the day one crosses.`;
+  /* Each step's heading is the question it answers, and the line under it the answer
+     (`buildPlanQuestions`); the FAQ markup reads the same object. */
+  const planQuestions = buildPlanQuestions({
+    stopItems,
+    startItems,
+    areaNames: listOf(planLineDefaults.map((line) => decisionAreaLabel(line.area)), "conjunction"),
+    runwayAnswer: financeStrategyFor(assessment.regime)?.runwayPosture ?? null,
+  });
+  const structuredData = buildOperateStructuredData({
+    name: operatePageName,
+    description: operatePageDescription,
+    questions: answeredPlanQuestions(planQuestions),
+    dateModifiedIso: treasury.record_date,
+  });
   const formatPlanCondition = (condition: { metric: "tightness" | "riskAppetite"; operator: ">" | "<"; value: number }) =>
     `${condition.metric === "tightness" ? "funding pressure" : "risk appetite"} ${condition.operator} ${condition.value}`;
   const planLinesPreview = planLineDefaults.length > 0
@@ -204,8 +168,7 @@ export async function buildPlanningPageModel(
         }),
       )
     : undefined;
-  const financeSummary =
-    financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
+
   /* Freshness and confidence, once, under the h1 before anything asks the
      reader to act. The shell draws it in the intro (DD-040). */
   const trustStrip = {
@@ -293,15 +256,15 @@ export async function buildPlanningPageModel(
                second build of it. */
             defaultOpen: true,
             label: "Areas",
-            title: "This week's rule for each area",
-            description: "Separate pause and restart lines keep one noisy week from reversing a decision.",
+            title: planQuestions.areas.question,
+            description: planQuestions.areas.answer,
             hashAliases: ["ops-monthly-action-summary-panel"],
             // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {
               variant: "split",
               hideHeader: true,
               id: "ops-monthly-action-summary-panel",
-              title: "This week's rule for each area",
+              title: planQuestions.areas.question,
               children: h(Fragment, null,
               /* The table only. This step drew the score rails and an Action now /
                  Pause if / Conditions change if list above it, both already on the
@@ -343,14 +306,14 @@ export async function buildPlanningPageModel(
             // still carries its own copy.
             defaultOpen: true,
             label: "Rules",
-            title: "Rules before you commit",
-            description: "The work to stop, start and keep limited this week.",
+            title: planQuestions.playbook.question,
+            description: planQuestions.playbook.answer,
             hashAliases: ["ops-playbook-panel"],
             // The step header above states this, and PlaybookPanel carries its own header below.
             children: h(ReportSection, { variant: "split",
               hideHeader: true,
               id: "ops-playbook-panel",
-              title: "Rules before you commit",
+              title: planQuestions.playbook.question,
               children: h(Fragment, null,
               /* The per-area rows are the weekly plan step's AreaTable now — the
                  consequence tier, in the one order every surface uses. What is
@@ -372,15 +335,15 @@ export async function buildPlanningPageModel(
             // so the step no longer greets a reader with an empty form.
             defaultOpen: true,
             label: "Test",
-            title: "Test a decision",
-            description: "Score a hire, price change, roadmap bet, or acquisition against this week's guidance.",
+            title: planQuestions.test.question,
+            description: planQuestions.test.answer,
             hashAliases: ["ops-decision-shield-panel"],
-            // The question this header used to ask now heads DecisionShieldPanel itself, so the
-            // step reads "Test a decision" → "Is this move safe right now?" with nothing between.
+            // The step asks the question and the panel answers it once a plan is typed; the
+            // panel has no heading of its own.
             children: h(ReportSection, { variant: "split",
               hideHeader: true,
               id: "ops-decision-shield-panel",
-              title: "Test a decision",
+              title: planQuestions.test.question,
               // The panel alone (2026-11-11): a line under it sent the reader to
               // "Answers by decision area", which the footer names on every page.
               children: h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
@@ -394,8 +357,8 @@ export async function buildPlanningPageModel(
             : [{
               id: "ops-plan-lines",
               label: "Your rules",
-              title: "Set your own rules",
-              description: planLinesSummary,
+              title: planQuestions.ownRules.question,
+              description: planQuestions.ownRules.answer,
               preview: planLinesPreview,
               children: h(PlanLinesForm, {
                 defaults: planLineDefaults,
@@ -407,15 +370,15 @@ export async function buildPlanningPageModel(
           {
             id: "ops-finance-strategy",
             label: "Finance",
-            title: "Finance strategy",
+            title: planQuestions.finance.question,
             // The runway target, the stance's headline; the panel draws the rest.
-            description: financeSummary,
+            description: planQuestions.finance.answer,
             hashAliases: ["ops-finance-strategy-panel"],
             // The step header above states this; FinanceStrategyPanel has no header of its own.
             children: h(ReportSection, { variant: "split",
               hideHeader: true,
               id: "ops-finance-strategy-panel",
-              title: "Finance strategy",
+              title: planQuestions.finance.question,
               children: h(Fragment, null,
               h(FinanceStrategyPanel, { regime: assessment.regime }),
               // The planner has one owner, /operate/financial. The same 520-line
@@ -441,7 +404,7 @@ export async function buildPlanningPageModel(
       failureModes.length > 0
         ? h("section", { id: "ops-failure-patterns", className: "space-y-3 border-t border-[color:var(--border-default)] pt-8", "aria-labelledby": "ops-failure-patterns-title" },
           h("div", { className: "space-y-1" },
-            h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
+            h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings before you approve"),
             h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and the check for it."),
           ),
           h("ul", { className: "weather-grid gap-x-8 gap-y-4 [--col-min:20rem] [--grid-max:2]" },
@@ -451,7 +414,7 @@ export async function buildPlanningPageModel(
             )),
           ),
           h("div", { className: "flex flex-wrap gap-2" },
-            h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck the rules"),
+            h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck what to stop and start"),
             h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
           ),
         )

@@ -71,7 +71,8 @@ export function RulesBeforeCommit({
        else's (DESIGN.md, "The Two Meanings Rule"), and the list's name says "stop". */
     { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), labelClassName: "text-slate-200" },
     { key: "start", label: "Start", items: visible(startItems, isExpanded), labelClassName: "text-semantic-easing-fg" },
-    { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), labelClassName: "text-slate-200" },
+    /* "Keep small", the word the step's question asks with (2026-11-25; "Keep limited" until then). */
+    { key: "limit", label: "Keep small", items: visible(fenceItems, isExpanded), labelClassName: "text-slate-200" },
   ];
 
   return (

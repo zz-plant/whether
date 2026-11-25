@@ -2,27 +2,30 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner } from "../components/historicalBanner";
-import { formatDateUTC, formatMonthYearShortFromValue } from "../../lib/formatters";
+import { formatDateUTC } from "../../lib/formatters";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastRead/visitorStrip";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import { buildSignalsPageModel, focusLabelByTab, type SignalsPageSearchParams } from "./evidencePageModel";
-import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { signalsEvidenceSections } from "./components/evidencePageBody";
+import { SIGNALS_PAGE_QUESTION } from "./signalsQuestions";
 
 export const runtime = "edge";
 export const revalidate = 900;
 
+/* The description answers the page's question in two spoken sentences (2026-11-25). It listed
+   what the page holds: "The interest rates, yield curve and funding-market numbers behind this
+   week's startup guidance, and each one's move since last time." */
 export const metadata: Metadata = buildPageMetadata({
   title: "Interest rates and funding data behind this week's guidance",
   description:
-    "The interest rates, yield curve and funding-market numbers behind this week's startup guidance, and each one's move since last time.",
+    "It follows two scores, funding pressure and risk appetite, built from public interest rates and market data. See each input, how it moved since last week and how close it is to changing the guidance.",
   path: "/signals",
-  imageAlt: "Why the weekly brief changed — evidence overview",
+  imageAlt: "Why did the guidance change? The evidence behind this week's guidance",
   imageParams: {
     template: "signals",
-    title: "Why the weekly brief changed",
+    title: SIGNALS_PAGE_QUESTION,
     subtitle: "The evidence behind this week's guidance.",
   },
 });
@@ -36,20 +39,6 @@ export default async function SignalsPage({
   const model = await buildSignalsPageModel(resolvedSearchParams);
   const visibleRowKeys = new Set(model.changedSignalRows.map((row) => row.key));
   const rowHref = (key: RegimeSignalKey) => (visibleRowKeys.has(key) ? `#${key}` : `/signals#${key}`);
-  /* Thirteen month-ends, so the move the strip prints spans twelve months. It
-     took twelve and printed "-6 over 12 mo" for risk appetite, Sep 2025 to
-     Aug 2026 — eleven months; over twelve (from 66 in Aug 2025) it is -10. */
-  const monthlyRegimeHistory = getMonthlyRegimeHistory().slice(-13);
-  const tightnessTrend = monthlyRegimeHistory.flatMap((entry) =>
-    typeof entry.tightness === "number"
-      ? [{ label: formatMonthYearShortFromValue(entry.record_date), value: entry.tightness }]
-      : [],
-  );
-  const riskAppetiteTrend = monthlyRegimeHistory.flatMap((entry) =>
-    typeof entry.riskAppetite === "number"
-      ? [{ label: formatMonthYearShortFromValue(entry.record_date), value: entry.riskAppetite }]
-      : [],
-  );
 
   return (
     <ReportShell
@@ -61,10 +50,11 @@ export default async function SignalsPage({
           fetchedAtLabel: model.fetchedAtLabel,
         },
         page: {
-          pageTitle: "Why the weekly brief changed",
-          // States the page's job; the index below already names the sections
-          // (editorial-guardrails.md -> Headings).
-          pageSummary: "The evidence behind this week's guidance.",
+          /* The question the header tab ("Why it changed") asks, and its answer first: the
+             guidance follows two scores, and how they moved (2026-11-25). The title was "Why
+             the weekly brief changed" over "The evidence behind this week's guidance." */
+          pageTitle: model.pageQuestion,
+          pageSummary: model.pageAnswer,
           sectionLinks: model.sectionLinks,
           currentPath: "/signals",
         },
@@ -107,8 +97,6 @@ export default async function SignalsPage({
       {signalsEvidenceSections({
         model,
         focusLabelByTab,
-        tightnessTrend,
-        riskAppetiteTrend,
         searchParams: resolvedSearchParams,
       })}
     </ReportShell>

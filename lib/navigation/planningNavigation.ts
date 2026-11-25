@@ -32,11 +32,13 @@ export const operationsSectionLinks: {
   // Rules first since 2026-10-07: the area table, the do/don't lists, then the
   // test that checks a move against them.
   plan: [
-    { href: "#ops-monthly-action-summary", label: "Rule for each area" },
-    { href: "#ops-playbook", label: "Rules before you commit" },
-    { href: "#ops-decision-shield", label: "Test a decision" },
-    { href: "#ops-plan-lines", label: "Set your own rules" },
-    { href: "#ops-finance-strategy", label: "Finance strategy" },
+    /* Short forms of the steps' questions (2026-11-25), so the index and the headings name
+       each section one way: app/operate/planQuestions.ts holds the headings. */
+    { href: "#ops-monthly-action-summary", label: "When does each area pause?" },
+    { href: "#ops-playbook", label: "What do we stop and start?" },
+    { href: "#ops-decision-shield", label: "Does this plan fit?" },
+    { href: "#ops-plan-lines", label: "Want your own numbers?" },
+    { href: "#ops-finance-strategy", label: "How much runway?" },
     { href: "#ops-failure-patterns", label: "Warnings before you approve" },
   ],
   financial: [

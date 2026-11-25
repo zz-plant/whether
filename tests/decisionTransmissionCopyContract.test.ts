@@ -40,7 +40,8 @@ describe("decision transmission copy contract", () => {
   it("keeps export briefs explicit about action now, the margin, and change-course conditions", () => {
     const brief = buildSlackBrief(fixtureBriefDocument({ reading: assessment }));
 
-    assert.match(brief, /• Guidance:/);
+    /* The guidance is the post's first line, answer first (2026-11-25). */
+    assert.match(brief, /^\*This week \([^)]+\): .+\*$/m);
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Room before a change: (plenty|some|little)\b/);
     assert.match(brief, /• How you'd know: watch "Conditions change if" above/);

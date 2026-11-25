@@ -227,18 +227,20 @@ describe("ReportShell extracted sections", () => {
 describe("report route page summaries", () => {
   it("state the page's job, not the outline beneath them", async () => {
     const signals = await readFile("app/signals/page.tsx", "utf8");
-    assert.match(signals, /pageSummary: "The evidence behind this week's guidance."/);
-    // The meta description and OG subtitle keep the enumeration: in a search
-    // result or social card there is no outline beneath the sentence.
+    /* The title asks the page's question and the summary answers it (2026-11-25):
+       "It follows two scores…", from the model, not a list of the sections. */
+    assert.match(signals, /pageTitle: model\.pageQuestion,\s*pageSummary: model\.pageAnswer,/);
     assert.doesNotMatch(signals, /pageSummary: "What moved/);
 
     const history = await readFile("app/history/page.tsx", "utf8");
     // The summary states the record's claim (what would have changed each call,
-    // and that none was edited), not the outline of sections beneath it.
+    // and that none was edited), not the outline of sections beneath it. The question
+    // it opened on is the Track record section's heading now, asked once (2026-11-25).
     assert.match(
       history,
-      /"Has it been right\? Every brief records what would have changed the guidance, and none has been edited since\./,
+      /pageSummary:\s*"Every brief records what would have changed the guidance, and none has been edited since\."/,
     );
+    assert.doesNotMatch(history, /pageSummary:\s*"Has it been right\?/);
     assert.doesNotMatch(history, /Look up the guidance for any past month/);
     assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);
 

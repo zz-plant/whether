@@ -28,47 +28,54 @@ const SERIES = [
 ];
 
 describe("rates summary", () => {
-  it("compares this week's reading with the last month-end the charts draw", () => {
+  /* "What are interest rates doing?" answered as a person would: the direction first (2026-11-25). */
+  it("compares this week's reading with the last month-end the charts draw, the direction first", () => {
     assert.equal(
       describeRatesSummary({ current: { recordDate: "2026-10-05", oneMonth: 4.05 }, series: SERIES }),
-      "1-month rate 4.05%, up from 3.85% on Aug 31",
+      "Rising: the 1-month rate is 4.05%, up from 3.85% on Aug 31",
     );
     assert.equal(
       describeRatesSummary({ current: { recordDate: "2026-09-10", oneMonth: 3.6 }, series: SERIES }),
-      "1-month rate 3.60%, down from 3.85% on Aug 31",
+      "Falling: the 1-month rate is 3.60%, down from 3.85% on Aug 31",
     );
   });
 
   it("skips a month-end that is the reading itself, and dates one from another year", () => {
     assert.equal(
       describeRatesSummary({ current: { recordDate: "2026-07-31", oneMonth: 3.78 }, series: SERIES }),
-      "1-month rate 3.78%, up from 3.74% on Dec 31, 2025",
+      "Rising: the 1-month rate is 3.78%, up from 3.74% on Dec 31, 2025",
     );
   });
 
-  it("says unchanged when the printed figures match, and drops the comparison it cannot make", () => {
+  it("says holding when the printed figures match, and drops the comparison it cannot make", () => {
     assert.equal(
       describeRatesSummary({ current: { recordDate: "2026-09-04", oneMonth: 3.851 }, series: SERIES }),
-      "1-month rate 3.85%, unchanged from Aug 31",
+      "Holding: the 1-month rate is 3.85%, as on Aug 31",
     );
-    assert.equal(describeRatesSummary({ current: { recordDate: "2025-01-02", oneMonth: 4.3 }, series: SERIES }), "1-month rate 4.30%");
+    assert.equal(describeRatesSummary({ current: { recordDate: "2025-01-02", oneMonth: 4.3 }, series: SERIES }), "The 1-month rate is 4.30%");
     assert.equal(describeRatesSummary({ current: { recordDate: "2026-10-05", oneMonth: null }, series: SERIES }), null);
   });
 });
 
 describe("inversion summary", () => {
-  it("answers no only when neither spread went below zero", () => {
+  /* The question names the recession warning gauge, the 10-year rate minus the 2-year, so
+     "Yes" or "No" answers for the gauge and the short end follows (2026-11-25). */
+  it("answers for the recession warning gauge first, then the short end", () => {
     assert.equal(
       describeInversionSummary({ months: 12, inverted10Y2Y: 0, inverted2Y3M: 0 }),
-      "No: long-term rates stayed above short-term ones in all of the last 12 months",
+      "No: the 10-year rate stayed above the 2-year rate, and the 2-year above the 3-month, in all of the last 12 months",
     );
     assert.equal(
       describeInversionSummary({ months: 12, inverted10Y2Y: 0, inverted2Y3M: 6 }),
-      "Yes: the 2-year rate below the 3-month rate in 6 of 12 months, and the 10-year rate below the 2-year rate in none",
+      "No: the 10-year rate stayed above the 2-year rate in all of the last 12 months, though the 2-year rate was below the 3-month rate in 6 of them",
     );
     assert.equal(
       describeInversionSummary({ months: 12, inverted10Y2Y: 9, inverted2Y3M: 4 }),
-      "Yes: the 10-year rate below the 2-year rate in 9 of 12 months, and the 2-year rate below the 3-month rate in 4 of 12 months",
+      "Yes, in 9 of the last 12 months: the 10-year rate was below the 2-year rate, and the 2-year rate was below the 3-month rate in 4 of them",
+    );
+    assert.equal(
+      describeInversionSummary({ months: 12, inverted10Y2Y: 2, inverted2Y3M: 0 }),
+      "Yes, in 2 of the last 12 months: the 10-year rate was below the 2-year rate, and the 2-year stayed above the 3-month",
     );
   });
 });
@@ -113,13 +120,16 @@ describe("lines, past months and habits", () => {
     assert.equal(runs.changeCount, 1);
     assert.equal(runs.longestRun?.regime, "EXPANSION");
     assert.equal(runs.longestRun?.count, 2);
-    assert.equal(describeConditionChanges(runs), "1 change across the last 3 months");
-    assert.equal(describeConditionChanges({ changeCount: 0, months: 24 }), "No change across the last 24 months");
-    assert.equal(describeConditionChanges({ changeCount: 3, months: 24 }), "3 changes across the last 24 months");
+    assert.equal(describeConditionChanges(runs), "Conditions changed once in the last 3 months");
+    assert.equal(describeConditionChanges({ changeCount: 0, months: 24 }), "Conditions held through all of the last 24 months");
+    assert.equal(describeConditionChanges({ changeCount: 3, months: 24 }), "Conditions changed 3 times in the last 24 months");
   });
 
-  it("lists the habit areas, or nothing for an empty table", () => {
-    assert.equal(describeFossilSummary([{ domain: "Infrastructure" }, { domain: "Org chart" }, { domain: "Roadmap" }]), "Infrastructure, org chart, and roadmap");
+  it("counts and lists the habit areas, or nothing for an empty table", () => {
+    assert.equal(
+      describeFossilSummary([{ domain: "Infrastructure" }, { domain: "Org chart" }, { domain: "Roadmap" }]),
+      "Habits in three areas: infrastructure, org chart, and roadmap",
+    );
     assert.equal(describeFossilSummary([]), null);
   });
 });
@@ -170,16 +180,15 @@ describe("inversion months", () => {
     assert.equal(summary.months[0]?.label, "Nov 2025", "the oldest month falls off");
     assert.equal(summary.inverted10Y2Y, 0);
     assert.equal(summary.inverted2Y3M, 4);
-    assert.deepEqual(summary.order, ["spread2Y3M", "spread10Y2Y"]);
+    assert.deepEqual(summary.order, ["spread10Y2Y", "spread2Y3M"]);
     assert.equal(summary.months.at(-1)?.spread2Y3M?.toFixed(2), "0.30", "two readings in one month are averaged");
   });
 
-  it("names the spread below zero more often first, the short end on a tie, as the answer does", () => {
-    assert.deepEqual(inversionSpreadOrder({ inverted10Y2Y: 3, inverted2Y3M: 1 }), ["spread10Y2Y", "spread2Y3M"]);
-    assert.deepEqual(inversionSpreadOrder({ inverted10Y2Y: 2, inverted2Y3M: 2 }), ["spread2Y3M", "spread10Y2Y"]);
+  it("names the recession warning gauge first, as the question and the answer do", () => {
+    assert.deepEqual(inversionSpreadOrder(), ["spread10Y2Y", "spread2Y3M"]);
     assert.match(
       describeInversionSummary({ months: 12, inverted10Y2Y: 3, inverted2Y3M: 1 }),
-      /^Yes: the 10-year rate below the 2-year rate in 3 of 12 months, and the 2-year/,
+      /^Yes, in 3 of the last 12 months: the 10-year rate was below the 2-year rate, and the 2-year/,
     );
   });
 

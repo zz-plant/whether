@@ -2,6 +2,7 @@ import { insightDatabase } from "../../../data/recommendations";
 import { UrlDetails } from "../../components/ui/urlDetails";
 import { describeFossilSummary } from "../../../lib/report/evidenceInstrumentSummaries";
 import { InstrumentQuestion } from "./instrumentQuestion";
+import type { SignalsQuestion } from "../signalsQuestions";
 
 /**
  * The last of the evidence page's instruments: a disclosure titled with the
@@ -14,11 +15,14 @@ export function FossilRecordSection({
   open = false,
   className,
   summaryClassName,
+  question,
 }: {
   regime?: string;
   open?: boolean;
   className?: string;
   summaryClassName?: string;
+  /** The question and its answer, from the page model; without one, the same words built here. */
+  question?: SignalsQuestion;
 }) {
   const { fossilRecord } = insightDatabase;
   const isTightClimate = regime === "SCARCITY" || regime === "DEFENSIVE";
@@ -32,8 +36,8 @@ export function FossilRecordSection({
       summaryClassName={summaryClassName}
       summary={
         <InstrumentQuestion
-          question="Which habits from the zero-rate years still shape your company?"
-          answer={describeFossilSummary(fossilRecord.rows)}
+          question={question?.question ?? "Which zero-rate habits should we check for?"}
+          answer={question ? question.answer : describeFossilSummary(fossilRecord.rows)}
         />
       }
     >

@@ -1,14 +1,27 @@
 import assert from "node:assert/strict";
-import { describe, it } from "bun:test";
-import { isValidElement, type ReactNode } from "react";
+import { describe, it, mock } from "bun:test";
+import { createElement, Fragment, isValidElement, type ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import * as nextNavigation from "next/navigation";
+import { Toast } from "@base-ui/react/toast";
 import { OperationsExecutionStepper } from "../app/operate/components/planningExecutionStepper";
 import { AreaTable } from "../app/components/ui/areaTable";
 import { buildPlanningPageModel } from "../app/operate/planningPageModel";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 import { insightDatabase } from "../data/recommendations";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+import { assertQuestionsVisible } from "./fixtures/questionMarkup";
 
 serveUnreachableUpstreams();
+
+/* The plan test reads the router; spread the real module, as every stub here does. */
+const mockAny: any = mock;
+mockAny.module("next/navigation", () => ({
+  ...nextNavigation,
+  useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
+  usePathname: () => "/operate",
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 const FINANCE_RUNWAY_TARGETS: string[] = insightDatabase.financeStrategyMode.regimes.map((entry) => entry.runwayPosture);
 
@@ -74,6 +87,30 @@ describe("/operate opening", () => {
       steps.map((step) => step.id),
       indexed.filter((id) => steps.some((step) => step.id === id)),
     );
+  });
+
+  /* Each step asks the question a reader would and answers it first (2026-11-25), and the
+     index names each step by the short form of that question. The FAQ markup carries the same
+     words; it named three questions no section asked until then. */
+  it("heads each step with its question, answers it first, and marks up only what it prints", async () => {
+    const { children, reportShellModel } = await buildPlanningPageModel();
+    const [stepper] = propsHandedTo(children, OperationsExecutionStepper);
+    assert.ok(stepper);
+    const title = (id: string) => stepper.steps.find((step) => step.id === id)?.title;
+    assert.equal(title("ops-monthly-action-summary"), "When does each area pause or restart?");
+    assert.equal(title("ops-playbook"), "What should we stop, start and keep small?");
+    assert.equal(title("ops-decision-shield"), "Does this plan fit this week?");
+    assert.equal(title("ops-finance-strategy"), "How much runway should we keep?");
+    const description = (id: string) => stepper.steps.find((step) => step.id === id)?.description ?? "";
+    assert.match(description("ops-playbook"), /^Stop [a-z].+, and start [a-z].+\.$/);
+    assert.match(description("ops-monthly-action-summary"), /^At two different scores/);
+    assert.deepEqual(
+      operationsSectionLinks.plan.map((link) => link.label).slice(0, 5),
+      ["When does each area pause?", "What do we stop and start?", "Does this plan fit?", "Want your own numbers?", "How much runway?"],
+    );
+    const html = renderToStaticMarkup(createElement(Toast.Provider, null, createElement(Fragment, null, children)));
+    const questions = assertQuestionsVisible(reportShellModel.payloads?.structuredData, html, { atLeast: 3 });
+    assert.ok(!questions.some((question) => question.name === "How do I turn this week's guidance into a plan?"));
   });
 
   it("shows the default alert lines on the closed rules step", async () => {

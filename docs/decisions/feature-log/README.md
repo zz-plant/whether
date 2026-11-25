@@ -1,7 +1,7 @@
 # Feature log (as built)
 
 The dated record behind the product. This is a decision log, not a short current-state
-spec: 188 entries, 144 of them under product surfaces. Do not read it end to end. Find the
+spec: 189 entries, 145 of them under product surfaces. Do not read it end to end. Find the
 entry for the surface you are changing:
 
 ```bash
@@ -16,7 +16,7 @@ this log records why it changed and what was ruled out. For the short index by s
 
 | Section | File | Lines |
 | --- | --- | --- |
-| 1) Product surfaces (UI routes) | [01-product-surfaces.md](01-product-surfaces.md) | 5014 |
+| 1) Product surfaces (UI routes) | [01-product-surfaces.md](01-product-surfaces.md) | 5117 |
 | 2) Data sourcing & provenance | [02-data-sourcing-and-provenance.md](02-data-sourcing-and-provenance.md) | 51 |
 | 3) Regime engine & scoring | [03-regime-engine-and-scoring.md](03-regime-engine-and-scoring.md) | 58 |
 | 4) Decision support tooling | [04-decision-support-tooling.md](04-decision-support-tooling.md) | 115 |

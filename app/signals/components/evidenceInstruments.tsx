@@ -14,28 +14,15 @@ import { RegimeTimelinePanel } from "./regimeTimelinePanel";
 import { FossilRecordSection } from "./fossilRecordSection";
 import type { SignalsPageSearchParams } from "../evidencePageModel";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
-import {
-  buildRatesTrail,
-  describeConditionChanges,
-  describeRatesSummary,
-  describeScoreTrendSummary,
-  monthOfLabel,
-  summarizeConditionRuns,
-} from "../../../lib/report/evidenceInstrumentSummaries";
+import { buildRatesTrail, monthOfLabel } from "../../../lib/report/evidenceInstrumentSummaries";
+import type { InstrumentQuestions, SignalsQuestion } from "../signalsQuestions";
 import { InstrumentQuestion } from "./instrumentQuestion";
 import { ConditionCellsPreview, RatesSparklinePreview, ScoreSparklinesPreview } from "./instrumentPreviews";
 import { MonthReadoutStrip } from "./monthReadoutStrip";
 import { columnMonthLabel, columnYearLabel, instrumentMonthHref } from "./instrumentMonthHref";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
-import {
-  describeLinesAndInputsAnswer,
-  hasCustomLines,
-  hasInputChoiceParams,
-  type InputChoiceModel,
-} from "../../../lib/report/countedInputs";
-import { formatChangeLines } from "../../../lib/report/evidenceInstrumentSummaries";
+import { hasInputChoiceParams, type InputChoiceModel } from "../../../lib/report/countedInputs";
 
 /**
  * The fourth section of the evidence page: the instruments. Charts, the line
@@ -86,7 +73,16 @@ const formatCoordinate = (value: number, unit: "%" | "pts") =>
  * on the page whose job is to be the proof behind the call. The coordinates are
  * the evidence, so they are what gets shown.
  */
-const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<RegimeAssessment, "scores">; open: boolean }) => {
+const AnalogPatternDisclosure = ({
+  assessment,
+  open,
+  question,
+}: {
+  assessment: Pick<RegimeAssessment, "scores">;
+  open: boolean;
+  /** The question and its answer, from the page model (`buildInstrumentQuestions`). */
+  question: SignalsQuestion;
+}) => {
   const analog = getHistoricalAnalogPlaybook(assessment);
   return (
     <UrlDetails
@@ -96,10 +92,7 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
       className={DISCLOSURE_CLASS}
       summaryClassName={SUMMARY_CLASS}
       summary={
-        <InstrumentQuestion
-          question="Which past cycle looks most like this one?"
-          answer={`${analog.analogPeriod} · ${analog.regimeType}`}
-        />
+        <InstrumentQuestion question={question.question} answer={question.answer} />
       }
     >
       <div className="space-y-4">
@@ -150,7 +143,7 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
         <p className="text-fluid-nano text-slate-500">
           Cycle notes are editorial summaries of that period&apos;s public record, not a measured sample of companies.{" "}
           <Link href="/history" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-            See the historical record →
+            Every month-end since 2012, on History
           </Link>
         </p>
       </div>
@@ -173,6 +166,7 @@ export const SignalsInstrumentsSection = ({
   invalidHistoricalSelection,
   monthPickerOpen,
   inputChoice = null,
+  questions,
   searchParams,
 }: {
   assessment: RegimeAssessment;
@@ -190,25 +184,25 @@ export const SignalsInstrumentsSection = ({
   monthPickerOpen: boolean;
   /** Which inputs count, for the line settings (`buildInputChoiceModel`); null when the reading offers no choice. */
   inputChoice?: InputChoiceModel | null;
+  /** Each closed question and its answer (`buildInstrumentQuestions`), the entries the page's markup carries too. */
+  questions: InstrumentQuestions;
   searchParams?: SignalsPageSearchParams;
 }) => {
   /* Each closed question carries its answer (§XII), from the values the panel
      under it draws: this week's rates beside the month-end archive the rate
      charts plot, the two series the score cells print, and the runs the
-     month-by-month timeline counts. */
+     month-by-month timeline counts. The page model builds the words, so the
+     markup reads the same ones. */
   const ratesInputs = {
     current: { recordDate: treasury.record_date, oneMonth: treasury.yields.oneMonth },
     series: yieldCurveSeries,
   };
-  const ratesAnswer = describeRatesSummary(ratesInputs);
   /* The points the rates answer quotes its last two of: the sparkline beside it and the month row in the panel draw them. */
   const ratesTrail = buildRatesTrail(ratesInputs);
   const scoreSeries = [
     { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend },
     { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true },
   ];
-  const trendsAnswer = describeScoreTrendSummary(scoreSeries);
-  const pastMonthsAnswer = regimeSeries.length > 0 ? describeConditionChanges(summarizeConditionRuns(regimeSeries)) : null;
   const ratesMonths = (ratesTrail ?? []).flatMap((point) => {
     const reading = point.isCurrent ? undefined : yieldCurveSeries.find((entry) => entry.recordDate === point.recordDate);
     return reading ? [{ ...reading, label: formatMonthLabel(reading.year, reading.month) }] : [];
@@ -220,11 +214,6 @@ export const SignalsInstrumentsSection = ({
      sender set. Decided here, from the request, so the server and the browser agree. */
   const linesOpen =
     Object.values(THRESHOLD_PARAM_KEYS).some((key) => typeof searchParams?.[key] === "string") || hasInputChoiceParams(searchParams);
-  const linesAnswer = describeLinesAndInputsAnswer({
-    customLines: hasCustomLines(assessment.thresholds, DEFAULT_THRESHOLDS),
-    inputs: inputChoice,
-    linesText: formatChangeLines(assessment.thresholds),
-  });
   return (
   /* Ruled off from "What would change this guidance" by the report rows' own divider.
      It drew a second rule 24px under that one, and kept the 20px inset the report
@@ -250,8 +239,8 @@ export const SignalsInstrumentsSection = ({
         summaryClassName={SUMMARY_CLASS}
         summary={
           <InstrumentQuestion
-            question="What are interest rates doing?"
-            answer={ratesAnswer}
+            question={questions.rates.question}
+            answer={questions.rates.answer}
             preview={ratesTrail ? <RatesSparklinePreview trail={ratesTrail} /> : null}
           />
         }
@@ -282,6 +271,7 @@ export const SignalsInstrumentsSection = ({
         summaryClassName={SUMMARY_CLASS}
         open={isDisclosureOpenInParams(searchParams, "curve")}
         monthHref={instrumentMonthHref({ searchParams, panelKey: "curve", anchor: "curve-context" })}
+        question={questions.curve}
       />
 
       <UrlDetails
@@ -292,8 +282,8 @@ export const SignalsInstrumentsSection = ({
         summaryClassName={SUMMARY_CLASS}
         summary={
           <InstrumentQuestion
-            question="How have the two scores moved this year?"
-            answer={trendsAnswer}
+            question={questions.trends.question}
+            answer={questions.trends.answer}
             preview={<ScoreSparklinesPreview series={scoreSeries} />}
           />
         }
@@ -334,7 +324,8 @@ export const SignalsInstrumentsSection = ({
       <AdvancedThresholdsSection
         currentThresholds={assessment.thresholds}
         defaultOpen={linesOpen}
-        answer={linesAnswer}
+        question={questions.lines.question}
+        answer={questions.lines.answer ?? ""}
         inputChoice={inputChoice}
       />
 
@@ -346,8 +337,8 @@ export const SignalsInstrumentsSection = ({
         summaryClassName={SUMMARY_CLASS}
         summary={
           <InstrumentQuestion
-            question="What was the guidance in an earlier month?"
-            answer={pastMonthsAnswer}
+            question={questions.pastMonths.question}
+            answer={questions.pastMonths.answer}
             preview={<ConditionCellsPreview series={regimeSeries} />}
           />
         }
@@ -371,13 +362,18 @@ export const SignalsInstrumentsSection = ({
         />
       </UrlDetails>
 
-      <AnalogPatternDisclosure assessment={assessment} open={isDisclosureOpenInParams(searchParams, "analog")} />
+      <AnalogPatternDisclosure
+        assessment={assessment}
+        open={isDisclosureOpenInParams(searchParams, "analog")}
+        question={questions.analog}
+      />
 
       <FossilRecordSection
         regime={assessment.regime}
         open={searchParams?.fossil === "1" || searchParams?.fossil === "open"}
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
+        question={questions.fossil}
       />
     </div>
   </section>

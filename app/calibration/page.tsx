@@ -18,6 +18,7 @@ import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCac
 import { formatMonthYearShortFromValue } from "../../lib/formatters";
 import { SectionTabs } from "../components/sectionTabs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { describePremiseAnswer } from "./calibrationQuestions";
 
 export const runtime = "edge";
 
@@ -41,8 +42,10 @@ export const runtime = "edge";
 export const metadata: Metadata = {
   ...buildPageMetadata({
     title: "How often the guidance held up",
+    /* The page's question answered in spoken sentences (2026-11-25); it listed what the study
+       checks. */
     description:
-      "How often the weekly guidance held, checked against every month since 2012, and how close conditions came to changing each time.",
+      "Most months: conditions stayed the same into the next month at every distance from a change, and more often than the percent published for that distance. Checked against every month-end since 2012.",
     path: "/calibration",
     imageAlt: "How often the guidance held up",
     imageParams: { template: "method", eyebrow: "The record" },
@@ -66,10 +69,12 @@ export default function CalibrationPage() {
   const record = countRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
   const since = record ? formatMonthYearShortFromValue(record.firstRecordDate) : "2012";
   const premiseModel = loadPremiseTestBacktestModel();
+  /* The premise section's question and its answer, from the medians the chart's key prints. */
+  const premiseQuestion = describePremiseAnswer(premiseModel);
 
   return (
     <ContentPageShell measure="wide">
-      <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
+      <JsonLdScript data={buildCalibrationStudyStructuredData({ totals, questions: [premiseQuestion] })} />
       <SectionTabs currentPath="/calibration" />
 
       {/* No "The record" kicker (2026-10-09): the header's Record tab and the
@@ -82,9 +87,10 @@ export default function CalibrationPage() {
 
       <ConfidenceRecordSection />
 
-      {/* No description (2026-11-11): the chart's own caption and key say what it
-          draws, over which quarters, and where the two groups split. */}
-      <SecondaryPageSection title="What happened to venture fundraising when funding pressure was above 70">
+      {/* The question, asked as one, and its answer first (2026-11-25). There was no
+          description from 2026-11-11, when it said what the chart's caption and key say; the
+          answer says what they show. */}
+      <SecondaryPageSection title={premiseQuestion.question} description={premiseQuestion.answer}>
         <PremiseOutcomeScatterChart model={premiseModel} className="max-w-xl" />
       </SecondaryPageSection>
 

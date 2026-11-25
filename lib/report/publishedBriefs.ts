@@ -29,6 +29,7 @@ import type { ComparedWith } from "./reportDataTypes";
 import { evaluateRegime, type RegimeAssessment, type RegimeThresholds } from "../regimeEngine";
 import { scoreStoredInputs } from "./comparisonReading";
 import { basisClause, describePublishedWeekBasis, describeScoringBasis } from "./scoringBasis";
+import { formatWeekAnswer } from "./briefArtifact";
 
 const PublishedRuleLineSchema = z.object({
   metric: z.enum(["tightness", "riskAppetite"]),
@@ -943,19 +944,19 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   /* The slots the record can fill: w31 names no pause line (`publishedBriefDisplay`). */
   /* One headline (`publishedBriefHeadline`). The stored action printed under
      the do-now slot beside it, and the call again under "Summary", so the paste said
-     the week's instruction three times in two versions. */
+     the week's instruction three times in two versions. It is the post's first line
+     now, answer first (`formatWeekAnswer`), and the lines it is bounded by follow. */
   const slots = [
-    { label: publicDecisionLabels.call, value: publishedBriefHeadline(brief).composed },
     ...(display.pauseIf ? [{ label: publicDecisionLabels.threshold, value: display.pauseIf }] : []),
     { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
   ];
 
-  /* The page's order: the call, what changed, one row per area, evidence, sources. */
+  /* The page's order: the call, what changed, one row per area, evidence, sources. The
+     answer opens the post as the live copy and the Monday email open theirs (2026-11-25),
+     dated in words; the title rides on the provenance line. */
   return [
-    `Whether Weekly Brief — ${brief.recordDateLabel}`,
+    `*${formatWeekAnswer(publishedBriefHeadline(brief).composed, brief.recordDateLabel)}*`,
     `Conditions: ${display.conditions} (${MARGIN_LABEL.toLowerCase()}: ${display.confidence.toLowerCase()})`,
-    "",
-    "This week:",
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),
     ...(readingLines.length > 0 ? ["", "Scores:", ...readingLines] : []),
     "",
@@ -965,7 +966,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     ...(brief.correction ? ["", `Correction: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance:",
-    `Data as of ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`,
+    `Whether Weekly Brief · Data as of ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`,
     ...(brief.sourceUrl ? [`Source: ${brief.sourceUrl}`] : []),
     "",
     `Permanent URL: ${permalinkUrl}`,
@@ -992,15 +993,15 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
 
   const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)}: ${item.detail}`);
 
-  /* The page's order: the call, what changed, one row per area, evidence, sources. */
+  /* The page's order: the call, what changed, one row per area, evidence, sources. The answer
+     is the first line, as the Monday email's is (2026-11-25), dated by the week's Monday; the
+     title moves to the source line. */
   return [
-    `Whether Weekly Brief — week of ${publishedBriefWeekLabel(brief)}`,
+    formatWeekAnswer(publishedBriefHeadline(brief).composed, publishedBriefWeekLabel(brief)),
     "",
     `Conditions: ${display.conditions}`,
     `${MARGIN_LABEL}: ${display.confidence.toLowerCase()}`,
     "",
-    "This week's guidance:",
-    `• ${publicDecisionLabels.call}: ${publishedBriefHeadline(brief).composed}`,
     ...(display.pauseIf ? [`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.pauseIf}`] : []),
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${display.conditionsChangeIf}`,
     "",
@@ -1013,7 +1014,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     "",
     "Sources:",
     `• Data as of: ${brief.recordDateLabel}`,
-    `• Source: ${display.source}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
+    `• Whether Weekly Brief · Source: ${display.source}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
     `• Freshness: ${brief.freshnessLabel}`,
     `• ${display.basis.sentence}`,
     "",

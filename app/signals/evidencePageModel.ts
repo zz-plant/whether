@@ -1,16 +1,15 @@
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import type { ReportData } from "../../lib/report/reportData";
-import { siteUrl } from "../../lib/siteUrl";
-import {
-  buildBreadcrumbList,
-  organizationId,
-  organizationName,
-  websiteId,
-} from "../../lib/seo";
-import { graph } from "../../lib/seo/pageStructuredData";
-import { publishedDataLicenseUrl } from "../../lib/publisher";
+import { buildSignalsStructuredData } from "../../lib/seo/reportPageStructuredData";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
-import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
+import { formatMonthYearShortFromValue } from "../../lib/formatters";
+import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
+import {
+  SIGNALS_PAGE_QUESTION,
+  answeredInstrumentQuestions,
+  buildInstrumentQuestions,
+  describeGuidanceChange,
+} from "./signalsQuestions";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import {
   buildSignalReferenceRows,
@@ -116,48 +115,33 @@ const signalsSectionLinks = [
   { href: "#instruments", label: "Charts, past months and checks" },
 ];
 
-/* The site node comes from `graph`, so `isPartOf` names it by id; it was an inline WebSite with
-   no id, which reads to a parser as a second site. */
-const buildStructuredData = () =>
-  graph([
-    {
-      "@type": "WebPage",
-      "@id": `${siteUrl}/signals#webpage`,
-      name: "Whether Weekly Brief — Evidence",
-      url: `${siteUrl}/signals`,
-      description:
-        "Evidence for the weekly brief: what changed, the pause lines, dates, and past months.",
-      inLanguage: "en",
-      isPartOf: { "@id": websiteId },
-      publisher: { "@id": organizationId },
-      mainEntity: {
-        "@type": "Dataset",
-        name: "Macro signal evidence feed",
-        description:
-          "Macro signal dataset for Whether, including the pause lines, the two scores, and the evidence behind the guidance.",
-        creator: { "@id": organizationId },
-        license: publishedDataLicenseUrl,
-      },
-    },
-    {
-      "@type": "Organization",
-      "@id": organizationId,
-      name: organizationName,
-      url: siteUrl,
-    },
-    buildBreadcrumbList(
-      buildGroupBreadcrumbs("/signals"),
-    ),
-  ]);
+/* Thirteen month-ends, so the move the trends answer prints spans twelve months. It took
+   twelve and printed "-6 over 12 mo" for risk appetite, Sep 2025 to Aug 2026 — eleven
+   months; over twelve (from 66 in Aug 2025) it is -10. */
+const buildScoreTrends = () => {
+  const months = getMonthlyRegimeHistory().slice(-13);
+  const trend = (pick: (entry: (typeof months)[number]) => number | null | undefined) =>
+    months.flatMap((entry) => {
+      const value = pick(entry);
+      return typeof value === "number" ? [{ label: formatMonthYearShortFromValue(entry.record_date), value }] : [];
+    });
+  return {
+    tightnessTrend: trend((entry) => entry.tightness),
+    riskAppetiteTrend: trend((entry) => entry.riskAppetite),
+  };
+};
 
 /**
  * The page model from report data already in hand. Split from the loader so a
  * test can build it from a fixture and render the sections in order without
  * serving an upstream.
  */
+type ScoreTrends = ReturnType<typeof buildScoreTrends>;
+
 const deriveSignalsPageModel = (
   reportData: ReportData,
   resolvedSearchParams?: SignalsPageSearchParams,
+  scoreTrends: ScoreTrends = buildScoreTrends(),
 ) => {
   const {
     assessment,
@@ -231,8 +215,31 @@ const deriveSignalsPageModel = (
     choice: parseInputChoice(resolvedSearchParams),
   });
 
+  const { tightnessTrend, riskAppetiteTrend } = scoreTrends;
+  /* The page's question and each instrument's, with the answers the page prints: the h1, the
+     line under it, the closed summaries and the markup all read these. */
+  const pageAnswer = describeGuidanceChange(signalRows, basis);
+  const instrumentQuestions = buildInstrumentQuestions({
+    assessment,
+    treasury,
+    yieldCurveSeries,
+    tightnessTrend,
+    riskAppetiteTrend,
+    regimeSeries,
+    inputChoice,
+  });
+
   return {
-    structuredData: buildStructuredData(),
+    structuredData: buildSignalsStructuredData({
+      questions: [{ question: SIGNALS_PAGE_QUESTION, answer: pageAnswer }, ...answeredInstrumentQuestions(instrumentQuestions)],
+      recordDateIso: treasury.record_date,
+      scores: assessment.scores,
+    }),
+    pageQuestion: SIGNALS_PAGE_QUESTION,
+    pageAnswer,
+    instrumentQuestions,
+    tightnessTrend,
+    riskAppetiteTrend,
     assessment,
     cacheCoverage,
     cacheMonthsByYear,
@@ -266,8 +273,10 @@ export type SignalsPageModel = ReturnType<typeof deriveSignalsPageModel>;
 
 export const buildSignalsPageModel = async (
   resolvedSearchParams?: SignalsPageSearchParams,
+  /** The month-end series the score trends draw and answer from; the archive's last thirteen unless a test names its own. */
+  scoreTrends?: ScoreTrends,
 ) => {
   const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/signals" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  return deriveSignalsPageModel(reportData, resolvedSearchParams);
+  return deriveSignalsPageModel(reportData, resolvedSearchParams, scoreTrends);
 };

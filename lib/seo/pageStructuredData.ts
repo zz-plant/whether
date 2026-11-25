@@ -6,7 +6,9 @@ import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
 import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
-import type { DecisionArea } from "../report/boundedDecisionRules";
+import { isDecisionArea, type DecisionArea } from "../report/boundedDecisionRules";
+import { conditionTermSlug, definedTermReference, type DefinedTermSlug } from "./definedTerms";
+import { isRegimeKey } from "../regimePresentation";
 
 /**
  * Per-page JSON-LD, for the pages whose content already supports a schema.org
@@ -32,7 +34,7 @@ const websiteNode = () => ({
   image: buildOgImageUrl({ template: "report" }),
 });
 
-const isPartOfSite = { "@id": websiteId } as const;
+export const isPartOfSite = { "@id": websiteId } as const;
 
 /**
  * A page's JSON-LD document: its nodes, after the site's `WebSite` node. Every page that
@@ -47,7 +49,7 @@ export const graph = (nodes: Array<Record<string, unknown>>): JsonLdGraph => ({
 });
 
 /** ISO 8601 date (`YYYY-MM-DD`) from an ISO timestamp or date, or null when unparseable. */
-const isoDate = (value: string | null | undefined) => {
+export const isoDate = (value: string | null | undefined) => {
   if (!value) return null;
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? null : date.toISOString().slice(0, 10);
@@ -86,8 +88,63 @@ const SIGNAL_WATCH_TOPICS: Record<string, ReadonlyArray<ReturnType<typeof wikipe
   "yield-curve-flip-watch": [wikipediaTopic("Yield curve", "Yield_curve")],
 };
 
-const areaTopics = (areas: readonly DecisionArea[]) =>
+export const areaTopics = (areas: readonly DecisionArea[]) =>
   areas.flatMap((area) => DECISION_AREA_TOPIC[area] ?? []);
+
+/**
+ * The site's own terms, by the ids `/about` gives them in its `DefinedTermSet`
+ * (`lib/seo/definedTerms.ts`). A page that uses a term points at it in `mentions` and does not
+ * define it again: one definition, many references (docs/seo/quality-gates.md, "Entities are
+ * named once and linked").
+ */
+export const siteTerms = (...terms: readonly DefinedTermSlug[]) => terms.map(definedTermReference);
+
+/** The condition term a record's regime prints as ("SCARCITY" → Freezing), or none for a key it does not know. */
+const conditionTermFor = (regime: string): DefinedTermSlug[] => (isRegimeKey(regime) ? [conditionTermSlug(regime)] : []);
+
+/** The four conditions, the terms every page that names this week's weather mentions. */
+export const CONDITION_TERMS: readonly DefinedTermSlug[] = ["sunny", "cloudy", "stormy", "freezing"];
+
+/* The market concepts the report pages read, each a Wikipedia article about the concept itself. */
+export const MARKET_TOPICS = {
+  interestRate: wikipediaTopic("Interest rate", "Interest_rate"),
+  treasury: wikipediaTopic("United States Treasury security", "United_States_Treasury_security"),
+  yieldCurve: wikipediaTopic("Yield curve", "Yield_curve"),
+  fedFundsRate: wikipediaTopic("Federal funds rate", "Federal_funds_rate"),
+  riskAversion: wikipediaTopic("Risk aversion", "Risk_aversion"),
+  ventureCapital: wikipediaTopic("Venture capital", "Venture_capital"),
+  startup: wikipediaTopic("Startup company", "Startup_company"),
+  businessCycle: wikipediaTopic("Business cycle", "Business_cycle"),
+} as const;
+
+/** A question the page asks in a heading, and the sentence under it that answers it. */
+export type VisibleQuestion = { question: string; answer: string };
+
+export const questionNodes = (questions: readonly VisibleQuestion[]) =>
+  questions
+    .filter((entry) => entry.question.trim() && entry.answer.trim())
+    .map((entry) => ({
+      "@type": "Question",
+      name: entry.question,
+      acceptedAnswer: { "@type": "Answer", text: entry.answer },
+    }));
+
+/** A route that serves a dataset, for `distribution`: the API or file a reader downloads it from. */
+export const dataDownload = (path: `/${string}`, encodingFormat: "application/json" | "text/markdown") => ({
+  "@type": "DataDownload",
+  encodingFormat,
+  contentUrl: buildCanonicalUrl(path),
+});
+
+/** A score as a measured variable: 0 to 100 points, with this week's value where the page prints it. */
+export const scoreVariable = (name: string, value?: number) => ({
+  "@type": "PropertyValue",
+  name,
+  minValue: 0,
+  maxValue: 100,
+  unitText: "points",
+  ...(typeof value === "number" ? { value } : {}),
+});
 
 /**
  * A hub: a `CollectionPage` listing what it links.
@@ -245,11 +302,14 @@ export const buildHistoryStructuredData = ({
   periods,
   publishedBriefs,
   coverage,
+  questions = [],
 }: {
   periods: readonly Pick<PostureArchivePeriod, "slug" | "title" | "kind">[];
   publishedBriefs: readonly Pick<PublishedBrief, "slug" | "headline">[];
   /** First and last record date on the monthly regime record, ISO. */
   coverage: { from: string; to: string } | null;
+  /** The questions the sections ask in their headings, with the answers they print first. */
+  questions?: readonly VisibleQuestion[];
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/history");
   const periodItems = periods.map((period) => ({
@@ -263,33 +323,45 @@ export const buildHistoryStructuredData = ({
     name: brief.headline,
   }));
 
+  /* The record's months, "2012-01/2026-10": it holds month-ends, so the month is its grain. */
+  const month = (value: string) => value.slice(0, 7);
   return graph([
     {
       "@type": "CollectionPage",
       "@id": `${url}#webpage`,
       url,
-      name: "Regime History and Track Record",
+      /* The page's title, as the tab and a search result print it; it was "Regime History and
+         Track Record", in the engine's word for conditions. */
+      name: "Has it been right?",
+      description: "Every brief records what would have changed the guidance, and none has been edited since.",
       inLanguage: "en",
       isPartOf: isPartOfSite,
+      publisher: buildPublisherSchema(organizationName),
+      ...(coverage ? { dateModified: isoDate(coverage.to) ?? coverage.to } : {}),
       mainEntity: { "@id": `${url}#dataset` },
-      hasPart: { "@id": `${url}#periods` },
+      hasPart: [{ "@id": `${url}#periods` }, ...questionNodes(questions)],
+      about: [MARKET_TOPICS.businessCycle, MARKET_TOPICS.ventureCapital, MARKET_TOPICS.interestRate],
+      mentions: siteTerms("funding-pressure", "risk-appetite", "room-to-move", ...CONDITION_TERMS),
     },
     {
       "@type": "Dataset",
       "@id": `${url}#dataset`,
-      name: "Whether monthly regime history",
+      name: "Whether month-end record",
       description:
-        "Every month-end reading on record, with each change in conditions and the length of each spell, scored from public US Treasury and macro series.",
+        "Every month-end reading since January 2012: the two scores, the room to move they make, the conditions they set, each change in conditions and how long each lasted. Scored from public US Treasury and market series with today's formula.",
       url,
       creator: buildPublisherSchema(organizationName),
       license: publishedDataLicenseUrl,
       isAccessibleForFree: true,
-      ...(coverage ? { temporalCoverage: `${coverage.from}/${coverage.to}` } : {}),
+      ...(coverage ? { temporalCoverage: `${month(coverage.from)}/${month(coverage.to)}` } : {}),
       variableMeasured: [
-        { "@type": "PropertyValue", name: "Regime" },
-        { "@type": "PropertyValue", name: "Funding pressure score" },
-        { "@type": "PropertyValue", name: "Risk appetite score" },
+        scoreVariable("Funding pressure"),
+        scoreVariable("Risk appetite"),
+        scoreVariable("Room to move"),
       ],
+      measurementTechnique: buildCanonicalUrl("/about#method"),
+      /* The routes that serve the record: month-end rows by API, and this week's reading beside them. */
+      distribution: [dataDownload("/api/cli/history", "application/json"), dataDownload("/api/scores", "application/json")],
     },
     {
       "@type": "ItemList",
@@ -533,14 +605,19 @@ export const buildAnswerFaqStructuredData = ({
  */
 export const buildCalibrationStudyStructuredData = ({
   totals,
+  questions = [],
 }: {
   totals: { months: number; held: number };
+  /** The questions the page asks in its headings, with the answers it prints first. */
+  questions?: readonly VisibleQuestion[];
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/calibration");
   const name = "How often the guidance held up";
+  /* "Room before a change", the reader's name for the distance since 2026-10-28; this said
+     "margin", which a reader took for a profit margin. */
   const description =
-    `A calibration study of Whether's published margin against ${totals.months} month-to-month comparisons. `
-    + "The margin is how far the scores are from changing conditions. "
+    `A calibration study of Whether's published room before a change against ${totals.months} month-to-month comparisons. `
+    + "The room before a change is how far the scores are from changing conditions. "
     + "Every band understates how often conditions held, and distance from a change line does not order the outcome.";
 
   return graph([
@@ -556,10 +633,13 @@ export const buildCalibrationStudyStructuredData = ({
       mainEntityOfPage: url,
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),
-      about: {
-        "@type": "Thing",
-        name: "Calibration of a distance-from-the-line margin for macro conditions",
-      },
+      about: [
+        { "@type": "Thing", name: "Calibration of the room before a change in startup funding conditions" },
+        wikipediaTopic("Calibration (statistics)", "Calibration_(statistics)"),
+        MARKET_TOPICS.ventureCapital,
+      ],
+      mentions: siteTerms("room-before-a-change", "funding-pressure", "risk-appetite", ...CONDITION_TERMS),
+      ...(questions.length > 0 ? { hasPart: questionNodes(questions) } : {}),
       citation: {
         "@type": "CreativeWork",
         name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
@@ -569,10 +649,12 @@ export const buildCalibrationStudyStructuredData = ({
     {
       "@type": "Dataset",
       "@id": `${url}#dataset`,
-      name: "Whether regime hold rates by distance to boundary",
+      name: "How often conditions held, by distance from a change",
       description:
-        `Month-end regime readings and whether the published regime held the following month. `
+        `Month-end readings and whether their conditions held the following month, by distance from the nearest change line. `
         + `${totals.held} of ${totals.months} held.`,
+      ...(totals.months > 0 ? { temporalCoverage: "2012-01/.." } : {}),
+      measurementTechnique: buildCanonicalUrl("/calibration"),
       url,
       creator: { "@id": organizationId },
       license: publishedDataLicenseUrl,
@@ -584,7 +666,7 @@ export const buildCalibrationStudyStructuredData = ({
       },
       variableMeasured: [
         { "@type": "PropertyValue", name: "Month-end readings compared", value: totals.months },
-        { "@type": "PropertyValue", name: "Readings whose regime held one month later", value: totals.held },
+        { "@type": "PropertyValue", name: "Readings whose conditions held one month later", value: totals.held },
       ],
     },
     buildBreadcrumbList(buildGroupBreadcrumbs("/calibration")),
@@ -656,6 +738,7 @@ export const buildPublishedBriefStructuredData = ({
   headline,
   description,
   dateModified,
+  questions = [],
 }: {
   brief: PublishedBrief;
   canonicalUrl: string;
@@ -665,6 +748,8 @@ export const buildPublishedBriefStructuredData = ({
   description: string;
   /** `publishedBriefModifiedAt`: a correction is the one edit a record takes. */
   dateModified: string;
+  /** The questions the page asks in its headings ("What happened next?"), with the answers it prints first. */
+  questions?: readonly VisibleQuestion[];
 }): JsonLdGraph =>
   graph([
     {
@@ -702,9 +787,14 @@ export const buildPublishedBriefStructuredData = ({
       ],
       about: [
         { "@type": "Thing", name: "Startup Operating Guidance" },
-        wikipediaTopic("Venture capital", "Venture_capital"),
-        wikipediaTopic("Yield curve", "Yield_curve"),
+        MARKET_TOPICS.ventureCapital,
+        MARKET_TOPICS.yieldCurve,
+        MARKET_TOPICS.startup,
+        ...areaTopics(brief.decisions.map((decision) => decision.area).filter(isDecisionArea)),
       ],
+      /* The site's terms the week prints: its two scores, the room before a change, and its conditions. */
+      mentions: siteTerms("funding-pressure", "risk-appetite", "room-before-a-change", ...conditionTermFor(brief.regime)),
+      ...(questions.length > 0 ? { hasPart: questionNodes(questions) } : {}),
     },
   ]);
 

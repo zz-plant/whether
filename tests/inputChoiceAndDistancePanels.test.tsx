@@ -116,7 +116,7 @@ describe("/signals: which inputs count", () => {
   });
 
   it("links to the arithmetic the points come from, by that section's name", () => {
-    assert.match(fieldset, /<a[^>]*href="\/trust#formula-reference"[^>]*>How the scores are built<\/a>/);
+    assert.match(fieldset, /<a[^>]*href="\/trust#formula-reference"[^>]*>How the scores are worked out<\/a>/);
   });
 
   it("asks about lines alone where the reading offers no inputs", () => {

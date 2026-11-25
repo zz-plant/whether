@@ -60,8 +60,9 @@ export type ReportShellModel = {
   };
   page: {
     pageTitle: string;
-    /** The page's job in one sentence. Left out where the title already says it
-     *  (/trust: "How much to trust this week's guidance"). */
+    /** The page's job in one sentence, or left out where the title already says it. A
+     *  title that asks a question carries its answer here (/trust: "Can we trust this
+     *  week's guidance?"), and the phone keeps it (`CommandCenterNavBlock`). */
     pageSummary?: string;
     sectionLinks: ReportSectionLink[];
     /** The route's address, for its group's sub-tab row above the intro. Omitted, no row renders. */
