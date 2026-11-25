@@ -44,7 +44,7 @@ describe("the change line in interest-rate terms", () => {
       // bond-desk token in the one line saying how close the call is to changing.
       assert.match(
         entry.sentence,
-        /^(If long rates (rise|fall) \d+\.\d{2} percentage points (further above|closer to) short rates, conditions turn|(About|Less than|More than) (one|\d+) quarter-point Fed (hike|cut)s? turns? conditions) (Sunny|Cloudy|Stormy|Freezing)\.$/,
+        /^(If long rates (rise|fall) \d+\.\d{2} percentage points (further above|closer to) short rates, conditions turn|(About|Less than|More than) (one|two|three|four|five|six|seven|eight|nine|\d+) quarter-point Fed (hike|cut)s? turns? conditions) (Sunny|Cloudy|Stormy|Freezing)\.$/,
       );
       assert.doesNotMatch(entry.sentence, /%|10Y|2Y|1M\b|flip/);
       assert.notEqual(entry.crossesTo, assessment.regime);

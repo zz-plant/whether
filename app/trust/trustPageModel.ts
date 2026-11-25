@@ -16,6 +16,7 @@ import { formatActivationFunnelLine } from "../../lib/telemetry/activationFunnel
 import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivationFunnel";
 import { evaluateRegime } from "../../lib/regimeEngine";
 import { buildScoreComposition } from "../../lib/report/scoreComposition";
+import { buildRateDial } from "../../lib/report/rateScenario";
 
 
 export async function buildTrustPageModel() {
@@ -160,10 +161,27 @@ export async function buildTrustPageModel() {
     scoringBasis: reportData.scoringBasis,
     evaluate: evaluateRegime,
   });
+  /* Funding pressure at every hundredth of the short rate, for the control on its bar:
+     the same re-scoring, judged against this week's rules for each area. */
+  const rateDial = scoreComposition
+    ? buildRateDial({
+        assessment: reportData.assessment,
+        treasury: reportData.treasury,
+        macroSeries: reportData.macroSeries,
+        evaluate: evaluateRegime,
+        rules: snapshot.weeklyDecisionCardModel.decision.decisionRules ?? [],
+        changeLines: {
+          tightness: reportData.assessment.thresholds.tightnessRegime,
+          riskAppetite: reportData.assessment.thresholds.riskAppetiteRegime,
+        },
+        regime: reportData.assessment.regime,
+      })
+    : null;
 
   return {
     reportData,
     scoreComposition,
+    rateDial,
     isFallback,
     degradedSourceRows,
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),

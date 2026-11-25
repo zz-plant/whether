@@ -19,6 +19,7 @@ import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 import { ruleMetricLabel, type RuleConditionMetric } from "./boundedDecisionRules";
 import { BASE_RATE_SOURCE_LABELS } from "./regimeDescription";
 import { scoreSourceLabel } from "./scoreMovement";
+import { regimeSignalLabel } from "./signalTranslations";
 import { describeNotCountedScore, type ScoringBasis } from "./scoringBasis";
 
 /**
@@ -92,7 +93,7 @@ export type ScoreComposition = {
   largest: CompositionSource | null;
   /** The arithmetic as one copyable sentence: "Funding pressure 90 = 90 from the short-term borrowing rate + 0 from …". */
   sentence: string;
-  /** "Not counted: -11 from startup-market inputs.", the line `/signals` prints under the score; null when nothing is left out. */
+  /** "Not counted: startup-market inputs, which would take it down 11 points.", the line `/signals` prints under the score; null when nothing is left out. */
   notCountedSentence: string | null;
 };
 
@@ -135,6 +136,9 @@ const describeMacro = (
 };
 
 const adj = MACRO_ADJUSTMENT_CONSTANTS;
+
+/** The curve's name as every reader surface prints it (`regimeSignalLabel.curveSlope`). */
+const RECESSION_GAUGE_NAME = regimeSignalLabel.curveSlope;
 
 /* Funding pressure stops at 100, and the terms can add up past it, so a term
    that lands on the ceiling gives only the points below it. */
@@ -257,8 +261,8 @@ export const buildScoreComposition = ({
     },
     {
       source: "inversion",
-      name: "Yield curve's inversion",
-      clause: "the yield curve's inversion",
+      name: "Recession warning gauge below zero",
+      clause: "the recession warning gauge below zero",
       points: ratesOnly.tightness - rateLevel,
       reading: describeCurve(ratesOnly.curveSlope),
       weight: ceilingNote(
@@ -299,8 +303,10 @@ export const buildScoreComposition = ({
   const riskAppetiteParts = placeParts([
     {
       source: "curve",
-      name: upperFirst(withoutArticle(scoreSourceLabel("riskAppetite", "curve"))),
-      clause: scoreSourceLabel("riskAppetite", "curve"),
+      /* The site's name for the 10-year rate less the 2-year (2026-11-18; "Yield curve" until
+         then, the desk's name): its reading under the bar names the two rates once. */
+      name: RECESSION_GAUGE_NAME,
+      clause: `the ${RECESSION_GAUGE_NAME.toLowerCase()}`,
       points: ratesOnly.riskAppetite,
       reading: describeCurve(ratesOnly.curveSlope),
       weight: `0 with the 10-year rate ${pointsWord(Math.abs(RISK_APPETITE_MIN_SLOPE))} below the 2-year, 100 with it ${pointsWord(RISK_APPETITE_MAX_SLOPE)} above, and a straight line between`,

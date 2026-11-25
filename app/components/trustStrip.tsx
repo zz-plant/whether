@@ -339,8 +339,12 @@ const MARKS_PER_ROW = 30;
  * Text height and em-sized, so it sits in the sentence at every size the strip is
  * set in. A square's hit area reaches up and down to 44px; across, it is the
  * square and its gap, which is why a tap shows the month before a second opens it.
+ *
+ * Each square carries its month (`data-month`, `lib/monthCursor.ts`): pointing at one
+ * shows that month on the record band, and a month read on the band, or stepped to
+ * with `[` and `]`, rings its square here (month-active.css).
  */
-function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
+export function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
   const firstYear = marks[0]?.asOf.slice(0, 4);
   const oneRow = marks.length <= MARKS_PER_ROW;
   return (
@@ -357,6 +361,7 @@ function BaseRateMarks({ marks }: { marks: readonly BaseRateMark[] }) {
           aria-label={mark.label}
           data-mark={mark.label}
           data-base-rate-mark={mark.held ? "held" : "changed"}
+          data-month={mark.asOf.slice(0, 7)}
           className={`relative block size-[0.6em] rounded-[1px] border-[1.5px] border-current hover:text-slate-200 after:absolute after:-inset-x-[0.1em] after:content-[''] ${
             oneRow ? "after:-inset-y-[calc(22px-0.3em)]" : "after:-inset-y-[0.1em]"
           } ${mark.held ? "bg-current" : "bg-transparent"}`}

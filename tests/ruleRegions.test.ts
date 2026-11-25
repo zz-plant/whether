@@ -6,12 +6,24 @@ import { buildActionStripItems, resolveLineState, selectPauseCondition } from ".
 import {
   buildAreaStateHistory,
   buildRuleChartModel,
+  areaChangesAt,
   buildRuleRegions,
+  compareOwnRule,
+  describeAreaChanges,
+  describeConditionsChange,
   describeRegionsAt,
+  ruleFromNumbers,
   ruleFromStripItem,
   type AreaRule,
 } from "../lib/report/ruleRegions";
-import { buildCountedChartHref, buildRuleChartHref, parseRuleChartArea, parseRuleChartCounted } from "../lib/report/ruleChartParams";
+import { planLinesFromRules } from "../lib/alert/planLines";
+import {
+  buildCountedChartHref,
+  buildRuleChartHref,
+  parseRuleChartArea,
+  parseRuleChartDecision,
+  parseRuleChartReading,
+} from "../lib/report/ruleChartParams";
 
 /* This week's reading when the layer was built: Freezing, every rule but Roadmap's paused. */
 const week = { tightness: 90, riskAppetite: 44 };
@@ -65,16 +77,47 @@ describe("buildRuleRegions", () => {
 });
 
 describe("describeRegionsAt", () => {
-  it("names the region the reading is in, by the rules table's predicates", () => {
+  it("says where the reading sits in the area's own verb, by the rules table's predicates", () => {
     const hiring = rule("hiring");
     assert.equal(
       describeRegionsAt(hiring, week, "This week's reading"),
-      "Hiring pauses where Funding pressure > 76 or Risk appetite < 44 and restarts where Funding pressure < 66 and Risk appetite > 54. This week's reading is in the pause region.",
+      "Hiring pauses where Funding pressure > 76 or Risk appetite < 44 and restarts where Funding pressure < 66 and Risk appetite > 54. This week's reading is where Hiring pauses.",
     );
-    assert.match(describeRegionsAt(hiring, { tightness: 60, riskAppetite: 60 }, "It"), /It is in the restart region\.$/);
+    assert.match(describeRegionsAt(hiring, { tightness: 60, riskAppetite: 60 }, "It"), /It is where Hiring restarts\.$/);
     assert.match(describeRegionsAt(hiring, { tightness: 70, riskAppetite: 50 }, "It"), /It is between the two, where nothing changes\.$/);
     /* A strict line is not met at the line: risk appetite 44 is not below 44. */
     assert.match(describeRegionsAt(rule("product-tempo"), week, "It"), /It is between the two/);
+    /* The drawing's name for it is not the reader's (2026-11-18). */
+    assert.doesNotMatch(describeRegionsAt(hiring, week, "It"), /region/);
+  });
+});
+
+describe("what another reading would move", () => {
+  it("restarts a paused area only once its restart holds, and pauses any other once a pause line is met", () => {
+    /* Funding pressure 60 and risk appetite 60: below every 66, above every 54. */
+    assert.deepEqual(areaChangesAt(rules, week, { tightness: 60, riskAppetite: 60 }), {
+      pauses: [],
+      restarts: ["hiring", "capital-raising", "burn-discipline", "expansion-bets"],
+    });
+    /* Funding pressure 70 leaves the pause lines but not for a restart: on hold, nothing changes. */
+    assert.deepEqual(areaChangesAt(rules, week, { tightness: 70, riskAppetite: 44 }), { pauses: [], restarts: [] });
+    /* Roadmap is the one area not paused at 90 and 44; risk appetite 40 pauses it. */
+    assert.deepEqual(areaChangesAt(rules, week, { tightness: 90, riskAppetite: 40 }), { pauses: ["product-tempo"], restarts: [] });
+    /* An area that is not on hold has nothing to restart. */
+    assert.deepEqual(areaChangesAt(rules, { tightness: 60, riskAppetite: 50 }, { tightness: 60, riskAppetite: 58 }), { pauses: [], restarts: [] });
+  });
+
+  it("leads with the answer, in the areas' order", () => {
+    assert.equal(describeAreaChanges({ pauses: [], restarts: ["hiring", "capital-raising", "expansion-bets"] }), "Hiring, Fundraising and New bets would restart");
+    assert.equal(describeAreaChanges({ pauses: ["product-tempo"], restarts: ["hiring"] }), "Hiring would restart and Roadmap would pause");
+    assert.equal(describeAreaChanges({ pauses: [], restarts: [] }), "No area would pause or restart");
+  });
+
+  it("names new conditions only where the scores would land somewhere this week's do not", () => {
+    assert.equal(describeConditionsChange({ regime: "SCARCITY", published: week, other: { tightness: 60, riskAppetite: 44 }, changeLines }), "Conditions would turn Stormy.");
+    assert.equal(describeConditionsChange({ regime: "SCARCITY", published: week, other: { tightness: 80, riskAppetite: 30 }, changeLines }), null);
+    /* A change awaiting confirmation: this week's scores already land in Stormy, so landing there again is not news. */
+    assert.equal(describeConditionsChange({ regime: "SCARCITY", published: { tightness: 60, riskAppetite: 44 }, other: { tightness: 50, riskAppetite: 44 }, changeLines }), null);
   });
 });
 
@@ -85,6 +128,7 @@ describe("buildRuleChartModel", () => {
     leadArea: "hiring",
     notCounted: [{ metric: "riskAppetite", score: 33 }],
     changeLines,
+    regime: "SCARCITY",
   });
 
   it("carries the five areas in the one order, each with its own sentences and side", () => {
@@ -96,6 +140,8 @@ describe("buildRuleChartModel", () => {
     assert.equal(fundraising?.resumeLine, "Risk appetite is above 54 and funding pressure falls below 66");
     assert.equal(model.areas.find((entry) => entry.area === "burn-discipline")?.pauseLine, "Funding pressure is above 76. Funding pressure is 90 now.");
     assert.equal(model.areas.find((entry) => entry.area === "product-tempo")?.held, false);
+    assert.equal(model.areas[0]?.where, "pause");
+    assert.match(model.areas[0]?.rule ?? "", /^Hiring pauses where Funding pressure > 76/);
   });
 
   it("notes the conditions no region can draw", () => {
@@ -107,37 +153,62 @@ describe("buildRuleChartModel", () => {
     assert.equal(model.areas.find((entry) => entry.area === "hiring")?.note, null);
   });
 
-  it("plots the left-out reading and names only the areas whose state it would change", () => {
+  it("offers the left-out reading, answering first with only the areas whose state it would change", () => {
+    const counted = model.readings.find((reading) => reading.key === "counted");
     assert.deepEqual(
-      { tightness: model.counted?.tightness, riskAppetite: model.counted?.riskAppetite, regime: model.counted?.regime },
-      { tightness: 90, riskAppetite: 33, regime: "SCARCITY" },
+      { tightness: counted?.tightness, riskAppetite: counted?.riskAppetite, regime: counted?.regime, label: counted?.label },
+      { tightness: 90, riskAppetite: 33, regime: "SCARCITY", label: "Startup-market inputs counted" },
     );
     /* Risk appetite 33 crosses the 44 line of four areas, but three of them are paused already. */
-    assert.equal(model.counted?.difference, "With startup-market inputs counted, Roadmap would pause.");
-    assert.match(model.areas[1]?.description.counted ?? "", /The reading with startup-market inputs counted is in the pause region\.$/);
+    assert.equal(counted?.answer, "Roadmap would pause. With startup-market inputs counted, risk appetite would be 33.");
+    assert.equal(counted?.where["product-tempo"], "pause");
   });
 
-  it("says so when the left-out inputs would change no area, and has no switch without them", () => {
-    const quiet = buildRuleChartModel({ rules, scores: week, leadArea: null, notCounted: [{ metric: "tightness", score: 95 }], changeLines });
-    assert.equal(quiet.counted?.difference, "With startup-market inputs counted, no area would pause or restart differently.");
-    assert.equal(quiet.defaultArea, null);
-    const none = buildRuleChartModel({ rules, scores: week, leadArea: "hiring", notCounted: [], changeLines });
-    assert.equal(none.counted, null);
-    assert.equal(none.areas[0]?.description.counted, null);
+  it("offers none without left-out inputs or a rate move, and opens on no rule where the sentence is not one", () => {
+    const none = buildRuleChartModel({ rules, scores: week, leadArea: null, notCounted: [], changeLines });
+    assert.deepEqual(none.readings, []);
+    assert.equal(none.defaultArea, null);
+    assert.equal(none.fundingPressureRates, null);
+    const quiet = buildRuleChartModel({ rules, scores: week, leadArea: "hiring", notCounted: [{ metric: "tightness", score: 95 }], changeLines });
+    assert.equal(quiet.readings[0]?.answer, "No area would pause or restart. With startup-market inputs counted, funding pressure would be 95.");
   });
 
-  it("names restarts and lifted pauses when the left-out inputs ease the reading", () => {
-    const easing = buildRuleChartModel({
+  it("judges each Fed step against the rules and puts the areas first", () => {
+    const stepped = buildRuleChartModel({
       rules,
-      scores: { tightness: 60, riskAppetite: 50 },
+      scores: week,
       leadArea: "hiring",
-      notCounted: [{ metric: "riskAppetite", score: 58 }],
+      notCounted: [],
       changeLines,
+      regime: "SCARCITY",
+      rateMoves: [{
+        key: "cut-2",
+        tightness: 18,
+        riskAppetite: 60,
+        label: "After two",
+        name: "After two quarter-point Fed cuts",
+        how: "Two quarter-point Fed cuts would take the 1-month rate to 3.60% and funding pressure to 18, with everything else as this week.",
+      }],
     });
+    assert.deepEqual(stepped.readings.map((reading) => reading.key), ["cut-2"]);
     assert.equal(
-      easing.counted?.difference,
-      "With startup-market inputs counted, the restart condition would hold for Hiring, Roadmap, Fundraising and New bets.",
+      stepped.readings[0]?.answer,
+      "Hiring, Fundraising, Spending and New bets would restart. Conditions would turn Sunny. Two quarter-point Fed cuts would take the 1-month rate to 3.60% and funding pressure to 18, with everything else as this week.",
     );
+    assert.equal(stepped.readings[0]?.regime, "EXPANSION");
+  });
+
+  it("carries the rate at each funding-pressure value a rule or the conditions turn on, where a lookup is given", () => {
+    const rated = buildRuleChartModel({
+      rules,
+      scores: week,
+      leadArea: "hiring",
+      notCounted: [],
+      changeLines,
+      rateAtFundingPressure: { name: "1-month rate", at: (value) => (value < 90 ? 3.5 + value / 200 : null) },
+    });
+    assert.equal(rated.fundingPressureRates?.name, "1-month rate");
+    assert.deepEqual(rated.fundingPressureRates?.values.map((entry) => entry.value), [66, 70, 76]);
   });
 });
 
@@ -181,20 +252,98 @@ describe("buildAreaStateHistory", () => {
   });
 });
 
-describe("rule chart params", () => {
-  it("reads only a real area and the switch's one value", () => {
-    assert.equal(parseRuleChartArea("capital-raising"), "capital-raising");
-    assert.equal(parseRuleChartArea("fundraising"), undefined);
-    assert.equal(parseRuleChartCounted("1"), true);
-    assert.equal(parseRuleChartCounted("true"), false);
+describe("compareOwnRule", () => {
+  const published = planLinesFromRules(rules);
+  const hiring = published.find((line) => line.area === "hiring")!;
+  /* The published Hiring rule with some of its numbers moved, as the /operate form keeps a reader's. */
+  const moved = (pause: [number, number], resume: [number, number]) => ({
+    area: "hiring" as const,
+    pause: [{ ...hiring.pause[0]!, value: pause[0] }, { ...hiring.pause[1]!, value: pause[1] }],
+    resume: [{ ...hiring.resume[0]!, value: resume[0] }, { ...hiring.resume[1]!, value: resume[1] }],
+  });
+  /* The words a reader sees never name the mechanism. */
+  const MECHANISM = /\b(lines?|regions?|outline|overlay|ghost|diff|delta|toggle|mini-map)\b/i;
+
+  it("draws the published rule as the rules table's map does, and says nothing while no number moved", () => {
+    for (const line of published) {
+      const item = buildActionStripItems(rules, week).map(ruleFromStripItem).find((candidate) => candidate.area === line.area)!;
+      assert.deepEqual(buildRuleRegions(ruleFromNumbers(line)), buildRuleRegions(item), line.area);
+      const same = compareOwnRule({ published: line, own: line, scores: week });
+      assert.deepEqual(same.regions, buildRuleRegions(item), line.area);
+      assert.deepEqual([same.outline, same.changes, same.thisWeek], [[], [], null], line.area);
+      assert.equal(same.description, describeRegionsAt(item, week, "This week's reading"));
+    }
   });
 
-  it("links to the chart counted, keeping the rest of the brief's query and its area", () => {
-    assert.equal(buildCountedChartHref(undefined), "/?counted=1#what-would-change");
+  it("outlines only the side whose numbers moved, and says each move with its verb, its number and ours", () => {
+    const later = compareOwnRule({ published: hiring, own: moved([76, 44], [60, 54]), scores: week });
+    assert.deepEqual(later.changes, ["Later than ours: your Hiring restarts when funding pressure is below 60, not 66."]);
+    assert.deepEqual(later.outline, [buildRuleRegions(ruleFromNumbers(moved([76, 44], [60, 54]))).resume]);
+    assert.deepEqual(later.outline[0]?.edges.map((edge) => `${edge.metric}${edge.value}`), ["tightness60", "riskAppetite54"]);
+    /* Paused by both at 90: nothing to say about this week. */
+    assert.equal(later.thisWeek, null);
+
+    const sooner = compareOwnRule({ published: hiring, own: moved([70, 48], [66, 50]), scores: week });
+    assert.deepEqual(sooner.changes, [
+      "Sooner than ours: your Hiring pauses if funding pressure is above 70, not 76.",
+      "Sooner than ours: your Hiring pauses if risk appetite is below 48, not 44.",
+      "Sooner than ours: your Hiring restarts when risk appetite is above 50, not 54.",
+    ]);
+    assert.equal(sooner.outline.length, 2);
+    for (const sentence of [...later.changes, ...sooner.changes]) assert.doesNotMatch(sentence, MECHANISM, sentence);
+  });
+
+  it("says where the reader's numbers put the area this week when that differs from ours, by the table's predicates", () => {
+    /* At 90 and 44 ours pauses Hiring; pause lines past the reading lift it, short of the restart. */
+    const lifted = compareOwnRule({ published: hiring, own: moved([95, 40], [66, 54]), scores: week });
+    assert.equal(lifted.thisWeek, "Hiring wouldn't pause this week by your numbers. By ours it does.");
+    assert.deepEqual(lifted.changes, [
+      "Later than ours: your Hiring pauses if funding pressure is above 95, not 76.",
+      "Later than ours: your Hiring pauses if risk appetite is below 40, not 44.",
+    ]);
+
+    /* At 80 and 60 ours still pauses; a restart at 82 meets the reading. */
+    const restarted = compareOwnRule({ published: hiring, own: moved([85, 44], [82, 54]), scores: { tightness: 80, riskAppetite: 60 } });
+    assert.equal(restarted.thisWeek, "Hiring would restart this week by your numbers. By ours it stays paused.");
+
+    /* At 70 and 60 ours is clear; a pause at 65 holds. */
+    const paused = compareOwnRule({ published: hiring, own: moved([65, 44], [60, 54]), scores: { tightness: 70, riskAppetite: 60 } });
+    assert.equal(paused.thisWeek, "Hiring would pause this week by your numbers, not by ours.");
+
+    /* A move the reading does not reach changes nothing this week. */
+    assert.equal(compareOwnRule({ published: hiring, own: moved([80, 44], [66, 54]), scores: week }).thisWeek, null);
+    for (const sentence of [lifted.thisWeek, restarted.thisWeek, paused.thisWeek]) assert.doesNotMatch(sentence ?? "", MECHANISM);
+  });
+});
+
+describe("rule chart params", () => {
+  it("reads the area from the brief's decision, then the chart's old key, and only a real one", () => {
+    assert.equal(parseRuleChartArea("capital-raising"), "capital-raising");
+    assert.equal(parseRuleChartArea("fundraising"), undefined);
+    assert.equal(parseRuleChartDecision({ decision: "hiring", rule: "capital-raising" }), "hiring");
+    assert.equal(parseRuleChartDecision({ rule: "capital-raising" }), "capital-raising");
+    assert.equal(parseRuleChartDecision({ decision: "bogus" }), undefined);
+  });
+
+  it("reads the reading by its key, and the old counted switch as the counted reading", () => {
+    assert.equal(parseRuleChartReading({ reading: "cut-2" }), "cut-2");
+    assert.equal(parseRuleChartReading({ reading: "cut-9" }), null);
+    assert.equal(parseRuleChartReading({ counted: "1" }), "counted");
+    assert.equal(parseRuleChartReading({ counted: "true" }), null);
+    assert.equal(parseRuleChartReading({ reading: "hike-1", counted: "1" }), "hike-1");
+    assert.equal(parseRuleChartReading(undefined), null);
+  });
+
+  it("links to the chart counted, keeping the rest of the brief's query and its area, in the new keys", () => {
+    assert.equal(buildCountedChartHref(undefined), "/?reading=counted#what-would-change");
     assert.equal(
       buildCountedChartHref({ cadence: "monthly", rule: "hiring", counted: "0", empty: undefined }),
-      "/?cadence=monthly&rule=hiring&counted=1#what-would-change",
+      "/?cadence=monthly&decision=hiring&reading=counted#what-would-change",
     );
-    assert.equal(buildRuleChartHref({ rule: "bogus", month: "9", year: "2026" }, { area: null, counted: false }), "/?month=9&year=2026#what-would-change");
+    assert.equal(
+      buildRuleChartHref({ rule: "bogus", month: "9", year: "2026", decision: "hiring" }, { area: null, reading: null }),
+      "/?month=9&year=2026#what-would-change",
+    );
+    assert.equal(buildRuleChartHref({}, { area: "capital-raising", reading: "cut-1" }), "/?decision=capital-raising&reading=cut-1#what-would-change");
   });
 });

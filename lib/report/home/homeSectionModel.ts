@@ -72,6 +72,45 @@ export const readHomeDecisionCookie = (cookieHeader: string | null | undefined):
 export const buildHomeDecisionCookie = (area: DecisionArea | null): string =>
   `${HOME_DECISION_COOKIE}=${area ?? ""}; path=/; max-age=${area ? HOME_DECISION_COOKIE_MAX_AGE_SECONDS : 0}; SameSite=Lax`;
 
+/**
+ * The area open on `/`, which every section below the card follows (2026-11-18): the one
+ * `?decision=` names, else the one the reader last picked (the cookie). The picker opens
+ * on it, "What changed" marks the rows that move it, and a copied brief's link carries it.
+ */
+export const resolveHomeDecision = (
+  query: Readonly<Record<string, string | undefined>> | undefined,
+  remembered: DecisionArea | null | undefined,
+): DecisionArea | undefined => parseHomeDecision(query?.[HOME_DECISION_PARAM]) ?? remembered ?? undefined;
+
+/**
+ * What a shared link to the brief carries of the sender's page: the area they had open,
+ * so a teammate opens on the same answer. Never a view of something that did not happen,
+ * such as the conditions chart's reading with the left-out inputs counted.
+ */
+export const buildSharedBriefQuery = (area: DecisionArea | undefined): Record<string, string> =>
+  area ? { [HOME_DECISION_PARAM]: area } : {};
+
+/**
+ * A link to one view of `/`, keeping the rest of the page's query (its horizon, a month,
+ * the area open) so the reader lands on the same brief with one thing changed. `null`
+ * drops a key: the view's default carries none. `hash` is where a full load lands.
+ */
+export const buildHomeViewHref = (
+  query: Readonly<Record<string, string | undefined>> | undefined,
+  changes: Readonly<Record<string, string | null>>,
+  hash?: string,
+): string => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value !== undefined && !(key in changes)) params.set(key, value);
+  }
+  for (const [key, value] of Object.entries(changes)) {
+    if (value !== null) params.set(key, value);
+  }
+  const search = params.toString();
+  return `/${search ? `?${search}` : ""}${hash ? `#${hash}` : ""}`;
+};
+
 /*
  * The homepage's sections, in the order they print (2026-10-22): the verdict, the
  * five areas, whose lines they are, what the conditions are made of, what changed,

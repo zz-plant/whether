@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
 import { openShareRail } from "./globalShareRail";
+import { clearPageMonth, stepPageMonth } from "./monthCursor";
 import { navigationGroups } from "../../lib/navigation/informationArchitecture";
 
 /* One source: the IA declares each group's key, the header tabs show it on
@@ -111,6 +112,14 @@ export function KeyboardShortcuts() {
 
       if (e.key === "Escape") {
         setHelpOpen(false);
+        clearPageMonth();
+        return;
+      }
+
+      /* A month back or on, across every drawing on the page (monthCursor.tsx). No
+         browser binds a bare bracket; ⌘[ is Back, and the modifier check above leaves it. */
+      if (e.key === "[" || e.key === "]") {
+        if (stepPageMonth(e.key === "[" ? -1 : 1)) e.preventDefault();
         return;
       }
 

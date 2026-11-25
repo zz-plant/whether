@@ -2,6 +2,7 @@ import { Sparkline, sparklineDomain, type SparklinePoint } from "../../component
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import type { RegimeKey } from "../../../lib/types";
 import type { summarizeInversionMonths } from "../../../lib/report/evidenceInstrumentSummaries";
+import { toMonthKey } from "../../../lib/monthCursor";
 
 /**
  * The pictures a closed instrument question draws beside its answer
@@ -10,6 +11,10 @@ import type { summarizeInversionMonths } from "../../../lib/report/evidenceInstr
  * drawings of the sentence and carry nothing it does not, so the summary hides
  * them from assistive tech; none holds a link. The domain each one covers is
  * named in its sentence or printed beside it.
+ *
+ * A cell that stands for a month carries it (`data-month`, `lib/monthCursor.ts`), so
+ * a month read anywhere on the page (the record band, a month in an opened panel,
+ * `[` and `]`) is ringed here too (month-active.css).
  */
 
 type InversionSummary = ReturnType<typeof summarizeInversionMonths>;
@@ -53,6 +58,7 @@ export function InversionCell({
   return (
     <span
       data-inverted={month[INVERTED_FLAG[spread]] ? "" : undefined}
+      data-month={toMonthKey(month.year, month.month)}
       className={`${className} ${month[INVERTED_FLAG[spread]] ? CELL_FILLED : CELL_EMPTY} ${month[spread] === null ? "opacity-40" : ""}`}
     />
   );
@@ -103,6 +109,7 @@ export function ConditionCellsPreview({ series }: { series: ReadonlyArray<{ year
           key={`${entry.year}-${entry.month}`}
           data-regime={regimeDataAttribute(entry.regime)}
           className="record-week-cell block h-4 w-[5px]"
+          data-month={toMonthKey(entry.year, entry.month)}
         />
       ))}
     </span>

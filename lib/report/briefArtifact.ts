@@ -432,6 +432,28 @@ export const resolveSharedBriefUrl = (artifact: BriefArtifact, origin: string) =
   return url.toString();
 };
 
+/**
+ * A paste whose link opens on the sender's view (2026-11-18): the area open on `/`
+ * (`{ decision: "hiring" }`, `buildSharedBriefQuery`), so a teammate opens on the same
+ * answer. Applied as the copy is made, because the reader can open another area after
+ * the page loads. `sharedUrl` is the link the paste was formatted with
+ * (`resolveSharedBriefUrl`), and every place it appears takes the view. The words of the
+ * paste do not change. Never pass a view of something that did not happen, such as the
+ * conditions chart's reading with the left-out inputs counted.
+ */
+export const carrySharedView = (
+  text: string,
+  sharedUrl: string,
+  query: Readonly<Record<string, string>>,
+): { text: string; url: string } => {
+  const entries = Object.entries(query).filter(([key]) => key !== SHARE_REFERRAL_PARAM);
+  if (entries.length === 0 || !URL.canParse(sharedUrl)) return { text, url: sharedUrl };
+  const url = new URL(sharedUrl);
+  for (const [key, value] of entries) url.searchParams.set(key, value);
+  const carried = url.toString();
+  return { text: text.split(sharedUrl).join(carried), url: carried };
+};
+
 const formatSlack = (artifact: BriefArtifact, origin: string) =>
   [
     `*${artifact.title} — ${artifact.recordDateLabel}*`,

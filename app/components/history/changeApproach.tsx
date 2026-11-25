@@ -25,6 +25,10 @@ const y = (distance: number) => H / 2 - (distance / CHANGE_APPROACH_SCALE_PTS) *
  * where every other one does. Drawn at its own size, never scaled, so nothing in it
  * changes with the column. It carries no text: the row it sits in names the month,
  * the change and the words this draws, and its accessible name lists the readings.
+ *
+ * Each dot carries its month (`data-month`), so a month read anywhere on the page
+ * rings the dot that stands for it (month-active.css). The row's link covers the
+ * drawing and carries the change's month, so pointing at the row reads that month.
  */
 export function ChangeApproachDrawing({ approach, id }: { approach: ChangeApproach; id: string }) {
   const last = approach.points.length - 1;
@@ -52,7 +56,14 @@ export function ChangeApproachDrawing({ approach, id }: { approach: ChangeApproa
       <g clipPath={`url(#${clipId})`}>
         <path d={path} fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" strokeLinecap="round" />
         {approach.points.map((point, index) => (
-          <circle key={point.recordDate} cx={x(index)} cy={y(point.distance)} r={index === last ? 2.5 : 1.6} fill="currentColor" />
+          <circle
+            key={point.recordDate}
+            cx={x(index)}
+            cy={y(point.distance)}
+            r={index === last ? 2.5 : 1.6}
+            fill="currentColor"
+            data-month={point.recordDate.slice(0, 7)}
+          />
         ))}
       </g>
     </svg>

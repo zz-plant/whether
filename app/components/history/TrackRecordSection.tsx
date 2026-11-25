@@ -116,9 +116,12 @@ export function TrackRecordSection({
                         and its ::after spans the row. */}
                     <a
                       href={buildMonthBriefHref(transition.atDate)}
+                      data-month={transition.atDate.slice(0, 7)}
+                      /* The date is all the row has room to print; its name says where it goes. */
+                      aria-label={`Open ${formatMonthYearShortFromValue(transition.atDate)}’s guidance`}
                       className="underline decoration-slate-600 underline-offset-4 after:absolute after:inset-0 group-hover:text-slate-200"
                     >
-                      {formatMonthYearShortFromValue(transition.atDate)}
+                      <time dateTime={transition.atDate.slice(0, 7)}>{formatMonthYearShortFromValue(transition.atDate)}</time>
                     </a>
                   </td>
                   <td className="py-2.5 pr-4 text-slate-200">

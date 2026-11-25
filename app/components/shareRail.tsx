@@ -22,6 +22,7 @@ import { CloseIcon } from "./uiIcons";
 import { CalendarButton, buildMondayAgendaDescription } from "./calendarButton";
 import { CLOSE_CONTROL_CLASS } from "./ui/closeControl";
 import { SegmentedControl } from "./ui/segmentedControl";
+import { shareablePageLink } from "../../lib/navigation/shareableLink";
 
 type SharePreset = "ceo" | "finance" | "team" | "custom";
 
@@ -206,7 +207,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             >
               <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px] data-[checked]:bg-[var(--bg-body)]" />
             </Switch.Root>
-            <span id={slackOverlayLabelId}>Slack preview overlay</span>
+            <span id={slackOverlayLabelId}>Preview in Slack</span>
           </label>
 
           <div className="border-t border-[color:var(--border-subtle)] pt-3">
@@ -272,7 +273,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => {
-                  void copyToClipboard(window.location.href, "link");
+                  void copyToClipboard(shareablePageLink(window.location.href), "link");
                 }}
                 className="weather-button inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
               >

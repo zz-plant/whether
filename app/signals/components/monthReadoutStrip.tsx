@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { monthKeyOf, toMonthKey } from "../../../lib/monthCursor";
+import { monthOfLabel } from "../../../lib/report/evidenceInstrumentSummaries";
 
 /**
  * A row of months a reader can point at and open, inside an opened instrument.
@@ -11,6 +13,10 @@ import type { ReactNode } from "react";
  * value is printed. No script: the readout is each link's own text, shown by
  * `:hover` and `:focus-visible`, so it works before hydration and both
  * gestures show the same thing.
+ *
+ * Each column carries its month (`data-month`, `lib/monthCursor.ts`), so a month read
+ * anywhere on the page (the record band, `[` and `]`) shows its words here as if
+ * pointed at: the readout also answers `data-month-active`.
  */
 
 type MonthReadout = {
@@ -27,6 +33,12 @@ type MonthReadout = {
   href: string | null;
   /** The month's mark, drawn over its label. */
   mark?: ReactNode;
+};
+
+/* The month a column stands for: its key where that is a date ("2026-03", "2026-03-31"), else its label ("Mar 2026"). */
+const monthOf = (month: MonthReadout) => {
+  const parsed = monthOfLabel(month.label);
+  return monthKeyOf(month.key) ?? (parsed ? toMonthKey(parsed.year, parsed.month) : undefined);
 };
 
 export function MonthReadoutStrip({
@@ -46,12 +58,13 @@ export function MonthReadoutStrip({
       {/* Two lines tall either way, so a longer readout never moves the row. */}
       <p
         aria-hidden="true"
-        className="min-h-10 text-fluid-nano leading-5 text-slate-400 group-has-[a:focus-visible]/strip:invisible group-has-[a:hover]/strip:invisible"
+        className="min-h-10 text-fluid-nano leading-5 text-slate-400 group-has-[a:focus-visible]/strip:invisible group-has-[a:hover]/strip:invisible group-has-[a[data-month-active]]/strip:invisible"
       >
         {caption}
       </p>
       <ol aria-label={label} className="flex">
         {months.map((month) => {
+          const key = monthOf(month);
           const body = (
             <>
               {month.mark ? <span className="flex w-full justify-center">{month.mark}</span> : null}
@@ -63,12 +76,17 @@ export function MonthReadoutStrip({
               </span>
               {/* One readout at a time: the month under the pointer wins over the
                   one the keyboard is on, which steps aside while any month is
-                  hovered (its rule's `:has()` outranks the focus rule). */}
+                  hovered (its rule's `:has()` outranks the focus rule). The page's
+                  month counts as pointed at: it is the hovered one, or one read
+                  elsewhere on the page. */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-0 hidden min-h-10 text-fluid-nano leading-5 text-slate-100 group-focus-visible/month:block group-has-[a:hover]/strip:hidden group-hover/month:block!"
+                className="pointer-events-none absolute inset-x-0 top-0 hidden min-h-10 text-fluid-nano leading-5 text-slate-100 group-focus-visible/month:block group-has-[a:hover]/strip:hidden group-has-[a[data-month-active]]/strip:hidden group-hover/month:block! group-data-[month-active]/month:block!"
               >
-                <span className="font-semibold">{month.label}</span> · {month.readout}
+                <time dateTime={key} className="font-semibold">
+                  {month.label}
+                </time>{" "}
+                · {month.readout}
               </span>
             </>
           );
@@ -80,11 +98,14 @@ export function MonthReadoutStrip({
                   aria-label={`${month.label}: ${month.readout}`}
                   className="group/month flex min-h-11 flex-col items-center justify-end gap-1 rounded-sm py-1 hover:bg-[color:var(--bg-nested)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[color:var(--accent-action)]"
                   style={{ touchAction: "manipulation" }}
+                  data-month={key}
                 >
                   {body}
                 </a>
               ) : (
-                <span className="group/month flex min-h-11 flex-col items-center justify-end gap-1 py-1">{body}</span>
+                <span data-month={key} className="group/month flex min-h-11 flex-col items-center justify-end gap-1 py-1">
+                  {body}
+                </span>
               )}
             </li>
           );

@@ -93,9 +93,9 @@ describe("buildScoreComposition", () => {
     assert.ok(composition);
     assert.match(
       composition.tightness.sentence,
-      /^Funding pressure 60 = 36 from the short-term borrowing rate \+ 0 from the yield curve's inversion \+ 24 from the recent pace of rate rises \+ 0 from financial-conditions stress\.$/,
+      /^Funding pressure 60 = 36 from the short-term borrowing rate \+ 0 from the recession warning gauge below zero \+ 24 from the recent pace of rate rises \+ 0 from financial-conditions stress\.$/,
     );
-    assert.match(composition.riskAppetite.sentence, /^Risk appetite \d+ = \d+ from the yield curve − \d+ from stock-market volatility\.$/);
+    assert.match(composition.riskAppetite.sentence, /^Risk appetite \d+ = \d+ from the recession warning gauge − \d+ from stock-market volatility\.$/);
     assert.equal(composition.tightness.largest, "rateLevel");
     assert.equal(composition.riskAppetite.largest, "curve");
   });

@@ -88,7 +88,7 @@ type AreaMovement = {
   state: AreaState;
   /** The lines that decided the movement, in the order the area states them. Empty when it held. */
   crossed: CrossedLine[];
-  /** A table cell's worth: "Pause now applies: funding pressure rose through 76." */
+  /** A table cell's worth: "Paused: funding pressure rose through 76." */
   text: string;
 };
 

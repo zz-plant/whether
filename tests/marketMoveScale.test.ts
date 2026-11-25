@@ -24,10 +24,10 @@ const bills = [4, 4, 4.25, 4.25, 4.25, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5];
 const series = bills.map((bill, index) => month(index, bill, 0.1 + index * 0.05));
 
 describe("the size of a market move", () => {
-  it("counts the record's months that moved as far, as a reader says it", () => {
+  it("counts the record's months that moved as far, as a reader says it, naming the rate", () => {
     assert.equal(
       describeMarketMoveScale({ input: "baseRate", move: -0.18, baseRateUsed: "1M", series }),
-      "The rate moved that far in about 1 month in 6 since 2020.",
+      "The 1-month rate moved that far in about 1 month in 6 since 2020.",
     );
   });
 
@@ -65,10 +65,10 @@ describe("a short-rate move in Fed steps", () => {
     assert.equal(describeRateMoveInFedSteps(0.27, "Cloudy"), "About one quarter-point Fed hike turns conditions Cloudy.");
   });
 
-  it("calls a move within three basis points of a whole step that many steps, and agrees the verb", () => {
-    assert.equal(describeRateMoveInFedSteps(0.5, "Cloudy"), "About 2 quarter-point Fed hikes turn conditions Cloudy.");
+  it("calls a move within three basis points of a whole step that many steps, in words, and agrees the verb", () => {
+    assert.equal(describeRateMoveInFedSteps(0.5, "Cloudy"), "About two quarter-point Fed hikes turn conditions Cloudy.");
     assert.equal(describeRateMoveInFedSteps(-0.4, "Sunny"), "More than one quarter-point Fed cut turns conditions Sunny.");
-    assert.equal(describeRateMoveInFedSteps(-0.9, "Sunny"), "More than 3 quarter-point Fed cuts turn conditions Sunny.");
+    assert.equal(describeRateMoveInFedSteps(-0.9, "Sunny"), "More than three quarter-point Fed cuts turn conditions Sunny.");
   });
 });
 

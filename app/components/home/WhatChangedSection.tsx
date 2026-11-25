@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { UrlDetails } from "../ui/urlDetails";
 import { HomeSection } from "./HomeSection";
 import { Sparkline, interquartileRange, sparklineDomain, type SparklinePoint } from "../ui/sparkline";
@@ -8,11 +9,26 @@ import { SignalContextDetails } from "../ui/plainLanguage";
 import type { ScoreMoveRanges } from "../../../lib/report/marketMoveScale";
 import type { RegimeKey } from "../../../lib/types";
 import { TrendGlyph, trendToneClass } from "../illustrations/TrendGlyph";
-import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
+import { HOME_DECISION_PARAM, HOME_SECTIONS, buildHomeViewHref, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { describeSignalMoveMeaning, type SignalMoveMeaning } from "../../../lib/report/signalMoveMeaning";
-import type { InputTrail, InputTrailKey } from "../../../lib/report/home/inputTrail";
+import { INPUT_TRAIL_PARAM, type InputTrail, type InputTrailKey, type InputTrailSpan } from "../../../lib/report/home/inputTrail";
+import { areasMovedBy } from "../../../lib/report/signalFlow";
+import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { InputTrailChart } from "../ui/inputTrail";
+import { ChosenAreaScope, MovesChosenArea } from "./homeView";
+import { quietUnlessMoves } from "./chosenAreaInk";
+
+/* The table inside the scope that carries the open area, where the rows follow one. */
+const TableScope = ({ follows, initial, children }: { follows: boolean; initial: DecisionArea | null; children: ReactNode }) =>
+  follows ? <ChosenAreaScope param={HOME_DECISION_PARAM} initial={initial}>{children}</ChosenAreaScope> : <>{children}</>;
+
+const SIGNAL_ROW_IDS: Record<SignalChangeRow["key"], string> = {
+  tightness: "signal-funding-pressure",
+  riskAppetite: "signal-risk-appetite",
+  baseRate: "signal-base-rate",
+  curveSlope: "signal-curve-slope",
+};
 
 /**
  * Movement: one row per signal, each opening on what the move means in everyday
@@ -47,7 +63,7 @@ const meaningOf = (row: SignalChangeRow, basis: ComparisonBasis) =>
     basis,
   });
 
-const MoveMeaning = ({ row, meaning }: { row: SignalChangeRow; meaning: SignalMoveMeaning }) => {
+const MoveMeaning = ({ row, meaning, quiet = "" }: { row: SignalChangeRow; meaning: SignalMoveMeaning; quiet?: string }) => {
   /* A score held at the top of its scale is not "unchanged": it cannot show a
      rise (2026-10-14). A flat "No change" said "no move" a row before the note
      that said the move was hidden, at the moment conditions were most extreme. */
@@ -60,7 +76,7 @@ const MoveMeaning = ({ row, meaning }: { row: SignalChangeRow; meaning: SignalMo
   }
   return (
     <p
-      className={`flex items-baseline gap-1.5 text-sm font-medium ${trendToneClass(meaning.direction, row.increaseIsPositive)}`}
+      className={`flex items-baseline gap-1.5 text-sm font-medium ${trendToneClass(meaning.direction, row.increaseIsPositive)} ${quiet}`.trim()}
       data-move-meaning={row.key}
     >
       {meaning.direction === "flat" ? null : <TrendGlyph direction={meaning.direction} className="h-3 w-3 shrink-0 self-center" />}
@@ -133,9 +149,24 @@ export function WhatChangedSection({
   compact = false,
   historyOpen = false,
   drawnAbove = false,
+  followsArea = false,
+  chosenArea,
+  query,
 }: {
   /** The guidance block above draws both scores on their ladders from `md` up; this table keeps its ladders for a phone, where the block draws one. */
   drawnAbove?: boolean;
+  /**
+   * On `/` (2026-11-18), the rows follow the area open on the brief: a row that moves it
+   * says so in its own line, the area's name in full ink, and a row that does not is set
+   * in the lower ink. Nothing is hidden and no heading is added. The picker can open
+   * another area after the page loads, so the ink is read off `ChosenAreaScope`, not
+   * decided here. The two trails switch their reach in place there too (`?trail=`).
+   */
+  followsArea?: boolean;
+  /** The area open when the page was rendered (`resolveHomeDecision`). */
+  chosenArea?: DecisionArea;
+  /** The page's query, so the trails' "Last 3 months · Since 2012" links keep the rest of the view. */
+  query?: Readonly<Record<string, string | undefined>>;
   /** How far the record's months moved each score, for its ladder. */
   moveRanges?: ScoreMoveRanges | null;
   /** The reading with the left-out inputs counted, where its conditions differ. */
@@ -175,6 +206,13 @@ export function WhatChangedSection({
     : movingRows;
   const hasHistory = Object.values(history ?? {}).some((points) => points.length >= 3)
     || (inputHistory ?? []).some((entry) => entry.points.length >= 3);
+  /* The areas each row moves, by the feeds the /signals diagram draws. */
+  const movedBy = (row: SignalChangeRow) => areasMovedBy(row.key, typeof row.value === "number" ? row.value : null);
+  /* Each reach's link lands on the row it was pressed in, keeping the rest of the view. */
+  const trailHrefs = (key: SignalChangeRow["key"]): Record<InputTrailSpan, string> => ({
+    daily: buildHomeViewHref(query, { [INPUT_TRAIL_PARAM]: null }, SIGNAL_ROW_IDS[key]),
+    "since-2012": buildHomeViewHref(query, { [INPUT_TRAIL_PARAM]: "since-2012" }, SIGNAL_ROW_IDS[key]),
+  });
   return (
     <HomeSection
       id={HOME_SECTIONS.changed.id}
@@ -187,6 +225,7 @@ export function WhatChangedSection({
           The meaning sits under the name, not in a column of its own, so it
           leads the row at every width: as a middle column it printed after the
           score's fold on a phone. */}
+      <TableScope follows={followsArea} initial={chosenArea ?? null}>
       <div className="md:overflow-x-auto overscroll-x-contain">
         <table
           className="weather-signal-table w-full border-collapse text-left text-sm max-md:block md:min-w-[42rem] md:table-fixed"
@@ -210,35 +249,38 @@ export function WhatChangedSection({
             </tr>
           </thead>
           <tbody className="max-md:block">
-            {displayRows.map((row) => (
+            {displayRows.map((row) => {
+              const moves = movedBy(row);
+              const isScore = row.key === "tightness" || row.key === "riskAppetite";
+              /* The lower ink, whenever the open area is one this row does not move. */
+              const quiet = followsArea ? quietUnlessMoves(moves) : "";
+              return (
               <tr
                 key={row.key}
-                id={
-                  row.key === "tightness"
-                    ? "signal-funding-pressure"
-                    : row.key === "riskAppetite"
-                      ? "signal-risk-appetite"
-                      : row.key === "baseRate"
-                        ? "signal-base-rate"
-                        : "signal-curve-slope"
-                }
+                id={SIGNAL_ROW_IDS[row.key]}
                 className="border-b border-[color:var(--border-faint)] align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
-                data-input={compact && row.key !== "tightness" && row.key !== "riskAppetite" ? "" : undefined}
+                data-input={compact && !isScore ? "" : undefined}
+                data-moves={followsArea ? moves.join(" ") : undefined}
               >
-                <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
+                <th scope="row" className={`py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0 ${quiet}`.trim()}>
                   <div className="space-y-1">
                     <Link
                       href={`/signals#${row.key}`}
-                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2 transition-colors"
+                      className={`weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2 transition-colors ${quiet}`.trim()}
                       title={`View ${row.label} evidence and historical charts`}
                     >
                       {row.label}
                     </Link>
                     {/* With nothing to compare, the lead over the table says so once. */}
-                    {comparisonUnavailable ? null : <MoveMeaning row={row} meaning={meanings.get(row.key) ?? meaningOf(row, basis)} />}
+                    {comparisonUnavailable ? null : <MoveMeaning row={row} meaning={meanings.get(row.key) ?? meaningOf(row, basis)} quiet={quiet} />}
+                    {/* An input that moves the open area says so in its own line, through the
+                        score it feeds; a score's own "Affects:" line names its areas already. */}
+                    {followsArea && !isScore ? (
+                      <MovesChosenArea param={HOME_DECISION_PARAM} initial={chosenArea ?? null} areas={moves} />
+                    ) : null}
                     {row.key === "tightness" || row.key === "riskAppetite" ? (
-                      <GovernedAreas metric={row.key} target="table" />
+                      <GovernedAreas metric={row.key} target="table" followsChosen={followsArea} />
                     ) : !compact && row.key === "baseRate" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
                         Feeds into <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
@@ -322,7 +364,7 @@ export function WhatChangedSection({
                             {/* The figure and the earlier reading are the trail's label; the
                                 hollow ring before the earlier one keys its tick on the line. */}
                             <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 tabular-nums">
-                              <span className="text-sm text-slate-200">{row.valueLabel}</span>
+                              <span className={`text-sm text-slate-200 ${quiet}`.trim()}>{row.valueLabel}</span>
                               {showPrevious ? (
                                 <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
                                   {trail?.comparison ? (
@@ -332,7 +374,14 @@ export function WhatChangedSection({
                                 </span>
                               ) : null}
                             </span>
-                            {trail ? <InputTrailChart trail={trail} label={row.label} /> : null}
+                            {trail ? (
+                              <InputTrailChart
+                                trail={trail}
+                                label={row.label}
+                                param={followsArea ? INPUT_TRAIL_PARAM : undefined}
+                                spanHrefs={trailHrefs(row.key)}
+                              />
+                            ) : null}
                           </>
                         );
                       })()}
@@ -348,10 +397,12 @@ export function WhatChangedSection({
                   {!compact ? <MonthEndHistory points={history?.[row.key]} label={row.label} /> : null}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
+      </TableScope>
       {compact && hasHistory ? (
         <UrlDetails queryKey="inputs" initialOpen={historyOpen}
           summary="Score history and market inputs" summaryClassName="weather-hit text-fluid-sm text-slate-300">

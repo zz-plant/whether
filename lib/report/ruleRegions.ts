@@ -14,10 +14,12 @@
  * they were, and this module only adds the words a picture needs beside it.
  */
 import {
+  buildRuleCondition,
   decisionAreaLabel,
   decisionAreaOrder,
   distanceToRuleCondition,
   isRuleConditionMet,
+  ruleMetricLabel,
   type BoundedDecisionRule,
   type DecisionArea,
   type RuleCondition,
@@ -25,12 +27,16 @@ import {
 } from "./boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import { resolveLineState, type ActionStripItem, type LineState } from "./operatingCalls";
-import { anyPauseLineMet } from "./reportEvidence";
 import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
 import { regimeAtCoordinates } from "../regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { formatMonthYearShortFromValue } from "../formatters";
+import { getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeKey } from "../types";
+import {
+  describeRuleChartWhere,
+  type RuleChartReadingKey,
+} from "./ruleChartParams";
 
 type Scores = { tightness: number; riskAppetite: number };
 
@@ -145,13 +151,16 @@ export const buildRuleRegions = (rule: AreaRule): AreaRuleRegions => ({
   resume: regionFor(rule.resume),
 });
 
-/* The pause by the predicate every area surface uses (`anyPauseLineMet`); a clause stored
-   as "and" needs every line, as its sentence says. */
+/* The pause by the predicate every area surface uses: any line met, as `anyPauseLineMet`
+   (lib/report/reportEvidence.ts) reads it, through the same `isRuleConditionMet`. It is not
+   imported from there, because the /operate form's client island reads this module and the
+   evidence builder would bring the engine with it. A clause stored as "and" needs every
+   line, as its sentence says. */
 const pauseMet = (rule: AreaRule, scores: Scores) =>
   rule.pause.conditions.length > 0 &&
   (rule.pause.join === "and"
     ? rule.pause.conditions.every((condition) => isRuleConditionMet(condition, scores[condition.metric]))
-    : anyPauseLineMet([{ pauseConditions: [...rule.pause.conditions] }], scores));
+    : rule.pause.conditions.some((condition) => isRuleConditionMet(condition, scores[condition.metric])));
 
 const restartMet = (rule: AreaRule, scores: Scores) =>
   rule.resume.conditions.length > 0 &&
@@ -161,6 +170,58 @@ const restartMet = (rule: AreaRule, scores: Scores) =>
 
 const regionAt = (rule: AreaRule, scores: Scores): RegionState =>
   pauseMet(rule, scores) ? "pause" : restartMet(rule, scores) ? "restart" : "between";
+
+type AreaChanges = { pauses: DecisionArea[]; restarts: DecisionArea[] };
+
+/**
+ * Which areas another reading would move, each by the one side that can change it
+ * (2026-11-03): an area paused at this week's reading restarts once its restart
+ * condition holds, and any other area pauses once a pause line is met. A paused area
+ * that leaves its pause lines short of restarting stays on hold: between the two,
+ * nothing changes. In the areas' own order.
+ */
+export const areaChangesAt = (rules: readonly AreaRule[], published: Scores, other: Scores): AreaChanges => {
+  const ordered = decisionAreaOrder.flatMap((area) => rules.filter((rule) => rule.area === area));
+  return {
+    pauses: ordered.filter((rule) => !pauseMet(rule, published) && pauseMet(rule, other)).map((rule) => rule.area),
+    restarts: ordered.filter((rule) => pauseMet(rule, published) && restartMet(rule, other)).map((rule) => rule.area),
+  };
+};
+
+/**
+ * The answer, first: "Hiring, Fundraising and New bets would restart", "Roadmap would
+ * pause", "No area would pause or restart". Without the full stop, so a caller can end it.
+ */
+export const describeAreaChanges = ({ pauses, restarts }: AreaChanges): string => {
+  const restart = restarts.length > 0 ? `${listAreas(restarts)} would restart` : null;
+  const pause = pauses.length > 0 ? `${listAreas(pauses)} would pause` : null;
+  if (restart && pause) return `${restart} and ${pause}`;
+  return restart ?? pause ?? "No area would pause or restart";
+};
+
+/**
+ * "Conditions would turn Cloudy.", or null when another reading's scores land where
+ * this week's conditions already are, or where this week's scores already land (a
+ * change awaiting confirmation is the published brief's to state, not this sentence's).
+ */
+export const describeConditionsChange = ({
+  regime,
+  published,
+  other,
+  changeLines,
+}: {
+  /** This week's published conditions. */
+  regime: string | undefined;
+  published: Scores;
+  other: Scores;
+  changeLines: Scores;
+}): string | null => {
+  const lines = { ...DEFAULT_THRESHOLDS, tightnessRegime: changeLines.tightness, riskAppetiteRegime: changeLines.riskAppetite };
+  const landing = regimeAtCoordinates(other.tightness, other.riskAppetite, lines);
+  const here = regimeAtCoordinates(published.tightness, published.riskAppetite, lines);
+  if (landing === here || landing === regime?.toUpperCase()) return null;
+  return `Conditions would turn ${getRegimePublicLabel(landing)}.`;
+};
 
 /**
  * The area's state against its pause lines, as the rules table grades it: crossed, close
@@ -187,26 +248,25 @@ const listAreas = (areas: readonly DecisionArea[]) => listFormat.format(areas.ma
 /* The compact form the rules table prints ("Funding pressure > 76 or Risk appetite < 44"). */
 const clauseLabel = (clause: RuleClause) => clause.conditions.map((condition) => condition.label).join(` ${clause.join} `);
 
-const WHERE: Record<RegionState, string> = {
-  pause: "in the pause region",
-  restart: "in the restart region",
-  between: "between the two, where nothing changes",
-};
-
-/**
- * The chart's claim in words, for its text alternative: which region is which and where the
- * reading sits. "Hiring pauses where Funding pressure > 76 or Risk appetite < 44 and restarts
- * where Funding pressure < 66 and Risk appetite > 54. This week's reading is in the pause region."
- */
-export const describeRegionsAt = (rule: AreaRule, scores: Scores, readingName: string): string => {
+/** The rule as a sentence, the same for every reading: "Hiring pauses where … and restarts where …." */
+const describeRuleSides = (rule: AreaRule): string => {
   const label = decisionAreaLabel(rule.area);
   const sides = [
     rule.pause.conditions.length > 0 ? `pauses where ${clauseLabel(rule.pause)}` : null,
     rule.resume.conditions.length > 0 ? `restarts where ${clauseLabel(rule.resume)}` : null,
   ].filter((side): side is string => side !== null);
-  const ruleSentence = sides.length > 0 ? `${label} ${sides.join(" and ")}.` : `${label} has no line on the two scores.`;
-  return `${ruleSentence} ${readingName} is ${WHERE[regionAt(rule, scores)]}.`;
+  return sides.length > 0 ? `${label} ${sides.join(" and ")}.` : `${label} turns on neither score.`;
 };
+
+/**
+ * The chart's claim in words, for its text alternative: where the area pauses and
+ * restarts, and where the reading sits, in the area's verb (2026-11-18; "in the pause
+ * region" until then, the drawing's name for it). "Hiring pauses where Funding pressure
+ * > 76 or Risk appetite < 44 and restarts where Funding pressure < 66 and Risk appetite
+ * > 54. This week's reading is where Hiring pauses."
+ */
+export const describeRegionsAt = (rule: AreaRule, scores: Scores, readingName: string): string =>
+  `${describeRuleSides(rule)} ${readingName} is ${describeRuleChartWhere(rule.area, regionAt(rule, scores))}.`;
 
 /**
  * The conditions a region cannot draw, because no score measures them, said once under the
@@ -231,54 +291,62 @@ const describeUndrawnConditions = (rule: AreaRule): string | null => {
   return null;
 };
 
-/**
- * What counting the left-out inputs would change, area by area, judged by the same
- * predicates as the published reading: "With startup-market inputs counted, Roadmap would
- * pause." The published guidance does not change; this says what the other reading would do.
- */
-const describeCountedDifference = (rules: readonly AreaRule[], published: Scores, counted: Scores): string => {
-  const ordered = decisionAreaOrder.flatMap((area) => rules.filter((rule) => rule.area === area));
-  const changed = (test: (rule: AreaRule, scores: Scores) => boolean, gained: boolean) =>
-    ordered.filter((rule) => test(rule, counted) === gained && test(rule, published) !== gained).map((rule) => rule.area);
-  const pauses = changed(pauseMet, true);
-  const unpauses = changed(pauseMet, false);
-  const restarts = changed(restartMet, true);
-  const unrestarts = changed(restartMet, false);
-  const clauses = [
-    pauses.length > 0 ? `${listAreas(pauses)} would pause` : null,
-    unpauses.length > 0 ? `${listAreas(unpauses)} would no longer pause` : null,
-    restarts.length > 0 ? `the restart condition would hold for ${listAreas(restarts)}` : null,
-    unrestarts.length > 0 ? `the restart condition would no longer hold for ${listAreas(unrestarts)}` : null,
-  ].filter((clause): clause is string => clause !== null);
-  return clauses.length === 0
-    ? "With startup-market inputs counted, no area would pause or restart differently."
-    : `With startup-market inputs counted, ${clauses.join("; ")}.`;
-};
-
 type LeftOutEntry = { metric: RuleConditionMetric; score: number };
 
 /**
  * The reading the left-out startup-market inputs would give: each score they move, at what
- * they would make it, and the conditions that point lands in. Null when they move neither.
- * `WhyConditionsSection` states the same point in words, from the same entries.
+ * they would make it. Null when they move neither. `WhyConditionsSection` states the same
+ * point in words, from the same entries.
  */
-const leftOutReading = (
-  notCounted: readonly LeftOutEntry[],
-  published: Scores,
-  changeLines: Scores,
-): (Scores & { regime: RegimeKey }) | null => {
+const leftOutReading = (notCounted: readonly LeftOutEntry[], published: Scores): Scores | null => {
   if (notCounted.length === 0) return null;
-  const tightness = notCounted.find((entry) => entry.metric === "tightness")?.score ?? published.tightness;
-  const riskAppetite = notCounted.find((entry) => entry.metric === "riskAppetite")?.score ?? published.riskAppetite;
   return {
-    tightness,
-    riskAppetite,
-    regime: regimeAtCoordinates(tightness, riskAppetite, {
-      ...DEFAULT_THRESHOLDS,
-      tightnessRegime: changeLines.tightness,
-      riskAppetiteRegime: changeLines.riskAppetite,
-    }),
+    tightness: notCounted.find((entry) => entry.metric === "tightness")?.score ?? published.tightness,
+    riskAppetite: notCounted.find((entry) => entry.metric === "riskAppetite")?.score ?? published.riskAppetite,
   };
+};
+
+/* The scores another reading moves, as its answer's last sentence states them. */
+const describeMovedScores = (published: Scores, other: Scores): string => {
+  const tightness = other.tightness !== published.tightness;
+  const riskAppetite = other.riskAppetite !== published.riskAppetite;
+  if (tightness && riskAppetite) return `funding pressure would be ${other.tightness} and risk appetite ${other.riskAppetite}`;
+  if (tightness) return `funding pressure would be ${other.tightness}`;
+  if (riskAppetite) return `risk appetite would be ${other.riskAppetite}`;
+  return "neither score would move";
+};
+
+/**
+ * Another reading the chart can plot besides this week's (2026-11-18): the left-out
+ * inputs counted, or this week's after a whole number of Fed steps (`rateScenario.ts`).
+ * Each is judged by the predicates the published reading is, and the published guidance
+ * never changes under it: this says what the other reading would do.
+ */
+export type RuleChartReading = Scores & {
+  key: RuleChartReadingKey;
+  /** The conditions its scores land in, which the plotted marker takes. */
+  regime: RegimeKey;
+  /** The choice's words: "Startup-market inputs counted", "After one Fed cut". */
+  label: string;
+  /** In full, as the marker and the choice's accessible name say it: "After one quarter-point Fed cut". */
+  name: string;
+  /**
+   * The answer under the chart, what would move first, then the number and what is held:
+   * "Hiring would restart. One quarter-point Fed cut would take the 1-month rate to 3.85%
+   * and funding pressure to 63, with everything else as this week."
+   */
+  answer: string;
+  /** Where it sits against each area's rule, for the chart's text alternative. */
+  where: Partial<Record<DecisionArea, RegionState>>;
+};
+
+/** A reading at a Fed step, as `buildRateMoves` (rateScenario.ts) scores it: the scores and the sentence saying how. */
+export type RuleChartRateMove = Scores & {
+  key: Exclude<RuleChartReadingKey, "counted">;
+  label: string;
+  name: string;
+  /** "One quarter-point Fed cut would take the 1-month rate to 3.85% and funding pressure to 63, with everything else as this week." */
+  how: string;
 };
 
 export type RuleChartArea = {
@@ -291,16 +359,25 @@ export type RuleChartArea = {
   resumeLine: string;
   /** Whether this week's reading meets a pause line: the side that can change the area is the restart. */
   held: boolean;
-  /** The chart's claim for this area, at the published reading and, where there is one, at the counted one. */
-  description: { published: string; counted: string | null };
+  /** The rule as a sentence, the first half of the chart's text alternative (`describeRuleSides`). */
+  rule: string;
+  /** Where this week's reading sits against it. */
+  where: RegionState;
 };
 
 export type RuleChartModel = {
   areas: RuleChartArea[];
   /** The area the chart opens on: the guidance's lead rule, whose sentences sit beside it. Null when those sentences are not that rule's. */
   defaultArea: DecisionArea | null;
-  /** The reading with the left-out inputs counted, and what it would change; null when they move nothing. */
-  counted: (Scores & { regime: RegimeKey; difference: string }) | null;
+  /** The readings the chart can plot besides this week's, in the order the choices print; empty when there are none. */
+  readings: RuleChartReading[];
+  /**
+   * The short rate each funding-pressure value the chart can label comes with, and the
+   * rate's name ("1-month rate"), where the rate alone makes funding pressure this week
+   * (`fundingPressureRateLookup`, rateScenario.ts); null otherwise, and the chart then
+   * labels no rate.
+   */
+  fundingPressureRates: { name: string; values: Array<{ value: number; rate: number }> } | null;
 };
 
 /**
@@ -308,8 +385,9 @@ export type RuleChartModel = {
  * built once on the server from the rules the page prints. `leadArea` is the rule whose
  * sentences the section already prints (`corridorRule`), or null where a stage or override
  * replaced them, so the chart never opens on regions the sentence beside it does not state.
- * `notCounted` is the scoring basis's left-out scores (empty on an archived or saved read,
- * where the toggle has nothing to show).
+ * `notCounted` is the scoring basis's left-out scores and `rateMoves` this week's reading
+ * after each Fed step; both are empty on an archived or saved read, where they have
+ * nothing to show.
  */
 export const buildRuleChartModel = ({
   rules,
@@ -317,34 +395,76 @@ export const buildRuleChartModel = ({
   leadArea,
   notCounted,
   changeLines,
+  regime,
+  rateMoves = [],
+  rateAtFundingPressure,
 }: {
   rules: readonly BoundedDecisionRule[];
   scores: Scores;
   leadArea: DecisionArea | null;
   notCounted: readonly LeftOutEntry[];
-  /** The two lines the conditions are cut at, which name the counted reading's conditions. */
+  /** The two lines the conditions are cut at, which name another reading's conditions. */
   changeLines: Scores;
+  /** This week's published conditions. */
+  regime?: string;
+  rateMoves?: readonly RuleChartRateMove[];
+  /** The rate at a funding-pressure value, or null, and the rate's name; absent when the rate does not make the whole score. */
+  rateAtFundingPressure?: { name: string; at: (value: number) => number | null };
 }): RuleChartModel => {
-  const counted = leftOutReading(notCounted, scores, changeLines);
+  const ordered = decisionAreaOrder.flatMap((area) => rules.filter((rule) => rule.area === area));
+  const lines = { ...DEFAULT_THRESHOLDS, tightnessRegime: changeLines.tightness, riskAppetiteRegime: changeLines.riskAppetite };
+  const chartReading = (entry: Scores & Pick<RuleChartReading, "key" | "label" | "name">, how: string): RuleChartReading => {
+    const other = { tightness: entry.tightness, riskAppetite: entry.riskAppetite };
+    const conditions = describeConditionsChange({ regime, published: scores, other, changeLines });
+    return {
+      ...entry,
+      regime: regimeAtCoordinates(other.tightness, other.riskAppetite, lines),
+      answer: [`${describeAreaChanges(areaChangesAt(ordered, scores, other))}.`, conditions, how].filter(Boolean).join(" "),
+      where: Object.fromEntries(ordered.map((rule) => [rule.area, regionAt(rule, other)])),
+    };
+  };
+  const counted = leftOutReading(notCounted, scores);
+  const readings = [
+    ...(counted
+      ? [chartReading(
+          { ...counted, key: "counted", label: "Startup-market inputs counted", name: "The reading with startup-market inputs counted" },
+          `With startup-market inputs counted, ${describeMovedScores(scores, counted)}.`,
+        )]
+      : []),
+    ...rateMoves.map(({ how, ...move }) => chartReading(move, how)),
+  ];
+  /* Every funding-pressure value an area's rule or the conditions turn on, once each. */
+  const fundingPressureValues = [
+    ...new Set([
+      changeLines.tightness,
+      ...ordered
+        .flatMap((rule) => [...rule.pause.conditions, ...rule.resume.conditions])
+        .filter((condition) => condition.metric === "tightness")
+        .map((condition) => condition.value),
+    ]),
+  ].sort((left, right) => left - right);
   return {
-    areas: decisionAreaOrder.flatMap((area) => {
-      const rule = rules.find((candidate) => candidate.area === area);
-      if (!rule) return [];
-      return [{
-        area,
-        regions: buildRuleRegions(rule),
-        note: describeUndrawnConditions(rule),
-        pauseLine: formatDecisionThreshold(rule.pauseTrigger),
-        resumeLine: formatDecisionReversal(rule.resumeTrigger),
-        held: pauseMet(rule, scores),
-        description: {
-          published: describeRegionsAt(rule, scores, "This week's reading"),
-          counted: counted ? describeRegionsAt(rule, counted, "The reading with startup-market inputs counted") : null,
-        },
-      }];
-    }),
+    areas: ordered.map((rule) => ({
+      area: rule.area,
+      regions: buildRuleRegions(rule),
+      note: describeUndrawnConditions(rule),
+      pauseLine: formatDecisionThreshold(rule.pauseTrigger),
+      resumeLine: formatDecisionReversal(rule.resumeTrigger),
+      held: pauseMet(rule, scores),
+      rule: describeRuleSides(rule),
+      where: regionAt(rule, scores),
+    })),
     defaultArea: leadArea,
-    counted: counted ? { ...counted, difference: describeCountedDifference(rules, scores, counted) } : null,
+    readings,
+    fundingPressureRates: rateAtFundingPressure
+      ? {
+          name: rateAtFundingPressure.name,
+          values: fundingPressureValues.flatMap((value) => {
+            const rate = rateAtFundingPressure.at(value);
+            return rate === null ? [] : [{ value, rate }];
+          }),
+        }
+      : null,
   };
 };
 
@@ -405,4 +525,102 @@ export const buildAreaStateHistory = (
         summary: `${label}: ${byState.join("; ")}. Funding pressure ${entry.tightness}, risk appetite ${entry.riskAppetite}.`,
       };
     });
+};
+
+/** One line of a rule as numbers only, the way a reader's own rules are kept (`PlanLines`, lib/alert/planLines.ts). */
+type NumericLine = { metric: RuleConditionMetric; operator: ">" | "<"; value: number };
+
+/** A rule as numbers only: a pause on any of its lines, a restart on all of them, as every published rule joins them. */
+type NumericRule = { area: DecisionArea; pause: readonly NumericLine[]; resume: readonly NumericLine[] };
+
+/** A numbers-only rule as the regions and predicates read one. */
+export const ruleFromNumbers = (rule: NumericRule): AreaRule => ({
+  area: rule.area,
+  pause: { conditions: rule.pause.map((line) => buildRuleCondition(line.metric, line.operator, line.value)), join: "or" },
+  resume: { conditions: rule.resume.map((line) => buildRuleCondition(line.metric, line.operator, line.value)), join: "and" },
+});
+
+/* A line is met sooner when it moves toward the reading that meets it: a "> 76" lowered, a
+   "< 44" raised. A pause comes as conditions get harder and a restart as they ease, so
+   "sooner" reads the same way on both sides. */
+const metSooner = (line: NumericLine, from: number) => (line.operator === ">" ? line.value < from : line.value > from);
+
+type RuleSide = "pause" | "resume";
+
+const SIDE_VERB: Record<RuleSide, string> = { pause: "pauses if", resume: "restarts when" };
+
+type OwnRuleComparison = {
+  /** The published rule's regions, as the rules table draws them. */
+  regions: AreaRuleRegions;
+  /** The reader's regions, one per side whose numbers moved, drawn over the published ones as an outline. */
+  outline: RuleRegion[];
+  /**
+   * One sentence per moved number, the answer first: "Later than ours: your Hiring restarts
+   * when funding pressure is below 60, not 66." Empty while the numbers are the published ones.
+   */
+  changes: string[];
+  /**
+   * Where the reader's numbers put the area this week, when that differs from where the
+   * published rule puts it: "Hiring would restart this week by your numbers. By ours it
+   * stays paused." Null when the two agree.
+   */
+  thisWeek: string | null;
+  /** The map's text alternative: the published rule and where this week's reading sits against it. */
+  description: string;
+};
+
+/**
+ * A reader's own numbers for one area beside the published rule, for the /operate form that
+ * lets them move each number. The regions, "sooner" and "later", and this week's state are
+ * judged with the geometry and predicates the rules table and its map use (`regionAt`), so
+ * the form cannot say an area pauses where the table, read with the same numbers, does not.
+ * Lines are paired by score and direction, as the form keeps them; a line with no published
+ * counterpart says nothing.
+ */
+export const compareOwnRule = ({
+  published,
+  own,
+  scores,
+}: {
+  published: NumericRule;
+  own: NumericRule;
+  scores: Scores;
+}): OwnRuleComparison => {
+  const label = decisionAreaLabel(published.area);
+  const publishedRule = ruleFromNumbers(published);
+  const ownRule = ruleFromNumbers({ ...own, area: published.area });
+  const ownRegions = buildRuleRegions(ownRule);
+  const moved = (side: RuleSide) =>
+    own[side].flatMap((line) => {
+      const from = published[side].find((candidate) => candidate.metric === line.metric && candidate.operator === line.operator);
+      return from && from.value !== line.value ? [{ side, line, from: from.value }] : [];
+    });
+  const movedPause = moved("pause");
+  const movedResume = moved("resume");
+  const changes = [...movedPause, ...movedResume].map(({ side, line, from }) => {
+    const score = ruleMetricLabel[line.metric].toLowerCase();
+    const direction = line.operator === ">" ? "above" : "below";
+    return `${metSooner(line, from) ? "Sooner" : "Later"} than ours: your ${label} ${SIDE_VERB[side]} ${score} is ${direction} ${line.value}, not ${from}.`;
+  });
+  const publishedAt = regionAt(publishedRule, scores);
+  const ownAt = regionAt(ownRule, scores);
+  /* Only the pause decides this week's state: an area that is not paused has nothing to restart. */
+  const thisWeek =
+    ownAt === "pause" && publishedAt !== "pause"
+      ? `${label} would pause this week by your numbers, not by ours.`
+      : ownAt !== "pause" && publishedAt === "pause"
+        ? ownAt === "restart"
+          ? `${label} would restart this week by your numbers. By ours it stays paused.`
+          : `${label} wouldn't pause this week by your numbers. By ours it does.`
+        : null;
+  return {
+    regions: buildRuleRegions(publishedRule),
+    outline: [
+      ...(movedPause.length > 0 ? [ownRegions.pause] : []),
+      ...(movedResume.length > 0 ? [ownRegions.resume] : []),
+    ].filter((region) => region.edges.length > 0),
+    changes,
+    thisWeek,
+    description: describeRegionsAt(publishedRule, scores, "This week's reading"),
+  };
 };

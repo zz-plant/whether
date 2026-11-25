@@ -6,15 +6,16 @@ import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/hom
 import { RegimeRadar, type RegimeRadarProps } from "./RegimeRadar";
 import {
   RuleChartChooser,
-  RuleChartCountedSwitch,
   RuleChartFigure,
   RuleChartLines,
   RuleChartProvider,
+  RuleChartReadings,
   RuleLines,
 } from "./RuleRegionsChart";
 import type { RegimeKey } from "../../../lib/types";
 import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import type { RuleChartModel } from "../../../lib/report/ruleRegions";
+import type { RuleChartReadingKey } from "../../../lib/report/ruleChartParams";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
 
@@ -75,8 +76,12 @@ type FlipProximityLine = {
  * Since 2026-11-18 the chart also draws the rules (`ruleChart`, `RuleRegionsChart`): an
  * area chosen over it shades that area's pause and restart regions, and the pause or
  * restart line beside it follows the choice. It opens on the guidance's lead rule, so the
- * first picture is the sentence beside it. Where the reading leaves inputs out, a switch
- * plots the reading with them counted and names the areas that would then move.
+ * first picture is the sentence beside it, or on the decision the reader chose. A second
+ * row plots another reading, with the left-out inputs counted or after a Fed cut or hike,
+ * and names the areas that would then move. Where the short rate makes the whole of
+ * funding pressure, the funding-pressure lines carry the rate each comes with, and the
+ * fold's "That is the 1-month Treasury bill rate falling …" line, which those labels now
+ * draw, is left out.
  */
 export function WhatWouldChangeSection({
   feelsLike,
@@ -114,7 +119,7 @@ export function WhatWouldChangeSection({
   regime?: string;
   /** The month-end path, its domain and its like-for-like note, for the map this section draws at every width. */
   conditionsTrail?: {
-    points: ReadonlyArray<{ tightness: number; riskAppetite: number }>;
+    points: ReadonlyArray<{ tightness: number; riskAppetite: number; label?: string; month?: string }>;
     caption: string | null;
     caveat: string | null;
   };
@@ -125,12 +130,14 @@ export function WhatWouldChangeSection({
   ruleChart?:
     | (RuleChartModel & {
         initialArea?: DecisionArea;
-        initialCounted: boolean;
+        initialReading: RuleChartReadingKey | null;
         /** The page's query, which the chart's links keep. */
         query?: Record<string, string | undefined>;
       })
     | null;
 }) {
+  const chart = ruleChart && ladders.length > 0 ? ruleChart : null;
+  const rateTicks = Boolean(chart?.fundingPressureRates && chart.fundingPressureRates.values.length > 0);
   const tightnessLadder = ladders.find((ladder) => ladder.metric === "tightness");
   const riskAppetiteLadder = ladders.find((ladder) => ladder.metric === "riskAppetite");
   const tightnessVal = tightnessLadder?.value ?? 50;
@@ -160,13 +167,17 @@ export function WhatWouldChangeSection({
     trail: conditionsTrail?.points,
     trailCaption: conditionsTrail?.caption,
     caveat: conditionsTrail?.caveat,
-    feelsLike,
+    /* Not where the chart can plot the counted reading itself (2026-11-18): the glyph drew
+       that point a second time, beside the choice that plots it. */
+    feelsLike: chart?.readings.some((reading) => reading.key === "counted") ? null : feelsLike,
     readingsId: "conditions-chart-readings",
   };
   /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
-     and line numbers drew at 8–10px with empty ground either side. */
-  const chartWidth = "w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[280px] shrink-0";
-  const chart = ruleChart && ladders.length > 0 ? ruleChart : null;
+     and line numbers drew at 8–10px with empty ground either side. The rate column
+     widens the drawing, so its box widens with it and the plot keeps its size. */
+  const chartWidth = rateTicks
+    ? "w-full max-w-[380px] mx-auto md:mx-0 md:max-w-[340px] shrink-0"
+    : "w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[280px] shrink-0";
 
   const body = (
       /* No key to the three lines (2026-11-03): the two questions below answer
@@ -181,7 +192,13 @@ export function WhatWouldChangeSection({
       >
         {ladders.length > 0 ? (
           chart ? (
-            <RuleChartFigure radar={radar} areas={chart.areas} counted={chart.counted} className={chartWidth} />
+            <RuleChartFigure
+              radar={radar}
+              areas={chart.areas}
+              readings={chart.readings}
+              fundingPressureRates={chart.fundingPressureRates}
+              className={chartWidth}
+            />
           ) : (
             <RegimeRadar {...radar} className={chartWidth} />
           )
@@ -212,7 +229,10 @@ export function WhatWouldChangeSection({
                     {/* The everyday size leads; the instrument and the record's count are the
                         secondary line, for the reader who wants the market's own units. */}
                     {marketMoves.map((line) => {
-                      const detail = [line.instrument, line.scale].filter(Boolean).join(" ");
+                      /* The rate the change line sits at is on the chart's funding-pressure
+                         axis when it labels rates, so the bill's move is not said again. */
+                      const instrument = rateTicks && line.axis === "tightness" ? null : line.instrument;
+                      const detail = [instrument, line.scale].filter(Boolean).join(" ");
                       return (
                         <li key={line.sentence} data-flip-axis={line.axis}>
                           <span className="text-slate-400">{line.label}:</span> {line.sentence}
@@ -254,13 +274,14 @@ export function WhatWouldChangeSection({
         <RuleChartProvider
           defaultArea={chart.defaultArea}
           initialArea={chart.initialArea}
-          initialCounted={chart.initialCounted}
+          initialReading={chart.initialReading}
+          areas={chart.areas.map((entry) => entry.area)}
           query={chart.query}
         >
           <div className="space-y-4">
             <div className="space-y-2">
               <RuleChartChooser areas={chart.areas.map((entry) => entry.area)} />
-              <RuleChartCountedSwitch available={Boolean(chart.counted)} />
+              <RuleChartReadings readings={chart.readings} />
             </div>
             {body}
           </div>

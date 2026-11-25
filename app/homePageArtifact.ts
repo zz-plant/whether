@@ -1,7 +1,7 @@
 import type { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { buildBriefArtifact } from "../lib/report/homeBrief/briefArtifactBuilder";
-import { formatBriefArtifact } from "../lib/report/briefArtifact";
+import { formatBriefArtifact, resolveSharedBriefUrl } from "../lib/report/briefArtifact";
 import type { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import type { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../lib/siteUrl";
@@ -58,6 +58,10 @@ export function buildHomePageArtifact({
   // lines, pointing at the frozen record. `siteUrl`, not the request host: a paste is read
   // later, from somewhere else, and a preview host does not outlive it.
   const briefSlackBlock = formatBriefArtifact(briefArtifact, "slack", siteUrl);
+  /* The share sheet's link is the paste's, not the page's own address: that carried
+     every view of the page, the chart's counted reading included. Copy brief adds the
+     area open as it copies (`carrySharedView`). */
+  const briefShareUrl = resolveSharedBriefUrl(briefArtifact, siteUrl);
 
-  return { cadenceCall, cadenceTitle, briefArtifact, briefSlackBlock };
+  return { cadenceCall, cadenceTitle, briefArtifact, briefSlackBlock, briefShareUrl };
 }

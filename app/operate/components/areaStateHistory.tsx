@@ -47,6 +47,14 @@ const placeLabel = (row: number, half: 0 | 1): Placement => ({
 });
 
 const PLACED = "[grid-column:var(--nc)] [grid-row:var(--nr)] @[44rem]:[grid-column:var(--wc)] @[44rem]:[grid-row:var(--wr)]";
+
+/* "2026-09": every piece of a month's column carries it, so a month made active anywhere on
+   the page (`data-month-active`, set on each element with a `data-month`) is found here too. */
+const monthKey = (recordDate: string) => recordDate.slice(0, 7);
+
+/* The active month's column takes the frame a pointed-at month takes, and nothing more: its
+   words stay for the pointer and focus, so two readouts never share the space under the grid. */
+const MONTH_ACTIVE = "data-[month-active]:outline data-[month-active]:outline-1 data-[month-active]:outline-[color:var(--border-strong)]";
 const PLACED_LABEL = "[grid-column:1] [grid-row:var(--nr)] @[44rem]:[grid-row:var(--wr)]";
 
 /**
@@ -69,12 +77,16 @@ export function AreaStateHistory({ months }: { months: readonly AreaStateMonth[]
     { key: "tightness", row: scoreRow, content: regimeSignalLabel.tightness },
     { key: "riskAppetite", row: scoreRow + 1, content: regimeSignalLabel.riskAppetite },
   ];
-  const caption = `Each area at the last ${months.length} month-ends, ${first.label} to ${last.label}: the month-end readings, scored with today’s formula, against this week’s lines.`;
   return (
     <figure className="m-0 space-y-2" data-area-state-history="">
       <figcaption className="space-y-1">
         <span className="block text-sm font-semibold text-slate-100">Each area by month-end</span>
-        <span className="block max-w-[60ch] text-xs leading-5 text-slate-400">{caption}</span>
+        <span className="block max-w-[60ch] text-xs leading-5 text-slate-400">
+          Each area at the last {months.length} month-ends,{" "}
+          <time dateTime={monthKey(first.recordDate)}>{first.label}</time> to{" "}
+          <time dateTime={monthKey(last.recordDate)}>{last.label}</time>: the month-end readings, scored with today’s
+          formula, against this week’s rules.
+        </span>
       </figcaption>
       <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300" aria-label="Key">
         {STATE_KEY.map((entry) => (
@@ -112,9 +124,11 @@ export function AreaStateHistory({ months }: { months: readonly AreaStateMonth[]
               const yearShown = index === 0 || month.month === 1;
               const yearInBlock = !yearShown && index === HALF;
               return [
-                <span
+                <time
                   key={`${month.recordDate}-head`}
+                  dateTime={monthKey(month.recordDate)}
                   aria-hidden="true"
+                  data-month={monthKey(month.recordDate)}
                   style={place(index, 1)}
                   /* The second block of six, on a narrow box, stands a little apart from the first. */
                   className={`${PLACED} flex flex-col items-center justify-end pb-1 leading-tight text-slate-400 ${
@@ -125,11 +139,12 @@ export function AreaStateHistory({ months }: { months: readonly AreaStateMonth[]
                   {yearShown || yearInBlock ? (
                     <span className={`text-[0.6875rem] text-slate-500 ${yearInBlock ? "@[44rem]:hidden" : ""}`}>{month.year}</span>
                   ) : null}
-                </span>,
+                </time>,
                 ...month.states.map((entry, row) => (
                   <span
                     key={`${month.recordDate}-${entry.area}`}
                     aria-hidden="true"
+                    data-month={monthKey(month.recordDate)}
                     style={place(index, row + 2)}
                     data-area-state={entry.state ?? "none"}
                     className={`${PLACED} flex min-h-11 items-center justify-center border-b border-[color:var(--border-faint)] ${
@@ -148,6 +163,7 @@ export function AreaStateHistory({ months }: { months: readonly AreaStateMonth[]
                 <span
                   key={`${month.recordDate}-t`}
                   aria-hidden="true"
+                  data-month={monthKey(month.recordDate)}
                   style={place(index, scoreRow)}
                   className={`${PLACED} flex min-h-11 items-center justify-center border-y border-b-[color:var(--border-faint)] border-t-[color:var(--border-subtle)] font-mono text-slate-300`}
                 >
@@ -156,6 +172,7 @@ export function AreaStateHistory({ months }: { months: readonly AreaStateMonth[]
                 <span
                   key={`${month.recordDate}-r`}
                   aria-hidden="true"
+                  data-month={monthKey(month.recordDate)}
                   style={place(index, scoreRow + 1)}
                   className={`${PLACED} flex min-h-11 items-center justify-center border-b border-[color:var(--border-faint)] font-mono text-slate-300`}
                 >
@@ -178,13 +195,19 @@ export function AreaStateHistory({ months }: { months: readonly AreaStateMonth[]
                   key={`${month.recordDate}-link`}
                   href={buildTimeMachineHref(MONTH_TARGET, { year: month.year, month: month.month })}
                   style={place(index, 1, ROWS_PER_BLOCK)}
-                  className={`${PLACED} group/month weather-focus-ring rounded-sm outline-offset-0 hover:outline hover:outline-1 hover:outline-[color:var(--border-strong)]`}
+                  className={`${PLACED} ${MONTH_ACTIVE} group/month weather-focus-ring rounded-sm outline-offset-0 hover:outline hover:outline-1 hover:outline-[color:var(--border-strong)]`}
                   data-area-state-month={month.recordDate}
+                  data-month={monthKey(month.recordDate)}
                 >
                   {readout}
                 </a>
               ) : (
-                <span key={`${month.recordDate}-link`} style={place(index, 1, ROWS_PER_BLOCK)} className={`${PLACED} group/month`}>
+                <span
+                  key={`${month.recordDate}-link`}
+                  style={place(index, 1, ROWS_PER_BLOCK)}
+                  className={`${PLACED} ${MONTH_ACTIVE} group/month rounded-sm outline-offset-0`}
+                  data-month={monthKey(month.recordDate)}
+                >
                   {readout}
                 </span>
               );

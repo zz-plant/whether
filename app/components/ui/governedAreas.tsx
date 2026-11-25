@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { areasGovernedBy, decisionAreaLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
+import { emphasisWhenChosen } from "../home/chosenAreaInk";
 import { HOME_DECISION_PARAM, HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
 import { AreaIcon } from "./conceptIcons";
 
@@ -16,10 +17,16 @@ import { AreaIcon } from "./conceptIcons";
 export function GovernedAreas({
   metric,
   target,
+  followsChosen = false,
   className = "",
 }: {
   metric: RuleConditionMetric;
   target: "table" | "brief";
+  /**
+   * Inside the brief's `ChosenAreaScope`: the area open on the page (`?decision=`) is set
+   * in full ink and weight among the rest (2026-11-18).
+   */
+  followsChosen?: boolean;
   className?: string;
 }) {
   const areas = areasGovernedBy(metric);
@@ -33,7 +40,9 @@ export function GovernedAreas({
         <Fragment key={area}>
           <a
             href={target === "table" ? `#area-${area}` : `/?${HOME_DECISION_PARAM}=${area}#${HOME_SECTIONS.areas.id}`}
-            className="weather-hit inline-flex items-center gap-1 align-middle underline decoration-slate-600 underline-offset-2 hover:text-sky-300"
+            className={`weather-hit inline-flex items-center gap-1 align-middle underline decoration-slate-600 underline-offset-2 hover:text-sky-300 ${
+              followsChosen ? emphasisWhenChosen(area) : ""
+            }`.trim()}
           >
             <AreaIcon area={area} />
             {decisionAreaLabel(area)}

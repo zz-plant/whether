@@ -175,7 +175,14 @@ describe("home route render contract", () => {
     assert.ok(buttonSource.includes("slackBlock"), "the copy control accepts a whole-artifact block");
     const copyCall = routeSource.slice(routeSource.indexOf("<ShareBriefButton")).split("/>")[0] ?? "";
     assert.ok(copyCall.includes("slackBlock="), "the canonical copy action passes the block");
-    assert.ok(!copyCall.includes("url="), "so it never falls back to the host it was made on");
+    /* Its link is the paste's own, built by the same formatter from the same origin, so the
+       share sheet and the area it carries (2026-11-18) never fall back to the host it was
+       made on, or to the page's address with every view of the page in it. */
+    assert.ok(
+      artifactSource.includes("resolveSharedBriefUrl(briefArtifact, siteUrl)"),
+      "the share link is the paste's link, from the canonical origin",
+    );
+    assert.ok(!/\burl=\{(?!briefShareUrl\})/.test(copyCall), "so it never falls back to the host it was made on");
     assert.ok(
       railSource.includes("formatBriefArtifact(artifact, format, siteUrl)"),
       "the panel and the card must agree on the origin the paste points at",
