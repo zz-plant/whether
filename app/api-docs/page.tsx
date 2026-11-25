@@ -356,6 +356,24 @@ export default function ApiDocsPage() {
               published. It takes no stage, and a brief from before scores were stored prints no scores.
             </Endpoint>
             <Endpoint
+              signature="GET /embed/call-strip?theme=light|dark"
+              tryHref="/embed/call-strip"
+              tryLabel="View embed"
+              tryAriaLabel="View embed: this week's guidance as a frame for a doc"
+            >
+              This week&apos;s guidance as a page for a frame: the conditions, each area&apos;s action with its
+              line, the line where conditions change, and the reading&apos;s date, with no site header or footer.
+              Paste the address into a Notion or Coda embed block. Without{" "}
+              <code className="font-mono">theme</code> it follows the reader&apos;s device setting.
+            </Endpoint>
+            <Endpoint signature="GET /api/oembed?url=https://whether.work/&format=json">
+              oEmbed for <code className="font-mono">/</code>, <code className="font-mono">/share</code> and the
+              embed: a <code className="font-mono">rich</code> response whose HTML frames the embed, within{" "}
+              <code className="font-mono">maxwidth</code> and <code className="font-mono">maxheight</code>. Any
+              other address answers 404, and any format but JSON 501. Both pages name it in their{" "}
+              <code className="font-mono">&lt;head&gt;</code>.
+            </Endpoint>
+            <Endpoint
               signature="GET /brief.md"
               tryHref="/brief.md"
               tryLabel="View brief.md"

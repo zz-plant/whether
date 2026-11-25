@@ -172,16 +172,21 @@ bun run cli:whether -- watch --changes-only --api-base-url https://whether.work
 
 `status` prints this week's conditions and guidance, `brief slack` prints the Slack post, and `watch` refreshes until a score moves. Leave out `--api-base-url` to read a local dev server. [docs/cli-command-reference.md](docs/cli-command-reference.md) lists every command.
 
-### Embed this week's call
+### Embed in Notion / Coda
 
-Paste two lines into any page, such as a team wiki, an investor portal or an internal dashboard:
+Paste this address into a Notion `/embed` block, a Coda embed, or any page that takes an iframe:
 
-```html
-<div data-whether-embed="brief"></div>
-<script async src="https://whether.work/embed.js"></script>
+```text
+https://whether.work/embed/call-strip
 ```
 
-`brief` draws the guidance and each area's action; `call-strip` draws a single line. The block updates when the brief does and links back to the full reading. The builder at [whether.work/share](https://whether.work/share) adds a company stage and previews the result.
+The frame shows the conditions, the guidance, each area's action with the line that would change it, the line where conditions change, and the reading's date, with a link out to the weekly brief. It reads the brief each time the doc opens, so a recurring agenda never carries last Monday's screenshot. Add `?theme=light` or `?theme=dark` to match the doc; without it the frame follows the reader's device setting.
+
+Pasting `https://whether.work/` itself also works in editors that read oEmbed (Notion through Iframely, among others): [`/api/oembed`](https://whether.work/api/oembed?url=https://whether.work/&format=json) answers for `/`, `/share` and the embed with the same frame. Elsewhere, an iframe works:
+
+```html
+<iframe src="https://whether.work/embed/call-strip" width="640" height="720" style="border:0;max-width:100%" title="Whether: this week's guidance"></iframe>
+```
 
 ### Run locally
 

@@ -269,14 +269,17 @@ const nextConfig = {
       },
       /*
        * The embed is the one response meant to sit inside another site's page:
-       * Notion's embed block and every oEmbed consumer frame `/api/embed`. A
-       * later rule's singular header replaces an earlier one's, so this lifts
-       * the DENY for that path alone; `frame-ancestors` is what browsers obey
-       * when both are present. The embed only reads and links out, so there is
-       * nothing in it to click-jack.
+       * Notion's and Coda's embed blocks and every oEmbed consumer frame
+       * `/embed/call-strip` (lib/export/callStripEmbed.ts). A later rule's
+       * singular header replaces an earlier one's (vinext keeps the last match
+       * per header name), so this lifts the DENY for that path alone;
+       * `frame-ancestors` is what browsers obey when both are present, and the
+       * X-Frame-Options value is one they ignore. The embed only reads and links
+       * out, so there is nothing in it to click-jack.
+       * `tests/callStripEmbed.test.ts` holds every other route to DENY.
        */
       {
-        source: "/api/embed",
+        source: "/embed/:path*",
         headers: [
           { key: "X-Frame-Options", value: "ALLOWALL" },
           { key: "Content-Security-Policy", value: "frame-ancestors *" },

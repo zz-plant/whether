@@ -1441,12 +1441,18 @@ the brief; these reach people who have not, and each carries the link back.
   for the coming Monday. The repeating Monday hold cannot carry a week's numbers; a subscribed feed
   can. Linked beside the hold on the meeting formats (webcal for Apple and Outlook, Google's
   add-by-URL page).
-- *Frames and oEmbed.* `/api/embed?format=page` wraps the widget in a whole document for a Notion
-  embed block or any iframe, and `next.config.js` lifts `X-Frame-Options: DENY` for `/api/embed`
-  alone (`frame-ancestors *`). `GET /api/oembed` (`lib/export/oembed.ts`) answers for `/` and
-  `/share` only, live readings only, since a live widget under a dated record's or an archived
-  month's address would print another week; it keeps the frame within the consumer's `maxwidth`
-  and `maxheight`. The homepage names it in its `<head>`, except on an archived reading.
+- *Frames and oEmbed.* `/api/embed` and `/api/oembed` were removed with the low-use surfaces on
+  2026-11-15 (#1833) and the frame came back on 2026-11-25 (#1785) as `/embed/call-strip`
+  (`lib/export/callStripEmbed.ts`): a route handler, so none of the root layout's chrome, that
+  prints the conditions, the guidance, each area's action with its one line (`areaRuleLine`), the
+  change line with its market move (`buildFlipProximity`) and the reading's date, in either theme
+  (`?theme=`, else the device setting), `noindex`, links opening outside the frame.
+  `next.config.js` lifts `X-Frame-Options: DENY` for `/embed/*` alone (`frame-ancestors *`).
+  `GET /api/oembed` (`lib/export/oembed.ts`) answers for `/`, `/share` and the embed, live
+  readings only, since a live frame under a dated record's, an archived month's or an answer
+  page's address would print something other than the link names; it keeps the frame within the
+  consumer's `maxwidth` and `maxheight`. `/` and `/share` name it in their `<head>`, except on an
+  archived reading.
 - *Status badge.* `GET /api/badge` (`lib/export/statusBadge.ts`): the conditions' weather word as a
   shields-style SVG for a README, data room, or investor page, in the conditions' color, saying
   "(saved copy)" on a fallback read. Markdown to copy sits in the embed section.
