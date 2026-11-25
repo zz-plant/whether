@@ -3,7 +3,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
-import { assertQuestionsVisible, jsonLdIn, questionNodesIn, visibleTextOf } from "./fixtures/questionMarkup";
+import { assertQuestionsVisible, isRecord, jsonLdIn, questionNodesIn, visibleTextOf } from "./fixtures/questionMarkup";
 
 serveUnreachableUpstreams();
 
@@ -56,10 +56,11 @@ describe("question markup mirrors the page", () => {
     assert.match(questions[1]?.name ?? "", /^How has it done in the last /);
     /* Asked once: the page summary no longer opens on the question its section asks. */
     assert.equal((visibleTextOf(html).match(/Has it been right\?/g) ?? []).length, 2, "the heading and the index, not the intro too");
-    const graph = (docs.find((doc) => JSON.stringify(doc).includes('"Dataset"')) as { "@graph": Array<Record<string, unknown>> }) ?? { "@graph": [] };
-    const dataset = graph["@graph"].find((node) => node["@type"] === "Dataset") as Record<string, unknown>;
+    const nodes = docs.flatMap((doc) => (isRecord(doc) && Array.isArray(doc["@graph"]) ? doc["@graph"].filter(isRecord) : []));
+    const dataset = nodes.find((node) => node["@type"] === "Dataset");
+    assert.ok(dataset, "the month-end record is a Dataset");
     assert.match(String(dataset.temporalCoverage), /^2012-01\/\d{4}-\d{2}$/);
-    const measured = dataset.variableMeasured as Array<Record<string, unknown>>;
+    const measured = Array.isArray(dataset.variableMeasured) ? dataset.variableMeasured.filter(isRecord) : [];
     assert.deepEqual(measured.map((variable) => variable.name), ["Funding pressure", "Risk appetite", "Room to move"]);
     for (const variable of measured) {
       assert.equal(variable.minValue, 0);

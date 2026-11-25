@@ -5,10 +5,13 @@ import { regimeSignalLabel } from "../lib/report/signalTranslations";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { joinSentences } from "../lib/report/reportFormatting";
 import { weeklyHeadline } from "../lib/report/reportEvidence";
+import { formatWeekAnswer } from "../lib/report/briefArtifact";
 
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
 
 const slot = (brief: string, label: string) => brief.match(new RegExp(`• ${label}: (.+)`))?.[1] ?? "";
+/* The post's first line, the week's answer in bold (2026-11-25): the guidance it printed as "• Guidance:". */
+const answerLine = (brief: string) => brief.split("\n")[0] ?? "";
 
 describe("buildSlackBrief", () => {
   it("prints the call contract's slots, each with content of its own shape", () => {
@@ -17,15 +20,20 @@ describe("buildSlackBrief", () => {
     // and then to stand-ins: "Keep last week's approvals as they are; start
     // nothing new." as the action and the assessment's description as the call.
     const weeklyCall = fixtureWeeklyCall();
-    const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall }));
+    const document = fixtureBriefDocument({ weeklyCall });
+    const brief = buildSlackBrief(document);
 
     /* The guidance is the week's one headline action (`weeklyHeadline`): the
        call, which the homepage h1, the email and the /share post lead with too.
        The action printed first until 2026-10-09, so one paste carried two
-       instructions for the week. */
-    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyHeadline(weeklyCall).composed));
-    assert.ok(slot(brief, "Guidance").endsWith(weeklyCall.currentCall));
-    assert.ok(!slot(brief, "Guidance").includes(weeklyCall.actionNow), "the action is not a second headline");
+       instructions for the week. Since 2026-11-25 it is the post's first line,
+       answer first and dated, as the copied brief and the Monday email open. */
+    assert.equal(answerLine(brief), `*${formatWeekAnswer(joinSentences(weeklyHeadline(weeklyCall).composed), document.recordDateLabel)}*`);
+    assert.ok(answerLine(brief).toLowerCase().includes(weeklyCall.currentCall.toLowerCase().replace(/\.$/, "")));
+    assert.ok(!answerLine(brief).includes(weeklyCall.actionNow), "the action is not a second headline");
+    assert.equal(slot(brief, "Guidance"), "", "the guidance is not a slot under its own line");
+    assert.doesNotMatch(brief, /^Whether Weekly Brief — /m, "the title rides on the source line");
+    assert.match(brief, /^Whether Weekly Brief · Source: /m);
     assert.equal(slot(brief, "Do now"), "", "no second slot repeats the guidance");
     assert.equal(slot(brief, "Pause if"), weeklyCall.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), weeklyCall.callChangesIf);
@@ -42,15 +50,15 @@ describe("buildSlackBrief", () => {
     assert.match(open, /^• Pause if: Funding pressure rises above 76$/m);
     // At 12 / 68 hiring is not on hold, so it has no hold to lift and no restart line beside the call.
     assert.equal(slot(open, "Restart when"), "");
-    assert.match(open, /^This week:\n• Guidance: .+\n• Pause if: .+\n• Conditions change if: /m);
+    assert.match(open, /^\*This week \([^)]+\): .+\*\nConditions: .+\n• Pause if: .+\n• Conditions change if: /);
 
     // At funding pressure 90 hiring is on hold, and the line it restarts at is the one that can change it.
     const reading = { ...assessment, scores: { ...assessment.scores, tightness: 90 } };
     const held = buildSlackBrief(fixtureBriefDocument({ reading, weeklyCall: { ...fixtureWeeklyCall(reading), pauseIf } }));
     assert.match(held, /^• Restart when: Funding pressure falls below 66 and risk appetite is above 54\. Funding pressure is 90 and risk appetite is 68 now\.$/m);
     assert.doesNotMatch(held, /Pause if: Pause|Restart when: Resume/);
-    assert.match(held, /^This week:\n• Guidance: .+\n• Pause if: .+\n• Restart when: .+\n• Conditions change if: /m);
-    const order = ["• Guidance:", "• Pause if:", "• Restart when:", "• Conditions change if:"].map((label) => held.indexOf(label));
+    assert.match(held, /^\*This week \([^)]+\): .+\*\nConditions: .+\n• Pause if: .+\n• Restart when: .+\n• Conditions change if: /);
+    const order = ["*This week (", "• Pause if:", "• Restart when:", "• Conditions change if:"].map((label) => held.indexOf(label));
     assert.deepEqual([...order].sort((left, right) => left - right), order, "the slots print in the page's order");
   });
 
@@ -63,14 +71,19 @@ describe("buildSlackBrief", () => {
       },
     });
     assert.equal(held.policyOverrideActive, true);
-    const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall: held }));
+    const heldDocument = fixtureBriefDocument({ weeklyCall: held });
+    const brief = buildSlackBrief(heldDocument);
     const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
-    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall), "a held week's action leads");
+    assert.equal(
+      answerLine(brief),
+      `*${formatWeekAnswer(joinSentences(hold.actionNow, hold.currentCall), heldDocument.recordDateLabel)}*`,
+      "a held week's action leads",
+    );
     assert.equal(slot(brief, "Pause if"), hold.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
     assert.equal(slot(brief, "Restart when"), "");
-    assert.match(brief, /^This week:\n• Guidance: .+\n• Pause if: .+\n• Conditions change if: /m);
+    assert.match(brief, /^\*This week \([^)]+\): .+\*\nConditions: .+\n• Pause if: .+\n• Conditions change if: /);
   });
 
   it("states each reading against the corridor as numbers, not a paragraph", () => {
@@ -213,7 +226,9 @@ describe("buildBoardSlideBullets", () => {
     const bullets = buildBoardSlideBullets(document);
     const brief = buildSlackBrief(document);
 
-    for (const label of ["Guidance", "Do now", "Pause if", "Restart when", "Conditions change if"]) {
+    /* The slide's guidance is the Slack post's first line, answer first. */
+    assert.equal(answerLine(brief), `*${formatWeekAnswer(slot(bullets, "Guidance"), document.recordDateLabel)}*`);
+    for (const label of ["Do now", "Pause if", "Restart when", "Conditions change if"]) {
       assert.equal(slot(bullets, label), slot(brief, label), `${label} differs between the slide bullets and the Slack brief`);
     }
     assert.match(bullets, /^Funding pressure 12 of 100 /m);

@@ -7,15 +7,16 @@ import assert from "node:assert/strict";
  * Question node out of a page's JSON-LD and look for its words in the page's rendered text.
  */
 
-type Node = Record<string, unknown>;
 type QuestionNode = { name: string; acceptedAnswer: { text: string } };
 
+export const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
 const isQuestion = (value: unknown): value is QuestionNode =>
-  Boolean(value) &&
-  typeof value === "object" &&
-  (value as Node)["@type"] === "Question" &&
-  typeof (value as Node).name === "string" &&
-  typeof ((value as Node).acceptedAnswer as Node | undefined)?.text === "string";
+  isRecord(value) &&
+  value["@type"] === "Question" &&
+  typeof value.name === "string" &&
+  isRecord(value.acceptedAnswer) &&
+  typeof value.acceptedAnswer.text === "string";
 
 /** Every `Question` node anywhere in a JSON-LD document, however deep. */
 export const questionNodesIn = (jsonLd: unknown): QuestionNode[] => {
