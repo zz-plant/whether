@@ -22,6 +22,8 @@
     "verify": "bun scripts/run-checks.mjs --preset verify",
     "time-machine:update-summaries": "bun scripts/updateTimeMachineSummariesSince.mjs",
     "mcp:whether": "bun scripts/mcp/whether-mcp-server.ts",
+    "deploy": "bun run check:vinext && bun run deploy:cloudflare",
+    "deploy:dry-run": "bun run check:vinext && node scripts/cloudflare-run.mjs deploy --skip-build-if-current --dry-run",
     "deploy:cloudflare": "node scripts/cloudflare-run.mjs deploy --skip-build-if-current",
     "deploy:cloudflare:dry-run": "node scripts/cloudflare-run.mjs deploy --dry-run",
     "deploy:cloudflare:preview": "node scripts/cloudflare-run.mjs deploy --env preview",
