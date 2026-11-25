@@ -36,7 +36,11 @@ export default defineConfig({
   plugins: [
     vinext({
       cache: {
-        data: kvDataAdapter(),
+        /* Every cache read also reads each of the entry's tag markers, which almost never
+           exist: 2.2M "not found" KV reads against 369k hits from Oct 26 to Nov 25 2026, about
+           13 per request, at the default 5s memo. Data changes hourly at most, so an isolate
+           seeing an invalidation up to a minute late costs nothing a reader can notice. */
+        data: kvDataAdapter({ tagCacheTtlMs: 60_000 }),
       },
     }),
     cloudflare({
