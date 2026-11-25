@@ -31,6 +31,7 @@ Use this file to find the current source of truth without reading the whole `doc
 - `developer/api-reference.md` for endpoint contracts
 - `developer/integrations.md` for webhook & SDK recipes
 - `developer/decision-models.md` for caller-owned text/audio/video checks and advisory brief, screenshot, evidence and model evaluations
+- `developer/spreadsheets/README.md` for `=WHETHER` in Google Sheets and the Excel Power Query table
 
 ## Document types
 
@@ -74,6 +75,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `developer/api-reference.md` — endpoint catalog and contract notes
 - `developer/integrations.md` — operational integration patterns
 - `developer/cli-fallback.md` — curl-first fallback flow
+- `developer/spreadsheets/README.md` — the state in Google Sheets and Excel cells
 
 ### Agent workflow
 

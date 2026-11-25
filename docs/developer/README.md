@@ -31,6 +31,10 @@ You will get:
 - health and cadence gates
 - alert and delivery flow patterns
 
+### I need this week's lines in a spreadsheet
+
+Read `spreadsheets/README.md`: the `=WHETHER` function for Google Sheets and a Power Query table for Excel.
+
 ### I need a fallback path when CLI install or auth is blocked
 
 Read `cli-fallback.md`.
