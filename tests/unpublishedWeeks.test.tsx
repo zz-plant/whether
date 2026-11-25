@@ -101,7 +101,7 @@ describe("the weeks with no brief", () => {
     const text = textOf(html);
     const start = text.indexOf("Published weekly briefs");
     assert.ok(start !== -1, "/history lists no published weeks");
-    const section = text.slice(start, text.indexOf("Track record", start));
+    const section = text.slice(start, text.indexOf("Has it been right?", start));
     for (const [line, before, after] of [
       [OCTOBER_LINE, "Week of Oct 26, 2026", "Weeks of Sep 28 – Oct 5, 2026"],
       [AUGUST_LINE, "Weeks of Sep 14 – Sep 21, 2026", "Week of Jul 27, 2026"],

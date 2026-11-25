@@ -56,12 +56,15 @@ export type ReportShellModel = {
      *  compare page's two periods. The intro does not print it. */
     frameCondition?: string;
     recordDateLabel: string;
+    /** The record date as an ISO date, for the `<time dateTime>` the intro prints the label in. */
+    recordDate?: string;
     fetchedAtLabel?: string;
   };
   page: {
     pageTitle: string;
-    /** The page's job in one sentence. Left out where the title already says it
-     *  (/trust: "How much to trust this week's guidance"). */
+    /** The page's job in one sentence, or left out where the title already says it. A
+     *  title that asks a question carries its answer here (/trust: "Can we trust this
+     *  week's guidance?"), and the phone keeps it (`CommandCenterNavBlock`). */
     pageSummary?: string;
     sectionLinks: ReportSectionLink[];
     /** The route's address, for its group's sub-tab row above the intro. Omitted, no row renders. */
@@ -107,7 +110,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
-    status: { statusLabel, statusPrefix, regime, statusRegime, frameCondition, recordDateLabel, fetchedAtLabel = "" },
+    status: { statusLabel, statusPrefix, regime, statusRegime, frameCondition, recordDateLabel, recordDate, fetchedAtLabel = "" },
     page: { pageTitle, pageSummary, sectionLinks, currentPath, tabsQuery },
     trust: {
       trustStatusTone,
@@ -179,6 +182,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             pageTitle={pageTitle}
             pageSummary={pageSummary}
             recordDateLabel={recordDateLabel}
+            recordDate={recordDate}
             primaryCta={primaryCta}
             exportCta={exportCta}
             statusLabel={statusLabel}

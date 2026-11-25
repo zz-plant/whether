@@ -21,6 +21,7 @@ export function CommandCenterNavBlock({
   pageTitle,
   pageSummary,
   recordDateLabel,
+  recordDate,
   primaryCta,
   exportCta,
   statusLabel,
@@ -37,6 +38,8 @@ export function CommandCenterNavBlock({
   pageTitle: string;
   pageSummary?: string;
   recordDateLabel: string;
+  /** The record date as an ISO date: the intro's "Data as of" prints it in `<time dateTime>`. */
+  recordDate?: string;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
   statusLabel: string;
@@ -62,16 +65,24 @@ export function CommandCenterNavBlock({
   // With a strip, the sources and the record date are its cells: /operate,
   // /signals and /trust printed "All sources live • As of Oct 2" here and the
   // same two facts again in the strip a row below (DD-040).
-  const introMetaRest = [
+  const introMetaParts = [
     trustStrip ? null : trustStatusLabel,
     // Interpolated only when there is a date. `As of ${x}` is a truthy string
     // even when x is "", so the filter below could never drop it, and a caller
     // passing no record date printed a bare "As of" with nothing after it.
     !trustStrip && recordDateLabel ? `Data as of ${recordDateLabel}` : null,
     showOfflineBadge ? offlineBadgeLabel : null,
-  ]
-    .filter(Boolean)
-    .join(" • ");
+  ].filter((part): part is string => Boolean(part));
+  const introMetaRest = introMetaParts.join(" • ");
+  /* The same line, with the record date in `<time dateTime>` where the route gives it as a
+     date (2026-11-25): it is the date the reading belongs to. */
+  const introMeta = introMetaParts.flatMap((part, index) => {
+    const separator = index > 0 ? [" • "] : [];
+    if (recordDate && part === `Data as of ${recordDateLabel}`) {
+      return [...separator, "Data as of ", <time key="record-date" dateTime={recordDate.slice(0, 10)}>{recordDateLabel}</time>];
+    }
+    return [...separator, part];
+  });
   // Same rule for the refresh stamp: /history passes no fetch time, and
   // printed "Updated " with nothing after it. There is no second stamp: a
   // "15m cadence" label and, on /history, "Fixed historical snapshot" beside the
@@ -153,17 +164,22 @@ export function CommandCenterNavBlock({
                     hero's tag and the sticky strip print. */}
                 <span data-regime={statusRegime} className="type-stamp weather-tag-placard text-fluid-base">{statusLabel}</span>
                 {introMetaRest ? (
-                  <span className="text-fluid-sm font-medium text-slate-400">{introMetaRest}</span>
+                  <span className="text-fluid-sm font-medium text-slate-400">{introMeta}</span>
                 ) : null}
               </p>
             ) : introMetaRest ? (
-              <p className="text-fluid-sm font-medium leading-4 text-slate-400">{introMetaRest}</p>
+              <p className="text-fluid-sm font-medium leading-4 text-slate-400">{introMeta}</p>
             ) : null}
             {/* On a phone a route with a strip drops the summary: the bottom bar
                 already names the page, and the strip is the line a reader
-                needs before the first task block. */}
+                needs before the first task block. A title that asks a question
+                keeps it (2026-11-25): the summary is the answer, and a question
+                with its answer hidden does not earn its "?". */}
             {pageSummary ? (
-              <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
+              <p
+                data-page-answer={pageTitle.trim().endsWith("?") ? "" : undefined}
+                className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip && !pageTitle.trim().endsWith("?") ? "max-sm:hidden" : ""}`.trim()}
+              >
                 {pageSummary}
               </p>
             ) : null}

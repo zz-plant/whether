@@ -24,10 +24,13 @@ import { ChevronDownIcon } from "../../components/uiIcons";
 export const AdvancedThresholdsSection = ({
   currentThresholds,
   defaultOpen = false,
+  question,
   answer,
   inputChoice = null,
 }: {
   currentThresholds: RegimeThresholds;
+  /** The closed row's question, from the page model; it names the inputs only where the panel offers them. */
+  question?: string;
   /** Open when the URL names lines or inputs, decided from the request so the server and the browser agree. */
   defaultOpen?: boolean;
   /** The closed row's answer (`describeLinesAndInputsAnswer`). */
@@ -60,9 +63,10 @@ export const AdvancedThresholdsSection = ({
               what that choice gives, conditions first. */}
           <InstrumentQuestion
             question={
-              inputChoice
+              question ??
+              (inputChoice
                 ? "What would conditions be with different lines or inputs?"
-                : "What would conditions be with different lines?"
+                : "What would conditions be with different lines?")
             }
             answer={answer}
           />

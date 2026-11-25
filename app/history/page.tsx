@@ -15,7 +15,7 @@ import { ConfidenceRecordSummary } from "../components/history/confidenceRecord"
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs, listPublishedRecord, publishedBriefDisplay, publishedBriefRunLabel, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, listPublishedRecord, publishedBriefDisplay, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { buildRecordCalendar } from "../../lib/report/recordCalendar";
@@ -25,6 +25,9 @@ import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { AdviceStudyTeaser } from "../components/history/AdviceStudyTeaser";
+import { buildRecentRecordQuestion, describeTrackRecordAnswer } from "../components/history/historyQuestions";
+import { BriefWeekTime, BriefRunLabel } from "../components/history/briefWeekTime";
+import { buildAdvanceWarningMarks } from "../../lib/report/advanceWarning";
 import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
@@ -99,6 +102,11 @@ export default async function HistoryPage({
   /* Each closed year's page, from the row that draws that year. */
   const archivePaths = new Map(postureArchiveYears.map((year) => [Number(year.slug), buildPostureArchivePath(year.slug)]));
   const archiveYearHref = (year: number) => archivePaths.get(year) ?? null;
+  /* The two questions the record's sections ask, with the answers they print first: built once,
+     for the headings, the marks and the markup. */
+  const advanceWarnings = buildAdvanceWarningMarks(fullSeries);
+  const recordQuestion = trackRecord ? describeTrackRecordAnswer(advanceWarnings, fullSeries[0]?.recordDate) : null;
+  const recentQuestion = buildRecentRecordQuestion(statsSeries);
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
   /* The month strip ends at the last month-end, and its "held since" line was
@@ -122,7 +130,8 @@ export default async function HistoryPage({
   const historySectionLinks = [
     ...(fullSeries.length > 0 ? [{ href: "#call-by-month", label: "Conditions by month" }] : []),
     ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
-    ...(trackRecord ? [{ href: "#track-record", label: "Track record" }] : []),
+    /* The section's question, which the page title asks too (2026-11-25). */
+    ...(recordQuestion ? [{ href: "#track-record", label: recordQuestion.question }] : []),
     { href: "#regime-map", label: "How the two scores set conditions" },
     ...(trackRecord ? [{ href: "#monthly-calls", label: "Monthly readings" }] : []),
   ];
@@ -142,6 +151,7 @@ export default async function HistoryPage({
       fullSeries.length > 0
         ? { from: fullSeries[0].recordDate, to: fullSeries[fullSeries.length - 1].recordDate }
         : null,
+    questions: [recordQuestion, recentQuestion].filter((entry) => entry !== null),
   });
 
   return (
@@ -175,6 +185,7 @@ export default async function HistoryPage({
              is neutral, because this page is about every regime on record rather
              than one. */
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
+          recordDate: trackRecord?.latestRecordDate,
           fetchedAtLabel: "",
         },
         /* "History", the group this page is the hub of (`navigationGroups`): the
@@ -183,11 +194,13 @@ export default async function HistoryPage({
           pageTitle: "History",
           /* The page is the product's one unfalsifiable asset, and the summary
              said what you could look up rather than what the record claims. It
-             now names the two things a competitor cannot copy: every brief
-             shipped with the line that would have changed it, and none edited
-             after publication. The numbers stay in the tiles below. */
+             names the two things a competitor cannot copy: every brief shipped
+             with the line that would have changed it, and none edited after
+             publication. "Has it been right?" opened it until 2026-11-25; the
+             section that answers it asks it now, once, and "The record is
+             published below." went with it, the page narrating its layout. */
           pageSummary:
-            "Has it been right? Every brief records what would have changed the guidance, and none has been edited since. The record is published below.",
+            "Every brief records what would have changed the guidance, and none has been edited since.",
           sectionLinks: historySectionLinks,
           currentPath: "/history",
         },
@@ -214,7 +227,7 @@ export default async function HistoryPage({
           <h2 id="call-by-month-heading" className="type-section">Conditions by month</h2>
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
-              Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
+              Since the last month-end, the week of <BriefWeekTime brief={weekAfterRecord} /> was published as{" "}
               <ConditionWord regime={weekAfterRecord.regime} className="font-semibold">{publishedBriefDisplay(weekAfterRecord).conditions}</ConditionWord>.{" "}
               {/* Inline with vertical padding, not the 44px inline-flex box: on a
                   phone the box wrapped onto its own line and opened the paragraph
@@ -223,7 +236,7 @@ export default async function HistoryPage({
                 href={buildPublishedBriefPath(weekAfterRecord.slug)}
                 className="weather-hit py-3 font-semibold text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
               >
-                Read that week
+                Read that week's brief
               </Link>
             </p>
           ) : null}
@@ -310,7 +323,7 @@ export default async function HistoryPage({
                       href={buildPublishedBriefPath(newest.slug)}
                       className="weather-hit text-sm font-semibold tabular-nums text-slate-100 underline decoration-slate-600 underline-offset-4"
                     >
-                      {publishedBriefRunLabel(run)}
+                      <BriefRunLabel run={run} />
                     </Link>
                     <Tag regime={newest.regime}>{getRegimePublicLabel(newest.regime)}</Tag>
                     <p className="max-w-[64ch] text-fluid-sm leading-snug text-slate-300">{newest.summary}</p>
@@ -320,7 +333,7 @@ export default async function HistoryPage({
                       <span>Each week:</span>
                       {run.map((brief) => (
                         <Link key={brief.slug} href={buildPublishedBriefPath(brief.slug)} className="weather-hit tabular-nums underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-                          {publishedBriefWeekLabel(brief).replace(/, \d{4}$/, "")}
+                          <BriefWeekTime brief={brief}>{publishedBriefWeekLabel(brief).replace(/, \d{4}$/, "")}</BriefWeekTime>
                         </Link>
                       ))}
                     </p>
@@ -342,6 +355,7 @@ export default async function HistoryPage({
             first section, belonging to neither. */}
         <TrackRecordTiles
           record={trackRecord}
+          question={recordQuestion ?? undefined}
           action={trackRecord ? <ExportBoardAnnexButton record={trackRecord} /> : null}
           aside={
             <div className="space-y-3">
@@ -349,7 +363,7 @@ export default async function HistoryPage({
                   study's title, "How often conditions held near a change", over a count of changes
                   that had advance warning; the study keeps that title on /calibration. */}
               <h3 className="type-eyebrow">Advance warning</h3>
-              <ConfidenceRecordSummary />
+              <ConfidenceRecordSummary warnings={advanceWarnings} countsPrinted={Boolean(recordQuestion)} />
               <p className="text-fluid-sm text-slate-400">
                 <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
@@ -362,7 +376,12 @@ export default async function HistoryPage({
 
       {/* Grades the record above: which regime changes were visible in the near band
           beforehand, and which were not. */}
-      <TrackRecordSection series={statsSeries} history={fullSeries} recordChanges={trackRecord?.regimeChanges} />
+      <TrackRecordSection
+        series={statsSeries}
+        history={fullSeries}
+        recordChanges={trackRecord?.regimeChanges}
+        question={recentQuestion}
+      />
 
       <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap

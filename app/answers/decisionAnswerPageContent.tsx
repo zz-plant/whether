@@ -28,7 +28,7 @@ import { formatDecisionReversal, formatDecisionThreshold, formatMarginStamp, pub
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
-import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
+import { buildDecisionAnswerContextSummary, describeThisWeeksAnswer } from "./decisionAnswerCopy";
 import {
   DATA_CURRENCY_ACTION,
   DATA_CURRENCY_ACTION_HREF,
@@ -94,6 +94,15 @@ export async function DecisionAnswerPageContent({
      its own headline, and neither was the week's. */
   const headline = weeklyHeadline(snapshot.weeklyCall);
   const leadArea = page.mappedDecisionAreas.find((area) => mappedRules.some((rule) => rule.area === area));
+  /* This week's answer first, then the page's rule for any week (2026-11-25): the card under
+     the question, the copied brief and the FAQ markup all lead with it. */
+  const thisWeek = describeThisWeeksAnswer({
+    slug: page.slug,
+    rows: ruleStanding,
+    leadArea,
+    scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
+  });
+  const leadAnswer = thisWeek ? `${thisWeek} ${answer.shortAnswer}` : answer.shortAnswer;
   const leadTransmission = leadArea ? decisionAreaCorporateTransmission[leadArea] : undefined;
   const areaDoNowLabel = leadArea
     ? `${decisionAreaLabel(leadArea)} · ${DECISION_CONTRACT_LABELS.action.doNow}`
@@ -121,7 +130,7 @@ export async function DecisionAnswerPageContent({
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [
     page.title,
-    `Short answer: ${answer.shortAnswer}`,
+    `Short answer: ${leadAnswer}`,
     `For: ${page.audience}`,
     `What to check at your company: ${answer.companyInputs.join(" ")}`,
     `Decision note to complete: ${answer.decisionNote}`,
@@ -150,7 +159,7 @@ export async function DecisionAnswerPageContent({
        "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
        comparisons, one of them under the engine's name for a score the rest of
        the site calls funding pressure. */
-    answer: `${answer.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)}, where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
+    answer: `${leadAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)}, where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
@@ -227,7 +236,7 @@ export async function DecisionAnswerPageContent({
           question={page.title}
           weeklyCall={headline.action}
           direction={headline.directionLabel}
-          callDetail={answer.shortAnswer}
+          callDetail={leadAnswer}
           regime={assessment.regime}
           lines={[
             { label: areaDoNowLabel, value: payload.immediateAction },

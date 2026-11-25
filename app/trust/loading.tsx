@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <RouteLoadingShell
       currentPath="/trust"
-      pageTitle="How much to trust this week's guidance"
+      pageTitle="Can we trust this week's guidance?"
     />
   );
 }

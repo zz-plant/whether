@@ -210,9 +210,34 @@ describe("/history", () => {
     const list = one(graph, "ItemList");
     assert.equal(list.numberOfItems, periods.length + briefs.length);
     const dataset = one(graph, "Dataset");
-    assert.equal(dataset.temporalCoverage, "2012-01-31/2026-08-31");
+    /* The record holds month-ends, so its coverage is in months (2026-11-25). */
+    assert.equal(dataset.temporalCoverage, "2012-01/2026-08");
     const page = one(graph, "CollectionPage");
     assert.deepEqual(page.mainEntity, { "@id": dataset["@id"] });
+  });
+
+  /* The dataset says what it holds (docs/seo/quality-gates.md, "Datasets say what they hold"). */
+  it("names the two scores and room to move on 0 to 100, with a download and the method", () => {
+    const graph = buildHistoryStructuredData({ periods: [], publishedBriefs: [], coverage: { from: "2012-01-31", to: "2026-08-31" } });
+    const dataset = one(graph, "Dataset");
+    const records = (value: unknown): Array<Record<string, unknown>> =>
+      Array.isArray(value) ? value.filter((entry): entry is Record<string, unknown> => typeof entry === "object" && entry !== null) : [];
+    const measured = records(dataset.variableMeasured);
+    assert.deepEqual(
+      measured.map(({ name, minValue, maxValue, unitText }) => [name, minValue, maxValue, unitText]),
+      [
+        ["Funding pressure", 0, 100, "points"],
+        ["Risk appetite", 0, 100, "points"],
+        ["Room to move", 0, 100, "points"],
+      ],
+    );
+    assert.equal(dataset.isAccessibleForFree, true);
+    assert.match(String(dataset.measurementTechnique), /\/about#method$/);
+    assert.ok(records(dataset.distribution).some((entry) => String(entry.contentUrl).endsWith("/api/cli/history")));
+    const page = one(graph, "CollectionPage");
+    const mentions = records(page.mentions).map((entry) => String(entry["@id"]));
+    assert.ok(mentions.some((id) => id.endsWith("/about#term-funding-pressure")));
+    assert.ok(mentions.every((id) => /\/about#term-(funding-pressure|risk-appetite|room-to-move|room-before-a-change|sunny|cloudy|stormy|freezing)$/.test(id)));
   });
 
   it("omits coverage when the record is empty rather than inventing a range", () => {

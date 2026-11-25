@@ -19,6 +19,8 @@ export type BaseRateMark = { asOf: string; held: boolean; label: string; href: s
 
 export type TrustStripProps = {
   recordDateLabel: string;
+  /** The record date as an ISO date, for the `<time dateTime>` the label prints in; without it the label prints bare. */
+  recordDate?: string;
   /** True when every source answered live for this reading. */
   sourcesLive: boolean;
   /** One phrase for the sources cell, e.g. "All sources live" or "Saved copy from Sep 12". */
@@ -104,6 +106,7 @@ const describeNextWeek = (couldChangeNextWeek: boolean, changeReason: string | u
 
 export function TrustStrip({
   recordDateLabel,
+  recordDate,
   sourcesLive,
   sourcesLabel,
   confidenceLabel,
@@ -146,6 +149,8 @@ export function TrustStrip({
   const cells: {
     label: string;
     value: string;
+    /** A machine-readable date for the value, which then prints in `<time>` (docs/seo/quality-gates.md, Semantic gates). */
+    dateTime?: string;
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
@@ -159,7 +164,7 @@ export function TrustStrip({
   }[] = [
     /* "Data as of": the date the guidance rests on. The report intro's other date
        is when the sources were last checked, and it says so (2026-10-09). */
-    { label: "Data as of", value: recordDateLabel },
+    { label: "Data as of", value: recordDateLabel, ...(recordDate ? { dateTime: recordDate.slice(0, 10) } : {}) },
     { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caveat", routine: sourcesLive },
     /* The margin, in points, where "Confidence: Low" stood: the number was always a
        distance from the change line, never a probability (/calibration). Whether
@@ -252,7 +257,7 @@ export function TrustStrip({
                     : "font-medium text-slate-200"
               }`}
             >
-              {cell.value}
+              {cell.dateTime ? <time dateTime={cell.dateTime}>{cell.value}</time> : cell.value}
               {cell.detail ? (
                 <span
                   className="font-normal text-slate-400"

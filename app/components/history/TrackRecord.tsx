@@ -13,6 +13,7 @@ import { UrlDetails } from "../ui/urlDetails";
 import { ConditionWord } from "../ui/conceptIcons";
 import { buildLatitudeChart } from "../../../lib/report/latitudeChart";
 import { LatitudeChart } from "./latitudeChart";
+import type { HistoryQuestion } from "./historyQuestions";
 
 /**
  * The record of what this product has called, framed as evidence rather than as
@@ -85,8 +86,8 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
           {/* "Jul 31, 2026" wraps onto two lines in a 26% column at phone
               width; the month alone is the fact the row is keyed on. */}
           <td className="py-2 pr-3 font-mono text-slate-400">
-            <span className="sm:hidden">{formatMonthYearShortFromValue(row.recordDate)}</span>
-            <span className="hidden sm:inline">{formatDateUTC(row.recordDate)}</span>
+            <time dateTime={row.recordDate.slice(0, 10)} className="sm:hidden">{formatMonthYearShortFromValue(row.recordDate)}</time>
+            <time dateTime={row.recordDate.slice(0, 10)} className="hidden sm:inline">{formatDateUTC(row.recordDate)}</time>
           </td>
           <td className="py-2 pr-3 text-slate-200">
             {/* A flex row, not inline text: with no break opportunity the
@@ -132,11 +133,18 @@ export function TrackRecordTiles({
   record,
   aside,
   action,
+  question,
 }: {
   record: TrackRecordModel | null;
   aside?: ReactNode;
   /** A control for the record as a whole — /history's "Copy the record summary" — drawn beside the heading. */
   action?: ReactNode;
+  /**
+   * The question the section answers and its answer (`describeTrackRecordAnswer`), the heading
+   * and the lead under it; the page's markup carries the same words. Without one the section
+   * is headed "Track record", as it was before 2026-11-25.
+   */
+  question?: HistoryQuestion;
 }) {
   if (!record) {
     return null;
@@ -154,11 +162,18 @@ export function TrackRecordTiles({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        {/* The heading alone (2026-11-11): an intro said the readings are scored with
-            the published formula, which /history's first section and the record band say. */}
-        <h2 className="type-section" id="track-record-heading">Track record</h2>
+        {/* The question the page's title asks, asked once, here (2026-11-25): the intro opened
+            on it too. An intro said the readings are scored with the published formula until
+            2026-11-11, which /history's first section and the record band say. */}
+        <h2 className="type-section" id="track-record-heading">{question?.question ?? "Track record"}</h2>
         {action}
       </div>
+      {/* The answer first, the facts and the marks that bear it out after it. */}
+      {question ? (
+        <p className="max-w-prose text-sm text-slate-200" data-section-answer>
+          {question.answer}
+        </p>
+      ) : null}
 
       <div className={aside ? "weather-switch gap-6 [--col-min:20rem]" : ""}>
         <div className="space-y-3">
@@ -221,7 +236,7 @@ export function TrackRecordTable({
           {OPERATING_LATITUDE_LABEL} (0–100): {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite +{" "}
           {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% inverse funding pressure. Higher means more room to commit.{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-            Formula
+            What goes into the scores
           </Link>
         </p>
       </div>
@@ -238,7 +253,8 @@ export function TrackRecordTable({
         summary={
           <span>
             Monthly readings ({record.allRows.length.toLocaleString("en-US")}) ·{" "}
-            {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(record.latestRecordDate)}
+            <time dateTime={record.firstRecordDate.slice(0, 10)}>{formatDateUTC(record.firstRecordDate)}</time> to{" "}
+            <time dateTime={record.latestRecordDate.slice(0, 10)}>{formatDateUTC(record.latestRecordDate)}</time>
           </span>
         }
       >
@@ -254,7 +270,8 @@ export function TrackRecordTable({
             <div>
               <p className="mb-2 text-fluid-nano type-eyebrow text-slate-500">
                 Earlier months ({earlierRows.length.toLocaleString("en-US")}) ·{" "}
-                {formatDateUTC(earlierOldestDate)} to {formatDateUTC(earlierNewestDate)}
+                <time dateTime={earlierOldestDate.slice(0, 10)}>{formatDateUTC(earlierOldestDate)}</time> to{" "}
+                <time dateTime={earlierNewestDate.slice(0, 10)}>{formatDateUTC(earlierNewestDate)}</time>
               </p>
               <RecordTable
                 rows={earlierRows}

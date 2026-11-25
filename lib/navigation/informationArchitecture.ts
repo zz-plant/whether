@@ -5,7 +5,7 @@ import type { Route } from "./routeType";
  *
  * Until 2026-10-08 the header drew six "loop" tabs — Brief, Plan, Evidence,
  * Resolve, Trust, History — and a nine-item More menu. Evidence had three names
- * (the tab, `/signals`, and "Why the weekly brief changed"), Plan and Resolve
+ * (the tab, `/signals`, and "Why did the guidance change?"), Plan and Resolve
  * both answered "what do I do about one decision", the track record sat on four
  * pages under three tabs, and Guides and About were reachable only from a
  * dropdown or another page. The four groups are the four questions a reader
@@ -106,8 +106,8 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     /* The sources and the score derivation stay on /trust, where they judge this
        week's reading; the record reaches them rather than holding a second copy. */
     crossLinks: [
-      { href: "/trust#source-board", label: "Sources" },
-      { href: "/trust#formula-reference", label: "How the scores are built" },
+      { href: "/trust#source-board", label: "Is the data current?" },
+      { href: "/trust#formula-reference", label: "What goes into the scores?" },
     ],
     footerLinks: [],
   },

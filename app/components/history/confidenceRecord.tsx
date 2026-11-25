@@ -162,19 +162,32 @@ const WarningDiamond = ({ warned, className = "" }: { warned: boolean; className
  * the marks are one object (`buildAdvanceWarningMarks`). The month under each mark is
  * what a touch screen reads before it opens one.
  */
-export function ConfidenceRecordSummary() {
+export function ConfidenceRecordSummary({
+  warnings,
+  countsPrinted = false,
+}: {
+  /** The marks and their counts (`buildAdvanceWarningMarks` over the whole record), where the page built them. */
+  warnings?: ReturnType<typeof buildAdvanceWarningMarks>;
+  /**
+   * The section's answer above already says how many changes had warning (/history's "Has it
+   * been right?", 2026-11-25), so the count sentences are not printed a second time.
+   */
+  countsPrinted?: boolean;
+} = {}) {
   const fullSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
-  const { total, warned, marks } = buildAdvanceWarningMarks(fullSeries);
+  const { total, warned, marks } = warnings ?? buildAdvanceWarningMarks(fullSeries);
   const missed = total - warned;
   const since = fullSeries.at(0)?.recordDate;
 
   return (
     <div className="space-y-1.5" data-confidence-record-summary>
-      <p className="text-sm text-slate-200">
-        {/* "Changes", the tiles' noun beside it; it said "shifts" (2026-11-10). */}
-        <span className="font-semibold text-slate-100">{warned} of {total}</span> changes had
-        advance warning.
-      </p>
+      {countsPrinted ? null : (
+        <p className="text-sm text-slate-200">
+          {/* "Changes", the tiles' noun beside it; it said "shifts" (2026-11-10). */}
+          <span className="font-semibold text-slate-100">{warned} of {total}</span> changes had
+          advance warning.
+        </p>
+      )}
       {marks.length > 0 ? (
         <figure className="m-0 space-y-1" data-advance-warning-marks data-readout-scope>
           <ol
@@ -213,9 +226,11 @@ export function ConfidenceRecordSummary() {
           <HistoryReadout />
         </figure>
       ) : null}
-      <p className="text-xs text-slate-400">
-        {missed} changes had no advance warning when scores moved across the line in a single month.
-      </p>
+      {countsPrinted ? null : (
+        <p className="text-xs text-slate-400">
+          {missed} changes had no advance warning when scores moved across the line in a single month.
+        </p>
+      )}
     </div>
   );
 }

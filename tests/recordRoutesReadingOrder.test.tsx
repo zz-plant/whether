@@ -42,7 +42,8 @@ describe("/history leads with the record's answer", () => {
     const headings = headingsInOrder(html);
 
     const strip = headings.indexOf("Conditions by month");
-    const record = headings.indexOf("Track record");
+    /* The Track record section asks the page title's question (2026-11-25). */
+    const record = headings.indexOf("Has it been right?");
     const confidence = headings.indexOf("Advance warning");
     const map = headings.indexOf("How the two scores set conditions");
     const table = headings.indexOf("Monthly readings");
