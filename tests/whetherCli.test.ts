@@ -5,6 +5,16 @@ import path from "node:path";
 import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
+import { GET as getAgentRoute } from "../app/api/agent/route";
+import { GET as getMcpRoute, POST as postMcpRoute } from "../app/api/mcp/route";
+import { stressTestDecisionPlan } from "../lib/decisionShield";
+import type { RegimeAssessment } from "../lib/regimeEngine";
+import { REGIME_LABELS } from "../lib/regimePresentation";
+import { buildAssessmentFixture } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+// The one case that serves the site's own routes reads them on a cold store, which ingests inline.
+serveUnreachableUpstreams();
 
 const CLI_PATH = path.join(process.cwd(), "scripts", "whether-cli.mjs");
 const DEFAULT_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
@@ -34,12 +44,14 @@ const resolveServerPort = (server: http.Server) => {
  */
 const CLI_TIMEOUT_MS = 30_000;
 
-const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
+/** `input`, when given, is piped to the CLI's stdin; without it stdin is closed. */
+const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv; input?: string } = {}) =>
   new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
     const child = spawn(NODE_BIN, [CLI_PATH, ...args], {
       env: options.env ?? process.env,
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: [options.input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
+    if (options.input !== undefined) child.stdin?.end(options.input);
 
     let stdout = "";
     let stderr = "";
@@ -55,10 +67,10 @@ const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
       });
     }, CLI_TIMEOUT_MS);
 
-    child.stdout.on("data", (chunk: Buffer) => {
+    child.stdout?.on("data", (chunk: Buffer) => {
       stdout += String(chunk);
     });
-    child.stderr.on("data", (chunk: Buffer) => {
+    child.stderr?.on("data", (chunk: Buffer) => {
       stderr += String(chunk);
     });
     child.on("error", (err) => {
@@ -135,11 +147,11 @@ const alwaysJson = (body: unknown): http.RequestListener => (_req, res) => sendJ
 
 const closeServer = (server: http.Server) => new Promise<void>((resolve) => server.close(() => resolve()));
 
-/** A local API for one case, on a port of its own, keeping the URLs it was asked for. */
+/** A local API for one case, on a port of its own, keeping the URLs it was asked for (a POST's prefixed "POST "). */
 const startApi = async (respond: http.RequestListener) => {
   const requests: string[] = [];
   const server = http.createServer((req, res) => {
-    requests.push(req.url ?? "");
+    requests.push(req.method === "POST" ? `POST ${req.url ?? ""}` : (req.url ?? ""));
     respond(req, res);
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -1203,4 +1215,244 @@ describe("whether cli", () => {
     assert.match(result.stdout, /- No numeric line\n?$/);
   });
 
+  it("standup prints the get_standup_line answer and the reading's date, or the shim's answer as served with --json", async () => {
+    const body = {
+      ok: true,
+      tool: "get_standup_line",
+      result: { standupLine: "Guidance unchanged; no pace change. Conditions change if funding pressure rises above 70.", regime: "DEFENSIVE", guidanceChange: "held", recordDate: "2026-11-23" },
+      use: { summary: "Informational only." },
+    };
+    const api = await startApi(alwaysJson(body));
+    const text = await runCli(["standup", "--no-local-discovery", "--api-base-url", api.baseUrl]);
+    const json = await runCli(["standup", "--no-local-discovery", "--api-base-url", api.baseUrl, "--json"]);
+    await api.close();
+
+    assert.deepEqual([...new Set(api.requests)], ["/api/mcp?tool=get_standup_line"]);
+    assert.equal(text.status, 0);
+    assert.equal(text.stdout, "Guidance unchanged; no pace change. Conditions change if funding pressure rises above 70.\nReading of 2026-11-23.\n");
+    assert.equal(json.status, 0);
+    assert.deepEqual(JSON.parse(json.stdout), body);
+  });
+
+  it("check reads the proposal from an argument, a file or stdin, and lints it once against the state", async () => {
+    const api = await checkApi("DEFENSIVE");
+    const homeDir = tempHome();
+    const prBody = path.join(homeDir, "pr-body.md");
+    fs.writeFileSync(prBody, "## Summary\n\nadd 3 AWS GPU nodes\n");
+    const target = ["--no-local-discovery", "--api-base-url", api.baseUrl];
+    const fromArgs = await runCli(["check", "add", "3", "AWS", "GPU", "nodes", ...target]);
+    const fromFile = await runCli(["check", "--file", prBody, "--json", ...target]);
+    const fromStdin = await runCli(["check", "--json", ...target], { input: "add 3 AWS GPU nodes\n" });
+    const both = await runCli(["check", "add 3 AWS GPU nodes", "--file", prBody, ...target]);
+    await api.close();
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.deepEqual(api.specTexts, ["add 3 AWS GPU nodes", "## Summary\n\nadd 3 AWS GPU nodes", "add 3 AWS GPU nodes"]);
+    assert.deepEqual(api.requests, ["/api/agent?view=state", "POST /api/mcp", "/api/agent?view=state", "POST /api/mcp", "/api/agent?view=state", "POST /api/mcp"]);
+
+    assert.equal(fromArgs.status, 0, fromArgs.stderr);
+    assert.match(fromArgs.stdout, /^Whether check, reading of 2026-11-23 \(Cloudy\)\n\nDecision verdict: RISKY\nInfra spend is considered RISKY in Cloudy conditions\.\n/);
+    assert.match(fromArgs.stdout, /\nPause line: .+\n/);
+    assert.match(fromArgs.stdout, /\nRestart line: .+\n/);
+    assert.match(fromArgs.stdout, /Informational only\.\n$/);
+    assert.doesNotMatch(fromArgs.stdout, /DEFENSIVE|INFRA_SPEND/, "no engine keys in what a person reads");
+
+    for (const run of [fromFile, fromStdin]) {
+      assert.equal(run.status, 0, run.stderr);
+      const parsed = JSON.parse(run.stdout);
+      assert.equal(parsed.tool, "lint_commitment");
+      assert.deepEqual(parsed.reading, { recordDate: "2026-11-23", conditions: { key: "DEFENSIVE", label: "Cloudy", meaning: "" }, automation: { ready: true, refusal: null } });
+      assert.equal(parsed.result.verdict, "RISKY");
+      assert.equal(parsed.result.detectedCategory, "INFRASTRUCTURE");
+      assert.equal(parsed.failOn, null);
+      assert.equal(parsed.blocked, false);
+    }
+
+    assert.equal(both.status, 1);
+    assert.match(both.stderr, /Give the proposal one way/);
+  });
+
+  /*
+   * The same proposal under each of the four conditions: the verdict follows the reading, `check`
+   * stays advisory without `--fail-on`, and each `--fail-on` value blocks on its own verdicts.
+   */
+  it("check gives the same proposal the verdict each of the four conditions calls for, and blocks only where --fail-on says", async () => {
+    const proposal = "Reserve 3 years of GPU capacity on AWS, paid upfront";
+    const cases: Array<[RegimeAssessment["regime"], string]> = [
+      ["SCARCITY", "DANGEROUS"],
+      ["DEFENSIVE", "RISKY"],
+      ["VOLATILE", "RISKY"],
+      ["EXPANSION", "SAFE"],
+    ];
+
+    await Promise.all(cases.map(async ([regime, verdict]) => {
+      const api = await checkApi(regime);
+      const target = ["--no-local-discovery", "--api-base-url", api.baseUrl];
+      const [advisory, failOnRisky, failOnDangerous] = await Promise.all([
+        runCli(["check", proposal, "--json", ...target]),
+        runCli(["check", proposal, "--fail-on", "risky", ...target]),
+        runCli(["check", proposal, "--fail-on", "DANGEROUS", "--json", ...target]),
+      ]);
+      await api.close();
+
+      const label = REGIME_LABELS[regime];
+      assert.equal(advisory.status, 0, `${regime}: advisory by default (${advisory.stderr})`);
+      const parsed = JSON.parse(advisory.stdout);
+      assert.equal(parsed.result.verdict, verdict, regime);
+      assert.equal(parsed.result.headline, `Infra spend is considered ${verdict} in ${label} conditions.`);
+      assert.equal(parsed.reading.conditions.label, label);
+
+      const blocksOnRisky = verdict !== "SAFE";
+      assert.equal(failOnRisky.status, blocksOnRisky ? 9 : 0, `${regime}: --fail-on risky (${failOnRisky.stderr})`);
+      assert.match(failOnRisky.stdout, new RegExp(`Decision verdict: ${verdict}\\n`), "the result prints either way");
+      assert.equal(failOnRisky.stderr, blocksOnRisky ? `blocked: decision verdict ${verdict} meets --fail-on risky\n` : "");
+
+      assert.equal(failOnDangerous.status, verdict === "DANGEROUS" ? 9 : 0, `${regime}: --fail-on dangerous`);
+      assert.equal(JSON.parse(failOnDangerous.stdout).blocked, verdict === "DANGEROUS");
+    }));
+  });
+
+  it("check never blocks on a proposal it cannot grade, says what it grades instead, and grades it given --category", async () => {
+    const api = await checkApi("SCARCITY");
+    const target = ["--no-local-discovery", "--api-base-url", api.baseUrl];
+    const ungraded = await runCli(["check", "Migrate the data warehouse to Snowflake", "--fail-on", "risky", ...target]);
+    const categorized = await runCli(["check", "Migrate the data warehouse to Snowflake", "--category", "roadmap", "--json", ...target]);
+    await api.close();
+
+    assert.equal(ungraded.status, 0, ungraded.stderr);
+    assert.match(ungraded.stdout, /Decision verdict: Not graded\n/);
+    assert.match(ungraded.stdout, /It grades hiring, infrastructure/);
+    assert.equal(ungraded.stderr, "");
+
+    assert.equal(categorized.status, 0, categorized.stderr);
+    assert.equal(JSON.parse(categorized.stdout).result.detectedCategory, "ROADMAP");
+  });
+
+  it("check exits 8 with --require-ready on a reading that is not live and current, 1 on a refusal, and 1 with nothing to check", async () => {
+    const stale = await checkApi("SCARCITY", { ready: false });
+    const notReady = await runCli(["check", "Hire two engineers", "--require-ready", "--fail-on", "risky", "--no-local-discovery", "--api-base-url", stale.baseUrl]);
+    const notReadyWithoutTheFlag = await runCli(["check", "Hire two engineers", "--no-local-discovery", "--api-base-url", stale.baseUrl]);
+    await stale.close();
+
+    assert.equal(notReady.status, 8, "readiness is checked before the verdict");
+    assert.match(notReady.stderr, /not ready: Data is a fallback snapshot/);
+    assert.match(notReady.stdout, /Not live and current: Data is a fallback snapshot/);
+    assert.equal(notReadyWithoutTheFlag.status, 0);
+    assert.match(notReadyWithoutTheFlag.stdout, /Not live and current: /);
+
+    const refusing = await checkApi("SCARCITY", { refusal: "specText: Required" });
+    const refused = await runCli(["check", "Hire two engineers", "--no-local-discovery", "--api-base-url", refusing.baseUrl]);
+    await refusing.close();
+    assert.equal(refused.status, 1);
+    assert.match(refused.stderr, /lint_commitment answered no result: specText: Required/);
+
+    const idle = await checkApi("SCARCITY");
+    const nothing = await runCli(["check", "--no-local-discovery", "--api-base-url", idle.baseUrl]);
+    const badFailOn = await runCli(["check", "Hire two engineers", "--fail-on", "maybe", "--no-local-discovery", "--api-base-url", idle.baseUrl]);
+    await idle.close();
+    assert.equal(nothing.status, 1);
+    assert.match(nothing.stderr, /No proposal to check/);
+    assert.equal(badFailOn.status, 1);
+    assert.match(badFailOn.stderr, /Invalid --fail-on "maybe"\. Expected one of: risky, dangerous\./);
+    assert.deepEqual(idle.requests, [], "nothing is requested when there is nothing to check or the flag is wrong");
+  });
+
+  /*
+   * The cases above stand in for the site. This one serves the site's own route handlers, so the
+   * request the CLI sends is the one the MCP transport and the GET shim accept.
+   */
+  it("check and standup read the site's own routes", async () => {
+    const api = await startApi(async (req, res) => {
+      const url = `http://127.0.0.1${req.url ?? "/"}`;
+      const body = req.method === "POST" ? await readBody(req) : undefined;
+      const headers = new Headers();
+      for (const [name, value] of Object.entries(req.headers)) if (typeof value === "string") headers.set(name, value);
+      const request = new Request(url, { method: req.method, headers, body });
+      const route = (req.url ?? "").startsWith("/api/agent") ? getAgentRoute : req.method === "POST" ? postMcpRoute : getMcpRoute;
+      const response = await route(request);
+      res.writeHead(response.status, { "content-type": response.headers.get("content-type") ?? "application/json" });
+      res.end(await response.text());
+    });
+    const target = ["--no-local-discovery", "--api-base-url", api.baseUrl, "--json"];
+    const check = await runCli(["check", "Reserve 3 years of GPU capacity on AWS, paid upfront", ...target]);
+    const categorized = await runCli(["check", "Migrate the data warehouse to Snowflake", "--category", "roadmap", ...target]);
+    const standup = await runCli(["standup", ...target]);
+    await api.close();
+
+    assert.equal(categorized.status, 0, categorized.stderr);
+    assert.equal(JSON.parse(categorized.stdout).result.detectedCategory, "ROADMAP", "the site reads the category in any case");
+    assert.equal(check.status, 0, check.stderr);
+    const parsed = JSON.parse(check.stdout);
+    assert.equal(parsed.result.detectedCategory, "INFRASTRUCTURE");
+    assert.ok(["SAFE", "RISKY", "DANGEROUS"].includes(parsed.result.verdict));
+    assert.match(parsed.reading.recordDate, /^\d{4}-\d{2}-\d{2}/);
+    assert.equal(typeof parsed.reading.automation.ready, "boolean");
+    assert.equal(standup.status, 0, standup.stderr);
+    assert.equal(typeof JSON.parse(standup.stdout).result.standupLine, "string");
+  });
+
 });
+
+const readBody = (req: http.IncomingMessage) =>
+  new Promise<string>((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk: Buffer) => {
+      body += String(chunk);
+    });
+    req.on("end", () => resolve(body));
+    req.on("error", reject);
+  });
+
+/** Scores inside each regime, with no transition on record (the shape tests/decisionShield.test.ts grades). */
+const SCORES_IN: Record<RegimeAssessment["regime"], Partial<RegimeAssessment["scores"]>> = {
+  SCARCITY: { tightness: 90, riskAppetite: 30, baseRate: 5.5, curveSlope: -0.4 },
+  DEFENSIVE: { tightness: 80, riskAppetite: 60, baseRate: 5.4, curveSlope: 0.3 },
+  VOLATILE: { tightness: 40, riskAppetite: 35, baseRate: 4.5, curveSlope: 0.1 },
+  EXPANSION: { tightness: 20, riskAppetite: 80, baseRate: 3.1, curveSlope: 1.1 },
+};
+
+const readingIn = (regime: RegimeAssessment["regime"]) =>
+  buildAssessmentFixture({
+    regime,
+    regimeTransition: null,
+    scores: SCORES_IN[regime],
+    diagnostics: { tightnessVsThreshold: 0, riskAppetiteVsThreshold: 0, nearestThresholdDelta: 0, transitionWatch: false },
+    constraints: [],
+  });
+
+/**
+ * A local API answering what `check` reads, in the regime given: the state, and `lint_commitment`
+ * over MCP `tools/call`, graded by the function the tool runs (`stressTestDecisionPlan`) on that
+ * regime's reading instead of today's. `refusal` answers the tool call as a refused one.
+ */
+const checkApi = async (regime: RegimeAssessment["regime"], options: { ready?: boolean; refusal?: string } = {}) => {
+  const specTexts: string[] = [];
+  const ready = options.ready ?? true;
+  const api = await startApi(async (req, res) => {
+    if (req.method === "POST" && req.url === "/api/mcp") {
+      const message = JSON.parse(await readBody(req));
+      specTexts.push(message.params.arguments.specText);
+      if (options.refusal) {
+        sendJson(res, { jsonrpc: "2.0", id: message.id, result: { content: [{ type: "text", text: options.refusal }], isError: true } });
+        return;
+      }
+      const { specText, category } = message.params.arguments;
+      const result = stressTestDecisionPlan(readingIn(regime), { planText: specText, category: category?.toUpperCase() });
+      sendJson(res, { jsonrpc: "2.0", id: message.id, result: { content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result } });
+      return;
+    }
+    if (req.url === "/api/agent?view=state") {
+      sendJson(res, {
+        version: "v1",
+        recordDate: "2026-11-23",
+        conditions: { key: regime, label: REGIME_LABELS[regime], meaning: "" },
+        automation: { ready, refusal: ready ? null : "Data is a fallback snapshot, not a live reading." },
+        use: { summary: "Informational only." },
+      });
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+  return { ...api, specTexts, requests: api.requests };
+};

@@ -20,6 +20,7 @@ const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, IN
 EXIT.NETWORK = 6;
 EXIT.SERVER = 7;
 EXIT.NOT_READY = 8;
+EXIT.CHECK_BLOCKED = 9;
 const CONFIG_PATH = path.join(os.homedir(), ".config", "whether", "config.yaml");
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PACKAGE_JSON_PATH = path.join(SCRIPT_DIR, "..", "package.json");
@@ -503,7 +504,7 @@ const renderBashCompletion = (commandNames) => `# whether bash completion
 _whether_completion() {
   local cur="\${COMP_WORDS[COMP_CWORD]}"
   local commands="${commandNames.join(" ")}"
-  local global_flags="--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only"
+  local global_flags="--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only --require-ready --file --category --fail-on"
   local subcommands=""
 
   if [[ \${COMP_CWORD} -eq 1 ]]; then
@@ -534,7 +535,7 @@ const renderZshCompletion = (commandNames) => `#compdef whether
 _whether_completion() {
   local -a commands global_flags subcommands
   commands=(${commandNames.join(" ")})
-  global_flags=(--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only)
+  global_flags=(--help --version --json --yaml --markdown --quiet --no-color --no-local-discovery --api-base-url --token --output --company --stage --compact --payload-only --prompt-only --skills-only --require-ready --file --category --fail-on)
 
   if (( CURRENT == 2 )); then
     compadd -- $commands $global_flags
@@ -751,8 +752,15 @@ const discoverHealthyLocalApiBaseUrl = async (settings, endpoint = "/api/health"
   return null;
 };
 
+/* A GET, unless `options.method` (with `options.body` and `options.headers`) says otherwise. */
 const fetchApiResponse = async (settings, endpoint, options = {}) => {
   const allowAutoDiscovery = options.allowAutoDiscovery ?? true;
+  const init = {
+    cache: "no-store",
+    method: options.method ?? "GET",
+    headers: { ...buildRequestHeaders(settings), ...options.headers },
+    ...(options.body === undefined ? {} : { body: options.body }),
+  };
   if (allowAutoDiscovery && settings.allowLocalApiDiscovery && !settings.resolvedApiBaseUrl) {
     await discoverHealthyLocalApiBaseUrl(settings);
   }
@@ -760,10 +768,7 @@ const fetchApiResponse = async (settings, endpoint, options = {}) => {
   const primaryBaseUrl = settings.resolvedApiBaseUrl ?? settings.apiBaseUrl;
 
   try {
-    const response = await fetch(`${primaryBaseUrl}${endpoint}`, {
-      cache: "no-store",
-      headers: buildRequestHeaders(settings),
-    });
+    const response = await fetch(`${primaryBaseUrl}${endpoint}`, init);
     settings.resolvedApiBaseUrl = primaryBaseUrl;
     settings.autodiscoveredApiBaseUrl = primaryBaseUrl !== settings.apiBaseUrl;
     return { response, baseUrl: primaryBaseUrl };
@@ -772,10 +777,7 @@ const fetchApiResponse = async (settings, endpoint, options = {}) => {
       const discoveredBaseUrl = await discoverHealthyLocalApiBaseUrl(settings);
       if (discoveredBaseUrl && discoveredBaseUrl !== primaryBaseUrl) {
         try {
-          const response = await fetch(`${discoveredBaseUrl}${endpoint}`, {
-            cache: "no-store",
-            headers: buildRequestHeaders(settings),
-          });
+          const response = await fetch(`${discoveredBaseUrl}${endpoint}`, init);
           settings.resolvedApiBaseUrl = discoveredBaseUrl;
           settings.autodiscoveredApiBaseUrl = true;
           return { response, baseUrl: discoveredBaseUrl };
@@ -1112,6 +1114,126 @@ const cmdState = async (settings, flags) => {
   if (flags["require-ready"] && body.automation?.ready !== true) {
     if (!settings.quiet) console.error(`not ready: ${body.automation?.refusal ?? "the state did not say the data is live and current"}`);
     process.exitCode = EXIT.NOT_READY;
+  }
+};
+
+/* The plain-GET shim of the MCP tool `get_standup_line` (`lib/agent/tools.ts`): the line is the
+   site's, so the CLI writes none of its own. */
+const cmdStandup = async (settings, flags) => {
+  const body = await getJson(settings, "/api/mcp?tool=get_standup_line");
+  const line = body.result?.standupLine;
+  if (typeof line !== "string") {
+    throw Object.assign(new Error("The API answered without a standup line."), { exitCode: EXIT.NO_DATA });
+  }
+  const rendered = isTextOutput(settings) ? `${line}\nReading of ${body.result.recordDate ?? "an unknown date"}.` : body;
+  await writeFileIfRequested(flags, rendered, settings);
+  writeOutput(rendered, settings);
+};
+
+/* The decision verdicts each `--fail-on` value blocks on. A proposal the test cannot grade blocks on none. */
+const CHECK_FAIL_ON = {
+  risky: ["RISKY", "DANGEROUS"],
+  dangerous: ["DANGEROUS"],
+};
+
+const readStdin = async () => {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks).toString("utf8");
+};
+
+/* The proposal, from one place: the words after `check`, `--file`, or a pipe. */
+const readProposal = async (words, flags) => {
+  const fromArgs = words.join(" ").trim();
+  const file = typeof flags.file === "string" ? flags.file : null;
+  if (fromArgs && file) {
+    throw Object.assign(new Error("Give the proposal one way: as an argument or with --file, not both."), { exitCode: EXIT.ERROR });
+  }
+  const text = fromArgs
+    || (file === "-" ? await readStdin() : file ? await fs.readFile(path.resolve(file), "utf8") : "")
+    || (!file && !process.stdin.isTTY ? await readStdin() : "");
+  if (!text.trim()) {
+    throw Object.assign(
+      new Error('No proposal to check. Pass it as an argument (whether check "Sign a three-year cloud commitment"), with --file <path>, or on stdin.'),
+      { exitCode: EXIT.ERROR },
+    );
+  }
+  return text.trim();
+};
+
+/* One MCP `tools/call` on the remote transport (`POST /api/mcp`, `lib/mcp/httpMcpServer.ts`). A
+   POST rather than the plain-GET shim: a PR body has no URL length limit there, and stays out of
+   request logs, which record the URL and not the body. */
+const callMcpTool = async (settings, name, args) => {
+  const endpoint = "/api/mcp";
+  const { response } = await fetchApiResponse(settings, endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } }),
+  });
+  const parsedBody = await parseJsonBody(response);
+  const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
+  if (statusError) throw statusError;
+  const refusal = parsedBody?.error?.message ?? (parsedBody?.result?.isError ? parsedBody.result.content?.[0]?.text : null);
+  if (refusal || !parsedBody?.result?.structuredContent) {
+    throw Object.assign(new Error(`${name} answered no result: ${refusal ?? "the response carried no structured content."}`), { exitCode: EXIT.ERROR });
+  }
+  return parsedBody.result.structuredContent;
+};
+
+/* Slot labels as the site's stress-test paste prints them (`buildShareText` in
+   app/operate/components/decisionShieldUtils.ts; the nouns are DECISION_CONTRACT_LABELS'). */
+const checkText = ({ reading, result, use }) => {
+  const lines = [`Whether check, reading of ${reading.recordDate ?? "an unknown date"}${reading.conditions?.label ? ` (${reading.conditions.label})` : ""}`];
+  if (reading.automation && reading.automation.ready !== true) {
+    lines.push(`Not live and current: ${reading.automation.refusal ?? "the state did not say the data is live and current."}`);
+  }
+  lines.push("", `Decision verdict: ${result.verdict ?? "Not graded"}`, result.headline);
+  if (result.verdict == null) {
+    if (result.nextStep) lines.push(result.nextStep);
+    if (result.answer?.permalink) lines.push(`Nearest answer: ${result.answer.title} ${result.answer.permalink}`);
+  } else {
+    if (result.sizingNote) lines.push("", `Sizing: ${result.sizingNote}`);
+    if (result.fragileAssumptions?.length) lines.push("", "What this plan assumes:", ...result.fragileAssumptions.map((item) => `- ${item}`));
+    lines.push("", `Pause line: ${result.boundedGuardrail}`);
+    if (result.reversibleAlternative) lines.push(`A more reversible version: ${result.reversibleAlternative}`);
+    lines.push(`Restart line: ${result.reversalTrigger}`);
+  }
+  if (use?.summary) lines.push("", use.summary);
+  return lines.join("\n");
+};
+
+/* A proposal linted against the current reading by the MCP tool `lint_commitment`, the stress test
+   `/operate` runs. Advisory: any decision verdict exits 0 unless `--fail-on` names the verdicts that
+   should stop a hook or a CI step. */
+const cmdCheck = async (settings, words, flags) => {
+  const failOn = typeof flags["fail-on"] === "string" ? flags["fail-on"].trim().toLowerCase() : null;
+  if (failOn !== null && !Object.hasOwn(CHECK_FAIL_ON, failOn)) {
+    throw Object.assign(new Error(`Invalid --fail-on "${flags["fail-on"]}". Expected one of: ${Object.keys(CHECK_FAIL_ON).join(", ")}.`), { exitCode: EXIT.ERROR });
+  }
+  const proposal = await readProposal(words, flags);
+  const state = await getJson(settings, "/api/agent?view=state");
+  // The server reads the category in any case and refuses one it has no rules for, naming those it has.
+  const category = typeof flags.category === "string" ? flags.category : undefined;
+  const result = await callMcpTool(settings, "lint_commitment", { specText: proposal, ...(category ? { category } : {}) });
+  const blocked = failOn !== null && CHECK_FAIL_ON[failOn].includes(result.verdict);
+  const check = {
+    tool: "lint_commitment",
+    reading: { recordDate: state.recordDate ?? null, conditions: state.conditions ?? null, automation: state.automation ?? null },
+    result,
+    failOn,
+    blocked,
+    use: state.use ?? null,
+  };
+  const rendered = isTextOutput(settings) ? checkText(check) : check;
+  await writeFileIfRequested(flags, rendered, settings);
+  writeOutput(rendered, settings);
+  if (flags["require-ready"] && state.automation?.ready !== true) {
+    if (!settings.quiet) console.error(`not ready: ${state.automation?.refusal ?? "the state did not say the data is live and current"}`);
+    process.exitCode = EXIT.NOT_READY;
+  } else if (blocked) {
+    if (!settings.quiet) console.error(`blocked: decision verdict ${result.verdict} meets --fail-on ${failOn}`);
+    process.exitCode = EXIT.CHECK_BLOCKED;
   }
 };
 
@@ -1645,7 +1767,10 @@ const run = async () => {
     .option("--metric <key>", "Filter by metric")
     .option("--plot", "Plot regime history")
     .option("--cadence <cadence>", "Agent cadence override")
-    .option("--require-ready", "state: exit 8 when the data is not live and current");
+    .option("--require-ready", "state, check: exit 8 when the data is not live and current")
+    .option("--file <path>", "check: read the proposal from a file (- for stdin)")
+    .option("--category <category>", "check: the kind of decision when the wording names none (hiring, roadmap, infrastructure, ...)")
+    .option("--fail-on <verdict>", "check: exit 9 on a risky (RISKY or DANGEROUS) or dangerous decision verdict");
 
   const withSettings = (action) => async (...args) => {
     const opts = args.at(-1);
@@ -1678,6 +1803,17 @@ const run = async () => {
     .description("Pull the canonical agent handoff payload")
     .argument("[cadence]", "Cadence (weekly/monthly/quarterly/yearly)")
     .action(withSettings(async (settings, flags, cadence) => cmdAgent(settings, cadence, flags)));
+
+  program
+    .command("check")
+    .description("Check a proposal against the current reading (argument, --file or stdin); advisory unless --fail-on is set")
+    .argument("[proposal...]", "The proposal, PR body or spec text")
+    .action(withSettings(async (settings, flags, words) => cmdCheck(settings, words ?? [], flags)));
+
+  program
+    .command("standup")
+    .description("Print the standup line: whether this week's guidance moved, and what would change it")
+    .action(withSettings(async (settings, flags) => cmdStandup(settings, flags)));
 
   program
     .command("call")
