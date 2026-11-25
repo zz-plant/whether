@@ -140,10 +140,10 @@ export function CopyImageCardButton({
       label="Copy as an image"
       state={copyState}
       onClick={() => void handleCopy()}
-      leadingIcon={<CopyIcon className="text-slate-400" />}
+      leadingIcon={<CopyIcon className="size-4 text-slate-400" />}
       stateIcons={{
-        copying: <SpinnerIcon className="text-slate-400" />,
-        copied: <CheckIcon className="text-emerald-400" />,
+        copying: <SpinnerIcon className="size-4 text-slate-400" />,
+        copied: <CheckIcon className="size-4 text-emerald-400" />,
       }}
       buttonLabels={{
         copying: <span className="text-slate-300">Rendering image…</span>,

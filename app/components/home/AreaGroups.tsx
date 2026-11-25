@@ -62,10 +62,9 @@ export function AreaGroups({
   /** Offer an email when a held group restarts. Live briefs only: plan lines watch today's reading. */
   alerts?: boolean;
   /**
-   * The guidance block above prints each area's action beside its standing from `lg` up
-   * (AreaStrip). This list then gives its own sentence up at that width, so the action is
-   * said once: it keeps the group's line, which states the condition the areas wait on,
-   * each area's name and what opens under it.
+   * The brief above prints each area's action in its row (AreaStrip), so this list gives
+   * its own sentence up: it keeps the group's line, which states the condition the areas
+   * wait on, each area's name and what opens under it.
    */
   rulesAbove?: boolean;
 }) {
@@ -150,7 +149,7 @@ export function AreaGroups({
                         ) : (
                           <span className="font-semibold text-slate-50">{entry.label}.</span>
                         )}{" "}
-                        <span className={rulesAbove ? "lg:hidden" : undefined} data-area-group-rule>{sentence(entry.rule)}</span>
+                        {rulesAbove ? null : <span data-area-group-rule>{sentence(entry.rule)}</span>}
                       </p>
                     </div>
                     {entry.changed ? <p className="text-fluid-sm text-slate-400">{entry.changed}</p> : null}

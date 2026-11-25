@@ -14,6 +14,7 @@ import { PeriodControl } from "./components/home/PeriodControl";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { QuietWeekFold } from "./components/home/QuietWeekFold";
+import { BoardSlidePreviewLink } from "./components/home/BoardSlidePreviewLink";
 import type { CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
@@ -47,17 +48,13 @@ import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AreaStrip } from "./components/home/AreaStrip";
 import { RunwayFold } from "./components/home/RunwayFold";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
-import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
 import Link from "next/link";
 import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
-import { buildRuleChartModel } from "../lib/report/ruleRegions";
-import { buildCountedChartHref, parseRuleChartDecision, parseRuleChartReading } from "../lib/report/ruleChartParams";
-import { buildRateMoves, fundingPressureRateLookup } from "../lib/report/rateScenario";
-import { buildScoreComposition } from "../lib/report/scoreComposition";
-import { evaluateRegime } from "../lib/regimeEngine";
+import { buildCountedChartHref } from "../lib/report/ruleChartParams";
+import { buildHomeRuleChart } from "./homePageRuleChart";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import { CopyImageCardButton } from "./components/CopyImageCardButton";
 import {
@@ -165,7 +162,7 @@ async function PageContent({
     data = await loadHomePageAssembly(searchParams);
   } catch {
     return (
-      <Shell>
+      <Shell measure="wide">
         <HomeBriefLoadError />
       </Shell>
     );
@@ -333,8 +330,7 @@ async function PageContent({
   /* The selected horizon, the artifact every share format renders, and the one Slack
      paste. The builders live in `homePageArtifact.ts` so this route does not decide the
      artifact's shape a second time. */
-  /* The area open on the page, which the sections below the card follow and a copied
-     brief's link carries: `?decision=`, else the one the reader last picked. */
+  /* The open area (`?decision=`, else the reader's last pick): what follows the card, and Copy brief's link. */
   const chosenArea = resolveHomeDecision(searchParams, data.operatorContext.decisionArea);
   const { cadenceCall, cadenceTitle, briefArtifact, briefSlackBlock, briefShareUrl } = buildHomePageArtifact({
     homepage,
@@ -415,6 +411,20 @@ async function PageContent({
           scores: { tightness, riskAppetite },
         })
       : null;
+  /* On a phone the two figures share one sentence naming the lead area and the whole
+     restart (2026-11-21): each figure's own full sentence printed the same compound
+     condition twice, and the pair pushed the area rows off the first screen. On a clear
+     week the figures' short captions already say so, and the shared sentence would only
+     repeat them; it prints when the lead area is held, where the whole restart matters.
+     The figures' own captions already carry each line's number, so the shared sentence
+     names the area and the restart without repeating the score. */
+  const sharedFigureStanding =
+    [figureStanding("tightness"), figureStanding("riskAppetite")].find((standing) => standing?.crossed)
+    ?? figureStanding("tightness")
+    ?? figureStanding("riskAppetite");
+  const phoneFigureStanding = sharedFigureStanding?.crossed
+    ? { ...sharedFigureStanding, lead: sharedFigureStanding.lead.replace(/ (?:above|below) [\d.]+$/, "") }
+    : null;
   /* Only on a week the call moved: the last time it moved the same way, and
      what the scores did over the three months after. Null otherwise, and the
      section renders nothing rather than reaching for the nearest analogue. */
@@ -594,39 +604,18 @@ async function PageContent({
     : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   /* A live reading's alone: a saved copy or an archived month carries no current "feels like". */
   const countedReading = historicalSelection || savedCopy ? null : reportData.scoringBasis?.countedReading ?? null;
-  /* The conditions chart's rule layer: each area's regions, opening on the decision the
-     reader chose, else on the lead rule only when the sentence beside the chart is that
-     rule's. On a live read it can also plot the reading with the left-out inputs counted,
-     or after a Fed cut or hike, and label funding pressure's lines with the short rate
-     where the rate makes the whole score; all three re-score through the engine. */
-  const liveChart = !historicalSelection && !savedCopy;
-  const rateInputs = { assessment: reportData.assessment, treasury: reportData.treasury, macroSeries: reportData.macroSeries, evaluate: evaluateRegime };
-  const ruleChartModel = buildRuleChartModel({
+  /* The conditions chart's rule layer (`homePageRuleChart.ts`). */
+  const ruleChart = buildHomeRuleChart({
+    reportData,
     rules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
     scores: { tightness, riskAppetite },
     leadArea: corridorRule && boundedConditions ? corridorRule.area : null,
-    notCounted: liveChart ? reportData.scoringBasis?.notCounted ?? [] : [],
     changeLines: callChangeLines,
     regime,
-    rateMoves: liveChart ? buildRateMoves(rateInputs) : [],
-    rateAtFundingPressure: liveChart
-      ? fundingPressureRateLookup({
-          assessment: reportData.assessment,
-          composition: buildScoreComposition({
-            ...rateInputs,
-            treasurySource: { label: reportData.treasuryProvenance.sourceLabel, url: reportData.treasuryProvenance.sourceUrl },
-            scoringBasis: reportData.scoringBasis,
-          }),
-        })
-      : undefined,
+    live: !historicalSelection && !savedCopy,
+    searchParams,
+    rememberedArea: data.operatorContext.decisionArea,
   });
-  const chosenReading = parseRuleChartReading(searchParams);
-  const ruleChart = {
-    ...ruleChartModel,
-    initialArea: parseRuleChartDecision(searchParams) ?? data.operatorContext.decisionArea ?? undefined,
-    initialReading: ruleChartModel.readings.some((reading) => reading.key === chosenReading) ? chosenReading : null,
-    query: searchParams,
-  };
   /* What the record's months did, drawn around this week: an archived month's reading has no later months to be judged by. */
   const moveRanges = historicalSelection ? null : describeScoreMoveRanges();
   /* The card sizes the room before a change once; the count of months held at this
@@ -672,7 +661,7 @@ async function PageContent({
   );
 
   return (
-    <Shell regime={regime}>
+    <Shell regime={regime} measure="wide">
       <BriefArtifactScript artifact={briefArtifact} />
       <ActivationTracker path="/" />
       {/* `/` was always one of the routes the tracker accepts and never mounted
@@ -778,9 +767,10 @@ async function PageContent({
                 jump: { href: `#${HOME_SECTIONS.areas.id}`, label: "By area" },
               })}
             >
-              {/* Above the card, inside the region it belongs to. Renders nothing
-                  unless an area is on hold or close to its line. */}
-              {lineStateBand ? <LineStateBand model={lineStateBand} /> : null}
+              {/* Above the card, inside the region it belongs to. The exception used
+                  to be a band above the call; the one-page brief prints it under the
+                  sentence it qualifies (`notice`), so the first screen opens on the
+                  call rather than on a box about it. */}
               <DecisionHero
                 periodControl={historicalSelection ? undefined : periodControl}
                 location={readingLocation}
@@ -810,14 +800,12 @@ async function PageContent({
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
+                notice={lineStateBand}
                 areaStrip={
                   areaStripModel ? (
                     <AreaStrip
                       model={areaStripModel}
                       earlier={weekMove?.areas}
-                      /* Each area's action beside its standing, from `lg` up, where the row has
-                         the width; "Your decisions this week" gives the sentence up there. */
-                      rules={Object.fromEntries(homeAreaRows.map((row) => [row.area, row.rule]))}
                     />
                   ) : undefined
                 }
@@ -829,8 +817,16 @@ async function PageContent({
                 phoneFigure={
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1" data-hero-scores-compact>
                     {scoreLadders.map((ladder) => (
-                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} standing={figureStanding(ladder.metric)} />
+                      <ScoreLadder key={ladder.metric} figure="compact" label={ladder.label} value={ladder.value} lines={ladder.lines} standing={null} />
                     ))}
+                    {phoneFigureStanding ? (
+                      <p data-hero-standing className="col-span-2 text-fluid-sm leading-snug text-[var(--app-text-secondary)]">
+                        <span className={phoneFigureStanding.crossed ? "font-semibold text-line-crossed-fg" : "font-semibold text-[var(--app-text)]"}>
+                          {phoneFigureStanding.lead}.
+                        </span>{" "}
+                        {phoneFigureStanding.rest}
+                      </p>
+                    ) : null}
                     {/* The facts line's one link to the basis, which it carries from md up. */}
                     <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4">
                       Why conditions are {publicRegimeLabel}
@@ -885,150 +881,169 @@ async function PageContent({
                 under this week's call. */}
             {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
 
-            {/* 2. The five areas: the picker, all five side by side folded under it,
-                and the one plan link. */}
-            <DecisionPicker
-              options={decisionPickerOptions}
-              initialSelected={chosenArea}
-              regime={regime}
-              stageLabel={stageLabel}
-              activeRunway={activeRunway}
-              savedReadingDate={savedReadingDate}
-              isHistorical={Boolean(historicalSelection)}
-              rulesAbove={Boolean(areaStripModel)}
-              groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
-                comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
-                /* An archived month's record would have to end at that month. */
-                record: historicalSelection ? undefined : recordSeries,
-              })}
-            >
-              <RunwayFold regime={regime} isHistorical={Boolean(historicalSelection)} />
-              <div>
-                <ActionLink href={operateHref} variant="primary">
-                  {cadenceCall?.planLabel ?? "Build this week’s plan →"}
-                </ActionLink>
-              </div>
-              {/* The formats a reader with one of these roles came for, named. They sat
-                  behind "Share or embed this" at the foot of the page. After the areas
-                  rather than beside Copy Brief: the decision, then the artifact, and the
-                  words-before-the-areas budget stands. A wrapped row reaches up only
-                  across the 4px gap (`--weather-hit-up`, controls.css). */}
-              {!historicalSelection ? (
-                <p data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)] [--weather-hit-up:4px]">
-                  Share as:
-                  {ROLE_FORMAT_LINKS.map((format) => (
-                    <ActionLink key={format.href} href={format.href} variant="inline">
-                      {format.label}
-                    </ActionLink>
-                  ))}
-                </p>
-              ) : null}
-            </DecisionPicker>
-
-            {/* 3. Whose rules these are, and the settings behind them. Live briefs
-                only: the profile holds the reader's company as of today. At every
-                horizon since 2026-11-03, because the horizon control folds here too.
-                Sits after the areas because the table above already names the
-                company it is scaled to; this is where the reader changes that. */}
-            {!historicalSelection ? (
-              <CompanyCalibration
+            {/* The reading body keeps the brief's reading measure (72rem) while the
+                call and its rail take the wide field (2026-11-21): the explanatory
+                tables and prose should not stretch to the comp's full width. It
+                keeps the call's left edge, so the page reads down one axis: centred,
+                it started 80px right of the brief above it on a laptop (2026-11-24). */}
+            <div className="weather-brief-flow mr-auto w-full max-w-[72rem]">
+              {/* 2. The five areas: the picker, all five side by side folded under it,
+                  and the one plan link. */}
+              <DecisionPicker
+                options={decisionPickerOptions}
+                initialSelected={chosenArea}
+                regime={regime}
                 stageLabel={stageLabel}
-                activeStage={activeStage}
                 activeRunway={activeRunway}
-                runwayEmphasis={runwayEmphasis}
-                stageAction={stageAction}
-                horizon={{ control: <CadenceSelector />, current: activeCadence }}
-              />
-            ) : null}
-
-            {/* 4. What changed. One table, every signal, each against the earlier
-                reading and against its own lines. It opens on the table: the card
-                says what the week did to the conditions and why, and each area's
-                row says which of its lines moved. Only a read with nothing to
-                compare says so over it. */}
-            <QuietWeekFold quiet={quietWeek} regimeLabel={publicRegimeLabel}>
-              <WhatChangedSection
-                compact
-                drawnAbove
-                historyOpen={searchParams?.inputs === "1"}
-                heading={`What changed ${basis.since}`}
-                rows={signalChangeRows}
-                moveRanges={moveRanges}
-                feelsLike={countedReading}
-                history={{
-                  tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
-                  riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
-                }}
-                historyCaveat={conditionsTrail.caveat}
-                inputHistory={historicalSelection ? undefined : inputHistory}
-                inputTrails={historicalSelection ? undefined : buildInputTrails({
-                  treasury: reportData.treasury,
-                  materializedSignals: reportData.materializedSignals,
-                  rows: signalChangeRows,
-                  baseRateLine: reportData.assessment.thresholds.baseRateTightness,
-                  comparedWith: comparisonUnavailable ? null : homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith,
-                  span: parseInputTrailSpan(searchParams?.[INPUT_TRAIL_PARAM]),
-                  monthEnds: getTimeMachineYieldCurveSeries(Number.MAX_SAFE_INTEGER),
+                savedReadingDate={savedReadingDate}
+                isHistorical={Boolean(historicalSelection)}
+                rulesAbove={Boolean(areaStripModel)}
+                groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
+                  comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
+                  /* An archived month's record would have to end at that month. */
+                  record: historicalSelection ? undefined : recordSeries,
                 })}
-                followsArea
-                chosenArea={chosenArea}
-                query={searchParams}
-                lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
-                comparisonUnavailable={comparisonUnavailable}
-                basis={basis}
-              />
+              >
+                <RunwayFold regime={regime} isHistorical={Boolean(historicalSelection)} />
+                <div>
+                  <ActionLink href={operateHref} variant="primary">
+                    {cadenceCall?.planLabel ?? "Build this week’s plan →"}
+                  </ActionLink>
+                </div>
+                {/* The formats a reader with one of these roles came for, named. They sat
+                    behind "Share or embed this" at the foot of the page. After the areas
+                    rather than beside Copy Brief: the decision, then the artifact, and the
+                    words-before-the-areas budget stands. A wrapped row reaches up only
+                    across the 4px gap (`--weather-hit-up`, controls.css). */}
+                {!historicalSelection ? (
+                  <div data-role-formats className="flex flex-wrap items-center gap-x-4 gap-y-1 text-fluid-sm text-[var(--app-text-muted)] [--weather-hit-up:4px]">
+                    <span>Share as:</span>
+                    {ROLE_FORMAT_LINKS.map((format) =>
+                      format.href === "/share#image-artifacts" ? (
+                        <BoardSlidePreviewLink
+                          key={format.href}
+                          href={format.href}
+                          label={format.label}
+                          stage={activeStage}
+                        />
+                      ) : (
+                        <ActionLink key={format.href} href={format.href} variant="inline">
+                          {format.label}
+                        </ActionLink>
+                      ),
+                    )}
+                  </div>
+                ) : null}
+              </DecisionPicker>
 
-              {/* 5. What the conditions are made of, and what the reading leaves out:
-                  the two scores with their meanings, the excluded inputs that would
-                  change the classification, and the capped score's real distance. */}
-              <WhyConditionsSection
-                regime={regime}
-                tightness={tightness}
-                riskAppetite={riskAppetite}
-                changeLines={callChangeLines}
-                pendingConditions={reportData.assessment.regimeTransition?.pending
-                  ? reportData.assessment.regimeTransition.candidateState
-                  : undefined}
-                notCounted={reportData.scoringBasis.notCounted}
-                warning={reportData.scoringBasis.warning}
-                chartHref={ruleChart.readings.some((reading) => reading.key === "counted") ? buildCountedChartHref(searchParams) : undefined}
-              />
+              {/* 3. Whose rules these are, and the settings behind them. Live briefs
+                  only: the profile holds the reader's company as of today. At every
+                  horizon since 2026-11-03, because the horizon control folds here too.
+                  Sits after the areas because the table above already names the
+                  company it is scaled to; this is where the reader changes that. */}
+              {!historicalSelection ? (
+                <CompanyCalibration
+                  stageLabel={stageLabel}
+                  activeStage={activeStage}
+                  activeRunway={activeRunway}
+                  runwayEmphasis={runwayEmphasis}
+                  stageAction={stageAction}
+                  horizon={{ control: <CadenceSelector />, current: activeCadence }}
+                />
+              ) : null}
 
-              {/* 6. What would change the guidance: its pause and restart lines, the
-                  line where conditions change, and where the reading sits. */}
-              <WhatWouldChangeSection
-                feelsLike={countedReading}
-                ladders={scoreLadders}
-                flipProximity={v2HeroSignalData.flipProximity}
-                reversalTrigger={reversalTriggerLabel}
-                resumeWhen={resumeWhenLabel}
-                guardrail={guardrailLabel}
-                leadResume={leadResumeCondition ? formatDecisionReversal(leadResumeCondition) : undefined}
-                leadHeld={leadItem ? anyPauseLineMet([leadItem], { tightness, riskAppetite }) : undefined}
-                flipConditions={flipConditionLabels}
-                callChangeLines={callChangeLines}
-                regime={regime}
-                conditionsTrail={conditionsTrail}
-                ruleChart={ruleChart}
-              />
+              {/* 4. What changed. One table, every signal, each against the earlier
+                  reading and against its own lines. It opens on the table: the card
+                  says what the week did to the conditions and why, and each area's
+                  row says which of its lines moved. Only a read with nothing to
+                  compare says so over it. */}
+              <QuietWeekFold
+                quiet={quietWeek}
+                regimeLabel={publicRegimeLabel}
+                preview={ruleChart.quietWeekPreview}
+              >
+                <WhatChangedSection
+                  compact
+                  drawnAbove
+                  historyOpen={searchParams?.inputs === "1"}
+                  heading={`What changed ${basis.since}`}
+                  rows={signalChangeRows}
+                  moveRanges={moveRanges}
+                  feelsLike={countedReading}
+                  history={{
+                    tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
+                    riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
+                  }}
+                  historyCaveat={conditionsTrail.caveat}
+                  inputHistory={historicalSelection ? undefined : inputHistory}
+                  inputTrails={historicalSelection ? undefined : buildInputTrails({
+                    treasury: reportData.treasury,
+                    materializedSignals: reportData.materializedSignals,
+                    rows: signalChangeRows,
+                    baseRateLine: reportData.assessment.thresholds.baseRateTightness,
+                    comparedWith: comparisonUnavailable ? null : homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith,
+                    span: parseInputTrailSpan(searchParams?.[INPUT_TRAIL_PARAM]),
+                    monthEnds: getTimeMachineYieldCurveSeries(Number.MAX_SAFE_INTEGER),
+                  })}
+                  followsArea
+                  chosenArea={chosenArea}
+                  query={searchParams}
+                  lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
+                  comparisonUnavailable={comparisonUnavailable}
+                  basis={basis}
+                />
 
-              {/* 8. How unusual is this? */}
-              <RecordSection
-                lastTime={lastTimeCallChanged}
-                comparisons={changeComparisons}
-                callChangeLines={callChangeLines}
-                query={searchParams}
-                /* The card's row of links names every change on the record, so the "Last
-                   changes:" line would list the same months a second time. */
-                turningPoints={lastTimeCallChanged ? [] : turningPoints}
-                spellLengths={spellLengths}
-                record={historicalSelection ? undefined : recordSeries}
-              />
-            </QuietWeekFold>
+                {/* 5. What the conditions are made of, and what the reading leaves out:
+                    the two scores with their meanings, the excluded inputs that would
+                    change the classification, and the capped score's real distance. */}
+                <WhyConditionsSection
+                  regime={regime}
+                  tightness={tightness}
+                  riskAppetite={riskAppetite}
+                  changeLines={callChangeLines}
+                  pendingConditions={reportData.assessment.regimeTransition?.pending
+                    ? reportData.assessment.regimeTransition.candidateState
+                    : undefined}
+                  notCounted={reportData.scoringBasis.notCounted}
+                  warning={reportData.scoringBasis.warning}
+                  chartHref={ruleChart.readings.some((reading) => reading.key === "counted") ? buildCountedChartHref(searchParams) : undefined}
+                />
 
-            {/* 9. The alert: hearing the day a line is crossed is how the page is
-                meant to be used, so it follows everything it watches. */}
-            <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
+                {/* 6. What would change the guidance: its pause and restart lines, the
+                    line where conditions change, and where the reading sits. */}
+                <WhatWouldChangeSection
+                  feelsLike={countedReading}
+                  ladders={scoreLadders}
+                  flipProximity={v2HeroSignalData.flipProximity}
+                  reversalTrigger={reversalTriggerLabel}
+                  resumeWhen={resumeWhenLabel}
+                  guardrail={guardrailLabel}
+                  leadResume={leadResumeCondition ? formatDecisionReversal(leadResumeCondition) : undefined}
+                  leadHeld={leadItem ? anyPauseLineMet([leadItem], { tightness, riskAppetite }) : undefined}
+                  flipConditions={flipConditionLabels}
+                  callChangeLines={callChangeLines}
+                  regime={regime}
+                  conditionsTrail={conditionsTrail}
+                  ruleChart={ruleChart}
+                />
+
+                {/* 8. How unusual is this? */}
+                <RecordSection
+                  lastTime={lastTimeCallChanged}
+                  comparisons={changeComparisons}
+                  callChangeLines={callChangeLines}
+                  query={searchParams}
+                  /* The card's links name every change, so "Last changes:" would repeat them. */
+                  turningPoints={lastTimeCallChanged ? [] : turningPoints}
+                  spellLengths={spellLengths}
+                  record={historicalSelection ? undefined : recordSeries}
+                />
+              </QuietWeekFold>
+
+              {/* 9. The alert: hearing the day a line is crossed is how the page is
+                  meant to be used, so it follows everything it watches. */}
+              <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
+            </div>
 
         </div>
       </div>

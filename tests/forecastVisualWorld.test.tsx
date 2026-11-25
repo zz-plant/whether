@@ -65,12 +65,12 @@ describe("the sky is drawn where the hero has a margin", () => {
   const hero = (aside?: React.ReactNode) =>
     renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="VOLATILE" phoneFigure={<p>the ladder</p>} aside={aside} />);
 
-  it("puts the condition and the guidance on the sky, and the scores on a panel of paper on it", () => {
+  it("puts the week, the condition and the guidance on the sky, and the scores in the rail beside it", () => {
     const html = hero(<p>the scores</p>);
     const skyAt = html.indexOf('<div class="weather-hero-sky" data-hero-sky="true">');
     assert.ok(skyAt >= 0, "the homepage hero draws the sky");
     assert.ok(skyAt < html.indexOf('id="weekly-call-title"'), "the guidance is on the sky");
-    assert.match(html, /<div class="weather-hero-aside weather-hero-sky-panel [^"]*"><div class="max-md:hidden"><p>the scores<\/p>/);
+    assert.match(html, /<aside class="weather-hero-aside [^"]*"><div class="max-md:hidden"><p>the scores<\/p>/);
     assert.match(html, /<div class="weather-hero-sky-panel md:hidden" data-hero-phone-figure="true"><p>the ladder<\/p>/, "on a phone the scores follow the guidance, on the same paper");
   });
 

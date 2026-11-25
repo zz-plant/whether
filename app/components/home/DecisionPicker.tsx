@@ -32,20 +32,15 @@ import { useClipboardCopy } from "../useClipboardCopy";
 import { CheckIcon, ShareIcon } from "../uiIcons";
 
 /**
- * "Your decisions this week": the five areas, third on the page, after the verdict
+ * "Your decisions this week": the five areas' rules, third on the page, after the verdict
  * and the stage and runway the lines are scaled to (2026-10-09).
  *
- * The five answers are on the page before any is picked: every area's rule, grouped by
- * the condition that changes it (`AreaGroups`). An area's name opens, under its own
- * rule, why the rule matters, a test against the reader's cash and the links to share
- * or argue it (2026-11-03). A strip of five choices under the groups did that, and
- * printed the five names a second time; the open card restated the rule and lines the
- * group had just said.
- *
- * It used to fold the rest of the brief away on a first visit and carry the alert,
- * the record and a "Show the full brief" button for that visit. The order does
- * that job for every reader now: the areas, what would change them, and the alert
- * come before the evidence, so nothing is hidden and nothing is printed twice.
+ * The five answers lead in the brief above (`AreaStrip`), each with its action and line.
+ * This section is the optional exploration, folded behind one disclosure since 2026-11-21:
+ * every area's rule grouped by the condition that changes it (`AreaGroups`), the cash test
+ * and the links. An area's name opens, under its own group, why the rule matters, a test
+ * against the reader's cash and the links to share or argue it (2026-11-03). A `?decision=`
+ * link or an area row's hash opens the fold on the area the reader meant.
  */
 
 export type DecisionPickerOption = HomeAreaRow & {
@@ -98,7 +93,7 @@ export function DecisionPicker({
   savedReadingDate?: string;
   /** An archived month: no runway notes, no restart emails, since both read today. */
   isHistorical?: boolean;
-  /** The guidance block prints each area's action from `lg` up, so the groups give theirs up there (AreaGroups). */
+  /** The brief above prints each area's action in its row, so the groups do not reprint it (AreaGroups). */
   rulesAbove?: boolean;
   /** What follows the groups inside the section: the fold behind the rules, and the plan link. */
   children?: ReactNode;
@@ -130,7 +125,6 @@ export function DecisionPicker({
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
     if (activePause?.line) bullets.push(`• *Pause if:* ${activePause.line}${activePause.distance ? ` (${activePause.distance})` : ""}`);
     if (activeResume?.line) bullets.push(`• *Restart when:* ${activeResume.line}${activeResume.distance ? ` (${activeResume.distance})` : ""}`);
-    if (activeTransmission?.whyLineMatters) bullets.push(`• *Why it matters:* ${activeTransmission.whyLineMatters}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
@@ -153,19 +147,19 @@ export function DecisionPicker({
           </p>
         ) : null}
         {activeTransmission ? (
-          <div data-transmission-note className="max-w-[60ch] space-y-1.5 text-fluid-sm">
-            <p className="leading-relaxed text-slate-300">
-              <span className="font-semibold text-slate-100">Why this matters for {decisionAreaLabel(area).toLowerCase()}:</span>{" "}
-              {activeTransmission.transmission} {activeTransmission.whyLineMatters}
-            </p>
-            <p className="text-fluid-nano text-slate-400">
-              <span className="font-medium text-slate-200">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
-            </p>
+          <div data-transmission-note className="max-w-[60ch] space-y-2 text-fluid-sm">
             {activeTransmission.startupMath ? (
-              <p className="text-fluid-nano text-slate-400">
-                <span className="font-medium text-slate-200">Startup math:</span> {activeTransmission.startupMath}
+              <p className="leading-snug text-slate-200">
+                <span className="font-semibold text-slate-100">Startup math:</span> {activeTransmission.startupMath}
               </p>
             ) : null}
+            <p className="leading-snug text-slate-200">
+              <span className="font-semibold text-slate-100">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
+            </p>
+            <p className="text-xs leading-relaxed text-slate-400">
+              <span className="font-medium text-slate-300">Why this matters for {decisionAreaLabel(area).toLowerCase()}:</span>{" "}
+              {activeTransmission.transmission} {activeTransmission.whyLineMatters}
+            </p>
           </div>
         ) : null}
         <details className="weather-auto-chevron" data-commitment-disclosure>
@@ -244,19 +238,34 @@ export function DecisionPicker({
           ) : null}
         </div>
 
-        {/* No "This week's scores" list here (2026-10-09). It printed both scores
-            and what they mean, which the conditions map's header and the bars in
-            "What changed" print at every width; each group says the score its
-            condition reads. */}
-        <AreaGroups
-          groups={groups}
-          rulesAbove={rulesAbove}
-          selected={selected}
-          onToggle={(area) => recordDecision(area === selected ? null : area)}
-          detail={renderDetail}
-          note={isHistorical ? undefined : (area) => <RunwayAreaNote regime={regime} area={area} />}
-          alerts={!isHistorical}
-        />
+        {/* The five answers are in the brief above (`AreaStrip`), each with its action
+            and its line. This section is the optional exploration: the condition each
+            group of areas waits on, the cash test, and the links. It folds by default
+            (2026-11-21) so the first screen is the brief, and a `?decision=` link or a
+            row's "View lines" opens it on the area the reader meant (`AnchorFeedback`
+            opens a disclosure around a hash target). */}
+        <details
+          className="weather-auto-chevron"
+          data-decision-explore
+          /* A saved copy or an archived month has no area strip above, so the groups
+             stay open: they are the five answers there, not optional exploration. */
+          open={initialSelected || !rulesAbove ? true : undefined}
+        >
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
+            {rulesAbove ? "Open each area’s rule, test and links" : "Every area’s rule, test and links"}
+          </summary>
+          <div className="pt-3">
+            <AreaGroups
+              groups={groups}
+              rulesAbove={rulesAbove}
+              selected={selected}
+              onToggle={(area) => recordDecision(area === selected ? null : area)}
+              detail={renderDetail}
+              note={isHistorical ? undefined : (area) => <RunwayAreaNote regime={regime} area={area} />}
+              alerts={!isHistorical}
+            />
+          </div>
+        </details>
       </div>
 
       {children}

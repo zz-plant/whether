@@ -1,31 +1,18 @@
 "use client";
 
 import { useCallback } from "react";
-import { Maximize2 } from "lucide-react";
+import { Presentation } from "lucide-react";
 
 type Props = {
   className?: string;
 };
 
 /**
- * Puts the page into presentation focus mode.
+ * Puts the page into presentation focus mode (3-slide meeting deck).
  *
- * This lived in `DecisionHero`, in the row that runs Copy Brief · Copy Meeting
- * Slide · Track in Memory — three controls that act on the brief artifact,
- * under a comment reading "One copy control per artifact". Present acts on the
- * viewport instead, so it sat one layer too deep: display modes belong beside
- * theme and settings in the global header, which is also where this app already
- * puts them.
- *
- * The header renders it only on the home brief, because focus mode targets
- * `[data-home-shell-main]` and `Shell` — the only component that renders it —
- * serves that one route.
- *
- * It is icon-only now. A prior comment here insisted on a visible label at every
- * width, because hiding it below `sm` left one bare glyph at the end of a
- * wrapping row of three labelled buttons. That row is no longer its parent; in
- * the header cluster every sibling is a 44px icon button, so a label is what
- * would look out of place.
+ * Rendered only on the home brief (`Shell` owns `[data-home-shell-main]`).
+ * Styled in Forecast's flat ink register (no dark bordered dashboard cage):
+ * presentation glyph on compact desktop, expanding to "Present" + `F` keycap on wide screens.
  */
 export function PresentModeButton({ className = "" }: Props) {
   const handleToggle = useCallback(() => {
@@ -36,11 +23,13 @@ export function PresentModeButton({ className = "" }: Props) {
     <button
       type="button"
       onClick={handleToggle}
-      title="Presentation focus mode (F)"
-      className={`weather-header-action inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/60 text-slate-400 transition-colors duration-150 hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 ${className}`}
-      aria-label="Toggle presentation focus mode"
+      title="Present 3-slide deck (F)"
+      className={`weather-header-action weather-focus-ring inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-2 text-[var(--app-text-muted)] transition-colors duration-150 hover:bg-[var(--bg-nested)] hover:text-[var(--app-text)] ${className}`}
     >
-      <Maximize2 aria-hidden="true" size={16} strokeWidth={1.8} />
+      <Presentation aria-hidden="true" size={16} strokeWidth={1.8} />
+      <span className="sr-only lg:not-sr-only lg:inline lg:text-fluid-sm lg:font-medium">Present</span>
+      <span className="sr-only"> 3-slide deck</span>
+      <kbd aria-hidden="true" className="weather-kbd hidden xl:inline-flex">F</kbd>
     </button>
   );
 }

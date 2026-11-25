@@ -9,6 +9,7 @@ import {
 } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
+import { AdviceStudyTeaser } from "../components/history/AdviceStudyTeaser";
 import { PremiseOutcomeScatterChart } from "../components/history/premiseOutcomeScatterChart";
 import { loadPremiseTestBacktestModel } from "../../lib/research/premiseBacktestModel";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
@@ -76,7 +77,7 @@ export default function CalibrationPage() {
           "Weekly brief" over their titles. */}
       <SecondaryPageHeader
         title="How often the guidance held up"
-        description={`We checked the published room before a change against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
+        description={`Checked across ${totals.months} month-to-month comparisons since 2012: how often conditions held at each distance from the change line.`}
       />
 
       <ConfidenceRecordSection />
@@ -90,24 +91,18 @@ export default function CalibrationPage() {
       <SecondaryPageSection title="How it was measured">
         <ul className="space-y-2 text-base text-slate-300">
           <li>
-            <span className="text-slate-100">Sample.</span> Every monthly reading in the archive
-            that has a following month to compare against: {totals.months} of them.
+            <span className="text-slate-100">Sample.</span> {totals.months} monthly readings with a following month to compare.
             {record ? (
               <>
-                {" "}The record holds {record.readings} readings, {since} to{" "}
-                {formatMonthYearShortFromValue(record.latestRecordDate)}; the newest has no following month yet.
+                {" "}The record holds {record.readings} readings, {since} to {formatMonthYearShortFromValue(record.latestRecordDate)}.
               </>
             ) : null}
           </li>
           <li>
-            <span className="text-slate-100">Outcome.</span> Did conditions stay the same one month
-            later? No other outcome is scored, and none is weighted.
+            <span className="text-slate-100">Outcome.</span> Whether conditions stayed the same one month later—unweighted, nothing else scored.
           </li>
           <li>
-            <span className="text-slate-100">Bands.</span> Distance to the nearest line where
-            conditions change, in points of funding pressure, with a risk-appetite point converted the
-            same way the room before a change converts it. The cut points were chosen before the outcomes
-            were looked at.
+            <span className="text-slate-100">Bands.</span> Pre-set distance bands from the nearest change line (in funding-pressure points, converting risk-appetite points the same way).
           </li>
           {/* The sources, as the last line of the method (2026-11-11). They were a
               section of their own, beside a link to how the scores are computed that
@@ -131,19 +126,18 @@ export default function CalibrationPage() {
       <SecondaryPageSection title="What it does not show">
         <ul className="space-y-2 text-base text-slate-300">
           <li>
-            {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is not enough to estimate a probability per band. A
-            curve fitted to that base rate would report about 97% every week and discriminate nothing. That is worse than a number that at least measures something real.
+            {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is too few to fit per-band probabilities—a fitted curve would read ~97% every week and separate nothing.
           </li>
           <li>
-            One month is the only horizon tested. Nothing here says what a reading is worth over a
-            quarter.
+            Only the one-month horizon is tested; nothing here measures a quarter.
           </li>
           <li>
-            The archive is one model over one country&rsquo;s rates. It is evidence
-            about this number, not about forecasting scores generally.
+            One model over U.S. rates—evidence about this score, not forecasting generally.
           </li>
         </ul>
       </SecondaryPageSection>
+
+      <AdviceStudyTeaser />
     </ContentPageShell>
   );
 }

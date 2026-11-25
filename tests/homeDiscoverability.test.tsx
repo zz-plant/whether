@@ -3,6 +3,9 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AlertSection } from "../app/components/home/AlertSection";
+import { PresentModeButton } from "../app/components/PresentModeButton";
+import { BoardSlidePreviewLink } from "../app/components/home/BoardSlidePreviewLink";
+import { FooterAgentColophon } from "../app/components/footerAgentColophon";
 import { isActivationEvent } from "../lib/activationFunnel";
 import { stressTestDecisionPlan } from "../lib/decisionShield";
 import { buildPlanTestHref } from "../lib/navigation/planningNavigation";
@@ -65,6 +68,46 @@ describe("the formats a role came for", () => {
       const hash = href.split("#")[1] ?? "";
       assert.ok(share.includes(`id: "${hash}"`) || files.includes(`id="${hash}"`), `${href} opens nothing on /share`);
     }
+  });
+});
+
+/*
+ * The craft behind the folds (2026-11-21). Each of these existed and was
+ * reachable only by knowing where to click: a 16px resize glyph opened a
+ * three-slide deck, the board-slide export was a link halfway down /share, and
+ * the Markdown/MCP doors were on /api-docs and /share alone. The doors are
+ * labelled now, and the previews still cost nothing until a reader shows
+ * interest.
+ */
+describe("the buried craft has a visible door", () => {
+  it("labels the presentation deck and its key instead of an unlabeled glyph", () => {
+    const html = renderToStaticMarkup(<PresentModeButton />);
+    assert.match(html, />Present</);
+    assert.match(html, /3-slide deck/);
+    assert.match(html, />F</);
+  });
+
+  it("labels the board slide and loads no preview bytes until interest", () => {
+    const html = renderToStaticMarkup(
+      <BoardSlidePreviewLink href="/share#image-artifacts" label="Board slide" stage="Series B" />,
+    );
+    assert.match(html, />Board slide</);
+    assert.match(html, /popover="hint"/);
+    assert.doesNotMatch(html, /<img/, "the hovercard image mounts only after hover or focus");
+  });
+
+  it("puts the Markdown request and the MCP docs in the footer", () => {
+    const html = renderToStaticMarkup(<FooterAgentColophon />);
+    assert.match(html, /curl -H &quot;Accept: text\/markdown&quot; https:\/\/whether\.work/);
+    assert.match(html, /href="\/api-docs"/);
+    assert.match(html, /<output aria-live="polite"[^>]*data-visible="false"><\/output>/, "status bubble stays empty at rest so screen readers do not read a stale Copied");
+  });
+
+  it("carries the assistant handoff in the share rail", () => {
+    const rail = readFileSync("app/components/shareRail.tsx", "utf8");
+    assert.match(rail, /buildAssistantLinks/);
+    assert.match(rail, /Ask an assistant/);
+    assert.match(rail, /assistantLinks\.map/, "the names come from the one prompt builder, not a second list");
   });
 });
 

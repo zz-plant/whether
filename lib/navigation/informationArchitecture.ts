@@ -28,6 +28,7 @@ type NavigationPageKey =
   | "comps"
   | "history"
   | "calibration"
+  | "concepts"
   | "guides"
   | "roles"
   | "companies";
@@ -211,6 +212,14 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
   {
+    key: "concepts",
+    group: "record",
+    href: "/concepts",
+    label: "Advice vs. market",
+    description: "407 investor posts and 35 essays placed against the monthly record since 2012.",
+    placement: "secondary",
+  },
+  {
     key: "guides",
     group: "guides",
     href: "/resources",
@@ -256,20 +265,22 @@ export const navigationLabelByPath = navigationPages.reduce<Record<string, strin
  * restate it.
  *
  * `header`: the width from which the header draws it as a text link (every
- * one is in the mobile sheet and the footer). About sat in the More menu until
- * 2026-10-08, which is where a reader stops looking; Use it
- * elsewhere waits for `lg`, because at a tablet's width the three ran into the
- * search field. API & MCP is reached from /share, which hosts every way to use
- * the guidance elsewhere; Search is the ⌘K field.
+ * one is in the mobile sheet and the footer). About sits directly in the
+ * header's utility row. Share and embed (`/share`) is reached from the single
+ * Share button in the masthead (via `ShareRail`), the footer, the mobile sheet
+ * and the palette — avoiding two side-by-side Share doors in the header.
+ * API & MCP is reached from `/share`; Search is the ⌘K control.
  */
 export const utilityLinks = [
   {
     // Carries the embed builder and the citation too: every
-    // way the guidance leaves the site starts here.
+    // way the guidance leaves the site starts here. Reached from the single
+    // Share control in the header (via ShareRail), the footer, the mobile sheet
+    // and the command palette — avoiding two side-by-side Share doors in the header.
     href: "/share",
     label: "Share and embed",
     description: "Copy, cite or embed this week's guidance, or pull it through the API, MCP or RSS",
-    header: "lg",
+    header: null,
   },
   {
     href: "/api-docs",
@@ -316,7 +327,6 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
-  { prefix: "/concepts", label: "Advice vs. market" },
   { prefix: "/privacy", label: "Privacy" },
   { prefix: "/acceptable-use-policy", label: "Acceptable Use" },
   { prefix: "/terms-of-service", label: "Terms" },

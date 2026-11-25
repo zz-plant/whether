@@ -7,6 +7,8 @@ type OperationsExecutionStep = {
   label: string;
   title: string;
   description: string;
+  /** Compact read-only preview shown under the description while the step is folded. */
+  preview?: ReactNode;
   summary?: string;
   owner?: string;
   approvalStatus?: string;
@@ -157,6 +159,9 @@ function StepPanel({
           <p className="text-sm leading-6 text-slate-300">
             {step.description}
           </p>
+          {!isOpen && step.preview ? (
+            <div className="pt-2">{step.preview}</div>
+          ) : null}
           {/* Facts about the step, not controls: a pill is a button
               shape, and three of them in a row look like three actions. */}
           {step.owner || step.approvalStatus || step.changeSignal ? (

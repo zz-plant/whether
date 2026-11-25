@@ -63,36 +63,6 @@
   color: var(--color-caveat-fg);
 }
 
-/* The line-state band (2026-10-31): the week's exception, above the call. A
-   crossed or close pause line is the one thing that changes what a reader does
-   this week, and `/` drew it in five small places and loud in none.
-   Deliberately not `.weather-caveat-band`: the caveat's ink and diamond say
-   "read this reading with care" (late or saved data, an archived month), which
-   is a different claim from "a line was crossed". This one takes the
-   line-state family the badges and the pause column already draw in, and the
-   same 4px rule, which is what makes a band read as a band. A leaf, never a
-   container (tests/surfaceDepthLadder.test.ts). */
-.weather-line-band {
-  border: 1px solid color-mix(in srgb, var(--line-crossed) 45%, transparent);
-  border-top-width: 2px;
-  border-top-color: var(--line-crossed);
-  border-radius: var(--radius-sm);
-  background-color: var(--line-crossed-bg);
-  color: var(--line-crossed-ink);
-}
-
-/* A line close, not crossed (2026-11-18): nothing has happened yet, so the band keeps
-   the neutral edge the close badge keeps (conceptIcons.tsx, LINE_STATE_STAMP) and the
-   ink of the page. The red box, rule and words read as an error over a note that says
-   what would pause an area. The dashed ring stays in the line-state ink (§XXIV), the
-   one mark of "close". */
-.weather-line-band[data-line-state-band="near"] {
-  border-color: var(--border-strong);
-  border-top-width: 1px;
-  background-color: transparent;
-  color: var(--app-text);
-}
-
 /* The caveat mark: an outlined diamond, the shape of a warning sign, before
    anything that says "read this reading with care" (cached sources, a
    scoring note, an archived week, guidance held back). Its own shape because
@@ -110,4 +80,99 @@
   border: 1.5px solid currentColor;
   transform: rotate(45deg);
   vertical-align: 0.0625rem;
+}
+
+/* Board slide hovercard preview (`app/components/home/BoardSlidePreviewLink.tsx`).
+   Uses native `popover="hint"` + `interestfor` with CSS Anchor Positioning gated
+   inside `@supports` so unsupported browsers keep user-agent centered placement. */
+.board-slide-trigger {
+  --interest-delay-start: 0.2s;
+  interest-delay-start: var(--interest-delay-start);
+  --interest-delay-end: 0.1s;
+  interest-delay-end: var(--interest-delay-end);
+}
+
+[popover].board-slide-hint {
+  width: min(21rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--bg-panel);
+  color: var(--app-text);
+  box-shadow: var(--elev-card);
+  opacity: 0;
+  transform-origin: top left;
+}
+
+[popover].board-slide-hint:popover-open {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.board-slide-hint-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-nested);
+}
+
+.board-slide-hint-caption {
+  font-size: var(--fs-nano);
+  line-height: 1.35;
+  color: var(--app-text-muted);
+}
+
+@supports (position-area: block-end) {
+  .board-slide-trigger {
+    anchor-name: --board-slide-trigger;
+  }
+
+  [popover].board-slide-hint {
+    position-anchor: --board-slide-trigger;
+    inset: auto;
+    margin: 0.5rem 0 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
+@starting-style {
+  [popover].board-slide-hint:popover-open {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [popover].board-slide-hint {
+    transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), display 180ms, overlay 180ms;
+    transition-behavior: allow-discrete;
+  }
+}
+
+/* Footer Markdown/MCP curl copy colophon (`app/components/footerAgentColophon.tsx`).
+   The confirmation bubble stays in the accessibility tree and fades via opacity only. */
+.footer-copy-status {
+  font-size: var(--fs-nano);
+  line-height: 1.2;
+  color: var(--app-text-muted);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.footer-copy-status[data-visible="true"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .footer-copy-status {
+    transition: opacity 150ms var(--ease-out);
+  }
 }

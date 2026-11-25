@@ -117,29 +117,29 @@ describe("the band is drawn in the line state's ink", () => {
   });
 
   /* 2026-11-18: a close line is a note about what would pause an area, and the red box,
-     rule and words read it as an error. The close badge's neutral edge, the page's ink;
-     the dashed ring stays in the line-state ink (§XXIV). A crossed line keeps the red. */
+     rule and words read it as an error. Inside the call (2026-11-21) the note keeps the
+     sky's ink and a neutral rule; a crossed line keeps the red. */
   it("draws a close line as a note, not an error, and keeps its dashed ring", () => {
     const html = renderToStaticMarkup(
       <LineStateBand model={{ state: "near", area: "product-tempo", text: "Roadmap: pause long-payback bets if risk appetite falls below 44. It is 48 now." }} />,
     );
+    assert.match(html, /data-line-state-placement="call"/);
     assert.match(html, /<svg[^>]*lucide-circle-dashed[^>]*text-line-crossed-fg/);
-    const css = readFileSync("app/styles/feedback.css", "utf8");
-    const near = /\.weather-line-band\[data-line-state-band="near"\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
-    assert.match(near, /border-color:\s*var\(--border-strong\)/);
-    assert.match(near, /background-color:\s*transparent/);
+    const css = readFileSync("app/styles/forecast.css", "utf8");
+    const near = /\.weather-line-band-call\[data-line-state-band="near"\]\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    assert.match(near, /border-left-color:\s*color-mix\(in srgb, var\(--app-text\)/);
     assert.match(near, /(?:^|\s)color:\s*var\(--app-text\)/);
-    assert.doesNotMatch(near, /line-crossed/, "no front red on the box or the words");
-    const crossed = /\.weather-line-band\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
-    assert.match(crossed, /background-color:\s*var\(--line-crossed-bg\)/, "a crossed line keeps the red");
+    assert.doesNotMatch(near, /line-crossed/, "no front red on the note's words");
+    const crossed = /\.weather-line-band-call\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+    assert.match(crossed, /border-left-color:\s*var\(--line-crossed\)/, "a crossed line keeps the red");
+    assert.match(crossed, /color:\s*var\(--line-crossed-ink\)/);
   });
 
-  it("mounts above the card and nowhere else on the route", () => {
+  it("hands the exception to the card, and mounts no band above it", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
-    const band = routeSource.indexOf("<LineStateBand");
-    const hero = routeSource.indexOf("<DecisionHero");
-    assert.ok(band !== -1, "the homepage mounts the band");
-    assert.ok(band < hero, "the band is above the card it explains");
+    assert.ok(!routeSource.includes("<LineStateBand"), "the one-page brief prints the notice inside the call");
+    assert.match(routeSource, /notice=\{lineStateBand\}/);
+    assert.ok(routeSource.indexOf("notice={lineStateBand}") > routeSource.indexOf("<DecisionHero"), "the notice is the card's own");
   });
 });
 
@@ -222,25 +222,25 @@ describe("the first screen keeps the week's statement on one screen", () => {
   );
   const withoutMargin = renderToStaticMarkup(<DecisionHero {...props} />);
 
-  it("heads the margin with the week line and the brief's number when there is a margin", () => {
-    assert.match(withMargin, /class="weather-hero-period [^"]*weather-hero-margin-head[^"]*md:col-start-2 md:row-start-1/);
+  it("heads the call with the week line and the brief's number, inside the sky", () => {
+    assert.match(withMargin, /class="weather-hero-period [^"]*basis-full"/);
     assert.match(withMargin, /data-brief-number[^>]*>[\s\S]*?No\. 2026-W45/);
-    assert.ok(withMargin.indexOf("weather-hero-margin-head") < withMargin.indexOf('id="weekly-call-title"'), "the week line comes first in the document");
-    assert.match(withMargin, /class="weather-hero-aside [^"]*md:col-start-2 md:row-start-2/);
+    assert.ok(withMargin.indexOf("weather-hero-period") < withMargin.indexOf('id="weekly-call-title"'), "the week line comes first in the document");
+    assert.ok(withMargin.indexOf("weather-hero-period") < withMargin.indexOf("<aside"), "the week line is in the reading column, not the rail");
+    assert.match(withMargin, /<aside class="weather-hero-aside [^"]*"><div class="max-md:hidden"><div data-testid="scores"/);
   });
 
-  it("keeps the week line on its own row above the condition word without one", () => {
-    assert.doesNotMatch(withoutMargin, /weather-hero-margin-head/);
-    assert.match(withoutMargin, /class="weather-hero-period [^"]*basis-full/);
+  it("keeps the week line on the same row in the sky without a margin", () => {
+    assert.match(withoutMargin, /class="weather-hero-period [^"]*basis-full"/);
+    assert.doesNotMatch(withoutMargin, /weather-hero-aside/);
   });
 
-  it("puts the phone's two scores straight after the guidance, and the facts line from md up", () => {
+  it("puts the phone's two scores straight after the guidance, and leaves the numbers to the rail", () => {
     const h1 = withMargin.indexOf('id="weekly-call-title"');
     const phone = withMargin.indexOf("data-hero-phone-figure");
-    const meaning = withMargin.indexOf("data-regime-meaning");
-    assert.ok(h1 < phone && phone < meaning, "guidance, then the phone's scores, then the facts line");
-    assert.match(withMargin, /class="[^"]*max-md:hidden[^"]*" data-regime-meaning/);
-    assert.doesNotMatch(withoutMargin, /max-md:hidden[^"]*" data-regime-meaning/, "with no phone scores the facts line shows at every width");
+    assert.ok(h1 < phone, "guidance, then the phone's scores");
+    assert.doesNotMatch(withMargin, /data-regime-meaning/, "the rail carries the scores and the why link on the homepage");
+    assert.match(withoutMargin, /data-regime-meaning/, "a card without a margin still states what the numbers are");
   });
 
   it("runs 'Feels like' in the delta line, never as a row of its own", () => {
@@ -293,8 +293,22 @@ describe("the figures say whose lines they draw, and that a restart needs both",
     assert.deepEqual(standing("riskAppetite"), { crossed: false, lead: "Hiring clear", rest: "Pauses below 44." });
   });
 
-  it("is what both figures on the route print, at either width", () => {
+  it("is what the rail's figures print, and what the phone's shared sentence names", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
-    assert.equal((routeSource.match(/standing=\{figureStanding\(ladder\.metric\)\}/g) ?? []).length, 2);
+    assert.equal((routeSource.match(/standing=\{figureStanding\(ladder\.metric\)\}/g) ?? []).length, 1, "the rail's two figures take it");
+    assert.match(routeSource, /data-hero-standing/, "the phone states it once for both figures");
+    assert.match(routeSource, /sharedFigureStanding\.lead\.replace/, "without repeating the figure's own number");
+  });
+});
+
+describe("the page reads down one left edge", () => {
+  /* The body under the call keeps its reading measure but not a centre of its own
+     (2026-11-24): centred, it started 80px right of the call and the area rows. */
+  it("starts the reading body at the call's left edge", () => {
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    const flow = /className="weather-brief-flow ([^"]*)"/.exec(routeSource)?.[1] ?? "";
+    assert.match(flow, /max-w-\[72rem\]/, "the reading measure stays");
+    assert.match(flow, /(?:^|\s)mr-auto(?:\s|$)/);
+    assert.doesNotMatch(flow, /(?:^|\s)mx-auto(?:\s|$)/, "centred, it drifts off the call's edge");
   });
 });

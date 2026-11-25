@@ -46,9 +46,15 @@ const MIN_WIDTH = 736;
 export function RecordPlateCanvas() {
   useEffect(() => {
     const band = document.querySelector<HTMLElement>("[data-record-band]");
+    const disclosure = band?.querySelector<HTMLDetailsElement>("[data-record-band-disclosure]");
     const plate = band?.querySelector<HTMLElement>("[data-record-band-plate]");
     const overlay = band?.querySelector<HTMLElement>("[data-record-band-overlay]");
     if (!band || !plate || !overlay) return;
+
+    /* History makes the record band the page's lead figure, so open the shared
+       frame disclosure on arrival and restore it on unmount if this route opened it. */
+    const openedByHistory = Boolean(disclosure && !disclosure.open);
+    if (openedByHistory && disclosure) disclosure.open = true;
 
     const encoded = band.dataset.months ?? "";
     const months = recordBandMonthCount(encoded);
@@ -178,6 +184,7 @@ export function RecordPlateCanvas() {
     const observer = new ResizeObserver(schedule);
     observer.observe(plate);
     const stopFollowing = still ? () => undefined : followPageMonth(follow);
+    disclosure?.addEventListener("toggle", schedule);
     if (!still) {
       plate.addEventListener("pointermove", onMove);
       plate.addEventListener("pointerleave", onLeave);
@@ -188,12 +195,14 @@ export function RecordPlateCanvas() {
     return () => {
       stopFollowing();
       observer.disconnect();
+      disclosure?.removeEventListener("toggle", schedule);
       plate.removeEventListener("pointermove", onMove);
       plate.removeEventListener("pointerleave", onLeave);
       plate.removeEventListener("pointercancel", onLeave);
       if (frame) window.cancelAnimationFrame(frame);
       canvas.remove();
       delete band.dataset.plateCanvas;
+      if (openedByHistory && disclosure) disclosure.open = false;
     };
   }, []);
 

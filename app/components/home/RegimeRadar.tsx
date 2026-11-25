@@ -384,8 +384,10 @@ export function RegimeRadar({
     month: point.month,
     tightness: point.tightness,
     riskAppetite: point.riskAppetite,
-    /* A dated dot names its reading on hover, in the words the current marker uses. */
-    title: point.label ? `${point.label}: Funding pressure ${point.tightness}, Risk appetite ${point.riskAppetite}` : undefined,
+    /* A dated dot names its reading in the chart's readout on hover, and in the "Scores on
+       this chart" table for touch. It printed a third copy as an SVG tooltip until
+       2026-11-25, four numbers a dot, which the first screen's number budget counted. */
+    dated: Boolean(point.label),
   }));
   const inspectedTrail =
     inspectedTrailIndex !== null ? trailPoints[inspectedTrailIndex] ?? null : null;
@@ -395,13 +397,19 @@ export function RegimeRadar({
      one's hover (SVG hit-testing is painter's order, so the last ring drawn
      wins), so each ring is capped at half the gap to its nearest dated
      neighbour: the rings meet at the midpoint and neither masks the other's
-     date. */
+     date.
+     The distance is a square root, not Math.hypot: hypot is not required to be
+     correctly rounded, and V8 (the server) and JavaScriptCore (Safari) disagree
+     in the last digit, so the server's r failed to hydrate in Safari. Multiply,
+     add and sqrt are exact in every engine. */
   const hitRadii = trailPoints.map((point, index) => {
-    if (!point.title) return 0;
+    if (!point.dated) return 0;
     let nearest = Infinity;
     for (const [otherIndex, other] of trailPoints.entries()) {
-      if (otherIndex === index || !other.title) continue;
-      nearest = Math.min(nearest, Math.hypot(other.x - point.x, other.y - point.y));
+      if (otherIndex === index || !other.dated) continue;
+      const dx = other.x - point.x;
+      const dy = other.y - point.y;
+      nearest = Math.min(nearest, Math.sqrt(dx * dx + dy * dy));
     }
     return nearest === Infinity ? 7 : Math.min(7, nearest / 2);
   });
@@ -748,7 +756,6 @@ export function RegimeRadar({
                 onPointerEnter={point.label ? () => setInspectedTrailIndex(index) : undefined}
                 onPointerLeave={point.label ? () => setInspectedTrailIndex((prev) => (prev === index ? null : prev)) : undefined}
               >
-                {point.title ? <title>{point.title}</title> : null}
                 {point.month ? (
                   <circle cx={point.x} cy={point.y} r="5" fill="none" stroke="var(--app-text)" strokeWidth="1.2" className="hidden in-data-[month-active]:inline" />
                 ) : null}
@@ -761,7 +768,7 @@ export function RegimeRadar({
                 />
                 {/* The ring is the pointer's target; its radius keeps it from
                     covering a neighbour's date (see hitRadii). */}
-                {point.title ? <circle cx={point.x} cy={point.y} r={hitRadii[index]} fill="transparent" /> : null}
+                {point.dated ? <circle cx={point.x} cy={point.y} r={hitRadii[index]} fill="transparent" /> : null}
               </g>
             ))}
           </g>

@@ -86,12 +86,17 @@ export type HomeLoadReading = z.infer<typeof readingSchema>;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  /* 1428 → 1437, 264 → 266, 316 → 323 (2026-11-08): three quick-copy pills on the
-     brief's action row (1-line standup, 3-bullet exec summary, card as image) add
-     their labels ahead of the areas. Justified raise, said here. */
-  words: 1435,
-  numbers: 266,
-  wordsBeforeAreas: 323,
+  /* 1435 → 1399, 266 → 226, 323 → 288, 19 → 14 buttons, 34 → 24 pressure mentions,
+     37 → 29 appetite mentions, 2 → 0 hard sentences (2026-11-21, the one-page brief):
+     the record band folds, the area rows carry their action and line in the brief, and
+     the grouped rules below stop reprinting the action and the facts line stops
+     reprinting the two scores. The budget only falls; this records the cut. */
+  /* 1,399 → 1,345 words and 226 → 207 numbers (2026-11-25): each dot on the conditions
+     chart's month trail printed its two scores a third time as an SVG tooltip, beside the
+     chart's readout and its "Scores on this chart" table. */
+  words: 1345,
+  numbers: 207,
+  wordsBeforeAreas: 288,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
      appetite, room before a change). A deliberate raise, said here and in its PR.
@@ -101,16 +106,18 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
   /* 16 → 19 (2026-11-08): three quick-copy pills on the brief's action row
      (1-line standup, 3-bullet exec summary, card as image), so a founder can
      paste the artifact in under 10 seconds. Same three controls the brief's
-     transmission loop asks for; justified raise, said here. */
-  /* 19 → 17 buttons and 9 → 6 jargon terms (2026-11-18): the conditions chart's "Copy link"
-     took one of the two spare buttons, and its rate labels replaced three jargon terms in the
-     "In interest-rate terms" fold. Lowered to the measure, as the rule above asks. */
-  buttons: 17,
+     transmission loop asks for; justified raise, said here.
+     19 → 14 (2026-11-21): the five area-name buttons moved inside the picker's closed
+     disclosure; the area rows above are links, not buttons.
+     → 15 buttons and 9 → 6 jargon terms (2026-11-25, merging the drawings and controls of
+     feature log §1.1.108–109): the conditions chart's "Copy link" is one button, and its rate
+     labels replaced three jargon terms in the "In interest-rate terms" fold. */
+  buttons: 15,
   fields: 21,
-  fundingPressure: 34,
-  riskAppetite: 37,
+  fundingPressure: 24,
+  riskAppetite: 29,
   jargon: 6,
-  hardSentences: 2,
+  hardSentences: 0,
   longestSentence: 22,
 };
 

@@ -7,6 +7,8 @@ import { SectionTabs } from "../components/sectionTabs";
 import { buildPageMetadata, formatTitleMonth } from "../../lib/seo";
 import { formatDateUTC } from "../../lib/formatters";
 import { buildCompsStructuredData } from "../../lib/seo/pageStructuredData";
+import { COMPANIES } from "../../lib/companies/companyRegistry";
+import { readCompanyRecord } from "../../lib/companies/companyFilingStore";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 // Slot labels come from the one vocabulary source; Invariant 8 fails the suite
 // when a surface spells them itself.
@@ -106,6 +108,28 @@ export default async function CompsPage() {
   const capitalRule = brief.snapshot.homeBriefModel.decisionRules.find((rule) => rule.area === "capital-raising");
   /* The same date the title's month comes from, printed beside the figures it dates. */
   const readMonth = comps.status === "ok" ? formatTitleMonth(comps.data.fetchedAt) : null;
+  /* The basket and the company pages overlap: eleven of these fourteen file the
+     accounts the pilot reads. Link the overlap, and mark an 8-K item 2.05 filed
+     in the twelve months before this read, so a valuation conversation can open
+     the filing history behind the multiple. */
+  const registryByTicker = new Map(COMPANIES.map((company) => [company.ticker.toUpperCase(), company]));
+  const basketPages = SAAS_BASKET_COMPANIES.flatMap((company) => {
+    const page = registryByTicker.get(company.ticker);
+    return page ? [{ ticker: company.ticker, page }] : [];
+  });
+  /* Only a read with a date can say a filing is recent; an outage does not
+     spend eleven KV reads to learn nothing. */
+  const records = comps.status === "ok"
+    ? await Promise.all(basketPages.map(async ({ ticker, page }) => [ticker, await readCompanyRecord(page)] as const))
+    : [];
+  const recordByTicker = new Map<string, (typeof records)[number][1]>(records);
+  const restructuringCutoff = comps.status === "ok"
+    ? new Date(new Date(comps.data.fetchedAt).getTime() - 365 * 86_400_000).toISOString().slice(0, 10)
+    : null;
+  const hasRecentRestructuring = (ticker: string) => {
+    if (!restructuringCutoff) return false;
+    return (recordByTicker.get(ticker)?.restructurings ?? []).some((filing) => filing.filedOn >= restructuringCutoff);
+  };
 
   return (
     <PageShell
@@ -206,10 +230,37 @@ export default async function CompsPage() {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-slate-100">Which companies are in the median</h2>
           {/* Derived, not retyped: the names and the count came from two places
-              and could disagree the moment a ticker was added. */}
-          <p className="text-sm text-slate-300">
-            {SAAS_BASKET_COMPANIES.map((company) => company.name).join(", ")}.
-          </p>
+              and could disagree the moment a ticker was added. Each name that has
+              a company page is a link to it; an 8-K item 2.05 in the last twelve
+              months is named beside the company it belongs to. */}
+          <ul className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-slate-300 [--weather-hit-up:4px]">
+            {SAAS_BASKET_COMPANIES.map((company) => {
+              const page = registryByTicker.get(company.ticker);
+              const flagged = hasRecentRestructuring(company.ticker);
+              return (
+                <li key={company.ticker} className="inline-flex items-baseline gap-1">
+                  {page ? (
+                    <Link
+                      href={`/companies/${page.slug}${flagged ? "#company-restructurings" : ""}`}
+                      className="weather-hit weather-focus-ring text-[var(--accent-action)] underline underline-offset-4 transition-colors hover:text-slate-100"
+                    >
+                      {company.name}
+                    </Link>
+                  ) : (
+                    company.name
+                  )}
+                  {flagged ? (
+                    <span
+                      className="font-mono text-[0.65rem] uppercase tracking-wide text-slate-400"
+                      title="Filed an 8-K item 2.05 restructuring in the twelve months before this read"
+                    >
+                      8-K
+                    </span>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
           <p className="text-sm text-slate-300">
             <Link href="/companies" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
               What public companies have filed, by role
@@ -219,16 +270,11 @@ export default async function CompsPage() {
 
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-slate-100">Use public multiples in a fundraising discussion</h2>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            Founders, finance teams and board members can use the basket to question valuation assumptions.
-            Compare growth, gross margin, retention, scale and the revenue period before choosing a comparable.
-            Public shares are liquid; a private round also depends on its terms, investor demand and company risk.
-            Multiplying private ARR by this median will not produce a supported valuation.
-          </p>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            For the board note, record the observation date, selected comparable, revenue basis and the differences
-            that matter. Revisit the financing plan when actual investor feedback or the cash deadline changes.
-          </p>
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300 leading-relaxed">
+            <li>Use the basket to test valuation assumptions—not as a direct multiplier on private ARR.</li>
+            <li>Adjust for growth, gross margin, retention, scale, revenue basis, and private-round illiquidity.</li>
+            <li>Log the observation date, chosen comparable, and key differences; revisit when investor feedback or cash deadlines shift.</li>
+          </ul>
           <ActionLink href="/answers/should-startups-raise-capital-now" variant="inline">Decide when to prepare a raise</ActionLink>
         </section>
       </article>

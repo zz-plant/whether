@@ -247,11 +247,21 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             ·{" "}
             <time dateTime={brief.publishedAt}>Published {formatDateUTC(brief.publishedAt)}</time>
           </p>
-          {superseded ? null : (
-            <ActionLink href="/" variant="inline">
-              Read this week&apos;s guidance
-            </ActionLink>
-          )}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            {superseded ? null : (
+              <ActionLink href="/" variant="inline">
+                Read this week&apos;s guidance
+              </ActionLink>
+            )}
+            <a
+              href={`/api/export/board-slide?week=${brief.slug}&format=pptx`}
+              download
+              data-brief-pptx-download
+              className="weather-hit weather-focus-ring text-fluid-sm font-semibold text-sky-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-sky-200"
+            >
+              Download board slide (.pptx)
+            </a>
+          </div>
           <SharedArrivalNote orientation={homeOrientationLine} />
         </header>
 

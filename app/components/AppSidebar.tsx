@@ -20,8 +20,8 @@ function OutlineItem({
   const isHash = href.startsWith("#");
   const linkClass = `rounded-lg px-2.5 py-2 text-fluid-sm no-underline transition-colors min-h-11 flex items-center justify-between group weather-focus-ring ${
     isActive
-      ? "bg-sky-500/15 text-white font-semibold border-l-2 border-sky-400 pl-2"
-      : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 border-l-2 border-transparent pl-2"
+      ? "bg-[var(--bg-nested)] text-[var(--app-text)] font-semibold border-l-2 border-[var(--app-text)] pl-2"
+      : "text-[var(--app-text-muted)] hover:bg-[var(--bg-nested)] hover:text-[var(--app-text)] border-l-2 border-transparent pl-2"
   }`;
 
   const content = <span className="min-w-0 break-words leading-snug">{label}</span>;
@@ -54,7 +54,7 @@ function OutlineItem({
  * band — mid-scroll between two sections, or at the very bottom — the last answer
  * stands rather than blanking.
  */
-export const useActiveSectionId = (sectionLinks: ReportSectionLink[]) => {
+const useActiveSectionId = (sectionLinks: ReportSectionLink[]) => {
   const sectionIds = useMemo(
     () => sectionIdsFromHrefs(sectionLinks.map((section) => section.href)),
     [sectionLinks],

@@ -1,4 +1,4 @@
-import { WHETHER_AGENT_MANIFEST_PATH } from "../agent/discovery";
+import { API_CATALOG_PATH, WHETHER_AGENT_MANIFEST_PATH } from "../agent/discovery";
 import { resolveSiteUrl } from "../siteUrl";
 
 /**
@@ -41,6 +41,8 @@ export const withAgentDiscoveryLinks = (response: Response): Response => {
   headers.append("Link", `<${resolveSiteUrl()}${WHETHER_AGENT_MANIFEST_PATH}>; rel="describedby"; type="application/json"`);
   headers.append("Link", `<${resolveSiteUrl()}/llms.txt>; rel="describedby"; type="text/plain"`);
   headers.append("Link", `<${resolveSiteUrl()}${BRIEF_MARKDOWN_PATH}>; rel="alternate"; type="text/markdown"`);
+  // RFC 9727 §3: the catalog of this origin's APIs, by the relation registered for it.
+  headers.append("Link", `<${resolveSiteUrl()}${API_CATALOG_PATH}>; rel="api-catalog"`);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

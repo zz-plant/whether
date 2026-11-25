@@ -32,7 +32,6 @@ import { Children, type ReactNode, isValidElement } from "react";
 import { PageShell } from "./pageShell";
 import { type ReportSectionLink } from "./reportShellNavigation";
 import { AppSidebar } from "./AppSidebar";
-import { MobileSectionChips } from "./mobileSectionChips";
 import type { RegimeIconType } from "./pageShell";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
@@ -194,12 +193,9 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             frameCondition={frameCondition}
           />
 
-          {/* The outline, as a row of tabs, where the rail is hidden. Under the
-              intro rather than above it: a phone read the index before it had
-              read which page it was on. Sticky, so it still follows the reader
-              down once they pass it. Renders nothing on a page with fewer than
-              two sections. */}
-          <MobileSectionChips sectionLinks={sectionLinks} />
+          {/* In-page section jumping on phones now lives inside the single morphing
+              masthead (`MastheadSectionJumper`), eliminating the second stacked
+              horizontal underline scroller below `SectionTabs`. */}
 
           {/* The section rule was white/[0.04] — below the visible threshold
               by this repo's own measure (see the border-alpha note in

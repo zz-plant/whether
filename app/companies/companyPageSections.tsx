@@ -83,7 +83,7 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
         </div>
       ) : null}
       {situation.restructurings.length > 0 ? (
-        <div className="space-y-1" data-testid="company-restructurings">
+        <div id="company-restructurings" className="space-y-1" data-testid="company-restructurings">
           <h3 className="text-sm font-semibold text-slate-100">Restructuring filings, last 12 months</h3>
           <ul className="space-y-1 text-sm text-slate-300">
             {situation.restructurings.map((filing) => (
@@ -96,7 +96,7 @@ export function CompanyPositionSection({ company, situation }: { company: Compan
             ))}
           </ul>
           <p className="text-xs text-slate-400">
-            This item reports a plan to exit or restructure part of a business, with material costs. Read the filing for what it covers: it may not say how many people or which groups are affected.
+            Reports material exit or restructuring costs; check the filing for scope (it may not say how many people or teams are affected).
           </p>
         </div>
       ) : null}

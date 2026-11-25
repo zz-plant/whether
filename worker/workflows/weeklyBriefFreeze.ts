@@ -25,6 +25,7 @@ import { installBindings } from "../bindings";
 import { writeAnalytics } from "../../lib/telemetry/analyticsEngine";
 import { GitHubRepoClient } from "../../lib/github/repoClient";
 import { sendOpsFailureNotice } from "../../lib/delivery/opsNotice";
+import { recordRunOutcome } from "../../lib/delivery/runOutcomes";
 import { assembleCurrentWeekBrief } from "../../lib/report/publishedBriefRecord";
 import {
   buildPublishedBriefUpdateAgainstBase,
@@ -81,6 +82,7 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
         },
         { doubles: [1, Date.now() - startedAt] },
       );
+      await recordRunOutcome("brief-freeze", []);
       return result;
     } catch (error) {
       const durationMs = Date.now() - startedAt;
@@ -89,6 +91,7 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
         { step: "brief-freeze", ok: false, error: error instanceof Error ? error.message : "Unknown error", durationMs },
         { doubles: [0, durationMs] },
       );
+      await recordRunOutcome("brief-freeze", [{ step: "brief-freeze" }]);
       /* The freeze fails hours after the cron that started it, so the cron's own notice has
          already gone out green; this is the only message that says the week was not frozen. */
       await sendOpsFailureNotice({

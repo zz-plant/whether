@@ -48,7 +48,7 @@ describe("navigation groups", () => {
       {
         "this-week": ["/", "/signals", "/trust"],
         decide: ["/operate", "/operate/financial", "/comps"],
-        record: ["/history", "/calibration"],
+        record: ["/history", "/calibration", "/concepts"],
         guides: ["/resources", "/roles", "/companies"],
       },
     );
@@ -69,9 +69,10 @@ describe("navigation groups", () => {
     assert.equal(navigationLabelByPath["/trust"], "Can I trust this?");
   });
 
-  it("keeps Advice vs. market outside the primary History tabs", () => {
+  it("files Advice vs. market under History as a secondary page, not a primary tab", () => {
     const concepts = navigationPages.find((page) => page.href === "/concepts");
-    assert.equal(concepts, undefined);
+    assert.equal(concepts?.group, "record");
+    assert.equal(concepts?.placement, "secondary");
     assert.ok(!utilityLinks.some((link) => String(link.href) === "/concepts"), "not a utility link");
   });
 
@@ -136,14 +137,16 @@ describe("navigation groups", () => {
 });
 
 describe("utility links", () => {
-  it("draws Share and embed and About in the header, not behind a menu", () => {
+  it("draws About in the header utility row and routes Share through the single Share action", () => {
     assert.deepEqual(
       headerUtilityLinks.map((link) => [link.label, link.href]),
-      [
-        ["Share and embed", "/share"],
-        ["About", "/about"],
-      ],
+      [["About", "/about"]],
     );
+    const share = utilityLinks.find((link) => link.href === "/share");
+    assert.ok(share, "/share remains in the utility links for footer, mobile sheet, and palette");
+    assert.equal(share.header, null, "Share is not duplicated beside the masthead Share button");
+    const rail = readFileSync(new URL("../app/components/shareRail.tsx", import.meta.url), "utf8");
+    assert.match(rail, /href="\/share"/, "ShareRail links directly to /share");
   });
 
   /* Until 2026-10-23 no page, nav or palette linked /contact — only the sitemap
@@ -206,9 +209,12 @@ describe("footer mirrors the groups and the utility links", () => {
 describe("content sections", () => {
   it("names every routed content family the pages and utilities do not", () => {
     const named = new Set<string>(contentSections.map((section) => section.prefix));
-    for (const prefix of ["/answers", "/brief", "/concepts"]) {
+    for (const prefix of ["/answers", "/brief"]) {
       assert.ok(named.has(prefix), `${prefix} must be a named content section`);
     }
+    // /concepts is a secondary page under History since 2026-11-21, so the IA
+    // names it as a page rather than as an unclaimed content family.
+    assert.ok(!named.has("/concepts"), "/concepts is claimed by a navigation page");
     // Contact is a utility link since 2026-10-23, so it reaches the footer, the
     // phone sheet and the palette from the one array instead of being named
     // only in the header's sublabel.

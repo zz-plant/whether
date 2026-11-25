@@ -1,47 +1,62 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { readFrameFacts, runningHeadSection, sameFrameFacts, type FrameFacts } from "../../lib/navigation/runningHead";
-import { useScrollDirection } from "./useScrollDirection";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import {
+  isPastHero,
+  readFrameFacts,
+  runningHeadSection,
+  sameFrameFacts,
+  type FrameFacts,
+} from "../../lib/navigation/runningHead";
+import { placePopoverElement } from "../../lib/navigation/popoverPlacement";
 import { siteUrl } from "../../lib/siteUrl";
 
-const siteHost = new URL(siteUrl).host;
+export const MASTHEAD_SITE_HOST = new URL(siteUrl).host;
+
 /** The date inside a phrase like "Week of Oct 19, 2026" or "Last completed month: Sep 30, 2026". */
-const DATE_IN_WORDS = /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? \d{1,2}, \d{4}/;
+export const MASTHEAD_DATE_IN_WORDS = /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? \d{1,2}, \d{4}/;
+
+type MastheadSectionTarget = {
+  id: string;
+  label: string;
+};
+
+type MastheadReadingState = {
+  facts: FrameFacts | null;
+  section: string | null;
+  sections: readonly MastheadSectionTarget[];
+  sectionStep: string | null;
+  pastHero: boolean;
+};
+
+const sameSections = (
+  a: readonly MastheadSectionTarget[],
+  b: readonly MastheadSectionTarget[],
+): boolean =>
+  a.length === b.length && a.every((item, index) => item.id === b[index]?.id && item.label === b[index]?.label);
+
+const resolveSectionId = (heading: HTMLElement): string | null => {
+  if (heading.id && heading.id !== "main-content") return heading.id;
+  const section = heading.closest<HTMLElement>("[id]");
+  if (section?.id && section.id !== "main-content") return section.id;
+  return null;
+};
 
 /**
- * The running head: one line at the top of the screen, once a page's own intro has
- * scrolled away, naming the site, the conditions, the date and the section on screen.
+ * Reads the current route's `[data-frame-facts]`, visible `main h2` sections,
+ * J/K step count, and whether the intro/hero has scrolled past the masthead.
  *
- * Why it exists (2026-10-27): a phone screenshot is the whole screen at wherever the
- * reader stopped, and that picture is what reaches Slack. The header hides on scroll
- * down, so a frame audit of eleven routes found 7 of 83 frames past the first screen
- * naming the site, a date and the conditions; the rest were a page with no source and
- * no week. A printed page solves this with a running head. This is that.
- *
- * It reads its facts from the page rather than taking props, because the layout mounts
- * it beside the header and the pages that know the week are three different shells: an
- * element marked `data-frame-facts` (the report intro, the brief's card, a reading
- * page's header) carries them, and its leaving the screen is when this appears. A page
- * that marks nothing still gets the site and its own h1.
- *
- * It follows the header: under it while the header shows, in its place once the header
- * slides away, by transform on the header's curve. `--top-chrome-height` on the root
- * tells the sticky rows below it (section chips, the report rail) where to stop: the foot
- * of the header and the head together. It was the head's height alone, so when the header
- * came back on a scroll up, the head moved down under it and covered the section chips,
- * at the moment a reader scrolls up to get around the page (2026-10-27).
+ * Powers the single morphing sticky masthead (`GlobalHeaderRouteGate`), so the
+ * header and the running head never stack as two separate sticky bars on scroll.
  */
-export function RunningHead() {
-  const pathname = usePathname();
+export function useMastheadReading(pathname: string): MastheadReadingState {
   const [facts, setFacts] = useState<FrameFacts | null>(null);
   const [section, setSection] = useState<string | null>(null);
+  const [sections, setSections] = useState<readonly MastheadSectionTarget[]>([]);
   const [sectionJump, setSectionJump] = useState<{ path: string | null; label: string } | null>(null);
-  const [shown, setShown] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const { direction, isPastThreshold } = useScrollDirection();
-  const headerHidden = isPastThreshold && direction === "down";
+  const [pastHero, setPastHero] = useState(false);
+
   const sectionStep = sectionJump && sectionJump.path === pathname ? sectionJump.label : null;
 
   useEffect(() => {
@@ -68,150 +83,175 @@ export function RunningHead() {
     const update = () => {
       frame = 0;
       const header = document.querySelector("header");
-      const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
+      const headerBottom = header ? Math.max(48, header.getBoundingClientRect().bottom) : 48;
       const source = document.querySelector<HTMLElement>("[data-frame-facts]");
       const title = document.querySelector("main h1")?.textContent?.trim() ?? null;
-      /* Kept when unchanged: the facts are the page's, and a new object every scroll
-         frame re-rendered the head on every frame (2026-10-27). */
-      const next = readFrameFacts(source, title);
-      setFacts((previous) => (previous && sameFrameFacts(previous, next) ? previous : next));
-      setHeaderHeight(header?.getBoundingClientRect().height ?? 0);
-      /* The intro's top, or failing that the page's h1, has gone under the header: the
-         stamp that names the week is at the top of an intro, so a frame that keeps
-         only the intro's foot (the brief's card is taller than a phone screen) has
-         already lost it. */
+
+      const nextFacts = readFrameFacts(source, title);
+      setFacts((previous) => (previous && sameFrameFacts(previous, nextFacts) ? previous : nextFacts));
+
       const anchor = source ?? document.querySelector("main h1");
-      setShown(anchor ? anchor.getBoundingClientRect().top + 24 < headerBottom : window.scrollY > 240);
-      const headings = [...document.querySelectorAll<HTMLElement>("main h2")]
-        .filter((heading) => heading.getClientRects().length > 0 && !heading.closest(".sr-only, details:not([open]) > :not(summary)"))
-        .map((heading) => ({ label: heading.textContent?.trim() ?? "", top: heading.getBoundingClientRect().top }));
-      setSection(runningHeadSection(headings, headerBottom + 48));
+      setPastHero(
+        isPastHero({
+          scrollY: window.scrollY,
+          anchorTop: anchor ? anchor.getBoundingClientRect().top : null,
+          headerBottom,
+        }),
+      );
+
+      const visibleHeadings = [...document.querySelectorAll<HTMLElement>("main h2")].filter(
+        (heading) =>
+          heading.getClientRects().length > 0 &&
+          !heading.closest(".sr-only, details:not([open]) > :not(summary)"),
+      );
+
+      const headingMetrics = visibleHeadings.map((heading) => ({
+        label: heading.textContent?.trim() ?? "",
+        top: heading.getBoundingClientRect().top,
+      }));
+      setSection(runningHeadSection(headingMetrics, headerBottom + 48));
+
+      const seenIds = new Set<string>();
+      const nextTargets: MastheadSectionTarget[] = [];
+      for (const heading of visibleHeadings) {
+        const label = heading.textContent?.trim() ?? "";
+        const id = resolveSectionId(heading);
+        if (!label || !id || seenIds.has(id)) continue;
+        seenIds.add(id);
+        nextTargets.push({ id, label });
+      }
+      setSections((previous) => (sameSections(previous, nextTargets) ? previous : nextTargets));
     };
+
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
     };
+
+    /* The brief streams its card in after hydration and the web fonts land after that,
+       so the mount measurement can see a page that is not laid out yet. Re-measure when
+       the document's box changes, and once the fonts are ready; both are equality-guarded
+       upstream, so a settled page stops re-rendering. */
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(document.documentElement);
+    void document.fonts?.ready.then(schedule);
+
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
   }, [pathname]);
 
-  const visible = shown && facts !== null;
-  /* The brief's call line only while the header is away: with the header back, the
-     header, both lines and the tab bar held about 175px of an 844px phone. */
-  const callLine = Boolean(facts?.call) && headerHidden;
-  const offset = headerHidden ? 0 : headerHeight;
+  return { facts, section, sections, sectionStep, pastHero };
+}
+
+/**
+ * Compact in-masthead section jumper (popover="auto").
+ * Replaces the sticky mobile horizontal chip scroller on report routes so phones
+ * never stack two underline tab bars on top of each other.
+ */
+export function MastheadSectionJumper({
+  currentLabel,
+  sections,
+}: {
+  currentLabel: string;
+  sections: readonly MastheadSectionTarget[];
+}) {
+  const reactId = useId();
+  const popoverId = `masthead-sections-${reactId.replace(/:/g, "")}`;
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
-    // The bar is 2rem tall, the call line on a phone brief adds 1.75rem.
-    const head = !visible ? "0rem" : callLine && window.innerWidth < 768 ? "3.75rem" : "2rem";
-    document.documentElement.style.setProperty("--top-chrome-height", `calc(${offset}px + ${head})`);
-  }, [visible, callLine, offset]);
+    const popover = popoverRef.current;
+    if (!popover) return;
+    /* Placed by script in every engine, not by CSS anchoring: the trigger sits mid-bar
+       and the list is wider than either side of it, so no anchored area fits and the
+       list ran off the right edge (`lib/navigation/popoverPlacement.ts`). */
+    const place = () => {
+      const trigger = triggerRef.current;
+      if (trigger) placePopoverElement(trigger, popover, { side: "below" });
+    };
+    const onToggle = (event: Event) => {
+      const isOpen = Reflect.get(event, "newState") === "open";
+      setOpen(isOpen);
+      if (isOpen) {
+        place();
+        window.addEventListener("resize", place);
+      } else {
+        window.removeEventListener("resize", place);
+      }
+    };
+    popover.addEventListener("toggle", onToggle);
+    return () => {
+      popover.removeEventListener("toggle", onToggle);
+      window.removeEventListener("resize", place);
+    };
+  }, []);
 
-  if (!visible || !facts) return null;
+  const closePopover = useCallback(() => {
+    const popover = popoverRef.current;
+    if (!popover || typeof popover.hidePopover !== "function") return;
+    try {
+      if (popover.matches(":popover-open")) popover.hidePopover();
+    } catch {
+      // Ignore if already closed or unsupported.
+    }
+  }, []);
 
-  const place = section ?? facts.title;
-  /* The page's own address beside the host (2026-10-27): a screenshot cannot be
-     clicked, so the frame says where the rest of it is, short enough to type. */
-  const address = `${siteHost}${pathname && pathname !== "/" ? pathname : ""}`;
-  const phoneDate = facts.date?.match(DATE_IN_WORDS)?.[0] ?? null;
+  if (sections.length < 2) {
+    return <span className="min-w-0 truncate text-[var(--app-text-secondary)]">{currentLabel}</span>;
+  }
+
   return (
-    <div
-      data-running-head
-      data-regime={facts.regime ?? undefined}
-      /* Under a reading, the bar's foot is a 2px rule in the week's colour, as the
-         brief's card carries one (§XIII): at the size Slack shows a screenshot its
-         words cannot be read, and the colour still says which weather it is. */
-      className={`fixed inset-x-0 top-0 z-[var(--z-chrome)] bg-[var(--bg-body)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden ${
-        facts.regime ? "border-b-2 border-[color:var(--regime-accent)]" : "border-b border-[color:var(--border-subtle)]"
-      }`}
-      style={{ transform: `translateY(${offset}px)` }}
-    >
-      <div className="mx-auto flex h-8 max-w-[96rem] items-center gap-2 px-4 text-fluid-nano leading-none text-slate-400 md:px-7">
-        <p aria-hidden="true" className="flex min-w-0 flex-1 items-center gap-2">
-          {/* The mark and name only while the header is away. With the header back
-              on a scroll up, the head sits right under its wordmark and printed
-              "Whether" twice in 95px; the frame still names the site, through the
-              header (2026-11-06). */}
-          {offset === 0 ? (
-            <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-slate-300">
-                <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
-              </svg>
-              <span className="shrink-0 font-semibold text-slate-100">Whether</span>
-            </>
-          ) : null}
-          {facts.condition ? (
-            <span className="type-stamp shrink-0 font-semibold" style={{ color: "var(--regime-ink)" }}>
-              {facts.condition}
-            </span>
-          ) : null}
-          {facts.tension ? (
-            /* The week's open question, by what it would change to. In the caveat
-               ink, with its diamond, when the call could change next week, as the
-               trust strip's margin cell prints it. */
-            <span
-              className={`shrink-0 font-semibold tabular-nums ${facts.tensionNear ? "weather-caveat-mark text-caveat-fg" : "text-slate-200"}`}
-            >
-              {facts.tension}
-            </span>
-          ) : null}
-          {facts.date ? (
-            <span className="shrink-0 tabular-nums">
-              {/* On a phone the date alone: with the tension beside it, "Data as of Oct 23,
-                  2026" ran past the screen's edge and clipped the year off. */}
-              {phoneDate && phoneDate !== facts.date ? (
-                <>
-                  <span className="sm:hidden">{phoneDate}</span>
-                  <span className="max-sm:hidden">{facts.date}</span>
-                </>
-              ) : (
-                facts.date
-              )}
-            </span>
-          ) : null}
-          {place ? (
-            /* On a phone with a tension there is no width left for the section: the
-               section chips (report pages) or the call line (the brief) carry it. */
-            <span className={`min-w-0 truncate text-slate-300 ${facts.tension ? "max-sm:hidden" : ""}`}>
-              {/* From md the brief leads with its call, which the strip at the foot no longer prints. */}
-              {facts.call ? (
-                <span className="font-medium text-slate-100 max-md:hidden">{facts.call} · </span>
-              ) : facts.title && place !== facts.title ? (
-                <span className="max-md:hidden">{facts.title} · </span>
-              ) : null}
-              {place}
-              {sectionStep ? (
-                <span className="ml-1.5 tabular-nums text-slate-400 max-md:hidden" data-running-head-step>
-                  ({sectionStep})
-                </span>
-              ) : null}
-            </span>
-          ) : null}
-        </p>
-        <span aria-hidden="true" className="shrink-0 max-sm:hidden">{address}</span>
+    <span className="inline-flex min-w-0 items-center">
+      <button
+        ref={triggerRef}
+        type="button"
+        popoverTarget={popoverId}
+        aria-controls={popoverId}
+        aria-expanded={open}
+        aria-label={`Jump to section, current: ${currentLabel}`}
+        className="weather-focus-ring inline-flex min-h-11 min-w-0 max-w-full items-center gap-1 rounded-md px-1.5 text-fluid-nano font-medium text-[var(--app-text)] transition-colors hover:bg-[var(--bg-nested)] md:min-h-9"
+      >
+        <span className="truncate">{currentLabel}</span>
+        <ChevronDown
+          aria-hidden="true"
+          size={13}
+          strokeWidth={2}
+          className={`shrink-0 text-[var(--app-text-muted)] transition-transform duration-150 motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        ref={popoverRef}
+        id={popoverId}
+        popover="auto"
+        className="site-section-popover"
+        data-masthead-section-menu
+      >
+        <p className="px-2.5 py-1 type-eyebrow">On this page</p>
+        <nav aria-label="Jump to section" className="flex flex-col gap-0.5">
+          {sections.map((item) => {
+            const isCurrent = item.label === currentLabel;
+            return (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                aria-current={isCurrent ? "location" : undefined}
+                onClick={closePopover}
+                className="site-nav-popover-link"
+              >
+                <span className="truncate">{item.label}</span>
+              </a>
+            );
+          })}
+        </nav>
       </div>
-      {facts.call && callLine ? (
-        /* The brief's own line on a phone: the call, which is what a screenshot of the
-           brief is for, and the jump to what it changes. The desktop brief keeps its
-           floating strip for both. */
-        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-4 pb-1 text-fluid-sm md:hidden">
-          <span aria-hidden="true" className="min-w-0 flex-1 truncate font-medium text-slate-50">
-            {facts.call}
-          </span>
-          {facts.jump ? (
-            <a
-              href={facts.jump.href}
-              className="weather-focus-ring weather-hit inline-flex shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
-            >
-              {facts.jump.label}
-            </a>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+    </span>
   );
 }

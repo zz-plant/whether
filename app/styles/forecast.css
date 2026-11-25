@@ -38,7 +38,10 @@
 .weather-hero-sky {
   position: relative;
   isolation: isolate;
-  padding-block: 1.25rem 1.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  padding: 1.25rem 1.25rem 1.5rem;
+  background: linear-gradient(180deg, var(--regime-sky-top), var(--regime-sky));
   color: var(--regime-sky-ink);
   --app-text: var(--regime-sky-ink);
   --app-text-secondary: var(--regime-sky-ink);
@@ -55,7 +58,7 @@
 
 @media (min-width: 768px) {
   .weather-hero-sky {
-    padding-block: 2.25rem 2.5rem;
+    padding: 1.75rem 1.75rem 2rem;
   }
 }
 
@@ -100,20 +103,25 @@
   --regime-ink: var(--app-text);
 }
 
-/* Full width from inside the brief's measure. The body clips horizontal overflow
-   (tokens.css), so the band reaching past a scrollbar draws no scroll. */
-.weather-hero-sky::before,
-.weather-hero-sky-clouds {
-  position: absolute;
-  inset-block: 0;
-  inset-inline: calc(50% - 50vw);
-  pointer-events: none;
+/* The week's exception, under the call (2026-11-21): a rule the sky has no ink for.
+   A crossed line keeps the crossed red; a close line is a note, so it takes the sky's
+   own ink and a neutral rule, as the boxed band does below. */
+.weather-line-band-call {
+  border-left-color: var(--line-crossed);
+  color: var(--line-crossed-ink);
+}
+.weather-line-band-call[data-line-state-band="near"] {
+  border-left-color: color-mix(in srgb, var(--app-text) 45%, transparent);
+  color: var(--app-text);
 }
 
-.weather-hero-sky::before {
-  content: "";
-  z-index: -2;
-  background: linear-gradient(180deg, var(--regime-sky-top), var(--regime-sky));
+/* Full width from inside the brief's measure, while the sky was the page's ground.
+   Since 2026-11-21 the sky is the call's contained block (the one-page brief), so the
+   clouds fill that block and no pseudo-element reaches past it. */
+.weather-hero-sky-clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 /* Four soft masses of cloud, drifting slowly. Only `transform` moves, so the blur is

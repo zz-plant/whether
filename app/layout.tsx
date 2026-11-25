@@ -11,10 +11,10 @@ import { GlobalTimeMachine } from "./components/globalTimeMachine";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { MobileTabBar } from "./components/MobileTabBar";
 import { DeadClickBeacon } from "./components/deadClickBeacon";
-import { RunningHead } from "./components/runningHead";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
+import { FooterAgentColophon } from "./components/footerAgentColophon";
 import { ServiceWorkerRegistrar } from "./components/serviceWorkerRegistrar";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { TooltipProvider } from "./components/ui/tooltip";
@@ -261,7 +261,6 @@ export default function RootLayout({
           <RecordBand />
           {/* One month across every drawing on a page; the band's readout is one of them. */}
           <MonthCursor />
-          <RunningHead />
           <GlobalCommandPalette />
           <ServiceWorkerRegistrar />
           <GlobalTimeMachine />
@@ -403,8 +402,12 @@ export default function RootLayout({
               </nav>
               {/* Inside the footer now. It used to render after `</footer>`, so a
                   keyboard hint floated alone under the copyright, attached to
-                  nothing. */}
-              <KeyboardShortcuts />
+                  nothing. The colophon beside it is the agent's one-line door:
+                  the Markdown request, and the MCP docs. */}
+              <div className="flex flex-wrap items-center justify-center gap-x-4">
+                <FooterAgentColophon />
+                <KeyboardShortcuts />
+              </div>
             </div>
           </div>
         </footer>

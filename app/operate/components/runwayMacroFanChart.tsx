@@ -1,5 +1,129 @@
-import type { RunwayMacroFanModel } from "../../../lib/report/runwayMacroFan";
+import type { MacroSpellBenchmark, RunwayMacroFanModel } from "../../../lib/report/runwayMacroFan";
 import { ScreenshotCaption } from "../../components/screenshotCaption";
+
+/**
+ * Empty-state preview of the Runway Macro Fan Chart: plots the real historical
+ * duration bands for today's conditions against a clearly dashed placeholder
+ * depletion path (zero invented company dollar figures).
+ */
+export function RunwayMacroFanGhost({
+  benchmark,
+  className = "",
+}: {
+  benchmark: MacroSpellBenchmark | null;
+  className?: string;
+}) {
+  /* No completed spell of this condition yet: there are no historical bands to
+     draw, and the current stretch is not one. The empty state stays as it was. */
+  if (!benchmark || benchmark.completedSpellCount === 0) return null;
+
+  const W = 460;
+  const H = 180;
+  const pad = { l: 52, r: 24, t: 20, b: 32 };
+  const plotW = W - pad.l - pad.r;
+  const plotH = H - pad.t - pad.b;
+  const maxMonths = 36;
+  const xOf = (m: number) => pad.l + (Math.min(m, maxMonths) / maxMonths) * plotW;
+  const monthTicks = [0, 6, 12, 18, 24, 30, 36];
+  /* The dashed line is a comparison mark, not a forecast: it ends at the median
+     past spell, the way a reader's runway would if it matched the typical one. */
+  const ghostEndMonth = Math.min(maxMonths, Math.max(1, benchmark.medianPastSpellMonths));
+
+  return (
+    <figure
+      data-runway-macro-fan-ghost
+      className={`rounded-lg border border-dashed border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-4 space-y-2 ${className}`.trim()}
+    >
+      <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
+        <span className="font-semibold text-slate-200">
+          How long past {benchmark.regimeLabel} spells lasted
+        </span>
+        <span className="tabular-nums text-slate-400">
+          Median {benchmark.medianPastSpellMonths} mo &middot; Longest {benchmark.longestPastSpellMonths} mo
+        </span>
+      </figcaption>
+      <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot block h-auto w-full text-slate-300" aria-hidden="true">
+        <line x1={pad.l} x2={W - pad.r} y1={pad.t} y2={pad.t} stroke="var(--border-subtle)" strokeDasharray="2 3" />
+        <line x1={pad.l} x2={W - pad.r} y1={pad.t + plotH * 0.5} y2={pad.t + plotH * 0.5} stroke="var(--border-subtle)" strokeDasharray="2 3" />
+        <text x={pad.l - 8} y={pad.t + 3.5} textAnchor="end" fontSize="10" fill="var(--app-text-muted)">
+          Cash
+        </text>
+        <text x={pad.l - 8} y={pad.t + plotH + 3.5} textAnchor="end" fontSize="10" fill="var(--app-text-muted)">
+          $0
+        </text>
+
+        <rect
+          x={xOf(0)}
+          y={pad.t}
+          width={Math.max(2, xOf(benchmark.medianPastSpellMonths) - xOf(0))}
+          height={plotH}
+          fill="var(--phase-trace)"
+          opacity="0.16"
+        />
+        <rect
+          x={xOf(benchmark.medianPastSpellMonths)}
+          y={pad.t}
+          width={Math.max(2, xOf(benchmark.longestPastSpellMonths) - xOf(benchmark.medianPastSpellMonths))}
+          height={plotH}
+          fill="var(--phase-trace)"
+          opacity="0.07"
+        />
+        <line
+          x1={xOf(benchmark.medianPastSpellMonths)}
+          x2={xOf(benchmark.medianPastSpellMonths)}
+          y1={pad.t}
+          y2={pad.t + plotH}
+          stroke="var(--phase-boundary)"
+          strokeDasharray="3 3"
+          strokeWidth="1"
+        />
+        <text
+          x={Math.min(W - pad.r - 82, xOf(benchmark.medianPastSpellMonths) + 4)}
+          y={pad.t + 12}
+          fontSize="9"
+          fill="var(--app-text-muted)"
+        >
+          Past median ({benchmark.medianPastSpellMonths} mo)
+        </text>
+
+        {monthTicks.map((m) => {
+          const x = xOf(m);
+          return (
+            <g key={m}>
+              <line x1={x} x2={x} y1={pad.t + plotH} y2={pad.t + plotH + 4} stroke="var(--border-default)" />
+              <text x={x} y={H - 10} textAnchor="middle" fontSize="10" fill="var(--app-text-muted)">
+                {m === 0 ? "now" : `${m} mo`}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Clearly dashed placeholder depletion path — no company dollars plotted yet. */}
+        <path
+          d={`M${xOf(0).toFixed(1)} ${(pad.t + 8).toFixed(1)} L${xOf(ghostEndMonth).toFixed(1)} ${(pad.t + plotH).toFixed(1)}`}
+          fill="none"
+          stroke="var(--app-text-muted)"
+          strokeWidth="2"
+          strokeDasharray="5 5"
+          opacity="0.55"
+        />
+        <text
+          x={xOf(ghostEndMonth * 0.48)}
+          y={pad.t + plotH * 0.42}
+          fontSize="9.5"
+          fill="var(--app-text-muted)"
+        >
+          Your cash curve
+        </text>
+
+        <line x1={pad.l} x2={W - pad.r} y1={pad.t + plotH} y2={pad.t + plotH} stroke="var(--border-default)" strokeWidth="1" />
+      </svg>
+      <p className="text-fluid-nano text-slate-400">
+        Enter cash, spend and revenue—or pick a stage benchmark or live ticker above—to plot your runway against these historical {benchmark.regimeLabel} bands.
+      </p>
+    </figure>
+  );
+}
 
 /**
  * Runway Macro Fan Chart (ui-ux-standards §XV, §XVI).

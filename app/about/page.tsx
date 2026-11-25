@@ -64,29 +64,27 @@ export default function AboutPage() {
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">How Whether works</h1>
         <p className="text-base text-slate-300">
-          Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
+          Whether publishes free weekly operating guidance for startup leaders, built from interest rates and credit conditions.
         </p>
         {/* One section under the h1 (2026-11-11): "How it works" was an h2 directly
             under "How Whether works", the same heading twice in a row. */}
         <p className="text-base text-slate-300">
-          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a
-          score at which to restart. The two are set apart, so a small move back won&rsquo;t restart anything.
+          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a score at which to restart—spaced apart so a small move back won&rsquo;t restart them.
         </p>
         <p className="text-base text-slate-300">
-          Each published brief stays on record. The{" "}
+          Every published brief stays on record: see the{" "}
           <Link href="/history#track-record" className={inlineLinkClass}>
             track record
-          </Link>{" "}
-          compares past guidance with what happened next, including where it fell short. Some changes in
-          conditions came with no warning. The{" "}
+          </Link>
+          , the{" "}
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
-          shows the room before a change is a distance, not a probability. We also track{" "}
+          (distance, not probability), and{" "}
           <Link href="/concepts" className={inlineLinkClass}>
             advice vs. market
-          </Link>{" "}
-          to see whether startup essays move with the cycle.
+          </Link>
+          .
         </p>
       </section>
 
@@ -96,7 +94,7 @@ export default function AboutPage() {
         <h2 className="type-section">Where it fits and where it does not</h2>
         <p className="text-base text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
-          Set when each area pauses and restarts for your own plan, and get an email the day one does.
+          Set your own pause and restart lines and get an email the day one crosses.
         </p>
         {/* Two blocks, one per list: together they ran 862px, taller than a phone
             screen, so no screenshot held the answer to "does this fit us" whole. */}
@@ -104,24 +102,20 @@ export default function AboutPage() {
           <p className="text-base font-semibold text-slate-100">It fits</p>
           <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
             <li>
-              Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
-              contract, the runway to hold before the next raise.
+              Multi-quarter, hard-to-unwind commitments: hiring plans, leases, multi-year contracts, and runway buffers.
             </li>
             <li>
-              Plans a group approves once and should not re-argue each month: a budget whose second half is released
-              when spending restarts, or an agreed floor on runway.
+              Pre-agreed budgets and runway floors you do not want to re-argue every month.
             </li>
             <li>
-              Venture-backed companies with one to two years of runway and a next raise that depends on what capital
-              costs. The test is the currency of the raise, not the address: a company in Toronto, London or Berlin
-              raising from U.S. funds prices its round off the same rates this brief reads.
+              Companies with 1–2 years of runway whose next raise prices off U.S. rates (by raise currency, not headquarters).
             </li>
             <li>
-              Investors and accelerators sending one reading to every company they back: the{" "}
+              Investors and accelerators sending one reading across a portfolio via the{" "}
               <Link href="/share" className={inlineLinkClass}>
                 portfolio note
-              </Link>{" "}
-              says what the week means at each runway.
+              </Link>
+              .
             </li>
           </ul>
         </div>
@@ -129,20 +123,16 @@ export default function AboutPage() {
           <p className="text-base font-semibold text-slate-100">It does not fit</p>
           <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
             <li>
-              A single hire or purchase. The rules are a policy for a kind of decision, not a verdict on one.
+              A single hire or purchase—the rules set policy, not one-off verdicts.
             </li>
             <li>
-              A company with under six months of runway. At that point cash matters more than the market, so the guidance starts with cash.
+              Under six months of runway, where cash overrides market conditions.
             </li>
             <li>
-              A company whose funding does not follow U.S. rates: one raising locally in a currency whose central bank
-              sets its own price of money, or one in a sector raising on a boom of its own. Where you are registered is
-              not the test; a company outside the U.S. that raises from U.S. funds borrows at U.S. rates, and the scores
-              are its cost of capital.
+              Funding outside U.S. rates (local-currency rounds or isolated sector booms).
             </li>
             <li>
-              Deciding which product work matters most. Rates affect how much slow-payback work a team can afford, not
-              what it should build.
+              Product prioritization—rates bound slow-payback work, not what to build.
             </li>
           </ul>
         </div>
@@ -167,21 +157,19 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">What it is built from</h2>
         <p className="text-base text-slate-300">
-          Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
-          pressure comes from the one-month bill rate, the speed of its rise, and long rates falling below short ones.
-          Risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings then adjust
-          them: the extra interest riskier companies pay to borrow, the Chicago Fed&apos;s summary of borrowing
-          conditions, and the VIX index of expected stock-market turbulence. Where the pair lands sets the conditions:
-          Sunny, Cloudy, Stormy or Freezing.
+          Two scores from U.S. Treasury rates read from the St. Louis Fed (FRED) and market stress set the conditions: Sunny, Cloudy, Stormy or Freezing.
         </p>
-        <p className="text-base text-slate-300">
-          Two startup-market inputs lower risk appetite when they weaken: the pace of venture funding and tech layoffs.
-          They come from a curated snapshot rather than a live feed, and every surface that uses them says so.
-        </p>
-        <p className="text-base text-slate-300">
-          Inflation and unemployment appear on the signals page but enter neither score. Everything that does is
-          published with its formula, source and refresh schedule.
-        </p>
+        <ul className="list-disc space-y-1.5 pl-5 text-base text-slate-300">
+          <li>
+            <span className="font-semibold text-slate-100">Funding pressure:</span> 1-month Treasury rate, its pace of rise, and curve inversions, adjusted for high-yield spreads and Chicago Fed financial conditions.
+          </li>
+          <li>
+            <span className="font-semibold text-slate-100">Risk appetite:</span> 10Y–2Y Treasury spread, adjusted for VIX and curated snapshots of venture funding and tech layoffs (labelled where used).
+          </li>
+          <li>
+            <span className="font-semibold text-slate-100">Context only:</span> Inflation and unemployment appear on Signals but enter neither score.
+          </li>
+        </ul>
         <div className="flex flex-wrap gap-2 pt-1">
           <ActionLink href="/trust" variant="pill">
             Sources and formulas

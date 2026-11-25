@@ -213,9 +213,21 @@ describe("the band says what the site is and names its colours", () => {
   const html = renderToStaticMarkup(createElement(RecordBand));
   const css = readFileSync("app/styles/record-band.css", "utf8");
 
-  it("prints the category line under the band, with nothing to dismiss it", () => {
-    assert.match(html, /<p class="record-band-what" data-category-line="true">Weekly operating guidance for startup leaders\.<\/p>/);
+  it("prints the category line in the disclosure's summary, with nothing to dismiss it", () => {
+    assert.match(html, /<span class="record-band-what" data-category-line="true">Weekly operating guidance for startup leaders\.<\/span>/);
     assert.doesNotMatch(html, /Dismiss|data-weather-first-run-orientation/);
+  });
+
+  it("folds the band behind a native disclosure whose summary stays visible", () => {
+    assert.match(html, /<details class="record-band-details weather-auto-chevron" data-record-band-disclosure="true">/);
+    const summary = /<summary class="record-band-summary">([\s\S]*?)<\/summary>/.exec(html)?.[1] ?? "";
+    assert.match(summary, /data-category-line/, "the frame's words stay on the closed row");
+    assert.match(summary, /The record since \d{4}/);
+    assert.ok(html.indexOf("data-record-band-plate") > html.indexOf("</summary>"), "the chart is inside the disclosure");
+    assert.ok(html.indexOf("data-record-band-readout") > html.indexOf("</summary>"), "the readout is inside it too");
+    /* Attribute order is the renderer's: tests/reportShellSections.test.tsx mocks next/link
+       process-wide and puts href first, so a shuffled run that loads it earlier flips the order. */
+    assert.match(html, /<a(?=[^>]*\bclass="record-band-link")(?=[^>]*\bhref="\/history")[^>]*>History<\/a>/);
   });
 
   it("names each condition the band draws beside its fill, at every width", () => {
@@ -230,5 +242,42 @@ describe("the band says what the site is and names its colours", () => {
   it("keeps the two counts after the key, under their own names", () => {
     assert.ok(html.indexOf("data-record-band-key") < html.indexOf("data-record-band-readout"));
     assert.match(html, /month-end readings since/);
+  });
+});
+
+/*
+ * The closed band's horizon (2026-11-21). The disclosure protects the first
+ * screen, but a closed bar that says only "The record since 2012" hides the one
+ * drawing that makes the record worth opening. A 4px proportional strip of the
+ * runs sits on its bottom edge, with no extra words and no extra height beyond
+ * the strip itself.
+ */
+describe("the closed band teases the record it holds", () => {
+  const html = renderToStaticMarkup(createElement(RecordBand));
+  const css = readFileSync("app/styles/record-band.css", "utf8");
+
+  it("draws one proportional segment per run, covering every month once", () => {
+    const horizon = /data-record-band-horizon="true">([\s\S]*?)<\/span><\/summary>/.exec(html)?.[1] ?? "";
+    const segments = [...horizon.matchAll(/data-regime="([A-Z]+)" style="flex-grow:(\d+)"/g)];
+    assert.ok(segments.length > 0, "the strip is drawn");
+    const months = recordBandMonthCount(/data-months="([^"]+)"/.exec(html)?.[1] ?? "");
+    assert.equal(
+      segments.reduce((sum, [, , grow]) => sum + Number(grow), 0),
+      months,
+      "the strip is the record's own proportions, not a decorative gradient",
+    );
+  });
+
+  it("hides the strip once the band is open, and thickens it on hover", () => {
+    assert.match(css, /\.record-band-details\[open\] \.record-band-horizon \{\s*display: none/);
+    assert.match(css, /\.record-band-summary:hover \.record-band-horizon/);
+    assert.match(css, /prefers-reduced-motion: no-preference/);
+  });
+
+  it("opens the band on /history so the plate canvas has a height to draw into", () => {
+    const plate = readFileSync("app/history/recordPlateCanvas.tsx", "utf8");
+    assert.match(plate, /disclosure\.open = true/);
+    assert.match(plate, /addEventListener\("toggle", schedule\)/);
+    assert.match(plate, /openedByHistory/);
   });
 });

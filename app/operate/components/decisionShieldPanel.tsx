@@ -4,6 +4,7 @@
  */
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { LabeledSelectField, type LabeledSelectOption } from "../../components/labeledSelectField";
@@ -167,7 +168,7 @@ export const DecisionShieldPanel = ({
             <>
               <div className="weather-surface p-4">
                 <p className="type-label text-slate-400">
-                  Pick a stage, an area, and an action. The verdict below says whether the move is safe this week, what would pause it, and what would reopen it.
+                  Pick stage, area, and action to see this week&apos;s verdict, pause line, and restart line.
                 </p>
               </div>
               <Fieldset.Root className="weather-grid min-w-0 gap-4 border-0 p-0 [--col-min:12rem]">
@@ -269,6 +270,16 @@ export const DecisionShieldPanel = ({
               />
             </div>
           ) : null}
+
+          <p className="text-xs text-slate-400" data-decision-shield-mcp>
+            Check PRDs or RFCs in Cursor or Claude Code:{" "}
+            <Link
+              href="/api-docs"
+              className="weather-hit weather-focus-ring whitespace-nowrap font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-sky-200"
+            >
+              Connect the MCP server &rarr;
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -82,8 +82,7 @@ export default function ApiDocsPage() {
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
         <h1 className="text-fluid-2xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
-          Read this week's guidance from an AI agent, a script, or a dashboard. The guidance, the two
-          scores behind it, and the pause and restart lines come through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. All of it is free, and the API needs no key.
+          Free, no-auth access to this week&apos;s guidance, scores, and pause/restart lines via MCP, REST, CLI, or an embeddable widget.
         </p>
 
         <section className="space-y-4">
@@ -92,8 +91,7 @@ export default function ApiDocsPage() {
             <span className="text-fluid-nano font-mono text-emerald-400">Streamable HTTP • No auth required</span>
           </div>
           <p className="text-xs text-slate-300">
-            <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a streamable-HTTP Model
-            Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, each score's distance from its line, and a scenario's result while it reasons.
+            Connect any MCP client to <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> so your model can query current guidance, score margins, and scenarios directly.
           </p>
           <div className="flex flex-wrap items-center gap-2" aria-label="Install the MCP server">
             <a href={cursorInstallHref} className="weather-button inline-flex items-center text-fluid-sm">
@@ -121,19 +119,17 @@ export default function ApiDocsPage() {
             </pre>
           </div>
           <p className="text-xs text-slate-300">
-            Start with <span className="font-mono text-slate-100">get_state</span>: one small answer with the conditions and the room before they change, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
+            Start with <span className="font-mono text-slate-100">get_state</span> (conditions, margin, freshness, scores, guidance). Read-only tools:{" "}
             {toolNames.map((name, index) => (
               <Fragment key={name}>
                 {index > 0 ? ", " : ""}
                 <span className="font-mono text-slate-100">{name}</span>
               </Fragment>
             ))}
-            . For local agents or CI pipelines, <span className="font-mono text-slate-100">bun run mcp:whether</span>{" "}
-            starts the same tools over stdio.
+            . Local/CI stdio: <span className="font-mono text-slate-100">bun run mcp:whether</span>.
           </p>
           <p className="text-xs text-slate-300">
-            A weather word works wherever a tool takes conditions: Freezing, Cloudy, Stormy or Sunny, in any case. A
-            wrong argument is refused with the values that would have worked.
+            Conditions accept Freezing, Cloudy, Stormy, or Sunny (case-insensitive); invalid arguments return the allowed values.
           </p>
         </section>
 
@@ -400,16 +396,15 @@ export default function ApiDocsPage() {
               tryLabel="View calendar.ics"
               tryAriaLabel="View calendar.ics: the calendar feed"
             >
-              The same weeks as a calendar to subscribe to: each Monday of the last six months is an all-day
-              event with that week&apos;s conditions and guidance. Subscribe by URL in any calendar app.
+              Subscribe by URL in any calendar app for all-day Monday events with each week&apos;s conditions and guidance (last 6 months).
             </Endpoint>
           </div>
           <div className="weather-surface px-4 py-3 space-y-2">
             <p className="text-fluid-sm font-semibold text-slate-100">Embeddable widget</p>
             <p className="text-xs text-slate-300">
-              Drop the current guidance into an internal dashboard or wiki. It updates itself each week.
-              Add <span className="font-mono text-slate-100">data-whether-stage</span> to tailor it to a company stage, or{" "}
-              <span className="font-mono text-slate-100">data-whether-ticker</span> to tag it with a label.
+              Self-updating weekly badge for dashboards or wikis. Optional:{" "}
+              <span className="font-mono text-slate-100">data-whether-stage</span> or{" "}
+              <span className="font-mono text-slate-100">data-whether-ticker</span>.
             </p>
             <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-sm leading-relaxed text-slate-300">
               {embedSnippet}

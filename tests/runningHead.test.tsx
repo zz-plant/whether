@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CommandCenterNavBlock } from "../app/components/report-shell/CommandCenterNavBlock";
 import { SecondaryPageHeader } from "../app/components/secondaryPageShell";
-import { frameFactsAttributes, readFrameFacts, runningHeadSection, sameFrameFacts } from "../lib/navigation/runningHead";
+import { frameFactsAttributes, isPastHero, readFrameFacts, runningHeadSection, sameFrameFacts } from "../lib/navigation/runningHead";
 
 /*
  * The running head prints, at the top of every frame after a page's intro, the site,
@@ -135,6 +135,27 @@ describe("the facts the head keeps", () => {
     assert.ok(sameFrameFacts(first, readFrameFacts({ dataset: datasetOf(attributes) }, null)));
     assert.ok(!sameFrameFacts(first, { ...first, jump: { href: "#b", label: "By area" } }));
     assert.ok(!sameFrameFacts(first, { ...first, tensionNear: true }));
+  });
+});
+
+describe("the top of the page is never past the hero", () => {
+  const headerBottom = 48;
+
+  it("keeps the nav at the top, whatever the page's layout was doing when it was measured", () => {
+    /* The brief's card streams in after hydration: measured before it lands, the block
+       sits above the head and the phone masthead opened in reading mode on production. */
+    assert.equal(isPastHero({ scrollY: 0, anchorTop: -20, headerBottom }), false);
+    assert.equal(isPastHero({ scrollY: 0, anchorTop: null, headerBottom }), false);
+  });
+
+  it("turns into the reading head once the intro block has left the bar", () => {
+    assert.equal(isPastHero({ scrollY: 400, anchorTop: 10, headerBottom }), true);
+    assert.equal(isPastHero({ scrollY: 400, anchorTop: 200, headerBottom }), false);
+  });
+
+  it("falls back to the distance scrolled on a page with nothing marked", () => {
+    assert.equal(isPastHero({ scrollY: 200, anchorTop: null, headerBottom }), false);
+    assert.equal(isPastHero({ scrollY: 300, anchorTop: null, headerBottom }), true);
   });
 });
 

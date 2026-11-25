@@ -1,16 +1,21 @@
 "use client";
 
-import { useCallback, useMemo, useState, useId } from "react";
+import Link from "next/link";
+import { Fragment, useCallback, useMemo, useState, useId } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { useSlackPreviewOverlay } from "./useSlackPreviewOverlay";
 import { useBriefArtifact } from "./useBriefArtifact";
 import { BriefFormatPicker } from "./briefFormatPicker";
 import {
   BRIEF_FORMATS,
+  MONDAY_AGENDA_MINUTES,
+  MONDAY_AGENDA_STEPS,
+  MONDAY_AGENDA_TITLE,
   formatBriefArtifact,
   type BriefFormatId,
 } from "../../lib/report/briefArtifact";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildAssistantLinks } from "../../lib/export/askAssistant";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
@@ -112,6 +117,14 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
 
   const activeFormat = BRIEF_FORMATS.find((option) => option.id === format) ?? BRIEF_FORMATS[0];
 
+  /* The rail is the keyboard's way into sharing (⇧S), so it also carries the
+     handoff /share has at its foot: the frozen brief and a prompt for the
+     reader's own numbers. Only where there is a brief to hand over. */
+  const assistantLinks = useMemo(
+    () => (artifact ? buildAssistantLinks(`${siteUrl}${artifact.permalinkPath ?? "/"}`, artifact.recordDateLabel) : []),
+    [artifact],
+  );
+
   /* The canonical origin, not `window.location.origin` (2026-11-02): the same
      string is now what Copy Brief under the call copies, and a paste outlives
      the host it was made on. A preview deployment writing its own hostname into
@@ -197,18 +210,45 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
             <span id={slackOverlayLabelId}>Preview in Slack</span>
           </label>
 
-          <div className="border-t border-slate-800/60 pt-3">
-            <div className="mb-3">
-              <CalendarButton
-                title="Whether Weekly Brief"
-                description={buildMondayAgendaDescription()}
-                date={(() => {
-                  const d = new Date();
-                  d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
-                  return d.toISOString().split("T")[0];
-                })()}
-              />
-            </div>
+          <div className="border-t border-[color:var(--border-subtle)] pt-3">
+            {/* The one place the product says what the Monday ritual is. The Agenda
+                format below has carried the item since 2026-10-21 and the hold has
+                lived in this rail just as long, but nothing said they were the same
+                three minutes: a reader met "Agenda" as one of four formats and a
+                calendar button with no reason to press it. Only where there is a
+                brief to paste — a route with no artifact has no Agenda format. */}
+            {artifact ? (
+              <div className="mb-3 space-y-1.5">
+                <p className="type-eyebrow">
+                  {MONDAY_AGENDA_TITLE} · {MONDAY_AGENDA_MINUTES} min
+                </p>
+                <p className="text-xs leading-relaxed text-[var(--app-text-muted)]">
+                  {MONDAY_AGENDA_STEPS.map((step) => step.label).join(" · ")}. The Agenda
+                  format below is the item to paste; the hold brings it back every Monday.
+                </p>
+                <CalendarButton
+                  title="Whether Weekly Brief"
+                  description={buildMondayAgendaDescription()}
+                  date={(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
+                    return d.toISOString().split("T")[0];
+                  })()}
+                />
+              </div>
+            ) : (
+              <div className="mb-3">
+                <CalendarButton
+                  title="Whether Weekly Brief"
+                  description={buildMondayAgendaDescription()}
+                  date={(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
+                    return d.toISOString().split("T")[0];
+                  })()}
+                />
+              </div>
+            )}
             <p className="type-eyebrow">Copy as</p>
             <output aria-live="polite" className="sr-only">
               {copyStatusMessage}
@@ -239,6 +279,40 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               >
                 {copiedTarget === "link" ? "Copied" : "Copy page link"}
               </button>
+            </div>
+
+            {assistantLinks.length > 0 ? (
+              <div className="mt-3 border-t border-slate-800/60 pt-3">
+                <p className="type-eyebrow">Ask an assistant</p>
+                <p className="mt-1 text-sm text-slate-300">
+                  {assistantLinks.map((link, index) => (
+                    <Fragment key={link.name}>
+                      {index > 0 ? <span aria-hidden="true"> &middot; </span> : null}
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="weather-hit weather-focus-ring font-medium text-[var(--accent-action)] underline underline-offset-4 transition-colors hover:text-slate-100"
+                      >
+                        {link.name}
+                      </a>
+                    </Fragment>
+                  ))}
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Opens with this week&apos;s brief and asks for your burn and runway.
+                </p>
+              </div>
+            ) : null}
+
+            <div className="mt-3 border-t border-slate-800/60 pt-3">
+              <Link
+                href="/share"
+                onClick={onClose}
+                className="weather-hit weather-focus-ring text-fluid-sm font-semibold text-[var(--app-text)] underline decoration-[var(--border-strong)] underline-offset-4"
+              >
+                All formats, slides &amp; embed &rarr;
+              </Link>
             </div>
           </div>
         </div>

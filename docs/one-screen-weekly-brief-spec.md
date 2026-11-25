@@ -632,3 +632,39 @@ sentences stay, and each drawing reads the model its sentence comes from.
 
 Every mark names itself on hover, on keyboard focus (each drawing is one tab stop; arrow keys
 step) and on a first tap, which a second tap follows (`app/components/ui/markReadout.tsx`).
+
+### One-page brief (2026-11-21)
+
+The homepage's first screen is one brief: a reading column and an evidence rail, from the
+approved comp in `.impeccable/mocks/declutter-20261121/brief.png`.
+
+- **The call is the sky's block.** The week line, condition, guidance and the week's changed
+  line sit on the condition in a contained rounded block, not across the page's full width.
+  The changed line ("Since Nov 9, Roadmap paused after risk appetite fell below 44.") is the
+  `LineStateBand`'s sentence, moved inside the call; a close line takes the sky's ink and a
+  neutral rule, a crossed line keeps the crossed red.
+- **The brief is wide; the reading body is not.** The call, its rail and the five area rows
+  take the 84rem wide measure (`Shell measure="wide"`, `weather-brief-measure`); the
+  explanatory sections below keep the 72rem reading measure, so tables and prose do not
+  stretch to the comp's full width.
+- **Five areas, action and line visible.** `AreaStrip` prints each area's standing, its action
+  and the one canonical line that can change that standing: the restart line while it is held,
+  the pause line otherwise, under the contract's labels (`Pause if` / `Restart when`). The row
+  is one link to the area's rule; "View lines" is its affordance, not a second anchor.
+- **The scores are the rail's.** From `md` the two figures, "Why this call", "History" and the
+  compact trust strip sit beside the call. On a phone the two compact figures follow the
+  guidance on a panel of paper, and the facts line gives way to them.
+- **Optional exploration folds.** "Your decisions this week" keeps its heading, the plan CTA
+  and the role formats; the grouped rules, the cash test and the links fold behind one native
+  disclosure. A `?decision=` link opens it on the named area, and a row's `#area-<area>` hash
+  opens it too (`AnchorFeedback` opens a disclosure around a hash target).
+- **The record band folds.** Its summary is one line: the category line and "The record since
+  2012". The chart, month readout, key, counts and the History link are one native disclosure
+  away, on every route.
+- **The load budget falls with it:** 1,401 words, 226 numbers, 290 words before the areas,
+  14 buttons, 24 "Funding pressure" mentions, 29 "Risk appetite" mentions and 0 hard sentences
+  (`scripts/check-home-load.ts`). The canonical rule models, exports, archival caveats,
+  calibration and URL selection are unchanged.
+## Finish correction (2026-11-21)
+
+The area rows print every required condition under “Restart when”. A distance slot may select the single binding score for measurement, but that slot is not a sufficient restart rule: an `and` restart must retain every required score and any qualitative condition. The rows use the existing rule formatters for both action-strip and canonical-rule fallback data. A pause may show one sufficient trigger because its numeric conditions combine with `or`.

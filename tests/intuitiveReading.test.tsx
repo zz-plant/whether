@@ -7,7 +7,10 @@ import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { ScoreLadder } from "../app/components/ui/scoreLadder";
 import { AreaStrip } from "../app/components/home/AreaStrip";
-import { buildAreaStrip, type SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import { buildAreaStrip, buildHomeAreaRows, type SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { buildActionStripItems } from "../lib/report/operatingCalls";
+import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import { describeLatitudeAgainstConditions } from "../lib/report/trackRecordCopy";
 
 /*
@@ -20,6 +23,29 @@ import { describeLatitudeAgainstConditions } from "../lib/report/trackRecordCopy
 const slot = (met: boolean) => ({ line: "Funding pressure > 76", distance: "", points: 4, met, metric: "tightness" as const });
 
 describe("the card ties the weather word to the areas", () => {
+  for (const source of ["rules", "action strip"] as const) {
+    it(`keeps both restart requirements in the visible brief from ${source}`, () => {
+      for (const scores of [{ tightness: 90, riskAppetite: 38 }, { tightness: 65, riskAppetite: 38 }]) {
+        const decisionRules = buildCanonicalBoundedDecisionRules({ regime: "SCARCITY", thresholds: DEFAULT_THRESHOLDS, scores });
+        const rows = buildHomeAreaRows({
+          decisionRules, scores, movement: null,
+          actionStripItems: source === "action strip" ? buildActionStripItems(decisionRules, scores) : undefined,
+        });
+        const model = buildAreaStrip(rows);
+        for (const area of ["hiring", "capital-raising", "expansion-bets"]) {
+          const cell = model?.cells.find((entry) => entry.area === area);
+          assert.equal(cell?.line?.label, "Restart when");
+          const text = cell?.line?.text ?? "";
+          assert.match(text, /funding pressure.*66/i, `${area} retains its funding-pressure requirement`);
+          assert.match(text, /risk appetite.*54/i, `${area} retains its risk-appetite requirement`);
+          assert.match(text, / and /, `${area} requires both scores even when one already meets its line`);
+        }
+        const html = renderToStaticMarkup(<AreaStrip model={model!} />);
+        assert.match(html, /data-area-line[^>]*>[\s\S]*?funding pressure[\s\S]*?risk appetite/i);
+      }
+    });
+  }
+
   const held = (metric: "tightness" | "riskAppetite", value: number, holdsAbove: boolean) => ({
     ...slot(true),
     metric,
@@ -60,6 +86,35 @@ describe("the card ties the weather word to the areas", () => {
       "two restart lines name neither",
     );
     assert.equal(strip([{ area: "hiring", pause: slot(false) }]), null, "nothing held");
+  });
+
+  it("prints each area's action and the line that can change its standing", () => {
+    const model = buildAreaStrip([
+      {
+        area: "hiring",
+        rule: "Only replace people who leave, and hire for roles you can't deliver without",
+        pause: { ...slot(true), line: "Funding pressure > 76", value: 76, holdsAbove: true },
+        resume: { ...slot(false), line: "Funding pressure < 66", points: 24, value: 66, holdsAbove: false },
+        resumeQualifier: "the weekly reading holds or improves",
+      },
+      {
+        area: "burn-discipline",
+        rule: "Before optional spend, work out how long it takes to pay back",
+        pause: { ...slot(false), line: "Funding pressure > 76", value: 76, holdsAbove: true, points: 14 },
+      },
+    ]);
+    assert.equal(model?.cells[0]?.action, "Only replace people who leave, and hire for roles you can't deliver without");
+    assert.deepEqual(model?.cells[0]?.line, {
+      kind: "resume",
+      label: "Restart when",
+      text: "Funding pressure < 66. the weekly reading holds or improves",
+    });
+    assert.deepEqual(model?.cells[1]?.line, { kind: "pause", label: "Pause if", text: "Funding pressure > 76" });
+    const html = renderToStaticMarkup(<AreaStrip model={model!} />);
+    assert.match(html, /data-area-rule[^>]*>Only replace people who leave/);
+    assert.match(html, /data-area-line[^>]*>[\s\S]*?Restart when[\s\S]*?Funding pressure &lt; 66/);
+    assert.match(html, /data-area-line[^>]*>[\s\S]*?Pause if[\s\S]*?Funding pressure &gt; 76/);
+    assert.match(html, /View lines/);
   });
 
   it("links each column on the card to its area's rule", () => {
