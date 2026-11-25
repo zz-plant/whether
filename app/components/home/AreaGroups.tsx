@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { LineStateIcon } from "../ui/conceptIcons";
 import { ActionLink } from "../ui/actionLink";
 import { ScoreMoveBars } from "./ScoreMoveBars";
+import { DatedText, type KnownDate } from "../ui/datedText";
 import type { DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import type { AreaGroup } from "../../../lib/report/home/homeSectionModel";
 import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigation";
@@ -49,6 +50,7 @@ export function AreaGroups({
   note,
   alerts = false,
   rulesAbove = false,
+  dates,
 }: {
   groups: readonly AreaGroup[];
   /** The area whose detail is open. */
@@ -67,6 +69,8 @@ export function AreaGroups({
    * wait on, each area's name and what opens under it.
    */
   rulesAbove?: boolean;
+  /** The comparison reading's date as the groups print it ("since Nov 9"), with its ISO date. */
+  dates?: readonly KnownDate[];
 }) {
   if (groups.length === 0) return null;
   /* Where the block above carries each area's sentence, a group here is its line and a
@@ -104,14 +108,14 @@ export function AreaGroups({
             </h3>
             {group.condition || group.distance ? (
               <p className="max-w-[60ch] text-fluid-sm text-slate-300" data-group-condition>
-                {[group.condition, group.distance].filter(Boolean).join(" ")}
+                <DatedText text={[group.condition, group.distance].filter(Boolean).join(" ")} dates={dates} />
               </p>
             ) : null}
             {/* The record the distance's band was read from, beside the sentence that names it (2026-11-18). */}
             {group.move && group.move === drawnMove ? <ScoreMoveBars move={group.move} /> : null}
             {group.history ? (
               <p className="max-w-[60ch] text-fluid-sm text-slate-400" data-group-history>
-                {group.history}
+                <DatedText text={group.history} dates={dates} />
               </p>
             ) : null}
             <ul className="space-y-2">

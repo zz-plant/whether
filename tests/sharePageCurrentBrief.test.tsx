@@ -121,11 +121,12 @@ describe("/share current weekly artifact", () => {
     const { options, textOf } = await shareOptions();
 
     assert.match(html, /data-chat-preview/, "the page opens on the Slack post, drawn");
-    assert.match(html, /<strong[^>]*>Whether Weekly Brief — [^<]+<\/strong>/, "the bold title is bold, not wrapped in asterisks");
+    /* The post leads with the week's answer in bold (2026-11-18), as a person would type it. */
+    assert.match(html, /<strong[^>]*>This week \([^)]+\): [^<]+<\/strong>/, "the bold answer is bold, not wrapped in asterisks");
     assert.match(html, /border-l-4/, "the quoted lines sit beside a bar");
     // The exact text that copies is still on the page, behind the drawing.
     const raw = /<pre aria-label="Text of Slack post"[^>]*>([\s\S]*?)<\/pre>/.exec(html)?.[1] ?? "";
-    assert.ok(raw.includes("*Whether Weekly Brief"), "the text keeps its markup");
+    assert.ok(raw.includes("*This week ("), "the text keeps its markup");
     /* Whichever page the post links, the frozen week or the live one: this fixture's
        Jun 17 reading has no frozen week, and it cited a later one until 2026-10-07. */
     const fullBrief = /Full brief: (https:\/\/\S+)/.exec(raw)?.[1];
@@ -139,7 +140,7 @@ describe("/share current weekly artifact", () => {
     };
     assert.deepEqual(["slack-post", "full-brief"].map(preview), ["chat", "chat"]);
     assert.deepEqual(["meeting-pack", "agenda", "slide-text", "email", "citation", "ticket-brief", "portfolio-note"].map(preview), Array(7).fill("text"));
-    assert.match(textOf("slack-post"), /^\*Whether Weekly Brief/, "the option still carries the markup it copies");
+    assert.match(textOf("slack-post"), /^\*This week \(/, "the option still carries the markup it copies");
   });
 
   it("builds the drawing as nodes, so text that looks like markup stays text", () => {

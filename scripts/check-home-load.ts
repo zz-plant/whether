@@ -16,7 +16,7 @@
  *
  *   words             whitespace-separated tokens holding a letter or digit
  *   numbers           digit runs, so "12–24" is two and "$2.1M" is two
- *   wordsBeforeAreas  words ahead of the "Your decisions this week" section, i.e. what a
+ *   wordsBeforeAreas  words ahead of the areas section ("What’s on hold?"), i.e. what a
  *                     reader crosses before the first answer about an area
  *   folds             `<details>` elements, open or closed
  *   buttons           `<button>` elements
@@ -94,9 +94,15 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
   /* 1,399 → 1,345 words and 226 → 207 numbers (2026-11-25): each dot on the conditions
      chart's month trail printed its two scores a third time as an SVG tooltip, beside the
      chart's readout and its "Scores on this chart" table. */
-  words: 1345,
-  numbers: 207,
-  wordsBeforeAreas: 288,
+  /* 1,345 → 1,325 words, 207 → 206 numbers and 288 → 285 words before the areas
+     (2026-11-25, spoken questions): each heading became the question a reader would ask
+     and its first sentence the answer, paid for by the claim that led "What would change
+     our mind?" (its answer is the "Conditions change if" sentence it printed below), the
+     runway fold's label that restated its summary, and links named "Why this call" and
+     "Why conditions are …" (now "Why Sunny?", the heading they open). */
+  words: 1325,
+  numbers: 206,
+  wordsBeforeAreas: 285,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
      appetite, room before a change). A deliberate raise, said here and in its PR.

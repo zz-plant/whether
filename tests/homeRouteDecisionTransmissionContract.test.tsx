@@ -98,12 +98,13 @@ describe("home route render contract", () => {
       [HOME_SECTIONS.areas, HOME_SECTIONS.watch, HOME_SECTIONS.changed, HOME_SECTIONS.record, HOME_SECTIONS.alert].map(
         (section) => section.heading,
       ),
+      /* The questions a reader would ask, said as they would say them (2026-11-18). */
       [
-        "Your decisions this week",
-        "What would change our mind",
-        "What changed this week",
+        "What’s on hold?",
+        "What would change our mind?",
+        "What’s changed since last week?",
         "Has this happened before?",
-        "Get an alert the day conditions turn",
+        "Can I get an email when conditions turn?",
       ],
     );
   });

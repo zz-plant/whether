@@ -6,9 +6,10 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { asClause, formatWeekAnswer } from "../report/briefArtifact";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
 import { formatDocumentMargin } from "../export/exportTerms";
-import { MARGIN_LABEL, publicDecisionLabels } from "../report/reportFormatting";
+import { MARGIN_LABEL } from "../report/reportFormatting";
 import { weeklyHeadline } from "../report/reportEvidence";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { fanOut } from "../delivery/fanOut";
@@ -272,44 +273,44 @@ export const sendWeeklyBrief = async (options?: {
       const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
         .filter((part): part is string => Boolean(part))
         .join(" ");
-      /* A phone shows roughly 40 characters of a subject and a desktop around
-         70; "Whether — Cloudy: Protect the revenue you already have, and hold
-         off on new bets until money gets cheaper." was 105 and lost its point
-         in every list view. The first clause carries the action. */
+      /* The answer first, in the subject and on the first line (2026-11-18): what to do
+         this week, as a person would write it, with the condition word ("This week: hold
+         new hires (Freezing)"). A phone shows roughly 40 characters of a subject and a
+         desktop around 70; the first clause carries the action. It read "Whether Brief —
+         Sunny" on every week that was not Freezing or Cloudy, a label with no answer. */
       const subjectAction = headline.action.split(/,\s|;\s|\s+and\s+/)[0]?.trim() || headline.action;
-      const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
-        ? `Whether — ${regimeLabel}: ${subjectAction}`
-        : `Whether Brief — ${regimeLabel}`;
+      const subject = `This week: ${asClause(subjectAction).replace(/[.!?]$/, "")} (${regimeLabel})`;
+      /* The same line every paste opens on, dated in words: the action with the week's
+         direction, or on a held week the hold's reason after it (`weeklyHeadline`). */
+      const answerLine = formatWeekAnswer(headline.composed, recordDate);
       const briefUrl = baseUrl;
       /* The lines above are the published ones. The use the record fits is a plan's
          own lines and an email the day one is crossed, and this is the one page
          every subscriber opens each week. */
       const planLinesUrl = `${baseUrl}/operate#ops-plan-lines`;
-      const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
 
       /* The reader's own lines lead, when they set any: the published rules
-         below are everyone's, these are the ones they chose. */
+         below are everyone's, these are the ones they chose. The order is the answer,
+         the numbers, the lines it is bounded by, the areas, then the links; the HTML
+         below says the same things in the same order. */
       const ownLines = describePlanLineStates(recipient.planLines ?? [], snapshot.assessment.scores);
       const text = [
-        `Whether Weekly Brief — ${recordDate}`,
+        answerLine,
         `Conditions: ${document.conditions.line}`,
         ...(ownLines ? [`Your rules: ${ownLines}.`] : []),
         ...(runwayAgeLine ? [runwayAgeLine] : []),
         ...(quiet ? [] : [...readingsText(readings), basisLine]),
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
-        `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
         ...(areaRows.length ? [`${EXPORT_SECTION_HEADINGS.areas}:`] : []),
         ...areaRows.map((row) => `• ${row.label}: ${row.areaActionNow}`),
+        `Full brief: ${briefUrl}`,
         `Set these rules for your own plan and we'll email you the day an area pauses or restarts: ${planLinesUrl}`,
         `Share or cite this week's brief: ${baseUrl}/share`,
-        ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
-        briefUrl,
         ...emailTextFooter(recipient.token, baseUrl),
       ].join("\n");
 
-      /* Regime-adaptive email */
       const sections = [];
       if (runwayAgeLine) {
         sections.push(`<p style="font-size:0.85rem;margin:0 0 12px;color:${OG_TEXT_SECONDARY};">${escapeHtml(runwayAgeLine)}</p>`);
@@ -328,45 +329,45 @@ export const sendWeeklyBrief = async (options?: {
           ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
           : []),
       );
-       if (areaRows.length > 0) {
-         sections.push(
-           `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
-           `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
-           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT_MUTED};margin:0 0 8px;">${EXPORT_SECTION_HEADINGS.areas}</p>`,
-           ...areaRows.map(
-             (row) =>
-               `<p style="font-size:0.9rem;margin:0 0 8px;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${escapeHtml(row.label)}.</strong> ${escapeHtml(row.areaActionNow)}</p>`,
-           ),
-           `</td></tr></table>`,
-         );
-       }
-       sections.push(
-         `<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};">`,
-         `<a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Set these rules for your own plan →</a>`,
-         ` · `,
-         `<a href="${baseUrl}/share" style="color:${OG_TEXT};text-decoration:underline;">Share or cite this brief →</a>`,
-         `</p>`,
-       );
-
+      /* The lines the answer is bounded by, under the labels every screen uses. The
+         "Guidance" box that headed them restated the answer the email now opens on. */
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT};margin:0 0 6px;">${publicDecisionLabels.call}</p>`,
-        `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:${OG_TEXT};">${escapeHtml(headline.composed)}</p>`,
         `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_LINE_CROSSED};margin:0 0 6px;">${DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>`,
         `<p style="font-size:0.9rem;margin:0 0 12px;color:${OG_TEXT_SECONDARY};">${pauseIf}</p>`,
         ...changeLines.flatMap(({ label, value }, index) => [
           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT};margin:${index === 0 ? "0" : "12px"} 0 6px;">${label}</p>`,
           `<p style="font-size:0.9rem;margin:0;color:${OG_TEXT_SECONDARY};">${value}</p>`,
         ]),
-        `<p style="font-size:0.8rem;margin:16px 0 0;color:${OG_TEXT_MUTED};"><a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;">Set these rules for your own plan</a> and we'll email you the day an area pauses or restarts.</p>`,
-        `</td></tr></table>`
+        `</td></tr></table>`,
+      );
+      if (areaRows.length > 0) {
+        sections.push(
+          `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
+          `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
+          `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT_MUTED};margin:0 0 8px;">${EXPORT_SECTION_HEADINGS.areas}</p>`,
+          ...areaRows.map(
+            (row) =>
+              `<p style="font-size:0.9rem;margin:0 0 8px;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${escapeHtml(row.label)}.</strong> ${escapeHtml(row.areaActionNow)}</p>`,
+          ),
+          `</td></tr></table>`,
+        );
+      }
+      sections.push(
+        `<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};">`,
+        `<a href="${briefUrl}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Full brief →</a>`,
+        ` · `,
+        `<a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;">Set these rules for your own plan</a> and we'll email you the day an area pauses or restarts`,
+        ` · `,
+        `<a href="${baseUrl}/share" style="color:${OG_TEXT};text-decoration:underline;">Share or cite this week's brief →</a>`,
+        `</p>`,
       );
 
       const html = renderEmailShell({
         title: "Whether Weekly Brief",
         body: [
-          `<p style="color:${OG_TEXT_MUTED};font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
+          `<p style="font-size:1.1rem;font-weight:600;line-height:1.35;margin:0 0 16px;color:${OG_TEXT};">${escapeHtml(answerLine)}</p>`,
           ...(ownLines
             ? [`<p style="font-size:0.9rem;margin:0 0 12px;color:${OG_TEXT};">Your rules: <span style="color:${OG_TEXT_SECONDARY};">${escapeHtml(ownLines)}.</span></p>`]
             : []),

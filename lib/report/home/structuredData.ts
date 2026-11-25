@@ -12,8 +12,17 @@ import {
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
 import { buildAuthorSchema, publishedDataLicenseUrl } from "../../publisher";
-import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
 import { MARGIN_LABEL, formatMarginBand } from "../reportFormatting";
+import { wikipediaTopic } from "../../seo/pageStructuredData";
+import {
+  SITE_VOCABULARY,
+  conditionTermSlug,
+  definedTermId,
+  definedTermReference,
+  type DefinedTermSlug,
+} from "../../seo/definedTerms";
+import { isRegimeKey } from "../../regimePresentation";
+import type { HomeQuestion } from "./homeSectionModel";
 
 /** A JSON-LD document. Typed loosely on purpose — this is serialized to JSON, and
  *  a consumer (or a test) reads nodes by key rather than by a TS shape. Giving the
@@ -40,10 +49,87 @@ export type HomeBriefStructuredDataInput = {
   datePublishedIso: string;
   /** ISO 8601. When the underlying data was last read. */
   dateModifiedIso: string;
-  postureLabel: string;
   regimeLabel: string;
   confidenceLabel: string;
+  /** The engine key the conditions word names, for its term's id. */
+  regime?: string;
+  /** The week's two scores, as the page prints them. */
+  scores?: { tightness: number; riskAppetite: number };
 };
+
+/** The page node's id, which the visible questions hang from (`withHomeQuestions`). */
+const HOME_PAGE_NODE_ID = `${siteUrl}/#webpage`;
+
+const vocabularyDescription = (slug: DefinedTermSlug) =>
+  SITE_VOCABULARY.find((term) => term.slug === slug)?.description;
+
+/* A score as a dataset variable: its value on its 0-100 scale, in the site's own words,
+   pointing at the term the method page defines. */
+const scoreVariable = (slug: DefinedTermSlug, name: string, value: number) => ({
+  "@type": "PropertyValue",
+  name,
+  propertyID: definedTermId(slug),
+  value: Math.round(value),
+  minValue: 0,
+  maxValue: 100,
+  unitText: "points",
+  description: vocabularyDescription(slug),
+});
+
+/*
+ * The market concepts the page names, as a knowledge graph knows them (`wikipediaTopic`),
+ * and the site's own terms by their ids on the method page. Each is printed on `/`: the Fed
+ * step sizes, the short-term borrowing rate (the 1-month Treasury bill), the yield curve
+ * behind the recession warning gauge, the two scores, Room before a change and the four
+ * conditions on the chart's key.
+ */
+const HOME_ABOUT = [
+  wikipediaTopic("Startup company", "Startup_company"),
+  wikipediaTopic("Venture capital", "Venture_capital"),
+];
+
+const HOME_MENTIONS = [
+  wikipediaTopic("Federal Reserve", "Federal_Reserve"),
+  wikipediaTopic("Federal funds rate", "Federal_funds_rate"),
+  wikipediaTopic("United States Treasury security", "United_States_Treasury_security"),
+  wikipediaTopic("Yield curve", "Yield_curve"),
+  ...(["funding-pressure", "risk-appetite", "room-before-a-change", "sunny", "cloudy", "stormy", "freezing"] as const).map(definedTermReference),
+];
+
+/**
+ * The page's questions under its page node (2026-11-18): each heading on `/` that asks a
+ * question, as a `Question` whose `acceptedAnswer` is the sentence printed under it. The
+ * route builds both from one object (`buildHomeQuestions`) and passes the same strings to
+ * the sections, so the markup says what the page says and nothing it does not.
+ */
+const isJsonLdDocument = (value: unknown): value is JsonLdDocument =>
+  typeof value === "object" && value !== null && Array.isArray(Reflect.get(value, "@graph"));
+
+/* Typed for the graph the builder returns; the assembly hands it over as `unknown`, and
+   anything that is not a graph passes through untouched. */
+export function withHomeQuestions(document: JsonLdDocument, questions: readonly HomeQuestion[]): JsonLdDocument;
+export function withHomeQuestions(document: unknown, questions: readonly HomeQuestion[]): unknown;
+export function withHomeQuestions(document: unknown, questions: readonly HomeQuestion[]): unknown {
+  if (!isJsonLdDocument(document) || questions.length === 0) return document;
+  return {
+    ...document,
+    "@graph": document["@graph"].map((node) =>
+      node["@id"] === HOME_PAGE_NODE_ID
+        ? {
+            ...node,
+            hasPart: questions.map((question) => ({
+              "@type": "Question",
+              "@id": `${siteUrl}/#${question.id}`,
+              url: `${siteUrl}/#${question.id}`,
+              name: question.question,
+              answerCount: 1,
+              acceptedAnswer: { "@type": "Answer", text: question.answer },
+            })),
+          }
+        : node,
+    ),
+  };
+}
 
 /**
  * The homepage entity graph.
@@ -92,7 +178,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
     },
     {
       "@type": "CollectionPage",
-      "@id": `${siteUrl}/#webpage`,
+      "@id": HOME_PAGE_NODE_ID,
       name: "Whether Weekly Brief",
       url: siteUrl,
       description: defaultSiteDescription,
@@ -104,21 +190,35 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       isPartOf: {
         "@id": websiteId,
       },
-      about: {
-        "@type": "Thing",
-        name: "The weekly guidance: what rates and credit mean for hiring, spend and raising",
-      },
+      about: [
+        {
+          "@type": "Thing",
+          name: "The weekly guidance: what rates and credit mean for hiring, spend and raising",
+        },
+        ...HOME_ABOUT,
+      ],
+      mentions: HOME_MENTIONS,
+      /*
+       * This week's reading, in the site's words (2026-11-18). It was named "US Treasury
+       * yield curve snapshot", which is one of its inputs: the reading is the two scores and
+       * the conditions they set, on a date, from a method the method page states.
+       */
       mainEntity: {
         "@type": "Dataset",
         "@id": `${siteUrl}/#dataset`,
-        name: "US Treasury yield curve snapshot",
-        description:
-          "The weekly US Treasury reading Whether bases its guidance on, with its margin from the change lines and what would change it.",
+        name: "This week's reading: funding pressure and risk appetite",
+        description: brief.scores
+          ? `The two 0–100 scores this week's guidance rests on, from public U.S. interest-rate and credit data: funding pressure ${Math.round(brief.scores.tightness)} and risk appetite ${Math.round(brief.scores.riskAppetite)}, which set the conditions at ${brief.regimeLabel}.`
+          : "The two 0–100 scores this week's guidance rests on, from public U.S. interest-rate and credit data, and the conditions they set.",
+        url: `${siteUrl}/`,
         creator: {
           "@id": organizationId,
         },
         license: publishedDataLicenseUrl,
+        isAccessibleForFree: true,
         temporalCoverage: brief.datePublishedIso,
+        dateModified: brief.dateModifiedIso,
+        measurementTechnique: `${siteUrl}/about#method`,
         /*
          * The posture, regime and confidence, in a property schema.org actually
          * defines. These three used to ride on the Article node inside a `result`
@@ -129,8 +229,23 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
          * equivalent that parses.
          */
         variableMeasured: [
-          { "@type": "PropertyValue", name: "Weekly guidance", value: brief.postureLabel },
-          { "@type": "PropertyValue", name: "Market conditions", value: brief.regimeLabel },
+          ...(brief.scores
+            ? [
+                scoreVariable("funding-pressure", "Funding pressure", brief.scores.tightness),
+                scoreVariable("risk-appetite", "Risk appetite", brief.scores.riskAppetite),
+              ]
+            : []),
+          {
+            "@type": "PropertyValue",
+            name: "Conditions",
+            value: brief.regimeLabel,
+            ...(brief.regime && isRegimeKey(brief.regime)
+              ? {
+                  propertyID: definedTermId(conditionTermSlug(brief.regime)),
+                  description: vocabularyDescription(conditionTermSlug(brief.regime)),
+                }
+              : {}),
+          },
           /*
            * The word, not the engine's code. This shipped `"MED"` — the value
            * `RegimeConfidenceLabel` stores — into the one payload on the site
@@ -139,7 +254,12 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
            * reader-facing surfaces were moved to the word form; this one was
            * missed because nothing renders it on screen.
            */
-          { "@type": "PropertyValue", name: MARGIN_LABEL, value: formatMarginBand(brief.confidenceLabel) },
+          {
+            "@type": "PropertyValue",
+            name: MARGIN_LABEL,
+            propertyID: definedTermId("room-before-a-change"),
+            value: formatMarginBand(brief.confidenceLabel),
+          },
         ],
         isBasedOn: {
           "@type": "CreativeWork",
@@ -207,21 +327,8 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       inLanguage: "en",
       isAccessibleForFree: true,
     },
-    {
-      "@type": "FAQPage",
-      "@id": `${siteUrl}/#weekly-decision-faq`,
-      mainEntity: homeDecisionFaqItems.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
-        },
-      })),
-      isPartOf: {
-        "@id": websiteId,
-      },
-    },
+    /* No FAQPage (2026-11-18): it marked up three questions the page never printed. The
+       questions the page does ask hang from the page node (`withHomeQuestions`). */
     buildBreadcrumbList([{ name: "Home", path: "/" }]),
   ],
 });
