@@ -120,8 +120,10 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
      labels replaced three jargon terms in the "In interest-rate terms" fold. */
   buttons: 15,
   fields: 21,
-  fundingPressure: 24,
-  riskAppetite: 29,
+  /* 24 → 18 and 29 → 23 (2026-11-25, distill): lowered to the measure, with the cut
+     that stopped the score figures restating the hiring row's restart. */
+  fundingPressure: 18,
+  riskAppetite: 23,
   jargon: 6,
   hardSentences: 0,
   longestSentence: 22,

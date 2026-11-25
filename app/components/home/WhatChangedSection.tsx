@@ -347,7 +347,16 @@ export function WhatChangedSection({
                            the moment conditions are most extreme. The meaning says
                            what that leaves the reader with; this says why, with the
                            uncapped number, under the ladder that has the width. */
-                        <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
+                        <p
+                          className={`weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg ${
+                            /* On a phone the ladder above stays drawn and its key already reads
+                               "Uncapped 128, past 100"; the note is for `md` up, where the rail
+                               draws the score and this ladder is hidden (2026-11-25). */
+                            drawnAbove && !comparisonUnavailable && (meanings.get(row.key) ?? meaningOf(row, basis)).capped
+                              ? "max-md:hidden"
+                              : ""
+                          }`}
+                        >
                           {/* The meaning beside it already says the score is at its top when it
                               held there (2026-11-11), so the note gives only the uncapped number. */}
                           {!comparisonUnavailable && (meanings.get(row.key) ?? meaningOf(row, basis)).capped

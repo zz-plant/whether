@@ -29,6 +29,7 @@ export function CompanyCalibration({
   runwayEmphasis,
   stageAction,
   horizon,
+  namedAbove = false,
 }: {
   /** The chosen stage's name, for the stage line. */
   stageLabel: string;
@@ -46,6 +47,14 @@ export function CompanyCalibration({
    * so the fold did not say a horizon was in it.
    */
   horizon?: { control: ReactNode; current: "weekly" | "monthly" | "quarterly" };
+  /**
+   * The card already names whose rules these are ("Rules for Series A · 12–24 mo ·
+   * change"), and that link opens this fold (2026-11-25, distill). The closed summary
+   * said the same sentence a second time a screen lower, so with the card's line on the
+   * page the fold stays out of sight until the link targets it or it is open. The
+   * stage and runway lines below it still print.
+   */
+  namedAbove?: boolean;
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,13 +93,19 @@ export function CompanyCalibration({
       id={HOME_SECTIONS.calibration.id}
       aria-label="Your stage and runway"
       data-calibration-updated={justCalibrated ? "" : undefined}
-      className="group/calibration space-y-3 border-t border-[color:var(--border-subtle)] pt-4 transition-colors duration-150 motion-reduce:transition-none target:block"
+      className={`group/calibration space-y-3 border-t border-[color:var(--border-subtle)] pt-4 transition-colors duration-150 motion-reduce:transition-none target:block ${
+        namedAbove && !stageAction && !runwayEmphasis ? "hidden has-[details[open]]:block" : ""
+      }`}
     >
       {/* Folded to one line (2026-10-14). The two four-key rows stood between
           the call and "What are you deciding?", so the first thing asked of a
           reader was to configure the page. The line says whose rules these are,
           which is the part every reader needs; the keys are one click away. */}
-      <details ref={detailsRef} className="group block group-target/calibration:block" data-company-calibration>
+      <details
+        ref={detailsRef}
+        className={`group ${namedAbove ? "hidden open:block" : "block"} group-target/calibration:block`}
+        data-company-calibration
+      >
         <summary className="weather-hit cursor-pointer list-none text-fluid-sm text-slate-300 [&::-webkit-details-marker]:hidden">
           {/* One span: the site's summary rule lays its children out as a flex row, which spread the sentence's words across the line. */}
           <span>

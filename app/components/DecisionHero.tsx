@@ -511,7 +511,9 @@ export function DecisionHero({
                 {trust ? trustStrip : null}
                 {reading ? (
                   <nav aria-label="Why this reading" className="weather-hero-rail-links flex flex-col gap-1 border-t border-[color:var(--border-faint)] pt-3 text-sm">
-                    <Link href={reading.whyHref} className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
+                    {/* From `md` up only (2026-11-25): on a phone the scores' panel in the sky
+                        carries this link, and the rail stacks two screens below it. */}
+                    <Link href={reading.whyHref} className="weather-hit max-md:hidden font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">
                       {whyLabel}
                     </Link>
                     <Link href="/history" className="weather-hit font-medium text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4 hover:text-[var(--app-text)]">

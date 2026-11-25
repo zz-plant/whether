@@ -296,6 +296,8 @@ describe("the figures say whose lines they draw, and that a restart needs both",
   it("is what the rail's figures print, and what the phone's shared sentence names", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
     assert.equal((routeSource.match(/standing=\{figureStanding\(ladder\.metric\)\}/g) ?? []).length, 1, "the rail's two figures take it");
+    /* The hiring row beside the figures prints the restart, so the figures leave it to the row (2026-11-25). */
+    assert.match(routeSource, /standing\?\.crossed && areaStripModel \? \{ \.\.\.standing, rest: "" \}/, "a held area's restart is said once, by its row");
     assert.match(routeSource, /data-hero-standing/, "the phone states it once for both figures");
     assert.match(routeSource, /sharedFigureStanding\.lead\.replace/, "without repeating the figure's own number");
   });
