@@ -338,7 +338,8 @@ const MARKS_PER_ROW = 30;
  *
  * Text height and em-sized, so it sits in the sentence at every size the strip is
  * set in. A square's hit area reaches up and down to 44px; across, it is the
- * square and its gap, which is why a tap shows the month before a second opens it.
+ * square and its gap, which is why a tap chooses the nearest square and opens nothing:
+ * its words show with a 44px link that opens it (2026-11-25).
  *
  * Each square carries its month (`data-month`, `lib/monthCursor.ts`): pointing at one
  * shows that month on the record band, and a month read on the band, or stepped to

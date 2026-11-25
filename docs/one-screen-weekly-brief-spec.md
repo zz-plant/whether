@@ -631,7 +631,12 @@ sentences stay, and each drawing reads the model its sentence comes from.
   `describeScoreMoveBand` reads its word from). A bar opens the latest month that moved that far.
 
 Every mark names itself on hover, on keyboard focus (each drawing is one tab stop; arrow keys
-step) and on a first tap, which a second tap follows (`app/components/ui/markReadout.tsx`).
+step) and on a tap (`app/components/ui/markReadout.tsx`). Since 2026-11-25 a tap anywhere in a
+drawing chooses the nearest mark (`lib/ui/nearestMark.ts`; by x alone for one row of bars or
+squares) and opens nothing: its words show in a card above the finger, held on screen, with a
+44px link that opens the mark ("Open Sep 2022") and a close key; a tap outside, the close key or
+Escape puts it away. /history's month grid and advance-warning marks do the same
+(`app/components/history/historyReadout.tsx`). A mouse click and Enter still open a mark at once.
 
 ### One-page brief (2026-11-21)
 
