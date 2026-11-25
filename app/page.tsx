@@ -68,9 +68,10 @@ import {
   buildAreaStrip,
   describeLineStateBand,
   describeScoreFigureStanding,
-  describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
+import { buildHomePageQuestions } from "./homePageQuestions";
+import { withHomeQuestions } from "../lib/report/home/structuredData";
 import { buildWeekMove } from "../lib/report/home/weekMove";
 import { INPUT_TRAIL_PARAM, buildInputTrails, parseInputTrailSpan } from "../lib/report/home/inputTrail";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
@@ -87,7 +88,7 @@ import { frameFactsAttributes } from "../lib/navigation/runningHead";
 import { ScoreLadder } from "./components/ui/scoreLadder";
 import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { describeConditionFacts, describeConditionsSince, describeScoreDistribution, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeConditionFacts, describeConditionsSince, describeScoreDistribution, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -102,7 +103,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const resolved = searchParams ? await searchParams : undefined;
   const data = await loadHomePageAssembly(resolved);
-  return buildHomeMetadata(searchParams, data.reportData);
+  return buildHomeMetadata(searchParams, data.reportData, { call: deriveBriefCallFields(data.homepage.weeklyDecisionCardModel, data.homepage.weeklyCall).headline.action, assessment: data.reportData.assessment });
 };
 
 export default async function Page({
@@ -482,16 +483,13 @@ async function PageContent({
     const answer = findLeadAnswerForArea(area);
     return [{ ...row, answer: answer ? { href: `/answers/${answer.slug}`, title: answer.title } : undefined }];
   });
-  /* How long these conditions lasted before, against the reader's chosen band.
-     Left out of an archived view, whose record would have to end at its month. */
   const recordSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
-  const spellLengths = historicalSelection || !isRegimeKey(regime)
-    ? null
-    : describeSpellLengths({
-        series: recordSeries,
-        currentRegime: regime,
-        runwayBand: data.operatorContext.companyRunway ?? null,
-      });
+  /* The page's questions and answers, which the sections print and the JSON-LD marks up, and the spell lengths the record's answer reads (`homePageQuestions.ts`). */
+  const { questions: homeQuestions, markedUp: markedUpQuestions, changedTitle, pendingConditions, spellLengths, dates: basisDates } = buildHomePageQuestions({
+    reportData, dynamics: homepage.weeklyDecisionCardModel.decision.reportDynamics, areaRows: decisionPickerOptions, signalChangeRows, basis,
+    scores: { tightness, riskAppetite }, deltas: { tightness: tightnessDelta, riskAppetite: riskAppetiteDelta }, savedReadingDate,
+    reversalTrigger: reversalTriggerLabel, record: historicalSelection ? null : recordSeries, runwayBand: data.operatorContext.companyRunway ?? null,
+  });
   const turningPoints = findRecentCallChanges(recordSeries, 4).map((change) => ({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
@@ -596,6 +594,8 @@ async function PageContent({
   const heroReading = {
     numbers: `Funding pressure ${Math.round(tightness)}, risk appetite ${Math.round(riskAppetite)}.`,
     whyHref: `#${HOME_SECTIONS.diagnosis.id}`,
+    /* The link names the section it opens by its question: "Why Freezing?". */
+    whyLabel: homeQuestions.diagnosis?.question,
     /* Live scores against the record. An archived month would need a record ending at that month. */
     facts: historicalSelection ? null : describeConditionFacts({ series: recordSeries, regime, tightness, riskAppetite }),
   };
@@ -782,6 +782,7 @@ async function PageContent({
                 direction={historicalSelection ? undefined : unmovedLine ?? cardCall.directionLabel}
                 earlier={earlierConditions}
                 since={conditionsSince}
+                dates={basisDates}
                 /* The two scores from `md` up, each as a figure on its ladder
                    (docs/design/rebuild-covenant.md): the number, where it stands
                    against its lines, and the lines named where they sit. The
@@ -829,7 +830,7 @@ async function PageContent({
                     ) : null}
                     {/* The facts line's one link to the basis, which it carries from md up. */}
                     <Link href={heroReading.whyHref} className="weather-hit col-span-2 text-fluid-sm leading-snug text-[var(--app-text-secondary)] underline decoration-slate-600 underline-offset-4">
-                      Why conditions are {publicRegimeLabel}
+                      {heroReading.whyLabel}
                     </Link>
                   </div>
                 }
@@ -898,6 +899,7 @@ async function PageContent({
                 savedReadingDate={savedReadingDate}
                 isHistorical={Boolean(historicalSelection)}
                 rulesAbove={Boolean(areaStripModel)}
+                question={homeQuestions.areas} dates={basisDates}
                 groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
                   comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
                   /* An archived month's record would have to end at that month. */
@@ -966,7 +968,7 @@ async function PageContent({
                   compact
                   drawnAbove
                   historyOpen={searchParams?.inputs === "1"}
-                  heading={`What changed ${basis.since}`}
+                  heading={changedTitle}
                   rows={signalChangeRows}
                   moveRanges={moveRanges}
                   feelsLike={countedReading}
@@ -988,9 +990,9 @@ async function PageContent({
                   followsArea
                   chosenArea={chosenArea}
                   query={searchParams}
-                  lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
+                  lead={homeQuestions.changed?.answer}
                   comparisonUnavailable={comparisonUnavailable}
-                  basis={basis}
+                  basis={basis} dates={basisDates}
                 />
 
                 {/* 5. What the conditions are made of, and what the reading leaves out:
@@ -1001,9 +1003,8 @@ async function PageContent({
                   tightness={tightness}
                   riskAppetite={riskAppetite}
                   changeLines={callChangeLines}
-                  pendingConditions={reportData.assessment.regimeTransition?.pending
-                    ? reportData.assessment.regimeTransition.candidateState
-                    : undefined}
+                  pendingConditions={pendingConditions}
+                  question={homeQuestions.diagnosis}
                   notCounted={reportData.scoringBasis.notCounted}
                   warning={reportData.scoringBasis.warning}
                   chartHref={ruleChart.readings.some((reading) => reading.key === "counted") ? buildCountedChartHref(searchParams) : undefined}
@@ -1024,7 +1025,7 @@ async function PageContent({
                   callChangeLines={callChangeLines}
                   regime={regime}
                   conditionsTrail={conditionsTrail}
-                  ruleChart={ruleChart}
+                  ruleChart={ruleChart} question={homeQuestions.watch}
                 />
 
                 {/* 8. How unusual is this? */}
@@ -1036,13 +1037,13 @@ async function PageContent({
                   /* The card's links name every change, so "Last changes:" would repeat them. */
                   turningPoints={lastTimeCallChanged ? [] : turningPoints}
                   spellLengths={spellLengths}
-                  record={historicalSelection ? undefined : recordSeries}
+                  record={historicalSelection ? undefined : recordSeries} question={homeQuestions.record}
                 />
               </QuietWeekFold>
 
               {/* 9. The alert: hearing the day a line is crossed is how the page is
                   meant to be used, so it follows everything it watches. */}
-              <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
+              <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} question={homeQuestions.alert ?? undefined} />
             </div>
 
         </div>
@@ -1053,7 +1054,7 @@ async function PageContent({
         *
         * This tag used to hold a hand-rolled Article/Report node while
         * `buildHomeStructuredData()` — Organization, WebSite, CollectionPage,
-        * Dataset, FAQPage, BreadcrumbList — was assembled on every request and
+        * Dataset, BreadcrumbList — was assembled on every request and
         * dropped, because nothing on this page read `reportShell.structuredData`.
         * So the site's only brand-entity anchors were missing from the one URL
         * search engines resolve them from, and the node that did ship carried
@@ -1064,7 +1065,7 @@ async function PageContent({
         * in the repo that skipped the escaper written for exactly that.
         */}
       <HomePageTail
-        structuredData={homepage.reportShell.structuredData}
+        structuredData={withHomeQuestions(homepage.reportShell.structuredData, markedUpQuestions)}
         call={primaryCall}
         direction={signalDirection}
         weatherWord={publicRegimeLabel}

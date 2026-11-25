@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { weeklyHeadline } from "../lib/report/reportEvidence";
+import { formatWeekAnswer } from "../lib/report/briefArtifact";
 import { describe, it } from "bun:test";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import type { OperatingSnapshot } from "../lib/operatingState/types";
@@ -49,8 +50,10 @@ const slot = (text: string, label: string): string | undefined => {
 
 const assertSameCall = (post: string, mail: string, snapshot: OperatingSnapshot) => {
   const { weeklyCall } = snapshot;
-  // Both lead with the week's one headline action (`weeklyHeadline`), under "Guidance".
-  assert.equal(slot(post, "Guidance"), slot(mail, "Guidance"), "the post and the email lead with the same headline");
+  // Both lead with the week's one headline action (`weeklyHeadline`): the post under
+  // "Guidance", the email as its first line, "This week (Aug 28, 2026): …" (2026-11-18).
+  const emailAnswer = (mail.split("\n")[0] ?? "").replace(/^This week \([^)]+\): /, "This week: ");
+  assert.equal(emailAnswer, formatWeekAnswer(slot(post, "Guidance") ?? ""), "the post and the email lead with the same headline");
   assert.equal(slot(post, "Guidance"), weeklyHeadline(weeklyCall).composed);
   assert.equal(slot(mail, "Action now"), undefined, "the email prints no second headline");
   assert.equal(slot(post, "Pause if"), slot(mail, "Pause if"));

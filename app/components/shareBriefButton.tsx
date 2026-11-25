@@ -1,6 +1,6 @@
 "use client";
 
-import { carrySharedView } from "../../lib/report/briefArtifact";
+import { carrySharedView, formatWeekAnswer } from "../../lib/report/briefArtifact";
 import { HOME_DECISION_PARAM, buildSharedBriefQuery, parseHomeDecision } from "../../lib/report/home/homeSectionModel";
 import { useHomeView } from "./home/homeView";
 import { useHydrated } from "./browserSource";
@@ -86,7 +86,7 @@ export function ShareBriefButton({
     // weekly heading here meant a monthly or quarterly call arrived in Slack labelled
     // "Whether Weekly Brief" — the wrong horizon on a message people act on.
     const formattedSlackBrief =
-      slackBlock ?? `*${title}*\n> *Guidance:* ${payload.text}\n\n*Full brief:* ${url || "https://whether.work"}`;
+      slackBlock ?? `*${formatWeekAnswer(payload.text)}*\n${title}\n\n*Full brief:* ${url || "https://whether.work"}`;
     /* The link opens on the area open now; the words are the brief's, unchanged. */
     const carried = carryArea ? carrySharedView(formattedSlackBrief, url, buildSharedBriefQuery(areaOpen)) : null;
     const copied = carried?.text ?? formattedSlackBrief;

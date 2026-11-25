@@ -8,7 +8,9 @@ import {
   MONDAY_AGENDA_STEPS,
   briefArtifactToSlidePayload,
   briefConditionEntries,
+  asClause,
   formatBriefArtifact,
+  formatWeekAnswer,
   parseBriefArtifact,
   resolveBriefUrl,
   resolveSharedBriefUrl,
@@ -36,9 +38,10 @@ describe("brief artifact formats", () => {
   it("keeps date, bounded conditions and provenance in every format", () => {
     for (const format of BRIEF_FORMATS) {
       const text = formatBriefArtifact(artifact, format.id, origin);
+      /* The Slack and agenda formats carry the call after "This week (…):", so its first
+         letter is lowered there: the call is matched whatever its case. */
       const missing = [
         artifact.recordDateLabel,
-        artifact.call,
         artifact.guardrail,
         artifact.reversal,
         artifact.clearsWhen?.[0],
@@ -49,7 +52,46 @@ describe("brief artifact formats", () => {
         .filter((field) => !text.includes(field));
 
       assert.deepEqual(missing, [], `${format.id} format dropped: ${missing.join(", ")}`);
+      assert.ok(text.toLowerCase().includes(artifact.call.toLowerCase()), `${format.id} format dropped the call`);
     }
+  });
+
+  /*
+   * Pastes are messages (docs/editorial-guardrails.md, 2026-11-18): read in a channel
+   * between other people's messages, they lead with the answer to "what do we do this
+   * week?" in one line a person could have typed, with the date in words, and keep the
+   * labelled lines and the numbers under it. The citation stays a citation.
+   */
+  it("leads the Slack post and the agenda with the week's answer, dated, and the citation with its reference", () => {
+    const answer = "This week (2026-09-04): hold hiring at current headcount.";
+    const slack = formatBriefArtifact(artifact, "slack", origin).split("\n");
+    assert.equal(slack[0], `*${answer}*`);
+    assert.ok(!slack.some((line) => line.includes("Guidance:")), "the answer is not printed a second time under a label");
+    assert.ok(slack.includes(`> • ${DECISION_CONTRACT_LABELS.action.doNow}: ${artifact.actionNow}`));
+    assert.ok(slack.includes(`> • ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${artifact.guardrail}`));
+    assert.ok(slack.includes(`> • ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${artifact.reversal}`));
+    assert.ok(slack.some((line) => line.startsWith("Funding pressure 64/100")), "the numbers stay beside the lines");
+    assert.ok(slack.some((line) => line.startsWith(`${artifact.title} · Source: FRED`)), "the title rides on the source line");
+    assert.match(slack.at(-1) ?? "", /^Full brief: https:\/\/whether\.work\//);
+
+    const agenda = formatBriefArtifact(artifact, "agenda", origin).split("\n");
+    assert.equal(agenda[0], `**${answer}** (${artifact.regimeLabel})`);
+
+    const citation = formatBriefArtifact(artifact, "citation", origin);
+    assert.match(citation, /^Whether\. "Whether Weekly Brief — 2026-09-04\."/);
+    assert.doesNotMatch(citation, /This week/);
+  });
+
+  it("lowers the call's first letter after the colon, but not a proper noun's", () => {
+    assert.equal(asClause("Hold hiring."), "hold hiring.");
+    assert.equal(asClause("Freezing conditions call for cash."), "Freezing conditions call for cash.");
+    assert.equal(asClause("FRED readings are late."), "FRED readings are late.");
+    assert.equal(formatWeekAnswer("Hold hiring."), "This week: hold hiring.");
+    /* The action answers "what do we do?", so it leads the week's direction. */
+    assert.equal(
+      formatWeekAnswer("Conditions are holding. Put more into what's already working.", "Aug 28, 2026"),
+      "This week (Aug 28, 2026): put more into what's already working. Conditions are holding.",
+    );
   });
 
   it("cites the frozen record when the archive has a current one", () => {
@@ -145,7 +187,7 @@ describe("brief artifact formats", () => {
         !text.includes("Do now:"),
         `${format.id} printed the call twice, once as the action`,
       );
-      assert.ok(text.includes(artifact.call), `${format.id} dropped the call`);
+      assert.ok(text.toLowerCase().includes(artifact.call.toLowerCase()), `${format.id} dropped the call`);
     }
   });
 
@@ -264,8 +306,8 @@ describe("brief artifact formats", () => {
     const agenda = formatBriefArtifact(artifact, "agenda", origin);
     const lines = agenda.split("\n");
 
-    assert.match(lines[0], /^### .* \(3 min\) — 2026-09-04$/);
-    assert.equal(lines[1], `**Guidance:** ${artifact.call} (${artifact.regimeLabel})`);
+    assert.equal(lines[0], `**This week (2026-09-04): hold hiring at current headcount.** (${artifact.regimeLabel})`);
+    assert.match(lines[1] ?? "", /^### .* \(3 min\)$/);
 
     for (const [index, step] of MONDAY_AGENDA_STEPS.entries()) {
       assert.ok(

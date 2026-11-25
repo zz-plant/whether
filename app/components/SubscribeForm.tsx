@@ -46,6 +46,7 @@ export function SubscribeForm({
   defaultFrequency = "weekly",
   condition,
   showTitle = true,
+  alertsDescribed = false,
 }: {
   compact?: boolean;
   defaultFrequency?: EmailFrequency;
@@ -53,6 +54,11 @@ export function SubscribeForm({
   condition?: string;
   /** False where the section's own heading already says what the form is for. */
   showTitle?: boolean;
+  /**
+   * True where the section's lead already says what an alert sends (the brief's "Can I get
+   * an email when conditions turn?", 2026-11-18), so the alerts-only line is not said twice.
+   */
+  alertsDescribed?: boolean;
 } = {}) {
   const pathname = usePathname() ?? "/";
   /* The stage the reader already set for the on-site rules; their brief prints
@@ -150,7 +156,7 @@ export function SubscribeForm({
                   ? "Tell me when the guidance changes"
                   : "Get the guidance every Monday, and a note the day it changes"}
             </p>
-          ) : (
+          ) : alertsDescribed && alertsOnly && !condition ? null : (
             <p className="max-w-[54ch] text-fluid-sm text-slate-400">
               {channel === "slack"
                 ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."

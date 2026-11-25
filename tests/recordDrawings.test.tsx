@@ -164,7 +164,8 @@ describe("every stretch by how long it lasted", () => {
     assert.match(html, /href="\/\?month=4&amp;year=2020"[^>]*aria-label="Freezing, Apr 2020 to Jul 2020: 4 months"/);
     assert.equal(count(html, /tabindex="0"/g), 1);
     assert.equal(count(html, /data-spell-plot-shortest/g), 3, "the rule crosses each row");
-    assert.match(html, /Months each stretch lasted, Jan 2020 to Nov 2020/, "the domain is stated");
+    assert.match(html.replace(/<\/?time[^>]*>/g, ""), /Months each stretch lasted, Jan 2020 to Nov 2020/, "the domain is stated");
+    assert.match(html, /<time datetime="2020-01">Jan 2020<\/time>/i, "in months a machine can read");
   });
 
   it("takes the place of the record's key in the section, which printed the same totals", () => {

@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { ConditionLabel } from "../ui/conceptIcons";
 import { MarkReadout } from "../ui/markReadout";
+import { DatedText } from "../ui/datedText";
 import type { SpellLengthPlot as SpellLengthPlotModel } from "../../../lib/report/lastTimeCallChanged";
 import { buildTimeMachineHref } from "../../../lib/timeMachine/timeMachineSelection";
 import { shiftMonthKey, toMonthKey } from "../../../lib/monthCursor";
@@ -134,7 +135,7 @@ export function SpellLengthPlot({ plot }: { plot: SpellLengthPlotModel }) {
         </div>
       </MarkReadout>
       <figcaption className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
-        <span>Months each stretch lasted, {plot.range}</span>
+        <span>Months each stretch lasted, <DatedText text={plot.range} /></span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden="true" className="inline-block size-2.5 rounded-full bg-current" />ended
         </span>
