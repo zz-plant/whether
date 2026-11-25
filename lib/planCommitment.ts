@@ -60,7 +60,7 @@ const MONEY_PATTERN =
   /\$\s?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*([kKmMbB])?|\b(\d+(?:\.\d+)?)\s*([kKmMbB])\b|\b(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s+(?:dollars?|usd|bucks)\b/gi;
 
 const PEOPLE_NOUNS =
-  "engineers?|developers?|designers?|architects?|leads?|principals?|hires?|reps?|sdrs?|aes?|contractors?|managers?|analysts?|people|persons?|heads?|ftes?|roles?|seats?|headcount";
+  "engineers?|developers?|designers?|architects?|leads?|principals?|hires?|reps?|sdrs?|aes?|contractors?|managers?|analysts?|people|persons?|heads?|ftes?|roles?|seats?|reqs?|requisitions?|positions?|headcount";
 
 /*
  * A count that belongs to people, not to money or to time. Up to three
@@ -223,6 +223,298 @@ export const parsePlanCommitment = (planText: string): ParsedCommitment => {
     basis: describeBasis(unitAmountUsd, headcount, multiplied, cadence, months, annualUsd),
   };
 };
+
+/* ------------------------------------------------------------------------------------------------
+ * Plans that name several commitments.
+ *
+ * "Pausing 2 EMEA SDR reqs and allocating $80k to an annual Datadog commit while deferring SOC-2 to
+ * Q3" is three decisions. Read as one sentence it became one category, sized on its largest figure,
+ * and the other two figures were thrown away; "Hire 2 engineers at $15k a month each and sign a $120k
+ * annual AWS commit" read as one monthly amount of $120k per engineer, $2.88M. Each clause is now
+ * read on its own by `parsePlanCommitment`, so each keeps its own figure, cadence and headcount.
+ *
+ * The split is conservative. A conjunction separates two commitments only when the words after it
+ * open with their own action verb ("and allocating …", "while deferring …") or their own dollar
+ * figure after a clause that already had one ("… at $180k and $50k a month on AWS"). "Sales and
+ * marketing", "$80k and 2 people for the same project" and "$10k/mo while maintaining a 9-month
+ * runway" stay whole. A sentence with no action verb of its own ("Each at $180k.", "We have 12 months
+ * of runway.") stays attached to its neighbour, so context sentences still reach the parse they
+ * qualify. A plan that does not split comes back as its own text, unchanged, and parses exactly as
+ * it did before clauses existed.
+ * ---------------------------------------------------------------------------------------------- */
+
+/** Whether a clause adds a commitment or pauses, defers or cuts one. */
+export type ClauseDirection = "COMMIT" | "REDUCE";
+
+export type PlanDepartment =
+  | "engineering"
+  | "data"
+  | "sales"
+  | "marketing"
+  | "product"
+  | "design"
+  | "customer success"
+  | "finance"
+  | "legal"
+  | "people"
+  | "security"
+  | "operations";
+
+export type ParsedPlanClause = {
+  /** The clause as written in the plan. */
+  text: string;
+  direction: ClauseDirection;
+  commitment: ParsedCommitment;
+  /** People added (positive) or paused and cut (negative); null when the clause names no count. */
+  headcountDelta: number | null;
+  department: PlanDepartment | null;
+};
+
+/* Verbs that open a commitment, in the forms a plan uses: "hire", "hiring", "hired". Words that are
+   also nouns ("commit", "lease", "budget") count, which only matters when a clause opens with one.
+   Left out on purpose: "fund", "move", "start", "extend", "keep" and "maintain", which open asides
+   about funding, timing and runway far more often than a commitment. */
+const COMMIT_VERBS = [
+  "hir(?:e|es|ed|ing)",
+  "add(?:s|ed|ing)?",
+  "recruit(?:s|ed|ing)?",
+  "poach(?:es|ed|ing)?",
+  "onboard(?:s|ed|ing)?",
+  "open(?:s|ed|ing)?",
+  "sign(?:s|ed|ing)?",
+  "commit(?:s|ted|ting)?",
+  "allocat(?:e|es|ed|ing)",
+  "spen(?:d|ds|t|ding)",
+  "invest(?:s|ed|ing)?",
+  "budget(?:s|ed|ing)?",
+  "buy(?:s|ing)?",
+  "bought",
+  "purchas(?:e|es|ed|ing)",
+  "acquir(?:e|es|ed|ing)",
+  "leas(?:e|es|ed|ing)",
+  "rent(?:s|ed|ing)?",
+  "reserv(?:e|es|ed|ing)",
+  "prepa(?:y|ys|id|ying)",
+  "pa(?:y|ys|id|ying)",
+  "renew(?:s|ed|ing)?",
+  "launch(?:es|ed|ing)?",
+  "build(?:s|ing)?",
+  "built",
+  "rebuild(?:s|ing)?",
+  "rebuilt",
+  "rewrit(?:e|es|ing)",
+  "rewrote",
+  "refactor(?:s|ed|ing)?",
+  "migrat(?:e|es|ed|ing)",
+  "expand(?:s|ed|ing)?",
+  "enter(?:s|ed|ing)?",
+  "offer(?:s|ed|ing)?",
+  "discount(?:s|ed|ing)?",
+  "rais(?:e|es|ed|ing)",
+  "increas(?:e|es|ed|ing)",
+  "doubl(?:e|es|ed|ing)",
+  "upgrad(?:e|es|ed|ing)",
+  "contract(?:s|ed|ing)?",
+  "engag(?:e|es|ed|ing)",
+  "deploy(?:s|ed|ing)?",
+  "provision(?:s|ed|ing)?",
+  "adopt(?:s|ed|ing)?",
+  "licens(?:e|es|ed|ing)",
+  "subscrib(?:e|es|ed|ing)",
+  "outsourc(?:e|es|ed|ing)",
+  "(?:bring|bringing|brought)\\s+on",
+  "(?:take|takes|taking|took)\\s+on",
+];
+
+/* Verbs that pause, defer or cut. "close" and "end" are left out: "close a $50k deal" and "end of
+   Q3" are not cuts. */
+const REDUCE_VERBS = [
+  "paus(?:e|es|ed|ing)",
+  "freez(?:e|es|ing)",
+  "froze(?:n)?",
+  "defer(?:s|red|ring)?",
+  "delay(?:s|ed|ing)?",
+  "postpon(?:e|es|ed|ing)",
+  /* "push the rewrite back", "push SOC-2 to Q3": the object usually sits between. */
+  "push(?:es|ed|ing)?(?=(?:\\s+\\S+){0,4}?\\s+(?:back|out|to\\s+(?:q[1-4]|h[12]|next|later|20\\d\\d))\\b)",
+  "cut(?:s|ting)?",
+  "cancel(?:s|led|ling|ed|ing)?",
+  "drop(?:s|ped|ping)?",
+  "halt(?:s|ed|ing)?",
+  "reduc(?:e|es|ed|ing)",
+  "trim(?:s|med|ming)?",
+  "shelv(?:e|es|ed|ing)",
+  "stop(?:s|ped|ping)?",
+  "sunset(?:s|ting)?",
+  "(?:lay|lays|laying|laid)\\s+off",
+  "(?:let|lets|letting)\\s+go",
+  "downsiz(?:e|es|ed|ing)",
+  "(?:scale|scales|scaled|scaling)\\s+back",
+  "(?:hold|holds|holding|held)\\s+off",
+  "(?:wind|winds|winding|wound)\\s+down",
+  "put(?:s|ting)?(?=(?:\\s+\\S+){0,5}?\\s+on\\s+(?:hold|ice)\\b)",
+];
+
+const ACTION_VERB = `(?:${[...COMMIT_VERBS, ...REDUCE_VERBS].join("|")})`;
+
+/* Words that may stand between a conjunction and its verb: "and we'll hire", "while also deferring",
+   "and then plan to sign". */
+const LEADING_FILLER =
+  "(?:(?:we|i|they|you|we['’]ll|we['’]re|i['’]ll|i['’]m|we\\s+are|will|would|should|shall|must|can|could|may|might|also|then|next|later|separately|finally|plan\\s+to|planning\\s+to|need\\s+to|want\\s+to|going\\s+to|intend\\s+to|to)\\s+)*";
+
+const HAS_ACTION_VERB = new RegExp(`\\b${ACTION_VERB}\\b`, "i");
+const OPENS_WITH_ACTION_VERB = new RegExp(`^${LEADING_FILLER}${ACTION_VERB}\\b`, "i");
+const OPENS_WITH_REDUCE_VERB = new RegExp(`^${LEADING_FILLER}(?:${REDUCE_VERBS.join("|")})\\b`, "i");
+const OPENS_WITH_MONEY = /^(?:(?:an?|another|the)\s+)?(?:\$\s?\d|\d+(?:\.\d+)?\s*[kmb]\b)/i;
+/* "… and $20k to the same project" is one commitment told in two figures. */
+const POINTS_BACK = /\b(?:same|it|its|that|this|those|these|them|both)\b/i;
+/* A cut that lowers a price is a discount, which the stress test grades, not a pause. */
+const NAMES_A_PRICE = /\b(?:price|prices|pricing|discounts?)\b/i;
+/* After a bare comma a past form describes the commitment before it ("a $240k AWS commit, paid
+   monthly"); it does not start another. */
+const OPENS_WITH_PAST_FORM = /^(?:[a-z]+ed|paid|prepaid|spent|built|rebuilt|bought|rewrote|laid|held|froze|frozen|wound|brought|took)\b/i;
+const PAUSE_ANYWHERE =/\bon\s+hold\b|\b(?:hiring|headcount)\s+freeze\b/i;
+
+/* Sentence ends, semicolons and line breaks always end a piece; a period inside "$1.2M" or "e.g. so"
+   does not, because a boundary needs whitespace and then a capital, digit or dollar sign after it. */
+const HARD_BOUNDARY = /\s*;\s*|\s*(?:\r?\n)+\s*|(?<=[.!?])\s+(?=["'(]?[A-Z0-9$])/g;
+/* A joining word, or a bare comma (which splits only before an action verb). */
+const SOFT_BOUNDARY = /\s*,?\s*\b(?:and\s+then|and\s+also|as\s+well\s+as|and|while|whilst|plus|but|whereas|then)\b\s+|\s+&\s+|\s*,\s+/gi;
+const LIST_MARKER = /^(?:[-*•]|\d{1,2}[.)])\s+/;
+
+type Span = { start: number; end: number };
+
+const wordCount = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
+
+const carriesItsOwnCommitment = (text: string) =>
+  HAS_ACTION_VERB.test(text) || readMoneyTokens(text).length > 0 || readHeadcount(text) !== null;
+
+/** Whether a joining word between `left` and `right` separates two commitments rather than listing parts of one. */
+const separatesCommitments = (left: string, right: string, bareComma: boolean): boolean => {
+  if (wordCount(left) < 2 || wordCount(right) < 2 || !carriesItsOwnCommitment(left)) return false;
+  if (bareComma && OPENS_WITH_PAST_FORM.test(right)) return false;
+  if (OPENS_WITH_ACTION_VERB.test(right)) return true;
+  return (
+    !bareComma &&
+    OPENS_WITH_MONEY.test(right) &&
+    HAS_ACTION_VERB.test(left) &&
+    readMoneyTokens(left).length > 0 &&
+    !POINTS_BACK.test(right)
+  );
+};
+
+const splitOnBoundaries = (text: string, span: Span, boundary: RegExp): { span: Span; gapAfter: string }[] => {
+  const piece = text.slice(span.start, span.end);
+  const parts: { span: Span; gapAfter: string }[] = [];
+  let cursor = 0;
+  for (const match of piece.matchAll(boundary)) {
+    if (match.index === undefined || match[0].length === 0) continue;
+    parts.push({ span: { start: span.start + cursor, end: span.start + match.index }, gapAfter: match[0] });
+    cursor = match.index + match[0].length;
+  }
+  parts.push({ span: { start: span.start + cursor, end: span.end }, gapAfter: "" });
+  return parts;
+};
+
+const softSplit = (text: string, span: Span): Span[] => {
+  const [first, ...rest] = splitOnBoundaries(text, span, SOFT_BOUNDARY);
+  if (first === undefined) return [span];
+  const clauses: Span[] = [];
+  /* `open` is the clause being built; it always ends where the previous part ended. */
+  let open = first.span;
+  let gapBefore = first.gapAfter;
+  for (const part of rest) {
+    const left = text.slice(open.start, open.end);
+    const right = text.slice(part.span.start, part.span.end);
+    if (separatesCommitments(left, right, !/[a-z&]/i.test(gapBefore))) {
+      clauses.push(open);
+      open = part.span;
+    } else {
+      open = { start: open.start, end: part.span.end };
+    }
+    gapBefore = part.gapAfter;
+  }
+  clauses.push(open);
+  return clauses;
+};
+
+/** Hard pieces with no action verb of their own join a neighbour: the one before, else the one after. */
+const attachVerblessPieces = (text: string, spans: Span[]): Span[] => {
+  const merged: Span[] = [];
+  let pendingStart: number | null = null;
+  for (const span of spans) {
+    if (!HAS_ACTION_VERB.test(text.slice(span.start, span.end))) {
+      const previous = merged.at(-1);
+      if (previous) previous.end = span.end;
+      else pendingStart ??= span.start;
+      continue;
+    }
+    merged.push({ start: pendingStart ?? span.start, end: span.end });
+    pendingStart = null;
+  }
+  return merged;
+};
+
+const tidyClause = (raw: string) => raw.trim().replace(LIST_MARKER, "").replace(/[\s,;:.]+$/, "").trim();
+
+/**
+ * Splits a plan into the commitments it names. A plan that names one comes back as a single
+ * element holding its own text, untouched, so every caller that read the whole sentence before
+ * reads the same sentence now.
+ */
+export const segmentPlanClauses = (planText: string): string[] => {
+  const text = planText ?? "";
+  const hard = splitOnBoundaries(text, { start: 0, end: text.length }, HARD_BOUNDARY)
+    .map(({ span }) => span)
+    .filter((span) => /[a-z0-9$]/i.test(text.slice(span.start, span.end)));
+  const clauses = attachVerblessPieces(text, hard)
+    .flatMap((span) => softSplit(text, span))
+    .map((span) => tidyClause(text.slice(span.start, span.end)))
+    .filter((clause) => /[a-z0-9$]/i.test(clause));
+  return clauses.length > 1 ? clauses : [text];
+};
+
+const DEPARTMENT_WORDS: [PlanDepartment, RegExp][] = [
+  ["data", /\bdata\s+(?:team|engineers?|scientists?|science|platform)\b|\bml\s+engineers?\b/i],
+  ["engineering", /\bengineer(?:s|ing)?\b|\bdevelopers?\b|\bdevops\b|\bsres?\b|\b(?:back|front)[- ]?end\b|\bplatform\s+team\b/i],
+  ["sales", /\bsales\b|\bsdrs?\b|\bbdrs?\b|\baes?\b|\baccount\s+executives?\b|\brevops\b/i],
+  ["marketing", /\bmarketing\b|\bdemand\s+gen\b|\bpaid\s+(?:ads|search|social)\b/i],
+  ["product", /\bproduct\s+(?:managers?|team|org)\b|\bpms?\b/i],
+  ["design", /\bdesigners?\b|\bdesign\s+team\b|\bux\b/i],
+  ["customer success", /\bcustomer\s+(?:success|support)\b|\bsupport\s+(?:team|agents?|reps?)\b|\bcsms?\b/i],
+  ["finance", /\bfinance\b|\baccounting\b|\bcontrollers?\b|\bcfo\b|\bbookkeep(?:er|ers|ing)\b/i],
+  ["legal", /\blegal\b|\bcounsel\b|\blawyers?\b/i],
+  ["people", /\brecruiters?\b|\brecruiting\s+(?:team|fees?|agency|agencies|firm)\b|\bhr\b|\bpeople\s+(?:team|ops)\b/i],
+  ["security", /\bsecurity\b|\bsoc[- ]?2\b|\biso\s?27001\b|\bcompliance\b|\bpen(?:etration)?[- ]tests?\b/i],
+  ["operations", /\boperations\b|\bbiz\s?ops\b|\bops\s+team\b/i],
+];
+
+/** The department the clause names first, when it names one. */
+const readDepartment = (text: string): PlanDepartment | null => {
+  let found: { department: PlanDepartment; index: number } | null = null;
+  for (const [department, pattern] of DEPARTMENT_WORDS) {
+    const match = pattern.exec(text);
+    if (match && (found === null || match.index < found.index)) found = { department, index: match.index };
+  }
+  return found?.department ?? null;
+};
+
+const readDirection = (text: string): ClauseDirection =>
+  (OPENS_WITH_REDUCE_VERB.test(text.trim()) && !NAMES_A_PRICE.test(text)) || PAUSE_ANYWHERE.test(text) ? "REDUCE" : "COMMIT";
+
+/** Every commitment the plan names, each read on its own. */
+export const parsePlanClauses = (planText: string): ParsedPlanClause[] =>
+  segmentPlanClauses(planText).map((text) => {
+    const commitment = parsePlanCommitment(text);
+    const direction = readDirection(text);
+    return {
+      text,
+      direction,
+      commitment,
+      headcountDelta: commitment.headcount === null ? null : direction === "REDUCE" ? -commitment.headcount : commitment.headcount,
+      department: readDepartment(text),
+    };
+  });
 
 /**
  * Reads a single money field — a burn box, a cash box — where the label already

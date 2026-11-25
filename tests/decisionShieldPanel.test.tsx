@@ -129,6 +129,22 @@ describe("DecisionShieldPlanModes markup", () => {
     assert.ok(markup.includes("aria-live=\"polite\""), "the live region is mounted before the verdict arrives");
   });
 
+  /* #1778: a plan of several commitments lists each with its call and figure; one commitment does not. */
+  it("lists each commitment of a multi-clause plan, and no list for a single one", () => {
+    const planText = "Hire 2 engineers at $15k a month each and sign a $120k annual AWS commit";
+    const multi = renderStressMode({ planText, planReady: true, stressTestResult: stressTestDecisionPlan(sampleAssessment, { planText }) });
+    assert.ok(multi.includes("Commitments in this plan"));
+    assert.ok(multi.includes("Hire 2 engineers at $15k a month each: Risky (2 × $15k a month each → $360k in the first year)"));
+    assert.ok(multi.includes("sign a $120k annual AWS commit: Risky ($120k a year)"));
+
+    const single = renderStressMode({
+      planText: "Hire 2 engineers",
+      planReady: true,
+      stressTestResult: stressTestDecisionPlan(sampleAssessment, { planText: "Hire 2 engineers" }),
+    });
+    assert.ok(!single.includes("Commitments in this plan"));
+  });
+
   it("adds the figures and the verdict once a plan is typed", () => {
     const planText = "Hire 3 senior engineers @ $180k";
     const stressResult = stressTestDecisionPlan(sampleAssessment, { planText });
@@ -262,6 +278,7 @@ describe("DecisionShieldPanel markup", () => {
           headline: "Not graded: this raises a price, and the stress test grades discounts, the opposite move.",
           nextStep: "It grades hiring.",
           answerTopic: "should-startups-raise-prices-now",
+          commitments: [],
         }}
       />,
     );

@@ -2,6 +2,7 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import {
+  describePlanCommitment,
   formatDecisionAction,
   type DecisionAction,
   type DecisionCategory,
@@ -106,8 +107,11 @@ export const buildShareText = (
       `Plan: "${options.planText.trim()}"`,
       `Decision verdict: ${res.verdict ?? "Not graded"}`,
       `Summary: ${res.headline}`,
+      ...(res.commitments.length > 1
+        ? ["", "Commitments in this plan:", ...res.commitments.map((commitment) => `- ${describePlanCommitment(commitment)}`)]
+        : []),
     ];
-    if (res.verdict === null) return [...lines, res.nextStep].join("\n");
+    if (res.verdict === null) return [...lines, ...(res.commitments.length > 1 ? [""] : []), res.nextStep].join("\n");
 
     lines.push(
       ...(res.sizingNote ? ["", `Sizing: ${res.sizingNote}`] : []),

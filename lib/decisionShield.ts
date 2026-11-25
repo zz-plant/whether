@@ -15,8 +15,9 @@ import {
 import {
   computeRunwayShare,
   formatCommitmentUsd,
-  parsePlanCommitment,
+  parsePlanClauses,
   type ParsedCommitment,
+  type ParsedPlanClause,
 } from "./planCommitment";
 import { netMonthlyBurnUsd, resolveProfileRunwayMonths, type OperatorProfile } from "./operatorProfile";
 
@@ -79,9 +80,9 @@ export const formatDecisionAction = (action: DecisionAction) =>
 const adjustVerdict = (verdict: DecisionVerdict, direction: "up" | "down"): DecisionVerdict => {
   const index = VERDICT_ORDER.indexOf(verdict);
   if (direction === "up") {
-    return VERDICT_ORDER[Math.min(index + 1, VERDICT_ORDER.length - 1)];
+    return VERDICT_ORDER[Math.min(index + 1, VERDICT_ORDER.length - 1)] ?? verdict;
   }
-  return VERDICT_ORDER[Math.max(index - 1, 0)];
+  return VERDICT_ORDER[Math.max(index - 1, 0)] ?? verdict;
 };
 
 const applyContextualVerdict = (baseVerdict: DecisionVerdict, input: DecisionInput): DecisionVerdict => {
@@ -267,15 +268,37 @@ interface PlanStressTestRequest {
   companyProfile?: CompanyFinancialProfile;
 }
 
+/** One commitment a plan names, with the decision row it reads as (null when there is none). */
+interface ExtractedPlanCommitment extends ParsedPlanClause {
+  category: DecisionCategory | null;
+  action: DecisionAction | null;
+}
+
+/** One commitment a plan names, graded on its own. */
+interface PlanCommitmentReading extends ExtractedPlanCommitment {
+  /** Null for a clause that pauses, defers or cuts, and for one the test has no rules for. */
+  verdict: DecisionVerdict | null;
+  /** The clause's own verdict line, or why it carries none. */
+  headline: string;
+}
+
 /** A plan the test could read as one of the decisions it has rules for. */
 export interface GradedPlan {
   verdict: DecisionVerdict;
   headline: string;
+  /** The row behind the verdict: in a plan of several commitments, the one graded harshest. */
   detectedCategory: DecisionCategory;
   detectedAction: DecisionAction;
-  /** What the sentence said about size. `annualUsd` is null when it said nothing. */
+  /**
+   * What the plan said about size. In a plan of several commitments, the largest graded one; the
+   * rest are in `commitments`. `annualUsd` is null when it said nothing.
+   */
   commitment: ParsedCommitment;
-  /** The commitment against available cash, when the caller supplied enough to divide by. */
+  /** First-year cost across every graded commitment, the figure sized against cash. */
+  totalAnnualUsd: number | null;
+  /** Every commitment the plan names, in the order written. One entry for a one-commitment plan. */
+  commitments: PlanCommitmentReading[];
+  /** The plan's first-year cost against available cash, when the caller supplied enough to divide by. */
   runwayShare: { share: number; cashUsd: number; cashBasis: string } | null;
   /** One line naming what sizing did to the verdict, or why it could not size the plan. */
   sizingNote: string;
@@ -305,6 +328,8 @@ interface UngradedPlan {
   nextStep: string;
   /** Words `matchDecisionPage` resolves to the answer that does cover this, when the plan named a topic. */
   answerTopic: string | null;
+  /** Every commitment the plan names, none of them graded. */
+  commitments: PlanCommitmentReading[];
 }
 
 export type PlanStressTestResult = GradedPlan | UngradedPlan;
@@ -317,7 +342,7 @@ export interface PlanComparisonResult {
   comparativeRecommendation: string;
 }
 
-type Detection = { category: DecisionCategory; action: DecisionAction } | { ungraded: Omit<UngradedPlan, "verdict"> };
+type Detection = { category: DecisionCategory; action: DecisionAction } | { ungraded: Omit<UngradedPlan, "verdict" | "commitments"> };
 
 const GRADABLE_DECISIONS =
   "It grades hiring, infrastructure, vendor deals and discounts, rewrites, acquisitions and geographic expansion.";
@@ -400,6 +425,9 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
     /\b(hire|hires|hired|hiring|headcount|recruit|recruiting|poach|engineer|engineers|sdr|developer|contractor|contractors|freelancer|consultant|team member)\b/.test(lower)
     || /\b(?:add|adding|open)\s+\d{1,4}\b/.test(lower)
     || /\b\d{1,4}\s+(?:new\s+)?(?:roles?|people)\b/.test(lower)
+    /* Growing a team is hiring, not a new market: "expand our outbound sales team" graded as a
+       regional expansion once a plan's clauses were read on their own. */
+    || /\b(?:expand|expanding|grow|growing|scale|scaling|build|building)\s+(?:out\s+)?(?:\S+\s+){0,3}?team\b/.test(lower)
   ) {
     return { category: "HIRING", action: "HIRE" };
   }
@@ -418,7 +446,12 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
       },
     };
   }
-  if (/\b(discount|discounts|pricing|price|prices|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contracts?)\b/.test(lower)) {
+  if (
+    /\b(discount|discounts|pricing|price|prices|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contracts?)\b/.test(lower)
+    /* A named vendor sits between the words: "an annual Datadog commit", "a 2-year Snowflake contract". */
+    || /\b(?:annual|yearly|multi-year|\d-year|(?:one|two|three)-year)\s+(?:\S+\s+){0,2}?(?:commit|commitment|contract|subscription|renewal)s?\b/.test(lower)
+    || /\b(?:saas|software)\s+(?:vendor|contract|subscription|renewal|licen[cs]es?|seats?|commit)s?\b/.test(lower)
+  ) {
     return { category: "PRICING", action: "DISCOUNT" };
   }
   if (readsAsAcquisition(lower)) {
@@ -489,21 +522,38 @@ const buildStressHeadline = ({
   return `${actionLabel} is considered ${verdict} in ${regimeLabel} conditions.`;
 };
 
-export const stressTestDecisionPlan = (
+interface DecisionGradeInput {
+  /** The words graded: the whole plan, or one of its clauses. */
+  text: string;
+  lifecycle: LifecycleStage;
+  category: DecisionCategory;
+  action: DecisionAction;
+  profile?: CompanyFinancialProfile;
+  /** Returned as the result's `commitment`. */
+  commitment: ParsedCommitment;
+  /** The first-year figure sized against cash: the clause's own, or a plan's total. */
+  sizedUsd: number | null;
+  /** How many commitments `sizedUsd` adds up, so the sizing line can say so. */
+  sizedCount: number;
+  /** What the headline names when size decides, in place of the decision's own label. */
+  sizeSubject?: string;
+}
+
+const describeSpend = (usd: number, count: number) =>
+  count > 1 ? `${formatCommitmentUsd(usd)} across ${count} commitments` : formatCommitmentUsd(usd);
+
+/** Grades one decision row against the week and, when it can, against the company's cash. */
+const gradeDecision = (
   assessment: RegimeAssessment,
-  request: PlanStressTestRequest
-): PlanStressTestResult => {
-  const lifecycle = request.lifecycle ?? "GROWTH";
-  const detection = detectCategoryAndAction(request.planText, request.category);
-  if ("ungraded" in detection) return { verdict: null, ...detection.ungraded };
-  const { category, action } = detection;
-  const profile = request.companyProfile;
+  input: DecisionGradeInput,
+): Omit<GradedPlan, "commitments" | "totalAnnualUsd"> => {
+  const { text, lifecycle, category, action, profile, commitment, sizedUsd, sizedCount } = input;
 
   const baseEvaluation = evaluateDecision(assessment, {
     lifecycle,
     category,
     action,
-    context: request.planText,
+    context: text,
   });
 
   const { tightness, riskAppetite, baseRate, curveSlope } = assessment.scores;
@@ -538,7 +588,7 @@ export const stressTestDecisionPlan = (
     }
   }
 
-  const isExplicitlyReversible = /\b(contract-to-hire|contract to hire|milestone|(?:monthly|flexible) rolling|month-to-month|on-demand|convertible|short-term|reversible)\b/i.test(request.planText);
+  const isExplicitlyReversible = /\b(contract-to-hire|contract to hire|milestone|(?:monthly|flexible) rolling|month-to-month|on-demand|convertible|short-term|reversible)\b/i.test(text);
   if (isExplicitlyReversible && verdict === "RISKY") {
     verdict = "SAFE";
     verdictDriver = "REVERSIBILITY";
@@ -552,9 +602,8 @@ export const stressTestDecisionPlan = (
    * the company's cash back down to SAFE. Structure can soften a posture call;
    * it cannot shrink a number. Ordering is the whole guarantee here, so leave it.
    */
-  const commitment = parsePlanCommitment(request.planText);
   const runwayShare = computeRunwayShare({
-    annualUsd: commitment.annualUsd,
+    annualUsd: sizedUsd,
     cashBalanceUsd: profile?.cashBalanceUsd,
     monthlyBurnUsd: profile?.monthlyBurnUsd,
     monthlyRevenueUsd: profile?.monthlyRevenueUsd,
@@ -568,7 +617,7 @@ export const stressTestDecisionPlan = (
   let sizingNote: string;
   if (runwayShare) {
     const pct = Math.round(runwayShare.share * 100);
-    const spend = formatCommitmentUsd(commitment.annualUsd!);
+    const spend = describeSpend(sizedUsd!, sizedCount);
     if (runwayShare.share >= COMMITMENT_SHARE_SEVERE) {
       verdict = "DANGEROUS";
       verdictDriver = "SIZE";
@@ -585,10 +634,10 @@ export const stressTestDecisionPlan = (
     } else {
       sizingNote = `${spend} in the first year is ${pct}% of ${runwayShare.cashBasis}, under the ${Math.round(COMMITMENT_SHARE_ELEVATED * 100)}% line that would move the verdict.`;
     }
-  } else if (commitment.annualUsd !== null && revenueCoversSpend) {
-    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year. Revenue covers your spending, so there is no burn to size it against: sizing it needs your cash in the bank, and without it the verdict rests on conditions alone.`;
-  } else if (commitment.annualUsd !== null) {
-    sizingNote = `Read ${formatCommitmentUsd(commitment.annualUsd)} for the first year, but sizing it needs your cash, or your runway and monthly spend — without them the verdict rests on conditions alone.`;
+  } else if (sizedUsd !== null && revenueCoversSpend) {
+    sizingNote = `Read ${describeSpend(sizedUsd, sizedCount)} for the first year. Revenue covers your spending, so there is no burn to size it against: sizing it needs your cash in the bank, and without it the verdict rests on conditions alone.`;
+  } else if (sizedUsd !== null) {
+    sizingNote = `Read ${describeSpend(sizedUsd, sizedCount)} for the first year, but sizing it needs your cash, or your runway and monthly spend — without them the verdict rests on conditions alone.`;
   } else {
     sizingNote = "No amount in the plan, so this is graded on conditions only. Add a figure to size it against your cash.";
   }
@@ -645,7 +694,7 @@ export const stressTestDecisionPlan = (
   return {
     verdict,
     headline: buildStressHeadline({
-      actionLabel: headlineActionLabel(action, request.planText),
+      actionLabel: verdictDriver === "SIZE" && input.sizeSubject ? input.sizeSubject : headlineActionLabel(action, text),
       verdict,
       verdictDriver,
       regimeLabel,
@@ -663,6 +712,153 @@ export const stressTestDecisionPlan = (
     reversibleAlternative,
     financialImpactSummary,
   };
+};
+
+const NOT_GRADED_REDUCTION = "Not graded: this pauses, defers or cuts a commitment rather than adding one.";
+
+const NOTHING_ADDED: Omit<UngradedPlan, "verdict" | "commitments"> = {
+  headline: "Not graded: every part of this plan pauses, defers or cuts a commitment, and the stress test grades commitments that add spending.",
+  nextStep: `${GRADABLE_DECISIONS} Name one of those in the plan to grade it.`,
+  answerTopic: null,
+};
+
+type ClauseReading = ParsedPlanClause & { detection: Detection };
+
+/*
+ * A plan's clauses, each placed on a decision row. A plan of one clause is detected as the whole
+ * text with the caller's category, exactly as before clauses existed. In a plan of several, the
+ * caller's category fills in only a commitment the wording names no row for: it does not overrule a
+ * clause the wording places, or turn a pause into a commitment.
+ */
+const readPlanClauses = (planText: string, categoryOverride?: DecisionCategory): ClauseReading[] => {
+  const clauses = parsePlanClauses(planText);
+  const [only, ...others] = clauses;
+  if (only !== undefined && others.length === 0) return [{ ...only, detection: detectCategoryAndAction(planText, categoryOverride) }];
+  return clauses.map((clause) => {
+    const detection = detectCategoryAndAction(clause.text);
+    const unnamed = "ungraded" in detection && detection.ungraded.answerTopic === null;
+    return {
+      ...clause,
+      detection: categoryOverride && unnamed && clause.direction === "COMMIT" ? detectCategoryAndAction(clause.text, categoryOverride) : detection,
+    };
+  });
+};
+
+const decisionRow = (detection: Detection) =>
+  "ungraded" in detection ? { category: null, action: null } : { category: detection.category, action: detection.action };
+
+/**
+ * Every commitment a plan names, each with its figures and the decision row it reads as, without
+ * grading any of them: no regime, no network, no model. `stressTestDecisionPlan` grades this list.
+ */
+export const extractPlanCommitments = (planText: string, categoryOverride?: DecisionCategory): ExtractedPlanCommitment[] =>
+  readPlanClauses(planText, categoryOverride).map(({ detection, ...clause }) => ({ ...clause, ...decisionRow(detection) }));
+
+/**
+ * One commitment as a line, for the share text and the screen: the words, the call, and the figure
+ * as `parsePlanCommitment` read it, so a misread clause is visible beside its verdict.
+ */
+export const describePlanCommitment = (
+  reading: PlanCommitmentReading,
+  formatVerdict: (verdict: DecisionVerdict) => string = (verdict) => verdict,
+): string => {
+  const call = reading.verdict !== null
+    ? formatVerdict(reading.verdict)
+    : reading.direction === "REDUCE" ? "paused or cut, not graded" : "not graded";
+  return `${reading.text}: ${call}${reading.commitment.basis ? ` (${reading.commitment.basis})` : ""}`;
+};
+
+export const stressTestDecisionPlan = (
+  assessment: RegimeAssessment,
+  request: PlanStressTestRequest
+): PlanStressTestResult => {
+  const lifecycle = request.lifecycle ?? "GROWTH";
+  const profile = request.companyProfile;
+  const clauses = readPlanClauses(request.planText, request.category);
+
+  const [only, ...others] = clauses;
+  if (only !== undefined && others.length === 0) {
+    const { detection, ...clause } = only;
+    if ("ungraded" in detection) {
+      const reading = { ...clause, category: null, action: null, verdict: null, headline: detection.ungraded.headline };
+      return { verdict: null, ...detection.ungraded, commitments: [reading] };
+    }
+    const graded = gradeDecision(assessment, {
+      text: request.planText,
+      lifecycle,
+      category: detection.category,
+      action: detection.action,
+      profile,
+      commitment: clause.commitment,
+      sizedUsd: clause.commitment.annualUsd,
+      sizedCount: 1,
+    });
+    return {
+      ...graded,
+      totalAnnualUsd: clause.commitment.annualUsd,
+      commitments: [{ ...clause, ...decisionRow(detection), verdict: graded.verdict, headline: graded.headline }],
+    };
+  }
+
+  const gradable: (ParsedPlanClause & { category: DecisionCategory; action: DecisionAction })[] = [];
+  const commitments: PlanCommitmentReading[] = clauses.map(({ detection, ...clause }) => {
+    if (clause.direction === "REDUCE") {
+      return { ...clause, ...decisionRow(detection), verdict: null, headline: NOT_GRADED_REDUCTION };
+    }
+    if ("ungraded" in detection) {
+      return { ...clause, category: null, action: null, verdict: null, headline: detection.ungraded.headline };
+    }
+    gradable.push({ ...clause, category: detection.category, action: detection.action });
+    const own = gradeDecision(assessment, {
+      text: clause.text,
+      lifecycle,
+      category: detection.category,
+      action: detection.action,
+      profile,
+      commitment: clause.commitment,
+      sizedUsd: clause.commitment.annualUsd,
+      sizedCount: 1,
+    });
+    return { ...clause, category: detection.category, action: detection.action, verdict: own.verdict, headline: own.headline };
+  });
+
+  if (gradable.length === 0) {
+    const firstUnplaced = clauses.find((clause) => clause.direction === "COMMIT" && "ungraded" in clause.detection);
+    const ungraded = firstUnplaced && "ungraded" in firstUnplaced.detection ? firstUnplaced.detection.ungraded : NOTHING_ADDED;
+    return { verdict: null, ...ungraded, commitments };
+  }
+
+  /*
+   * The plan's verdict is its harshest commitment's on conditions, then sized on the first-year cost
+   * of every graded commitment together: two commitments of 30% each spend 60% of the cash, which
+   * neither shows alone. Ties go to the larger commitment, then to the one written first.
+   */
+  const amountOf = (clause: ParsedPlanClause) => clause.commitment.annualUsd ?? -1;
+  const severityOf = (clause: (typeof gradable)[number]) =>
+    VERDICT_ORDER.indexOf(
+      gradeDecision(assessment, { text: clause.text, lifecycle, category: clause.category, action: clause.action, profile, commitment: clause.commitment, sizedUsd: null, sizedCount: 0 }).verdict,
+    );
+  const driver = gradable
+    .map((clause) => ({ clause, severity: severityOf(clause) }))
+    .reduce((best, next) =>
+      next.severity > best.severity || (next.severity === best.severity && amountOf(next.clause) > amountOf(best.clause)) ? next : best,
+    ).clause;
+  const largest = gradable.reduce((best, next) => (amountOf(next) > amountOf(best) ? next : best));
+  const amounts = gradable.flatMap((clause) => (clause.commitment.annualUsd === null ? [] : [clause.commitment.annualUsd]));
+  const totalAnnualUsd = amounts.length === 0 ? null : amounts.reduce((sum, amount) => sum + amount, 0);
+
+  const plan = gradeDecision(assessment, {
+    text: driver.text,
+    lifecycle,
+    category: driver.category,
+    action: driver.action,
+    profile,
+    commitment: largest.commitment,
+    sizedUsd: totalAnnualUsd,
+    sizedCount: amounts.length,
+    sizeSubject: gradable.length > 1 ? "This plan" : undefined,
+  });
+  return { ...plan, totalAnnualUsd, commitments };
 };
 
 export const compareDecisionPlans = (

@@ -16,7 +16,7 @@
 import { useState } from "react";
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
-import { isBusinessModel, type CompanyFinancialProfile, type PlanComparisonResult, type PlanStressTestResult } from "../../../lib/decisionShield";
+import { describePlanCommitment, isBusinessModel, type CompanyFinancialProfile, type PlanComparisonResult, type PlanStressTestResult } from "../../../lib/decisionShield";
 import { resolveProfileRunway, resolveProfileRunwayMonths, type OperatorProfile, type ProfileRunway } from "../../../lib/operatorProfile";
 
 type BusinessModel = NonNullable<CompanyFinancialProfile["businessModel"]>;
@@ -31,6 +31,25 @@ type PlanStressTestModeProps = {
   setBusinessModel: (value: BusinessModel) => void;
   stressTestResult: PlanStressTestResult;
 };
+
+/* A plan naming several commitments lists each with its own call and figure, so a
+   clause read wrongly is visible next to the verdict it fed. One commitment needs
+   no list: the verdict above is its call. */
+function PlanCommitmentList({ result }: { result: PlanStressTestResult }) {
+  if (result.commitments.length < 2) return null;
+  return (
+    <div className="space-y-1.5">
+      <p className="type-eyebrow">Commitments in this plan</p>
+      <ul className="space-y-1">
+        {result.commitments.map((commitment, idx) => (
+          <li key={idx} className="text-fluid-sm text-slate-300 break-words">
+            {describePlanCommitment(commitment, (verdict) => `${verdict.charAt(0)}${verdict.slice(1).toLowerCase()}`)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 /* Revenue that covers spending blanks the runway box, a typed figure included,
    so the box says why rather than looking unfilled. */
@@ -178,6 +197,7 @@ export function PlanStressTestMode({
             {stressTestResult.verdict === null ? (
               <>
                 <p className="type-data text-slate-200 break-words font-medium">{stressTestResult.headline}</p>
+                <PlanCommitmentList result={stressTestResult} />
                 <p className="text-fluid-sm text-slate-300">{stressTestResult.nextStep}</p>
               </>
             ) : (
@@ -211,6 +231,8 @@ export function PlanStressTestMode({
             <p className="type-data text-slate-200 break-words font-medium">
               {stressTestResult.headline}
             </p>
+
+            <PlanCommitmentList result={stressTestResult} />
 
             {stressTestResult.sizingNote ? (
               <div className="rounded border border-slate-800/80 bg-slate-900/60 p-2.5">
