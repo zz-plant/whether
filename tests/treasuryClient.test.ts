@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
-import { fetchFredCsv, getFredCircuitBreakerState, resetFredCircuitBreaker } from "../lib/fred";
+import { FRED_FETCH_HEADERS, fetchFredCsv, getFredCircuitBreakerState, resetFredCircuitBreaker } from "../lib/fred";
 import type { TreasuryData } from "../lib/types";
 
 /** The URL a fetch stub was asked for, whichever form the caller passed. */
@@ -91,6 +91,26 @@ describe("treasury client", () => {
     assert.ok(requestedUrls.some((url) => url.includes("DGS3MO")));
     assert.ok(requestedUrls.some((url) => url.includes("DGS2")));
     assert.ok(requestedUrls.some((url) => url.includes("DGS10")));
+  });
+
+  it("asks FRED with the user agent FRED serves, not the one it answers with 520", async () => {
+    const agentsByHost = new Map<string, Set<string>>();
+    const fetcher: typeof fetch = async (input, init) => {
+      const url = requestUrl(input);
+      const agent = new Headers(init?.headers).get("user-agent") ?? "";
+      const host = new URL(url).host;
+      agentsByHost.set(host, (agentsByHost.get(host) ?? new Set()).add(agent));
+      return url.includes("home.treasury.gov")
+        ? new Response([TREASURY_DAILY_HEADER, "01/09/2026,4.12,4.23,4.31,4.56"].join("\n"))
+        : new Response("{}", { status: 520 });
+    };
+
+    await fetchTreasuryData({ fetcher });
+
+    // FRED's edge answered the browser-style agent with 520 on 42,897 of 43,482 requests in the
+    // week to 2026-11-25, and served the agent every other FRED read sends.
+    assert.deepEqual([...(agentsByHost.get("fred.stlouisfed.org") ?? [])], [FRED_FETCH_HEADERS["user-agent"]]);
+    assert.ok(agentsByHost.has("home.treasury.gov"), "the Treasury file is still the backup");
   });
 
   it("falls back to snapshot on fetch failure", async () => {
