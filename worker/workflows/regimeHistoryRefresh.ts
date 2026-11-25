@@ -19,6 +19,7 @@ import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloud
 import { installBindings } from "../bindings";
 import { GitHubRepoClient } from "../../lib/github/repoClient";
 import { sendOpsFailureNotice } from "../../lib/delivery/opsNotice";
+import { recordRunOutcome } from "../../lib/delivery/runOutcomes";
 import { writeAnalytics } from "../../lib/telemetry/analyticsEngine";
 import {
   commitRegimeArchiveRebuild,
@@ -63,6 +64,7 @@ export class RegimeHistoryRefreshWorkflow extends WorkflowEntrypoint<RegimeHisto
         },
         { doubles: [1, Date.now() - startedAt] },
       );
+      await recordRunOutcome("regime-history", []);
       return result;
     } catch (error) {
       /* Same two reports as the brief freeze: the cron's `regime-history-workflow` row is green
@@ -70,6 +72,7 @@ export class RegimeHistoryRefreshWorkflow extends WorkflowEntrypoint<RegimeHisto
       const message = error instanceof Error ? error.message : "Unknown error";
       const durationMs = Date.now() - startedAt;
       writeAnalytics("cron-step", { step: "regime-history", ok: false, error: message, durationMs }, { doubles: [0, durationMs] });
+      await recordRunOutcome("regime-history", [{ step: "regime-history" }]);
       await sendOpsFailureNotice({ run: "Regime archive pull request", failures: [{ step: "regime-history", error: message }] });
       throw error;
     }
