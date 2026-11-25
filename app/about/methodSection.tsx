@@ -77,7 +77,7 @@ export function MethodSection() {
           {SITE_VOCABULARY.map((term) => (
             <div key={term.slug} className="space-y-0.5">
               <dt className="text-base font-semibold text-slate-100">
-                <dfn id={definedTermAnchor(term.slug)} className="not-italic">{term.name}</dfn>
+                <dfn id={definedTermAnchor(term.slug)} className="[font-style:normal]">{term.name}</dfn>
               </dt>
               <dd className="text-base text-slate-300">{term.description}</dd>
             </div>
