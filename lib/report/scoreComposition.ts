@@ -93,7 +93,7 @@ export type ScoreComposition = {
   largest: CompositionSource | null;
   /** The arithmetic as one copyable sentence: "Funding pressure 90 = 90 from the short-term borrowing rate + 0 from …". */
   sentence: string;
-  /** "Not counted: -11 from startup-market inputs.", the line `/signals` prints under the score; null when nothing is left out. */
+  /** "Not counted: startup-market inputs, which would take it down 11 points.", the line `/signals` prints under the score; null when nothing is left out. */
   notCountedSentence: string | null;
 };
 

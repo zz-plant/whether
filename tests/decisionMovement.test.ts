@@ -65,11 +65,11 @@ describe("buildDecisionMovement", () => {
     const byArea = new Map(result.areas.map((entry) => [entry.area, entry]));
 
     // Spending pauses on funding pressure alone; the roadmap on risk appetite alone.
-    assert.equal(byArea.get("burn-discipline")?.text, "Pause now applies: funding pressure rose above 76.");
-    assert.equal(byArea.get("product-tempo")?.text, "Pause now applies: risk appetite fell below 44.");
+    assert.equal(byArea.get("burn-discipline")?.text, "Paused: funding pressure rose above 76.");
+    assert.equal(byArea.get("product-tempo")?.text, "Paused: risk appetite fell below 44.");
     assert.equal(
       byArea.get("hiring")?.text,
-      "Pause now applies: funding pressure rose above 76 and risk appetite fell below 44.",
+      "Paused: funding pressure rose above 76 and risk appetite fell below 44.",
     );
   });
 

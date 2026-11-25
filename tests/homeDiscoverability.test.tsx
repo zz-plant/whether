@@ -19,13 +19,13 @@ describe("the Monday email link", () => {
   });
 
   it("leaves the form on alerts only for a reader who scrolled to it", () => {
-    assert.match(renderToStaticMarkup(<AlertSection />), /No weekly newsletter/);
+    assert.match(renderToStaticMarkup(<AlertSection />), /Alerts only, no Monday email/);
   });
 
   it("is still a Monday form for a reader from a shared link", () => {
     const monday = renderToStaticMarkup(<AlertSection defaultFrequency="weekly" />);
     assert.match(monday, /Monday morning/);
-    assert.doesNotMatch(monday, /No weekly newsletter/);
+    assert.doesNotMatch(monday, /Alerts only, no Monday email/);
   });
 });
 

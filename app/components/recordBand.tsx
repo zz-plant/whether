@@ -51,7 +51,6 @@ export function RecordBand() {
   const published = briefsCounted ? `${briefsCounted}, published as written` : null;
   const keyed = CONDITIONS.filter((regime) => model.runs.some((run) => run.regime === regime));
   const firstYear = model.firstDate.slice(0, 4);
-  const lastYear = model.lastDate.slice(0, 4);
   return (
     <aside className="record-band" aria-label="The record" data-record-band data-first={model.firstDate} data-months={model.encoded}>
       {/* The record folds (2026-11-21, the one-page brief): it is the frame's proof and
@@ -68,7 +67,7 @@ export function RecordBand() {
           </span>
           <span className="record-band-summary-meta">
             The record since {firstYear}
-            <span className="record-band-summary-cue"> &middot; Scrub {firstYear}&ndash;{lastYear}</span>
+            <span className="record-band-summary-cue"> &middot; Open to explore it</span>
           </span>
           <span className="record-band-horizon" aria-hidden="true" data-record-band-horizon>
             {model.runs.map((run) => (

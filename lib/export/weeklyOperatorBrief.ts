@@ -111,7 +111,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     : "";
 
   return [
-    `Weekly Operator Brief — ${payload.date}`,
+    `Whether Weekly Brief — ${payload.date}`,
     /* The number never travels without what it measures: a paste is read by
        people who have not seen the hero that explains it. */
     latitude

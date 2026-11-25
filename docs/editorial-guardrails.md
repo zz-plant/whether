@@ -187,7 +187,11 @@ message. The register above says where the question comes from; this says how it
   "the score". `buildBoldnessScore` in `lib/report/weeklyLeadershipBrief.ts` is the source.
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
   brief"). "Report" stays internal (function names, keys, docs). User-visible,
-  shareable, and metadata surfaces must not print "Whether Report".
+  shareable, and metadata surfaces must not print "Whether Report". Every paste opens on it
+  too (2026-11-25): "Weekly Operator Brief", "Whether Leadership Update" and "Whether Board
+  Memo" were three more product names for the same text, and the board memo's "Macro
+  Posture", "Operating Threshold" and "Posture Flips If" kept retired slot words alive in a
+  format the vocabulary test did not render.
 - **Signal names are Funding pressure, Risk appetite and Recession warning gauge**
   (2026-10-09), in full on charts and in inline metrics alike; "Capital tightness",
   "Pressure" and "Appetite" alone are retired. The three watch pages keep their slugs

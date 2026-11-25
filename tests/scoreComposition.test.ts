@@ -114,7 +114,7 @@ describe("buildScoreComposition", () => {
     assert.equal(left.counted, false);
     assert.equal(left.points, offRecord.riskAppetite - assessment.scores.riskAppetite);
     assert.deepEqual([left.from, left.to], [offRecord.riskAppetite, assessment.scores.riskAppetite]);
-    assert.equal(composition.riskAppetite.notCountedSentence, `Not counted: -${Math.abs(left.points)} from startup-market inputs.`);
+    assert.equal(composition.riskAppetite.notCountedSentence, `Not counted: startup-market inputs, which would take it down ${Math.abs(left.points)} points.`);
     assert.equal(sum(composition.riskAppetite.parts), assessment.scores.riskAppetite, "the left-out inputs are no part of the sum");
     assert.equal(composition.tightness.notCounted, null);
     assert.deepEqual(

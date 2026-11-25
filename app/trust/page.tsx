@@ -108,7 +108,7 @@ export default async function MethodPage({
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-100">Escalation rule</h3>
+            <h3 className="text-sm font-semibold text-slate-100">Before you act</h3>
             <p className="text-sm text-slate-200">
               If a warning below is active, check the source dates before going ahead.
             </p>
