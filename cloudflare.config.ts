@@ -135,7 +135,12 @@ const buildWorker = (shape: Shape): WorkerConfig => {
       }),
       ASSETS: bindings.assets(),
     },
+    // SPIKE: Workers Cache off for the Worker as a whole, on for vinext's cached response
+    // stage only (what @vinext/cloudflare's createWorkersCacheConfig() declares).
+    cache: { enabled: false },
     exports: {
+      VinextCachedResponse: exports.worker({ cache: { enabled: true } }),
+      VinextUncachedResponse: exports.worker({ cache: { enabled: false } }),
       // Live since wrangler.toml's migration v1 (`new_sqlite_classes`). This declaration replaces
       // that migration history: it names the class as it stands, so it must stay SQLite-backed.
       IngestCoordinator: exports.durableObject({ storage: "sqlite" }),

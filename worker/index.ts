@@ -1,6 +1,8 @@
 import { refreshCompanyFilings } from "../lib/companies/companyFilingStore";
 import { handleImageOptimization } from "vinext/server/image-optimization";
-import handler from "vinext/server/app-router-entry";
+/* SPIKE: the Workers Cache gateway replaces vinext/server/app-router-entry: it runs routing and
+   middleware here and dispatches cacheable renders to the cached VinextCachedResponse stage. */
+import handler from "@vinext/cloudflare/cache/cdn-adapter.worker";
 import { refreshOperatingState } from "../lib/operatingState/refreshOperatingState";
 import { writeAnalytics } from "../lib/telemetry/analyticsEngine";
 import { installWaitUntil } from "../lib/runtime/backgroundWork";

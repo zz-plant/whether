@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import vinext from "vinext";
 import { kvDataAdapter } from "@vinext/cloudflare/cache/kv-data-adapter";
+import { workersCacheCdnAdapter } from "@vinext/cloudflare/cache/workers-cache-cdn-adapter";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { buildCommit } from "./scripts/exec.mjs";
 
@@ -36,6 +37,9 @@ export default defineConfig({
   plugins: [
     vinext({
       cache: {
+        /* SPIKE: page-level ISR served from Workers Cache (cloudflare.config.ts declares the
+           cached response entrypoint; worker/index.ts hands app requests to its gateway). */
+        cdn: workersCacheCdnAdapter(),
         /* Every cache read also reads each of the entry's tag markers, which almost never
            exist: 2.2M "not found" KV reads against 369k hits from Oct 26 to Nov 25 2026, about
            13 per request, at the default 5s memo. Data changes hourly at most, so an isolate
