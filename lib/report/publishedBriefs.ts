@@ -629,6 +629,9 @@ const HELD_CALLS = new Set(
   [...Object.values(POLICY_OVERRIDE_CALL), POLICY_OVERRIDE_CALL_UNNAMED].map((hold) => hold.currentCall.trim()),
 );
 
+/* A record stores no hold flag; a held week stored the hold's own call. */
+export const isHeldPublishedBrief = (brief: Pick<PublishedBrief, "summary">) => HELD_CALLS.has(brief.summary.trim());
+
 /**
  * A frozen week's headline action, through the same source as the live brief
  * (`weeklyHeadline`): the stored call, with the stored action's direction.
@@ -637,8 +640,7 @@ export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" |
   weeklyHeadline({
     actionNow: brief.actionNow,
     currentCall: brief.summary,
-    /* A record stores no hold flag; a held week stored the hold's own call. */
-    policyOverrideActive: HELD_CALLS.has(brief.summary.trim()),
+    policyOverrideActive: isHeldPublishedBrief(brief),
   });
 
 /** The week's name: its Monday (`formatWeekMondayUTC`), never the record's own weekday. */
