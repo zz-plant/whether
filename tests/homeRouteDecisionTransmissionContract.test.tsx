@@ -251,12 +251,13 @@ describe("home route render contract", () => {
       assert.ok(!routeSource.includes(tag), `${tag} has no render site on /`);
     }
 
-    /* One control per axis at every width: the inline calibration is visible everywhere,
-       so the header asks nothing and the calibration is the one control. */
+    /* One control per axis at every width: the card's "Rules for · change" line opens the
+       calibration (folded out of sight under that line since 2026-11-25), so the header
+       asks nothing and the calibration is the one control. */
     const calibrationSource = readFileSync("app/components/home/CompanyCalibration.tsx", "utf8");
     assert.match(
       calibrationSource,
-      /<details[^>]*className="group block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      /<details[\s\S]*?className=\{`group [^`]*`\}[\s\S]*?>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
       "the sm+ tablists lead the areas they reshape, folded under the line that names them",
     );
     const explainerSource = readFileSync("app/components/home/ConditionsLegend.tsx", "utf8");

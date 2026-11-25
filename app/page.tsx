@@ -398,34 +398,6 @@ async function PageContent({
       ],
     },
   ];
-  /* The two figures' sentences name the area whose lines they draw, the first rule's
-     (hiring), and say its restart whole: "Hiring paused above 76. Restarts only when
-     below 66 and risk appetite is above 54." Without the rule's lines the figures keep
-     their own wording. */
-  const figureStanding = (metric: "tightness" | "riskAppetite") =>
-    corridorRule && boundedConditions
-      ? describeScoreFigureStanding({
-          area: corridorRule.area,
-          metric,
-          pause: boundedConditions.pause,
-          resume: boundedConditions.resume,
-          scores: { tightness, riskAppetite },
-        })
-      : null;
-  /* On a phone the two figures share one sentence naming the lead area and the whole
-     restart (2026-11-21): each figure's own full sentence printed the same compound
-     condition twice, and the pair pushed the area rows off the first screen. On a clear
-     week the figures' short captions already say so, and the shared sentence would only
-     repeat them; it prints when the lead area is held, where the whole restart matters.
-     The figures' own captions already carry each line's number, so the shared sentence
-     names the area and the restart without repeating the score. */
-  const sharedFigureStanding =
-    [figureStanding("tightness"), figureStanding("riskAppetite")].find((standing) => standing?.crossed)
-    ?? figureStanding("tightness")
-    ?? figureStanding("riskAppetite");
-  const phoneFigureStanding = sharedFigureStanding?.crossed
-    ? { ...sharedFigureStanding, lead: sharedFigureStanding.lead.replace(/ (?:above|below) [\d.]+$/, "") }
-    : null;
   /* Only on a week the call moved: the last time it moved the same way, and
      what the scores did over the three months after. Null otherwise, and the
      section renders nothing rather than reaching for the nearest analogue. */
@@ -556,6 +528,32 @@ async function PageContent({
      and the areas below are dated to the reading. "No area is on hold." sat under
      "hold new hires, spend and vendor contracts" (2026-11-02). */
   const areaStripModel = historicalSelection || savedCopy ? null : buildAreaStrip(decisionPickerOptions);
+  /* The two figures' sentences name the area whose lines they draw, the first rule's
+     (hiring): "Hiring paused above 76." A held area's restart is said once (2026-11-25,
+     distill): the hiring row beside the figures prints it word for word, so with the
+     rows on the page the figures leave it to the row. A page without the rows (a past
+     week, a saved copy) keeps the whole sentence. Without the rule's lines the figures
+     keep their own wording. */
+  const figureStanding = (metric: "tightness" | "riskAppetite") => {
+    const standing = corridorRule && boundedConditions
+      ? describeScoreFigureStanding({ area: corridorRule.area, metric, pause: boundedConditions.pause, resume: boundedConditions.resume, scores: { tightness, riskAppetite } })
+      : null;
+    return standing?.crossed && areaStripModel ? { ...standing, rest: "" } : standing;
+  };
+  /* On a phone the two figures share one sentence naming the lead area and the whole
+     restart (2026-11-21): each figure's own full sentence printed the same compound
+     condition twice, and the pair pushed the area rows off the first screen. On a clear
+     week the figures' short captions already say so, and the shared sentence would only
+     repeat them; it prints when the lead area is held, where the whole restart matters.
+     The figures' own captions already carry each line's number, so the shared sentence
+     names the area and the restart without repeating the score. */
+  const sharedFigureStanding =
+    [figureStanding("tightness"), figureStanding("riskAppetite")].find((standing) => standing?.crossed)
+    ?? figureStanding("tightness")
+    ?? figureStanding("riskAppetite");
+  const phoneFigureStanding = sharedFigureStanding?.crossed
+    ? { ...sharedFigureStanding, lead: sharedFigureStanding.lead.replace(/ (?:above|below) [\d.]+$/, "") }
+    : null;
   /* The week's move, for the card to replay once on arrival: live, compared readings
      only, and null on a week the conditions held and no area changed standing. The
      earlier strip is the same rules read at the earlier scores. */
@@ -951,6 +949,7 @@ async function PageContent({
                   runwayEmphasis={runwayEmphasis}
                   stageAction={stageAction}
                   horizon={{ control: <CadenceSelector />, current: activeCadence }}
+                  namedAbove={Boolean(readingLocation)}
                 />
               ) : null}
 
