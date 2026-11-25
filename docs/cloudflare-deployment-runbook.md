@@ -123,11 +123,24 @@ local runs, and treats an empty value as unset at either source. The site serves
 without any of them: each provider key switches a read from a keyless path to a keyed one, and
 the Slack signing secret gates one webhook route.
 
+The list itself is `DEPLOYMENT_SECRETS` in `lib/runtime/deploymentSecrets.ts`, and two things read
+it. `bun run secrets:check` compares it with `wrangler secret list` for production and exits 1 when a
+required one is missing; `/api/health` names the required secrets the running lane lacks in
+`missingSecrets` and reports `dependencies.automation: "unconfigured"`. A secret is required by the
+switch it serves: `GITHUB_TOKEN` wherever a data Workflow is switched on, `WHETHER_OPS_EMAIL`
+wherever the lane has the `EMAIL` binding. A Worker Preview switches neither on, so it needs none.
+The same endpoint reads each scheduled run's last outcome from KV (`ops:last-run:<run>`, written by
+`lib/delivery/runOutcomes.ts` at the end of both crons and both Workflows) and lists any whose last
+run had a failed step in `failingRuns`, as `"failing"`. Both count as `degraded`. This exists because
+production held one secret from 2026-11-02 to at least 2026-11-25: every data Workflow failed, the
+failure notice had no address, and `/api/health` said `ok`. Add a secret to that list in the commit
+that first reads it.
+
 | Secret | Read by | Without it |
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median reads SEC EDGAR filings priced with Cboe's delayed quotes, falling back to Yahoo Finance. Neither needs a key. |
-| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly at their first line rather than skipping, the freeze before it spends a live read and the archive rebuild before it fetches FRED. Production has never had it: every regime-history instance from 2026-10-19 to 2026-11-02 ended "GITHUB_TOKEN is not configured". Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token on this repository only: contents and pull requests, write; checks, read. The checks permission is what lets a Workflow read its branch build before merging (`WHETHER_AUTOMERGE_DATA_PRS`); without it the merge step fails with HTTP 403 and leaves the pull request open. |
+| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly at their first line rather than skipping, the freeze before it spends a live read and the archive rebuild before it fetches FRED. Production has never had it: every regime-history instance from 2026-10-19 to at least 2026-11-25, and the 2026-11-23 brief freeze, ended "GITHUB_TOKEN is not configured". Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token on this repository only: contents and pull requests, write; checks, read. The checks permission is what lets a Workflow read its branch build before merging (`WHETHER_AUTOMERGE_DATA_PRS`); without it the merge step fails with HTTP 403 and leaves the pull request open. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 | `SLACK_WEBHOOK_URL` | `lib/delivery/slack.ts` (`slackChannel.listTargets`), for the Monday brief, both crons' `check-regime-change` alerts and the month-end pulse | The operator's own channel is not a target. Every post still goes to the channels subscribed through the form (the per-team webhook registry), and the three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`. |
 | `WHETHER_OPS_EMAIL` | `lib/delivery/opsNotice.ts` (`sendOpsFailureNotice`), at the end of each cron run and from both Workflows when they fail | Failures are recorded on `/trust` and reach nobody: every run with a failed step writes a failing `ops-notice` row saying the address is unset. With it, a run where any step failed sends one email to that address through the `EMAIL` binding, naming each failed step and its error; a run where everything succeeded sends nothing. The address is not a secret, but set it with `npx wrangler secret put … --name whether` so it stays out of the repository. |
@@ -138,41 +151,6 @@ the Slack signing secret gates one webhook route.
 The FRED key is free and allows 120 requests a minute. Alpha Vantage's free tier allows 25 requests
 a day and 5 a minute: each symbol is fetched at most once a day (`next: { revalidate: 86400 }`), but
 a basket fetched at once still exceeds the per-minute limit, and the comps then fall through to EDGAR.
-
-## Browser notifications (VAPID keys)
-
-Regime-change notifications to a browser need three values on the lane that should send them. Until
-all three are set, `resolveVapidConfig` returns null and **nothing is offered anywhere in the UI** —
-the toggle renders nothing rather than failing when pressed, and `/api/push` answers
-`{ configured: false }`. That is deliberate, and it is the same rule the brief freeze follows: check
-the configuration first and say so, rather than spend work discovering it later.
-
-```bash
-# Generate a P-256 pair. The public key is the uncompressed point, base64url;
-# the private key is the JWK's `d`.
-node -e '
-const { subtle } = crypto;
-subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]).then(async (pair) => {
-  const raw = new Uint8Array(await subtle.exportKey("raw", pair.publicKey));
-  const jwk = await subtle.exportKey("jwk", pair.privateKey);
-  const b64 = (b) => Buffer.from(b).toString("base64url");
-  console.log("VAPID_PUBLIC_KEY=" + b64(raw));
-  console.log("VAPID_PRIVATE_KEY=" + jwk.d);
-});'
-
-npx wrangler secret put VAPID_PRIVATE_KEY --name whether   # secret
-npx wrangler secret put VAPID_PUBLIC_KEY --name whether    # not secret, but kept beside its pair
-npx wrangler secret put VAPID_SUBJECT --name whether       # mailto: or https: identifying the sender (RFC 8292 §2.1)
-```
-
-The keypair is an identity, not a rotating credential: regenerating it invalidates every stored
-subscription, and each browser has to opt in again. Rotate only if the private key leaks.
-
-Sending happens in one place — the branch of `checkRegimeChange` that has established the published
-regime actually moved — so nothing fires on a week where nothing happened. The push carries no
-payload, so there is no RFC 8291 encryption in the codebase and no way for a queued notification to
-deliver a reading that has since changed; the service worker fetches `/api/posture/current` as it
-draws the notification. Subscriptions that answer 404 or 410 are deleted rather than retried.
 
 ## Trial infrastructure
 

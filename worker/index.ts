@@ -15,6 +15,7 @@ import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
 import { sendOpsFailureNotice, type FailedStep } from "../lib/delivery/opsNotice";
+import { recordRunOutcome } from "../lib/delivery/runOutcomes";
 import { API_CATALOG_PATH, WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { apiCatalogResponse } from "../lib/agent/apiCatalog";
 import { negotiateMarkdown, withAgentDiscoveryLinks } from "../lib/runtime/agentResponse";
@@ -250,6 +251,9 @@ export default {
         return { ok: result.errors === 0, error: result.errors > 0 ? `${result.errors} delivery errors` : undefined };
       });
     }
+
+    /* What /api/health reads back: this run's failed steps, or none. */
+    await recordRunOutcome(isDailyIngestion ? "daily" : "weekly", failures);
 
     /* Last, so it covers every step above. Recorded like a step but never added to the list
        it reports on: a notice that failed is on /trust, and there is nobody else to tell. */

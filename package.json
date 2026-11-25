@@ -75,6 +75,7 @@
     "lint:types": "oxlint --type-aware --deny-warnings",
     "check:suppressions": "bun --bun suppression-census --config scripts/census.config.ts --export suppressionCensusConfig",
     "check:dead-exports": "bun run scripts/check-dead-exports.ts",
+    "secrets:check": "bun run scripts/check-secrets.ts",
     "telemetry:streams": "bun run scripts/telemetry-stream-census.ts",
     "telemetry:dead-clicks": "bun run scripts/dead-click-report.ts",
     "telemetry:agent-tools": "bun run scripts/agent-tool-report.ts",

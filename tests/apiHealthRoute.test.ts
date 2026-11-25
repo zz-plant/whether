@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GET as getHealthRoute } from "../app/api/health/route";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+import { FakeKv } from "./fixtures/fakeKv";
 
 serveUnreachableUpstreams();
 
@@ -25,7 +26,8 @@ describe("/api/health", () => {
     assert.ok(dependencies && typeof dependencies === "object" && "dataFreshness" in dependencies);
     const degraded = Array.isArray(body.degradedSources) && body.degradedSources.length > 0;
     const modelStale = Reflect.get(dependencies, "ingestModel") === "stale";
-    if (body.status !== "down") assert.equal(body.status, degraded || modelStale ? "degraded" : "ok");
+    const automationDown = ["unconfigured", "failing"].includes(String(Reflect.get(dependencies, "automation")));
+    if (body.status !== "down") assert.equal(body.status, degraded || modelStale || automationDown ? "degraded" : "ok");
   });
 
   it("reports the ingest model's freshness apart from the sources", async () => {
@@ -65,6 +67,39 @@ describe("/api/health", () => {
       assert.equal(body.deployedVersion, null);
     } finally {
       Reflect.deleteProperty(globalThis, "CF_VERSION_METADATA");
+    }
+  });
+
+  it("reports automation as ok where the lane switches nothing on that needs a secret", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    assert.equal(Reflect.get(Object(body.dependencies), "automation"), "ok");
+    assert.deepEqual(body.missingSecrets, []);
+    assert.deepEqual(body.failingRuns, []);
+  });
+
+  it("names a required secret the running lane is missing, and says degraded", async () => {
+    Reflect.set(globalThis, "EMAIL", { send: async () => ({}) });
+    try {
+      const body: Record<string, unknown> = await (await getHealthRoute()).json();
+      assert.equal(Reflect.get(Object(body.dependencies), "automation"), "unconfigured");
+      assert.deepEqual(body.missingSecrets, ["WHETHER_OPS_EMAIL"]);
+      if (body.status !== "down") assert.equal(body.status, "degraded");
+    } finally {
+      Reflect.deleteProperty(globalThis, "EMAIL");
+    }
+  });
+
+  it("names a scheduled run whose last outcome failed", async () => {
+    const kv = new FakeKv();
+    kv.entries.set("ops:last-run:brief-freeze", JSON.stringify({ at: "2026-11-23T14:01:00.000Z", failedSteps: ["brief-freeze"] }));
+    Reflect.set(globalThis, "WHETHER_DURABLE_KV", kv);
+    try {
+      const body: Record<string, unknown> = await (await getHealthRoute()).json();
+      assert.equal(Reflect.get(Object(body.dependencies), "automation"), "failing");
+      assert.deepEqual(body.failingRuns, [{ run: "brief-freeze", at: "2026-11-23T14:01:00.000Z", failedSteps: ["brief-freeze"] }]);
+      if (body.status !== "down") assert.equal(body.status, "degraded");
+    } finally {
+      Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
     }
   });
 });
