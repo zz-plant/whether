@@ -5,9 +5,15 @@
 import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { fetchWithTimeout } from "../fetchWithTimeout";
-import { FRED_BASE_URL, parseFredCsvSeries } from "../fred";
+import { FRED_BASE_URL, FRED_FETCH_HEADERS, parseFredCsvSeries } from "../fred";
 import { isTestRuntime, withRetry } from "../runtime/retry";
 
+/**
+ * For home.treasury.gov only. FRED's requests send `FRED_FETCH_HEADERS`, the headers every other
+ * FRED read in this repo sends: FRED's edge answers this browser-style agent with HTTP 520. In the
+ * week to 2026-11-25 it did so for 42,897 of 43,482 yield-curve requests, so every read made eight
+ * failed calls before the Treasury file below answered, and a failure is never cached.
+ */
 const TREASURY_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
   "user-agent": "Mozilla/5.0 (compatible; WhetherApp/1.0)",
@@ -21,8 +27,9 @@ const RETRY_BACKOFF_MS = isTestRuntime() ? 0 : 250;
 /**
  * Year-scoped rather than `/current/all`: that path answers 200 with a
  * zero-byte body -- an empty object cached at the CDN, not an error -- so the
- * client fell through to FRED, which refuses Worker-originated requests, and
- * production served a June snapshot into late August. The year file carries the
+ * client fell through to FRED, which was refusing these requests (for their
+ * user agent, it turned out: see TREASURY_FETCH_HEADERS), and production served
+ * a June snapshot into late August. The year file carries the
  * same columns and the same current row, and is served normally.
  */
 const buildTreasuryRatesEndpoint = (year: number) =>
@@ -340,7 +347,7 @@ const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string): Pr
         const response = await fetchWithTimeout(
           fetcher,
           endpoint,
-          { headers: TREASURY_FETCH_HEADERS },
+          { headers: FRED_FETCH_HEADERS },
           attempt === 0 ? PRIMARY_FETCH_TIMEOUT_MS : RETRY_FETCH_TIMEOUT_MS,
         );
         if (!response.ok && (response.status >= 500 || response.status === 429)) {
