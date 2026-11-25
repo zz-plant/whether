@@ -15,7 +15,6 @@ import { assertQuestionsVisible } from "./fixtures/questionMarkup";
 serveUnreachableUpstreams();
 
 /* The plan test reads the router; spread the real module, as every stub here does. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
   ...nextNavigation,

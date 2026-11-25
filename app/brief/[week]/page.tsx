@@ -413,7 +413,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                         key={decision.area}
                         id={briefAreaRowId(decision.area)}
                         data-area-row={decision.area}
-                        className={`scroll-mt-24 border-b border-slate-800/50 align-top ${chosenRowInk(decision.area)}`.trim()}
+                        className={`border-b border-slate-800/50 align-top ${chosenRowInk(decision.area)}`.trim()}
                       >
                         <th scope="row" className={`py-2 pr-3 font-semibold text-slate-100 ${chosenNameInk(decision.area)}`.trim()}>
                           <BriefAreaName area={decision.area} />
@@ -452,7 +452,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     key={decision.area}
                     id={briefAreaRowId(decision.area)}
                     data-area-row={decision.area}
-                    className={`scroll-mt-24 space-y-1 border-b border-[color:var(--border-default)] py-3 ${chosenRowInk(decision.area)}`.trim()}
+                    className={`space-y-1 border-b border-[color:var(--border-default)] py-3 ${chosenRowInk(decision.area)}`.trim()}
                   >
                     <p className={`text-sm font-semibold text-slate-100 ${chosenNameInk(decision.area)}`.trim()}>
                       <BriefAreaName area={decision.area} />

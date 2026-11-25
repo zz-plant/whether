@@ -8,7 +8,6 @@ import { assertQuestionsVisible, isRecord, jsonLdIn, questionNodesIn, visibleTex
 serveUnreachableUpstreams();
 
 /* The pages mount client islands that reach the router; spread the real module, as every stub here does. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
   ...nextNavigation,
