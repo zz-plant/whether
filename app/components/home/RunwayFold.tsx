@@ -18,10 +18,12 @@ export function RunwayFold({
   return (
     <details className="weather-auto-chevron group" data-runway-fold>
       <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-        Apply it to your runway
+        What about our runway?
       </summary>
       <div className="mt-4 space-y-4">
-        {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
+        {/* Under a summary that asks the question, the notes open on the answer and drop
+            the label that restated it (2026-11-18, ui-ux-standards §XI). */}
+        {isHistorical ? null : <RunwayConditionedNotes regime={regime} nested />}
         {/* Live briefs only, like the runway notes: it reads today's cash. */}
         {isHistorical ? null : <CommitmentTestDisclosure regime={regime} />}
       </div>

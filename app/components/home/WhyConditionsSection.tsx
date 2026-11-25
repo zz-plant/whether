@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { HomeSection } from "./HomeSection";
-import { getRegimePublicLabel, isRegimeKey, REGIME_WEATHER_LINES } from "../../../lib/regimePresentation";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { NOT_COUNTED_REASON } from "../../../lib/report/scoringBasis";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
-import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
+import { HOME_SECTIONS, describeWhyConditions, diagnosisHeading, type HomeQuestion } from "../../../lib/report/home/homeSectionModel";
 import { PlainActionLink } from "../ui/actionLink";
 
 type NotCountedReading = {
@@ -41,7 +41,10 @@ export function WhyConditionsSection({
   notCounted,
   warning,
   chartHref,
+  question,
 }: {
+  /** The heading and its answer, as the page marks them up (`buildHomeQuestions`). */
+  question?: Pick<HomeQuestion, "question" | "answer"> | null;
   regime: string;
   tightness: number;
   riskAppetite: number;
@@ -69,35 +72,26 @@ export function WhyConditionsSection({
   });
   const countedRegimeLabel = getRegimePublicLabel(countedRegime);
 
+  /* The heading is the reader's question, "Why Freezing?", and the lead answers it, meaning
+     first and then the two numbers against their lines (2026-11-18). The page passes the
+     strings it also marks up (`buildHomeQuestions`); without them, the same builders. */
+  const shown = question ?? {
+    question: diagnosisHeading({ regimeLabel, pending: Boolean(pendingConditions) }),
+    answer: describeWhyConditions({
+      regime,
+      regimeLabel,
+      pendingLabel: pendingConditions ? readingLabel : undefined,
+      tightness,
+      riskAppetite,
+      changeLines,
+    }),
+  };
+
   return (
     /* The rule that turns two numbers into a weather word leads (2026-10-27): it is
-       the answer to the heading, and it sat under the table that is its evidence. */
-    <HomeSection
-      id={HOME_SECTIONS.diagnosis.id}
-      heading={pendingConditions ? "Where the scores land" : `Why conditions are ${regimeLabel}`}
-      /* What each side means, in the lead, and no table under it (2026-10-27). The
-         table printed the two scores a third time on the brief, beside the card's
-         ladder and the rows of "What changed" further down; its one column of its
-         own, what each reading means, is a clause here. */
-      lead={(
-        <>
-          {/* The numbers against their lines, then what they add up to in the weather's
-              terms (2026-11-05). Each score carried its meaning in brackets; the closing
-              line says it once, for both. */}
-          Funding pressure is {Math.round(tightness)}, {tightness > changeLines.tightness ? "above" : "at or below"}{" "}
-          {changeLines.tightness}. Risk appetite is {Math.round(riskAppetite)},{" "}
-          {riskAppetite > changeLines.riskAppetite ? "above" : "at or below"} {changeLines.riskAppetite}.{" "}
-          {pendingConditions ? (
-            <span className="font-semibold">Those scores land in {readingLabel}. The published conditions remain {regimeLabel}.</span>
-          ) : (
-            <>
-              {isRegimeKey(regime) ? `${REGIME_WEATHER_LINES[regime]} ` : null}
-              <span className="font-semibold">That&rsquo;s {regimeLabel}.</span>
-            </>
-          )}
-        </>
-      )}
-    >
+       the answer to the heading, and it sat under the table that is its evidence. No
+       table under it: it printed the two scores a third time on the brief. */
+    <HomeSection id={HOME_SECTIONS.diagnosis.id} heading={shown.question} lead={shown.answer}>
       <div className="min-w-0">
         {notCounted.length > 0 ? (
           /* The band hugs its paragraph (2026-11-17): prose stops at 60ch, and a band

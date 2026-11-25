@@ -27,20 +27,8 @@ export const revisitDecisionPhrase = (revisit: boolean, basis: ComparisonBasis) 
   return revisit ? "revisit last week's decisions" : "last week's decisions stand";
 };
 
-export const homeDecisionFaqItems = [
-  {
-    question: "What changed this week?",
-    answer:
-      "Each brief compares both scores with the previous reading and names any pause, restart or change line that was crossed. Most weeks none is crossed.",
-  },
-  {
-    question: "What should we do differently right now?",
-    answer:
-      "The brief gives each area one action, the pause line that holds it and the restart line that reopens it, scaled to your company stage and cash runway.",
-  },
-  {
-    question: "How close is the guidance to changing?",
-    answer:
-      "Room before a change is how many points the nearer score can move before conditions change. It is a distance, not a probability.",
-  },
-] as const;
+/*
+ * `homeDecisionFaqItems` stood here until 2026-11-18: three questions and answers the
+ * homepage's FAQPage marked up and the page never printed. The questions `/` marks up are
+ * its own headings now (`buildHomeQuestions`, lib/report/home/homeSectionModel.ts).
+ */

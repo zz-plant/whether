@@ -62,7 +62,7 @@ const isoDate = (value: string | null | undefined) => {
  * no entry because `Market_expansion` redirects to `Economic_growth`, and a wrong link is worse than
  * none.
  */
-const wikipediaTopic = (name: string, article: string) => ({
+export const wikipediaTopic = (name: string, article: string) => ({
   "@type": "Thing",
   name,
   sameAs: `https://en.wikipedia.org/wiki/${article}`,
