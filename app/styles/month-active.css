@@ -15,6 +15,16 @@
  *   show their words and light the month as their hover does.
  */
 
+/* A mark a tap chose (ui/markReadout.tsx, 2026-11-25), while the card naming it is open:
+   its drawn part ringed in the same ink, whether or not it stands for a month, so a bar
+   five pixels wide or a dot beside the finger shows which one the words are about. First
+   in the file, so a mark with a month ring of its own below keeps that ring. */
+[data-mark-chosen] > :first-child,
+[data-mark-chosen]:empty {
+  outline: 2px solid var(--app-text);
+  outline-offset: 1px;
+}
+
 /* A cell of the year grid on /history, ringed as its hover rings it. */
 a[data-month][data-month-active] > .record-week-cell {
   outline: 2px solid var(--app-text);
