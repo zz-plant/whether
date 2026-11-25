@@ -3,6 +3,7 @@ import type { BoundedDecisionRule, DecisionArea } from "../report/boundedDecisio
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildCanonicalUrl } from "../seo";
 import { resolveAnswerUpdatedAt } from "./contentLedger";
+import { buildAnswerLead } from "./thisWeeksAnswer";
 
 /**
  * One canonical answer object, rendered to the page and served to agents.
@@ -19,7 +20,16 @@ type AnswerObject = {
   title: string;
   permalink: string;
   category: DecisionPageDefinition["category"];
+  /** The page's rule for any week. */
   shortAnswer: string;
+  /**
+   * What the page prints under the question and `get_answer` returns first: this week's standing
+   * ("No, not this week: hiring is open until risk appetite falls below 44; it is 52."), then
+   * `shortAnswer`. The rule alone where the page's area has no numbered line.
+   */
+  leadAnswer: string;
+  /** The first of the page's areas the week has a rule for; the lead sentence is about it unless the question names another. */
+  leadArea?: DecisionArea;
   directAnswer: string;
   audience: string;
   companyInputs: string[];
@@ -57,6 +67,7 @@ export const buildAnswerObject = ({
   mappedRules: BoundedDecisionRule[];
 }): AnswerObject => {
   const permalink = buildCanonicalUrl(`/answers/${page.slug}`);
+  const { leadArea, leadAnswer } = buildAnswerLead({ page, mappedRules, scores });
 
   return {
     slug: page.slug,
@@ -64,6 +75,8 @@ export const buildAnswerObject = ({
     permalink,
     category: page.category,
     shortAnswer: page.shortAnswer,
+    leadAnswer,
+    ...(leadArea ? { leadArea } : {}),
     directAnswer: page.directAnswer,
     audience: page.audience,
     companyInputs: [...page.companyInputs],
@@ -83,6 +96,8 @@ export const buildAnswerObject = ({
       resumeWhen: rule.resumeTrigger,
     })),
     citation: `Whether Weekly Brief (Week of ${recordDateLabel}): "${page.title}" — ${permalink}`,
-    attributionSnippet: `According to Whether's weekly guidance for startup leaders (Week of ${recordDateLabel}, ${permalink}): "${page.shortAnswer}"`,
+    /* Quotes what the page says first, so a quote opens on the page's line. It is dated, so the
+       week's number belongs in it; the meta description is what keeps that number out of caches. */
+    attributionSnippet: `According to Whether's weekly guidance for startup leaders (Week of ${recordDateLabel}, ${permalink}): "${leadAnswer}"`,
   };
 };

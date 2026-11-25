@@ -191,7 +191,7 @@ const PROMPTS: readonly WhetherPrompt[] = [
       const answer = await runOrRefusal("get_answer", { question }, transport);
       return [
         `Answer this question from Whether's guidance: ${question}`,
-        "Give the short answer first, then the rules in force that bear on it. " +
+        "Open with the answer's leadAnswer, the line its page opens on, then the rules in force that bear on it. " +
           "If the answer was refused, say Whether has no answer for this question and pass on where the refusal points, rather than stretching another answer to fit.",
         ANSWER_RULES,
         block("Answer (get_answer)", answer),

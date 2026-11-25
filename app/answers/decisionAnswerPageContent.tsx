@@ -28,7 +28,7 @@ import { formatDecisionReversal, formatDecisionThreshold, formatMarginStamp, pub
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
-import { buildDecisionAnswerContextSummary, describeThisWeeksAnswer } from "./decisionAnswerCopy";
+import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import {
   DATA_CURRENCY_ACTION,
   DATA_CURRENCY_ACTION_HREF,
@@ -93,16 +93,10 @@ export async function DecisionAnswerPageContent({
      the area's rule and then printed a different do-now line, so the answer page had
      its own headline, and neither was the week's. */
   const headline = weeklyHeadline(snapshot.weeklyCall);
-  const leadArea = page.mappedDecisionAreas.find((area) => mappedRules.some((rule) => rule.area === area));
+  const { leadArea, leadAnswer } = answer;
   /* This week's answer first, then the page's rule for any week (2026-11-25): the card under
-     the question, the copied brief and the FAQ markup all lead with it. */
-  const thisWeek = describeThisWeeksAnswer({
-    slug: page.slug,
-    rows: ruleStanding,
-    leadArea,
-    scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
-  });
-  const leadAnswer = thisWeek ? `${thisWeek} ${answer.shortAnswer}` : answer.shortAnswer;
+     the question, the copied brief and the FAQ markup all lead with it. The object builds it
+     (`buildAnswerLead`), so `get_answer` opens on the same sentence. */
   const leadTransmission = leadArea ? decisionAreaCorporateTransmission[leadArea] : undefined;
   const areaDoNowLabel = leadArea
     ? `${decisionAreaLabel(leadArea)} · ${DECISION_CONTRACT_LABELS.action.doNow}`

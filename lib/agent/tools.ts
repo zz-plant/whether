@@ -62,6 +62,9 @@ export const decisionAnswerOutputSchema = z.looseObject({
   title: z.string(),
   permalink: z.string(),
   category: z.enum(["climate", "decision", "explanation"]),
+  leadAnswer: z
+    .string()
+    .describe("What the answer page prints under its question: this week's standing for the page's area, then shortAnswer. Open with it."),
   shortAnswer: z.string(),
   directAnswer: z.string(),
   audience: z.string(),
@@ -326,6 +329,7 @@ const AGENT_TOOLS = [
         title: answer.title,
         permalink: answer.permalink,
         category: answer.category,
+        leadAnswer: answer.leadAnswer,
         shortAnswer: answer.shortAnswer,
         directAnswer: answer.directAnswer,
         audience: answer.audience,

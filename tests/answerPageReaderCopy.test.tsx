@@ -151,6 +151,7 @@ describe("answer page reader copy", () => {
     );
 
     assert.equal(agent.shortAnswer, object.shortAnswer);
+    assert.equal(agent.leadAnswer, object.leadAnswer, "tests/answerLeadParity.test.tsx holds it to the page");
     assert.equal(agent.directAnswer, object.directAnswer);
     assert.deepEqual(agent.companyInputs, object.companyInputs);
     assert.equal(agent.decisionNoteTemplate, object.decisionNote);
