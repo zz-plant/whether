@@ -36,6 +36,10 @@ so a client can read the contract without making a call, and `tests/agentState.t
 it to the page's own. It takes no cadence other than weekly (`?view=state&cadence=monthly` is a 400, not the
 weekly state under another name) and cannot be combined with `format=jev`.
 
+Spreadsheets read it too: [`=WHETHER(key, [score])`](../developer/spreadsheets/README.md) for Google Sheets
+and a Power Query table for Excel. Each key names a field of this payload; `tests/spreadsheetFunction.test.ts`
+runs the Apps Script file against the state the route builds, so renaming a field here fails that test.
+
 ## One confidence
 
 `/api/agent`'s root `confidence` (`{ label, percent }`), the legacy `?tool=get_brief` answer and the RSS item
