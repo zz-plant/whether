@@ -7,6 +7,8 @@ import type { PublishedBrief } from "../report/publishedBriefs";
 import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 import { isDecisionArea, type DecisionArea } from "../report/boundedDecisionRules";
+import { conditionTermSlug, definedTermReference, type DefinedTermSlug } from "./definedTerms";
+import { isRegimeKey } from "../regimePresentation";
 
 /**
  * Per-page JSON-LD, for the pages whose content already supports a schema.org
@@ -62,7 +64,7 @@ export const isoDate = (value: string | null | undefined) => {
  * no entry because `Market_expansion` redirects to `Economic_growth`, and a wrong link is worse than
  * none.
  */
-const wikipediaTopic = (name: string, article: string) => ({
+export const wikipediaTopic = (name: string, article: string) => ({
   "@type": "Thing",
   name,
   sameAs: `https://en.wikipedia.org/wiki/${article}`,
@@ -90,36 +92,18 @@ export const areaTopics = (areas: readonly DecisionArea[]) =>
   areas.flatMap((area) => DECISION_AREA_TOPIC[area] ?? []);
 
 /**
- * The site's own terms, by the ids `/about` gives them in its `DefinedTermSet`. A page that uses a
- * term points at it in `mentions` and does not define it again: one definition, many references
- * (docs/seo/quality-gates.md, "Entities are named once and linked").
+ * The site's own terms, by the ids `/about` gives them in its `DefinedTermSet`
+ * (`lib/seo/definedTerms.ts`). A page that uses a term points at it in `mentions` and does not
+ * define it again: one definition, many references (docs/seo/quality-gates.md, "Entities are
+ * named once and linked").
  */
-type SiteTerm =
-  | "funding-pressure"
-  | "risk-appetite"
-  | "room-to-move"
-  | "room-before-a-change"
-  | "sunny"
-  | "cloudy"
-  | "stormy"
-  | "freezing";
-
-export const siteTerms = (...terms: readonly SiteTerm[]) => terms.map((term) => ({ "@id": `${siteUrl}/about#term-${term}` }));
+export const siteTerms = (...terms: readonly DefinedTermSlug[]) => terms.map(definedTermReference);
 
 /** The condition term a record's regime prints as ("SCARCITY" → Freezing), or none for a key it does not know. */
-const CONDITION_TERM_BY_REGIME: Record<string, SiteTerm> = {
-  EXPANSION: "sunny",
-  DEFENSIVE: "cloudy",
-  VOLATILE: "stormy",
-  SCARCITY: "freezing",
-};
-const conditionTermFor = (regime: string): SiteTerm[] => {
-  const term = CONDITION_TERM_BY_REGIME[regime];
-  return term ? [term] : [];
-};
+const conditionTermFor = (regime: string): DefinedTermSlug[] => (isRegimeKey(regime) ? [conditionTermSlug(regime)] : []);
 
 /** The four conditions, the terms every page that names this week's weather mentions. */
-export const CONDITION_TERMS: readonly SiteTerm[] = ["sunny", "cloudy", "stormy", "freezing"];
+export const CONDITION_TERMS: readonly DefinedTermSlug[] = ["sunny", "cloudy", "stormy", "freezing"];
 
 /* The market concepts the report pages read, each a Wikipedia article about the concept itself. */
 export const MARKET_TOPICS = {

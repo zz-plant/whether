@@ -93,7 +93,7 @@ describe("sub-tabs", () => {
         ["How it held up", "tab", true],
         ["Advice vs. market", "secondary", false],
         ["Is the data current?", "cross", false],
-        ["What goes into the scores?", "cross", false],
+        ["How are the scores worked out?", "cross", false],
       ],
     );
   });

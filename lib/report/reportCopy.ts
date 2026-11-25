@@ -63,16 +63,15 @@ export const OPERATING_LATITUDE_GLOSS = "how much you can hire, spend and commit
  * The claim that leads the homepage's "What would change our mind" section.
  *
  * Every other surface states what the guidance is; this says what it is
- * against. A first-time reader meets the pause, restart and change lines with
- * no reason to think they are unusual, because the rest of the category
- * publishes a read and stops. The sentence names the contrast once, where the
- * lines are, so a screenshot of that section carries the argument and not just
- * the reading.
+ * against: the score moves that would make it wrong, each sized by how often
+ * the record has seen it. It opened on "Most guidance reports current
+ * conditions" until 2026-11-25, a comparison with other products the reader
+ * had not asked for (editorial guardrails, "unlike other tools").
  *
  * Homepage only: an answer page or an archived week draws as before.
  */
 export const BOUNDED_CALL_CONTRAST =
-  "Most guidance reports current conditions. This states what would make the guidance wrong.";
+  "The score moves that would make this guidance wrong, sized against past months.";
 
 export const DECISION_CONTRACT_LABELS = {
   /* Noun slots for exports. "Threshold" and "Reversal" were retired on

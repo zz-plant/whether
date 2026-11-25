@@ -40,7 +40,7 @@ describe("question markup mirrors the page", () => {
     const questions = assertQuestionsVisible(jsonLdIn(html), html, { atLeast: 3 });
     assert.deepEqual(
       questions.slice(0, 3).map((question) => question.name),
-      ["Can we trust this week's guidance?", "Is the data current?", "What goes into the scores?"],
+      ["Can we trust this week's guidance?", "Is the data current?", "How are the scores worked out?"],
     );
     assert.match(questions[0]?.acceptedAnswer.text ?? "", /^(Yes|Mostly|With care|Not fully)[:,]/);
     assert.match(questions[1]?.acceptedAnswer.text ?? "", /^(Yes|Mostly|No)[:,]/);

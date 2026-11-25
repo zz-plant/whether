@@ -4902,6 +4902,9 @@ Left out, each for a reason:
   at that month.
 - Several marks are narrower than 44px on a phone: the grid cells, the bars and the squares. Each
   takes a 44px height, and on touch the first tap only shows its words.
+  - 2026-11-25: the drawing is the target instead. A tap anywhere in it chooses the nearest mark
+    (`lib/ui/nearestMark.ts`) and shows its words above the finger with a 44px "Open Sep 2022"
+    link, which replaced "Tap again to open" and its second tap on the same few pixels.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

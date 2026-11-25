@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -10,6 +11,21 @@ import {
   type PointerEvent,
   type ReactNode,
 } from "react";
+import { markMonth } from "../../../lib/monthCursor";
+import {
+  boxAround,
+  clearOfFinger,
+  holdsPoint,
+  nearestMark,
+  openMarkLabel,
+  placeMarkWords,
+  type MarkBox,
+  type TapPoint,
+} from "../../../lib/ui/nearestMark";
+import { setPageMonth } from "../monthCursor";
+import { CloseIcon } from "../uiIcons";
+import { PlainActionLink } from "./actionLink";
+import { CLOSE_CONTROL_CLASS } from "./closeControl";
 
 /**
  * One readout for the marks of a small drawing: hover, keyboard focus and a tap say
@@ -26,11 +42,18 @@ import {
  *   in document order, Home and End jump, Enter follows a mark that is a link, and
  *   Escape clears. Ten squares or a dozen dots as ten or twelve tab stops would bury
  *   the page's controls, as the record band's 177 months would have (§XXX).
- * - Touch: a mark is a few pixels wide, so the first tap on a linked mark shows its
- *   words and says a second tap opens it; a tap anywhere else clears. A tap that
- *   navigated at once would open a month the reader could not see they had hit.
+ * - Touch and pen (2026-11-25): the whole drawing is the target. A mark is a few
+ *   pixels wide and a finger about forty, so a tap anywhere in the drawing chooses the
+ *   mark nearest to it (`nearestMark`) and never opens anything by itself. Its words
+ *   show in a small card above the finger, with a 44px link that opens it ("Open Sep
+ *   2022") and a close key; a tap outside the drawing, the close key or Escape puts it
+ *   away. Until then a first tap showed the words and "Tap again to open", and the
+ *   second tap had to find the same few pixels.
  *
- * No motion: the bubble appears and goes, it does not travel (§XXIII).
+ * A mark that stands for a month lights that month across the page while it is chosen
+ * (`setPageMonth`), as pointing at it does.
+ *
+ * No motion: the bubble and the card appear and go, they do not travel (§XXIII).
  */
 type Active = {
   element: Element;
@@ -40,8 +63,6 @@ type Active = {
   y: number;
   /** Which edge of the bubble the mark sits under, so a mark near a screen edge keeps its bubble on screen. */
   align: "start" | "center" | "end";
-  /** Shown by a tap: a second tap on the same linked mark follows it. */
-  touch: boolean;
 };
 
 /** Half the bubble's widest, in px: a mark closer than this to a screen edge anchors its bubble to that edge. */
@@ -55,6 +76,185 @@ const ALIGN_TRANSFORM: Record<Active["align"], string> = {
   center: "translate(-50%, calc(-100% - 6px))",
   end: "translate(calc(-100% + 0.75rem), calc(-100% - 6px))",
 };
+
+/* ---- A tap on touch or pen, shared with /history's grid (historyReadout.tsx) ---- */
+
+/** Where the last finger or pen came down in a drawing, so its click is read as a tap and not as a keyboard's Enter. */
+export type MarkTapDown = TapPoint & { time: number };
+
+/** A tap's click arrives within this long of its pointerdown; anything later, or with none, is a key or an assistive tool. */
+const TAP_WINDOW_MS = 1000;
+
+/** The pointerdown this click finishes, if a finger or pen made it. */
+export const tapOf = (down: MarkTapDown | null, clickTime: number): TapPoint | null =>
+  down && clickTime - down.time >= 0 && clickTime - down.time < TAP_WINDOW_MS ? { x: down.x, y: down.y } : null;
+
+/** A control in the drawing that is not a mark (a year's link beside the grid) keeps its own tap. */
+export const isOtherControl = (target: EventTarget | null) => {
+  const control = target instanceof Element ? target.closest("a[href],button,input,select,textarea,summary,label") : null;
+  return Boolean(control && !control.matches("[data-mark],[data-readout-text]"));
+};
+
+const boxOf = (element: Element): MarkBox => {
+  const { left, top, right, bottom } = element.getBoundingClientRect();
+  return { left, top, right, bottom };
+};
+
+/**
+ * The mark nearest a tap, among `marks`. `withinMarks` counts only a tap inside the box
+ * the marks fill, for a drawing whose wrapper also holds words around it (/history's
+ * figures hold their readout line and key).
+ */
+export const markNearest = <T extends Element>(marks: readonly T[], point: TapPoint, withinMarks = false): T | null => {
+  const boxes = marks.map(boxOf);
+  const area = boxAround(boxes);
+  if (withinMarks && !(area && holdsPoint(area, point))) return null;
+  const index = nearestMark(point, boxes);
+  return index === null ? null : (marks[index] ?? null);
+};
+
+/** A mark a tap chose, as its card shows it, placed against the box the card is drawn in. */
+export type TappedMark = {
+  element: Element;
+  text: string;
+  href: string | null;
+  /** "Open Sep 2022". */
+  open: string;
+  month: string | null;
+  /** The card's left edge, its width and the edge that faces the mark, in the card's own box. */
+  left: number;
+  width: number;
+  edge: number;
+  side: "above" | "below";
+};
+
+/** The card's widest, and the height it is placed for: its words on up to three lines, the 44px link under them. */
+const CARD = { width: 320, height: 128 };
+
+const MONTH_MARKS = "[data-month],[data-month-from],[data-month-to]";
+
+/**
+ * Chooses `element` for a tap at `point`: places its card in `origin`'s box (the box the
+ * card is positioned in, read before anything is written) and lights its month on the
+ * page. Reads layout once, writes none.
+ */
+export const chooseTappedMark = (element: Element, text: string, point: TapPoint, origin: Element): TappedMark => {
+  const html = document.documentElement;
+  const chrome = getComputedStyle(html);
+  const view = {
+    width: html.clientWidth,
+    height: window.innerHeight,
+    top: Number.parseFloat(chrome.scrollPaddingTop) || 0,
+    bottom: Number.parseFloat(chrome.scrollPaddingBottom) || 0,
+  };
+  const box = origin.getBoundingClientRect();
+  const left = box.left + origin.clientLeft;
+  const top = box.top + origin.clientTop;
+  const place = placeMarkWords(clearOfFinger(boxOf(element), point), CARD, view);
+  const month = markMonth({
+    month: element.getAttribute("data-month"),
+    monthFrom: element.getAttribute("data-month-from"),
+    monthTo: element.getAttribute("data-month-to"),
+  });
+  if (month) setPageMonth(month);
+  return {
+    element,
+    text,
+    href: element.closest("a[href]")?.getAttribute("href") ?? null,
+    open: openMarkLabel(month),
+    month,
+    left: place.left - left,
+    width: place.width,
+    edge: place.edge - top,
+    side: place.side,
+  };
+};
+
+/**
+ * Lets go of a tapped mark's month, unless the tap that let go landed on another month's
+ * mark (that mark sets its own) or something else has set the page's month since.
+ */
+export const releaseTappedMonth = (tapped: TappedMark, target: EventTarget | null) => {
+  if (!tapped.month || document.documentElement.dataset.activeMonth !== tapped.month) return;
+  if (target instanceof Element && target.closest(MONTH_MARKS)) return;
+  setPageMonth(null);
+};
+
+/**
+ * The card a tap opens: the mark's words, a link that opens the mark where it is one,
+ * and a close key. `scope` is the drawing: a press outside it closes the card, and so
+ * does Escape. Positioned by `chooseTappedMark`, so it measures nothing.
+ */
+export function TappedMarkCard({
+  tapped,
+  scope,
+  onClose,
+}: {
+  tapped: TappedMark;
+  scope: () => Element | null;
+  onClose: (target: EventTarget | null) => void;
+}) {
+  const card = useRef<HTMLSpanElement>(null);
+  const close = useRef(onClose);
+  useEffect(() => {
+    close.current = onClose;
+  }, [onClose]);
+
+  /* The chosen mark is ringed while its card is open (month-active.css), so a bar five pixels wide shows which one the words name. */
+  useEffect(() => {
+    const chosen = tapped.element;
+    chosen.setAttribute("data-mark-chosen", "");
+    return () => chosen.removeAttribute("data-mark-chosen");
+  }, [tapped.element]);
+
+  useEffect(() => {
+    /* Capture, as monthCursor.tsx does, so a drawing that answers the same press sets its month after this lets go. */
+    const onDown = (event: globalThis.PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      if (target && (card.current?.contains(target) || scope()?.contains(target))) return;
+      close.current(event.target);
+    };
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") close.current(null);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [scope]);
+
+  return (
+    <span
+      ref={card}
+      data-mark-tap-card
+      /* Over the page's content and under its sticky header, which a card scrolled up to it slides beneath. */
+      className="absolute z-[var(--z-raised)] flex items-start gap-1 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] py-1 pl-3 pr-0 text-left text-fluid-sm leading-snug font-normal whitespace-normal text-slate-200 tabular-nums shadow-[var(--elev-3)]"
+      style={{
+        left: tapped.left,
+        top: tapped.edge,
+        width: tapped.width,
+        transform: tapped.side === "above" ? "translateY(-100%)" : undefined,
+      }}
+    >
+      <span className="block min-w-0 flex-1 space-y-1.5 py-2">
+        {/* The mark's own name says these words to a screen reader. */}
+        <span aria-hidden="true" className="block">
+          {tapped.text}
+        </span>
+        {tapped.href ? (
+          <PlainActionLink href={tapped.href} variant="pill" className="min-w-11">
+            {tapped.open}
+          </PlainActionLink>
+        ) : null}
+      </span>
+      <button type="button" aria-label="Close" className={CLOSE_CONTROL_CLASS} onClick={() => close.current(null)}>
+        <CloseIcon />
+      </button>
+    </span>
+  );
+}
 
 export function MarkReadout({
   children,
@@ -70,10 +270,11 @@ export function MarkReadout({
   className?: string;
 }) {
   const root = useRef<HTMLElement | null>(null);
-  const pointerType = useRef<string>("mouse");
+  const down = useRef<MarkTapDown | null>(null);
   const [active, setActive] = useState<Active | null>(null);
+  const [tapped, setTapped] = useState<TappedMark | null>(null);
 
-  const show = (element: Element, touch: boolean) => {
+  const show = (element: Element) => {
     const box = root.current?.getBoundingClientRect();
     if (!box) return;
     const rect = element.getBoundingClientRect();
@@ -85,57 +286,64 @@ export function MarkReadout({
       x: centre - box.left,
       y: rect.top - box.top,
       align: centre < EDGE_ROOM ? "start" : centre > viewport - EDGE_ROOM ? "end" : "center",
-      touch,
     });
   };
 
-  /* A tap outside the drawing clears what a tap showed. Mouse and keyboard clear on leaving. */
-  useEffect(() => {
-    if (!active?.touch) return undefined;
-    const clear = (event: globalThis.PointerEvent) => {
-      if (event.target instanceof Node && root.current?.contains(event.target)) return;
-      setActive(null);
-    };
-    document.addEventListener("pointerdown", clear);
-    return () => document.removeEventListener("pointerdown", clear);
-  }, [active?.touch]);
+  const scope = useCallback(() => root.current, []);
+  const closeTapped = (target: EventTarget | null) => {
+    if (tapped) releaseTappedMonth(tapped, target);
+    setTapped(null);
+  };
 
   const onPointerDown = (event: PointerEvent<HTMLElement>) => {
-    pointerType.current = event.pointerType;
+    down.current = event.pointerType === "mouse" ? null : { x: event.clientX, y: event.clientY, time: event.timeStamp };
+  };
+
+  /* A finger that scrolled the page made no tap. */
+  const onPointerCancel = () => {
+    down.current = null;
   };
 
   const onPointerOver = (event: PointerEvent<HTMLElement>) => {
     if (event.pointerType === "touch") return;
     const mark = markOf(event.target);
     if (mark) {
-      if (active?.element !== mark) show(mark, false);
-    } else if (active && !active.touch) {
+      if (active?.element !== mark) show(mark);
+    } else if (active) {
       setActive(null);
     }
   };
 
   const onPointerLeave = (event: PointerEvent<HTMLElement>) => {
-    /* A finger "leaves" when it lifts; only a mouse leaving clears. */
-    if (event.pointerType !== "touch" && !active?.touch) setActive(null);
+    /* A finger "leaves" when it lifts; only a mouse or a pen leaving clears the bubble. */
+    if (event.pointerType !== "touch") setActive(null);
   };
 
+  /* A finger or a pen: choose the mark nearest the tap. A mouse click and a keyboard's
+     Enter carry no tap (no pointerdown from either just before), so a link mark opens as
+     it always did. */
   const onClick = (event: MouseEvent<HTMLElement>) => {
-    if (pointerType.current !== "touch") return;
-    const mark = markOf(event.target);
+    const point = tapOf(down.current, event.timeStamp);
+    down.current = null;
+    const node = root.current;
+    if (!point || !node) return;
+    if (event.target instanceof Element && event.target.closest("[data-mark-tap-card]")) return;
+    if (isOtherControl(event.target)) return;
+    const mark = markNearest([...node.querySelectorAll("[data-mark]")], point);
     if (!mark) return;
-    if (active?.element === mark && active.touch) return;
-    if (mark.closest("a")) event.preventDefault();
-    show(mark, true);
+    event.preventDefault();
+    setActive(null);
+    setTapped(chooseTappedMark(mark, mark.getAttribute("data-mark") ?? "", point, node));
   };
 
   const onFocus = (event: FocusEvent<HTMLElement>) => {
     const mark = markOf(event.target);
-    if (mark && active?.element !== mark) show(mark, false);
+    if (mark && active?.element !== mark) show(mark);
   };
 
   const onBlur = (event: FocusEvent<HTMLElement>) => {
     if (event.relatedTarget instanceof Node && root.current?.contains(event.relatedTarget)) return;
-    if (!active?.touch) setActive(null);
+    setActive(null);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -157,7 +365,6 @@ export function MarkReadout({
     target.focus();
   };
 
-  const linked = active ? Boolean(active.element.closest("a")) : false;
   return (
     <Tag
       ref={(node: HTMLElement | null) => {
@@ -166,6 +373,7 @@ export function MarkReadout({
       data-mark-readout
       className={`relative ${className}`.trim()}
       onPointerDown={onPointerDown}
+      onPointerCancel={onPointerCancel}
       onPointerOver={onPointerOver}
       onPointerLeave={onPointerLeave}
       onClick={onClick}
@@ -176,7 +384,7 @@ export function MarkReadout({
       {/* The marks' name, read before them: a group role on a span or div is not allowed to carry it. */}
       {label ? <span className="sr-only select-none">{label}</span> : null}
       {children}
-      {active?.text ? (
+      {active?.text && !tapped ? (
         <span
           aria-hidden="true"
           data-mark-readout-bubble
@@ -184,9 +392,9 @@ export function MarkReadout({
           style={{ left: active.x, top: active.y, transform: ALIGN_TRANSFORM[active.align] }}
         >
           {active.text}
-          {active.touch && linked ? <span className="block opacity-80">Tap again to open</span> : null}
         </span>
       ) : null}
+      {tapped ? <TappedMarkCard tapped={tapped} scope={scope} onClose={closeTapped} /> : null}
     </Tag>
   );
 }

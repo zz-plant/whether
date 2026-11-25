@@ -159,8 +159,9 @@ const WarningDiamond = ({ warned, className = "" }: { warned: boolean; className
  * the three without were the latest. Each mark links to its month in the time machine
  * (there is no compare view to open: `/history/compare` redirects here), named and read
  * out with the words the grading table uses (`describeAdvanceWarning`); the count and
- * the marks are one object (`buildAdvanceWarningMarks`). The month under each mark is
- * what a touch screen reads before it opens one.
+ * the marks are one object (`buildAdvanceWarningMarks`). On touch a tap shows a mark's
+ * words with a 44px link that opens it (`HistoryReadout`, 2026-11-25), so the warning
+ * the line names is read before the month opens.
  */
 export function ConfidenceRecordSummary({
   warnings,
@@ -250,8 +251,8 @@ function ConfidenceRecordBody() {
     <div className="space-y-3">
       <p className="text-sm text-slate-200">
         <BaseRateSentence totals={totals} baseRate={baseRate} /> Every band below held more often than its
-        published percent, and the two closest bands are out of order—read the room before a change
-        as a distance from the change line, not a probability.
+        published percent, and the two closest bands are out of order. Treat room before a change as a
+        distance from the change line, not a probability.
       </p>
 
       <MarginReliabilityChart rows={rows} />

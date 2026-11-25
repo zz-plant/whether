@@ -538,25 +538,25 @@ export const describeSpellLengths = ({
    * month-end yet, and the lead then names the earlier spells alone.
    */
   const current = ongoing ? spells.at(-1)?.months ?? null : null;
-  const soFar = current !== null ? `It's been ${label} for ${monthEnds(current)} so far. ` : "";
+  /*
+   * The lead answers the section's question, "Has this happened before?", the way a person
+   * would (2026-11-18): "Once", "Yes", "Not since 2012" first, then the lengths. It opened
+   * on the record ("There have been 3 earlier Sunny stretches, lasting…"), so the answer
+   * came after the count it rests on.
+   */
+  const soFar = current !== null ? ` It's been ${label} for ${monthEnds(current)} so far.` : "";
   let lead = "";
   if (earlier.length === 0) {
     lead = current !== null
-      ? `This is the first ${label} stretch since ${firstYear}, ${monthEnds(current)} so far.`
-      : `There's no earlier ${label} stretch since ${firstYear}.`;
+      ? `Not since ${firstYear}: this is the first ${label} stretch, ${monthEnds(current)} so far.`
+      : `Not since ${firstYear}: there's no earlier ${label} stretch.`;
   } else if (earlier.length === 1) {
     const only = earlier.at(0);
-    if (only) {
-      lead = current !== null
-        ? `${soFar}The last ${label} stretch lasted ${monthEnds(only.months)}, ${spellRange(only)}.`
-        : `The only earlier ${label} stretch lasted ${monthEnds(only.months)}, ${spellRange(only)}.`;
-    }
+    if (only) lead = `Once: ${label} lasted ${monthEnds(only.months)}, ${spellRange(only)}.${soFar}`;
   } else {
     const lengths = earlier.map((spell) => spell.months);
     const listed = `${lengths.slice(0, -1).join(", ")} and ${monthEnds(lengths.at(-1) ?? 0)}`;
-    lead = current !== null
-      ? `${soFar}The ${earlier.length} earlier ones lasted ${listed}.`
-      : `There have been ${earlier.length} earlier ${label} stretches, lasting ${listed}.`;
+    lead = `Yes. Earlier ${label} stretches lasted ${listed}.${soFar}`;
   }
   const parts: string[] = [];
   if (shortest !== null) parts.push(`Since ${firstYear}, every stretch of conditions has lasted at least ${monthEnds(shortest)}.`);

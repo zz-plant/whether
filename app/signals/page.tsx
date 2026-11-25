@@ -47,7 +47,6 @@ export default async function SignalsPage({
           statusLabel: model.statusLabel,
           regime: model.assessment.regime,
           recordDateLabel: model.recordDateLabel,
-          recordDate: model.treasury.record_date,
           fetchedAtLabel: model.fetchedAtLabel,
         },
         page: {
@@ -62,7 +61,7 @@ export default async function SignalsPage({
         trust: {
           trustStatusTone: model.trust.trustStatusTone,
           showOfflineBadge: model.isFallback && !model.historicalSelection,
-          strip: { ...model.trustStrip, recordDate: model.treasury.record_date, href: "/trust" },
+          strip: { ...model.trustStrip, href: "/trust" },
         },
         // No closing "Open the plan" card (2026-10-09): Decide is a header tab.
         payloads: {

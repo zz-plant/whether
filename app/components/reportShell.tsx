@@ -56,8 +56,6 @@ export type ReportShellModel = {
      *  compare page's two periods. The intro does not print it. */
     frameCondition?: string;
     recordDateLabel: string;
-    /** The record date as an ISO date, for the `<time dateTime>` the intro prints the label in. */
-    recordDate?: string;
     fetchedAtLabel?: string;
   };
   page: {
@@ -110,7 +108,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
-    status: { statusLabel, statusPrefix, regime, statusRegime, frameCondition, recordDateLabel, recordDate, fetchedAtLabel = "" },
+    status: { statusLabel, statusPrefix, regime, statusRegime, frameCondition, recordDateLabel, fetchedAtLabel = "" },
     page: { pageTitle, pageSummary, sectionLinks, currentPath, tabsQuery },
     trust: {
       trustStatusTone,
@@ -182,7 +180,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             pageTitle={pageTitle}
             pageSummary={pageSummary}
             recordDateLabel={recordDateLabel}
-            recordDate={recordDate}
             primaryCta={primaryCta}
             exportCta={exportCta}
             statusLabel={statusLabel}

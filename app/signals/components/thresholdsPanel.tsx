@@ -236,7 +236,7 @@ const InputChoiceFieldset = ({ model }: { model: InputChoiceModel }) => {
         {/* The link names the section it opens: each box's points are that arithmetic. */}
         <p className="mt-2 text-fluid-sm text-slate-400">
           <ActionLink href="/trust#formula-reference" variant="inline">
-            What goes into the scores
+            How the scores are worked out
           </ActionLink>
         </p>
       </fieldset>

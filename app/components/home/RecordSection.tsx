@@ -3,7 +3,8 @@ import { HomeSection } from "./HomeSection";
 import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import { MonthStrip } from "../history/monthStrip";
 import { SpellLengthPlot } from "./SpellLengthPlot";
-import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
+import { HOME_SECTIONS, type HomeQuestion } from "../../../lib/report/home/homeSectionModel";
+import { DatedText } from "../ui/datedText";
 import type { LastTimeCallChanged, SpellLengthPlot as SpellLengthPlotModel } from "../../../lib/report/lastTimeCallChanged";
 
 /**
@@ -27,6 +28,7 @@ export function RecordSection({
   record,
   comparisons,
   query,
+  question,
 }: {
   lastTime: LastTimeCallChanged | null;
   /** Every change the card offers, for switching in place (`findCallChangeComparisons`). */
@@ -42,13 +44,15 @@ export function RecordSection({
   spellLengths?: { lead: string; rest: string; plot?: SpellLengthPlotModel | null } | null;
   /** Every month-end on record, for the band; left out of an archived view, whose record would end at its month. */
   record?: readonly { recordDate: string; regime: string; tightness?: number; riskAppetite?: number }[];
+  /** The heading and its answer (`buildHomeQuestions`): the spell lengths' lead, which the JSON-LD quotes. */
+  question?: HomeQuestion | null;
 }) {
   if (!lastTime && turningPoints.length === 0 && !spellLengths && !record?.length) return null;
   return (
     /* The answer leads (2026-10-27): this spell beside the earlier ones, over the band
        that is its evidence. It sat under the band and a sampling note, so a frame of
        the section showed the band and the question, and the answer was a scroll away. */
-    <HomeSection id={HOME_SECTIONS.record.id} heading={HOME_SECTIONS.record.heading} lead={spellLengths?.lead}>
+    <HomeSection id={HOME_SECTIONS.record.id} heading={question?.question ?? HOME_SECTIONS.record.heading} lead={question?.answer ?? spellLengths?.lead}>
       {lastTime ? <LastTimeCallChangedCard record={lastTime} comparisons={comparisons} callChangeLines={callChangeLines} query={query} /> : null}
       {/* Every stretch by how long it lasted (2026-11-18), with the months under each
           condition on its rows: the count the key printed, so the key is not printed too. */}
@@ -77,7 +81,7 @@ export function RecordSection({
               <span key={point.href}>
                 {index > 0 ? " · " : null}
                 <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                  {point.label}
+                  <DatedText text={point.label} />
                 </Link>
               </span>
             ))}

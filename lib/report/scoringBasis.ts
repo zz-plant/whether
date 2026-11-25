@@ -294,11 +294,13 @@ export const resolveScoringBasis = ({
   };
 };
 
-const signed = (points: number) => `${points > 0 ? "+" : "-"}${Math.abs(points)}`;
+/** "would take it down 11 points": the not-counted move as a reader says it. */
+const wouldMove = (subject: string, points: number) =>
+  `would take ${subject} ${points > 0 ? "up" : "down"} ${Math.abs(points)} ${Math.abs(points) === 1 ? "point" : "points"}`;
 
 /**
  * What one score leaves out, for the row under it in the breakdown: "Not
- * counted: -11 from startup-market inputs." Null when the inputs outside the
+ * counted: startup-market inputs, which would take it down 11 points." Null when the inputs outside the
  * record would not move it. Printed whichever reading the week compares with,
  * because it is about this reading's score, not about the move.
  */
@@ -307,7 +309,7 @@ export const describeNotCountedScore = (
   basis: Pick<ScoringBasis, "notCounted"> | undefined,
 ): string | null => {
   const entry = basis?.notCounted.find((candidate) => candidate.metric === metric);
-  return entry ? `Not counted: ${signed(entry.score - entry.published)} from ${entry.label}.` : null;
+  return entry ? `Not counted: ${entry.label}, which ${wouldMove("it", entry.score - entry.published)}.` : null;
 };
 
 /** A score's move and what it leaves out, as the row under it prints them; null when neither says anything. */
@@ -315,15 +317,15 @@ export const joinSentences = (...sentences: Array<string | null | undefined>): s
   sentences.filter((sentence): sentence is string => Boolean(sentence)).join(" ") || null;
 
 /**
- * Both scores' not-counted lines as one, for a paste: "Not counted: risk
- * appetite -11 from startup-market inputs." Null when neither score leaves
+ * Both scores' not-counted lines as one, for a paste: "Not counted:
+ * startup-market inputs, which would take risk appetite down 11 points." Null when neither score leaves
  * anything out.
  */
 export const describeNotCountedLine = (basis: Pick<ScoringBasis, "notCounted"> | undefined): string | null => {
   const entries = basis?.notCounted ?? [];
   return entries.length > 0
     ? `Not counted: ${joinAnd(
-        entries.map((entry) => `${ruleMetricLabel[entry.metric].toLowerCase()} ${signed(entry.score - entry.published)} from ${entry.label}`),
+        entries.map((entry) => `${entry.label}, which ${wouldMove(ruleMetricLabel[entry.metric].toLowerCase(), entry.score - entry.published)}`),
       )}.`
     : null;
 };

@@ -18,7 +18,7 @@ export const TRUST_PAGE_QUESTION = "Can we trust this week's guidance?";
 
 /** The meta description: the page's question answered in two spoken sentences. */
 export const trustPageDescription =
-  "Yes, when every source is current and the scores sit well clear of a change. Check each source's date, how close conditions are to changing and what goes into each score.";
+  "Yes, when every source is current and the scores sit well clear of a change. Check each source's date, how close conditions are to changing and how each score is worked out.";
 
 const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 const countWord = (count: number) => COUNT_WORDS[count] ?? String(count);
@@ -75,9 +75,9 @@ const describeTrustAnswer = ({
 };
 
 export const SCORES_QUESTION: TrustQuestion = {
-  question: "What goes into the scores?",
+  question: "How are the scores worked out?",
   answer:
-    "Public U.S. market data: interest rates set most of each score, market reads adjust it, and each lands between 0 and 100.",
+    "From public U.S. market data: interest rates set most of each score, market reads adjust it, and each lands between 0 and 100.",
 };
 
 /** The limits fold's summary: the question it answers and this week's answer, the change line in words. */

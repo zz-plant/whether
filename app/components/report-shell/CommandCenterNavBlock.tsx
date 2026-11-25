@@ -5,6 +5,7 @@ import { formatNearestChange } from "../../../lib/report/reportFormatting";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import type { RegimeKey } from "../../../lib/types";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
+import { DatedText } from "../ui/datedText";
 
 /**
  * The one page intro block a report route gets (ui-ux-standards §XI): kicker,
@@ -21,7 +22,6 @@ export function CommandCenterNavBlock({
   pageTitle,
   pageSummary,
   recordDateLabel,
-  recordDate,
   primaryCta,
   exportCta,
   statusLabel,
@@ -38,8 +38,6 @@ export function CommandCenterNavBlock({
   pageTitle: string;
   pageSummary?: string;
   recordDateLabel: string;
-  /** The record date as an ISO date: the intro's "Data as of" prints it in `<time dateTime>`. */
-  recordDate?: string;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
   statusLabel: string;
@@ -65,24 +63,19 @@ export function CommandCenterNavBlock({
   // With a strip, the sources and the record date are its cells: /operate,
   // /signals and /trust printed "All sources live • As of Oct 2" here and the
   // same two facts again in the strip a row below (DD-040).
-  const introMetaParts = [
+  const introMetaRest = [
     trustStrip ? null : trustStatusLabel,
     // Interpolated only when there is a date. `As of ${x}` is a truthy string
     // even when x is "", so the filter below could never drop it, and a caller
     // passing no record date printed a bare "As of" with nothing after it.
     !trustStrip && recordDateLabel ? `Data as of ${recordDateLabel}` : null,
     showOfflineBadge ? offlineBadgeLabel : null,
-  ].filter((part): part is string => Boolean(part));
-  const introMetaRest = introMetaParts.join(" • ");
-  /* The same line, with the record date in `<time dateTime>` where the route gives it as a
-     date (2026-11-25): it is the date the reading belongs to. */
-  const introMeta = introMetaParts.flatMap((part, index) => {
-    const separator = index > 0 ? [" • "] : [];
-    if (recordDate && part === `Data as of ${recordDateLabel}`) {
-      return [...separator, "Data as of ", <time key="record-date" dateTime={recordDate.slice(0, 10)}>{recordDateLabel}</time>];
-    }
-    return [...separator, part];
-  });
+  ]
+    .filter(Boolean)
+    .join(" • ");
+  /* The same line with its record date in `<time dateTime>` (2026-11-25): it is the date the
+     reading belongs to, and the strip's own date cell does the same (`DatedText`). */
+  const introMeta = <DatedText text={introMetaRest} />;
   // Same rule for the refresh stamp: /history passes no fetch time, and
   // printed "Updated " with nothing after it. There is no second stamp: a
   // "15m cadence" label and, on /history, "Fixed historical snapshot" beside the

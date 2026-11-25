@@ -3,6 +3,7 @@ import { sharedDecisionLines } from "../../lib/report/boundedDecisionRules";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
 import { CorridorStrip } from "./corridorStrip";
 import { TemplateActions } from "./templateActions";
+import { DEFINED_TERM_SET_ANCHOR, SITE_VOCABULARY, definedTermAnchor } from "../../lib/seo/definedTerms";
 
 /* The worked example quotes the published lines, so a reader who checks it
    against the brief finds the same numbers. It said "below 64", a line no rule
@@ -64,6 +65,24 @@ export function MethodSection() {
           pauseLine={EXAMPLE_LINES.tightnessPause}
           resumeLine={EXAMPLE_LINES.tightnessResume}
         />
+      </section>
+
+      {/* The words every brief uses, each once, in the sentence the site already prints
+          beside it (`SITE_VOCABULARY`, 2026-11-18). The page's DefinedTermSet is built
+          from the same list, and every other page points at these ids. Not a glossary
+          route (feature log §1.5): eight terms, on the page that explains the method. */}
+      <section id={DEFINED_TERM_SET_ANCHOR} aria-labelledby="terms-heading" className="space-y-3">
+        <h3 id="terms-heading" className="text-fluid-lg font-semibold text-slate-100">The words on the brief</h3>
+        <dl className="space-y-2">
+          {SITE_VOCABULARY.map((term) => (
+            <div key={term.slug} className="space-y-0.5">
+              <dt className="text-base font-semibold text-slate-100">
+                <dfn id={definedTermAnchor(term.slug)} className="not-italic">{term.name}</dfn>
+              </dt>
+              <dd className="text-base text-slate-300">{term.description}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {/* Folded: the essay explains a method (§XII: the explanation behind a

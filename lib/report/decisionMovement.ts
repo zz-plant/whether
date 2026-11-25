@@ -88,7 +88,7 @@ type AreaMovement = {
   state: AreaState;
   /** The lines that decided the movement, in the order the area states them. Empty when it held. */
   crossed: CrossedLine[];
-  /** A table cell's worth: "Pause now applies: funding pressure rose through 76." */
+  /** A table cell's worth: "Paused: funding pressure rose through 76." */
   text: string;
 };
 
@@ -170,7 +170,7 @@ const describeCrossing = (line: CrossedLine) =>
  * area that was running.
  */
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
-  paused: "Pause now applies",
+  paused: "Paused",
   lifted: "Pause lifted",
   resumable: "Restart condition now holds",
   resumeLost: "Restart condition no longer holds",

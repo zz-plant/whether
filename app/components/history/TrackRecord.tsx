@@ -236,7 +236,7 @@ export function TrackRecordTable({
           {OPERATING_LATITUDE_LABEL} (0–100): {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite +{" "}
           {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% inverse funding pressure. Higher means more room to commit.{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-            What goes into the scores
+            How the scores are worked out
           </Link>
         </p>
       </div>

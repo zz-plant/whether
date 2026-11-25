@@ -75,7 +75,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     key: "this-week",
     href: "/",
     label: "This week",
-    description: "What this week's guidance is, why it changed and how much to trust it.",
+    description: "This week's guidance, the evidence behind it and its sources.",
     shortcut: "w",
     memberPrefixes: [],
     crossLinks: [],
@@ -107,7 +107,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
        week's reading; the record reaches them rather than holding a second copy. */
     crossLinks: [
       { href: "/trust#source-board", label: "Is the data current?" },
-      { href: "/trust#formula-reference", label: "What goes into the scores?" },
+      { href: "/trust#formula-reference", label: "How are the scores worked out?" },
     ],
     footerLinks: [],
   },
@@ -291,7 +291,7 @@ export const utilityLinks = [
   {
     href: "/about",
     label: "About",
-    description: "Product philosophy & team",
+    description: "Who writes Whether and how it works",
     header: "md",
   },
   /* Reached from the footer, the phone's More sheet and the palette, not the

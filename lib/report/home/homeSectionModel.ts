@@ -22,6 +22,7 @@ import { describeScoreMoveBand, describeScoreMoveHistogram, type ScoreMoveHistog
 import { describePastHolds } from "../lastTimeCallChanged";
 import type { TimeMachineRegimeEntry } from "../../timeMachine/timeMachineCache";
 import { describeMovementCause, type AreaMovementKind, type DecisionMovement } from "../decisionMovement";
+import { isRegimeKey, REGIME_WEATHER_LINES } from "../../regimePresentation";
 
 /**
  * The homepage's sections in the reader's order (`HOME_SECTIONS` below). Each
@@ -123,16 +124,147 @@ export const buildHomeViewHref = (
  * Sharing is the action row under the card and the header's share panel; the page
  * has no share section or closing share line (2026-11-11).
  */
+/*
+ * Since 2026-11-18 each heading is the question a reader would ask out loud or in Slack
+ * (docs/editorial-guardrails.md, "Questions and answers, as people say them"), and the
+ * first sentence under it is the answer (`buildHomeQuestions` below). Where a week gives
+ * a section no answer, it keeps its label (`fallback`): a question the page cannot answer
+ * is not asked. The ids are link contracts and did not move.
+ */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
-  areas: { id: "what-it-changes", heading: "Your decisions this week" },
+  areas: { id: "what-it-changes", heading: "What’s on hold?", fallback: "Your decisions this week" },
   calibration: { id: "company-calibration" },
   diagnosis: { id: "why-conditions" },
-  changed: { id: "what-changed", heading: "What changed this week" },
-  watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
+  changed: { id: "what-changed", heading: "What’s changed since last week?" },
+  watch: {
+    id: "what-would-change",
+    heading: `${DECISION_CONTRACT_LABELS.watch.flipWatch}?`,
+    fallback: DECISION_CONTRACT_LABELS.watch.flipWatch,
+  },
   record: { id: "has-this-happened-before", heading: "Has this happened before?" },
-  alert: { id: "subscribe", heading: "Get an alert the day conditions turn" },
+  alert: { id: "subscribe", heading: "Can I get an email when conditions turn?" },
 } as const;
+
+/**
+ * One of the page's questions and its answer, as the page prints them: the heading, and
+ * the first sentence under it. The section renders these two strings and the page's
+ * JSON-LD marks up the same two (`withHomeQuestions`), so the markup cannot say what the
+ * page does not.
+ */
+export type HomeQuestion = { id: string; question: string; answer: string };
+
+/** "What’s changed since Nov 9?": the heading names the reading the move is measured from. */
+export const changedHeading = (basis: Pick<ComparisonBasis, "since">) => `What’s changed ${basis.since}?`;
+
+/** "Why Freezing?", or, while a change is waiting on a second reading, where the scores land. */
+export const diagnosisHeading = ({ regimeLabel, pending }: { regimeLabel: string; pending: boolean }) =>
+  pending ? "Where do the scores land?" : `Why ${regimeLabel}?`;
+
+/**
+ * "What’s on hold?", answered with the held areas by name, in the page's order: "Hiring,
+ * Fundraising, Spending and New bets." On a saved copy the count is the old reading's, said
+ * in the past tense with its date, as `describePauseLineCount` says it. Null when no area
+ * states a pause line, and the section keeps its label.
+ */
+export const describeHeldAreas = (
+  rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
+  savedReadingDate?: string,
+): string | null => {
+  const ruled = rows.filter((row) => row.pause);
+  if (ruled.length === 0) return null;
+  const held = [...ruled]
+    .filter((row) => row.pause?.met)
+    .sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area))
+    .map((row) => decisionAreaLabel(row.area));
+  const list = held.length <= 1 ? (held[0] ?? "") : `${held.slice(0, -1).join(", ")} and ${held.at(-1) ?? ""}`;
+  if (savedReadingDate) {
+    const on = `on the ${savedReadingDate} reading`;
+    if (held.length === 0) return `Nothing was on hold ${on}.`;
+    return `${list} ${held.length === 1 ? "was" : "were"} on hold ${on}.`;
+  }
+  return held.length === 0 ? "Nothing is on hold." : `${list}.`;
+};
+
+/**
+ * "What’s changed since Nov 9?", answered with the two scores, the bigger move first and
+ * where each stands now: "Risk appetite fell to 44, and funding pressure stayed at 90." The
+ * earlier figures are the rows' ("Nov 9: 53"), so the answer does not print them again.
+ * Rounded as the scores are published. Null without a comparison: the section then says
+ * there is none.
+ */
+export const describeScoreChanges = (rows: readonly Pick<SignalChangeRow, "key" | "label" | "value" | "previous">[]): string | null => {
+  const scores = rows.flatMap((row) =>
+    (row.key === "tightness" || row.key === "riskAppetite") && typeof row.value === "number" && typeof row.previous === "number"
+      ? [{ label: row.label, now: Math.round(row.value), before: Math.round(row.previous) }]
+      : [],
+  );
+  if (scores.length === 0) return null;
+  const ordered = [...scores].sort((left, right) => Math.abs(right.now - right.before) - Math.abs(left.now - left.before));
+  const named = (label: string, index: number) => (index === 0 ? label : label.toLowerCase());
+  if (ordered.every((score) => score.now === score.before)) {
+    return `Neither score moved: ${ordered.map((score, index) => `${named(score.label, index + 1)} is ${score.now}`).join(" and ")}.`;
+  }
+  const clauses = ordered.map(
+    (score, index) =>
+      `${named(score.label, index)} ${score.now === score.before ? "stayed at" : score.now > score.before ? "rose to" : "fell to"} ${score.now}`,
+  );
+  return `${clauses.join(", and ")}.`;
+};
+
+/**
+ * "Why Freezing?", answered with what the two scores mean together, then the numbers:
+ * "Money is pricey, and investors won't go out in it. Funding pressure is 90, above 70, and
+ * risk appetite is 44, at or below 50." While a change waits on a second reading, where the
+ * scores land and what the published conditions still are.
+ */
+export const describeWhyConditions = ({
+  regime,
+  regimeLabel,
+  pendingLabel,
+  tightness,
+  riskAppetite,
+  changeLines,
+}: {
+  regime: string;
+  regimeLabel: string;
+  /** The conditions the scores land in while the published ones hold; absent otherwise. */
+  pendingLabel?: string;
+  tightness: number;
+  riskAppetite: number;
+  changeLines: { tightness: number; riskAppetite: number };
+}): string => {
+  const side = (score: number, line: number) => `${score > line ? "above" : "at or below"} ${line}`;
+  const numbers = `Funding pressure is ${Math.round(tightness)}, ${side(tightness, changeLines.tightness)}, and risk appetite is ${Math.round(riskAppetite)}, ${side(riskAppetite, changeLines.riskAppetite)}.`;
+  if (pendingLabel) return `In ${pendingLabel}. ${numbers} The published conditions remain ${regimeLabel}.`;
+  return isRegimeKey(regime) ? `${REGIME_WEATHER_LINES[regime]} ${numbers}` : numbers;
+};
+
+/** "Can I get an email when conditions turn?", answered with what the alert sends. The form under it does not repeat it. */
+export const ALERT_ANSWER = "Yes. We’ll email you the day the guidance changes, an area pauses or restarts, or a market input jumps.";
+
+/**
+ * The page's questions that have an answer this week, in page order, for the sections and
+ * the JSON-LD. "What would change our mind?" is answered with the week's "Conditions change
+ * if" sentence, the one every paste prints under that label (on a held week, the hold's own
+ * condition), so the section prints it once, as its lead.
+ */
+export const buildHomeQuestions = (answers: {
+  areas: string | null;
+  changed: { question: string; answer: string | null };
+  diagnosis: { question: string; answer: string };
+  /** The week's "Conditions change if" sentence (`reversalTriggerLabel`); none on a read that published no line. */
+  watch: string | null | undefined;
+  record: string | null | undefined;
+  alert: string;
+}): Record<"areas" | "changed" | "diagnosis" | "watch" | "record" | "alert", HomeQuestion | null> => ({
+  areas: answers.areas ? { id: HOME_SECTIONS.areas.id, question: HOME_SECTIONS.areas.heading, answer: answers.areas } : null,
+  changed: answers.changed.answer ? { id: HOME_SECTIONS.changed.id, question: answers.changed.question, answer: answers.changed.answer } : null,
+  diagnosis: { id: HOME_SECTIONS.diagnosis.id, question: answers.diagnosis.question, answer: answers.diagnosis.answer },
+  watch: answers.watch ? { id: HOME_SECTIONS.watch.id, question: HOME_SECTIONS.watch.heading, answer: answers.watch } : null,
+  record: answers.record ? { id: HOME_SECTIONS.record.id, question: HOME_SECTIONS.record.heading, answer: answers.record } : null,
+  alert: { id: HOME_SECTIONS.alert.id, question: HOME_SECTIONS.alert.heading, answer: answers.alert },
+});
 
 /** `/share` opens on the format its hash names; the slide is in the files section under it. */
 export const ROLE_FORMAT_LINKS = [
@@ -557,7 +689,7 @@ export const describeScoreFigureStanding = ({
     const rest = !restart
       ? ""
       : others.length > 0
-        ? `Restarts only when ${side(restart)} and ${others.join(" and ")}.`
+        ? `Restarts once ${ruleMetricLabel[metric].toLowerCase()} is ${side(restart)} and ${others.join(" and ")}.`
         : `Restarts ${side(restart)}.`;
     return { crossed: true, lead: `${name} paused ${side(own)}`, rest };
   }

@@ -259,9 +259,9 @@ export const searchIndex = (query: string): SearchEntity[] => {
 /** Human names for the five jobs, for the results page's group headings. */
 export const searchJobLabels: Record<SearchEntityJob, string> = {
   check: "Check what changed",
-  approve: "Approve or hold this week",
-  resolve: "Resolve one remaining edge case",
-  risk: "Diagnose what could break",
+  approve: "Share it with your board",
+  resolve: "Answers for your role, company or question",
+  risk: "See what could go wrong",
   trust: "Check the sources",
 };
 

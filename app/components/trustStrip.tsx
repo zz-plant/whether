@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
 import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
 import { MarkReadout } from "./ui/markReadout";
+import { DatedText } from "./ui/datedText";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -19,8 +20,6 @@ export type BaseRateMark = { asOf: string; held: boolean; label: string; href: s
 
 export type TrustStripProps = {
   recordDateLabel: string;
-  /** The record date as an ISO date, for the `<time dateTime>` the label prints in; without it the label prints bare. */
-  recordDate?: string;
   /** True when every source answered live for this reading. */
   sourcesLive: boolean;
   /** One phrase for the sources cell, e.g. "All sources live" or "Saved copy from Sep 12". */
@@ -106,7 +105,6 @@ const describeNextWeek = (couldChangeNextWeek: boolean, changeReason: string | u
 
 export function TrustStrip({
   recordDateLabel,
-  recordDate,
   sourcesLive,
   sourcesLabel,
   confidenceLabel,
@@ -149,8 +147,6 @@ export function TrustStrip({
   const cells: {
     label: string;
     value: string;
-    /** A machine-readable date for the value, which then prints in `<time>` (docs/seo/quality-gates.md, Semantic gates). */
-    dateTime?: string;
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
@@ -164,7 +160,7 @@ export function TrustStrip({
   }[] = [
     /* "Data as of": the date the guidance rests on. The report intro's other date
        is when the sources were last checked, and it says so (2026-10-09). */
-    { label: "Data as of", value: recordDateLabel, ...(recordDate ? { dateTime: recordDate.slice(0, 10) } : {}) },
+    { label: "Data as of", value: recordDateLabel },
     { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caveat", routine: sourcesLive },
     /* The margin, in points, where "Confidence: Low" stood: the number was always a
        distance from the change line, never a probability (/calibration). Whether
@@ -257,7 +253,7 @@ export function TrustStrip({
                     : "font-medium text-slate-200"
               }`}
             >
-              {cell.dateTime ? <time dateTime={cell.dateTime}>{cell.value}</time> : cell.value}
+              {cell.label === "Data as of" ? <DatedText text={cell.value} /> : cell.value}
               {cell.detail ? (
                 <span
                   className="font-normal text-slate-400"
@@ -343,7 +339,8 @@ const MARKS_PER_ROW = 30;
  *
  * Text height and em-sized, so it sits in the sentence at every size the strip is
  * set in. A square's hit area reaches up and down to 44px; across, it is the
- * square and its gap, which is why a tap shows the month before a second opens it.
+ * square and its gap, which is why a tap chooses the nearest square and opens nothing:
+ * its words show with a 44px link that opens it (2026-11-25).
  *
  * Each square carries its month (`data-month`, `lib/monthCursor.ts`): pointing at one
  * shows that month on the record band, and a month read on the band, or stepped to

@@ -25,24 +25,28 @@ const render = (overrides: Partial<Parameters<typeof WhyConditionsSection>[0]> =
 describe("why conditions", () => {
   it("prints each reading with what it means, so the scores need no decoding", () => {
     const html = render();
-    assert.match(html, /Why conditions are Cloudy/);
+    /* The heading is the reader's question, said as they would say it (2026-11-18). */
+    assert.match(html, /<h2[^>]*>Why Cloudy\?<\/h2>/);
     assert.match(html, /Funding pressure/);
-    assert.match(html, /Risk appetite/);
+    assert.match(html, /risk appetite/i);
     assert.match(html, /they(?:&#x27;|')ll charge you for it/);
   });
 
-  it("states which side of each change line the readings sit on", () => {
+  /* The first sentence under the question is its answer, meaning first (2026-11-18): "That's
+     Cloudy." closed it, after the numbers, and the heading now names the conditions. */
+  it("answers with what the scores mean, then which side of each change line they sit on", () => {
     const html = render();
-    assert.match(html, /Funding pressure is 90, above\s*(?:<!-- -->)?\s*70\./);
-    assert.match(html, /Risk appetite is 55,\s*(?:<!-- -->)?\s*above\s*(?:<!-- -->)?\s*50\./);
-    assert.match(html, /Investors will still go out in this, and they(?:&#x27;|')ll charge you for it\./);
-    assert.match(html, /That(?:&rsquo;|’|&#x27;|')s Cloudy\./);
+    assert.match(
+      html,
+      /data-section-lead="true">Investors will still go out in this, and they(?:&#x27;|')ll charge you for it\. Funding pressure is 90, above 70, and risk appetite is 55, above 50\.<\/p>/,
+    );
+    assert.doesNotMatch(html, /That(?:&rsquo;|’|&#x27;|')s Cloudy\./);
   });
 
   it("separates the current scores from the published conditions while a change is pending", () => {
     const html = render({ riskAppetite: 42, pendingConditions: "SCARCITY" });
-    assert.match(html, /Where the scores land/);
-    assert.match(html, /Those scores land in Freezing\. The published conditions remain Cloudy\./);
+    assert.match(html, /<h2[^>]*>Where do the scores land\?<\/h2>/);
+    assert.match(html, /data-section-lead="true">In Freezing\. Funding pressure is 90, above 70, and risk appetite is 42, at or below 50\. The published conditions remain Cloudy\./);
     assert.doesNotMatch(html, /Investors will still go out/);
   });
 
@@ -54,7 +58,7 @@ describe("why conditions", () => {
     assert.match(html, /Why it feels like Freezing/);
     assert.match(html, /would put risk appetite at 44/);
     // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
-    assert.match(html, /the scores would land in Freezing/);
+    assert.match(html, /Counting those inputs would put the scores in Freezing/);
     assert.match(html, /doesn(?:&#x27;|')t go back far enough to check against past months/);
   });
 

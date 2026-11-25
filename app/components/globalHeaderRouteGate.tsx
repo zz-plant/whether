@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import { Menu, Search, Share2 } from "lucide-react";
 import {
   hasVisibleActiveNavLink,
@@ -22,10 +22,6 @@ import {
   useMastheadReading,
 } from "./runningHead";
 import { useScrollDirection } from "./useScrollDirection";
-
-type GlobalHeaderRouteGateProps = {
-  initialPathname?: string;
-};
 
 const DESKTOP_MEDIA_QUERY = "(min-width: 768px)";
 const subscribeToDesktop = (onChange: () => void) => {
@@ -54,10 +50,12 @@ const serverIsDesktop = () => true;
  *     bottom site nav), exposing a tappable section jumper (`MastheadSectionJumper`)
  *     that replaces the redundant sticky mobile chip scroller.
  */
-export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRouteGateProps) {
-  const currentPathname = normalizePathname(usePathname() ?? initialPathname);
+export function GlobalHeaderRouteGate() {
+  /* usePathname() answers during the server render too, so the path no longer comes from a
+     request header. Reading headers() in the root layout made every page dynamic, which sent
+     `private, no-store` on all HTML and switched off every route's `revalidate`. */
+  const pathname = normalizePathname(usePathname() ?? "/");
   const hydrated = useHydrated();
-  const pathname = hydrated ? currentPathname : normalizePathname(initialPathname);
   const isDesktop = useSyncExternalStore(subscribeToDesktop, readIsDesktop, serverIsDesktop);
 
   const { direction, isPastThreshold } = useScrollDirection();
@@ -101,8 +99,11 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
       regime={facts?.regime ?? null}
     >
       {/* Every route has the header, so the runway band's one re-render
-          listener lives here rather than beside any one control. */}
-      <RunwayServerSync />
+          listener lives here rather than beside any one control. It reads the query
+          string, so it sits in its own boundary: unwrapped, a static page cannot render. */}
+      <Suspense fallback={null}>
+        <RunwayServerSync />
+      </Suspense>
 
       {readingMode && facts ? (
         <div data-running-head>

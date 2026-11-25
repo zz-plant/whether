@@ -101,11 +101,12 @@ export async function buildTrustPageModel() {
      method before the revisit triggers, while the page drew the formula first,
      the method next and every other section folded at its foot. */
   const sectionLinks = [
-    /* The two open sections by the questions their headings ask (2026-11-25), short. */
+    /* The two open sections by the questions their headings ask (2026-11-25), short; no two
+       entries open on the same word. */
     { href: "#source-board", label: "Is the data current?" },
-    { href: "#formula-reference", label: "What goes into the scores?" },
-    { href: "#confidence-limits", label: "How close to changing" },
-    { href: "#revisit-call", label: "When to look again" },
+    { href: "#formula-reference", label: "How are scores worked out?" },
+    { href: "#confidence-limits", label: "Distance to a change" },
+    { href: "#revisit-call", label: "What would make it wrong" },
     // Only when the telemetry read is configured: an index entry for a section that
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
@@ -135,7 +136,6 @@ export async function buildTrustPageModel() {
       statusLabel: reportData.statusLabel,
       regime: reportData.assessment.regime,
       recordDateLabel: reportData.recordDateLabel,
-      recordDate: reportData.treasury.record_date,
       fetchedAtLabel: reportData.fetchedAtLabel,
     },
     page: {
@@ -153,7 +153,7 @@ export async function buildTrustPageModel() {
       degradedSourceRows,
       showOfflineBadge: isFallback,
       // No link: the strip's link points here.
-      strip: { ...trustStrip, recordDate: reportData.treasury.record_date },
+      strip: trustStrip,
     },
     chrome: {
       sidebarVariant: "full",
@@ -167,7 +167,7 @@ export async function buildTrustPageModel() {
     },
   };
 
-  /* This week's scores split by input, for "What goes into the scores?": the
+  /* This week's scores split by input, for "How are the scores worked out?": the
      engine's own stages over the inputs this reading was scored from, and the
      source board's Treasury link for the rate terms. */
   const scoreComposition = buildScoreComposition({

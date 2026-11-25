@@ -13,10 +13,11 @@ import {
   HOME_DECISION_PARAM,
   HOME_SECTIONS,
   buildHomeDecisionCookie,
-  describePauseLineCount,
+  describeHeldAreas,
   parseHomeDecision,
   type AreaGroup,
   type HomeAreaRow,
+  type HomeQuestion,
 } from "../../../lib/report/home/homeSectionModel";
 import {
   runwayBandLabel,
@@ -26,13 +27,15 @@ import { buildPlanTestHref } from "../../../lib/navigation/planningNavigation";
 import { ActionLink, PlainActionLink } from "../ui/actionLink";
 import { CommitmentTest } from "./CommitmentTest";
 import { AreaGroups } from "./AreaGroups";
+import type { KnownDate } from "../ui/datedText";
+import { asClause } from "../../../lib/report/briefArtifact";
 import { RunwayAreaNote } from "../RunwayConditionedNotes";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { useClipboardCopy } from "../useClipboardCopy";
 import { CheckIcon, ShareIcon } from "../uiIcons";
 
 /**
- * "Your decisions this week": the five areas' rules, third on the page, after the verdict
+ * "What’s on hold?" (2026-11-18; "Your decisions this week" until then): the five areas' rules, third on the page, after the verdict
  * and the stage and runway the lines are scaled to (2026-10-09).
  *
  * The five answers lead in the brief above (`AreaStrip`), each with its action and line.
@@ -77,6 +80,8 @@ export function DecisionPicker({
   isHistorical = false,
   rulesAbove = false,
   children,
+  question: questionProp,
+  dates,
 }: {
   options: readonly DecisionPickerOption[];
   /** Every area's rule, grouped by the condition that changes it (`buildAreaGroups`). */
@@ -97,6 +102,10 @@ export function DecisionPicker({
   rulesAbove?: boolean;
   /** What follows the groups inside the section: the fold behind the rules, and the plan link. */
   children?: ReactNode;
+  /** "What’s on hold?" and its answer, as the page marks them up (`buildHomeQuestions`); null keeps the label. */
+  question?: HomeQuestion | null;
+  /** The comparison reading's date as the groups print it, with its ISO date, for `<time>`. */
+  dates?: readonly KnownDate[];
 }) {
   /* The URL's area, or the remembered one the server opened on (2026-11-18). */
   const selected = parseHomeDecision(useHomeView(HOME_DECISION_PARAM, initialSelected ?? null) ?? undefined);
@@ -121,17 +130,26 @@ export function DecisionPicker({
     if (activeRunway) calibrationParts.push(`${runwayBandLabel(activeRunway)} runway`);
     const calibrationHeader = calibrationParts.length > 0 ? ` (${calibrationParts.join(" · ")})` : "";
 
+    /* A message, answer first (2026-11-18): the area's rule as the line a person would type,
+       then the lines it is bounded by. It opened on "Whether: Hiring Takeaway" and a
+       "Guidance:" bullet. */
     const bullets: string[] = [];
-    if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
     if (activePause?.line) bullets.push(`• *Pause if:* ${activePause.line}${activePause.distance ? ` (${activePause.distance})` : ""}`);
     if (activeResume?.line) bullets.push(`• *Restart when:* ${activeResume.line}${activeResume.distance ? ` (${activeResume.distance})` : ""}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
-    const message = `*Whether: ${label} Takeaway${calibrationHeader}*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
+    const rule = /[.!?]$/.test(active.rule) ? active.rule : `${active.rule}.`;
+    const message = `*${label} this week${calibrationHeader}: ${asClause(rule)}*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
     void copyToClipboard(message, `slack-takeaway-${active.area}`);
   }, [active, activePause, activeResume, activeRunway, activeTransmission, copyToClipboard, stageLabel]);
-  const pauseLineCount = describePauseLineCount(options, savedReadingDate);
+  /* The heading's answer: the page passes the one it marks up; without it, the same builder. */
+  const heldAnswer = describeHeldAreas(options, savedReadingDate);
+  const question = questionProp !== undefined
+    ? questionProp
+    : heldAnswer
+      ? { id: HOME_SECTIONS.areas.id, question: HOME_SECTIONS.areas.heading, answer: heldAnswer }
+      : null;
 
   /* Under the area's own rule: what the rule and its condition, said in the group, do
      not — why it matters, the test against the reader's cash, and the links. */
@@ -226,14 +244,15 @@ export function DecisionPicker({
         <div className="space-y-1">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="type-section">
-              {HOME_SECTIONS.areas.heading}
+              {question?.question ?? HOME_SECTIONS.areas.fallback}
             </h2>
           </div>
-          {/* A saved copy only (2026-11-03): on a live week the card's "On hold …" line
-              and the groups below say the same count. */}
-          {pauseLineCount && savedReadingDate ? (
-            <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
-              {pauseLineCount}
+          {/* "What’s on hold?", answered with the held areas by name (2026-11-18), or on a
+              saved copy the old reading's count with its date. It took the place of the
+              count a saved copy alone printed here. */}
+          {question ? (
+            <p data-section-lead data-pause-line-count className="text-fluid-lg font-medium leading-snug text-slate-50">
+              {question.answer}
             </p>
           ) : null}
         </div>
@@ -252,12 +271,13 @@ export function DecisionPicker({
           open={initialSelected || !rulesAbove ? true : undefined}
         >
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-            {rulesAbove ? "Open each area’s rule, test and links" : "Every area’s rule, test and links"}
+            {rulesAbove ? "Each area’s rule, decision test and links" : "Every area’s rule, decision test and links"}
           </summary>
           <div className="pt-3">
             <AreaGroups
               groups={groups}
               rulesAbove={rulesAbove}
+              dates={dates}
               selected={selected}
               onToggle={(area) => recordDecision(area === selected ? null : area)}
               detail={renderDetail}

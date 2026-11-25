@@ -223,7 +223,7 @@ export function CommitmentTestDisclosure({ regime }: { regime: RegimeKey }) {
       <div className="mt-2 space-y-2">
         <div className="sm:max-w-xs">
           <label htmlFor={areaId} className="block text-fluid-nano text-slate-400">
-            What it is
+            Decision area
           </label>
           <select
             id={areaId}

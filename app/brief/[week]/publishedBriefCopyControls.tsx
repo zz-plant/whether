@@ -99,7 +99,7 @@ export function PublishedBriefCopyControls({
             Share the week of {weekLabel}
           </h2>
           <p className="text-xs text-slate-400">
-            Copy date-pinned leadership updates into Slack, email, or your board deck.
+            Copy this week's guidance into Slack, an email or a board memo. Each copy keeps this week's date.
           </p>
         </div>
         <div className="flex gap-2">

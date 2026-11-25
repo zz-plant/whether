@@ -185,7 +185,6 @@ export default async function HistoryPage({
              is neutral, because this page is about every regime on record rather
              than one. */
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
-          recordDate: trackRecord?.latestRecordDate,
           fetchedAtLabel: "",
         },
         /* "History", the group this page is the hub of (`navigationGroups`): the

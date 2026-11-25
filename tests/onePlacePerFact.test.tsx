@@ -136,13 +136,17 @@ describe("/ says what changed since a visit only when the card has not", () => {
   });
 });
 
-describe("/ opens 'What changed this week' on its table", () => {
-  it("with no lead restating the card, and one sentence only when nothing was compared", () => {
-    const compared = renderToStaticMarkup(<WhatChangedSection rows={[]} comparisonUnavailable={false} />);
+/* "What's changed since Nov 9?" is answered first (2026-11-18), with where the two scores
+   went: the card prints the scores, not their move, so the answer restates nothing. Where
+   nothing was compared, the one sentence that says so. */
+describe("/ opens 'What's changed' on its answer, then its table", () => {
+  it("with the scores' move as the answer, and one sentence when nothing was compared", () => {
+    const compared = renderToStaticMarkup(<WhatChangedSection rows={[]} lead="Risk appetite fell to 44, and funding pressure stayed at 90." comparisonUnavailable={false} />);
+    assert.match(compared, /data-section-lead="true">Risk appetite fell to 44, and funding pressure stayed at 90\.</);
     assert.doesNotMatch(compared, /<p class="max-w-3xl/);
     const none = renderToStaticMarkup(<WhatChangedSection rows={[]} lead="No previous week to compare the scores against." comparisonUnavailable />);
     assert.match(none, /No previous week to compare the scores against\./);
-    assert.match(route, /lead=\{comparisonUnavailable \? describeWeeklyMovement/);
+    assert.match(route, /lead=\{homeQuestions\.changed\?\.answer\}/);
   });
 });
 

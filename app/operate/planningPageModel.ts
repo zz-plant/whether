@@ -140,7 +140,7 @@ export async function buildPlanningPageModel(
     dateModifiedIso: treasury.record_date,
   });
   const formatPlanCondition = (condition: { metric: "tightness" | "riskAppetite"; operator: ">" | "<"; value: number }) =>
-    `${condition.metric === "tightness" ? "pressure" : "risk"} ${condition.operator} ${condition.value}`;
+    `${condition.metric === "tightness" ? "funding pressure" : "risk appetite"} ${condition.operator} ${condition.value}`;
   const planLinesPreview = planLineDefaults.length > 0
     ? h(
         "ul",
@@ -181,7 +181,6 @@ export async function buildPlanningPageModel(
       assessment,
       scoringBasis: reportData.scoringBasis,
     }),
-    recordDate: treasury.record_date,
     href: "/trust" as const,
   };
 
@@ -191,7 +190,6 @@ export async function buildPlanningPageModel(
         statusLabel,
         regime: assessment.regime,
         recordDateLabel,
-        recordDate: treasury.record_date,
         fetchedAtLabel,
       },
       page: {

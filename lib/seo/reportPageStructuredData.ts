@@ -12,6 +12,7 @@ import {
   questionNodes,
   scoreVariable,
   siteTerms,
+  wikipediaTopic,
   type VisibleQuestion,
 } from "./pageStructuredData";
 
@@ -24,11 +25,7 @@ import {
  */
 type JsonLdGraph = ReturnType<typeof graph>;
 
-const FRED_TOPIC = {
-  "@type": "Thing",
-  name: "Federal Reserve Economic Data",
-  sameAs: "https://en.wikipedia.org/wiki/Federal_Reserve_Economic_Data",
-};
+const FRED_TOPIC = wikipediaTopic("Federal Reserve Economic Data", "Federal_Reserve_Economic_Data");
 
 /**
  * `/signals`: the page, the questions it asks (its h1 and each closed instrument, with the answer

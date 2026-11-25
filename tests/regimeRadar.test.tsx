@@ -205,7 +205,9 @@ describe("RegimeRadar path", () => {
     assert.match(caption, /<summary[^>]*>Scores on this chart<\/summary>/);
     /* A table (2026-11-03): each score is named once, in its column header, not in every row. */
     assert.match(caption, /<th scope="col"[^>]*>Funding pressure<\/th><th scope="col"[^>]*>Risk appetite<\/th>/);
-    const row = (label: string) => new RegExp(`<th scope="row"[^>]*>${label}</th><td[^>]*>(\\d+)</td><td[^>]*>(\\d+)</td>`).exec(caption)?.slice(1);
+    /* A dated row's label sits in <time dateTime> (2026-11-18). */
+    const row = (label: string) => new RegExp(`<th scope="row"[^>]*>(?:<time[^>]*>)?${label}(?:</time>)?</th><td[^>]*>(\\d+)</td><td[^>]*>(\\d+)</td>`).exec(caption)?.slice(1);
+    assert.match(caption, /<time datetime="2026-04">April 2026<\/time>/i);
     assert.deepEqual(row("April 2026"), ["40", "61"]);
     assert.deepEqual(row("May 2026"), ["40", "59"]);
     assert.deepEqual(row("Current reading"), ["90", "48"]);
@@ -231,7 +233,8 @@ describe("RegimeRadar path", () => {
         caveat="The Aug 31 scores were built from interest rates alone."
       />,
     );
-    assert.match(html, /Trail: month-ends Jun–Aug 2026, then this week\./);
+    assert.match(html.replace(/<\/?time[^>]*>/g, ""), /Trail: month-ends Jun–Aug 2026, then this week\./);
+    assert.match(html, /<time datetime="2026-08">Aug 2026<\/time>/i, "the month it names is machine-readable");
     assert.match(html, /built from interest rates alone/);
   });
 

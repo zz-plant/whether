@@ -119,8 +119,8 @@ describe("/operate opening", () => {
     const step = steps.find((candidate) => candidate.id === "ops-plan-lines");
     assert.ok(step?.preview, "the closed step carries a preview");
     const text = textIn(step.preview);
-    assert.match(text, /Hiring: pause pressure > \d+ · restart pressure < \d+/);
-    assert.match(text, /New bets: pause risk < \d+/);
+    assert.match(text, /Hiring: pause funding pressure > \d+ · restart funding pressure < \d+/);
+    assert.match(text, /New bets: pause risk appetite < \d+/);
   });
 
   it("says on each closed step what is behind it, not what the gesture does", async () => {

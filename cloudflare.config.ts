@@ -149,4 +149,8 @@ const buildWorker = (shape: Shape): WorkerConfig => {
   };
 };
 
-export default defineConfig((ctx) => ({ worker: buildWorker(ctx.isPreview ? "preview" : "production") }));
+export default defineConfig((ctx) => ({
+  // Pins the account for `cf`, so no command needs CLOUDFLARE_ACCOUNT_ID.
+  accountId: "df6ed8218af41dca3279a09ccc58e5f5",
+  worker: buildWorker(ctx.isPreview ? "preview" : "production"),
+}));

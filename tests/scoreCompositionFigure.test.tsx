@@ -67,7 +67,7 @@ describe("the score composition on /trust", () => {
     assert.ok(html.includes(composition.tightness.sentence.replace(/'/g, "&#x27;")), "the funding-pressure sentence is printed");
     assert.match(html, /Funding pressure 90 = 90 from the short-term borrowing rate/);
     assert.match(html, /Risk appetite 44 = 52 from the recession warning gauge − 8 from stock-market volatility\./);
-    assert.match(html, /Not counted: -11 from startup-market inputs\./, "the scoring basis's own line");
+    assert.match(html, /Not counted: startup-market inputs, which would take it down 11 points\./, "the scoring basis's own line");
     assert.ok(
       html.indexOf("data-score-composition") < html.indexOf("Show the exact arithmetic"),
       "the drawing sits outside the arithmetic fold",

@@ -113,13 +113,13 @@ export function SourceBoard({
           Read at the source:{" "}
           {treasurySourceUrl ? (
             <a href={treasurySourceUrl} target="_blank" rel="noreferrer" className={sourceLinkClass}>
-              Treasury source
+              Treasury rates
             </a>
           ) : null}
           {treasurySourceUrl && macroSourceUrl ? " · " : null}
           {macroSourceUrl ? (
             <a href={macroSourceUrl} target="_blank" rel="noreferrer" className={sourceLinkClass}>
-              Macro source
+              Market and economic data
             </a>
           ) : null}
         </p>
