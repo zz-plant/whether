@@ -71,19 +71,22 @@ export const canonicalSurfaceRedirectPairs = [
   // that forwarded them went in d0ddedd6 (2026-03-16) with nothing in its place,
   // so their deep links 404'd. Concept essays land on the one list, failure modes
   // on the revisit triggers, the hubs where /learn does.
-  ["/learn/concepts/:path*", "/concepts"],
+  ["/learn/concepts/:path*", "/research/advice-vs-market"],
   ["/library", "/trust"],
-  ["/library/canon/:path*", "/concepts"],
+  ["/library/canon/:path*", "/research/advice-vs-market"],
   ["/library/failure-modes/:path*", "/trust#revisit-call"],
   ["/reference", "/trust"],
-  ["/reference/concepts/:path*", "/concepts"],
+  ["/reference/concepts/:path*", "/research/advice-vs-market"],
   ["/reference/failure-modes/:path*", "/trust#revisit-call"],
-  // /concepts itself is a page again (restored 2026-09-23). The first version's
+  // /concepts was a page again from 2026-09-23 to 2026-11-25. The first version's
   // detail, focus, audience and conflicts pages are not: one page carries the
-  // list now, with an anchor per essay. The old `/concepts` -> `/trust` rule was a
+  // list, with an anchor per essay. The old `/concepts` -> `/trust` rule was a
   // 308, so a browser that followed it keeps landing on /trust until its cache
-  // clears; the `/resources` note below records the same standing cost.
-  ["/concepts/:path+", "/concepts"],
+  // clears; the `/resources` note below records the same standing cost. Since
+  // 2026-11-25 the study lives under /research, beside its registration and
+  // results files, and both the page and its old sub-pages land there.
+  ["/concepts", "/research/advice-vs-market"],
+  ["/concepts/:path+", "/research/advice-vs-market"],
   // Decide redirect stubs. Both spellings, and both above the wildcard below:
   // team-context is not a generated param on either route, so without these it
   // would 404 rather than land on the plan.
@@ -187,6 +190,12 @@ export const iaConsolidationRedirectPairs = [
   // Whether is free. The paid plans /pricing offered were never on sale and were
   // removed on 2026-10-14; /about is the page that says what Whether is.
   ["/pricing", "/about"],
+  // The calibration study had its own page from 2026-09-17 to 2026-11-25. It is a
+  // section of /history now, under the tiles that summarised it and linked away.
+  ["/calibration", "/history#confidence-record"],
+  // The public SaaS basket was its own page under Plan until 2026-11-25. It is a
+  // section of the runway planner now, beside the raise window it informs.
+  ["/comps", "/operate/financial#saas-multiples"],
 ];
 
 /*

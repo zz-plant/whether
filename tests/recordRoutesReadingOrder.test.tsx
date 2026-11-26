@@ -58,8 +58,8 @@ describe("/history leads with the record's answer", () => {
     assert.equal((html.match(/data-conditions-by-year/g) ?? []).length, 1);
     assert.ok(html.indexOf("data-conditions-by-year") < html.indexOf('id="phase-map-heading"'));
     assert.doesNotMatch(html, /Where this month sits/);
-    /* The confidence record prints the rule on /calibration; here it sits
-       beside the tiles that already state it, and the rule is once per page. */
+    /* The calibration study is a section of this page since 2026-11-25; the tiles state
+       the rule, and the study's footnote no longer repeats it. */
     assert.equal(html.split(CALL_CHANGE_RULE).length - 1, 1, "the change rule is stated once on /history");
   });
 

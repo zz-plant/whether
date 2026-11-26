@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import monthly from "../data/advice-corpus/monthly.json";
-import { AdviceCorpusSection } from "../app/concepts/adviceCorpusSection";
+import { AdviceCorpusSection } from "../app/research/advice-vs-market/adviceCorpusSection";
 
 /*
  * The advice corpus's section on /concepts renders offline from the committed series and the

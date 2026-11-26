@@ -109,13 +109,15 @@ type SectionTabLink = {
 
 /**
  * The sub-tab row for the group a path is on: its pages in order, then its
- * cross-links. Null for a one-page group, or a path in no group.
+ * cross-links. Null when that would be one link, or for a path in no group.
+ * History has one page since 2026-11-25 (the calibration study is a section of
+ * it), and keeps its row for the two cross-links into /trust.
  */
 export const resolveSectionTabs = (pathname: string): { group: NavigationGroup; links: SectionTabLink[] } | null => {
   const group = findActiveGroup(pathname);
   if (!group) return null;
   const pages = pagesInGroup(group.key);
-  if (pages.length < 2) return null;
+  if (pages.length + group.crossLinks.length < 2) return null;
   const activeKey = findActivePage(pathname)?.key;
   return {
     group,

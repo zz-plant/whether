@@ -213,9 +213,6 @@ export default async function sitemap(options?: {
     // deep link, and compare is a disclosure under history. Both stay indexable;
     // neither is ranked like a hub.
     { path: "/trust", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
-    /* Derived from the bundled archive at module load, so the monthly refresh
-       moves it — it takes the report's date, not the static one. */
-    { path: "/calibration", lastModified: reportLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/operate", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.84 },
     // The two workstreams are indexable pages with their own metadata; they
     // were submitted nowhere because the page file kept its route map private.
@@ -232,10 +229,9 @@ export default async function sitemap(options?: {
     { path: "/privacy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
-    { path: "/comps", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.75 },
     { path: "/api-docs", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.7 },
-    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
+    { path: "/research/advice-vs-market", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
     { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },
     { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },

@@ -38,7 +38,9 @@ describe("sitemap", () => {
     assert.ok(!urls.has(`${siteUrl}/operate/scenarios`));
     assert.ok(!urls.has(`${siteUrl}/search`));
     assert.ok(!urls.has(`${siteUrl}/learn/failure-modes`));
-    assert.ok(urls.has(`${siteUrl}/concepts`));
+    assert.ok(urls.has(`${siteUrl}/research/advice-vs-market`));
+    assert.ok(!urls.has(`${siteUrl}/concepts`), "the old address redirects");
+    assert.ok(!urls.has(`${siteUrl}/calibration`) && !urls.has(`${siteUrl}/comps`), "sections are not submitted as pages");
 
     for (const retiredPath of retiredSitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${retiredPath}`));

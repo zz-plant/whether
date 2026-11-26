@@ -86,10 +86,15 @@ describe("redirect resolution", () => {
       // The paid tier was removed on 2026-10-14; Whether is free.
       ["/pricing", "/about"],
       ["/planning/financial", "/operate/financial"],
-      // The first version's detail, focus and conflicts pages fold into the one list.
-      ["/concepts/escaping-the-build-trap", "/concepts"],
-      ["/concepts/focus/strategy", "/concepts"],
-      ["/concepts/conflicts", "/concepts"],
+      // The first version's detail, focus and conflicts pages fold into the one list, which
+      // moved under /research on 2026-11-25.
+      ["/concepts", "/research/advice-vs-market"],
+      ["/concepts/escaping-the-build-trap", "/research/advice-vs-market"],
+      ["/concepts/focus/strategy", "/research/advice-vs-market"],
+      ["/concepts/conflicts", "/research/advice-vs-market"],
+      // The calibration study and the SaaS basket became sections on 2026-11-25.
+      ["/calibration", "/history#confidence-record"],
+      ["/comps", "/operate/financial#saas-multiples"],
     ] as const) {
       assert.equal(resolve(from).landing, to, `${from} should land on ${to}`);
     }
@@ -98,14 +103,14 @@ describe("redirect resolution", () => {
   it("forwards Learn's deep links under its earlier names to where those topics live now", () => {
     // Nothing matched these from 2026-03-16, when d0ddedd6 deleted the table that forwarded them.
     for (const [from, to] of [
-      ["/learn/concepts", "/concepts"],
-      ["/learn/concepts/escaping-the-build-trap", "/concepts"],
+      ["/learn/concepts", "/research/advice-vs-market"],
+      ["/learn/concepts/escaping-the-build-trap", "/research/advice-vs-market"],
       ["/library", "/trust"],
-      ["/library/canon/escaping-the-build-trap", "/concepts"],
+      ["/library/canon/escaping-the-build-trap", "/research/advice-vs-market"],
       ["/library/failure-modes", "/trust#revisit-call"],
       ["/library/failure-modes/regime-mismatch", "/trust#revisit-call"],
       ["/reference", "/trust"],
-      ["/reference/concepts/escaping-the-build-trap", "/concepts"],
+      ["/reference/concepts/escaping-the-build-trap", "/research/advice-vs-market"],
       ["/reference/failure-modes/regime-mismatch", "/trust#revisit-call"],
     ] as const) {
       assert.deepEqual(resolve(from), { landing: to, hops: 1 }, `${from} should land on ${to} in one hop`);
@@ -127,8 +132,8 @@ describe("redirect resolution", () => {
     assert.equal(resolve("/planning/cli").landing, "/operate");
     assert.equal(resolve("/planning/integrations").landing, "/operate");
     assert.equal(resolve("/resolve/team-context").landing, "/operate#ops-monthly-action-summary");
-    // A page again: the sub-path rule must not claim the bare path.
-    assert.equal(resolve("/concepts").hops, 0);
+    // The study's page, which the old /concepts rules land on, is not itself redirected.
+    assert.equal(resolve("/research/advice-vs-market").hops, 0);
   });
 
   it("lands every redirect in one hop", () => {

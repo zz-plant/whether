@@ -44,6 +44,8 @@ export const operationsSectionLinks: {
   financial: [
     { href: "#ops-runway-inputs", label: "Financial inputs" },
     { href: "#ops-runway-risk", label: "Runway analysis" },
+    /* The SaaS basket, a section here since 2026-11-25 (it was /comps). */
+    { href: "#saas-multiples", label: "SaaS multiples" },
     /* No "Board memo" chip. That section is behind a toggle inside the results,
        so the anchor exists only after two separate user actions — a nav target
        that does nothing on most visits is worse than one fewer chip, and the

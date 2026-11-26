@@ -7,7 +7,7 @@ import {
 } from "../../../lib/report/confidenceCalibration";
 import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift";
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
-import { CALL_CHANGE_RULE, describeCalibrationRescore } from "../../../lib/report/trackRecordCopy";
+import { describeCalibrationRescore } from "../../../lib/report/trackRecordCopy";
 import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
 import { buildAdvanceWarningMarks } from "../../../lib/report/advanceWarning";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
@@ -237,9 +237,9 @@ export function ConfidenceRecordSummary({
 }
 
 /**
- * The paragraph, the table and the footnote, which closes on `CALL_CHANGE_RULE`
- * (printed once per page, lib/report/AGENTS.md). Only /calibration draws the body
- * now; /history states the rule under its track-record tiles.
+ * The paragraph, the table and the footnote. The footnote closed on `CALL_CHANGE_RULE`
+ * while the body was /calibration's; on /history (2026-11-25) the track-record tiles
+ * above state the rule, and it is printed once per page (lib/report/AGENTS.md).
  */
 function ConfidenceRecordBody() {
   const record = loadRecord();
@@ -283,11 +283,7 @@ function ConfidenceRecordBody() {
 
       <RecentYearParagraph />
 
-      <p className="text-fluid-sm text-slate-400">
-        A held month means conditions did not change.
-        {" "}
-        {CALL_CHANGE_RULE}
-      </p>
+      <p className="text-fluid-sm text-slate-400">A held month means conditions did not change.</p>
       <p className="text-fluid-sm text-slate-400" data-record-rescore>
         {describeCalibrationRescore({ held: totals.held, comparisons: totals.months })}
       </p>
@@ -326,14 +322,16 @@ function RecentYearParagraph() {
   );
 }
 
-/** The study on its own URL, /calibration. */
-export function ConfidenceRecordSection() {
+/**
+ * The calibration study's table, a section of /history since 2026-11-25 (`CalibrationStudy`).
+ * It had its own URL, /calibration, whose intro said what the room measures; on /history
+ * the section says it itself, in `description`.
+ */
+export function ConfidenceRecordSection({ description }: { description?: string } = {}) {
   if (!loadRecord()) return null;
 
   return (
-    /* No description: the page's own intro, directly above, says what the margin
-       measures and what this checks it against (2026-10-09). */
-    <ReportSection id="confidence-record" title={CONFIDENCE_RECORD_TITLE}>
+    <ReportSection id="confidence-record" title={CONFIDENCE_RECORD_TITLE} description={description}>
       <ConfidenceRecordBody />
     </ReportSection>
   );

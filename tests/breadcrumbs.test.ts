@@ -17,8 +17,7 @@ describe("breadcrumbs follow the groups", () => {
     assert.deepEqual(names(buildGroupBreadcrumbs("/signals")), ["This week", "Why it changed"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/trust")), ["This week", "Can I trust this?"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/operate/financial")), ["Plan", "Runway planner"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/comps")), ["Plan", "SaaS multiples"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/calibration")), ["History", "How it held up"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/research/advice-vs-market")), ["Guides", "Advice vs. market"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/roles")), ["Guides", "Roles"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/companies")), ["Guides", "Companies"]);
   });

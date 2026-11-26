@@ -19,7 +19,7 @@ describe("route context in the global header", () => {
 
   /* Guides has no header tab since 2026-11-25, so its pages keep the label beside the wordmark. */
   it("reports none for Guides, utility and unlisted routes, which then keep their label", () => {
-    for (const pathname of ["/resources", "/resources/some-article", "/answers/x", "/roles", "/companies", "/concepts", "/about", "/share", "/api-docs"]) {
+    for (const pathname of ["/resources", "/resources/some-article", "/answers/x", "/roles", "/companies", "/research/advice-vs-market", "/about", "/share", "/api-docs"]) {
       assert.equal(hasVisibleActiveNavLink(pathname), false, pathname);
       // Whatever the header falls back to must actually name something.
       const label = resolveGlobalHeaderRouteLabel(pathname);

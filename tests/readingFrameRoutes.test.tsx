@@ -49,8 +49,7 @@ const routes: Array<[string, () => Promise<ReactElement>]> = [
         route: "/answers/should-startups-hire-engineers-right-now",
       }),
   ],
-  ["/calibration", async () => (await import("../app/calibration/page")).default()],
-  ["/concepts", async () => (await import("../app/concepts/page")).default()],
+  ["/concepts", async () => (await import("../app/research/advice-vs-market/page")).default()],
   ["/404", async () => (await import("../app/not-found")).default()],
 ];
 

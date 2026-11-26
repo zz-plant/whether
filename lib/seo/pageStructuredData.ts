@@ -379,7 +379,8 @@ export const buildHistoryStructuredData = ({
 };
 
 /**
- * `/comps`: the basket median as a `Dataset`, declared only when there is a
+ * The SaaS basket on the runway planner (`/operate/financial#saas-multiples`; it was
+ * `/comps` until 2026-11-25): the basket median as a `Dataset`, declared only when there is a
  * reading. An outage page has nothing to measure and says so; markup claiming a
  * dataset it does not show would be the reverse of what the page is for.
  */
@@ -390,7 +391,7 @@ export const buildCompsStructuredData = ({
   data: SaaSValuationSnapshot | null;
   tickers: readonly string[];
 }): JsonLdGraph => {
-  const url = buildCanonicalUrl("/comps");
+  const url = `${buildCanonicalUrl("/operate/financial")}#saas-multiples`;
   const measured = data
     ? [
         { "@type": "PropertyValue", name: "Median EV / revenue", value: data.medianEvToRevenue },
@@ -399,21 +400,12 @@ export const buildCompsStructuredData = ({
       ].filter((entry) => entry.value !== null)
     : [];
 
-  return graph([
-    {
-      "@type": "WebPage",
-      "@id": `${url}#webpage`,
-      url,
-      name: "SaaS Valuation Multiples",
-      inLanguage: "en",
-      isPartOf: isPartOfSite,
-      ...(data ? { mainEntity: { "@id": `${url}#dataset` } } : {}),
-    },
-    ...(data
+  return graph(
+    data
       ? [
           {
             "@type": "Dataset",
-            "@id": `${url}#dataset`,
+            "@id": `${buildCanonicalUrl("/operate/financial")}#saas-basket`,
             name: "Public SaaS valuation basket",
             description: `Median enterprise value to revenue and median revenue growth across ${tickers.length} public SaaS companies (${tickers.join(", ")}).`,
             url,
@@ -428,9 +420,8 @@ export const buildCompsStructuredData = ({
             },
           },
         ]
-      : []),
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/comps" }])),
-  ]);
+      : [],
+  );
 };
 
 /** `/api-docs`: the API as a `WebAPI`, with this page as its documentation. */
@@ -596,7 +587,9 @@ export const buildAnswerFaqStructuredData = ({
 };
 
 /**
- * `/calibration`: the confidence calibration study.
+ * The confidence calibration study, a section of `/history` since 2026-11-25 (it was
+ * `/calibration`, which redirects to the section). The page's own graph carries the
+ * breadcrumb; this one names the study and its data, at the section's anchor.
  *
  * Both a `Dataset` and a `ScholarlyArticle`, because it is both — a measured
  * result over a named sample, and a written finding about that result. The
@@ -611,7 +604,8 @@ export const buildCalibrationStudyStructuredData = ({
   /** The questions the page asks in its headings, with the answers it prints first. */
   questions?: readonly VisibleQuestion[];
 }): JsonLdGraph => {
-  const url = buildCanonicalUrl("/calibration");
+  const page = buildCanonicalUrl("/history");
+  const url = `${page}#confidence-record`;
   const name = "How often the guidance held up";
   /* "Room before a change", the reader's name for the distance since 2026-10-28; this said
      "margin", which a reader took for a profit margin. */
@@ -623,14 +617,14 @@ export const buildCalibrationStudyStructuredData = ({
   return graph([
     {
       "@type": "ScholarlyArticle",
-      "@id": `${url}#study`,
+      "@id": `${page}#calibration-study`,
       url,
       headline: name,
       name,
       description,
       inLanguage: "en",
       isPartOf: isPartOfSite,
-      mainEntityOfPage: url,
+      mainEntityOfPage: page,
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),
       about: [
@@ -648,13 +642,13 @@ export const buildCalibrationStudyStructuredData = ({
     },
     {
       "@type": "Dataset",
-      "@id": `${url}#dataset`,
+      "@id": `${page}#calibration-dataset`,
       name: "How often conditions held, by distance from a change",
       description:
         `Month-end readings and whether their conditions held the following month, by distance from the nearest change line. `
         + `${totals.held} of ${totals.months} held.`,
       ...(totals.months > 0 ? { temporalCoverage: "2012-01/.." } : {}),
-      measurementTechnique: buildCanonicalUrl("/calibration"),
+      measurementTechnique: url,
       url,
       creator: { "@id": organizationId },
       license: publishedDataLicenseUrl,
@@ -669,12 +663,11 @@ export const buildCalibrationStudyStructuredData = ({
         { "@type": "PropertyValue", name: "Readings whose conditions held one month later", value: totals.held },
       ],
     },
-    buildBreadcrumbList(buildGroupBreadcrumbs("/calibration")),
   ]);
 };
 
 /**
- * `/concepts`: a `CollectionPage` whose `ItemList` names each text on the page
+ * `/research/advice-vs-market` (`/concepts` until 2026-11-25): a `CollectionPage` whose `ItemList` names each text on the page
  * as the `CreativeWork` it is — its own author, its own URL, its first
  * publication month. The items are the external works themselves, not anchors
  * on this page, because that is what the list is a list of. A memo signed by a
@@ -692,7 +685,7 @@ export const buildProductCanonStructuredData = ({
     published: { year: number; month: number };
   }>;
 }): JsonLdGraph => {
-  const url = buildCanonicalUrl("/concepts");
+  const url = buildCanonicalUrl("/research/advice-vs-market");
   const name = "Does startup advice follow the market?";
   return graph([
     {
@@ -722,7 +715,7 @@ export const buildProductCanonStructuredData = ({
         })),
       },
     },
-    buildBreadcrumbList(buildGroupBreadcrumbs("/concepts")),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/research/advice-vs-market")),
   ]);
 };
 

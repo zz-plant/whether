@@ -240,7 +240,7 @@ describe("the site gives one account of what is new and what the scores read", (
 
     assert.match(html, /How Whether works/);
     assert.match(html, /href="\/history#track-record"/);
-    assert.match(html, /href="\/calibration"/);
+    assert.match(html, /href="\/history#confidence-record"/);
   });
 
   /* "Who writes it" names the editor and links to the work once; the method

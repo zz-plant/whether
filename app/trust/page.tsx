@@ -116,7 +116,7 @@ export default async function MethodPage({
             a heading and a sentence over one link. */}
         <p className="mt-6 text-sm text-slate-300">
           How often conditions held at each room before a change, across the whole archive:{" "}
-          <ActionLink href="/calibration" variant="inline">
+          <ActionLink href="/history#confidence-record" variant="inline">
             read the calibration study
           </ActionLink>
           .

@@ -26,7 +26,7 @@ function buildSparklinePath(
 }
 
 /**
- * Compact empirical teaser pointing to the `/concepts` VC-advice study.
+ * Compact empirical teaser pointing to the VC-advice study (`/research/advice-vs-market`, `/concepts` until 2026-11-25).
  * Draws a 64x18 dual-line micro-sparkline from `data/advice-corpus/monthly.json`
  * (expand vs. conserve shares across the July 2022 funding-pressure crossing).
  */
@@ -98,7 +98,7 @@ export function AdviceStudyTeaser({ className = "" }: { className?: string }) {
         </p>
       </div>
       <Link
-        href="/concepts"
+        href="/research/advice-vs-market"
         className="weather-hit weather-focus-ring weather-press-scale shrink-0 text-fluid-sm font-semibold text-sky-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-sky-200"
       >
         Read the study &rarr;

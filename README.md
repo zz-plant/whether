@@ -104,7 +104,7 @@ The engine behind the live brief has scored every month-end since 2012. Weekly b
 | Of those, warned a month ahead | 2 of 5 |
 | Of those, changed back within a month | 0 |
 
-Predicting "no change" every month would also score 96%, so that figure shows how rarely conditions move, not foresight. The record grades conditions, not companies: it cannot show that following the lines improved any company's results. [`/history`](https://whether.work/history) lists each change, and [`/calibration`](https://whether.work/calibration) has the study behind the 96%.
+Predicting "no change" every month would also score 96%, so that figure shows how rarely conditions move, not foresight. The record grades conditions, not companies: it cannot show that following the lines improved any company's results. [`/history`](https://whether.work/history) lists each change, and [the calibration study](https://whether.work/history#confidence-record) has the study behind the 96%.
 
 ---
 

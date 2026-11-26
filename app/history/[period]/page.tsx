@@ -369,7 +369,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
             {essays.map((essay) => (
               <li key={essay.slug}>
                 <Link
-                  href={`/concepts#${essay.slug}`}
+                  href={`/research/advice-vs-market#${essay.slug}`}
                   className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white"
                 >
                   {essay.title}

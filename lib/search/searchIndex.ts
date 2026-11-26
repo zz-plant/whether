@@ -123,7 +123,7 @@ const keyDocs: SearchEntity[] = [
     job: "trust",
     routePriority: 1,
     title: "Product writing against the record",
-    href: "/concepts",
+    href: "/research/advice-vs-market",
     summary: "Widely read product management essays, books and investor memos, each placed on the month-end record: the conditions the month it came out.",
     intentLabel: "Read product writing in context",
     keywords: ["concepts", "canon", "essays", "product management", "reading list", "investor memos", "cagan", "torres", "perri", "sequoia"],

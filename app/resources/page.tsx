@@ -222,7 +222,7 @@ export default async function ResourcesHubPage({
           {/* Two references the answers lean on, linked under the list they serve. Stacked
               on a phone, the second reaches up only across the gap (`--weather-hit-up`). */}
           <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5 gap-y-2 [--weather-hit-up:8px]">
-            <ActionLink href="/comps" variant="inline">SaaS valuation multiples</ActionLink>
+            <ActionLink href="/operate/financial#saas-multiples" variant="inline">SaaS valuation multiples</ActionLink>
           </nav>
         </section>
 

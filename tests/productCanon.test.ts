@@ -64,7 +64,7 @@ const record = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
 const liveTimeline = buildCanonTimeline(record);
 
 const renderPage = async () => {
-  const page = await import("../app/concepts/page");
+  const page = await import("../app/research/advice-vs-market/page");
   return renderToStaticMarkup(page.default());
 };
 
@@ -318,7 +318,7 @@ describe("product canon: the list itself", () => {
     ]) {
       assert.ok(html.includes(sentence), sentence);
     }
-    const source = readFileSync("app/concepts/page.tsx", "utf8");
+    const source = readFileSync("app/research/advice-vs-market/page.tsx", "utf8");
     assert.doesNotMatch(source, /\b(of the|tagged|came out in)\s+\d+\b|\b\d+%/, "the route types no count or share into its copy");
   });
 
@@ -383,7 +383,7 @@ describe("product canon: search and the archive", () => {
 
   /* A search result shows about sixty characters of title; the layout appends " | Whether". */
   it("keeps the title inside a result line and gives the share card its own image", async () => {
-    const { metadata } = await import("../app/concepts/page");
+    const { metadata } = await import("../app/research/advice-vs-market/page");
     assert.equal(typeof metadata.title, "string");
     const title = `${typeof metadata.title === "string" ? metadata.title : ""} | Whether`;
     assert.ok(title.length <= 60, `${title.length} characters: ${title}`);
@@ -417,7 +417,7 @@ describe("product canon: the archive's side of the link", () => {
     const page = await import("../app/history/[period]/page");
     const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ period: "2016" }) }));
     for (const entry of essaysPublishedIn({ year: 2016 })) {
-      assert.ok(html.includes(`href="/concepts#${entry.slug}"`), `2016 links to ${entry.slug}`);
+      assert.ok(html.includes(`href="/research/advice-vs-market#${entry.slug}"`), `2016 links to ${entry.slug}`);
     }
     assert.ok(essaysPublishedIn({ year: 2016 }).length > 0, "the fixture year has essays");
   });
