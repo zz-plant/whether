@@ -11,14 +11,15 @@ import { hasVisibleActiveNavLink, resolveGlobalHeaderRouteLabel } from "../lib/n
  */
 
 describe("route context in the global header", () => {
-  it("reports a visible active link for every grouped route, nested routes included", () => {
-    for (const pathname of ["/", "/signals", "/signals/capital-tightness-watch", "/operate", "/trust", "/history", "/history/compare", "/brief/2026-w31", "/resources/some-article", "/answers/x"]) {
+  it("reports a visible active link for every route in a header group, nested routes included", () => {
+    for (const pathname of ["/", "/signals", "/signals/capital-tightness-watch", "/operate", "/trust", "/history", "/history/compare", "/brief/2026-w31"]) {
       assert.equal(hasVisibleActiveNavLink(pathname), true, pathname);
     }
   });
 
-  it("reports none for utility and unlisted routes, which then keep their label", () => {
-    for (const pathname of ["/about", "/share", "/api-docs"]) {
+  /* Guides has no header tab since 2026-11-25, so its pages keep the label beside the wordmark. */
+  it("reports none for Guides, utility and unlisted routes, which then keep their label", () => {
+    for (const pathname of ["/resources", "/resources/some-article", "/answers/x", "/roles", "/companies", "/concepts", "/about", "/share", "/api-docs"]) {
       assert.equal(hasVisibleActiveNavLink(pathname), false, pathname);
       // Whatever the header falls back to must actually name something.
       const label = resolveGlobalHeaderRouteLabel(pathname);

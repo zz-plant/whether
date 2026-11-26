@@ -1061,8 +1061,9 @@ width it is given:
 ## XXX. The record band
 
 Added 2026-11-10 with the Covenant rebuild (`docs/design/rebuild-covenant.md`). The record band is
-the strip under the header of every route: every month-end reading since the record began, drawn
-once. With the homepage's sky, it is one of the two places colour commits at page scale (§XVI,
+the strip under History's header: every month-end reading since the record began, drawn once. It
+sat under the header of every route until 2026-11-25; every other route now prints its category
+line alone (`CategoryLine`, chosen by `RecordBandRouteGate`, `showsRecordBand`). With the homepage's sky, it is one of the two places colour commits at page scale (§XVI,
 §XXV). Since 2026-11-12 it is the Forecast's weather strip: each field is a small sky, and the
 readout shows the month as a card with its scores as large figures.
 

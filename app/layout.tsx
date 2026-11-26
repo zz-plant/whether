@@ -2,7 +2,8 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
-import { RecordBand } from "./components/recordBand";
+import { CategoryLine, RecordBand } from "./components/recordBand";
+import { RecordBandRouteGate } from "./components/recordBandRouteGate";
 import { MonthCursor } from "./components/monthCursor";
 import { STORAGE_KEYS } from "../lib/storage/keys";
 import { navigationGroups, pagesInGroup, utilityLinks } from "../lib/navigation/informationArchitecture";
@@ -258,7 +259,8 @@ export default function RootLayout({
             Skip to content
           </a>
           <GlobalHeader />
-          <RecordBand />
+          {/* The record band on History, the category line on every other route. */}
+          <RecordBandRouteGate band={<RecordBand />} line={<CategoryLine />} />
           {/* One month across every drawing on a page; the band's readout is one of them. */}
           <MonthCursor />
           <GlobalCommandPalette />

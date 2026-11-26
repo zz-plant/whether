@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Search, Share2 } from "lucide-react";
+import { useMemo } from "react";
+import { Search, Share2 } from "lucide-react";
 import { openShareRail } from "./globalShareRail";
 import { CloseIcon } from "./uiIcons";
 import { ThemeToggleButton } from "./themeToggleButton";
 import {
   findActivePage,
   resolveGlobalHeaderNavigationLinks,
+  resolveNavigationGroupLinks,
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
-import { placePopoverElement } from "../../lib/navigation/popoverPlacement";
 import {
   headerUtilityLinks,
   pagesInGroup,
@@ -32,10 +32,11 @@ const SHEET_CONTROL_CLASS =
 
 /**
  * The phone's Menu sheet: Search, Share + Theme, a compact 2-column grid of all
- * four groups' pages (no multi-paragraph wall of descriptions), and utility links.
+ * four groups' pages — Guides too, which has no tab in the bottom bar — (no
+ * multi-paragraph wall of descriptions), and utility links.
  */
 export function MobileNavContent({ navigationLinks: propLinks, currentPathname, onClose }: MobileNavContentProps) {
-  const groups = propLinks ?? resolveGlobalHeaderNavigationLinks(currentPathname);
+  const groups = propLinks ?? resolveNavigationGroupLinks(currentPathname);
   const activePageKey = findActivePage(currentPathname)?.key;
 
   return (
@@ -143,135 +144,22 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
 }
 
 /**
- * One desktop primary group tab + its anchored sibling submenu (`popover="auto"`).
+ * One desktop primary group tab: a link to the group's hub.
  *
- * Follows modern site-navigation conventions:
- * - Links stay in the Tab order; no ARIA `role="menu"` or `aria-haspopup`.
- * - Hovering with a fine pointer previews sibling pages via `showPopover({ source })`;
- *   clicking the chevron trigger pins it open; leaving focus closes it cleanly.
- * - Anchored natively inside `@supports (position-area: block-end)`, with a
- *   `getBoundingClientRect()` fixed fallback for browsers without Anchor Positioning.
+ * Each tab opened a submenu of the group's pages until 2026-11-25, on hover or from a
+ * chevron beside it. The pages it listed are the sub-tab row under the header on every
+ * grouped page, in the phone's Menu sheet, in the footer and in the palette, so the
+ * submenu was a fifth way to the same links; with three groups of two or three pages it
+ * went. The one-key jump stays in the tab's title and in the palette.
  */
-function DesktopNavGroupItem({
-  group,
-  activePageKey,
-}: {
-  group: GlobalHeaderNavigationLink;
-  activePageKey: string | undefined;
-}) {
-  /* The id is the group's, not `useId`'s. Next's `Link` consumes a `useId` on the
-     client and not on the server, so every `useId` after a link shifted by one on
-     hydration and the nav's `popoverTarget` / `aria-controls` / `id` disagreed —
-     React logged "a tree hydrated but some attributes … didn't match" on every
-     page (2026-11-22). One group renders once per header, so the key is unique. */
-  const submenuId = `nav-group-${group.key}`;
-  const itemRef = useRef<HTMLLIElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const submenuRef = useRef<HTMLDivElement>(null);
-  const hoverPreviewRef = useRef(false);
-  const [open, setOpen] = useState(false);
-
-  const pages = useMemo(() => pagesInGroup(group.key), [group.key]);
-  const hasSubmenu = pages.length > 1 || group.crossLinks.length > 0;
-
-  const positionFallback = useCallback(() => {
-    const item = itemRef.current;
-    const submenu = submenuRef.current;
-    if (!item || !submenu) return;
-    if (typeof CSS !== "undefined" && CSS.supports("position-area", "block-end")) return;
-    placePopoverElement(item, submenu, { side: "below" });
-  }, []);
-
-  useEffect(() => {
-    const submenu = submenuRef.current;
-    if (!submenu) return;
-    const onToggle = (event: Event) => {
-      const nextOpen = Reflect.get(event, "newState") === "open";
-      setOpen(nextOpen);
-      if (nextOpen) positionFallback();
-      else hoverPreviewRef.current = false;
-    };
-    submenu.addEventListener("toggle", onToggle);
-    return () => submenu.removeEventListener("toggle", onToggle);
-  }, [positionFallback]);
-
-  const closeSubmenu = useCallback(() => {
-    const submenu = submenuRef.current;
-    hoverPreviewRef.current = false;
-    if (!submenu || typeof submenu.hidePopover !== "function") return;
-    try {
-      if (submenu.matches(":popover-open")) submenu.hidePopover();
-    } catch {
-      // Ignore when unsupported or detached.
-    }
-  }, []);
-
-  useEffect(() => {
-    const item = itemRef.current;
-    if (!item || !hasSubmenu) return;
-
-    const onPointerEnter = (event: PointerEvent) => {
-      if (event.pointerType === "touch") return;
-      if (typeof window === "undefined" || !window.matchMedia("(hover: hover)").matches) return;
-      const submenu = submenuRef.current;
-      const trigger = triggerRef.current;
-      if (!submenu || typeof submenu.showPopover !== "function") return;
-      try {
-        if (!submenu.matches(":popover-open")) {
-          hoverPreviewRef.current = true;
-          if (trigger) submenu.showPopover({ source: trigger });
-          else submenu.showPopover();
-        }
-      } catch {
-        // Fallback for older browsers whose showPopover ignores the options object.
-        try {
-          if (!submenu.matches(":popover-open")) {
-            hoverPreviewRef.current = true;
-            submenu.showPopover();
-          }
-        } catch {
-          // Ignore if Popover API is unavailable.
-        }
-      }
-    };
-
-    const onPointerLeave = () => {
-      if (!hoverPreviewRef.current) return;
-      closeSubmenu();
-    };
-
-    const onFocusOut = (event: FocusEvent) => {
-      const next = event.relatedTarget;
-      if (next instanceof Node && item.contains(next)) return;
-      closeSubmenu();
-    };
-
-    item.addEventListener("pointerenter", onPointerEnter);
-    item.addEventListener("pointerleave", onPointerLeave);
-    item.addEventListener("focusout", onFocusOut);
-    return () => {
-      item.removeEventListener("pointerenter", onPointerEnter);
-      item.removeEventListener("pointerleave", onPointerLeave);
-      item.removeEventListener("focusout", onFocusOut);
-    };
-  }, [hasSubmenu, closeSubmenu]);
-
-  const handleTriggerClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (hoverPreviewRef.current) {
-      /* Clicking while hover-previewing pins the submenu open instead of closing it. */
-      hoverPreviewRef.current = false;
-      event.preventDefault();
-    }
-  }, []);
-
+function DesktopNavGroupItem({ group }: { group: GlobalHeaderNavigationLink }) {
   return (
-    <li ref={itemRef} className="relative flex items-center">
+    <li className="relative flex items-center">
       <Link
         href={group.href}
         aria-current={group.isActive ? "page" : undefined}
         title={`${group.description} Press ${group.shortcut}.`}
-        onClick={closeSubmenu}
-        className={`group weather-focus-ring relative flex min-h-11 items-center rounded-md py-1.5 pl-2.5 pr-1 text-fluid-sm tracking-[0.01em] no-underline transition-colors duration-150 ${
+        className={`group weather-focus-ring relative flex min-h-11 items-center rounded-md px-2.5 py-1.5 text-fluid-sm tracking-[0.01em] no-underline transition-colors duration-150 ${
           group.isActive
             ? "font-semibold text-[var(--app-text)]"
             : "font-medium text-[var(--app-text-muted)] hover:text-[var(--app-text)]"
@@ -285,73 +173,6 @@ function DesktopNavGroupItem({
           }`}
         />
       </Link>
-      {hasSubmenu ? (
-        <>
-          <button
-            ref={triggerRef}
-            type="button"
-            popoverTarget={submenuId}
-            aria-controls={submenuId}
-            aria-expanded={open}
-            aria-label={`${group.label} pages`}
-            onClick={handleTriggerClick}
-            className="weather-focus-ring inline-flex h-7 w-6 items-center justify-center rounded-md text-[var(--app-text-muted)] transition-colors hover:bg-[var(--bg-nested)] hover:text-[var(--app-text)]"
-          >
-            <ChevronDown
-              aria-hidden="true"
-              size={13}
-              strokeWidth={1.9}
-              className={`transition-transform duration-150 motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
-            />
-          </button>
-          <div
-            ref={submenuRef}
-            id={submenuId}
-            popover="auto"
-            className="site-nav-submenu"
-            data-nav-submenu={group.key}
-          >
-            {pages.map((page) => {
-              const isHub = page.href === group.href;
-              const isPageActive = page.key === activePageKey;
-              return (
-                <Link
-                  key={page.href}
-                  href={page.href}
-                  onClick={closeSubmenu}
-                  data-current-page={isPageActive ? "true" : undefined}
-                  className="site-nav-popover-link"
-                >
-                  <span className="min-w-0 truncate">{page.label}</span>
-                  {isHub ? (
-                    <kbd aria-hidden="true" className="weather-kbd shrink-0">
-                      {group.shortcut}
-                    </kbd>
-                  ) : page.placement === "secondary" ? (
-                    <span className="shrink-0 text-fluid-nano font-normal text-[var(--app-text-muted)]">
-                      Reference
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
-            {group.crossLinks.length > 0 ? (
-              <div className="mt-1 border-t border-[color:var(--border-subtle)] pt-1">
-                {group.crossLinks.map((cross) => (
-                  <Link
-                    key={cross.href}
-                    href={cross.href}
-                    onClick={closeSubmenu}
-                    className="site-nav-popover-link text-[var(--app-text-muted)]"
-                  >
-                    <span className="truncate text-fluid-nano">{cross.label}</span>
-                  </Link>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </>
-      ) : null}
     </li>
   );
 }
@@ -364,7 +185,7 @@ const utilityVisibilityClass = (breakpoint: "md" | "lg"): string =>
   breakpoint === "lg" ? "hidden lg:flex" : "flex";
 
 /**
- * The desktop masthead's primary groups (with hover/click sibling popovers) and
+ * The desktop masthead's primary groups and
  * quiet utility links, styled in Forecast's ink register.
  */
 export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) {
@@ -375,18 +196,12 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
     () => resolveGlobalHeaderNavigationLinks(resolvedPathname),
     [resolvedPathname],
   );
-  const activePageKey = useMemo(() => findActivePage(resolvedPathname)?.key, [resolvedPathname]);
-
   return (
     <div className="hidden min-w-0 flex-1 items-center justify-between gap-2 md:flex">
       <nav aria-label="Primary">
         <ul className="flex shrink-0 items-center gap-0.5 lg:gap-1">
           {groupLinks.map((group) => (
-            <DesktopNavGroupItem
-              key={group.href}
-              group={group}
-              activePageKey={activePageKey}
-            />
+            <DesktopNavGroupItem key={group.href} group={group} />
           ))}
         </ul>
       </nav>

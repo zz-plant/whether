@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { GlobalHeaderNavClient, MobileNavContent } from "../app/components/globalHeaderNavClient";
-import { resolveGlobalHeaderNavigationLinks } from "../lib/navigation/globalHeader";
 import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
@@ -28,38 +27,35 @@ describe("MobileNavContent", () => {
 });
 
 describe("GlobalHeaderNavClient", () => {
-  it("renders the four groups as tabs in order, a single utility row, and anchored group submenus", () => {
+  it("renders the header's three groups as plain tabs in order, and a single utility row", () => {
     const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
     const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf('aria-label="Utility"'));
     const utility = html.slice(html.indexOf('aria-label="Utility"'));
 
-    const positions = ["This week", "Plan", "History", "Guides"].map((label) => {
+    const positions = ["This week", "Plan", "History"].map((label) => {
       const index = bar.indexOf(`<span>${label}</span>`);
       assert.ok(index > -1, `the bar renders ${label}`);
       return index;
     });
     assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "tabs keep IA order");
-    for (const retired of ["Brief", "Decide", "Why it changed", "Resolve", "Trust", "Record"]) {
+    for (const retired of ["Brief", "Decide", "Why it changed", "Resolve", "Trust", "Record", "Guides"]) {
       assert.ok(!bar.includes(`<span>${retired}</span>`), `the top tab row no longer carries ${retired}`);
     }
     assert.ok(utility.includes('href="/about"'), "the utility row links /about");
     assert.ok(!utility.includes('href="/share"'), "Share is not duplicated beside the header Share button");
     assert.ok(!html.includes("<details"), "no More menu");
     assert.ok(!html.includes('href="/api-docs"'), "API & MCP is reached from /share, not the header");
-    assert.ok(!bar.includes('role="menu"'), "navigation submenus keep link semantics, not ARIA menu roles");
-    assert.ok(!bar.includes("aria-haspopup"), "navigation submenus avoid aria-haspopup menu semantics");
-    for (const groupKey of ["this-week", "decide", "record", "guides"]) {
-      assert.ok(bar.includes(`data-nav-submenu="${groupKey}"`), `group ${groupKey} renders an anchored popover submenu`);
-    }
-    for (const sibling of ["Why it changed", "Runway planner", "How it held up"]) {
-      assert.ok(bar.includes(sibling), `desktop group submenus expose sibling page ${sibling}`);
-    }
+    /* No submenus since 2026-11-25: the sub-tab row, the Menu sheet, the footer and the
+       palette list each group's pages. */
+    assert.ok(!bar.includes("popover"), "no tab opens a submenu");
+    assert.ok(!bar.includes("<button"), "the bar holds links only");
+    assert.equal(bar.split("<a ").length - 1, 3, "one link per group");
   });
 
-  it("shows each tab's one-key shortcut so the keyboard layer is discoverable", () => {
+  it("names each tab's one-key shortcut in its title, so hovering a tab teaches it", () => {
     const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
-    for (const key of ["w", "p", "h", "g"]) {
-      assert.ok(html.includes(`>${key}</kbd>`), `tab shows the ${key} key`);
+    for (const key of ["w", "p", "h"]) {
+      assert.ok(html.includes(`Press ${key}.`), `the tab's title names the ${key} key`);
     }
   });
 
@@ -70,12 +66,10 @@ describe("GlobalHeaderNavClient", () => {
     assert.equal(bar.split('aria-current="page"').length - 1, 1, "exactly one tab is active");
   });
 
-  it("lists every group's pages and the utility links in the mobile sheet", () => {
-    const navigationLinks = resolveGlobalHeaderNavigationLinks("/");
-    const html = renderToStaticMarkup(
-      <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
-    );
-    for (const label of ["This week", "Why it changed", "Plan", "Runway planner", "History", "How it held up", "Guides", "Share and embed", "API &amp; MCP", "About", "Contact"]) {
+  /* Guides, which has no tab in the bottom bar, is reached here (2026-11-25). */
+  it("lists every group's pages, Guides included, and the utility links in the mobile sheet", () => {
+    const html = renderToStaticMarkup(<MobileNavContent currentPathname="/" onClose={() => {}} />);
+    for (const label of ["This week", "Why it changed", "Plan", "Runway planner", "History", "How it held up", "Guides", "Roles", "Advice vs. market", "Share and embed", "API &amp; MCP", "About", "Contact"]) {
       assert.ok(html.includes(label), `the sheet lists ${label}`);
     }
     assert.ok(html.includes("Search or jump to a page"), "the sheet opens search");

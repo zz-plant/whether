@@ -5,7 +5,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 
-import { RecordBand } from "../app/components/recordBand";
+import { CategoryLine, RecordBand } from "../app/components/recordBand";
+import { RECORD_BAND_PATH, showsRecordBand } from "../lib/navigation/globalHeader";
 
 import { RECORD_BAND_HEIGHT, buildRecordBand, findRecordDifferences } from "../lib/report/recordBand";
 import {
@@ -20,7 +21,7 @@ import type { RegimeKey } from "../lib/types";
 
 /*
  * The record band (docs/design/rebuild-covenant.md): every month-end as one engraved
- * strip under the navigation of every route. These hold what the drawing claims: one
+ * strip under the navigation of History; every other route keeps its category line. These hold what the drawing claims: one
  * field per stretch, the two bundles the right way up, the published briefs kept apart
  * from the month-ends, and a readout that reads the same months back.
  */
@@ -183,7 +184,10 @@ describe("the band is the frame's, and takes nothing a route did not already hol
   const plate = readFileSync("app/history/recordPlateCanvas.tsx", "utf8");
 
   it("mounts once, under the header, and reads the bundled month-end series", () => {
-    assert.match(readFileSync("app/layout.tsx", "utf8"), /<GlobalHeader \/>\s*<RecordBand \/>/);
+    assert.match(
+      readFileSync("app/layout.tsx", "utf8"),
+      /<GlobalHeader \/>[\s\S]{0,120}<RecordBandRouteGate band=\{<RecordBand \/>\} line=\{<CategoryLine \/>\} \/>/,
+    );
     assert.match(component, /getTimeMachineRegimeSeries\(Number\.MAX_SAFE_INTEGER\)/);
     assert.doesNotMatch(component, /"use client"|await |fetch\(/, "the still image is server-drawn and makes no request");
   });
@@ -279,5 +283,33 @@ describe("the closed band teases the record it holds", () => {
     assert.match(plate, /disclosure\.open = true/);
     assert.match(plate, /addEventListener\("toggle", schedule\)/);
     assert.match(plate, /openedByHistory/);
+  });
+});
+
+/*
+ * History only (2026-11-25). The band opened on every route, a second way into History
+ * beside the header's tab; off History the frame keeps the band's category line alone.
+ */
+describe("the band is History's, and the category line is every route's", () => {
+  it("draws the band on /history and nowhere else", () => {
+    assert.equal(RECORD_BAND_PATH, "/history");
+    assert.ok(showsRecordBand("/history"));
+    assert.ok(showsRecordBand("/history/"), "a trailing slash is the same route");
+    for (const path of ["/", "/operate", "/signals", "/trust", "/resources", "/history/2022-09", "/brief/2026-11-23"]) {
+      assert.ok(!showsRecordBand(path), `${path} draws the category line, not the band`);
+    }
+  });
+
+  it("prints the category line alone, with no disclosure and no way into the record", () => {
+    const html = renderToStaticMarkup(createElement(CategoryLine));
+    assert.match(html, /data-category-line="true">Weekly operating guidance for startup leaders\.<\/p>/);
+    assert.doesNotMatch(html, /<details|<summary|data-record-band|href=/);
+  });
+
+  it("chooses between the two by the path, in a client gate fed server-drawn props", () => {
+    const gate = readFileSync("app/components/recordBandRouteGate.tsx", "utf8");
+    assert.match(gate, /^"use client";/);
+    assert.match(gate, /showsRecordBand\(usePathname\(\) \?\? "\/"\) \? band : line/);
+    assert.doesNotMatch(gate, /timeMachineCache|publishedBriefs|from "next\/headers"/, "the gate holds no data and reads no request");
   });
 });

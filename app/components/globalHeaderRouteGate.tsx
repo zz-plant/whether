@@ -39,7 +39,7 @@ const serverIsDesktop = () => true;
  * `RunningHead` sliding beneath it, which created 84px–128px of stacked chrome on
  * scroll-up). One 48px bar stays anchored at the top:
  *
- * - At top of page: Brand + 4 primary groups (with hover/click sibling popovers) +
+ * - At top of page: Brand + the header's 3 groups (plain links, no submenus) +
  *   Forecast ink actions on desktop; Brand + Search + Share on EVERY mobile route
  *   (including `/`).
  * - Scrolled past the hero/intro:

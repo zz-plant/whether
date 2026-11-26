@@ -238,11 +238,13 @@ Rules:
 - **No cards.** Sections open with a number, a Besley heading and a 2px rule. Enumerable
   content is a table with hairline rows. Boxes remain for inputs, previews, dialogs and menus.
 - **Navigation is unchanged:** This week, Plan, History, Guides; Share and embed, About, search.
-  No route is renamed.
+  No route is renamed. (Since 2026-11-25 Guides has no header tab; it is in the footer, the
+  phone's Menu sheet and the palette.)
 
 ### The record band
 
-The signature, present under the navigation on every route.
+The signature, present under the navigation on History. (On every route until 2026-11-25; the
+others keep its category line alone, `RecordBandRouteGate`.)
 
 - **What it draws.** One slot per month from Jan 2012, then this week. Each stretch of
   conditions is a field in that condition's ink. Two bundles of fine lines run across it: risk

@@ -5,6 +5,7 @@ import {
   normalizePathname,
   resolveGlobalHeaderNavigationLinks,
   resolveGlobalHeaderRouteLabel,
+  resolveNavigationGroupLinks,
   resolveSectionTabs,
 } from "../lib/navigation/globalHeader";
 
@@ -61,7 +62,7 @@ describe("global header navigation helpers", () => {
     assert.equal(groupOf("/history"), "record");
     assert.equal(groupOf("/history/2024-q1"), "record");
     assert.equal(groupOf("/calibration"), "record");
-    assert.equal(groupOf("/concepts"), "record");
+    assert.equal(groupOf("/concepts"), "guides");
     assert.equal(groupOf("/brief/2026-w31"), "record");
     assert.equal(groupOf("/resources"), "guides");
     assert.equal(groupOf("/resources/reversibility-as-governance"), "guides");
@@ -77,8 +78,17 @@ describe("global header navigation helpers", () => {
     assert.deepEqual(active("/signals"), ["This week"]);
     assert.deepEqual(active("/operate/financial"), ["Plan"]);
     assert.deepEqual(active("/brief/2026-w31"), ["History"]);
-    assert.deepEqual(active("/answers/should-startups-raise-capital-now"), ["Guides"]);
     assert.deepEqual(active("/about"), []);
+  });
+
+  /* Guides left the header on 2026-11-25: the header's tabs leave it out and mark none on
+     its pages, and the phone's Menu sheet, which lists every group, marks it. */
+  it("draws three groups in the header and all four in the Menu sheet", () => {
+    assert.deepEqual(resolveGlobalHeaderNavigationLinks("/").map((link) => link.label), ["This week", "Plan", "History"]);
+    assert.deepEqual(resolveNavigationGroupLinks("/").map((link) => link.label), ["This week", "Plan", "History", "Guides"]);
+    const answer = "/answers/should-startups-raise-capital-now";
+    assert.deepEqual(resolveGlobalHeaderNavigationLinks(answer).filter((link) => link.isActive), []);
+    assert.deepEqual(resolveNavigationGroupLinks(answer).filter((link) => link.isActive).map((link) => link.label), ["Guides"]);
   });
 });
 
@@ -91,7 +101,6 @@ describe("sub-tabs", () => {
       [
         ["History", "tab", false],
         ["How it held up", "tab", true],
-        ["Advice vs. market", "secondary", false],
         ["Is the data current?", "cross", false],
         ["How are the scores worked out?", "cross", false],
       ],
@@ -129,6 +138,7 @@ describe("sub-tabs", () => {
         ["Guides", false],
         ["Roles", true],
         ["Companies", false],
+        ["Advice vs. market", false],
       ],
     );
     assert.equal(resolveSectionTabs("/answers/should-startups-hire-engineers-right-now")?.links.find((link) => link.isActive), undefined);
