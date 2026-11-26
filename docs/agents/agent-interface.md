@@ -14,8 +14,11 @@ them into another repository's agent instructions, git hooks and GitHub Actions 
 
 For Claude Code, [the Whether plugin](../../plugins/whether/README.md) bundles the remote server
 with a skill for hiring, fundraising, burn and board-update questions. The marketplace lives in
-`.claude-plugin/marketplace.json`; the MCP Registry declaration is `server.json`. These files prepare
-distribution; committing them does not submit the plugin or register the server externally.
+`.claude-plugin/marketplace.json`; the MCP Registry declaration is `server.json`. Committing either file
+publishes nothing. The server has been listed in the official MCP Registry as `io.github.zz-plant/whether`
+since 2026-11-26 (version 1.1.0). A change to `server.json` reaches the registry only when someone runs
+`mcp-publisher login github` as `zz-plant`, then `mcp-publisher publish` from the repository root. The
+registry refuses a version it already has, so bump `version` first.
 `tests/agentDiscoveryParity.test.ts` checks their server URL and the tools the skill names.
 
 ## Start here: the state
