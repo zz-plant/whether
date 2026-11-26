@@ -2,6 +2,30 @@
 
 ## 1) Product surfaces (UI routes)
 
+### Three header groups, and the record band on History only (2026-11-25)
+
+The header and the frame under it are cut back to the weekly habit:
+
+- **Guides has no header tab.** The header draws This week, Plan and History
+  (`headerNavigationGroups`, the groups with `inHeader`); the phone's bottom bar draws those three
+  and Menu. Guides keeps its hub, sub-tabs and breadcrumbs, a footer column, a block in the Menu
+  sheet (which lists every group, `resolveNavigationGroupLinks`) and its palette entries. Its pages
+  keep the route label beside the wordmark, as utility routes do, since no tab marks them.
+- **No header submenus.** Each tab opened a popover of its group's pages on hover or from a
+  chevron. The sub-tab row, the Menu sheet, the footer and the palette list the same pages, so the
+  tabs are plain links; the one-key jump stays in each tab's title and in the palette.
+- **Advice vs. market (`/concepts`) moved from History to Guides.** It studies what investors and
+  essayists advised, not the product's own past calls. Its address is unchanged. History keeps
+  `/history` and `/calibration`: the calibration study stays on its own citable URL, and
+  `/history` already carries only a summary and a link to it.
+- **The record band is History's.** It sat under the header of every route as a disclosure, a
+  second way into History beside the header's tab. Every other route now prints its category line
+  alone (`CategoryLine`, chosen in the layout by `RecordBandRouteGate` via `showsRecordBand`).
+- **One home for the change lines.** `/trust`'s "How close conditions are to changing" dropped its
+  "What to watch" list — where conditions change, the lead area's pause line and its restart line —
+  for one line linking the brief's "What would change our mind?", which carries every area's lines
+  and the rate-cut readings. The section keeps the distance-held evidence only it holds.
+
 ### Caller-owned decision checks and advisory artifact audits (2026-10-17)
 
 `GET /api/agent?format=jev` supports optional Jev/Clef/Flash/Omni model selection;
@@ -64,8 +88,8 @@ those names.
 | --- | --- | --- |
 | This week | `/` | Why it changed (`/signals`); Can I trust this? (`/trust`) |
 | Plan | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`); Your decisions (`/decisions`) |
-| History | `/history` | How it held up (`/calibration`); Compare periods (`/history/compare`), Advice vs. market (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
-| Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix |
+| History | `/history` | How it held up (`/calibration`); Compare periods (`/history/compare`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`). Advice vs. market moved to Guides on 2026-11-25 |
+| Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; Advice vs. market (`/concepts`), since 2026-11-25; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix. No header tab since 2026-11-25 |
 
 - **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Plan"
   and on `/history` "History". `/signals` keeps its URL; it is "Why it changed" in the tabs, the

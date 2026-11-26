@@ -15,7 +15,25 @@ const monthLabel = (recordDate: string) =>
   new Date(`${recordDate}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 /**
- * The record band, under the navigation of every route (docs/design/rebuild-covenant.md).
+ * The category line under the navigation, on every route but History (2026-11-25).
+ *
+ * It was the closed row of the record band, which opened on every route. On History the
+ * band still carries it; elsewhere this prints the same sentence with nothing behind it,
+ * so a first visit still reads what the site is before the week's guidance.
+ */
+export function CategoryLine() {
+  return (
+    <div className="record-band category-line">
+      <p className="record-band-what" data-category-line>
+        {categorySentence}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The record band, under the navigation of History (docs/design/rebuild-covenant.md);
+ * every other route draws `CategoryLine` in its place (`RecordBandRouteGate`).
  * Since 2026-11-12 it is the Forecast's weather strip (.impeccable/surfaces/app-page-tsx.md):
  * each stretch is drawn as a small sky, lighter at the top, and moving along it reads
  * the month out as a card with its condition and its two scores as large numerals,

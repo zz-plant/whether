@@ -5,17 +5,13 @@ import { buildPageMetadata } from "../../lib/seo";
 import { UrlDetails } from "../components/ui/urlDetails";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
-import {
-  DECISION_CONTRACT_LABELS,
-  PRIMARY_AUDIENCE_SUMMARY,
-} from "../../lib/report/reportCopy";
+import { PRIMARY_AUDIENCE_SUMMARY } from "../../lib/report/reportCopy";
 import { ReportSection } from "../components/reportSection";
 import { FormulaReference } from "./formulaReference";
 import { RunHistorySection } from "./runHistorySection";
 import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
-import { formatDecisionReversal } from "../../lib/report/reportFormatting";
 import { RATE_PARAM, parseRateParam } from "../../lib/report/fedSteps";
 import {
   CALIBRATION_DISTANCE_PARAM,
@@ -93,32 +89,19 @@ export default async function MethodPage({
         id="confidence-limits"
         title="How close conditions are to changing"
       >
-        {/* Two columns under their own headings, not two cards inside the
-            section (2026-10-09); the warnings below are set the same way. */}
-        <div className="weather-switch gap-x-8 gap-y-6 [--col-min:18rem]">
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-100">What to watch</h3>
-            <ul className="space-y-2 text-sm text-slate-200">
-              <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
-              <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              {/* The lead area's restart line, as the brief and every paste print
-                  it. This slot said "confidence is back to high and conditions
-                  have held for a second reading" under the same label, so the
-                  page named a second restart line the plan never uses. */}
-              {reportData.actionStripItems[0]?.reversalCondition ? (
-                <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatDecisionReversal(reportData.actionStripItems[0].reversalCondition)}</li>
-              ) : null}
-            </ul>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-100">Before you act</h3>
-            <p className="text-sm text-slate-200">
-              If a warning below is active, check the source dates before going ahead.
-            </p>
-            {/* No buttons to #source-board and #revisit-call (2026-10-09): the page's
-                index names both sections, and "Check source dates" closes the
-                section below. */}
-          </div>
+        {/* One place for the change lines (2026-11-25). A "What to watch" column here
+            restated three of them — where conditions change, the lead area's pause line
+            and its restart line — beside the brief's "What would change our mind?",
+            which carries all five areas' lines and what a rate cut would do to them. This
+            section keeps what only it holds: how often a reading this close has held. */}
+        <div className="space-y-3 text-sm text-slate-200">
+          <p>
+            Each area&rsquo;s pause and restart lines, and how far a rate cut would move them, are on the brief:{" "}
+            <ActionLink href="/#what-would-change" variant="inline">
+              What would change our mind?
+            </ActionLink>
+          </p>
+          <p>If a warning below is active, check the source dates before going ahead.</p>
         </div>
         <div className="mt-6">
           <DistanceHeldChoice

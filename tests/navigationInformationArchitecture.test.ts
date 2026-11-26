@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import {
   contentSections,
+  headerNavigationGroups,
   headerUtilityLinks,
   navigationGroupByKey,
   navigationGroups,
@@ -20,7 +21,7 @@ import { pathMatchesLink } from "../lib/navigation/pathMatching";
  * History, Guides" since 2026-10-28; the code keys kept the first names.
  */
 describe("navigation groups", () => {
-  it("puts four groups in the header, in this order, each on its hub", () => {
+  it("keeps four groups, in this order, each on its hub", () => {
     assert.deepEqual(
       navigationGroups.map((group) => [group.label, group.href]),
       [
@@ -30,6 +31,13 @@ describe("navigation groups", () => {
         ["Guides", "/resources"],
       ],
     );
+  });
+
+  /* 2026-11-25: the weekly habit is in the header; Guides, which search brings readers
+     to, is in the footer, the Menu sheet and the palette. */
+  it("puts three of them in the header and leaves Guides out", () => {
+    assert.deepEqual(headerNavigationGroups.map((group) => group.label), ["This week", "Plan", "History"]);
+    assert.equal(navigationGroupByKey.guides.inHeader, false);
   });
 
   it("gives every group a distinct one-key jump that no other shortcut binds", () => {
@@ -48,8 +56,8 @@ describe("navigation groups", () => {
       {
         "this-week": ["/", "/signals", "/trust"],
         decide: ["/operate", "/operate/financial", "/comps"],
-        record: ["/history", "/calibration", "/concepts"],
-        guides: ["/resources", "/roles", "/companies"],
+        record: ["/history", "/calibration"],
+        guides: ["/resources", "/roles", "/companies", "/concepts"],
       },
     );
     for (const group of navigationGroups) {
@@ -69,9 +77,11 @@ describe("navigation groups", () => {
     assert.equal(navigationLabelByPath["/trust"], "Can I trust this?");
   });
 
-  it("files Advice vs. market under History as a secondary page, not a primary tab", () => {
+  /* Under History until 2026-11-25. It studies what others advised, not the product's own
+     past calls, so it is a longer answer (Guides) rather than the record (History). */
+  it("files Advice vs. market under Guides as a secondary page, not a primary tab", () => {
     const concepts = navigationPages.find((page) => page.href === "/concepts");
-    assert.equal(concepts?.group, "record");
+    assert.equal(concepts?.group, "guides");
     assert.equal(concepts?.placement, "secondary");
     assert.ok(!utilityLinks.some((link) => String(link.href) === "/concepts"), "not a utility link");
   });
@@ -83,6 +93,7 @@ describe("navigation groups", () => {
         ["/resources", "Guides", "tab"],
         ["/roles", "Roles", "secondary"],
         ["/companies", "Companies", "secondary"],
+        ["/concepts", "Advice vs. market", "secondary"],
       ],
     );
     // Their pages under them are the group's through the page, not a member prefix or a content section.

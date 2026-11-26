@@ -191,9 +191,9 @@ contained block, with the guidance written on it and the five areas ruled beneat
 scores sit in the evidence rail beside it, on the page's own paper. A storm week and a
 sunny week look like different pages. Beneath the sky the brief is filed on cool paper in a
 blue-black ink, read top to bottom: the five areas with their action and line, the calibration,
-then the sections that explain them. The record band under the navigation of every route is
-every month-end reading since January 2012, drawn as the same four conditions, folded under a
-one-line summary that carries the category line.
+then the sections that explain them. The record band under History's navigation is every
+month-end reading since January 2012, drawn as the same four conditions, folded under a
+one-line summary that carries the category line; every other route prints that line alone.
 
 The world borrows a modern weather app's glanceability and an investor update's restraint: the
 condition drives the page, structure stays quiet, every engraved line on the band is drawn from
@@ -322,8 +322,8 @@ an outlined diamond, never red: shape carries the state where hue cannot.
 **The Ink Is the Action Rule.** Links, buttons, focus rings, the selected pill and the caret are
 the ink in every week. A condition's colour means the condition and nothing else.
 
-**The Two Fields Rule.** Colour commits at page scale in two places: the record band on every
-route, and the sky on the homepage's first screen. Both draw the four conditions and nothing
+**The Two Fields Rule.** Colour commits at page scale in two places: the record band on
+History, and the sky on the homepage's first screen. Both draw the four conditions and nothing
 else. The regime atmosphere wash is off everywhere else (`--atmosphere-*: transparent`), so
 the paper below the sky, and every other route, stays paper.
 
@@ -394,8 +394,8 @@ are for `.type-badge` alone. No italics.
 
 ## Layout
 
-One frame on every route: the global header, the record band full-bleed beneath it, then the
-document. The page gutter is `--weather-shell-pad-inline` (16px); the one-page brief's call
+One frame on every route: the global header, the category line beneath it (the record band,
+full-bleed, on History), then the document. The page gutter is `--weather-shell-pad-inline` (16px); the one-page brief's call
 and rail take the wide 84rem measure, and its reading body below keeps 72rem (the one-page
 brief, 2026-11-21).
 
@@ -503,14 +503,16 @@ corners: they are print, not furniture.
 
 ### Navigation
 
-- **Global masthead:** full-bleed sticky Forecast bar (`48px`) on paper ground. At the top of a page it carries the Bricolage wordmark, the four primary groups (`This week`, `Plan`, `History`, `Guides`) with anchored hover/click sibling popovers (`popover="auto"`) and a 2px ink active underline, `About`, and flat ink action controls (`Search ⌘K`, `Present F` on desktop `/`, a single `Share` button opening `ShareRail`, and `Theme` on `md+`). Past the hero, the same single 48px masthead morphs in place into the reading running head (conditions, nearest change, date, current section jumper popover, site address, and a `Nav` reveal toggle on desktop), so top chrome never stacks into two bars.
-- **Phone:** the same 48px masthead carries Brand + `Search` + `Share` on every route (morphing into the reading head with a section-jumper popover on scroll, replacing any second sticky chip strip), paired with a sticky bottom tab bar in Forecast's ink register whose active tab opens a sibling-page popover directly above the thumb bar and whose fifth tab (`Menu`) opens the compact 2-column route sheet.
+- **Global masthead:** full-bleed sticky Forecast bar (`48px`) on paper ground. At the top of a page it carries the Bricolage wordmark, the three primary groups (`This week`, `Plan`, `History`) as plain links with a 2px ink active underline (no submenus since 2026-11-25; Guides left the header then and is reached from the footer, the phone's Menu sheet, the palette and search), `About`, and flat ink action controls (`Search ⌘K`, `Present F` on desktop `/`, a single `Share` button opening `ShareRail`, and `Theme` on `md+`). Past the hero, the same single 48px masthead morphs in place into the reading running head (conditions, nearest change, date, current section jumper popover, site address, and a `Nav` reveal toggle on desktop), so top chrome never stacks into two bars.
+- **Phone:** the same 48px masthead carries Brand + `Search` + `Share` on every route (morphing into the reading head with a section-jumper popover on scroll, replacing any second sticky chip strip), paired with a sticky bottom tab bar in Forecast's ink register whose active tab opens a sibling-page popover directly above the thumb bar and whose fourth tab (`Menu`) opens the compact 2-column route sheet, which lists all four groups' pages, Guides included.
 
 ### The record band (signature)
 
 One of the page's two fields of colour, with the homepage's sky, an `aside` labelled "The record" directly
-under the header on every route (`app/components/recordBand.tsx`, `lib/report/recordBand.ts`,
-`app/styles/record-band.css`). Server-rendered SVG from the bundled month-end series; the still
+under the header on History (`app/components/recordBand.tsx`, `lib/report/recordBand.ts`,
+`app/styles/record-band.css`). It was on every route until 2026-11-25; elsewhere it was a second
+way into History beside the header's tab, and those routes now print its category line alone
+(`CategoryLine`, chosen by `RecordBandRouteGate`). Server-rendered SVG from the bundled month-end series; the still
 image needs no script.
 
 - **Construction.** One slot per month-end reading. Each stretch of conditions is a field in

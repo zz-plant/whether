@@ -1,5 +1,6 @@
 import {
   contentSections,
+  headerNavigationGroups,
   navigationGroupByKey,
   navigationGroups,
   navigationPages,
@@ -15,6 +16,15 @@ const fallbackLabel = "Page";
 
 export const normalizePathname = (pathname: string) =>
   pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+
+/*
+ * The one route that draws the record band (2026-11-25): History, where the band is the
+ * page's lead figure and `RecordPlateCanvas` opens it. Every other route keeps the
+ * category line the band's summary carried, without the record behind it: on the brief,
+ * Plan and Guides it was a second way into History beside the header's tab.
+ */
+export const RECORD_BAND_PATH = "/history";
+export const showsRecordBand = (pathname: string) => normalizePathname(pathname) === RECORD_BAND_PATH;
 
 const matchesPrefix = (prefix: string, pathname: string) => pathname === prefix || pathname.startsWith(`${prefix}/`);
 
@@ -66,21 +76,28 @@ export const resolveGlobalHeaderRouteLabel = (pathname: string) => {
 
 export type GlobalHeaderNavigationLink = NavigationGroup & { isActive: boolean };
 
-/** The four groups in header order, the one the path belongs to marked active. */
-export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHeaderNavigationLink[] => {
+const markActiveGroup = (groups: readonly NavigationGroup[], pathname: string): GlobalHeaderNavigationLink[] => {
   const activeKey = findActiveGroup(pathname)?.key;
-  return navigationGroups.map((group) => ({ ...group, isActive: group.key === activeKey }));
+  return groups.map((group) => ({ ...group, isActive: group.key === activeKey }));
 };
+
+/** The header's groups in order, the one the path belongs to marked active. */
+export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHeaderNavigationLink[] =>
+  markActiveGroup(headerNavigationGroups, pathname);
+
+/** Every group in order, the header's and Guides, for the phone's Menu sheet. */
+export const resolveNavigationGroupLinks = (pathname: string): GlobalHeaderNavigationLink[] =>
+  markActiveGroup(navigationGroups, pathname);
 
 /**
  * Whether the header's group tabs will visibly mark the current route.
  *
  * The header drops the route label beside the wordmark from `md` only where a
- * tab marks the route. Every grouped page and route family does; `/about`,
- * `/share` and the legal pages sit outside the groups, so the label comes back
- * for those. Callers render the label when this returns false.
+ * tab marks the route. The pages and route families of the header's groups do;
+ * Guides' pages, `/about`, `/share` and the legal pages have no tab, so the label
+ * comes back for those. Callers render the label when this returns false.
  */
-export const hasVisibleActiveNavLink = (pathname: string) => Boolean(findActiveGroup(pathname));
+export const hasVisibleActiveNavLink = (pathname: string) => Boolean(findActiveGroup(pathname)?.inHeader);
 
 type SectionTabLink = {
   href: Route;

@@ -19,6 +19,7 @@ const TAB_ICONS: Record<NavigationGroupKey, typeof Home> = {
   "this-week": Home,
   decide: LayoutGrid,
   record: Archive,
+  /* No tab since 2026-11-25 (`inHeader`); kept so the map stays complete if it returns. */
   guides: BookOpen,
 };
 
@@ -50,8 +51,8 @@ function ActiveGroupTab({
 }) {
   /* Keyed by the group, not `useId`: Next's `Link` consumes a `useId` on the client
      only, so an id derived from it shifts between server and client and the trigger's
-     `popoverTarget` stops naming the popover (see `DesktopNavGroupItem`). One tab is
-     active at a time, so the key is unique. */
+     `popoverTarget` stops naming the popover. One tab is active at a time, so the key
+     is unique. */
   const popoverId = `mobile-tab-group-${tab.key}`;
   const popoverRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -168,7 +169,8 @@ function ActiveGroupTab({
 }
 
 /**
- * The four groups, one thumb-tap away on a phone, in Forecast's ink register.
+ * The header's three groups and Menu, one thumb-tap away on a phone, in Forecast's ink
+ * register. Guides has no tab (2026-11-25); Menu opens a sheet that lists its pages.
  *
  * - Inactive tabs navigate straight to their group hub.
  * - The active tab opens a compact popover for its sibling pages right above the bar.
@@ -264,8 +266,9 @@ export function MobileTabBar({ pathname: propPathname }: { pathname?: string } =
           <Drawer.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/50 backdrop-blur-sm" />
           <Drawer.Viewport className="fixed inset-0 z-[var(--z-modal)] flex items-end md:hidden">
             <Drawer.Popup className="w-full max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-2xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] shadow-2xl">
+              {/* Every group's pages, not the bar's tabs: Guides has no tab, and the
+                  sheet is how a phone reaches it. */}
               <MobileNavContent
-                navigationLinks={tabs}
                 currentPathname={pathname}
                 onClose={() => setShowMore(false)}
               />

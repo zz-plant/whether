@@ -15,6 +15,12 @@ import type { Route } from "./routeType";
  * One name per URL. A group's hub page carries the group's label, so the header
  * tab, the group's first sub-tab, the breadcrumb and the footer heading all say
  * the same word for the same address.
+ *
+ * Three of the four are in the header since 2026-11-25 (`inHeader`). Guides left it:
+ * its answers, role and company pages bring readers in from search, and the weekly
+ * habit — this week, the plan, the record — does not pass through them. It keeps its
+ * hub, its sub-tabs and its breadcrumbs, and is reached from the footer, the phone's
+ * Menu sheet, the palette and search.
  */
 
 export type NavigationGroupKey = "this-week" | "decide" | "record" | "guides";
@@ -56,8 +62,13 @@ export type NavigationGroup = {
   href: Route;
   label: string;
   description: string;
-  /** One-key jump. Rendered as a kbd hint on the header tab and in the palette; bound in KeyboardShortcuts. */
+  /** One-key jump. Named in the header tab's title and in the palette; bound in KeyboardShortcuts. */
   shortcut: string;
+  /**
+   * A tab in the desktop header and the phone's bottom bar. Every group, in the header
+   * or not, has a footer column, a block in the phone's Menu sheet and palette entries.
+   */
+  inHeader: boolean;
   /**
    * Route families the group owns beyond its pages, prefix-matched: the frozen
    * weeks under History, the answer and guide pages under Guides. They light the
@@ -77,6 +88,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     label: "This week",
     description: "This week's guidance, the evidence behind it and its sources.",
     shortcut: "w",
+    inHeader: true,
     memberPrefixes: [],
     crossLinks: [],
     footerLinks: [],
@@ -90,6 +102,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     label: "Plan",
     description: "Turn this week's guidance into decisions on hiring, roadmap, fundraising, spending and new bets.",
     shortcut: "p",
+    inHeader: true,
     memberPrefixes: [],
     crossLinks: [],
     footerLinks: [],
@@ -102,6 +115,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     label: "History",
     description: "The guidance for every past month and week, scored against what happened next.",
     shortcut: "h",
+    inHeader: true,
     memberPrefixes: ["/brief"],
     /* The sources and the score derivation stay on /trust, where they judge this
        week's reading; the record reaches them rather than holding a second copy. */
@@ -117,6 +131,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     label: "Guides",
     description: "Answers and guides for each decision area, and the frameworks behind them.",
     shortcut: "g",
+    inHeader: false,
     /* /resolve/<slug> (help by role and situation) and /toolkits/<slug> are the
        "More tools" at the foot of Guides; /answers/<slug> are its answers. /roles and
        /companies are the group's own pages since 2026-11-06, so their pages under them
@@ -130,10 +145,13 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
   },
 };
 
-/** The four groups in header order. */
+/** The four groups in order: the footer's columns, the Menu sheet's blocks, the palette. */
 export const navigationGroups: readonly NavigationGroup[] = (["this-week", "decide", "record", "guides"] as const).map(
   (key) => navigationGroupByKey[key],
 );
+
+/** The groups the desktop header and the phone's bottom bar draw as tabs. */
+export const headerNavigationGroups: readonly NavigationGroup[] = navigationGroups.filter((group) => group.inHeader);
 
 /*
  * Every grouped page, hub first within its group, groups in nav order. The
@@ -212,14 +230,6 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
   {
-    key: "concepts",
-    group: "record",
-    href: "/concepts",
-    label: "Advice vs. market",
-    description: "407 investor posts and 35 essays placed against the monthly record since 2012.",
-    placement: "secondary",
-  },
-  {
     key: "guides",
     group: "guides",
     href: "/resources",
@@ -241,6 +251,18 @@ export const navigationPages: readonly NavigationPage[] = [
     href: "/companies",
     label: "Companies",
     description: "This week's conditions beside what 50 public tech companies have filed, for each role there.",
+    placement: "secondary",
+  },
+  /* Guides rather than History since 2026-11-25: a study of what investors and essayists
+     advised, read against the record, not the product's own past calls. History keeps
+     the record and the calibration study that grades it; the advice study is a longer
+     answer, which is what Guides holds. */
+  {
+    key: "concepts",
+    group: "guides",
+    href: "/concepts",
+    label: "Advice vs. market",
+    description: "407 investor posts and 35 essays placed against the monthly record since 2012.",
     placement: "secondary",
   },
 ];

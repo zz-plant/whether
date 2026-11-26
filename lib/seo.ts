@@ -18,7 +18,8 @@ export const organizationName = "Whether";
 export const websiteName = "Whether — Weekly Operating Guidance for Startup Leaders";
 /*
  * The category line as a sentence: "Weekly operating guidance for startup leaders." The
- * strip under the header prints it on every route (recordBand.tsx), so a first visit
+ * strip under the header prints it on every route (recordBand.tsx: the record band's summary
+ * on History, `CategoryLine` everywhere else), so a first visit
  * reads what the site is before the week's guidance (2026-11-18). Derived from the
  * title, so the two cannot drift.
  */

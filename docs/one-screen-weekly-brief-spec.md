@@ -665,7 +665,8 @@ approved comp in `.impeccable/mocks/declutter-20261121/brief.png`.
   opens it too (`AnchorFeedback` opens a disclosure around a hash target).
 - **The record band folds.** Its summary is one line: the category line and "The record since
   2012". The chart, month readout, key, counts and the History link are one native disclosure
-  away, on every route.
+  away, on every route. (Since 2026-11-25 the band is on History only; the brief keeps the
+  category line under the header and reaches the record from "Has this happened before?".)
 - **The load budget falls with it:** 1,401 words, 226 numbers, 290 words before the areas,
   14 buttons, 24 "Funding pressure" mentions, 29 "Risk appetite" mentions and 0 hard sentences
   (`scripts/check-home-load.ts`). The canonical rule models, exports, archival caveats,
