@@ -8,7 +8,7 @@ import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saas
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 import { isDecisionArea, type DecisionArea } from "../report/boundedDecisionRules";
 import { conditionTermSlug, definedTermReference, type DefinedTermSlug } from "./definedTerms";
-import { isRegimeKey } from "../regimePresentation";
+import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 
 /**
  * Per-page JSON-LD, for the pages whose content already supports a schema.org
@@ -90,6 +90,10 @@ const SIGNAL_WATCH_TOPICS: Record<string, ReadonlyArray<ReturnType<typeof wikipe
 
 export const areaTopics = (areas: readonly DecisionArea[]) =>
   areas.flatMap((area) => DECISION_AREA_TOPIC[area] ?? []);
+
+/** Topics with a name listed once, the first kept: two sources can name the same topic. */
+const uniqueTopics = <T extends { name: string }>(topics: readonly T[]): T[] =>
+  topics.filter((topic, index) => topics.findIndex((other) => other.name === topic.name) === index);
 
 /**
  * The site's own terms, by the ids `/about` gives them in its `DefinedTermSet`
@@ -776,15 +780,17 @@ export const buildPublishedBriefStructuredData = ({
         "startup hiring guidance",
         "burn rate discipline",
         `week of ${brief.recordDateLabel}`,
-        brief.regime,
+        /* The condition by the name readers see ("Freezing"), not the engine's key ("SCARCITY"). */
+        getRegimePublicLabel(brief.regime),
       ],
-      about: [
+      /* Once each: the fundraising area's topic is also Venture capital, which listed it twice. */
+      about: uniqueTopics([
         { "@type": "Thing", name: "Startup Operating Guidance" },
         MARKET_TOPICS.ventureCapital,
         MARKET_TOPICS.yieldCurve,
         MARKET_TOPICS.startup,
         ...areaTopics(brief.decisions.map((decision) => decision.area).filter(isDecisionArea)),
-      ],
+      ]),
       /* The site's terms the week prints: its two scores, the room before a change, and its conditions. */
       mentions: siteTerms("funding-pressure", "risk-appetite", "room-before-a-change", ...conditionTermFor(brief.regime)),
       ...(questions.length > 0 ? { hasPart: questionNodes(questions) } : {}),
