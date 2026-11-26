@@ -4996,12 +4996,36 @@ A section that answers a question is headed by it, and its first sentence starts
   panel's "Slack preview overlay" switch now reads "Preview in Slack".
 
 Left out, each for a reason:
-- The MCP `get_answer` tool still returns the answer pages' short answer without this week's
-  lead. The lead is computed in `app/answers`, not in the shared answer object.
+- The MCP `get_answer` tool still returned the answer pages' short answer without this week's
+  lead, which was computed in `app/answers`, not in the shared answer object. Closed the same day
+  (§1.1.110).
 - `/api/cli/history` serves 12 month-ends, so /history's dataset `distribution` points at what
   exists. There is no full-record download.
 - `llms.txt` is built without a reading. It asks "What's changed since the last reading?" and
   "Why these conditions?" as a person would.
+
+### 1.1.110 `get_answer` opens on the page's sentence (2026-11-25)
+
+The owner asked, overriding maintenance mode, to close the gap §1.1.109 left: the answer pages
+led with this week's standing and `get_answer` did not, so an assistant quoting Whether opened on
+a different line from the page a reader would open.
+
+- **One function.** `describeThisWeeksAnswer` moved from `app/answers/decisionAnswerCopy.ts` to
+  `lib/answers/thisWeeksAnswer.ts`, with `buildAnswerLead`, which picks the lead area, draws its
+  row with `buildHomeAreaRows` and puts the week's sentence before the page's `shortAnswer`.
+  `buildAnswerObject` calls it, and the page reads `leadAnswer` and `leadArea` from the object for
+  its card, its copied brief and its FAQ answer.
+- **What the tool returns.** `get_answer` gains `leadAnswer`, the sentence the page prints under
+  its question. `shortAnswer` stays the page's rule for any week. `attributionSnippet` quotes
+  `leadAnswer`: it is dated ("Week of …"), so the week's number belongs in it. The
+  `answer-question` MCP prompt tells the model to open with it.
+- **What did not change.** Titles, questions, slugs and meta descriptions: the meta description
+  is still the page's `shortAnswer`, so crawlers cache no weekly number. `/llms.txt` and the tool
+  catalog read the tool definition; the output schema lists the new field.
+- **Held to it.** `tests/answerLeadParity.test.tsx` renders the page and calls the tool for two
+  hiring questions in the bundled week (hiring open) and in a Freezing fixture week (hiring on
+  hold). It asserts the card, the FAQ answer, `leadAnswer` and the snippet all open on the one
+  sentence.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

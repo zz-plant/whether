@@ -116,7 +116,9 @@ from the same fields; they can drift.
 single source for the answer text, company inputs, decision note, watchouts, FAQ,
 last-reviewed date, standing and rules. `decisionAnswerPageContent.tsx` renders it;
 `get_answer` returns it. `tests/answerPageReaderCopy.test.tsx` asserts the page's
-visible answer and the agent payload are the same object.
+visible answer and the agent payload are the same object. Since 2026-11-25 it also
+carries `leadAnswer`, the week's standing the page leads with (`buildAnswerLead`),
+held to the page by `tests/answerLeadParity.test.tsx`.
 
 ## Phase 4 — Segmented sitemaps
 
