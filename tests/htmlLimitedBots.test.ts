@@ -41,8 +41,9 @@ describe("html-limited bots", () => {
  * render of an answer, a published week, a signal page or an archive period (metadata streamed
  * to the foot of <body>) was cached and served to Googlebot for an hour to a year. 128 sitemap
  * URLs had no <title>, description or canonical in <head> for any crawler.
- * patches/vinext@1.0.1.patch keeps a cache-candidate render's metadata in <head>; vinext 1.4.6
- * has the same code, so a version bump must carry the patch forward.
+ * patches/vinext@<version>.patch keeps a cache-candidate render's metadata in <head>. vinext 1.4.7
+ * still has the bug (checked 2026-11-26 on a production build: a browser's render, then Googlebot
+ * from the cache, no <title> in <head>), so a version bump must carry the patch forward.
  */
 describe("a cached page keeps its metadata in <head>", () => {
   const dispatch = readFileSync("node_modules/vinext/dist/server/app-page-dispatch.js", "utf8");
@@ -56,9 +57,13 @@ describe("a cached page keeps its metadata in <head>", () => {
     assert.equal(
       (dispatch.match(/serveStreamingMetadata: placeMetadataInBodyForRender/g) ?? []).length,
       2,
-      "both page renders read the cache-aware choice",
+      "the page render and the intercepted render read the cache-aware choice",
     );
-    assert.doesNotMatch(dispatch, /serveStreamingMetadata: placeGeneratedMetadataInBody\b/);
+    assert.match(dispatch, /streamMetadata: placeMetadataInBodyForRender && options\.renderWholeDocument !== true/);
+    /* The one render that still reads the per-request choice is the background revalidation,
+       which writes only to the cache and pins its metadata to <head> itself. */
+    assert.match(dispatch, /serveStreamingMetadata: placeGeneratedMetadataInBody,\s*placeStreamedMetadataInHead: true,/);
+    assert.equal((dispatch.match(/serveStreamingMetadata: placeGeneratedMetadataInBody\b/g) ?? []).length, 1);
   });
 
   it("names the patch for the vinext version installed", () => {

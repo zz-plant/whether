@@ -1,0 +1,42 @@
+diff --git a/dist/server/app-page-dispatch.js b/dist/server/app-page-dispatch.js
+index 66a6f782cbaf2b7b7c0bdec2809577af3537a13a..8d0164d421e9a5fb90c44aeb57b025c3092b017a 100644
+--- a/dist/server/app-page-dispatch.js
++++ b/dist/server/app-page-dispatch.js
+@@ -380,6 +380,10 @@ async function dispatchAppPageInner(options) {
+ 		};
+ 	};
+ 	let { isCacheCandidate, isUncacheableRender, mountedLayouts } = resolveRenderCacheability(isStaticEligible);
++	// whether.work patch: a render that may be written to the shared ISR cache keeps its
++	// metadata in <head>. The cache key does not vary by user agent, so a browser's
++	// streamed render (metadata at the foot of <body>) would be served to crawlers too.
++	const placeMetadataInBodyForRender = placeGeneratedMetadataInBody && !isCacheCandidate;
+ 	if (shouldReadCache && (isStaticEligible || isEveryParamCacheCandidate)) {
+ 		traceOperation = resolveAppPageTraceOperation({
+ 			hasRequestSearchParams,
+@@ -655,7 +659,7 @@ async function dispatchAppPageInner(options) {
+ 	const renderedRouteHead = {
+ 		observeSearchParams: !isForceStatic,
+ 		searchParams: pageSearchParams,
+-		streamMetadata: placeGeneratedMetadataInBody && options.renderWholeDocument !== true,
++		streamMetadata: placeMetadataInBodyForRender && options.renderWholeDocument !== true,
+ 		value: null
+ 	};
+ 	const onHeadPrepared = (head) => {
+@@ -693,7 +697,7 @@ async function dispatchAppPageInner(options) {
+ 				observePageSearchParamsAccess: interceptDynamicConfig !== "force-static",
+ 				isUncacheableRender,
+ 				routeTreeOnlyPrefetchShell,
+-				serveStreamingMetadata: placeGeneratedMetadataInBody,
++				serveStreamingMetadata: placeMetadataInBodyForRender,
+ 				placeStreamedMetadataInHead: options.renderWholeDocument === true,
+ 				onHeadPrepared
+ 			});
+@@ -766,7 +770,7 @@ async function dispatchAppPageInner(options) {
+ 				isUncacheableRender,
+ 				routeTreeOnlyPrefetchShell,
+ 				mountedLayouts: interceptResult.interceptOpts ? null : mountedLayouts,
+-				serveStreamingMetadata: placeGeneratedMetadataInBody,
++				serveStreamingMetadata: placeMetadataInBodyForRender,
+ 				placeStreamedMetadataInHead: options.renderWholeDocument === true,
+ 				onHeadPrepared
+ 			});
