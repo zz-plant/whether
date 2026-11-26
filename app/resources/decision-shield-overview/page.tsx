@@ -81,7 +81,7 @@ export default async function DecisionShieldOverviewPage() {
           <ActionLink href="/operate#ops-decision-shield" variant="primary">
             Open Decision Shield
           </ActionLink>
-          <ActionLink href="/decisions" variant="pill">
+          <ActionLink href="/operate" variant="pill">
             Your decision record
           </ActionLink>
         </div>

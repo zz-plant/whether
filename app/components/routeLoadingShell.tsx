@@ -14,7 +14,10 @@ type RouteLoadingShellProps = {
  */
 export function RouteLoadingShell({ pageTitle = "Weekly brief" }: RouteLoadingShellProps) {
   return (
-    <div className="weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100">
+    /* At least a screen tall (2026-11-26). The body is a full-height flex column, so a short
+       placeholder left the footer at the foot of the first screen, and the page that
+       replaced it pushed the footer away: a layout shift of 0.46 on a desktop brief. */
+    <div className="weather-shell weather-page-enter relative isolate min-h-[100dvh] flex-1 overflow-x-clip text-slate-100">
       <div className="relative z-10 mx-auto w-full max-w-[96rem] px-[var(--weather-shell-pad-inline)] pb-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] sm:pt-4">
         <section
           aria-label={pageTitle}

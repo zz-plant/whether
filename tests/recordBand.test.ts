@@ -223,7 +223,9 @@ describe("the band says what the site is and names its colours", () => {
   });
 
   it("folds the band behind a native disclosure whose summary stays visible", () => {
-    assert.match(html, /<details class="record-band-details weather-auto-chevron" data-record-band-disclosure="true">/);
+    /* Open in the server's HTML (2026-11-26): the band is History's, and opening it from script
+       after the first paint shifted the page down 356px. */
+    assert.match(html, /<details class="record-band-details weather-auto-chevron" data-record-band-disclosure="true" open="">/);
     const summary = /<summary class="record-band-summary">([\s\S]*?)<\/summary>/.exec(html)?.[1] ?? "";
     assert.match(summary, /data-category-line/, "the frame's words stay on the closed row");
     assert.match(summary, /The record since \d{4}/);
@@ -278,11 +280,13 @@ describe("the closed band teases the record it holds", () => {
     assert.match(css, /prefers-reduced-motion: no-preference/);
   });
 
-  it("opens the band on /history so the plate canvas has a height to draw into", () => {
+  /* The band arrives open, so the canvas has a height to draw into on the first paint and
+     nothing opens it later (2026-11-26: that late open was a layout shift of 0.22). */
+  it("arrives open on /history, and the plate canvas does not open it", () => {
     const plate = readFileSync("app/history/recordPlateCanvas.tsx", "utf8");
-    assert.match(plate, /disclosure\.open = true/);
+    assert.match(html, /data-record-band-disclosure="true" open=""/);
+    assert.doesNotMatch(plate, /disclosure\.open = /);
     assert.match(plate, /addEventListener\("toggle", schedule\)/);
-    assert.match(plate, /openedByHistory/);
   });
 });
 

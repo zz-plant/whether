@@ -78,7 +78,9 @@ export function RecordBand() {
           one native disclosure away, and need no script to open. Along the closed bar's
           bottom edge sits a 4px proportional strip of the monthly record so visitors can
           see the coloured history waiting behind one click. */}
-      <details className="record-band-details weather-auto-chevron" data-record-band-disclosure>
+      {/* Open in the server's HTML (2026-11-26): the band is drawn on History only, where it is
+          the lead figure, and opening it from script after the first paint shifted the page. */}
+      <details className="record-band-details weather-auto-chevron" data-record-band-disclosure open>
         <summary className="record-band-summary">
           <span className="record-band-what" data-category-line>
             {categorySentence}

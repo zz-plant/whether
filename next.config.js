@@ -253,6 +253,11 @@ const securityHeaders = [
  * exists for do not run JavaScript at all. So: the default list, then Google's
  * own crawler, then every agent `robots.ts` names.
  * `tests/htmlLimitedBots.test.ts` fails if robots.ts names one this does not.
+ *
+ * The list decides per request, so it cannot reach a page served from the ISR cache,
+ * whose key does not vary by user agent: whoever rendered it first decided where the
+ * tags went for everyone after. `patches/vinext@1.0.1.patch` keeps a cacheable render's
+ * metadata in <head> (2026-11-26, docs/seo/technical-audit-2026-11-26.md).
  */
 export const htmlLimitedBots = [
   String.raw`[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight`,
