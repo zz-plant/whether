@@ -28,7 +28,9 @@ import {
 import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
-const title = "Startup Decision Guides: Hiring, Fundraising, Runway and Spending";
+/* Sentence case and inside a result line with the suffix (2026-11-26); it read "Startup
+   Decision Guides: Hiring, Fundraising, Runway and Spending". */
+const title = "Startup guides: hiring, fundraising, runway, spending";
 const description =
   "Guides to the decisions startup leaders ask about most: when to hire, when to raise, how much runway to keep, and what to cut when money gets expensive.";
 

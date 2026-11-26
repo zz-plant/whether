@@ -109,7 +109,7 @@ export const buildSignalDecisionScenarioMetadata = ({
        platforms cache never advertises a stale call. */
     imageParams: {
       template: "signals",
-      eyebrow: "Evidence",
+      eyebrow: "Why it changed",
       ...(payload?.immediateAction && !shouldNoindexPayload(payload)
         ? { panelLabel: "This week", panelTitle: payload.immediateAction, panelBody: payload.currentCall }
         : {}),

@@ -175,7 +175,8 @@ export const buildSearchIndex = (): SearchEntity[] => {
     job: "resolve",
     routePriority: 2,
     title: toolkit.title,
-    href: `/toolkits/${toolkit.slug}`,
+    /* The Guides page's own link to a toolkit: /toolkits/<slug> is a redirect to its foot. */
+    href: `/resources?toolkitQuery=${toolkit.slug}#toolkit-library`,
     summary: toolkit.decisionThisSession,
     intentLabel: "Run this decision toolkit",
     keywords: [

@@ -32,7 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { stale } = await loadWeekConditions();
   const metadata = buildPageMetadata({
     title: titleFor(role.title),
-    description: `Is now a good time for ${role.label} to ask for a raise, more headcount or a slower roadmap? This week's conditions at any tech company, the general rules, and questions to ask leadership.`,
+    /* Inside a result line for every role (2026-11-26): the longest label ran 209 characters. */
+    description: `Should ${role.label} ask for a raise, more headcount or a slower roadmap now? This week's conditions and what to ask leadership.`,
     path: `/roles/${role.slug}`,
     imageAlt: titleFor(role.title),
   });

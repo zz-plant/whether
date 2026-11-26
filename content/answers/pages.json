@@ -80,7 +80,7 @@
     "supportingLinks": [
       {
         "label": "Compare historical conditions",
-        "href": "/history/compare"
+        "href": "/history"
       },
       {
         "label": "How the signals are interpreted",
@@ -163,7 +163,7 @@
     "supportingLinks": [
       {
         "label": "Roadmap focus toolkit",
-        "href": "/toolkits/focus"
+        "href": "/resources?toolkitQuery=focus#toolkit-library"
       },
       {
         "label": "Should we delay new product lines?",
@@ -371,7 +371,7 @@
     "supportingLinks": [
       {
         "label": "Launch gates toolkit",
-        "href": "/toolkits/launch-gates"
+        "href": "/resources?toolkitQuery=launch-gates#toolkit-library"
       },
       {
         "label": "Should startups slow roadmap expansion?",
@@ -539,7 +539,7 @@
         "label": "How often the guidance held up: what distance from the line is worth"
       },
       {
-        "href": "/history/compare",
+        "href": "/history",
         "label": "This week's scores against past downturns: 2001, 2008 and 2022"
       },
       {
@@ -618,7 +618,7 @@
     "supportingLinks": [
       {
         "label": "Claims & positioning toolkit",
-        "href": "/toolkits/claims"
+        "href": "/resources?toolkitQuery=claims#toolkit-library"
       },
       {
         "label": "Plan the week",

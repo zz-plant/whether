@@ -20,7 +20,7 @@ export const dynamicParams = true;
 export const revalidate = 3600;
 
 const companyDescription = (company: CompanyEntry) =>
-  `When ${company.name} sets next year's budgets and files its next report, its latest filed revenue, R&D, cash flow and debt, and what each role can bring to planning.`;
+  `When ${company.name} sets next year's budgets and files its next report, its filed revenue, R&D, cash flow and debt, and what each role can bring to planning.`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const company = findCompany((await params).company);

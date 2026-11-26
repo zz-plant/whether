@@ -1,4 +1,7 @@
 import { refreshCompanyFilings } from "../lib/companies/companyFilingStore";
+import sitemap from "../app/sitemap";
+import { getWhetherKv } from "../lib/runtime/kv";
+import { syncSitemapToIndexNow } from "../lib/seo/indexNowSitemapSync";
 import { handleImageOptimization } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { refreshOperatingState } from "../lib/operatingState/refreshOperatingState";
@@ -203,6 +206,18 @@ export default {
     /* A few companies each night: filings arrive quarterly, and the pages read only what this stores. */
     if (isDailyIngestion) {
       await step("companies/refresh-filings", () => refreshCompanyFilings());
+    }
+
+    /* After the day's refreshes, so the sitemap carries today's dates: tell IndexNow which URLs
+       are new or changed since the last run (a merged week, a new month, a refreshed answer).
+       The sitemap is built in-process, not fetched: the cron does not self-fetch. */
+    if (isDailyIngestion) {
+      await step("seo/indexnow-sync", async () => {
+        const kv = getWhetherKv();
+        if (!kv) return { ok: true };
+        const result = await syncSitemapToIndexNow({ entries: await sitemap(), kv });
+        return { ok: result.ok, error: result.error };
+      });
     }
 
     /* The daily run, where the lane is on: start the Workflow that rebuilds the regime archive

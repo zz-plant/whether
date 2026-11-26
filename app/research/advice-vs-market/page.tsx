@@ -50,9 +50,11 @@ export const runtime = "edge";
  */
 /* The title is the search: "product management reading list" is what people type,
    and the whole tag has to fit a result line (~60 characters with the site suffix).
-   The H1 asks the page's question; the title stays the phrase people search. */
+   The H1 asks the page's question; the title stays the phrase people search. Sentence
+   case and no "Best" since 2026-11-26 (docs/editorial-guardrails.md); it read "Best
+   Product Management Books and Articles". */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Best Product Management Books and Articles",
+  title: "Product management reading list",
   description:
     `${canonEssays.length} product management essays, books, articles and investor memos, from Cagan to Sequoia, each dated and placed on the month it came out.`,
   path: "/research/advice-vs-market",

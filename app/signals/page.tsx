@@ -18,9 +18,11 @@ export const revalidate = 900;
    what the page holds: "The interest rates, yield curve and funding-market numbers behind this
    week's startup guidance, and each one's move since last time." */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Interest rates and funding data behind this week's guidance",
+  /* Both inside a result line since 2026-11-26: the title ran 69 characters with the suffix,
+     the description 199. */
+  title: "Interest rates and funding data behind the guidance",
   description:
-    "It follows two scores, funding pressure and risk appetite, built from public interest rates and market data. See each input, how it moved since last week and how close it is to changing the guidance.",
+    "It follows two scores, funding pressure and risk appetite, built from public rates and market data. See how each input moved this week and how close it is to a change.",
   path: "/signals",
   imageAlt: "Why did the guidance change? The evidence behind this week's guidance",
   imageParams: {

@@ -18,7 +18,7 @@ export const TRUST_PAGE_QUESTION = "Can we trust this week's guidance?";
 
 /** The meta description: the page's question answered in two spoken sentences. */
 export const trustPageDescription =
-  "Yes, when every source is current and the scores sit well clear of a change. Check each source's date, how close conditions are to changing and how each score is worked out.";
+  "Yes, when every source is current and the scores sit well clear of a change. Check each source's date, how close a change is and how each score is worked out.";
 
 const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 const countWord = (count: number) => COUNT_WORDS[count] ?? String(count);

@@ -51,10 +51,9 @@ export function RecordPlateCanvas() {
     const overlay = band?.querySelector<HTMLElement>("[data-record-band-overlay]");
     if (!band || !plate || !overlay) return;
 
-    /* History makes the record band the page's lead figure, so open the shared
-       frame disclosure on arrival and restore it on unmount if this route opened it. */
-    const openedByHistory = Boolean(disclosure && !disclosure.open);
-    if (openedByHistory && disclosure) disclosure.open = true;
+    /* The band arrives open: it is drawn on History only, as the page's lead figure
+       (recordBand.tsx). It was opened here, after hydration, until 2026-11-26, which
+       pushed the page down 356px a moment after it painted (a layout shift of 0.22). */
 
     const encoded = band.dataset.months ?? "";
     const months = recordBandMonthCount(encoded);
@@ -202,7 +201,6 @@ export function RecordPlateCanvas() {
       if (frame) window.cancelAnimationFrame(frame);
       canvas.remove();
       delete band.dataset.plateCanvas;
-      if (openedByHistory && disclosure) disclosure.open = false;
     };
   }, []);
 

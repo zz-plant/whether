@@ -39,7 +39,7 @@ export const revalidate = 3600;
  */
 const roleTitle = (role: CompanyPageRole, company: CompanyEntry) => `${role.title} at ${company.name}: what to bring to planning`;
 const roleDescription = (role: CompanyPageRole, company: CompanyEntry) =>
-  `When ${company.name} sets next year's budgets, when its next report is due, and what ${role.label} can bring to planning and to a 1:1, from its SEC filings.`;
+  `When ${company.name} sets next year's budgets, when its next report is due, and what ${role.label} can bring to planning, from its SEC filings.`;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { company: companySlug, role: roleSlug } = await params;

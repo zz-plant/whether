@@ -77,8 +77,10 @@ describe("site review copy fixes", () => {
     const html = renderToStaticMarkup(await page.default({}));
     assert.match(html, /<h1[^>]*>Guides<\/h1>/);
     const title = page.metadata.title;
-    /* The <title> says what the guides are about, for search (2026-10-28); the h1 stays the nav's name. */
-    assert.equal(typeof title === "string" ? title : JSON.stringify(title), "Startup Decision Guides: Hiring, Fundraising, Runway and Spending");
+    /* The <title> says what the guides are about, for search (2026-10-28); the h1 stays the nav's name.
+       Sentence case, and inside a result line with the suffix, since 2026-11-26. */
+    assert.equal(typeof title === "string" ? title : JSON.stringify(title), "Startup guides: hiring, fundraising, runway, spending");
+    assert.ok(typeof title === "string" && `${title} | Whether`.length <= 65);
     assert.doesNotMatch(html, /Governance Pillars Emblem|Governance resources/i);
     const text = visibleText(html);
     assert.doesNotMatch(text, /confirmation logic|governance artifacts|escalation thresholds|board operating system/i);
