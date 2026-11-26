@@ -203,7 +203,7 @@ const TEXT_CARD_TEMPLATES: ReadonlySet<string> = new Set([
   "plain",
 ]);
 
-/** A page title minus its section suffix ("Funding pressure watch | Evidence"). */
+/** A page title minus its section suffix ("Funding pressure watch | Whether"). */
 const cardTitle = (title: string) => title.split(" | ")[0] ?? title;
 
 /** A subtitle that ends on a word, inside what the card draws. */

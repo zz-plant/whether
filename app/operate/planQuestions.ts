@@ -24,7 +24,7 @@ export const operatePageName = "This week's plan: hiring, spending and runway ru
  * being crossed", a list of what the page holds.
  */
 export const operatePageDescription =
-  "Each area pauses at one score and restarts at another, agreed before the week starts. Set your own numbers, check a plan against this week's guidance and size your runway.";
+  "Each area pauses at one score and restarts at another, agreed in advance. Set your own numbers, check a plan against this week's guidance and size your runway.";
 
 /* A list item opens a clause in a sentence: "Hiring ahead of revenue" → "hiring ahead of
    revenue". A word in capitals ("SaaS", "AI") keeps them. */

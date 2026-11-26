@@ -64,11 +64,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     : {};
 
   const metadata = buildPageMetadata({
-    title: `${clusterDefinition.title} | Evidence`,
+    /* No "| Evidence" (2026-11-26): the retired name for /signals, which is "Why it changed". */
+    title: clusterDefinition.title,
     description: clusterDefinition.summary,
     path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,
-    imageParams: { template: "signals", eyebrow: "Evidence", ...readingPanel },
+    imageParams: { template: "signals", eyebrow: "Why it changed", ...readingPanel },
   });
 
   /*

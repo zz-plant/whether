@@ -34,7 +34,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { atCompanies } = stageForWorkers(stage);
   const metadata = buildPageMetadata({
     title: titleFor(role.title, atCompanies),
-    description: `Is now a good time for ${role.label} at ${atCompanies} to ask for a raise or more headcount? This week's conditions, the rule at this stage, and questions to ask leadership.`,
+    /* Inside a result line for every role and stage (2026-11-26): the longest ran 202 characters. */
+    description: `Should ${role.label} at ${atCompanies} ask for a raise or more headcount? This week's conditions and the rule at this stage.`,
     path: `/roles/${role.slug}/${stage}`,
     imageAlt: titleFor(role.title, atCompanies),
   });

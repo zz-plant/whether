@@ -49,14 +49,31 @@ the site serves: every sitemap URL fetched as a browser and as Googlebot, the si
    links (`/toolkits/<slug>`, now the Guides page's own `/resources?toolkitQuery=<slug>#toolkit-library`),
    `/history/compare`, `/decisions` and `/visual-assets/index.html`. Each points at where it lands.
 
+5. **Titles and descriptions.** Read from every page as Googlebot (metadata anywhere in the
+   document, so the cached pages count): none missing, none duplicated. Fixed in the same pass:
+   - The signal pages were titled "<watch> | Evidence", the name /signals lost on 2026-10-08;
+     their share cards said "Evidence" too. They are titled by the watch alone.
+   - The advice study was "Best Product Management Books and Articles" and the Guides hub
+     "Startup Decision Guides: Hiring, Fundraising, Runway and Spending": title case, and a
+     superlative. Now "Product management reading list" and "Startup guides: hiring,
+     fundraising, runway, spending".
+   - Descriptions past 160 characters on `/signals`, `/trust` and `/operate`, and in the role
+     (up to 209), role-stage (202), company-role (172) and company (166) templates, which
+     `tests/searchResultLengths.test.ts` now holds to 160 for every label.
+   - "See what has changed since you decided" and "Your decision record" linked a record the
+     product retired. The first is "Check the plan against this week's guidance", on the plan
+     stress test; the second went.
+
 ## Not changed
 
-- Three descriptions run past 160 characters (`/signals`, `/trust`, `/operate`) and three titles
-  past 65 with the suffix. Search engines truncate them; rewriting is a copy pass under
-  `docs/editorial-guardrails.md`.
-- The "decision record" links on `/operate`'s work questions and the Decision Shield overview
-  still promise a record the product retired; they now point at `/operate` directly, where the
-  redirect sent them.
+- The homepage description is this week's guidance sentence, so its length moves with the
+  week (171 characters this week). Six answer descriptions run 161–201 characters because they
+  are the enduring answer itself, and three resource guides 162–191. Rewriting those is
+  editorial, not template, work.
+- Titles past 60 characters with the suffix remain on the company-role (249 of 300), role-stage
+  and answer templates. A result line cuts the brand suffix first and the words people search
+  lead each title, so the cut costs little.
+- Mintlify's generated pages of the repository now answer 410 Gone; search engines drop them.
 - Authority. With no search arrivals in three months, the limit is discovery and links to the
-  site, which the code cannot supply. Search Console (or a phone screenshot of it, as on andwise)
-  is the next read: indexed pages, impressions by query, and whether the metadata fix moves them.
+  site, which the code cannot supply. Search Console is the next read: indexed pages,
+  impressions by query, and whether the metadata fix moves them.

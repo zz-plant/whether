@@ -24,8 +24,10 @@ const QUESTION_TOOLS: Record<QuestionToolKey, QuestionTool> = {
   /* The planner draws its payback section once a runway is entered, so the link lands on those figures. */
   payback: { key: "payback", label: "Work out the payback", href: "/operate/financial#ops-runway-inputs" },
   reversible: { key: "reversible", label: "Find a more reversible version", href: "/operate#ops-decision-shield" },
-  /* /operate, where /decisions redirects since decision memory was retired: no link through a hop. */
-  record: { key: "record", label: "See what has changed since you decided", href: "/operate" },
+  /* "Would we approve it again?" is a plan checked against this week's guidance: the plan
+     stress test. It read "See what has changed since you decided" over /decisions, a record
+     the product retired (2026-11-26). */
+  record: { key: "record", label: "Check the plan against this week's guidance", href: "/operate#ops-decision-shield" },
 };
 
 type SeatKey = "founder" | "technicalFounder" | "engineeringLead" | "productLead" | "financeLead" | "chiefOfStaff" | "boardMember";
