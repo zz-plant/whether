@@ -207,7 +207,7 @@ Open [http://localhost:3000](http://localhost:3000). Without network access the 
 - **An engine that reads no data and writes no words.** `lib/regimeEngineScoring.ts` turns inputs into codes. Every sentence a reader sees comes from `lib/report/`, and an architecture test rejects any engine import of copy, React or data files. A change to scoring bumps `ENGINE_VERSION`.
 - **Fallback that says so.** If a feed fails or goes stale, the brief draws from the snapshots in `data/` and labels the reading with its date and the reason.
 - **A record you can audit.** Conditions are scored at every month-end since 2012 by the same engine the live brief runs, so a past reading can be checked against what followed.
-- **Fast, strict gates.** The 3,400+ tests run in about 20 seconds on Bun. The pre-push gate rejects new `as` casts, new lint suppressions and exports with no caller.
+- **Fast, strict gates.** The 4,300+ tests run in about 35 seconds on Bun. The pre-push gate rejects new `as` casts, new lint suppressions and exports with no caller.
 
 ---
 
@@ -217,7 +217,7 @@ Open [http://localhost:3000](http://localhost:3000). Without network access the 
 | :--- | :--- | :--- |
 | `bun run dev` | Dev server with hot reload (Vinext on Cloudflare Workers) | — |
 | `bun run test <path>` | One test file | ~0.2s |
-| `bun run test` | The full suite, 3,400+ tests | ~20s |
+| `bun run test` | The full suite, 4,300+ tests | ~35s |
 | `bun run typecheck` | TypeScript 7 (native) | ~5s |
 | `bun run lint` | oxlint, warnings denied | ~1s |
 | `bun run build` | The production Worker bundle | — |

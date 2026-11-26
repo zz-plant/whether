@@ -23,6 +23,14 @@ said "I run product at an early-stage company", in the present tense; it now say
 tense and that the author builds alone, which is what the author's own site says. The post text and prepared answers were brought in line with the README the same day: the
 inputs that move the scores, the premise test, and the test count.
 
+**Update 2026-11-26.** The live checks ran against production (commit `c7edaa1`). Every page and
+API the post links answers, the OG image renders, the homepage shows no degraded badge, and no
+data source is stale. One thing still fails: `bun run smoke:prod` stops at `/api/health`, which
+reports `degraded` because production has no `GITHUB_TOKEN`. The nightly regime-history Workflow
+and the Monday brief freeze fail without it (`docs/cloudflare-deployment-runbook.md` → `GITHUB_TOKEN`).
+Readers never see that, but anyone who curls `/api/health` from the thread does. Set the secret,
+rerun `bun run smoke:prod`, then post.
+
 All four closed on 2026-08-29. The reason the fourth gated a *launch* and not just a funnel: the
 strongest thing this product can say on HN is "it is free, here is the scoring, here is the API" —
 and that claim is only credible in writing, on a page, before the traffic arrives. Saying it in a
@@ -94,7 +102,7 @@ concrete audience. Avoid "AI", "revolutionary", "beautiful" — all negative sig
 >   readings predict venture declines two to four quarters out came back "not supported": the
 >   scores move with deal count in the same quarter and lead nothing reliably.
 >   https://github.com/zz-plant/whether/blob/main/docs/research/premise-test-results.md
-> - **No signup, no trackers.** The whole product is on the front page.
+> - **No signup, no third-party trackers.** The whole product is on the front page.
 > - **Free API, no key**: `curl https://whether.work/api/agent?cadence=weekly`. There's also an
 >   MCP endpoint and llms.txt if you want your agent to read it instead of you.
 > - **Open source**: https://github.com/zz-plant/whether
@@ -157,7 +165,7 @@ None right now. It's free and open source; it started as scratching my own Monda
 **"Stack?"**
 Bun, React server components on Cloudflare Workers (edge SSR, 300s revalidate), KV for
 materialized weekly read models with a 92-day history window, cron-driven ingest that never
-self-fetches over HTTP. 3,800+ tests. The repo's AGENTS.md and docs/agents/ are public too if you want
+self-fetches over HTTP. 4,300+ tests. The repo's AGENTS.md and docs/agents/ are public too if you want
 to see how the agent-assisted workflow is set up.
 
 ## Pre-launch checklist
@@ -168,17 +176,17 @@ to see how the agent-assisted workflow is set up.
       visitors. The repo already reads as public (MIT LICENSE, CONTRIBUTING, README with demo
       gif). If it stays private instead, strip the open-source claims from the post text and
       remove the site's GitHub links before launch — a dead "Source code" link is worse than none.
-- [ ] **Deploy** the current main first — the launch-prep work (homepage explainer, formula
-      reference, GitHub footer link, `/evidence` `/resolve` `/planning` redirects) must be live.
-- [ ] `bun run smoke:prod` passes — as of 2026-08-10 it fails on `/evidence` (404) until the
-      redirect change deploys.
-- [ ] Check https://whether.work shows **no DEGRADED badge** at post time (local dev shows one
-      when live fetch fails; prod was healthy at last check). If a source is degraded, wait —
+- [x] **Deploy** the current main first. Production served `c7edaa1`, the tip of main, on 2026-11-26.
+- [ ] `bun run smoke:prod` passes. On 2026-11-26 every content, redirect and schema check passed,
+      and it failed only on `/api/health` = `degraded` (missing `GITHUB_TOKEN`; see the update above).
+- [ ] Check https://whether.work shows **no DEGRADED badge** at post time. None on 2026-11-26, and
+      no source was degraded or stale. If a source is degraded, wait —
       "first click shows stale data" is a thread-killer.
-- [ ] OG/social image renders correctly (in progress in a parallel session on 2026-08-10 —
-      confirm before posting).
-- [ ] `curl https://whether.work/api/agent?cadence=weekly` returns JSON — the post text cites it.
-- [ ] Repo README is current (it is: demo gif + quickstart + curl example).
+- [x] OG/social image renders correctly (1200×630, current call, checked 2026-11-26).
+- [x] `curl https://whether.work/api/agent?cadence=weekly` returns JSON — the post text cites it.
+- [x] Every URL in the post text answers (2026-11-26; `/calibration` redirects to
+      `/history#confidence-record`, and the anchor exists).
+- [x] Repo README is current (demo gif, quickstart, curl example; test count updated 2026-11-26).
 - [ ] Post **Tuesday–Thursday, 8–10am ET**. Weekends and Mondays bury Show HNs.
 - [ ] Submit from the account that will answer comments; be present for the first 3 hours.
       Fast, non-defensive author replies are the strongest ranking signal a Show HN has.
