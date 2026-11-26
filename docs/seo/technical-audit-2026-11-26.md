@@ -25,8 +25,9 @@ the site serves: every sitemap URL fetched as a browser and as Googlebot, the si
    key does not vary by user agent, so the first requester's render (a browser's, with streamed
    metadata) was cached and served to everyone: for an hour on answers, a year on published weeks.
    Google ignores a canonical outside `<head>`; link unfurlers and Bing read `<head>` only.
-   `patches/vinext@1.0.1.patch` keeps a cache-candidate render's metadata in `<head>`; uncached
-   routes still stream for browsers. vinext 1.4.6 has the same code. Verified on the production
+   `patches/vinext@<version>.patch` keeps a cache-candidate render's metadata in `<head>`; uncached
+   routes still stream for browsers. vinext 1.4.7 has the same bug (re-checked on a production
+   build when the dependency update moved to it), so the patch moved with it. Verified on the production
    build in workerd: a browser's first render (cache miss), then Googlebot and an empty user agent
    (cache hits), all carry the tags in `<head>`. The cache key includes the build ID, so the deploy
    replaces every poisoned entry. Pinned by `tests/htmlLimitedBots.test.ts`.

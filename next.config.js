@@ -256,7 +256,7 @@ const securityHeaders = [
  *
  * The list decides per request, so it cannot reach a page served from the ISR cache,
  * whose key does not vary by user agent: whoever rendered it first decided where the
- * tags went for everyone after. `patches/vinext@1.0.1.patch` keeps a cacheable render's
+ * tags went for everyone after. `patches/vinext@<version>.patch` keeps a cacheable render's
  * metadata in <head> (2026-11-26, docs/seo/technical-audit-2026-11-26.md).
  */
 export const htmlLimitedBots = [
