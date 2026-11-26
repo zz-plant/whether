@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AlertSection } from "../app/components/home/AlertSection";
+import { SubscribeForm } from "../app/components/SubscribeForm";
 import { PresentModeButton } from "../app/components/PresentModeButton";
 import { BoardSlidePreviewLink } from "../app/components/home/BoardSlidePreviewLink";
 import { FooterAgentColophon } from "../app/components/footerAgentColophon";
@@ -13,19 +14,29 @@ import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { AREA_TEST_PLANS, HOME_MONDAY_EMAIL_HASH, ROLE_FORMAT_LINKS } from "../lib/report/home/homeSectionModel";
 import { evaluateRegime } from "../lib/regimeEngine";
 
-describe("the Monday email link", () => {
-  it("names an anchor the form carries", () => {
-    assert.match(renderToStaticMarkup(<AlertSection />), new RegExp(`id="${HOME_MONDAY_EMAIL_HASH}"`));
+describe("the Monday email", () => {
+  it("is one field under the call on the homepage, on the anchor its links name", () => {
+    const route = readFileSync("app/page.tsx", "utf8");
+    assert.match(route, /<div id=\{HOME_MONDAY_EMAIL_HASH\}[^>]*>\s*<SubscribeForm inline \/>/);
+    assert.ok(route.indexOf("<SubscribeForm inline") < route.indexOf("<DecisionPicker"), "it sits under the call, ahead of the areas");
   });
 
-  it("leaves the form on alerts only for a reader who scrolled to it", () => {
-    assert.match(renderToStaticMarkup(<AlertSection />), /Alerts only, no Monday email/);
+  it("asks for an address and nothing else, and sends Monday's email", () => {
+    const html = renderToStaticMarkup(<SubscribeForm inline />);
+    assert.equal(html.match(/<input/g)?.length, 1, "no channel or frequency choice");
+    assert.match(html, />Email me Mondays</);
+    assert.doesNotMatch(html, /id="subscribe-email"/, "the full form's id stays the full form's");
   });
 
-  it("is still a Monday form for a reader from a shared link", () => {
-    const monday = renderToStaticMarkup(<AlertSection defaultFrequency="weekly" />);
-    assert.match(monday, /Monday morning/);
-    assert.doesNotMatch(monday, /Alerts only, no Monday email/);
+  it("leaves the alert section pointing at it, with alerts only and Slack on /share", () => {
+    const html = renderToStaticMarkup(<AlertSection />);
+    assert.doesNotMatch(html, /<input/, "one email field on the page, not two");
+    assert.match(html, new RegExp(`href="#${HOME_MONDAY_EMAIL_HASH}"`));
+    assert.match(html, /href="\/share#subscribe-email"/);
+  });
+
+  it("is counted apart from the full form", () => {
+    assert.ok(isActivationEvent({ step: "committed", path: "/", commitment: "subscribed_inline" }));
   });
 });
 

@@ -43,7 +43,9 @@ export type ActivationCommitment =
   | "copied_meeting"
   | "copied_brief"
   | "copied_social"
-  | "subscribed";
+  | "subscribed"
+  /** The one-field Monday form under the call, told apart from the full form (2026-11-26). */
+  | "subscribed_inline";
 
 /**
  * Bucketed rather than exact so the value cannot narrow a browser down to one
@@ -73,6 +75,7 @@ const COMMITMENTS: ActivationCommitment[] = [
   "copied_brief",
   "copied_social",
   "subscribed",
+  "subscribed_inline",
 ];
 
 const RETURN_GAPS: ActivationReturnGap[] = ["same_week", "next_week", "within_month", "lapsed"];

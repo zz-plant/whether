@@ -288,6 +288,14 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           <p className="text-sm text-slate-300">{display.whatChanged}</p>
         </section>
 
+        {/* The Monday email after the call and the delta (2026-11-26). Most pasted links
+            land on a dated record, and the form was at its foot, under the readings, the
+            areas and the share tool. The shared-arrival note's "Get it every Monday"
+            lands here. The full form, with alerts only and Slack, stays at the foot. */}
+        <div id="monday-email" className="max-w-2xl px-6 max-sm:px-0" data-print-hide>
+          <SubscribeForm inline moreHref="#monday-email-options" />
+        </div>
+
         {/* What the record says happened next. The page ended at the week's own
             delta, so a cited link showed a claim and never an outcome; the one
             thing a reader forwarding it cannot check is whether the line the
@@ -557,8 +565,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
       {/* A shared brief used to be a dead end: the recipient got the citation
           and nothing that brought next Monday's call to them. */}
-      {/* The shared-arrival note's "Get it every Monday" lands here: this form starts on Monday delivery. */}
-      <div id="monday-email" data-print-hide>
+      {/* The one-field form under "What changed" links here for alerts only or Slack. */}
+      <div id="monday-email-options" data-print-hide>
         <SubscribeForm />
         {/* The other way a week reaches a reader who did not come looking: Google shows a
             preferred source's pages more often in that reader's Top Stories. */}

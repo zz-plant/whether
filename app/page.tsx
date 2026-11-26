@@ -51,7 +51,8 @@ import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
 import Link from "next/link";
-import { ActionLink, PlainActionLink } from "./components/ui/actionLink";
+import { ActionLink } from "./components/ui/actionLink";
+import { SubscribeForm } from "./components/SubscribeForm";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { buildCountedChartHref } from "../lib/report/ruleChartParams";
 import { buildHomeRuleChart } from "./homePageRuleChart";
@@ -864,12 +865,16 @@ async function PageContent({
                 <div className="flex flex-wrap items-center gap-3">
                   <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} url={briefShareUrl} carryArea={{ initial: chosenArea ?? null }} showLabel />
                   <CopyImageCardButton />
-                  {/* The core loop, beside the artifact rather than 4,000px below
-                      it: the alert is what a quiet week is for. */}
-                  <PlainActionLink href={`#${HOME_MONDAY_EMAIL_HASH}`}>Email me Mondays →</PlainActionLink>
                 </div>
                 {/* No plan-horizon control here (2026-11-03): it is set once, so it
                     folds with stage and runway under the calibration line below. */}
+              </div>
+              {/* The Monday email as a field under the call (2026-11-26), where it was
+                  a link to the form in the fifth section. The email is what brings a
+                  reader back, and the link put a scroll and two choices between the
+                  reader and it. Alerts only and Slack stay on the full form below. */}
+              <div id={HOME_MONDAY_EMAIL_HASH} className="mt-5 max-w-2xl" data-print-hide>
+                <SubscribeForm inline />
               </div>
             </div>
 
@@ -1042,7 +1047,7 @@ async function PageContent({
 
               {/* 9. The alert: hearing the day a line is crossed is how the page is
                   meant to be used, so it follows everything it watches. */}
-              <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} question={homeQuestions.alert ?? undefined} />
+              <AlertSection question={homeQuestions.alert ?? undefined} />
             </div>
 
         </div>

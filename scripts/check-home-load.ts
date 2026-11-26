@@ -100,7 +100,11 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
      our mind?" (its answer is the "Conditions change if" sentence it printed below), the
      runway fold's label that restated its summary, and links named "Why this call" and
      "Why conditions are …" (now "Why Sunny?", the heading they open). */
-  words: 1325,
+  /* 1,325 → 1,305 words and 21 → 17 fields (2026-11-26, the Monday email under the call):
+     one email field on the page, not two. The call's "Email me Mondays →" link became the
+     form itself, and the alert section's full form, with its channel and frequency radios,
+     moved to /share. */
+  words: 1305,
   numbers: 206,
   wordsBeforeAreas: 285,
   folds: 9,
@@ -119,7 +123,7 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
      feature log §1.1.108–109): the conditions chart's "Copy link" is one button, and its rate
      labels replaced three jargon terms in the "In interest-rate terms" fold. */
   buttons: 15,
-  fields: 21,
+  fields: 17,
   /* 24 → 18 and 29 → 23 (2026-11-25, distill): lowered to the measure, with the cut
      that stopped the score figures restating the hiring row's restart. */
   fundingPressure: 18,
