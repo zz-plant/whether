@@ -1,11 +1,11 @@
-import { ScreenshotCaption } from "../components/screenshotCaption";
-import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCES, type AdviceStance } from "../../lib/adviceStance";
-import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngineCore";
-import { regimeAtCoordinates } from "../../lib/regimePhaseSpace";
-import { REGIME_LABELS } from "../../lib/regimePresentation";
-import { CALL_CHANGE_RULE } from "../../lib/report/trackRecordCopy";
-import type { RegimeKey } from "../../lib/types";
-import { ConditionIcon } from "../components/ui/conceptIcons";
+import { ScreenshotCaption } from "../../components/screenshotCaption";
+import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCES, type AdviceStance } from "../../../lib/adviceStance";
+import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
+import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
+import { REGIME_LABELS } from "../../../lib/regimePresentation";
+import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
+import type { RegimeKey } from "../../../lib/types";
+import { ConditionIcon } from "../../components/ui/conceptIcons";
 
 /**
  * The texts on the two-score plane: one mark per text, at the month-end it came

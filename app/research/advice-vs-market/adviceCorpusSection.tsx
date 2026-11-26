@@ -1,10 +1,10 @@
-import { ScreenshotCaption } from "../components/screenshotCaption";
-import { FindingCard } from "../components/ui/findingCard";
-import monthly from "../../data/advice-corpus/monthly.json";
-import { ADVICE_STANCE_DEFINITIONS } from "../../lib/adviceStance";
-import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
-import { SecondaryPageSection } from "../components/secondaryPageShell";
+import { ScreenshotCaption } from "../../components/screenshotCaption";
+import { FindingCard } from "../../components/ui/findingCard";
+import monthly from "../../../data/advice-corpus/monthly.json";
+import { ADVICE_STANCE_DEFINITIONS } from "../../../lib/adviceStance";
+import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
+import { SecondaryPageSection } from "../../components/secondaryPageShell";
 
 /*
  * The advice corpus on /concepts: every dated post from ten investors' archives, labelled

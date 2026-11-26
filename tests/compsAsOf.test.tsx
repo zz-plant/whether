@@ -1,20 +1,18 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it, mock, setSystemTime } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import CompsPage, { generateMetadata } from "../app/comps/page";
+import { SaasMultiplesSection } from "../app/operate/components/saasMultiplesSection";
 import { cboeQuoteResponse, companyFactsFixture, healthyYahoo, stubMarketData } from "./fixtures/marketData";
 
 /*
- * /comps leads with the phrase people search ("SaaS valuation multiples") and
- * the month of the read that produced its numbers. The month has to be the
- * data's: the clock here is set to a month no one would type into a title, and
- * the title, the heading and the date printed beside the figures must all name
- * it. With every source refusing there is no read, so nothing on the page may
- * claim a month or credit a source.
+ * The SaaS basket, a section of the runway planner since 2026-11-25 (it was /comps). Its
+ * heading names the month of the read that produced its numbers. The month has to be the
+ * data's: the clock here is set to a month no one would type into a heading, and the
+ * heading and the date printed beside the figures must both name it. With every source
+ * refusing there is no read, so nothing in the section may claim a month or credit a source.
  *
- * Rendered, per docs/agents/lessons/tests-and-copy-rules.md: the page reads the
- * basket through `fetchSaaSValuations` and the guidance through
- * `loadWeeklyBriefSnapshot`, which falls back to the bundled snapshot offline.
+ * Rendered, per docs/agents/lessons/tests-and-copy-rules.md: the section reads the basket
+ * through `fetchSaaSValuations`.
  */
 
 /* The basket's upstreams answer as the test says; every other upstream stays unreachable, as the network guard has it. */
@@ -40,16 +38,14 @@ afterEach(() => {
   if (installedKv) Object.defineProperty(globalThis, "WHETHER_DURABLE_KV", installedKv);
 });
 
-describe("/comps title and as-of date", () => {
-  it("dates the title, the heading and the figures by the read, and names the filings and prices it came from", async () => {
+describe("the SaaS basket's heading and as-of date, on the runway planner", () => {
+  it("dates the heading and the figures by the read, and names the filings and prices it came from", async () => {
     setSystemTime(READ_DAY);
     stubMarketData({ ...filings, ...prices, ...offline });
 
-    const metadata = await generateMetadata();
-    assert.equal(metadata.title, "What a SaaS company is worth, January 2027");
-
-    const html = renderToStaticMarkup(await CompsPage());
-    assert.match(html, /<h1[^>]*>\s*What a SaaS company is worth, January 2027\s*<\/h1>/);
+    const html = renderToStaticMarkup(await SaasMultiplesSection());
+    assert.match(html, /<section id="saas-multiples"/);
+    assert.match(html, /<h2[^>]*>\s*What a SaaS company is worth, January 2027\s*<\/h2>/);
     assert.match(html, /<time dateTime="2027-01-15T12:00:00.000Z">Jan 15, 2027<\/time>/);
     assert.ok(
       visibleText(html).includes("As of Jan 15, 2027, from SEC EDGAR filings and Cboe delayed prices."),
@@ -66,7 +62,7 @@ describe("/comps title and as-of date", () => {
     setSystemTime(READ_DAY);
     stubMarketData({ sec: () => new Response("busy", { status: 503 }), ...prices, ...healthyYahoo(), ...offline });
 
-    const html = renderToStaticMarkup(await CompsPage());
+    const html = renderToStaticMarkup(await SaasMultiplesSection());
     assert.ok(visibleText(html).includes("As of Jan 15, 2027, from Yahoo Finance."));
     assert.ok(!html.includes("SEC EDGAR"), "the source that did not answer is not credited");
   });
@@ -75,12 +71,10 @@ describe("/comps title and as-of date", () => {
     setSystemTime(READ_DAY);
     stubMarketData({ ...offline });
 
-    const metadata = await generateMetadata();
-    assert.equal(metadata.title, "What is a SaaS company worth right now?");
-
-    const html = renderToStaticMarkup(await CompsPage());
-    assert.match(html, /<h1[^>]*>\s*What a SaaS company is worth\s*<\/h1>/);
+    const html = renderToStaticMarkup(await SaasMultiplesSection());
+    assert.match(html, /<h2[^>]*>\s*What a SaaS company is worth\s*<\/h2>/);
     assert.ok(!html.includes("<time"), "no read, so no read date");
+    assert.ok(!html.includes("application/ld+json"), "no read, so no dataset is claimed");
     assert.ok(!html.includes("January 2027"));
     assert.ok(visibleText(html).includes("Market data sources are unreachable right now"));
   });

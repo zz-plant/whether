@@ -222,8 +222,7 @@ describe("reader copy carries no stapled wh-clause, no repeated gloss and no pag
     const pages: Array<[string, () => Promise<string>]> = [
       ["/about", async () => textOf(renderToStaticMarkup((await import("../app/about/page")).default()))],
       ["/privacy", async () => textOf(renderToStaticMarkup((await import("../app/privacy/page")).default()))],
-      ["/calibration", async () => textOf(renderToStaticMarkup((await import("../app/calibration/page")).default()))],
-      ["/concepts", async () => textOf(renderToStaticMarkup((await import("../app/concepts/page")).default()))],
+      ["/concepts", async () => textOf(renderToStaticMarkup((await import("../app/research/advice-vs-market/page")).default()))],
       ["/api-docs", async () => textOf(renderToStaticMarkup((await import("../app/api-docs/page")).default()))],
       ["/contact", async () => textOf(renderToStaticMarkup((await import("../app/contact/page")).default()))],
       ["/resources", async () => textOf(renderToStaticMarkup(await (await import("../app/resources/page")).default({})))],
@@ -248,8 +247,7 @@ describe("reader copy carries no stapled wh-clause, no repeated gloss and no pag
       [
         import("../app/about/page"),
         import("../app/privacy/page"),
-        import("../app/calibration/page"),
-        import("../app/concepts/page"),
+        import("../app/research/advice-vs-market/page"),
         import("../app/api-docs/page"),
         import("../app/resources/page"),
         import("../app/trust/page"),

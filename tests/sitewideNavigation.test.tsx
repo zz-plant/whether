@@ -55,7 +55,6 @@ describe("MobileTabBar", () => {
     assert.match(html, /data-mobile-group-menu="decide"/);
     assert.match(html, /popover="auto"/);
     assert.match(html, /Runway planner/);
-    assert.match(html, /SaaS multiples/);
     assert.match(html, /<span>Menu<\/span>/);
     assert.doesNotMatch(html, /<span>More<\/span>/);
     assert.equal(html.split('aria-current="page"').length - 1, 1, "one active tab carries aria-current");

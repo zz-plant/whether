@@ -139,7 +139,7 @@ const BANNED: { name: string; pattern: RegExp }[] = [
   { name: "retired signal name", pattern: /\bCapital tightness\b|\bRecession warning watch\b/i },
   /* The margin (2026-10-09). "Confidence: Low" beside "Freeze new commitments" read
      as the product doubting its advice; the number is a distance from the change
-     line (/calibration), so it is shown as one. The API field keeps `confidence`. */
+     line (the calibration study on /history), so it is shown as one. The API field keeps `confidence`. */
   {
     name: "confidence as a display label",
     pattern:
@@ -240,8 +240,12 @@ const routeSurfaces: Surface[] = [
   { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },
   { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },
   { name: "/resources", text: async () => visibleText(renderToStaticMarkup(await (await import("../app/resources/page")).default({}))) },
-  { name: "/calibration", text: async () => visibleText(renderToStaticMarkup((await import("../app/calibration/page")).default())) },
-  { name: "/concepts", text: async () => visibleText(renderToStaticMarkup((await import("../app/concepts/page")).default())) },
+  /* The calibration study, a section of /history since 2026-11-25 (it was /calibration). */
+  {
+    name: "/history#confidence-record",
+    text: async () => visibleText(renderToStaticMarkup((await import("../app/components/history/calibrationStudy")).CalibrationStudy())),
+  },
+  { name: "/concepts", text: async () => visibleText(renderToStaticMarkup((await import("../app/research/advice-vs-market/page")).default())) },
   { name: "/api-docs", text: async () => visibleText(renderToStaticMarkup((await import("../app/api-docs/page")).default())) },
   { name: "/404", text: async () => visibleText(renderToStaticMarkup((await import("../app/not-found")).default())) },
   {

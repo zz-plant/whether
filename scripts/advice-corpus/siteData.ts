@@ -4,7 +4,7 @@
  *
  * - `data/advice-corpus/posts.json`: derived metadata for every classified post (no text),
  *   written from the local cache with `--from-labels`.
- * - `data/advice-corpus/monthly.json`: the monthly and quarterly stance shares `/concepts`
+ * - `data/advice-corpus/monthly.json`: the monthly and quarterly stance shares `/research/advice-vs-market`
  *   draws, generated from posts.json alone.
  *
  *   bun run advice-corpus:data                 # regenerate monthly.json from posts.json

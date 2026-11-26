@@ -82,7 +82,7 @@ const liveRoutes = [
   { slug: "brief", label: "Published brief", path: "/brief/2026-w31" },
   { slug: "share", label: "Share", path: "/share" },
   // Restored 2026-09-23: product writing placed on the month-end record.
-  { slug: "concepts", label: "Product writing", path: "/concepts" },
+  { slug: "concepts", label: "Product writing", path: "/research/advice-vs-market" },
   // The plain-language entry point. It was a disclosure inside /trust, so the
   // one surface addressed to a reader who does not yet know the vocabulary was
   // never captured and never reviewed.
@@ -129,9 +129,8 @@ export const frameAuditRoutes = [
     .filter(({ path }) => !path.startsWith("/brief/"))
     // A page that reports this week's reading names it in every frame; a page that is read
     // (guides, product writing) names the site, and has no week to name.
-    .map(({ path }) => ({ path, requires: ["/resources", "/concepts"].includes(path) ? PAGE : READING })),
+    .map(({ path }) => ({ path, requires: ["/resources", "/research/advice-vs-market"].includes(path) ? PAGE : READING })),
   { path: "/operate/financial", requires: READING },
-  { path: "/calibration", requires: PAGE },
   { path: "/about", requires: PAGE },
 ];
 

@@ -13,11 +13,10 @@ import { describe, it } from "bun:test";
  */
 
 const ROUTES_WITH_SELF_CANONICAL = [
-  ["app/comps/page.tsx", "/comps"],
   ["app/history/page.tsx", "/history"],
   ["app/share/page.tsx", "/share"],
   ["app/api-docs/page.tsx", "/api-docs"],
-  ["app/concepts/page.tsx", "/concepts"],
+  ["app/research/advice-vs-market/page.tsx", "/research/advice-vs-market"],
 ] as const;
 
 /**
@@ -78,15 +77,17 @@ describe("crawlable route contract", () => {
    * Reading `fetchSaaSValuations` directly also drops a self-fetch of the origin
    * the page is served from, which is the rule the cron path already follows.
    */
+  /* A section of the runway planner since 2026-11-25; the same rules hold for it. */
   it("renders the SaaS comps basket on the server", () => {
-    const source = codeOf("app/comps/page.tsx");
+    const path = "app/operate/components/saasMultiplesSection.tsx";
+    const source = codeOf(path);
 
-    assert.ok(!declaresUseClient("app/comps/page.tsx"), "/comps is a server component");
-    assert.ok(!source.includes('fetch("/api/comps")'), "/comps does not fetch the origin it is served from");
-    assert.ok(source.includes("fetchSaaSValuations"), "/comps reads the basket through the library directly");
+    assert.ok(!declaresUseClient(path), "the basket is a server component");
+    assert.ok(!source.includes('fetch("/api/comps")'), "the basket does not fetch the origin it is served from");
+    assert.ok(source.includes("fetchSaaSValuations"), "the basket is read through the library directly");
     assert.ok(
       source.includes("QuoteSourceUnavailableError"),
-      "/comps still distinguishes an upstream outage from a basket of zeroes",
+      "the basket still distinguishes an upstream outage from a basket of zeroes",
     );
   });
 
@@ -99,7 +100,6 @@ describe("crawlable route contract", () => {
       "app/share/page.tsx",
       "app/terms-of-service/page.tsx",
       "app/acceptable-use-policy/page.tsx",
-      "app/comps/page.tsx",
       "app/history/page.tsx",
     ]) {
       const source = codeOf(path);

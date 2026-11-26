@@ -4,8 +4,9 @@ import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 import { pagesInGroup } from "../lib/navigation/informationArchitecture";
 
 describe("operations navigation", () => {
-  it("keeps Decide focused on the plan, the runway planner and the market multiples", () => {
-    assert.deepEqual(pagesInGroup("decide").map((page) => page.href), ["/operate", "/operate/financial", "/comps"]);
+  /* The SaaS basket is a section of the runway planner since 2026-11-25 (it was /comps). */
+  it("keeps Plan to the plan and the runway planner", () => {
+    assert.deepEqual(pagesInGroup("decide").map((page) => page.href), ["/operate", "/operate/financial"]);
   });
 
   it("indexes the plan page in page order, one entry per section", () => {

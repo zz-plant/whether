@@ -609,7 +609,7 @@ pressure, which is worse higher, is drawn high to low.
 
 A quadrant plane with a monthly trail, washed in the four fills at a fifth to a third of their
 strength. Funding pressure rises downward, so up and right are both the easier side: Sunny top
-right, Freezing bottom left. The same orientation on `/`, `/history`, `/trust` and `/concepts`.
+right, Freezing bottom left. The same orientation on `/`, `/history`, `/trust` and `/research/advice-vs-market`.
 
 **Easier is up and right.** The two scores point opposite ways and the published record prints
 both as they are. Every drawing aligns instead: a plot, ladder, corridor or band puts the easier

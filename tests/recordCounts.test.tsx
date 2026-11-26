@@ -63,7 +63,7 @@ describe("the record's counts", () => {
     assert.equal(totals.months - totals.held, counts.changes);
   });
 
-  it("print with their window on /history, /calibration and /about, and never as written-out stale prose", async () => {
+  it("print with their window on /history and /about, and never as written-out stale prose", async () => {
     assert.ok(counts && recent);
     const since = formatMonthYearShortFromValue(counts.firstRecordDate);
     const through = formatMonthYearShortFromValue(counts.latestRecordDate);
@@ -78,13 +78,14 @@ describe("the record's counts", () => {
     assert.ok(!history.includes(`${counts.changes} changes in conditions`), "the band's caption does not repeat the change count");
     assert.ok(history.includes(`Changes in conditions ${recent.changes} in the last ${recent.readings} months`), "the grading tile carries its window");
 
-    const calibration = textOf(renderToStaticMarkup((await import("../app/calibration/page")).default()));
-    assert.ok(calibration.includes(`${counts.changes} changes in conditions since ${since}`), "the study counts the record's changes");
-    assert.ok(calibration.includes(`The record holds ${counts.readings} readings, ${since} to ${through}`), "the study says why it compares one fewer");
+    /* The calibration study is a section of /history since 2026-11-25: it says why it compares
+       one fewer reading, and leaves the change count to the tile. */
+    assert.ok(history.includes(`The record holds ${counts.readings} readings, ${since} to ${through}`), "the study says why it compares one fewer");
+    assert.ok(history.includes(`Too few changes in conditions since ${since}`), "the study's limit names the record's window");
 
     assert.ok(describeRecordCadence(buildTrackRecord(full)!).startsWith(`Since ${since}, conditions have changed ${counts.changes} times in ${counts.readings} months`));
 
-    for (const [name, text] of [["/history", history], ["/calibration", calibration]] as const) {
+    for (const [name, text] of [["/history", history]] as const) {
       assert.doesNotMatch(text, /\b(five|six|seven|eight) changes\b|fourteen years|\b17[5-7] months of\b/i, `${name} prints a written-out count`);
     }
   });

@@ -80,11 +80,11 @@ export default function AboutPage() {
             track record
           </Link>
           , the{" "}
-          <Link href="/calibration" className={inlineLinkClass}>
+          <Link href="/history#confidence-record" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
           (distance, not probability), and{" "}
-          <Link href="/concepts" className={inlineLinkClass}>
+          <Link href="/research/advice-vs-market" className={inlineLinkClass}>
             advice vs. market
           </Link>
           .

@@ -88,7 +88,7 @@ reading exists it says so rather than mailing a stand-in.
 
 - A published archive of weekly briefs and month-end readings since January 2012, in
   `data/published_briefs.json` and the monthly regime history.
-- A calibration study and a track record page (`/calibration`, `/history`) scoring past readings
+- A calibration study and a track record (both on `/history` since 2026-11-25) scoring past readings
   against what happened next, including where they fell short.
 - A source board on `/trust` naming each input, its cadence and its last successful fetch.
 - No customer testimonials, no logos, no case studies, no usage benchmarks. Future work must not

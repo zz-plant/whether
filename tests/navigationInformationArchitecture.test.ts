@@ -55,9 +55,9 @@ describe("navigation groups", () => {
       Object.fromEntries(navigationGroups.map((group) => [group.key, pagesInGroup(group.key).map((page) => page.href)])),
       {
         "this-week": ["/", "/signals", "/trust"],
-        decide: ["/operate", "/operate/financial", "/comps"],
-        record: ["/history", "/calibration"],
-        guides: ["/resources", "/roles", "/companies", "/concepts"],
+        decide: ["/operate", "/operate/financial"],
+        record: ["/history"],
+        guides: ["/resources", "/roles", "/companies", "/research/advice-vs-market"],
       },
     );
     for (const group of navigationGroups) {
@@ -80,10 +80,10 @@ describe("navigation groups", () => {
   /* Under History until 2026-11-25. It studies what others advised, not the product's own
      past calls, so it is a longer answer (Guides) rather than the record (History). */
   it("files Advice vs. market under Guides as a secondary page, not a primary tab", () => {
-    const concepts = navigationPages.find((page) => page.href === "/concepts");
+    const concepts = navigationPages.find((page) => page.href === "/research/advice-vs-market");
     assert.equal(concepts?.group, "guides");
     assert.equal(concepts?.placement, "secondary");
-    assert.ok(!utilityLinks.some((link) => String(link.href) === "/concepts"), "not a utility link");
+    assert.ok(!utilityLinks.some((link) => String(link.href) === "/research/advice-vs-market"), "not a utility link");
   });
 
   it("keeps Roles and Companies as secondary pages under Guides, not primary tabs", () => {
@@ -93,7 +93,7 @@ describe("navigation groups", () => {
         ["/resources", "Guides", "tab"],
         ["/roles", "Roles", "secondary"],
         ["/companies", "Companies", "secondary"],
-        ["/concepts", "Advice vs. market", "secondary"],
+        ["/research/advice-vs-market", "Advice vs. market", "secondary"],
       ],
     );
     // Their pages under them are the group's through the page, not a member prefix or a content section.
@@ -102,8 +102,16 @@ describe("navigation groups", () => {
     assert.ok(!contentSections.some((section) => owned.has(section.prefix)));
   });
 
-  it("files SaaS multiples under Plan", () => {
-    assert.equal(navigationPages.find((page) => page.href === "/comps")?.group, "decide");
+  /* 2026-11-25: the SaaS basket and the calibration study are sections now, of the runway
+     planner and of History, and their old addresses redirect to them. */
+  it("lists the basket and the calibration study as sections, not pages", () => {
+    const hrefs = new Set<string>(navigationPages.map((page) => page.href));
+    assert.ok(!hrefs.has("/comps") && !hrefs.has("/calibration"));
+    /* History is one page, so its footer column names its sections, the study among them. */
+    assert.deepEqual(
+      navigationGroupByKey.record.footerLinks.map((link) => link.href),
+      ["/history#published-briefs", "/history#confidence-record"],
+    );
   });
 
   it("reaches the sources and the score derivation on /trust from History", () => {
@@ -223,9 +231,9 @@ describe("content sections", () => {
     for (const prefix of ["/answers", "/brief"]) {
       assert.ok(named.has(prefix), `${prefix} must be a named content section`);
     }
-    // /concepts is a secondary page under History since 2026-11-21, so the IA
-    // names it as a page rather than as an unclaimed content family.
-    assert.ok(!named.has("/concepts"), "/concepts is claimed by a navigation page");
+    // The advice study is a secondary page under Guides (at /research/advice-vs-market since
+    // 2026-11-25), so the IA names it as a page rather than as an unclaimed content family.
+    assert.ok(!named.has("/research/advice-vs-market"), "the advice study is claimed by a navigation page");
     // Contact is a utility link since 2026-10-23, so it reaches the footer, the
     // phone sheet and the palette from the one array instead of being named
     // only in the header's sublabel.

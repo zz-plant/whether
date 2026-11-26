@@ -78,10 +78,7 @@ describe("site entities", () => {
   });
 
   it("joins every page graph to the site entity by id", () => {
-    for (const graph of [
-      buildApiDocsStructuredData(),
-      buildCompsStructuredData({ data: null, tickers: ["SNOW"] }),
-    ]) {
+    for (const graph of [buildApiDocsStructuredData()]) {
       const website = one(graph, "WebSite");
       assert.equal(website["@id"], websiteId);
       const page = graph["@graph"].find((node) => node["@type"] === "WebPage" || node["@type"] === "CollectionPage");
@@ -256,9 +253,13 @@ describe("/comps", () => {
     const measured = dataset.variableMeasured as Array<{ name: string }>;
     assert.deepEqual(measured.map((entry) => entry.name), ["Median EV / revenue", "Companies in basket"]);
 
+    /* A section of the runway planner since 2026-11-25 (it was /comps): the page's own graph
+       names the page, and this names the basket at the section. */
+    assert.equal(dataset.url, "https://whether.work/operate/financial#saas-multiples");
+    assert.equal(nodesOf(withData, "WebPage").length, 0);
+
     const outage = buildCompsStructuredData({ data: null, tickers: ["SNOW"] });
     assert.equal(nodesOf(outage, "Dataset").length, 0);
-    assert.equal("mainEntity" in one(outage, "WebPage"), false);
   });
 });
 
@@ -383,14 +384,17 @@ describe("data licenses", () => {
   });
 });
 
-describe("Google Scholar", () => {
-  /* Scholar ignores the ScholarlyArticle node; it reads Highwire Press meta tags, and needs at
-     least a title, an author and a publication date to list a page. */
-  it("can list the calibration study", async () => {
-    const { metadata } = await import("../app/calibration/page");
-    assert.equal(metadata.other?.citation_title, metadata.title);
-    assert.equal(metadata.other?.citation_author, "Kanav Jain");
-    assert.match(String(metadata.other?.citation_publication_date), /^\d{4}\/\d{2}\/\d{2}$/);
-    assert.equal(metadata.other?.citation_technical_report_institution, "Whether");
+/* The calibration study had its own page, with Highwire tags for Google Scholar, until
+   2026-11-25. It is a section of /history now: the tags went with the page, and the
+   study's markup names the section. */
+describe("the calibration study, on /history", () => {
+  it("names the section it is in, not the retired address", () => {
+    const study = buildCalibrationStudyStructuredData({ totals: { months: 10, held: 8 } });
+    const article = one(study, "ScholarlyArticle");
+    assert.equal(article.url, "https://whether.work/history#confidence-record");
+    assert.equal(article.mainEntityOfPage, "https://whether.work/history");
+    assert.equal(one(study, "Dataset").url, "https://whether.work/history#confidence-record");
+    assert.doesNotMatch(JSON.stringify(study), /\/calibration\b/);
+    assert.equal(nodesOf(study, "BreadcrumbList").length, 0, "the page's own graph carries the breadcrumb");
   });
 });

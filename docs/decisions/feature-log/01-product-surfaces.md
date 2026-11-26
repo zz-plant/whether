@@ -14,13 +14,24 @@ The header and the frame under it are cut back to the weekly habit:
 - **No header submenus.** Each tab opened a popover of its group's pages on hover or from a
   chevron. The sub-tab row, the Menu sheet, the footer and the palette list the same pages, so the
   tabs are plain links; the one-key jump stays in each tab's title and in the palette.
-- **Advice vs. market (`/concepts`) moved from History to Guides.** It studies what investors and
-  essayists advised, not the product's own past calls. Its address is unchanged. History keeps
-  `/history` and `/calibration`: the calibration study stays on its own citable URL, and
-  `/history` already carries only a summary and a link to it.
+- **Advice vs. market moved from History to Guides.** It studies what investors and essayists
+  advised, not the product's own past calls.
 - **The record band is History's.** It sat under the header of every route as a disclosure, a
   second way into History beside the header's tab. Every other route now prints its category line
   alone (`CategoryLine`, chosen in the layout by `RecordBandRouteGate` via `showsRecordBand`).
+- **Three pages became sections or moved** (the same day, after #1869):
+  - The calibration study (`/calibration`) is a section of `/history`, under the "Has it been
+    right?" tiles that summarised it (`CalibrationStudy`). `/calibration` redirects to
+    `/history#confidence-record`. Its Highwire `citation_*` tags for Google Scholar went with the
+    page; the `ScholarlyArticle` and `Dataset` markup now names the section. The study's footnote
+    no longer repeats the change rule, which the tiles above state. History is one page now and
+    keeps its sub-tab row for the two cross-links into `/trust`.
+  - The SaaS basket (`/comps`) is a section of the runway planner (`SaasMultiplesSection`, under a
+    Suspense boundary so a slow quote source never holds the calculator). `/comps` redirects to
+    `/operate/financial#saas-multiples`. Its "Against this week's guidance" block, which restated
+    the fundraising rule, did not come along. The monthly search title went with the page.
+  - The advice study moved from `/concepts` to `/research/advice-vs-market`, beside its
+    registration and results files; `/concepts` and its old sub-paths redirect there.
 - **One home for the change lines.** `/trust`'s "How close conditions are to changing" dropped its
   "What to watch" list — where conditions change, the lead area's pause line and its restart line —
   for one line linking the brief's "What would change our mind?", which carries every area's lines
@@ -87,9 +98,9 @@ those names.
 | Group | Hub | Pages (sub-tabs, then secondary links) |
 | --- | --- | --- |
 | This week | `/` | Why it changed (`/signals`); Can I trust this? (`/trust`) |
-| Plan | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`); Your decisions (`/decisions`) |
-| History | `/history` | How it held up (`/calibration`); Compare periods (`/history/compare`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`). Advice vs. market moved to Guides on 2026-11-25 |
-| Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; Advice vs. market (`/concepts`), since 2026-11-25; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix. No header tab since 2026-11-25 |
+| Plan | `/operate` | Runway planner (`/operate/financial`, with the SaaS basket as a section since 2026-11-25), Scenarios (`/operate/scenarios`); Your decisions (`/decisions`) |
+| History | `/history` | Compare periods (`/history/compare`); the calibration study as a section since 2026-11-25 (it was `/calibration`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`). Advice vs. market moved to Guides on 2026-11-25 |
+| Guides | `/resources` | Roles (`/roles`), Companies (`/companies`), since 2026-11-06; Advice vs. market (`/research/advice-vs-market`, formerly `/concepts`), since 2026-11-25; the answers, `/resolve/<slug>` and `/toolkits/<slug>` belong to it by prefix. No header tab since 2026-11-25 |
 
 - **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Plan"
   and on `/history` "History". `/signals` keeps its URL; it is "Why it changed" in the tabs, the

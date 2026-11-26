@@ -1,7 +1,7 @@
-import type { PremiseTestBacktestModel } from "../../lib/research/premiseBacktestModel";
+import type { PremiseTestBacktestModel } from "../../../lib/research/premiseBacktestModel";
 
 /**
- * The question `/calibration`'s premise section asks, and its answer first
+ * The question the calibration study's premise section asks (on `/history` since 2026-11-25), and its answer first
  * (docs/editorial-guardrails.md, "Questions and answers, as people say them"). The heading
  * read "What happened to venture fundraising when funding pressure was above 70" with no
  * question mark and no sentence under it, so the chart's two medians were the only answer

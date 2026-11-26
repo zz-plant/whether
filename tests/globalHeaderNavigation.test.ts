@@ -21,7 +21,7 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Can I trust this?");
     assert.equal(resolveGlobalHeaderRouteLabel("/operate/financial"), "Runway planner");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
-    assert.equal(resolveGlobalHeaderRouteLabel("/concepts"), "Advice vs. market");
+    assert.equal(resolveGlobalHeaderRouteLabel("/research/advice-vs-market"), "Advice vs. market");
     assert.equal(resolveGlobalHeaderRouteLabel("/resources/capital-posture-template"), "Guides");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
@@ -58,11 +58,9 @@ describe("global header navigation helpers", () => {
     assert.equal(groupOf("/signals/capital-tightness-watch/hiring"), "this-week");
     assert.equal(groupOf("/trust"), "this-week");
     assert.equal(groupOf("/operate"), "decide");
-    assert.equal(groupOf("/comps"), "decide");
     assert.equal(groupOf("/history"), "record");
     assert.equal(groupOf("/history/2024-q1"), "record");
-    assert.equal(groupOf("/calibration"), "record");
-    assert.equal(groupOf("/concepts"), "guides");
+    assert.equal(groupOf("/research/advice-vs-market"), "guides");
     assert.equal(groupOf("/brief/2026-w31"), "record");
     assert.equal(groupOf("/resources"), "guides");
     assert.equal(groupOf("/resources/reversibility-as-governance"), "guides");
@@ -93,14 +91,15 @@ describe("global header navigation helpers", () => {
 });
 
 describe("sub-tabs", () => {
-  it("draws the group's pages, the current one marked, with Record's cross-links after", () => {
-    const record = resolveSectionTabs("/calibration");
+  /* History is one page since 2026-11-25 (the calibration study is a section of it); its
+     row stays for the two cross-links into /trust. */
+  it("draws the group's pages, the current one marked, with History's cross-links after", () => {
+    const record = resolveSectionTabs("/history");
     assert.equal(record?.group.label, "History");
     assert.deepEqual(
       record?.links.map((link) => [link.label, link.placement, link.isActive]),
       [
-        ["History", "tab", false],
-        ["How it held up", "tab", true],
+        ["History", "tab", true],
         ["Is the data current?", "cross", false],
         ["How are the scores worked out?", "cross", false],
       ],
@@ -117,11 +116,10 @@ describe("sub-tabs", () => {
       ],
     );
     assert.deepEqual(
-      resolveSectionTabs("/comps")?.links.map((link) => [link.label, link.isActive]),
+      resolveSectionTabs("/operate/financial")?.links.map((link) => [link.label, link.isActive]),
       [
         ["Plan", false],
-        ["Runway planner", false],
-        ["SaaS multiples", true],
+        ["Runway planner", true],
       ],
     );
   });

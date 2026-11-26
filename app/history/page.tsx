@@ -25,6 +25,7 @@ import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ConditionWord } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { AdviceStudyTeaser } from "../components/history/AdviceStudyTeaser";
+import { CALIBRATION_STUDY_ANCHOR, CalibrationStudy } from "../components/history/calibrationStudy";
 import { buildRecentRecordQuestion, describeTrackRecordAnswer } from "../components/history/historyQuestions";
 import { BriefWeekTime, BriefRunLabel } from "../components/history/briefWeekTime";
 import { buildAdvanceWarningMarks } from "../../lib/report/advanceWarning";
@@ -132,6 +133,8 @@ export default async function HistoryPage({
     ...(publishedBriefs.length > 0 ? [{ href: "#published-briefs", label: "Published briefs" }] : []),
     /* The section's question, which the page title asks too (2026-11-25). */
     ...(recordQuestion ? [{ href: "#track-record", label: recordQuestion.question }] : []),
+    /* The calibration study, a section here since 2026-11-25 (it was /calibration). */
+    { href: `#${CALIBRATION_STUDY_ANCHOR}`, label: "How often it held near a change" },
     { href: "#regime-map", label: "How the two scores set conditions" },
     ...(trackRecord ? [{ href: "#monthly-calls", label: "Monthly readings" }] : []),
   ];
@@ -346,8 +349,8 @@ export default async function HistoryPage({
 
       {/* The tiles, with the confidence record's headline beside them: "how often
           did the call hold" and "how often was the margin right" are the same
-          question asked twice. The study itself, table and all, is /calibration's;
-          this page drew all of it until 2026-10-09. */}
+          question asked twice. The study itself, table and all, follows the grading
+          below (it was /calibration's from 2026-10-09 to 2026-11-25). */}
       <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         {/* The export copies the track record, so it sits in that section's
             header. It had a row of its own between the page intro and the
@@ -360,13 +363,13 @@ export default async function HistoryPage({
             <div className="space-y-3">
               {/* Named for what the summary counts (2026-11-10). It carried the margin
                   study's title, "How often conditions held near a change", over a count of changes
-                  that had advance warning; the study keeps that title on /calibration. */}
+                  that had advance warning; the study keeps that title, further down this page. */}
               <h3 className="type-eyebrow">Advance warning</h3>
               <ConfidenceRecordSummary warnings={advanceWarnings} countsPrinted={Boolean(recordQuestion)} />
               <p className="text-fluid-sm text-slate-400">
-                <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                <a href={`#${CALIBRATION_STUDY_ANCHOR}`} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
-                </Link>
+                </a>
               </p>
             </div>
           }
@@ -381,6 +384,10 @@ export default async function HistoryPage({
         recordChanges={trackRecord?.regimeChanges}
         question={recentQuestion}
       />
+
+      {/* The calibration study grades the room before a change the way the section above
+          grades the calls (2026-11-25). */}
+      <CalibrationStudy />
 
       <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap

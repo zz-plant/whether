@@ -202,7 +202,10 @@ describe("/history prints each record fact once", () => {
     const [, warned, total] = /(\d+) of (\d+) changes since [A-Z][a-z]{2} \d{4} had advance warning/.exec(printed) ?? [];
     assert.equal((printed.match(new RegExp(`\\b${warned} of ${total} changes`, "g")) ?? []).length, 1, "the count prints once");
     assert.ok(printed.indexOf("Has it been right?") < printed.indexOf("Advance warning"), "the answer leads, the marks follow");
-    assert.doesNotMatch(html, /Points from the line/, "the band table is /calibration's");
-    assert.match(html, /href="\/calibration"/);
+    /* The calibration study is a section of /history since 2026-11-25: its band table
+       prints once, after the tiles that link to it. */
+    assert.equal((html.match(/Points from the line/g) ?? []).length, 1, "the band table prints once");
+    assert.ok(printed.indexOf("Advance warning") < printed.indexOf("Points from the line"), "the tiles lead, the study follows");
+    assert.match(html, /href="#confidence-record"/);
   });
 });

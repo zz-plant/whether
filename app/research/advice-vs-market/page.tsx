@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
-import { buildPageMetadata } from "../../lib/seo";
-import { buildProductCanonStructuredData } from "../../lib/seo/pageStructuredData";
-import { SecondaryPageHeader, SecondaryPageSection } from "../components/secondaryPageShell";
-import { JsonLdScript } from "../components/jsonLdScript";
-import { ActionLink } from "../components/ui/actionLink";
-import { Tag } from "../components/ui/tag";
-import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
-import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { getOrderedRegimeLegend } from "../../lib/regimePresentation";
-import { formatDateUTC } from "../../lib/formatters";
-import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCE_RUBRIC, ADVICE_STANCES } from "../../lib/adviceStance";
+import { buildPageMetadata } from "../../../lib/seo";
+import { buildProductCanonStructuredData } from "../../../lib/seo/pageStructuredData";
+import { SecondaryPageHeader, SecondaryPageSection } from "../../components/secondaryPageShell";
+import { JsonLdScript } from "../../components/jsonLdScript";
+import { ActionLink } from "../../components/ui/actionLink";
+import { Tag } from "../../components/ui/tag";
+import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
+import { buildPostureArchivePath, postureArchiveYears } from "../../../lib/summary/postureArchiveYears";
+import { getOrderedRegimeLegend } from "../../../lib/regimePresentation";
+import { formatDateUTC } from "../../../lib/formatters";
+import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCE_RUBRIC, ADVICE_STANCES } from "../../../lib/adviceStance";
 import {
   buildCanonBaseRate,
   buildCanonTimeline,
@@ -21,7 +21,7 @@ import {
   formatCanonPublished,
   formatCanonShare,
   type CanonReading,
-} from "../../lib/productCanon";
+} from "../../../lib/productCanon";
 import {
   buildAdvicePairs,
   buildCapitalAdviceLag,
@@ -29,9 +29,9 @@ import {
   describeAdvicePairs,
   describeCapitalAdviceLag,
   describeScoreAlignment,
-} from "../../lib/productCanonMeasures";
-import { ContentPageShell } from "../components/ui/contentPageShell";
-import { SectionTabs } from "../components/sectionTabs";
+} from "../../../lib/productCanonMeasures";
+import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { SectionTabs } from "../../components/sectionTabs";
 import { AdvicePlane, type AdvicePlanePoint } from "./advicePlane";
 import { AdviceCorpusSection } from "./adviceCorpusSection";
 
@@ -55,7 +55,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Best Product Management Books and Articles",
   description:
     `${canonEssays.length} product management essays, books, articles and investor memos, from Cagan to Sequoia, each dated and placed on the month it came out.`,
-  path: "/concepts",
+  path: "/research/advice-vs-market",
   imageAlt: "Product management reading list, dated by market conditions",
   /* Without these the share card is the live weekly-guidance card, so a link to a
      reading list previewed as this week's numbers. */
@@ -243,7 +243,7 @@ export default function ProductCanonPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
-      <SectionTabs currentPath="/concepts" />
+      <SectionTabs currentPath="/research/advice-vs-market" />
 
       <SecondaryPageHeader
         title="Does startup advice follow the market?"

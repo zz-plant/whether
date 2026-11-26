@@ -71,9 +71,9 @@ describe("question markup mirrors the page", () => {
     assert.match(String(dataset.measurementTechnique), /\/about#method$/);
   });
 
-  it("/calibration: the premise question, answered from the chart's medians", async () => {
-    const page = await import("../app/calibration/page");
-    const html = renderToStaticMarkup(page.default());
+  it("/history's calibration study: the premise question, answered from the chart's medians", async () => {
+    const { CalibrationStudy } = await import("../app/components/history/calibrationStudy");
+    const html = renderToStaticMarkup(CalibrationStudy());
     const questions = assertQuestionsVisible(jsonLdIn(html), html, { atLeast: 1 });
     assert.equal(questions[0]?.name, "What happened to venture fundraising when funding pressure was above 70?");
     assert.match(questions[0]?.acceptedAnswer.text ?? "", /^It (grew more slowly|grew at least as fast|shrank): /);

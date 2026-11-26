@@ -31,9 +31,7 @@ type NavigationPageKey =
   | "trust"
   | "planning"
   | "runway"
-  | "comps"
   | "history"
-  | "calibration"
   | "concepts"
   | "guides"
   | "roles"
@@ -123,7 +121,12 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
       { href: "/trust#source-board", label: "Is the data current?" },
       { href: "/trust#formula-reference", label: "How are the scores worked out?" },
     ],
-    footerLinks: [],
+    /* One page since 2026-11-25, when the calibration study became a section of it, so
+       its footer column names two of its sections rather than standing empty. */
+    footerLinks: [
+      { href: "/history#published-briefs", label: "Published briefs" },
+      { href: "/history#confidence-record", label: "How often it held near a change" },
+    ],
   },
   guides: {
     key: "guides",
@@ -202,31 +205,12 @@ export const navigationPages: readonly NavigationPage[] = [
     description: "Work out runway, a raise window and a memo from your cash, burn and revenue.",
     placement: "tab",
   },
-  /* Decide rather than Record: the multiples are this month's market input to a
-     raise (what a round may be priced against), read beside the runway planner.
-     Record holds the product's own past calls; the basket is not one of them. */
-  {
-    key: "comps",
-    group: "decide",
-    href: "/comps",
-    label: "SaaS multiples",
-    description: "Median EV/Revenue multiple across a basket of public SaaS companies",
-    placement: "secondary",
-  },
   {
     key: "history",
     group: "record",
     href: "/history",
     label: "History",
     description: "See how funding pressure and risk appetite have changed over time and how the guidance held up.",
-    placement: "tab",
-  },
-  {
-    key: "calibration",
-    group: "record",
-    href: "/calibration",
-    label: "How it held up",
-    description: "How often conditions held at each distance from a change, 2012–2026",
     placement: "tab",
   },
   {
@@ -260,7 +244,7 @@ export const navigationPages: readonly NavigationPage[] = [
   {
     key: "concepts",
     group: "guides",
-    href: "/concepts",
+    href: "/research/advice-vs-market",
     label: "Advice vs. market",
     description: "407 investor posts and 35 essays placed against the monthly record since 2012.",
     placement: "secondary",

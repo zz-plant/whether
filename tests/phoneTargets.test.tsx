@@ -9,8 +9,8 @@ import { PremiseOutcomeScatterChart } from "../app/components/history/premiseOut
 import { ThresholdLadder } from "../app/components/illustrations/ThresholdLadder";
 import { GovernedAreas } from "../app/components/ui/governedAreas";
 import { OrdinalMarker } from "../app/components/ui/ordinalMarker";
-import { AdviceCorpusSection } from "../app/concepts/adviceCorpusSection";
-import { AdvicePlane } from "../app/concepts/advicePlane";
+import { AdviceCorpusSection } from "../app/research/advice-vs-market/adviceCorpusSection";
+import { AdvicePlane } from "../app/research/advice-vs-market/advicePlane";
 import { FormulaReference } from "../app/trust/formulaReference";
 import { loadPremiseTestBacktestModel } from "../lib/research/premiseBacktestModel";
 

@@ -206,7 +206,7 @@
     "supportingLinks": [
       {
         "label": "SaaS valuation multiples",
-        "href": "/comps"
+        "href": "/operate/financial#saas-multiples"
       },
       {
         "label": "Carta: preparing a startup fundraise",
@@ -535,7 +535,7 @@
     "decisionNote": "If [score] crosses [line], we will [action] in [area] within [timeframe]. Approver: [name]. Evidence to start again: [criteria]. Review: [date].",
     "supportingLinks": [
       {
-        "href": "/calibration",
+        "href": "/history#confidence-record",
         "label": "How often the guidance held up: what distance from the line is worth"
       },
       {

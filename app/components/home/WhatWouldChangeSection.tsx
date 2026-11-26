@@ -309,7 +309,7 @@ export function WhatWouldChangeSection({
           is marketing rather than a claim the product stands behind. */}
       <p className="max-w-none border-t border-[color:var(--border-subtle)] pt-3 text-fluid-sm text-slate-400">
         How often these lines held, and every brief behind them:{" "}
-        <Link href="/calibration" className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+        <Link href="/history#confidence-record" className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
           the calibration study
         </Link>{" "}
         ·{" "}
