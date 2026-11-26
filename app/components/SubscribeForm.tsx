@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Check } from "lucide-react";
 import { requestSubscription, requestSlackSubscription } from "./subscribeRequest";
 import { trackActivationEvent } from "../../lib/activationFunnel";
-import { HOME_MONDAY_EMAIL_HASH } from "../../lib/report/home/homeSectionModel";
-import { locationHashSource, useBrowserSource } from "./browserSource";
 import { CalendarReviewActions } from "./CalendarReviewActions";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 import { useOperatorStage } from "./useOperatorStage";
@@ -26,39 +24,29 @@ const FREQUENCY_OPTIONS: readonly SegmentedOption<EmailFrequency>[] = [
 ];
 
 /**
- * The one subscription form, with both promises on it: an email only when the
- * guidance changes, or Monday's brief as well.
+ * The subscription form, in two shapes.
  *
- * There were two forms. A first visit met "Tell me when this changes" under the
- * decision picker (alerts only, "No weekly newsletter"); a returning reader met
- * "Get the guidance every Monday" at the foot of the brief. Each was honest,
- * and on separate screens they read as two products making different claims.
- * `defaultFrequency` picks which choice starts selected: alerts on a first
- * visit, where a weekly email is the larger ask, Monday everywhere else.
+ * `inline` (2026-11-26) is one field and one button: the Monday email, with an
+ * alert the day conditions change. It sits under the call on `/` and under
+ * "What changed" on `/brief/[week]`, and asks nothing else, because every
+ * choice between a reader and the email is a reason to leave without it.
+ * `moreHref` adds a line linking the full form, for alerts only or Slack.
  *
- * Supports delivery directly to executive inboxes (Email) or team channels (Slack).
- *
- * `compact` is the inline block on the brief; the default is the fuller block
- * that /share and /brief/[week] mount for a recipient arriving from a link.
+ * The full form, on `/share` and at the foot of `/brief/[week]`, carries both
+ * channels (Email to an inbox, Slack to a channel) and both promises: an email
+ * only when the guidance changes, or Monday's brief as well. It starts on
+ * Monday. It keeps the `subscribe-email` id that the README links and
+ * `StickyCallStrip` watches; the inline form takes ids of its own, so a page
+ * can hold both.
  */
 export function SubscribeForm({
-  compact = false,
-  defaultFrequency = "weekly",
-  condition,
-  showTitle = true,
-  alertsDescribed = false,
+  inline = false,
+  moreHref,
 }: {
-  compact?: boolean;
-  defaultFrequency?: EmailFrequency;
-  /** The call-change line, printed as the next change to watch when the form offers alerts. */
-  condition?: string;
-  /** False where the section's own heading already says what the form is for. */
-  showTitle?: boolean;
-  /**
-   * True where the section's lead already says what an alert sends (the brief's "Can I get
-   * an email when conditions turn?", 2026-11-18), so the alerts-only line is not said twice.
-   */
-  alertsDescribed?: boolean;
+  /** One field and one button for the Monday email; see above. */
+  inline?: boolean;
+  /** With `inline`: where the full form is, for alerts only or Slack. */
+  moreHref?: string;
 } = {}) {
   const pathname = usePathname() ?? "/";
   /* The stage the reader already set for the on-site rules; their brief prints
@@ -68,12 +56,10 @@ export function SubscribeForm({
      prints the same one, so the signup carries it rather than asking again. */
   const { runwayBand, runwayBandFixed } = useOperatorRunway();
   const [channel, setChannel] = useState<SubscribeChannel>("email");
-  /* The reader's own choice wins; until they make one, a link to Monday delivery
-     (`HOME_MONDAY_EMAIL_HASH`) starts the form there. The hash reads "" through hydration. */
-  const hash = useBrowserSource(locationHashSource);
-  const [chosenFrequency, setFrequency] = useState<EmailFrequency | null>(null);
-  const frequency = chosenFrequency ?? (hash === HOME_MONDAY_EMAIL_HASH ? "weekly" : defaultFrequency);
+  const [chosenFrequency, setFrequency] = useState<EmailFrequency>("weekly");
+  const frequency = inline ? "weekly" : chosenFrequency;
   const alertsOnly = channel === "email" && frequency === "alerts";
+  const inlineId = useId();
   const [email, setEmail] = useState("");
   const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
   const [channelName, setChannelName] = useState("");
@@ -99,10 +85,70 @@ export function SubscribeForm({
       setMessage(result.message);
       if (result.ok) {
         setEmail("");
-        trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
+        trackActivationEvent({ step: "committed", path: pathname, commitment: inline ? "subscribed_inline" : "subscribed" });
       }
     }
   };
+
+  if (inline) {
+    const messageId = `${inlineId}-message`;
+    if (status === "success") {
+      return (
+        <output className="flex items-center gap-2 text-fluid-sm text-[var(--app-text-secondary)]">
+          <Check className="size-4 shrink-0 text-line-clear-fg" aria-hidden="true" />
+          <span>
+            <span className="font-semibold text-[var(--app-text)]">Check your inbox.</span> {message}
+          </span>
+        </output>
+      );
+    }
+    return (
+      <form onSubmit={handleSubmit} noValidate className="space-y-2" data-monday-email-inline>
+        <div className="flex max-w-xl flex-wrap gap-2">
+          {/* Named by `aria-label`, not a hidden label: the button beside it says what
+              the field is for, and the homepage's word budget counts hidden text. */}
+          <input
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            spellCheck={false}
+            aria-label="Email address"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (status === "error") setStatus("idle");
+            }}
+            placeholder="you@company.com"
+            disabled={status === "loading"}
+            aria-invalid={status === "error" ? true : undefined}
+            aria-describedby={message ? messageId : undefined}
+            className="min-h-11 min-w-0 grow-[999] basis-56 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-sm text-[var(--app-text)] transition-colors placeholder:text-[var(--app-text-secondary)] disabled:opacity-50 weather-focus-ring"
+          />
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-sm font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
+          >
+            {status === "loading" ? "Subscribing…" : "Email me Mondays"}
+          </button>
+        </div>
+        {message ? (
+          <p id={messageId} role="alert" className="text-fluid-nano text-line-crossed-fg">
+            {message}
+          </p>
+        ) : null}
+        {moreHref ? (
+          <p className="text-fluid-nano text-[var(--app-text-secondary)]">
+            One email a week, one more the day conditions change. Unsubscribe in one click.{" "}
+            <a href={moreHref} className="underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[var(--app-text)]">
+              Alerts only, or Slack
+            </a>
+          </p>
+        ) : null}
+      </form>
+    );
+  }
 
   if (status === "success") {
     return (
@@ -140,35 +186,18 @@ export function SubscribeForm({
   }
 
   return (
-    <div className={compact
-      ? "space-y-2 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-4 py-3"
-      : "weather-section-border space-y-3"}>
-      {/* The channel control sits on the title line (or beside the lead when the
-          enclosing section already provides the heading) so the card has no
-          empty top-left corner above the description. */}
+    <div className="weather-section-border space-y-3">
+      {/* The channel control sits on the title line so the card has no empty
+          top-left corner above the description. */}
       <div className="space-y-1">
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-          {showTitle ? (
-            <p className="text-fluid-sm font-medium text-slate-50">
-              {channel === "slack"
-                ? "Get the Monday brief in a Slack channel"
-                : alertsOnly
-                  ? "Tell me when the guidance changes"
-                  : "Get the guidance every Monday, and a note the day it changes"}
-            </p>
-          ) : alertsDescribed && alertsOnly && !condition ? null : (
-            <p className="max-w-[54ch] text-fluid-sm text-slate-400">
-              {channel === "slack"
-                ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
-                : alertsOnly
-                  ? <>
-                      {condition ? <>Next change to watch: {condition} </> : null}
-                      We&rsquo;ll email you the day the guidance changes, an area pauses or restarts, or a market input
-                      jumps.
-                    </>
-                  : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
-            </p>
-          )}
+          <p className="text-fluid-sm font-medium text-slate-50">
+            {channel === "slack"
+              ? "Get the Monday brief in a Slack channel"
+              : alertsOnly
+                ? "Tell me when the guidance changes"
+                : "Get the guidance every Monday, and a note the day it changes"}
+          </p>
 
           {/* The one segmented control (segmentedControl.tsx): a radio group,
               so arrows move between the two channels and the pair is one tab
@@ -184,19 +213,13 @@ export function SubscribeForm({
             }}
           />
         </div>
-        {showTitle ? (
-          <p className="max-w-[60ch] text-fluid-sm text-slate-400">
-            {channel === "slack"
-              ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
-              : alertsOnly
-                ? <>
-                    {condition ? <>Next change to watch: {condition} </> : null}
-                    We&rsquo;ll email you the day the guidance changes, an area pauses or restarts, or a market input
-                    jumps.
-                  </>
-                : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
-          </p>
-        ) : null}
+        <p className="max-w-[60ch] text-fluid-sm text-slate-400">
+          {channel === "slack"
+            ? "Paste the incoming webhook URL for a channel. The brief arrives there every Monday at 9:00 AM ET."
+            : alertsOnly
+              ? "We’ll email you the day the guidance changes, an area pauses or restarts, or a market input jumps."
+              : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
+        </p>
       </div>
 
       {channel === "email" ? (
@@ -298,13 +321,9 @@ export function SubscribeForm({
         <span>
           {alertsOnly
             ? "Alerts only, no Monday email. Unsubscribe in one click."
-            : compact
-              ? channel === "slack"
-                ? "Monday mornings, and an alert the day conditions change. To stop, delete the webhook in Slack."
-                : "One email a week, one more the day conditions change. Unsubscribe in one click."
-              : channel === "slack"
-                ? "Set a recurring Monday hold"
-                : "Prefer calendar holds over email?"}
+            : channel === "slack"
+              ? "Set a recurring Monday hold"
+              : "Prefer calendar holds over email?"}
         </span>
         {alertsOnly ? null : (
           <CalendarReviewActions variant="compact" />

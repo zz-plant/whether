@@ -660,8 +660,7 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.match(html, /^<section id="subscribe"/);
     assert.match(html, /<h2[^>]*>Can I get an email when conditions turn\?<\/h2>/);
     assert.match(html, /data-section-lead="true">Yes\. We’ll email you the day the guidance changes/, "answered first");
-    assert.match(html, /Every Monday too/, "the Monday email stays one choice away");
-    assert.doesNotMatch(html, /Tell me when the guidance changes/, "the form does not restate the heading");
+    assert.match(html, /The Monday email includes them/, "the Monday email carries the alerts");
     const { WhatWouldChangeSection } = require("../app/components/home/WhatWouldChangeSection");
     const watch = renderToStaticMarkup(
       <WhatWouldChangeSection ladders={[]} flipProximity={[]} reversalTrigger="Risk appetite crossing 50" callChangeLines={{ tightness: 70, riskAppetite: 50 }} />,

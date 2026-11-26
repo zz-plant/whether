@@ -38,10 +38,11 @@ import { isRegimeKey, REGIME_WEATHER_LINES } from "../../regimePresentation";
 export const HOME_DECISION_PARAM = "decision";
 
 /*
- * "Email me Mondays" under the call (2026-11-04). The form starts on alerts only, on
- * purpose (`AlertSection`), and a link that promises Monday has to land on Monday: #1661
- * found the greeting's "Get it every Monday" signing readers up for no Monday email. This
- * anchor sits on the form, and the form starts on Monday delivery when the hash names it.
+ * The Monday email under the call. It was a link to the alert section's form (2026-11-04),
+ * and since 2026-11-26 it is the form itself: one field, Monday delivery with alerts
+ * (`SubscribeForm inline`). This anchor sits on it, so the shared-arrival greeting's
+ * "Get it every Monday" and the alert section's link land on a form that sends Monday's
+ * email, which #1661 found the greeting once did not.
  * A hash and not a query, so the press does not reload the page or lose the week shown.
  */
 export const HOME_MONDAY_EMAIL_HASH = "email-monday";

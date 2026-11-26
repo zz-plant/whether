@@ -5062,6 +5062,31 @@ a different line from the page a reader would open.
   hold). It asserts the card, the FAQ answer, `leadAnswer` and the snippet all open on the one
   sentence.
 
+### 1.1.111 The Monday email is a field under the call (2026-11-26)
+
+The owner asked, overriding maintenance mode, for the email signup to become the main action. The
+Monday email is the one feature that brings a reader back without asking them to do anything
+else. Production had one active subscriber, and the paths to the form were long: on `/` a link
+under the call jumped to the fifth section, and on a dated record, where most pasted links land,
+the form was at the foot.
+
+- **One field and one button.** `SubscribeForm inline` asks for an address and sends Monday's
+  email with alerts. It has no channel or frequency choice, and its button reads "Email me
+  Mondays". On `/` it replaces the "Email me Mondays →" link under the call and carries
+  `#email-monday`. On `/brief/[week]` it follows "What changed this week" and carries
+  `#monday-email`, which the shared-arrival note links. The full form stays at the record's foot
+  (`#monday-email-options`).
+- **One email field on `/`.** The alert section keeps its question and answer and now links to
+  the field under the call ("The Monday email includes them") and to the full form on `/share`
+  ("Alerts only, or Slack"). This reverses the 2026-11-04 choice to start a first visit on
+  alerts only. A first visit is now offered the Monday email first, and alerts only is one
+  click away on `/share`. The homepage load budget falls: 1,325 → 1,305 words and 21 → 17 fields.
+- **Counted apart.** A signup from the inline form records `committed` with
+  `subscribed_inline`, so the activation report can tell which form converts.
+- **Removed.** The full form's `compact`, `showTitle`, `alertsDescribed`, `condition` and
+  `defaultFrequency` props, and its hash check, served only the alert section. The full form now
+  always starts on Monday.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

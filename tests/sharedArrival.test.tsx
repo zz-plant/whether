@@ -34,19 +34,12 @@ describe("arriving from a shared link", () => {
     const html = renderToStaticMarkup(
       <ConditionsLegend arrival="share" thresholds={{ tightnessRegime: 70, riskAppetiteRegime: 50 }} />,
     );
-    const subscribe = html.indexOf('href="#subscribe"');
+    const subscribe = html.indexOf('href="#email-monday"');
     const calibrate = html.indexOf('href="#company-calibration"');
     assert.ok(subscribe !== -1 && calibrate !== -1, "both steps link to their sections");
     assert.ok(subscribe < calibrate, "the email comes first");
     assert.match(html, /Get it every Monday/);
     assert.match(html, /Scale it to your stage and runway/);
-  });
-
-  it("starts the homepage form on Monday delivery for a shared arrival, so the greeting's promise holds", async () => {
-    const { AlertSection } = await import("../app/components/home/AlertSection");
-    const checked = (html: string) => /<input[^>]*checked=""[^>]*value="(alerts|weekly)"/.exec(html)?.[1];
-    assert.equal(checked(renderToStaticMarkup(<AlertSection defaultFrequency="weekly" />)), "weekly");
-    assert.equal(checked(renderToStaticMarkup(<AlertSection />)), "alerts", "any other visit keeps alerts first");
   });
 
   it("leaves the greeting's steps off for any other visit", () => {
@@ -69,10 +62,15 @@ describe("a dated record that newer weeks replaced", () => {
     assert.equal(html.match(/Read this week&#x27;s guidance/g)?.length, 1, "one link to the live brief, in the notice");
   });
 
-  it("sends the record's Monday link to its own form, which starts on Monday delivery", async () => {
+  it("sends the record's Monday link to its own form, under what changed", async () => {
     assert.ok(older);
     const html = await renderRecord(older.slug);
-    assert.match(html, /<div id="monday-email"/);
+    const form = html.indexOf('id="monday-email"');
+    assert.ok(form !== -1, "the anchor is on the page");
+    assert.match(html.slice(form, form + 400), /data-monday-email-inline/, "on the one-field Monday form");
+    assert.ok(form > html.indexOf("What changed this week"), "after the delta");
+    assert.ok(form < html.indexOf("Guidance by area"), "ahead of the areas");
+    assert.match(html, /<div id="monday-email-options"/, "the full form stays at the foot");
   });
 
   it("says nothing of the kind on the latest week", async () => {

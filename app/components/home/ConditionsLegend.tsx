@@ -9,6 +9,7 @@ import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { SharedArrivalActions } from "../sharedArrival";
+import { HOME_MONDAY_EMAIL_HASH } from "../../../lib/report/home/homeSectionModel";
 import { CLOSE_CONTROL_CLASS } from "../ui/closeControl";
 import { CloseIcon } from "../uiIcons";
 
@@ -185,7 +186,7 @@ export function ConditionsLegend({
         </span> : null}
       </p>
       {/* Same-page anchors: the email form and the stage and runway pickers are below. */}
-      {arrival === "share" ? <SharedArrivalActions calibrateHref="#company-calibration" subscribeHref="#subscribe" /> : null}
+      {arrival === "share" ? <SharedArrivalActions calibrateHref="#company-calibration" subscribeHref={`#${HOME_MONDAY_EMAIL_HASH}`} /> : null}
       </div>
       <button
         type="button"
