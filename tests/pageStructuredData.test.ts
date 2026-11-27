@@ -22,6 +22,7 @@ import { buildPageMetadata, organizationId, organizationSameAs, websiteId } from
 import { findToolkitDefinition } from "../lib/decisionDomainCatalog";
 import { getPostureArchivePeriods } from "../lib/summary/postureArchive";
 import { getPublishedBriefs } from "../lib/report/publishedBriefs";
+import { getRegimePublicLabel } from "../lib/regimePresentation";
 
 type Node = Record<string, unknown>;
 const nodesOf = (graph: { "@graph": Node[] }, type: string) =>
@@ -349,6 +350,23 @@ describe("/brief/[week]", () => {
     assert.equal(article.temporalCoverage, `${brief.recordDate}/${brief.recordDate}`);
     assert.ok(Array.isArray(article.keywords));
     assert.deepEqual(article.image, ["https://whether.work/a.png", "https://whether.work/b.png"]);
+  });
+
+  it("names the condition as readers see it, and each topic once, in every week", () => {
+    for (const brief of getPublishedBriefs()) {
+      const article = one(
+        buildPublishedBriefStructuredData({ brief, canonicalUrl: `https://whether.work/brief/${brief.slug}`, imageUrls: [], headline: "h", description: "d", dateModified: brief.publishedAt }),
+        "NewsArticle",
+      );
+      const keywords = article.keywords;
+      assert.ok(Array.isArray(keywords));
+      assert.ok(keywords.includes(getRegimePublicLabel(brief.regime)), `${brief.slug} names its condition`);
+      assert.ok(!keywords.includes(brief.regime), `${brief.slug} leaks the engine key ${brief.regime}`);
+      const about = article.about;
+      assert.ok(Array.isArray(about));
+      const names = about.map((topic) => (topic && typeof topic === "object" ? Reflect.get(topic, "name") : topic));
+      assert.equal(new Set(names).size, names.length, `${brief.slug} repeats a topic: ${names.join(", ")}`);
+    }
   });
 });
 
